@@ -11,6 +11,7 @@ const saveFile = fs.readFileSync(path.join(root, 'js', 'core', 'save-file.js'), 
 
 assert(source.includes('navigationUnlocked: false'), 'Muenba must start each page with a locked room gate');
 assert(saveFile.includes('huntAccepted: false'), 'weekly Muenba schema must default to an unopened hunt');
+assert(saveFile.includes('activeCaseRecoveryDone: false'), 'weekly Muenba schema must track one-time legacy target recovery');
 assert(source.includes('world.huntAccepted = world.huntAccepted === true;'), 'weekly Muenba acceptance must be normalized as a boolean');
 
 const acceptStart = source.indexOf('function acceptMuenbaHunt()');
@@ -27,6 +28,11 @@ const caseBlock = source.slice(caseStart, caseEnd);
 assert(caseBlock.includes('weekly.activeCaseId'), 'Muenba case resolution must consult the persisted active case');
 assert(caseBlock.includes('caseData.id === weekly.activeCaseId'), 'Muenba must keep the accepted case when it remains unfinished');
 assert(source.includes('function activeMuenbaCase()'), 'Muenba must expose an accepted-case-only resolver for the room reminder');
+const activeCaseStart = source.indexOf('function activeMuenbaCase()');
+const activeCaseEnd = source.indexOf('\n  function availableMuenbaGhostsThisWeek()', activeCaseStart);
+const activeCaseBlock = source.slice(activeCaseStart, activeCaseEnd);
+assert(activeCaseBlock.includes('activeCaseRecoveryDone'), 'accepted legacy hunts must have a one-time recovery path');
+assert(activeCaseBlock.includes('Number(weekly.orbsPending) <= 0'), 'legacy recovery must not invent a target during pending handoff');
 const roomPopupStart = source.indexOf('function renderRoomNuppiPopup()');
 const roomPopupEnd = source.indexOf('\n  function openRoomNuppiPopup()', roomPopupStart);
 const roomPopup = source.slice(roomPopupStart, roomPopupEnd);
