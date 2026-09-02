@@ -21,6 +21,14 @@ assert(runtime.includes('function allMuenbaCaseModesComplete()'),
   'runtime must distinguish selected-tier completion from total case completion');
 assert(runtime.includes('function unfinishedMuenbaModeExcept(mode)'),
   'runtime must identify the next tier that still has authored cases');
+assert(runtime.includes('an accepted case remains the live hunt target across profile'),
+  'runtime must document the active-hunt tier policy');
+assert(runtime.includes('const activeCase = typeof weekly.activeCaseId === \'string\''),
+  'active hunt case resolution must remain independent of the selected tier');
+assert(runtime.includes('const caseDifficulty = caseData ? getMuenbaReadingDifficulty() : null;'),
+  'the selected tier must apply when the pinned ghost case opens');
+assert(profile.includes('Your current hunt target stays the same when you change levels.'),
+  'profile must explain that tier changes preserve the live hunt target');
 assert(runtime.includes('const tierNeedsSelection = !huntTarget && unfinishedMuenbaModeExcept(getMuenbaReadingDifficulty());'),
   'ghost placement must stop when the selected tier is complete but another tier needs selection');
 assert(runtime.includes("eyebrow.textContent = everyModeComplete ? 'ALL CASE FILES SETTLED' : 'READING TIER COMPLETE';"),
