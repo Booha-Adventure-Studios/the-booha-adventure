@@ -1173,7 +1173,15 @@
   // Muenba. Keep it in weekly state so room navigation opens for the current
   // hunt and automatically closes again at the next weekly rollover.
   function acceptMuenbaHunt() {
-    if (!writeMuenbaWeekly({ huntAccepted: true })) return false;
+    // Pin the case at the same moment the hunt is accepted. The target is
+    // already derived from the week-stable order, but storing its case id
+    // prevents a profile visit, reload, or another state read from silently
+    // choosing a different story before the player returns to the cemetery.
+    const acceptedCase = nextMuenbaCase();
+    if (!writeMuenbaWeekly({
+      huntAccepted: true,
+      activeCaseId: acceptedCase ? acceptedCase.id : null
+    })) return false;
     state.navigationUnlocked = true;
     state.inputLocked = false;
     state.clickTarget = null;
@@ -2081,7 +2089,13 @@
 
   function nextMuenbaCase() {
     const mode = getMuenbaReadingDifficulty();
-    return randomizedMuenbaCases().find(caseData => !caseModeIsComplete(caseData, mode)) || null;
+    const cases = randomizedMuenbaCases();
+    const weekly = readMuenbaWeekly();
+    const activeCase = typeof weekly.activeCaseId === 'string'
+      ? cases.find(caseData => caseData.id === weekly.activeCaseId && !caseModeIsComplete(caseData, mode))
+      : null;
+    if (activeCase) return activeCase;
+    return cases.find(caseData => !caseModeIsComplete(caseData, mode)) || null;
   }
 
   function availableMuenbaGhostsThisWeek() {
