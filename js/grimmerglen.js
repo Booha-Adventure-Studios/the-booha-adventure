@@ -156,16 +156,26 @@
   const GRIMMERGLEN_MUSIC_VOLUME = 0.46;
   const GRIMMERGLEN_DANCE_VOLUME = 0.72;
   const GRIMMERGLEN_DANCE_FALLBACK_MS = 15100;
+  // Perf pass: 'auto' told the browser to start pulling the full 3.2MB bgm
+  // file down as soon as this script ran, on every Grimmerglen entry --
+  // stacking on top of whatever Karasuki's own canvas world still held in
+  // memory during the transition. 'metadata' still gives duration/seekability
+  // immediately; the audio body itself is only actually fetched once
+  // startGrimmerglenMusic() calls .play(), same as before.
   const grimmerglenMusic = new Audio('assets/img/grimmerglen/grimmerglen_bgm.mp3');
-  grimmerglenMusic.preload = 'auto';
+  grimmerglenMusic.preload = 'metadata';
   grimmerglenMusic.loop = true;
   grimmerglenMusic.volume = GRIMMERGLEN_MUSIC_VOLUME;
   const grimmerglenDance = new Audio('assets/img/grimmerglen/grimmerglen_dance.mp3');
   grimmerglenDance.preload = 'metadata';
   grimmerglenDance.loop = false;
   grimmerglenDance.volume = GRIMMERGLEN_DANCE_VOLUME;
+  // Perf pass: this is small (44K) but was still set to 'auto' and
+  // constructed at module load, well before the change prompt is ever
+  // shown -- 'none' defers the actual fetch to beginBoohaChange()'s own
+  // .play() call, i.e. the moment the player accepts the prompt.
   const boohaChangeAudio = new Audio('assets/img/grimmerglen/booha_change.mp3');
-  boohaChangeAudio.preload = 'auto';
+  boohaChangeAudio.preload = 'none';
   boohaChangeAudio.loop = false;
   boohaChangeAudio.volume = 0.88;
   let boohaChangePromptOpen = false;
@@ -176,14 +186,26 @@
   const GRIMMERGLEN_DANCE_MARIETTA_SIZE = 82;
   const GRIMMERGLEN_DANCE_BOOHA_SIZE = 66;
   const GRIMMERGLEN_DANCE_GAP = 54;
-  const grimmerglenDanceImages = {
-    marietta: ((DATA.dance && DATA.dance.marietta) || []).map(src => {
-      const image = new Image(); image.decoding = 'async'; image.src = src; return image;
-    }),
-    booha: ((DATA.dance && DATA.dance.booha) || []).map(src => {
-      const image = new Image(); image.decoding = 'async'; image.src = src; return image;
-    })
-  };
+  // Perf pass: the comment above always said the dance art was lazy, but
+  // this object literal ran at module load and set .src on all 6 Image
+  // objects immediately, fetching every dance frame whether or not the
+  // player ever reaches the celebration. Made genuinely lazy: the images
+  // are only constructed the first time ensureGrimmerglenDanceImages() is
+  // called, which startGrimmerglenCelebration() does right as the
+  // celebration begins -- the only place these frames are ever drawn from.
+  let grimmerglenDanceImages = null;
+  function ensureGrimmerglenDanceImages() {
+    if (grimmerglenDanceImages) return grimmerglenDanceImages;
+    grimmerglenDanceImages = {
+      marietta: ((DATA.dance && DATA.dance.marietta) || []).map(src => {
+        const image = new Image(); image.decoding = 'async'; image.src = src; return image;
+      }),
+      booha: ((DATA.dance && DATA.dance.booha) || []).map(src => {
+        const image = new Image(); image.decoding = 'async'; image.src = src; return image;
+      })
+    };
+    return grimmerglenDanceImages;
+  }
   const grimmerglenDanceSparkles = [];
 
   function startGrimmerglenMusic() {
@@ -760,8 +782,9 @@
   function drawGrimmerglenCelebration(now) {
     const elapsed = Math.max(0, (now - state.celebrationStart) / 1000);
     const frameIndex = REDUCED_MOTION ? 0 : Math.floor(elapsed * 1000 / GRIMMERGLEN_DANCE_FRAME_MS) % 3;
-    const mariettaFrame = grimmerglenDanceImages.marietta[frameIndex];
-    const boohaFrame = grimmerglenDanceImages.booha[frameIndex];
+    const danceImages = ensureGrimmerglenDanceImages();
+    const mariettaFrame = danceImages.marietta[frameIndex];
+    const boohaFrame = danceImages.booha[frameIndex];
     const beat = REDUCED_MOTION ? 0 : Math.sin(elapsed * 6.3);
     const mariettaX = CENTER_X - GRIMMERGLEN_DANCE_GAP;
     const boohaX = CENTER_X + GRIMMERGLEN_DANCE_GAP;
@@ -2212,6 +2235,10 @@
     grimmerglenDanceSparkles.length = 0;
     updateGrimmerglenProfilePortal();
     closeMariettaPanel();
+    // Kick off the dance frame fetches now, right as the celebration
+    // starts, so they have a head start on the network before
+    // drawGrimmerglenCelebration() actually needs frame 0.
+    ensureGrimmerglenDanceImages();
     const duration = playGrimmerglenDanceMusic(finishGrimmerglenCelebration);
     state.celebrationTimer = window.setTimeout(finishGrimmerglenCelebration, Math.max(1200, duration + 120));
   }

@@ -159,14 +159,38 @@ for (const asset of ['grimmerglen-data.js', 'grimmerglen-typing.js', 'grimmergle
 }
 assert(serviceWorker.includes('`${BASE}/js/`'), 'service worker must cache Grimmerglen JS at runtime');
 assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache Grimmerglen art at runtime');
-assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3'), 'service worker must precache Grimmerglen BGM');
-assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3'), 'service worker must precache Grimmerglen dance music');
 assert(/pages:\s+'booha-pages-2026-403'/.test(serviceWorker), 'page cache must be bumped for the Muenba Pass C profile update');
-assert(serviceWorker.includes('grimmerglen/dance/marietta_dance_'), 'service worker must precache Marietta dance art');
-assert(serviceWorker.includes('grimmerglen/dance/booha_grimmerglen_dance_'), 'service worker must precache Booha dance art');
-assert(serviceWorker.includes('room_${String(index + 1).padStart(2, \'0\')}.webp'), 'service worker must cover the generated room sequence');
-assert(serviceWorker.includes('${BASE}/assets/img/grimmerglen/booha_change.mp3'), 'service worker must precache the Booha change cue');
-assert(/assets:\s+'booha-assets-2026-495'/.test(serviceWorker), 'asset cache must be bumped for the Muenba canonical target update');
+// Perf pass: the install-time precache used to force all 15 room
+// backgrounds, all 6 dance frames, all 5 Marietta poses, the 8
+// collectibles, and the bgm/dance/change audio into the cache in one shot
+// on every device (~35.5MB), stacking on top of whatever heavy world (often
+// Karasuki, reached via its own portal) was already resident in memory --
+// weak devices would stall hard enough for the audio buffer to buzz or the
+// PWA to appear frozen. Those files are still cached, just lazily: the
+// `${BASE}/assets/` prefix above makes every one of them cache-first the
+// moment the app's own loaders actually request it (getImage()/
+// preloadAdjacent() for rooms, ensureGrimmerglenDanceImages() for dance
+// frames, the audio elements' own preload/play calls). The CORE_ASSETS
+// install list must stay limited to the always-needed shell only.
+const coreAssetsSource = serviceWorker.slice(serviceWorker.indexOf('const CORE_ASSETS = ['), serviceWorker.indexOf('const ASSET_PREFIXES = ['));
+assert(!coreAssetsSource.includes('grimmerglen_bgm.mp3'), 'service worker must NOT eagerly precache Grimmerglen BGM -- lazy via startGrimmerglenMusic()');
+assert(!coreAssetsSource.includes('grimmerglen_dance.mp3'), 'service worker must NOT eagerly precache Grimmerglen dance music -- lazy via playGrimmerglenDanceMusic()');
+assert(!coreAssetsSource.includes('booha_change.mp3'), 'service worker must NOT eagerly precache the Booha change cue -- lazy via beginBoohaChange()');
+assert(!coreAssetsSource.includes('grimmerglen/dance/'), 'service worker must NOT eagerly precache dance frame art -- lazy via ensureGrimmerglenDanceImages()');
+assert(!coreAssetsSource.includes('grimmerglen/marietta/'), 'service worker must NOT eagerly precache all 5 Marietta poses');
+assert(!coreAssetsSource.includes('grimmerglen/room_'), 'service worker must NOT eagerly precache all 15 room backgrounds -- lazy via preloadAdjacent()');
+assert(!coreAssetsSource.includes('grimmerglen/collectibles/'), 'service worker must NOT eagerly precache the 8 collectibles');
+assert(coreAssetsSource.includes('${BASE}/assets/img/grimmerglen/grimmerglen.css'), 'service worker must still precache the small always-needed Grimmerglen stylesheet');
+assert(coreAssetsSource.includes('${BASE}/assets/img/grimmerglen/booha_grimmerglen_version_1.webp'), 'service worker must still precache the small always-needed default Booha sprite');
+assert(/assets:\s+'booha-assets-2026-496'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen eager-precache perf fix');
+
+// The lazy loaders these files now depend on must actually exist and be
+// wired to the right moments, not merely removed from CORE_ASSETS.
+assert(runtimeSource.includes('function ensureGrimmerglenDanceImages'), 'dance frames must be built lazily, not at module load');
+assert(runtimeSource.includes('let grimmerglenDanceImages = null;'), 'dance frame Images must not be constructed eagerly at module scope');
+assert(runtimeSource.includes('ensureGrimmerglenDanceImages()'), 'the celebration must trigger the lazy dance-image build');
+assert(/grimmerglenMusic\.preload = 'metadata'/.test(runtimeSource), 'Grimmerglen BGM must not preload="auto" -- that pulls the full 3.2MB file on every entry');
+assert(/boohaChangeAudio\.preload = 'none'/.test(runtimeSource), 'the transformation cue must not preload until the change prompt is accepted');
 
 assert(profile.includes('GRIMMERGLEN / MEMORY CASE FILE'), 'profile must use the Grimmerglen case-file header');
 assert(profile.includes('grimmerglen-data.js'), 'profile must load the Grimmerglen manifest');

@@ -133,7 +133,7 @@ const CURRENT_CACHES = {
   // Muenba Pass 1 repairs target state, Pass 2 clears pins after capture, and
   // Pass 3 pins the card's exact ghost, Pass 4 restores legacy portraits,
   // Pass 5 preserves targets across tier changes, and Pass 6 checks identity.
-  assets: 'booha-assets-2026-495',
+  assets: 'booha-assets-2026-496',
   decks:  'booha-decks-2026-310',
 };
 
@@ -182,6 +182,20 @@ const CORE_FILES = [
 
 // Static images are fetched from ASSET_CACHE, so these must be pre-cached
 // there rather than added to CORE_FILES (which belongs to PAGE_CACHE).
+// Grimmerglen perf pass: this used to also list all 15 room backgrounds,
+// all 5 Marietta poses, all 6 dance frames, the 8 collectibles, and the
+// bgm/dance/transform audio -- ~35.5MB pre-cached in one install event on
+// EVERY device, competing with whatever heavy world (Karasuki included) was
+// already resident in memory when that install happened to land. Weaker
+// devices (old iPads, Fire tablets) would stall hard enough for the audio
+// buffer to buzz or the whole PWA to appear frozen. Grimmerglen's own
+// loaders already fetch these lazily and correctly on demand -- getImage()/
+// preloadAdjacent() for rooms (current + exits only), ensureGrimmerglenDanceImages()
+// for dance frames (only once the celebration begins), and the transform
+// audio only once the change prompt is accepted -- so the service worker
+// forcing them all in eagerly was pure redundancy, not a real caching win.
+// Keep only the small, always-needed shell here: the world's own scripts,
+// stylesheet, and default sprite.
 const CORE_ASSETS = [
   `${BASE}/js/utsu-sfx.js`,
   `${BASE}/js/grimmerglen-data.js`,
@@ -189,17 +203,6 @@ const CORE_ASSETS = [
   `${BASE}/js/grimmerglen.js`,
   `${BASE}/assets/img/grimmerglen/grimmerglen.css`,
   `${BASE}/assets/img/grimmerglen/booha_grimmerglen_version_1.webp`,
-  `${BASE}/assets/img/grimmerglen/booha_change.mp3`,
-  `${BASE}/assets/img/grimmerglen/grimmerglen_bgm.mp3`,
-  `${BASE}/assets/img/grimmerglen/grimmerglen_dance.mp3`,
-  ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/marietta_dance_${String(index + 1).padStart(2, '0')}.webp`),
-  ...Array.from({ length: 3 }, (_, index) => `${BASE}/assets/img/grimmerglen/dance/booha_grimmerglen_dance_version_1_${String(index + 1).padStart(2, '0')}.webp`),
-  ...Array.from({ length: 5 }, (_, index) => `${BASE}/assets/img/grimmerglen/marietta/marietta_${String(index + 1).padStart(2, '0')}.webp`),
-  ...Array.from({ length: 15 }, (_, index) => `${BASE}/assets/img/grimmerglen/room_${String(index + 1).padStart(2, '0')}.webp`),
-  ...[
-    'banner', 'ticket', 'pillow', 'backpack', 'book', 'teddy_bear',
-    'to_go_coffee_cup', 'ball'
-  ].map(name => `${BASE}/assets/img/grimmerglen/collectibles/${name}.webp`),
   `${BASE}/assets/img/background-1.webp`,
   `${BASE}/assets/img/booha_ghost.webp`,
   `${BASE}/assets/img/profile.webp`,
