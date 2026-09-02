@@ -35,7 +35,8 @@ const pendingSource = sourceSection('setReturnToNuppiPending', 'leaveCaptureForN
 // scene replacements.
 assert(source.includes('#muenba-lobby-overlay { position:fixed; inset:0; z-index:210; display:none; align-items:flex-start;'), 'lobby overlay must remain top-anchored');
 assert(source.includes('#muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:flex-start;'), 'capture overlay must remain top-anchored');
-assert(source.includes('overflow-y:auto; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px))'), 'modal overlays must retain safe-area scrolling');
+assert(source.includes('overflow:hidden; overscroll-behavior:contain; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px))'), 'modal overlays must retain safe-area containment');
+assert(source.includes('overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:28px 26px 26px;'), 'modal cards must own scrolling');
 assert(popupSource.includes('box.scrollTop = 0;'), 'capture scene replacement must reset vertical scroll');
 assert(source.includes('function focusLobbyControl(selector)'), 'lobby scenes must share the scroll reset path');
 

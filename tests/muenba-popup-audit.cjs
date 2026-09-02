@@ -12,8 +12,10 @@ assert(source.includes('#muenba-lobby-overlay { position:fixed; inset:0; z-index
   'lobby popups must open from the top of the viewport');
 assert(source.includes('#muenba-capture-overlay { position:fixed; inset:0; z-index:215; display:none; align-items:flex-start;'),
   'capture popups must open from the top of the viewport');
-assert(source.includes('overflow-y:auto; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px))'),
-  'popup overlays must preserve a safe top inset and remain scrollable');
+assert(source.includes('overflow:hidden; overscroll-behavior:contain; background:rgba(0,0,0,0); transition:background .4s ease; padding:max(20px,env(safe-area-inset-top,0px))'),
+  'popup overlays must preserve a safe top inset and contain scrolling');
+assert(source.includes('overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; padding:28px 26px 26px;'),
+  'popup cards must own vertical scrolling');
 assert(source.includes('max-height:calc(100dvh - 40px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))'),
   'popup cards must fit between mobile safe-area insets');
 assert(source.includes('function focusLobbyControl(selector)'), 'lobby scenes need a shared focus/reset helper');

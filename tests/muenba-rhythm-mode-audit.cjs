@@ -29,7 +29,7 @@ assert(board.includes("laneButton.addEventListener('pointerdown'"), 'rhythm lane
 assert(board.includes('event.preventDefault();'), 'touch input must prevent browser gesture interference');
 assert(board.includes('className = `muenba-rhythm-touch-pad'), 'each lane must expose a visible touch pad');
 assert(source.includes('touch-action:none'), 'rhythm controls must opt out of browser touch scrolling');
-assert(source.includes('min-height:190px'), 'portrait rhythm lanes must remain large enough to tap');
+assert(source.includes('height:clamp(160px,32vh,250px);'), 'rhythm lanes must remain responsive while large enough to tap');
 assert(source.includes('function bindRhythmAudioUnlock(button)'), 'rhythm entry controls need a shared audio-unlock binder');
 assert(source.includes("button.addEventListener('pointerdown', unlockRhythmAudioFromGesture)"), 'rhythm audio must attempt unlock on direct pointerdown');
 assert(source.includes('primeRhythmSfx();'), 'the direct gesture must also prime decoded rhythm buffers');

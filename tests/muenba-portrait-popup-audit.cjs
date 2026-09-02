@@ -24,7 +24,7 @@ assert(source.includes('max-height:calc(100dvh - 20px - env(safe-area-inset-top,
   'portrait popup cards must fit within dynamic viewport safe areas');
 assert(source.includes('overscroll-behavior:contain; touch-action:pan-y;'),
   'portrait popup scrolling must stay inside the modal instead of chaining to the page');
-assert(source.includes('html.muenba-phone-portrait .muenba-rhythm-board { height:min(42dvh,250px); min-height:190px;'),
+assert(source.includes('html.muenba-phone-portrait .muenba-rhythm-board { height:clamp(160px,32vh,250px); min-height:0;'),
   'portrait rhythm boards must remain compact and playable');
 assert(source.includes('html.muenba-phone-portrait .muenba-case-choice { min-height:58px;'),
   'portrait comprehension choices must retain a comfortable touch target');
