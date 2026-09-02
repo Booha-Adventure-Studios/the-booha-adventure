@@ -73,7 +73,10 @@
     .difficulty-option small { color:var(--muted); font-size:.72rem; font-weight:700; }
     .difficulty-option-name { font:inherit; }
     .difficulty-progress { margin-top:5px; color:#d27b51; font-size:.68rem; font-weight:950; letter-spacing:.03em; }
-    .difficulty-progress-status { color:#4ba98f; font-size:.62rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; }
+    .difficulty-progress-status { display:flex; flex-direction:column; gap:2px; color:#4ba98f; font-size:.62rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; }
+    .difficulty-progress-status small { color:inherit; font-size:.9em; font-weight:700; letter-spacing:0; text-transform:none; }
+    .difficulty-progress-status ruby { ruby-position:over; }
+    .difficulty-progress-status rt { font-size:.7em; letter-spacing:0; text-transform:none; }
     .difficulty-option[data-tier-state="not-started"] .difficulty-progress-status { color:var(--muted); }
     .difficulty-option.is-next { box-shadow:0 0 0 2px rgba(243,203,103,.35),0 5px 0 rgba(216,93,154,.08); }
     .difficulty-option.is-next::after { content:'NEXT RECOMMENDED'; align-self:flex-end; margin-top:-2px; color:#c17b36; font-size:.52rem; font-weight:950; letter-spacing:.08em; }
@@ -93,12 +96,14 @@
     .memory-name { margin:0; text-align:center; font-size:1.03rem; letter-spacing:-.03em; }
     .memory-kana { margin:2px 0 0; text-align:center; color:var(--muted); font-size:.68rem; }
     .memory-status { display:flex; align-items:center; justify-content:space-between; gap:7px; margin-top:12px; padding-top:10px; border-top:1px solid rgba(104,70,119,.14); font-size:.65rem; font-weight:950; }
-    .memory-status-label { color:#705878; }
+    .memory-status-label { display:flex; flex-direction:column; gap:2px; color:#705878; }
+    .memory-status-label small { color:var(--muted); font-size:.88em; font-weight:700; }
     .dots { display:flex; gap:4px; }
     .dot { width:10px; height:10px; border-radius:50%; border:2px solid #dbb4cc; background:#fff; }
     .dot.found { border-color:#e781ae; background:#e781ae; box-shadow:inset 0 0 0 2px #fff; }
     .memory-details { margin-top:10px; padding-top:9px; border-top:1px dashed rgba(104,70,119,.2); }
     .memory-details summary { display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--pink-deep); font-size:.65rem; font-weight:950; cursor:pointer; list-style:none; }
+    .memory-details summary small { display:block; margin-top:2px; color:var(--muted); font-size:.88em; font-weight:700; }
     .memory-details summary::-webkit-details-marker { display:none; }
     .memory-details summary::after { content:'+'; color:#b97a9b; font-size:.9rem; line-height:1; }
     .memory-details[open] summary::after { content:'−'; }
@@ -106,6 +111,7 @@
     .memory-story { margin:8px 0 0; color:#705878; font-size:.74rem; line-height:1.45; }
     .memory-story-jp { margin:4px 0 0; color:var(--muted); font-size:.68rem; line-height:1.55; }
     .memory-lifetime { margin:8px 0 0; color:var(--muted); font-size:.61rem; font-weight:800; }
+    .memory-lifetime small { display:block; margin-top:2px; font-size:.9em; font-weight:700; }
     .memory-tier { margin:5px 0 0; color:var(--pink-deep); font-size:.61rem; font-weight:900; }
     .memory-card.weekly-complete { --memory-color:#9ee8d3; background:linear-gradient(155deg,#fff,rgba(220,255,245,.85)); }
     .memory-card[data-found="false"] .memory-art { filter:grayscale(.45) saturate(.55) drop-shadow(0 6px 4px rgba(98,55,115,.12)); opacity:.72; }
@@ -263,9 +269,9 @@
       }
 
       function weeklyTierState(stats) {
-        return stats.complete ? { key: 'complete', en: 'Complete this week', jp: '今週は完了' }
-          : stats.found > 0 ? { key: 'in-progress', en: 'In progress', jp: '進行中' }
-            : { key: 'not-started', en: 'Not started', jp: '未開始' };
+        return stats.complete ? { key: 'complete', en: 'Complete this week', jp: '<ruby>今週<rt>こんしゅう</rt></ruby>は<ruby>完了<rt>かんりょう</rt></ruby>' }
+          : stats.found > 0 ? { key: 'in-progress', en: 'In progress', jp: '<ruby>進行中<rt>しんこうちゅう</rt></ruby>' }
+            : { key: 'not-started', en: 'Not started', jp: '<ruby>未開始<rt>みかいし</rt></ruby>' };
       }
 
       function nextTierFor(current, statsByTier) {
@@ -359,7 +365,7 @@
               ${MEMORY_TIER_CHOICES.map(tier => {
                 const stats = weeklyTierStats(tier);
                 const state = weeklyTierState(stats);
-                return `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}${tier === suggestedNext ? ' is-next' : ''}" data-memory-tier="${tier}" data-tier-state="${state.key}" aria-pressed="${tier === current}"><span class="difficulty-option-name">${esc(MEMORY_TIER_META[tier].en)}</span><small>${MEMORY_TIER_META[tier].jp}</small><span class="difficulty-progress">${stats.found} / ${stats.total} this week</span><span class="difficulty-progress-status">${state.en} · ${state.jp}</span></button>`;
+                return `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}${tier === suggestedNext ? ' is-next' : ''}" data-memory-tier="${tier}" data-tier-state="${state.key}" aria-pressed="${tier === current}"><span class="difficulty-option-name">${esc(MEMORY_TIER_META[tier].en)}</span><small>${MEMORY_TIER_META[tier].jp}</small><span class="difficulty-progress">${stats.found} / ${stats.total} this week</span><span class="difficulty-progress-status"><span>${state.en}</span><small>${state.jp}</small></span></button>`;
               }).join('')}
             </div>
             <p class="difficulty-note">${esc(meta.note)}<small>${meta.noteJP}</small></p>
@@ -386,11 +392,11 @@
           const storyJP = tierStory?.jp || DATA.stories?.[type]?.jp || '';
           const canReview = weeklyFound >= 3 || found >= 3;
           const tier = `${MEMORY_TIER_META[currentTier]?.en || 'Starter Memory'} · ${weeklyFound} of 3 returned`;
-          const reviewHTML = canReview ? `<details class="memory-details"><summary>Review memory</summary><div class="memory-details-body"><p class="memory-story">${esc(story)}</p>${storyJP ? `<p class="memory-story-jp">${esc(storyJP)}</p>` : ''}<p class="memory-lifetime">Lifetime: ${found} of 3 returned</p><p class="memory-tier">${esc(tier)}</p></div></details>` : '';
+          const reviewHTML = canReview ? `<details class="memory-details"><summary><span>Review memory<small><ruby>記憶<rt>きおく</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>す</small></span></summary><div class="memory-details-body"><p class="memory-story">${esc(story)}</p>${storyJP ? `<p class="memory-story-jp">${esc(storyJP)}</p>` : ''}<p class="memory-lifetime">Lifetime: ${found} of 3 returned<small><ruby>生涯<rt>しょうがい</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></small></p><p class="memory-tier">${esc(tier)}</p></div></details>` : '';
           return `<article class="memory-card${weeklyFound >= 3 ? ' weekly-complete' : ''}${found >= 3 ? ' has-lifetime-memory' : ''}${active === type ? ' active' : ''}" data-found="${weeklyFound > 0}" data-reviewable="${canReview}" style="--memory-color:${colors[index % colors.length]}">
             <img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}">
             <h3 class="memory-name">${esc(name[0])}</h3><p class="memory-kana">${esc(name[1])}</p>
-            <div class="memory-status"><span class="memory-status-label">This week: ${weeklyFound} of 3 returned</span><span class="dots" aria-hidden="true">${[0,1,2].map(i => `<i class="dot${i < weeklyFound ? ' found' : ''}"></i>`).join('')}</span></div>
+            <div class="memory-status"><span class="memory-status-label"><span>This week: ${weeklyFound} of 3 returned</span><small><ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></small></span><span class="dots" aria-hidden="true">${[0,1,2].map(i => `<i class="dot${i < weeklyFound ? ' found' : ''}"></i>`).join('')}</span></div>
             ${reviewHTML}
           </article>`;
         }).join('');
