@@ -21,7 +21,7 @@ assert(runtime.includes('function allMuenbaCaseModesComplete()'),
   'runtime must distinguish selected-tier completion from total case completion');
 assert(runtime.includes('function unfinishedMuenbaModeExcept(mode)'),
   'runtime must identify the next tier that still has authored cases');
-assert(runtime.includes('const tierNeedsSelection = !activeCaseGhost && unfinishedMuenbaModeExcept(getMuenbaReadingDifficulty());'),
+assert(runtime.includes('const tierNeedsSelection = !huntTarget && unfinishedMuenbaModeExcept(getMuenbaReadingDifficulty());'),
   'ghost placement must stop when the selected tier is complete but another tier needs selection');
 assert(runtime.includes("eyebrow.textContent = everyModeComplete ? 'ALL CASE FILES SETTLED' : 'READING TIER COMPLETE';"),
   'Nuppi must report tier completion instead of no reading level');

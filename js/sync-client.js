@@ -201,6 +201,7 @@ window.BoohaSync = (() => {
     if (w.worlds?.muenba?.ghostsFound && Object.keys(w.worlds.muenba.ghostsFound).length) return false;
     if (w.worlds?.muenba?.huntGhostOrder && w.worlds.muenba.huntGhostOrder.length) return false;
     if (w.worlds?.muenba?.activeCaseId) return false;
+    if (w.worlds?.muenba?.activeHuntGhostId) return false;
     if (Number(w.worlds?.muenba?.orbsPending) > 0) return false;
     if (w.worlds?.grimmerglen?.objects && Object.keys(w.worlds.grimmerglen.objects).length) return false;
     if (w.worlds?.grimmerglen?.objectSlots && Object.keys(w.worlds.grimmerglen.objectSlots).length) return false;

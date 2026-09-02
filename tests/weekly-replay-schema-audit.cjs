@@ -87,7 +87,7 @@ assert.strictEqual(migrated.version, 3);
 assert.deepStrictEqual(plain(migrated.weekly.worlds), {
   occurrenceKey: '',
   utsuroba: { drifterQuest: null, drifters: {}, readingChallenge: null },
-  muenba: { ghostsFound: {}, huntGhostOrder: [], activeCaseId: null, activeCaseRecoveryDone: false, orbsPending: 0, huntAccepted: false },
+  muenba: { ghostsFound: {}, huntGhostOrder: [], activeCaseId: null, activeHuntGhostId: null, activeCaseRecoveryDone: false, orbsPending: 0, huntAccepted: false },
   grimmerglen: {
     objects: {},
     objectSlots: {},
@@ -124,6 +124,7 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.muenba), {
   ghostsFound: {},
   huntGhostOrder: [],
   activeCaseId: null,
+  activeHuntGhostId: null,
   activeCaseRecoveryDone: false,
   orbsPending: 0,
   huntAccepted: false,
