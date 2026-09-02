@@ -14,7 +14,13 @@ for (const filename of ['Muenba_BGM.mp3', 'rhythm.mp3', 'get.mp3', 'miss.mp3']) 
   assert(audioFiles.has(filename), `Muenba audio asset is missing: ${filename}`);
 }
 
-assert(source.includes("new Audio('assets/img/muenba/Muenba_BGM.mp3')"), 'Muenba BGM path must match the restored filename case');
+assert(source.includes("makeDeferredMuenbaAudio('assets/img/muenba/Muenba_BGM.mp3')"), 'Muenba BGM path must match the restored filename case');
+assert(source.includes('function makeDeferredMuenbaAudio(src)'), 'Muenba long tracks must use a deferred audio factory');
+assert(source.includes("audio.preload = 'none';"), 'Muenba audio must not preload at world entry');
+assert(!/new Audio\(\s*['"]/.test(source), 'Muenba must not construct an audio element with an eager source');
+assert(source.includes('ensureMuenbaAudioSource(music)'), 'Muenba BGM must load only when playback begins');
+assert(source.includes('ensureMuenbaAudioSource(dangerRhythmMusic)'), 'danger rhythm audio must load only when rhythm begins');
+assert(source.includes('ensureMuenbaAudioSource(muenbaDance)'), 'celebration audio must load only when celebration begins');
 assert(source.includes('music.loop = true;'), 'Muenba BGM must loop');
 assert(source.includes("music.addEventListener('ended'"), 'Muenba BGM needs a loop recovery handler');
 assert(source.includes('music.addEventListener(\'error\''), 'Muenba BGM errors must release the started flag');

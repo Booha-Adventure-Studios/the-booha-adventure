@@ -80,7 +80,7 @@ assert(serviceWorker.includes('${BASE}/muenba.html'), 'service worker must preca
 assert(serviceWorker.includes("`${BASE}/js/`"), 'service worker must cache Muenba scripts');
 assert(serviceWorker.includes("`${BASE}/assets/`"), 'service worker must cache Muenba images and audio');
 assert(data.includes("bg: `assets/img/muenba/${roomId}.webp`"), 'room backgrounds must use the service-worker-covered relative asset path');
-assert(runtime.includes("new Audio('assets/img/muenba/Muenba_BGM.mp3')"), 'Muenba audio must use the covered relative asset path');
+assert(runtime.includes("makeDeferredMuenbaAudio('assets/img/muenba/Muenba_BGM.mp3')"), 'Muenba audio must use the covered relative asset path');
 assert(runtime.includes("muenba-profile.html"), 'Muenba must retain its profile route');
 assert(fs.existsSync(path.join(root, 'muenba-profile.html')), 'Muenba profile route must exist');
 

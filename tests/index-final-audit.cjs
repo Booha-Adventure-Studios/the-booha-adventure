@@ -46,6 +46,13 @@ pickerImages.forEach((tag) => {
   assert(/\bdecoding\s*=\s*["']async["']/i.test(tag), 'picker icons should decode asynchronously');
 });
 
+const introVideoTag = index.match(/<video[^>]+id="introVideo"[^>]*>[\s\S]*?<\/video>/i);
+assert(introVideoTag, 'index intro video must remain present');
+assert(/\bpreload\s*=\s*["']none["']/i.test(introVideoTag[0]), 'intro video must not preload on landing-page entry');
+assert(!/\ssrc\s*=\s*["'][^"']+intro\.mp4/i.test(introVideoTag[0]), 'intro video source must stay deferred until start');
+assert(/data-src\s*=\s*["'][^"']+intro\.mp4/i.test(introVideoTag[0]), 'intro video must retain a deferred source');
+assert(index.includes('introVideo.load();'), 'intro video must load explicitly when the player starts it');
+
 // No sound file or AudioContext should be created merely by parsing index.
 assert(!/<audio\b/i.test(index), 'index must not add an audio element for button feedback');
 assert(!/new\s+(?:Audio|AudioContext|webkitAudioContext)\s*\(/i.test(index), 'index must not create WebAudio at load time');
