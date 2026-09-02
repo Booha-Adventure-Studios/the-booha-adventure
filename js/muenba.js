@@ -2113,6 +2113,10 @@
     const weekly = readMuenbaWeekly();
     const mode = getMuenbaReadingDifficulty();
     const cases = randomizedMuenbaCases();
+    // Pass 5: an accepted case remains the live hunt target across profile
+    // tier changes. Only beginCaptureSession reads the current tier for the
+    // case text, so changing the selector cannot make the room wait for a
+    // different ghost.
     const activeCase = typeof weekly.activeCaseId === 'string'
       ? cases.find(caseData => caseData.id === weekly.activeCaseId) || null
       : null;
