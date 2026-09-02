@@ -24,5 +24,7 @@ assert(profile.includes('weekly-hunt-legend'), 'profile weekly availability stat
 assert(profile.includes('<div class="stat-label">Captures<small>'), 'profile stats must retain compact English labels with Japanese counterparts');
 assert(profile.includes('ghost-memory-current'), 'profile current-mode memory status must remain visible');
 assert(profile.includes('<ruby>未完了<rt>みかんりょう</rt></ruby>'), 'open memory status must include Japanese text');
+assert(!profile.includes('Case settled<small>') && !profile.includes('Caught<small>'), 'journal status markup must not nest small elements');
+assert(profile.includes('journal-status-jp'), 'journal status markup must use a semantic inline counterpart');
 
 console.log('Muenba Pass C language-consistency audit passed.');
