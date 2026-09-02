@@ -1013,6 +1013,13 @@ else
   bad "Muenba weekly replay audit failed"
 fi
 
+echo "[weekly] Muenba target recovery audit"
+if node tests/muenba-target-recovery-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba accepted-hunt target recovery contracts pass"
+else
+  bad "Muenba target recovery audit failed"
+fi
+
 echo "[weekly] Muenba profile weekly audit"
 if node tests/muenba-profile-weekly-audit.cjs >/dev/null 2>&1; then
   ok "Muenba weekly versus lifetime profile labels pass"
