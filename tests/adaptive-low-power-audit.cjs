@@ -30,6 +30,6 @@ assert(maze.includes('mazePerfTier'), 'Maze must measure an adaptive performance
 assert(maze.includes('function mazeDprCap(){ return mazePerfTier === \'low\' ? 1 : 1.5; }'), 'Maze must cap normal DPR at 1.5 and low-power DPR at 1');
 assert(maze.includes('if(!popupOpen())drawFrame(now);'), 'Maze must hold a static frame behind popups');
 assert(maze.includes('pageHidden=document.hidden'), 'Maze must pause its render loop while hidden');
-assert(sw.includes('booha-assets-2026-500'), 'Pass 5 changes must bump the asset cache');
+assert(sw.includes('booha-assets-2026-501'), 'Pass 5 changes must bump the asset cache');
 
 console.log('Adaptive low-power audit passed: hidden pages suspend rendering, popups hold static frames, and slow-device fallbacks are wired across the worlds.');
