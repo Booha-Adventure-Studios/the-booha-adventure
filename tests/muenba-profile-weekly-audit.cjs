@@ -15,7 +15,7 @@ assert.match(profile, /weeklyGhostsFound/, 'Muenba profile must keep weekly hunt
 assert.match(profile, /weeklyFoundCount/, 'Muenba profile must show a weekly hunt meter');
 assert.match(profile, /Found this week/, 'Muenba profile must label ghosts found in the current week');
 assert.match(profile, /Available this week/, 'Muenba profile must label ghosts available for the current week');
-assert.match(profile, /Lifetime case memory/, 'Muenba profile must label case-memory status as lifetime progress');
+assert.match(profile, /Memory: \$\{currentModeComplete \? 'settled' : 'open'\}/, 'Muenba profile must label the selected case-memory status');
 assert.match(profile, /ghost-card\$\{isFound \? ' has-lifetime-memory' : ''\}\$\{weeklyFound \? ' is-weekly-found' : ''\}/, 'Muenba ghost brightness must be driven by weekly capture state');
 assert.doesNotMatch(profile, /ghost-card\$\{isFound \? ' is-found'/, 'Muenba lifetime completion must not re-light a new week');
 assert.match(profile, /Fresh every Sunday/, 'Muenba profile must explain the weekly reset cadence');
