@@ -1194,8 +1194,8 @@
 
   <!-- ── VIDEO ── -->
   <section id="videoScene" class="scene" aria-label="Intro video">
-    <video id="introVideo" preload="auto" playsinline webkit-playsinline>
-      <source src="assets/video/intro.mp4" type="video/mp4" />
+    <video id="introVideo" preload="none" playsinline webkit-playsinline>
+      <source data-src="assets/video/intro.mp4" type="video/mp4" />
     </video>
   </section>
 
@@ -1893,6 +1893,13 @@ async function startIntro() {
   fadeToBlack(true);
   await new Promise(r => setTimeout(r, 900));
   showScene(videoScene);
+  // Do not give the browser a media URL until the player explicitly starts
+  // the intro. This keeps the landing page request-free for the 10 MB video.
+  const introSource = introVideo.querySelector('source[data-src]');
+  if (introSource && !introSource.src) {
+    introSource.src = introSource.dataset.src;
+    introVideo.load();
+  }
   try { introVideo.currentTime = 0; } catch(e) {}
   
   requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
