@@ -7061,9 +7061,28 @@
     const weekly = readMuenbaWeekly();
     const pending = Number(weekly.orbsPending) > 0;
     const huntAccepted = !pending && weekly.huntAccepted === true;
-    const huntTarget = huntAccepted
+    let huntTarget = huntAccepted
       ? getMuenbaHuntTarget({ activeOnly: true })
       : null;
+    // Pass 2 (fix): an accepted hunt's pin can go stale -- a legacy save
+    // recovered without a claimable ghost, or every weekly ghost already
+    // turned in to Nuppi. activeOnly alone would then render the empty
+    // "Nuppi is here when you are ready" fallback despite huntAccepted still
+    // being true, hiding a hunt that is either actually still live or truly
+    // finished for the week. Re-resolve with the full resolver (which can
+    // find the next available case/ghost) and repair the pin so the popup
+    // and the live hunt stay in sync; if even that comes back empty, the
+    // week's hunt really is finished and Nuppi should say so explicitly.
+    let weekHuntExhausted = false;
+    if (huntAccepted && !huntTarget) {
+      const recovered = getMuenbaHuntTarget();
+      if (recovered) {
+        huntTarget = recovered;
+        acceptMuenbaHunt(recovered);
+      } else {
+        weekHuntExhausted = true;
+      }
+    }
     // The target card is the mandatory visual reminder while an accepted hunt
     // is live. If a legacy target cannot be recovered, keep Nuppi's generic
     // status rather than previewing a future hunt before acceptance.
@@ -7077,7 +7096,7 @@
     // already pinned.
     const offerTarget = !pending && !huntAccepted ? getMuenbaHuntTarget() : null;
     const canOfferHunt = !!offerTarget;
-    const needsTierSelection = !pending && !waitingForCase && !canOfferHunt && !allMuenbaCaseModesComplete();
+    const needsTierSelection = !pending && !waitingForCase && !canOfferHunt && !weekHuntExhausted && !allMuenbaCaseModesComplete();
     const selectedMode = getMuenbaReadingDifficulty();
     const selectedModeLabel = MUENBA_MEMORY_MODE_LABELS[selectedMode] || MUENBA_MEMORY_MODE_LABELS.start;
     const waitingGhost = huntTarget ? huntTarget.ghost : null;
@@ -7091,42 +7110,54 @@
       : '<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけて、ここに<ruby>戻<rt>もど</rt></ruby>ってきてね。';
     const offerLine = name ? `I have a case for you, ${name}.` : 'I have a case for you.';
     const offerLineJp = 'あなたのための<ruby>事件<rt>じけん</rt></ruby>があるよ。';
+    const weekDoneLine = name
+      ? `You found every ghost I needed this week, ${name}. Come back after the next reset for a new hunt.`
+      : 'You found every ghost I needed this week. Come back after the next reset for a new hunt.';
+    const weekDoneLineJp = '<ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>つかまえたね。<ruby>次<rt>つぎ</rt></ruby>のリセットの<ruby>後<rt>あと</rt></ruby>にまた<ruby>来<rt>き</rt></ruby>てね。';
     const copy = pending
       ? 'The ghost energy is waiting here. Nuppi is ready for the handoff.'
       : waitingForCase
         ? waitingLine
         : canOfferHunt
           ? offerLine
-          : needsTierSelection
-            ? `${selectedModeLabel} is complete. Choose another reading level to continue the English cases.`
-            : 'Nuppi is here when you are ready.';
+          : weekHuntExhausted
+            ? weekDoneLine
+            : needsTierSelection
+              ? `${selectedModeLabel} is complete. Choose another reading level to continue the English cases.`
+              : 'Nuppi is here when you are ready.';
     const statusCopy = pending
       ? 'Your energy orbs are ready to return here.'
       : waitingForCase
         ? `Find ${waitingGhostName}, then bring the energy home.`
         : canOfferHunt
           ? 'Open the case file to see which ghost you are looking for.'
-          : needsTierSelection
-            ? 'Open your Muenba profile and choose a level with unfinished cases.'
-            : 'Nuppi will be here when you need him.';
+          : weekHuntExhausted
+            ? 'Nuppi will have a new hunt after the weekly reset.'
+            : needsTierSelection
+              ? 'Open your Muenba profile and choose a level with unfinished cases.'
+              : 'Nuppi will be here when you need him.';
     const statusCopyJp = pending
       ? '<ruby>集<rt>あつ</rt></ruby>めたエネルギーオーブをここへ<ruby>返<rt>かえ</rt></ruby>せます。'
       : waitingForCase
         ? `${waitingGhost ? waitingGhost.kana : '幽霊'}を<ruby>見<rt>み</rt></ruby>つけて、エネルギーをここへ<ruby>持<rt>も</rt></ruby>ってきてね。`
         : canOfferHunt
           ? '<ruby>事件<rt>じけん</rt></ruby>ファイルを<ruby>開<rt>ひら</rt></ruby>いて、<ruby>探<rt>さが</rt></ruby>す<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>確認<rt>かくにん</rt></ruby>しよう。'
-          : needsTierSelection
-            ? 'プロフィールで、まだ<ruby>終<rt>お</rt></ruby>わっていない<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぼう。'
-            : 'ヌーピーは<ruby>必要<rt>ひつよう</rt></ruby>なとき、ここにいるよ。';
+          : weekHuntExhausted
+            ? '<ruby>次<rt>つぎ</rt></ruby>のリセットの<ruby>後<rt>あと</rt></ruby>に、また<ruby>新<rt>あたら</rt></ruby>しい<ruby>事件<rt>じけん</rt></ruby>が<ruby>始<rt>はじ</rt></ruby>まるよ。'
+            : needsTierSelection
+              ? 'プロフィールで、まだ<ruby>終<rt>お</rt></ruby>わっていない<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぼう。'
+              : 'ヌーピーは<ruby>必要<rt>ひつよう</rt></ruby>なとき、ここにいるよ。';
     const copyJp = pending
       ? '<ruby>幽霊<rt>ゆうれい</rt></ruby>のエネルギーはここで<ruby>待<rt>ま</rt></ruby>っています。ヌーピーは<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>る<ruby>準備<rt>じゅんび</rt></ruby>ができています。'
         : waitingForCase
         ? waitingLineJp
         : canOfferHunt
           ? offerLineJp
-          : needsTierSelection
-            ? 'プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられるよ。'
-            : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
+          : weekHuntExhausted
+            ? weekDoneLineJp
+            : needsTierSelection
+              ? 'プロフィールで<ruby>別<rt>べつ</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>ぶと、<ruby>英語<rt>えいご</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>を<ruby>続<rt>つづ</rt></ruby>けられるよ。'
+              : 'ヌーピーはここで<ruby>待<rt>ま</rt></ruby>っているよ。';
     const huntTargetHTML = waitingForCase && waitingGhost
       ? `<section class="muenba-room-hunt-target" data-muenba-target-ghost="${escapeHtml(waitingGhostId)}" aria-labelledby="muenba-room-hunt-target-title muenba-room-hunt-target-name">
           <div id="muenba-room-hunt-target-title" class="muenba-room-hunt-target-label">FIND THIS GHOST</div>
