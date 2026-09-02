@@ -1111,6 +1111,13 @@ else
   bad "Service-worker Pass 1 precache resilience audit failed"
 fi
 
+echo "[grimmerglen] Pass 4 memory-cache audit"
+if node tests/grimmerglen-memory-cache-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen room-cache and decode-gate contracts pass"
+else
+  bad "Grimmerglen Pass 4 memory-cache audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"
