@@ -1111,6 +1111,13 @@ else
   bad "Service-worker Pass 1 precache resilience audit failed"
 fi
 
+echo "[profile] Adventure-log Pass 1 fail-soft audit"
+if node tests/adventure-log-fail-soft-audit.cjs >/dev/null 2>&1; then
+  ok "Adventure-log weekly loading and error-state contracts pass"
+else
+  bad "Adventure-log Pass 1 fail-soft audit failed"
+fi
+
 echo "[grimmerglen/muenba] Pass 4 room memory-cache audit"
 if node tests/room-memory-cache-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen and Muenba room-cache contracts pass; Grimmerglen decode-gate contracts pass"

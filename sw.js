@@ -138,7 +138,9 @@ const CURRENT_CACHES = {
   // Pass 4 follow-up: Muenba room images/glow canvases are now bounded to
   // the current neighborhood, matching Grimmerglen; invalidate the
   // cache-first JavaScript bundle.
-  assets: 'booha-assets-2026-502',
+  // Adventure-log Pass 1 adds fail-soft weekly rendering; invalidate the
+  // cache-first JavaScript bundle.
+  assets: 'booha-assets-2026-503',
   decks:  'booha-decks-2026-310',
 };
 
