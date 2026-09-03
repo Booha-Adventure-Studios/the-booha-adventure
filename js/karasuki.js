@@ -1059,7 +1059,7 @@ const HAPPY_HOUSE_PORTAL = {
     orbPanelOpen = false;
     orbPanelOrb  = null;
     finishOrbTypewriter({ revealActions: false });
-    try { if (state.musicStarted) { music.play().catch(() => {}); } } catch (_) {}
+    try { if (state.musicStarted) playKarasukiMusic(); } catch (_) {}
     orbPanelEl.classList.remove('open');
     orbPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
   }
@@ -4284,9 +4284,21 @@ const HAPPY_HOUSE_PORTAL = {
   const memoryBoxImg = new Image(); memoryBoxImg.src = 'assets/img/memory_box.webp';
   const observerImg = new Image();
   observerImg.src = 'assets/img/karasuki/observer-1.webp';
-  const music    = new Audio('assets/audio/karasuki-music.mp3');
-  music.loop     = true;
-  music.volume   = 0.65;
+  let music = null;
+
+  // Pass 4: defer the long-form world track until the player first enters
+  // an interaction that is allowed to start music.
+  function ensureKarasukiMusic() {
+    if (!music) {
+      music = new Audio('assets/audio/karasuki-music.mp3');
+      music.loop = true;
+      music.volume = 0.65;
+    }
+    return music;
+  }
+  function playKarasukiMusic() {
+    return ensureKarasukiMusic().play().catch(() => {});
+  }
 
   /* Small SFX (Pass 1) — a light chime on evidence pickup. Same
      ding.mp3 used as the "correct/success" cue across the
@@ -5082,7 +5094,7 @@ function tick(now) {
   function startMusic() {
     if (state.musicStarted) return;
     state.musicStarted = true;
-    music.play().catch(() => { state.musicStarted = false; });
+    ensureKarasukiMusic().play().catch(() => { state.musicStarted = false; });
   }
 
   function getGamesThisWeek() {
