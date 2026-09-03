@@ -55,6 +55,9 @@ const CURRENT_CACHES = {
   // Muenba 27G aligns phone orientation and popup height with visualViewport.
   // Muenba scream asset pass right-sizes six mono MP3 one-shots for the
   // upcoming shared sample-loader pass.
+  // Pass 4 defers Karasuki, Utsuroba, and Happy House long-form music until
+  // playback. No asset-cache purge is needed: Pass 3's network-first script
+  // route fetches the updated loaders online while preserving offline copies.
   // Muenba 28A adds the shared decoded sample-loader and pitch variation API.
   // Muenba 28B adds staggered authored scream playback, decay, and danger-state cleanup.
   // Muenba 28C primes all authored clips after the first gesture and avoids immediate repeats.
