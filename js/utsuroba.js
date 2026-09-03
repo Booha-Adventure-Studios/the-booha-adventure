@@ -35,6 +35,7 @@
   let worldInitialized = false;
 
   const MAX_DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let canvasDpr    = MAX_DPR;
 
   const LOW_POWER_HINT = Boolean(
     (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
@@ -1418,7 +1419,7 @@
       const p = document.getElementById('buki-dev-perf');
       const q = document.getElementById('buki-dev-quest');
       if (r) r.textContent = `room:${state.roomId} moved:${Math.round(state.distMovedSinceSpawn)}`;
-      if (p) p.textContent = `tier:${perfTier} dpr:${MAX_DPR} touch:${isTouchDevice}`;
+      if (p) p.textContent = `tier:${perfTier} dpr:${canvasDpr} touch:${isTouchDevice}`;
       if (q) {
         const quest = getCachedQuest();
         q.textContent = quest
@@ -2768,10 +2769,12 @@
      CANVAS / FIT
   ═══════════════════════════════════════════ */
   function resizeCanvas() {
+    const dpr = perfTier === 'low' ? 1 : MAX_DPR;
+    canvasDpr = dpr;
     canvas.style.width = WORLD_W+'px'; canvas.style.height = WORLD_H+'px';
-    canvas.width  = Math.round(WORLD_W*MAX_DPR);
-    canvas.height = Math.round(WORLD_H*MAX_DPR);
-    ctx.setTransform(MAX_DPR,0,0,MAX_DPR,0,0);
+    canvas.width  = Math.round(WORLD_W*dpr);
+    canvas.height = Math.round(WORLD_H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
   }
   function fitStage() {
     const scale = Math.max(window.innerWidth/WORLD_W, window.innerHeight/WORLD_H);
@@ -2785,7 +2788,15 @@
     if (perfTier === 'low') return;
     perfFrameCount++;
     if (perfFrameCount === 1) { perfFirstTime = now; return; }
-    if (perfFrameCount === 90) { const avg = 89/((now-perfFirstTime)/1000); if (avg < 40) { perfTier = 'low'; shadowsEnabled = false; } }
+    if (perfFrameCount === 90) {
+      const averageFps = 89 / ((now - perfFirstTime) / 1000);
+      if (averageFps < 40) {
+        perfTier = 'low';
+        shadowsEnabled = false;
+        resizeCanvas();
+        trail.length = Math.min(trail.length, 30);
+      }
+    }
   }
 
   /* ═══════════════════════════════════════════
