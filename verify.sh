@@ -1139,6 +1139,13 @@ else
   bad "Adaptive low-power, hidden-page, and static-overlay contracts failed"
 fi
 
+echo "[audio] Pass 4 deferred world-music audit"
+if node tests/deferred-world-music-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki, Utsuroba, and Happy House music-loading contracts pass"
+else
+  bad "Pass 4 deferred world-music audit failed"
+fi
+
 echo "[assets] Pass 3 weight audit"
 if node tests/asset-weight-audit.cjs >/dev/null 2>&1; then
   ok "Unused masters, audio bitrates, and Grimmerglen room WebP weights pass"

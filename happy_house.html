@@ -588,15 +588,23 @@
 
 
   /* ── BGM ── */
-  const bgm = new Audio('assets/happy_house/happy-house.mp3');
-  bgm.loop   = true;
-  bgm.volume = 0.65;
+  let bgm = null;
+
+  // Pass 4: defer this long-form track until Happy House is actually entered.
+  function ensureHappyHouseBgm() {
+    if (!bgm) {
+      bgm = new Audio('assets/happy_house/happy-house.mp3');
+      bgm.loop = true;
+      bgm.volume = 0.65;
+    }
+    return bgm;
+  }
   let bgmStarted = false;
 
   function startBGM() {
     if (bgmStarted) return;
     bgmStarted = true;
-    bgm.play().catch(() => {});
+    ensureHappyHouseBgm().play().catch(() => {});
   }
 
   /* ═══════════════════════════════════════════

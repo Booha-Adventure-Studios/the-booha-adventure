@@ -967,12 +967,32 @@
     { img: danceSwayImg,   contentScale: 0.801, offsetX:  0.009, offsetY: -0.015 },
     { img: danceWaveImg,   contentScale: 0.811, offsetX:  0.009, offsetY: -0.009 },
   ];
-  const music = new Audio('./assets/audio/utsuroba-music.mp3');
-  music.loop = true;
-  music.volume = 0.65;
-  const booDance = new Audio('./assets/audio/boo-dance.mp3');
-  booDance.loop = true;
-  booDance.volume = 0.72;
+  let music = null;
+  let booDance = null;
+
+  // Pass 4: keep the two long-form tracks out of the initial page load.
+  // Constructing the media element only when playback is requested preserves
+  // the existing looping behavior without making the browser fetch both
+  // tracks while the world is still booting.
+  function ensureUtsurobaMusic() {
+    if (!music) {
+      music = new Audio('./assets/audio/utsuroba-music.mp3');
+      music.loop = true;
+      music.volume = 0.65;
+    }
+    return music;
+  }
+  function ensureUtsurobaDanceAudio() {
+    if (!booDance) {
+      booDance = new Audio('./assets/audio/boo-dance.mp3');
+      booDance.loop = true;
+      booDance.volume = 0.72;
+    }
+    return booDance;
+  }
+  function playUtsurobaMusic() {
+    return ensureUtsurobaMusic().play().catch(() => {});
+  }
 
   function stopBooDance() {
     try { booDance.pause(); booDance.currentTime = 0; } catch (_) {}
@@ -2564,7 +2584,7 @@
     drifterPanelOpen     = false;
     drifterPanel.classList.remove('open');
     setTimeout(() => { state.inputLocked = false; }, PANEL_SLIDE_MS);
-    try { music.play().catch(() => {}); } catch(_) {}
+    try { playUtsurobaMusic(); } catch(_) {}
   }
 
   function persistQuestPatch(patch) {
@@ -2601,7 +2621,7 @@
         state.inputLocked = false;
         setTimeout(() => {
           if (!state.celebrating && !state.exitingToKarasuki) {
-            try { music.play().catch(() => {}); } catch(_) {}
+            try { playUtsurobaMusic(); } catch(_) {}
           }
         }, 0);
       },
@@ -2669,7 +2689,11 @@
     danceSparkles            = [];
     DANCE_FRAMES.forEach(frame => ensureUtsurobaImage(frame.img));
     try { music.pause(); } catch(_) {}
-    try { booDance.currentTime = 0; booDance.play().catch(() => {}); } catch(_) {}
+    try {
+      const danceAudio = ensureUtsurobaDanceAudio();
+      danceAudio.currentTime = 0;
+      danceAudio.play().catch(() => {});
+    } catch(_) {}
     playCelebrationChime(drifter);
 
     const pos = drifterWorldPos(drifter, weeklyRooms[DATA.drifters.indexOf(drifter)]);
@@ -2690,7 +2714,7 @@
         state.x = state.celebrateOrbitX;
         state.y = state.celebrateOrbitY;
         stopBooDance();
-        try { music.play().catch(() => {}); } catch(_) {}
+        try { playUtsurobaMusic(); } catch(_) {}
         state.inputLocked = false;
         showThankYouPanel(drifter);
       }, DANCE_SETTLE_MS);
@@ -3417,7 +3441,7 @@
   function startMusic() {
     if (state.musicStarted) return;
     state.musicStarted = true;
-    music.play().catch(() => { state.musicStarted = false; });
+    ensureUtsurobaMusic().play().catch(() => { state.musicStarted = false; });
   }
 
   function stagePointToWorld(cx,cy) {
