@@ -526,16 +526,21 @@ const HAPPY_HOUSE_PORTAL = {
     const convergenceEpisodeIds = Array.isArray(window.UTSUROBA_CONVERGENCE_EPISODE_IDS)
       ? window.UTSUROBA_CONVERGENCE_EPISODE_IDS : [];
     if (!convergenceEpisodeIds.length) { echoesTrackerEl.style.display = 'none'; return; }
-    let restored = {};
+    let data = null;
     try {
-      const data = (window.BoohaAdventure && BoohaAdventure.save) ? BoohaAdventure.save.load() : null;
-      restored = (data && data.utsuroba && data.utsuroba.readingEchoes) || {};
+      data = (window.BoohaAdventure && BoohaAdventure.save) ? BoohaAdventure.save.load() : null;
     } catch (_) {}
+    const mode = ['start', 'fresh', 'deep'].includes(window.UTSUROBA_READING_DIFFICULTY?.())
+      ? window.UTSUROBA_READING_DIFFICULTY() : 'start';
+    const weeklyDrifters = data?.weekly?.worlds?.utsuroba?.drifters || {};
     const nextLitEchoIds = new Set();
     const dots = convergenceEpisodeIds.map(episodeId => {
       const episode = episodes[episodeId];
       const motif = episode?.worldEcho?.motif && ECHO_ICON_FOR[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
-      const isLit = !!restored[episodeId];
+      const drifter = window.UTSUROBA_DATA?.drifters?.find(item => item.episodeId === episodeId);
+      const weekly = drifter ? weeklyDrifters[drifter.id] : null;
+      const isLit = weekly?.statusByMode?.[mode] === 'complete'
+        || (Array.isArray(weekly?.completedModes?.[mode]) && weekly.completedModes[mode].length > 0);
       if (isLit) nextLitEchoIds.add(episodeId);
       const justLit = isLit && lastLitEchoIds && !lastLitEchoIds.has(episodeId);
       return `<span class="utsu-hud-chip-dot motif-${motif}${isLit ? ' is-lit' : ''}${justLit ? ' is-just-lit' : ''}"><span aria-hidden="true">${ECHO_ICON_FOR[motif]}</span></span>`;
@@ -4678,11 +4683,79 @@ const HAPPY_HOUSE_PORTAL = {
   function getRoom() { return DATA.rooms[state.roomId]; }
   function getSpawn(room, spawnId) { return room.spawns?.[spawnId] || room.spawns?.default || { x: 480, y: 270 }; }
   function placeGhost(x, y) { state.x = x; state.y = y; }
-  function makeBg(src) { const img = document.createElement("img"); img.className = "karasuki-bg"; img.src = src; return img; }
+  const imageCache = new Map();
+
+  function getImage(roomId) {
+    if (imageCache.has(roomId)) return imageCache.get(roomId);
+    const room = DATA.rooms[roomId];
+    if (!room) return null;
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = room.bg;
+    imageCache.set(roomId, image);
+    return image;
+  }
+
+  function getRoomExits(roomId) {
+    return (NPP[roomId] || []).filter(exit => exit && DATA.rooms[exit.to]);
+  }
+
+  function trimRoomCachesToNeighborhood(roomId) {
+    const keep = new Set([roomId, ...getRoomExits(roomId).map(exit => exit.to)]);
+    for (const cachedRoomId of imageCache.keys()) {
+      if (!keep.has(cachedRoomId)) imageCache.delete(cachedRoomId);
+    }
+  }
+
+  function preloadAdjacent(roomId) {
+    getImage(roomId);
+    for (const exit of getRoomExits(roomId)) getImage(exit.to);
+  }
+
+  function showRoom(roomId) {
+    preloadAdjacent(roomId);
+    trimRoomCachesToNeighborhood(roomId);
+    const image = getImage(roomId);
+    if (!image) return null;
+    image.className = 'karasuki-bg';
+    roomLayer.replaceChildren(image);
+    currentBg = image;
+    return image;
+  }
+
+  function waitForKarasukiImage(image, timeoutMs = 1600) {
+    if (!image) return Promise.resolve(false);
+    return new Promise(resolve => {
+      let settled = false;
+      let timer = 0;
+      const settle = ready => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        image.removeEventListener('load', onLoad);
+        image.removeEventListener('error', onError);
+        resolve(ready);
+      };
+      const decode = () => {
+        if (typeof image.decode !== 'function') { settle(image.naturalWidth > 0); return; }
+        image.decode().then(() => settle(image.naturalWidth > 0)).catch(() => settle(image.naturalWidth > 0));
+      };
+      const onLoad = () => decode();
+      const onError = () => settle(false);
+      image.addEventListener('load', onLoad, { once: true });
+      image.addEventListener('error', onError, { once: true });
+      timer = window.setTimeout(() => settle(image.naturalWidth > 0), timeoutMs);
+      if (image.complete) {
+        if (image.naturalWidth > 0) decode();
+        else settle(false);
+      }
+    });
+  }
+
   let currentBg;
 
   function renderInitialRoom() {
-    const room = getRoom(); currentBg = makeBg(room.bg); roomLayer.appendChild(currentBg);
+    const room = getRoom(); showRoom(state.roomId);
     const spawn = getSpawn(room, state.spawnId); placeGhost(spawn.x, spawn.y);
     state.spawnX = spawn.x; state.spawnY = spawn.y;
     const now = performance.now();
@@ -4717,25 +4790,34 @@ const HAPPY_HOUSE_PORTAL = {
   function transitionTo(exit) {
     if (!exit?.to || state.transitioning) return;
     const nextRoom = DATA.rooms[exit.to]; if (!nextRoom) return;
-    state.transitioning = true; state.clickTarget = null;
+    // Ask for the next room before covering the current one so warm-cache
+    // walks stay instant and cold-cache walks can spend the fade time loading.
+    const nextImage = getImage(exit.to);
+    preloadAdjacent(exit.to);
+    state.transitioning = true; state.inputLocked = true; state.clickTarget = null;
     const fadeEl = document.getElementById("kara-fade");
     fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-in`; fadeEl.style.opacity = "1";
-    setTimeout(() => {
-      const nextBg = makeBg(nextRoom.bg); roomLayer.innerHTML = ""; roomLayer.appendChild(nextBg); currentBg = nextBg;
-      state.roomId = exit.to; onRoomChanged(); state.spawnId = exit.spawn || "default";
-      saveCurrentRoom();
-      const spawn = getSpawn(nextRoom, state.spawnId); placeGhost(spawn.x, spawn.y);
-      state.spawnX = spawn.x; state.spawnY = spawn.y; state.arrivalDir = exit.dir || null;
-      trail = []; pins = [];
-      const now = performance.now();
-      state.transitionReadyAt = now + TRANSITION_COOLDOWN_MS;
-      arrivalArrowHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS;
-      arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
-      state.distMovedSinceSpawn = 0; state.spawnLockUntil = now + 500;
-      const lh = pinLog.querySelector(".log-header span"); if (lh) lh.textContent = `PINS — ${state.roomId}`;
-      renderPinLog();
+    setTimeout(async () => {
+      try {
+        showRoom(exit.to);
+        state.roomId = exit.to; onRoomChanged(); state.spawnId = exit.spawn || "default";
+        saveCurrentRoom();
+        const spawn = getSpawn(nextRoom, state.spawnId); placeGhost(spawn.x, spawn.y);
+        state.spawnX = spawn.x; state.spawnY = spawn.y; state.arrivalDir = exit.dir || null;
+        trail = []; pins = [];
+        const now = performance.now();
+        state.transitionReadyAt = now + TRANSITION_COOLDOWN_MS;
+        arrivalArrowHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS;
+        arrivalArrowBackHiddenUntil = now + ARRIVAL_ARROW_DELAY_MS * ARRIVAL_ARROW_BACK_MULTIPLIER;
+        state.distMovedSinceSpawn = 0; state.spawnLockUntil = now + 500;
+        const lh = pinLog.querySelector(".log-header span"); if (lh) lh.textContent = `PINS — ${state.roomId}`;
+        renderPinLog();
+        await waitForKarasukiImage(nextImage);
+      } catch (error) {
+        console.warn('[Karasuki] Room image readiness failed; revealing fallback room.', error);
+      }
       fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-out`; fadeEl.style.opacity = "0";
-      setTimeout(() => { state.transitioning = false; startEntryDrift(); }, FADE_MS/2 + 30);
+      setTimeout(() => { state.transitioning = false; state.inputLocked = false; startEntryDrift(); }, FADE_MS/2 + 30);
     }, FADE_MS/2 + 20);
   }
 
@@ -5018,7 +5100,10 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function staticFrameOverlayOpen() {
-    return anyModalOpen();
+    return state.mazeExiting || state.muenbaExiting || isPortalOpen()
+      || isBonusPopOpen() || isWandererPopOpen() || isUtsuobaPopOpen()
+      || isMuenbaPopupOpen() || isObserverPopOpen() || isNuppiPopOpen()
+      || isOrbPanelOpen() || isHappyHousePopOpen();
   }
 
   function scheduleKarasukiFrame() {
@@ -5793,6 +5878,10 @@ function drawObserver(now) {
     restoreProfileRoom();
     fitStage(); resizeCanvas();
     initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    document.addEventListener('booha:weeklyReset', () => {
+      lastLitEchoIds = null;
+      renderEchoesTracker();
+    });
     
     window.addEventListener("resize",()=>{ fitStage(); resizeCanvas(); });
     worldInitialized = true;
