@@ -1111,6 +1111,13 @@ else
   bad "Service-worker Pass 1 precache resilience audit failed"
 fi
 
+echo "[service-worker] Pass 3 HTML/JavaScript coherence audit"
+if node tests/service-worker-coherence-audit.cjs >/dev/null 2>&1; then
+  ok "Service-worker JavaScript network-first coherence contracts pass"
+else
+  bad "Service-worker Pass 3 HTML/JavaScript coherence audit failed"
+fi
+
 echo "[profile] Adventure-log Pass 1 fail-soft audit"
 if node tests/adventure-log-fail-soft-audit.cjs >/dev/null 2>&1; then
   ok "Adventure-log weekly loading and error-state contracts pass"

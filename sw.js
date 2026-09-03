@@ -11,8 +11,8 @@ const CURRENT_CACHES = {
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
   pages:  'booha-pages-2026-404',
-  // js/ is served cache-first (see ASSET_PREFIXES below), so once a device
-  // caches a script it never re-fetches it until this string changes.
+  // JavaScript is served network-first with a cached fallback (see fetch
+  // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
   // asset, so invalidate the previous script bundle.
   // Connected-doors pass: bumped for js/karasuki.js's UTSUROBA_LOCKED_COPY
@@ -329,6 +329,14 @@ self.addEventListener('fetch', (event) => {
   // ── Study decks / JSON → Cache-first, then network ───────
   if (DECK_PATTERNS.some((pattern) => pattern.test(path))) {
     event.respondWith(cacheFirst(request, DECK_CACHE));
+    return;
+  }
+
+  // ── JavaScript → Network-first, fall back to cached script ─
+  // Keep the HTML/JavaScript pair coherent whenever the device is online;
+  // the cached copy remains available for offline and weak-network starts.
+  if (/\.m?js$/.test(path)) {
+    event.respondWith(networkFirst(request, ASSET_CACHE));
     return;
   }
 
