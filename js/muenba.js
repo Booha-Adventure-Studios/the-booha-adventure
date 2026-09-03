@@ -314,6 +314,17 @@
   const TOUCH_DEVICE = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   const REDUCED_MOTION = typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LOW_POWER_HINT = Boolean(
+    (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
+    || REDUCED_MOTION
+  );
+  let perfTier       = LOW_POWER_HINT ? 'low' : 'high';
+  let perfFrameCount = 0;
+  let perfFirstTime  = 0;
+  let shadowsEnabled = perfTier !== 'low';
+  let rafHandle      = null;
+  let pageHidden     = document.hidden;
+  let worldInitialized = false;
 
   const state = {
     roomId: DATA.rooms[requestedRoom] ? requestedRoom : DATA.startRoom,
@@ -834,7 +845,12 @@
   }
 
   function handleMuenbaVisibilityChange() {
+    pageHidden = document.hidden;
     if (document.hidden) {
+      if (rafHandle) window.cancelAnimationFrame(rafHandle);
+      rafHandle = null;
+      perfFrameCount = 0;
+      perfFirstTime = 0;
       if (dangerScreamStateIsActive()) {
         dangerScreamVisibilityPaused = true;
         stopDangerScream();
@@ -842,6 +858,10 @@
       pauseRhythmForVisibility();
       return;
     }
+    perfFrameCount = 0;
+    perfFirstTime = 0;
+    state.lastTickTime = 0;
+    scheduleMuenbaFrame();
     if (captureSession?.phase === 'rhythm-paused') {
       renderRhythmResume();
       return;
@@ -6086,11 +6106,11 @@
   }
 
   function resizeCanvas() {
-    // Two full-world canvases at DPR 2 are unnecessarily expensive on many
+    // Three full-world canvases at DPR 2 are unnecessarily expensive on many
     // touch devices. DPR 1.5 keeps the fixed stage clean while cutting the
     // backing-store pixels substantially; desktop/high-density screens retain
     // the sharper DPR 2 path.
-    const maxDpr = TOUCH_DEVICE ? 1.5 : 2;
+    const maxDpr = perfTier === 'low' ? 1 : (TOUCH_DEVICE ? 1.5 : 2);
     const dpr = Math.min(maxDpr, Math.max(1, window.devicePixelRatio || 1));
     for (const canvas of [roomTintCanvas, atmosphereCanvas, actorCanvas]) {
       canvas.width = Math.round(WORLD_W * dpr);
@@ -7314,7 +7334,7 @@
     // The glow belongs to Nuppi's sprite now. There are no orbiting or
     // outlined circles, so he reads as a living guide rather than a map pin.
     actorCtx.globalAlpha = .9 + pulse * .1;
-    actorCtx.shadowBlur = (highlighted ? 30 : 18) + pulse * (highlighted ? 16 : 11);
+    actorCtx.shadowBlur = shadowsEnabled ? (highlighted ? 30 : 18) + pulse * (highlighted ? 16 : 11) : 0;
     actorCtx.shadowColor = highlighted
       ? `rgba(255,226,132,${.55 + pulse * .25})`
       : `rgba(122,224,177,${.42 + pulse * .22})`;
@@ -7349,7 +7369,7 @@
     actorCtx.globalAlpha = glow * .42;
     actorCtx.strokeStyle = `rgba(${roomGlowStr},.92)`;
     actorCtx.shadowColor = `rgba(${roomGlowStr},.86)`;
-    actorCtx.shadowBlur = 18 + pulse * 8;
+    actorCtx.shadowBlur = shadowsEnabled ? 18 + pulse * 8 : 0;
     actorCtx.lineWidth = 5;
     actorCtx.lineCap = 'round';
     actorCtx.lineJoin = 'round';
@@ -7373,7 +7393,7 @@
     actorCtx.globalAlpha = .58 + pulse * .2;
     actorCtx.fillStyle = `rgb(${roomCoreStr})`;
     actorCtx.shadowColor = `rgba(${roomGlowStr},.78)`;
-    actorCtx.shadowBlur = 12 + pulse * 7;
+    actorCtx.shadowBlur = shadowsEnabled ? 12 + pulse * 7 : 0;
     actorCtx.font = '700 12px ui-monospace,monospace';
     actorCtx.textAlign = 'center';
     actorCtx.textBaseline = 'middle';
@@ -7437,7 +7457,7 @@
       actorCtx.globalAlpha = fade * (.24 + flicker * .14 + proximity * .12);
       actorCtx.strokeStyle = `rgba(${glowStr},.9)`;
       actorCtx.shadowColor = `rgba(${glowStr},.65)`;
-      actorCtx.shadowBlur = 14;
+      actorCtx.shadowBlur = shadowsEnabled ? 14 : 0;
       actorCtx.lineWidth = 3.6;
       actorCtx.lineCap = 'round';
       actorCtx.lineJoin = 'round';
@@ -7517,7 +7537,7 @@
         const twinkle = .5 + .5 * Math.sin(now / 100 + sparkle.phase);
         actorCtx.save();
         actorCtx.globalAlpha = sparkle.life * twinkle * .9;
-        actorCtx.shadowBlur = 7;
+        actorCtx.shadowBlur = shadowsEnabled ? 7 : 0;
         actorCtx.shadowColor = '#ffd700';
         actorCtx.fillStyle = sparkle.color;
         actorCtx.beginPath();
@@ -7750,7 +7770,43 @@
     document.addEventListener('touchend', startMusic, { once: true, passive: true });
   }
 
+  function updateMuenbaPerfTier(now) {
+    if (perfTier === 'low') return;
+    perfFrameCount += 1;
+    if (perfFrameCount === 1) { perfFirstTime = now; return; }
+    if (perfFrameCount === 90) {
+      const averageFps = 89 / ((now - perfFirstTime) / 1000);
+      if (averageFps < 40) {
+        perfTier = 'low';
+        shadowsEnabled = false;
+        resizeCanvas();
+      }
+    }
+  }
+
+  // Keep the world canvas static while a DOM panel owns the foreground. The
+  // capture loop has its own scheduler, so skipping this world repaint does
+  // not pause rhythm timing or the panel itself.
+  function staticFrameOverlayOpen() {
+    return lobbyOpen || returnPortalOpen || captureOpen || !isMuenbaOrientationReady();
+  }
+
+  function scheduleMuenbaFrame() {
+    if (worldInitialized && !pageHidden && !rafHandle) {
+      rafHandle = window.requestAnimationFrame(tick);
+    }
+  }
+
   function tick(now) {
+    rafHandle = null;
+    if (pageHidden) return;
+    if (staticFrameOverlayOpen()) {
+      // Do not let time spent behind a panel distort the measured world FPS.
+      perfFrameCount = 0;
+      perfFirstTime = 0;
+    } else {
+      updateMuenbaPerfTier(now);
+    }
     // Match Karasuki/Utsuroba: use elapsed time directly so a 30fps phone
     // still covers the same distance per second as a 60fps tablet.
     const dt = Math.min(50, Math.max(8, now - (state.lastTickTime || now)));
@@ -7762,7 +7818,7 @@
     // automatically when the modal closes, but do not update ghost AI or
     // redraw fog, motes, characters, or other canvas layers underneath it.
     if (captureOpen) {
-      window.requestAnimationFrame(tick);
+      scheduleMuenbaFrame();
       return;
     }
     const orientationReady = isMuenbaOrientationReady();
@@ -7781,8 +7837,8 @@
         tickGhost(now);
       }
     }
-    drawFrame(now);
-    window.requestAnimationFrame(tick);
+    if (!staticFrameOverlayOpen()) drawFrame(now);
+    scheduleMuenbaFrame();
   }
 
   function init() {
@@ -7803,7 +7859,8 @@
     state.navigationUnlocked = readMuenbaWeekly().huntAccepted === true;
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
-    window.requestAnimationFrame(tick);
+    worldInitialized = true;
+    scheduleMuenbaFrame();
     // Nuppi's dialogue is player-invoked from his room hit target. Entry and
     // profile-return flows should leave Booha in free roam without a modal.
   }
