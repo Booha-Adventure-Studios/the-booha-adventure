@@ -11,3 +11,6 @@ test-results/
 playwright-report/
 *.log
 
+# Local generated artifacts (keep deployed source at the repository root)
+/output/
+/tmp/
