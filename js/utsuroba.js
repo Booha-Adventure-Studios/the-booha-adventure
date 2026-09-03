@@ -689,7 +689,8 @@
   }
 
   function drifterCompletedThisWeek(id) {
-    return drifterWeekStatus(id) === 'complete';
+    const drifter = DATA.drifters.find(item => item.id === id);
+    return drifter ? drifterRestoredThisWeek(drifter) : drifterWeekStatus(id) === 'complete';
   }
 
   function drifterRestingThisWeek(id) {
@@ -906,11 +907,13 @@
     if (!Array.isArray(requiredIds) || requiredIds.length < 3 || !requiredIds.includes(drifterId)) return false;
     const current = DATA.drifters.find(drifter => drifter.id === drifterId);
     if (!current?.episodeId) return false;
-    const restored = readUtsuroba().readingEchoes || {};
-    if (restored[current.episodeId]) return false;
+    // The explanatory gate is a one-time permanent story beat. Its weekly
+    // prerequisite is still evaluated from the current tier, so a new week
+    // must rebuild all three echoes before the gate can appear again.
+    if (readUtsuroba().flags?.convergenceSeen) return false;
     const restoredBeforeCurrent = requiredIds.filter(id => {
       const drifter = DATA.drifters.find(item => item.id === id);
-      return drifter && drifter.episodeId && restored[drifter.episodeId];
+      return drifter && drifterRestoredThisWeek(drifter);
     }).length;
     return restoredBeforeCurrent === requiredIds.length - 1;
   }
@@ -1569,9 +1572,27 @@
     </div>`;
   }
 
-  function drifterMemoryRestored(drifter) {
+  function drifterRestoredEver(drifter) {
     const episodeId = drifter && drifter.episodeId;
     return !!(episodeId && getCachedDrifterState().readingEchoes?.[episodeId]);
+  }
+
+  function drifterRestoredThisWeek(drifter, mode = currentReadingMode(), data = null) {
+    const id = drifter && drifter.id;
+    if (!id) return false;
+    const normalizedMode = readingMode(mode);
+    const world = data ? ensureWeeklyUtsuroba(data) : { drifters: getCachedWeeklyDrifterState().drifters };
+    const record = world.drifters?.[id];
+    if (!record || typeof record !== 'object') return false;
+    if (record.statusByMode?.[normalizedMode] === 'complete') return true;
+    const completed = record.completedModes?.[normalizedMode];
+    return Array.isArray(completed) && completed.length > 0;
+  }
+
+  // Keep the old descriptive call available for lifetime-only surfaces while
+  // making weekly world visuals use the explicit weekly helper above.
+  function drifterMemoryRestored(drifter) {
+    return drifterRestoredEver(drifter);
   }
 
   function renderMemoryEchoes() {
@@ -1590,7 +1611,7 @@
        The old "The lantern remembers" hotspots were too easy to hit while
        simply walking through a room. */
     const gate = DATA.readingConvergence;
-    if (gate && gate.gateRoom === state.roomId && allReadingMemoriesRestored()) {
+    if (gate && gate.gateRoom === state.roomId && allRequiredEchoesRestoredThisWeek()) {
       const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen;
       const gardenButton = document.createElement('button');
       gardenButton.type = 'button';
@@ -1710,10 +1731,10 @@
     if (!episodeDrifters.length) { echoesTrackerEl.style.display = 'none'; return; }
 
     const utsu = readUtsuroba();
-    const restored = utsu.readingEchoes || {};
+    const mode = currentReadingMode();
     const episodes = window.UTSUROBA_EPISODES || {};
     const iconFor = { lantern: '✦', candy: '●', reflection: '◈', window: '▱' };
-    const worldUnderstood = !!utsu.flags?.convergenceSeen;
+    const worldUnderstood = !!utsu.flags?.convergenceSeen && allRequiredEchoesRestoredThisWeek(mode);
     const garden = convergence.garden;
     const label   = worldUnderstood && garden ? garden.title   : convergence.title;
     const labelJP = worldUnderstood && garden ? garden.titleJP : convergence.titleJP;
@@ -1722,7 +1743,7 @@
     const dots = episodeDrifters.map(d => {
       const episode = d.episodeId ? episodes[d.episodeId] : null;
       const motif = episode?.worldEcho?.motif && iconFor[episode.worldEcho.motif] ? episode.worldEcho.motif : 'lantern';
-      const isLit = !!(d.episodeId && restored[d.episodeId]);
+      const isLit = drifterRestoredThisWeek(d, mode);
       if (isLit && d.episodeId) nextLitEchoIds.add(d.episodeId);
       const justLit = isLit && d.episodeId && lastLitEchoIds && !lastLitEchoIds.has(d.episodeId);
       const status = isLit ? 'found' : 'not found yet';
@@ -1744,6 +1765,16 @@
       !!(drifter.episodeId && restored[drifter.episodeId]));
   }
 
+  function allRequiredEchoesRestoredThisWeek(mode = currentReadingMode()) {
+    const requiredIds = DATA.readingConvergence?.requiredDrifterIds;
+    if (!Array.isArray(requiredIds) || requiredIds.length < 3) return false;
+    const requiredDrifters = requiredIds
+      .map(id => DATA.drifters.find(drifter => drifter.id === id))
+      .filter(drifter => drifter && drifter.episodeId);
+    return requiredDrifters.length === requiredIds.length
+      && requiredDrifters.every(drifter => drifterRestoredThisWeek(drifter, mode));
+  }
+
   function closeMemoryConvergence() {
     convergenceOpen = false;
     if (convergenceOverlay) convergenceOverlay.remove();
@@ -1759,7 +1790,7 @@
   }
 
   function openMemoryGarden() {
-    if (gardenOpen || !allReadingMemoriesRestored() || !readUtsuroba().flags?.convergenceSeen || drifterPanelOpen || readingJournalOpen || convergenceOpen) return;
+    if (gardenOpen || !allRequiredEchoesRestoredThisWeek() || !readUtsuroba().flags?.convergenceSeen || drifterPanelOpen || readingJournalOpen || convergenceOpen) return;
     const garden = DATA.readingConvergence?.garden;
     if (!garden) return;
     gardenOpen = true;
@@ -1775,7 +1806,7 @@
   }
 
   async function openMemoryConvergence() {
-    if (convergenceOpen || !allReadingMemoriesRestored() || drifterPanelOpen || readingJournalOpen) return;
+    if (convergenceOpen || !allRequiredEchoesRestoredThisWeek() || drifterPanelOpen || readingJournalOpen) return;
     convergenceOpen = true;
     state.inputLocked = true;
     convergenceOverlay = document.createElement('div');
@@ -1852,6 +1883,15 @@
     window.UTSUROBA_EPISODES_READY.then(renderMemoryEchoes).catch(() => {});
   }
 
+  function handleUtsurobaWeeklyReset() {
+    invalidateDrifterStateCache();
+    invalidateQuestCache();
+    lastLitEchoIds = null;
+    refreshMemoryEchoes();
+    renderEchoesTracker();
+    refreshReadingChallengeButton();
+  }
+
   function readingJournalEntries() {
     const entries = readUtsuroba().readingJournal?.entries;
     return Array.isArray(entries) ? entries : [];
@@ -1887,7 +1927,10 @@
     const challenge = DATA.readingChallenge;
     const bundle = weeklyReadingChallengeState();
     const state = bundle.state || { evidenceUsed: false, postcardSaved: false, lensReplayed: false };
-    const restoredCount = Object.keys(bundle.data.utsuroba?.readingEchoes || {}).length;
+    const mode = currentReadingMode();
+    const restoredCount = DATA.drifters.filter(drifter =>
+      drifter.episodeId && drifterRestoredThisWeek(drifter, mode, bundle.data)
+    ).length;
     const values = {
       memories: restoredCount,
       evidence: state.evidenceUsed ? 1 : 0,
@@ -2291,9 +2334,10 @@
     const replayOffer = !quest && hasMemories && !hasUnfinishedMemory;
     const completedThisWeek = drifterCompletedThisWeek(drifter.id);
     const restingThisWeek = drifterRestingThisWeek(drifter.id);
-    const hasRestoredMemory = drifterMemoryRestored(drifter);
+    const hasRestoredMemory = drifterRestoredThisWeek(drifter);
+    const hasRestoredEver = drifterRestoredEver(drifter);
     const questTrack = questTrackHTML(drifter, quest, hasRestoredMemory);
-    const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen && allReadingMemoriesRestored();
+    const worldUnderstood = !!readUtsuroba().flags?.convergenceSeen && allRequiredEchoesRestoredThisWeek();
     const relationshipEpisodeId = DATA.readingRelationships?.triggerEpisodeId;
     const relationshipAwake = worldUnderstood && !!relationshipEpisodeId && !!readUtsuroba().readingEchoes?.[relationshipEpisodeId];
 
@@ -2421,7 +2465,7 @@
       ? 'restored'
       : hasQuestOffer
       ? 'offer'
-      : (relationshipAwake || worldUnderstood || hasRestoredMemory ? 'restored' : 'idle');
+      : (relationshipAwake || worldUnderstood || hasRestoredEver ? 'restored' : 'idle');
     const legacyDialogue = window.UTSUROBA_LEGACY_DIALOGUE?.[drifter.id]?.[dialogueMode];
     const baseLines = questInProgressWithThisDrifter
       ? []
@@ -2431,7 +2475,7 @@
           ? drifter.relationshipGreeting
           : (worldUnderstood && drifter.convergenceGreeting
           ? drifter.convergenceGreeting
-          : (hasRestoredMemory && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)))));
+          : (hasRestoredEver && drifter.restoredGreeting ? drifter.restoredGreeting : drifter.greeting)))));
     const dialogueVariant = dialogueVariantFor(drifter);
     const weeklyLine = !questInProgressWithThisDrifter && dialogueVariant
       ? dialogueVariant[dialogueMode]
@@ -2855,11 +2899,78 @@
     return spawnToWorld(sp);
   }
   function placeGhost(x,y) { state.x = x; state.y = y; }
-  function makeBg(src) { const img = document.createElement('img'); img.className = 'utsuroba-bg'; img.src = src; return img; }
+  const imageCache = new Map();
+
+  function getImage(roomId) {
+    if (imageCache.has(roomId)) return imageCache.get(roomId);
+    const room = DATA.rooms[roomId];
+    if (!room) return null;
+    const image = new Image();
+    image.decoding = 'async';
+    image.src = room.bg;
+    imageCache.set(roomId, image);
+    return image;
+  }
+
+  function getRoomExits(roomId) {
+    return (NPP[roomId] || []).filter(exit => exit && DATA.rooms[exit.to]);
+  }
+
+  function trimRoomCachesToNeighborhood(roomId) {
+    const keep = new Set([roomId, ...getRoomExits(roomId).map(exit => exit.to)]);
+    for (const cachedRoomId of imageCache.keys()) {
+      if (!keep.has(cachedRoomId)) imageCache.delete(cachedRoomId);
+    }
+  }
+
+  function preloadAdjacent(roomId) {
+    getImage(roomId);
+    for (const exit of getRoomExits(roomId)) getImage(exit.to);
+  }
+
+  function showRoom(roomId) {
+    preloadAdjacent(roomId);
+    trimRoomCachesToNeighborhood(roomId);
+    const image = getImage(roomId);
+    if (!image) return null;
+    image.className = 'utsuroba-bg';
+    roomLayer.replaceChildren(image);
+    currentBg = image;
+    return image;
+  }
+
+  function waitForUtsurobaImage(image, timeoutMs = 1600) {
+    if (!image) return Promise.resolve(false);
+    return new Promise(resolve => {
+      let settled = false;
+      let timer = 0;
+      const settle = ready => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        image.removeEventListener('load', onLoad);
+        image.removeEventListener('error', onError);
+        resolve(ready);
+      };
+      const decode = () => {
+        if (typeof image.decode !== 'function') { settle(image.naturalWidth > 0); return; }
+        image.decode().then(() => settle(image.naturalWidth > 0)).catch(() => settle(image.naturalWidth > 0));
+      };
+      const onLoad = () => decode();
+      const onError = () => settle(false);
+      image.addEventListener('load', onLoad, { once: true });
+      image.addEventListener('error', onError, { once: true });
+      timer = window.setTimeout(() => settle(image.naturalWidth > 0), timeoutMs);
+      if (image.complete) {
+        if (image.naturalWidth > 0) decode();
+        else settle(false);
+      }
+    });
+  }
   let currentBg;
 
   function renderInitialRoom() {
-    const room = getRoom(); currentBg = makeBg(room.bg); roomLayer.appendChild(currentBg);
+    const room = getRoom(); showRoom(state.roomId);
     const spawn = getSpawn(room, state.spawnId);
     placeGhost(ENTER_START_X, ENTER_START_Y);
     state.spawnX = spawn.x; state.spawnY = spawn.y;
@@ -2907,18 +3018,25 @@
   function transitionTo(exit) {
     if (!exit?.to || state.transitioning) return;
     const nextRoom = DATA.rooms[exit.to]; if (!nextRoom) return;
+    const nextImage = getImage(exit.to);
+    preloadAdjacent(exit.to);
     state.transitioning = true; state.clickTarget = null; state.inputLocked = true;
     const fadeEl = document.getElementById('buki-fade');
     fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-in`; fadeEl.style.opacity = '1';
-    setTimeout(() => {
-      const nextBg = makeBg(nextRoom.bg); roomLayer.innerHTML = ''; roomLayer.appendChild(nextBg); currentBg = nextBg;
-      state.roomId  = exit.to; state.spawnId = exit.spawn || 'default';
-      markVisited();
-      saveCurrentRoom();
-      arriveInRoom(nextRoom, state.spawnId, exit.dir);
-      refreshMemoryEchoes();
+    setTimeout(async () => {
+      try {
+        showRoom(exit.to);
+        state.roomId  = exit.to; state.spawnId = exit.spawn || 'default';
+        markVisited();
+        saveCurrentRoom();
+        arriveInRoom(nextRoom, state.spawnId, exit.dir);
+        refreshMemoryEchoes();
+        await waitForUtsurobaImage(nextImage);
+      } catch (error) {
+        console.warn('[Utsuroba] Room image readiness failed; revealing fallback room.', error);
+      }
       fadeEl.style.transition = `opacity ${FADE_MS/2}ms ease-out`; fadeEl.style.opacity = '0';
-      setTimeout(() => { state.transitioning = false; }, FADE_MS/2+30);
+      setTimeout(() => { state.transitioning = false; state.inputLocked = false; }, FADE_MS/2+30);
     }, FADE_MS/2+20);
   }
 
@@ -3034,7 +3152,7 @@
 
     drifters.forEach(drifter => {
       const hasMemories = drifterHasMemories(drifter.id);
-      const hasRestoredMemory = drifterMemoryRestored(drifter);
+      const hasRestoredMemory = drifterRestoredThisWeek(drifter);
       const completedThisWeek = drifterCompletedThisWeek(drifter.id);
       const restingThisWeek = drifterRestingThisWeek(drifter.id);
       const isWaiting   = !!(quest && quest.active === drifter.id && quest.state === 'accepted');
@@ -3148,12 +3266,12 @@
      room. This is one radial gradient per restored echo, drawn before the
      characters and arrows, so it stays cheap and never obscures gameplay. */
   function drawRestoredRoomShimmer(now) {
-    const restored = readUtsuroba().readingEchoes || {};
+    const mode = currentReadingMode();
     const episodes = window.UTSUROBA_EPISODES || {};
     const echoes = DATA.drifters.map(drifter => {
       const episode = drifter.episodeId ? episodes[drifter.episodeId] : null;
       const echo = episode && episode.worldEcho;
-      return echo && echo.roomId === state.roomId && restored[drifter.episodeId]
+      return echo && echo.roomId === state.roomId && drifterRestoredThisWeek(drifter, mode)
         ? { echo, motif: echo.motif }
         : null;
     }).filter(Boolean);
@@ -3518,6 +3636,7 @@
     renderInitialRoom();
     refreshMemoryEchoes();
     bindInput();
+    document.addEventListener('booha:weeklyReset', handleUtsurobaWeeklyReset);
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     markVisited();
     worldInitialized = true;
