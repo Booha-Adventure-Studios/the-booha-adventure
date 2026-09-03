@@ -125,6 +125,29 @@ const BoohaAdventureLog = (() => {
     return e;
   }
 
+  function showMountFallback(mount, label, error) {
+    console.error(`[AdventureLog] ${label} section failed:`, error);
+    if (!mount) return;
+    mount.replaceChildren();
+    mount.setAttribute('aria-busy', 'false');
+    const box = el('div', 'profile-render-fallback');
+    box.setAttribute('role', 'status');
+    box.appendChild(el('strong', null, `${label} is temporarily unavailable.`));
+    box.appendChild(el('small', null, 'Try refreshing this page.'));
+    mount.appendChild(box);
+  }
+
+  function showWeeklyLoading(mount) {
+    if (!mount) return;
+    mount.replaceChildren();
+    mount.setAttribute('aria-busy', 'true');
+    const box = el('div', 'profile-render-fallback is-loading');
+    box.setAttribute('role', 'status');
+    box.appendChild(el('strong', null, 'Loading this week’s progress…'));
+    box.appendChild(el('small', null, '今週のきろくを よみこんでいます'));
+    mount.appendChild(box);
+  }
+
   function formatPastWeekLabel(key) {
     const match = String(key).match(/^(\d{4})-(\d{2})-(\d{2})\|([a-z]+)-w(\d+)$/);
     if (!match) return String(key).slice(5);
@@ -381,48 +404,102 @@ const BoohaAdventureLog = (() => {
     const wMount = document.getElementById('alog-week');
     const cMount = document.getElementById('alog-calendar');
     const pMount = document.getElementById('alog-past');
-    if (!wMount || !window.BoohaDayRecord || !window.CALENDAR) return;
+    if (!wMount) return;
+    showWeeklyLoading(wMount);
 
-    const keys    = BoohaDayRecord.getCurrentKeys();
-    if (!keys) return; // CALENDAR failed — sections stay empty rather than wrong
-    const dayLog  = BoohaDayRecord.getDayLog();
-    const weekLog = BoohaDayRecord.getWeekLog();
-    let curr = null;
     try {
-      const s = localStorage.getItem('booha_profile_curr');
-      if (['pb', 'br', 'bc'].includes(s)) curr = s;
-    } catch (_) {}
-    if (!curr) curr = inferCurriculum(weekLog, keys.week);
-    const gamesFor = c => BoohaGameRegistry.getForCurriculum(c).map(g => ({
-      id: g.baseId || g.id.split(':').pop(), name: g.name
-    }));
-    const games = gamesFor(curr);
+      if (!window.BoohaDayRecord || !window.CALENDAR || !window.BoohaGameRegistry) {
+        throw new Error('weekly log dependencies are unavailable');
+      }
 
-    let playerName = 'PLAYER';
-    try {
-      const raw = localStorage.getItem('booha_first_name') ||
-                  (localStorage.getItem('booha_user_name') || '').split(/\s+/)[0];
-      if (raw) playerName = raw.trim().slice(0, 12).toUpperCase();
-    } catch (_) {}
+      const keys = BoohaDayRecord.getCurrentKeys();
+      if (!keys || typeof keys.week !== 'string' || typeof keys.day !== 'string') {
+        throw new Error('current calendar keys are unavailable');
+      }
+      const dayLog = BoohaDayRecord.getDayLog();
+      const weekLog = BoohaDayRecord.getWeekLog();
+      if (!weekLog || typeof weekLog !== 'object' || Array.isArray(weekLog)) {
+        throw new Error('weekly log data is unavailable');
+      }
 
-    const title = document.getElementById('alog-title');
-    if (title) title.textContent = `${playerName}のぼうけんログ`;
+      let curr = null;
+      try {
+        const s = localStorage.getItem('booha_profile_curr');
+        if (['pb', 'br', 'bc'].includes(s)) curr = s;
+      } catch (_) {}
+      if (!curr) curr = inferCurriculum(weekLog, keys.week);
 
-    const paint = (c) => {
-      try { localStorage.setItem('booha_profile_curr', c); } catch (_) {}
-      const g = gamesFor(c);
-      const reference = {
-        average: recentFullWeekAverage(weekLog, keys.week, c, g),
+      const gamesFor = c => {
+        if (!['pb', 'br', 'bc'].includes(c)
+          || typeof BoohaGameRegistry.getForCurriculum !== 'function') {
+          throw new Error('curriculum lookup is unavailable');
+        }
+        const entries = BoohaGameRegistry.getForCurriculum(c);
+        if (!Array.isArray(entries) || !entries.length) {
+          throw new Error(`curriculum ${c} has no game registry entries`);
+        }
+        return entries.map((g, index) => {
+          if (!g || typeof g !== 'object') throw new Error(`invalid game entry ${index}`);
+          const id = typeof g.baseId === 'string' && g.baseId
+            ? g.baseId
+            : typeof g.id === 'string' && g.id ? g.id.split(':').pop() : '';
+          if (!id) throw new Error(`game entry ${index} has no id`);
+          return { id, name: typeof g.name === 'string' && g.name ? g.name : id };
+        });
       };
-      renderWeek(wMount, weekStatus(weekLog[keys.week], c, g), c, playerName, paint, reference);
-      if (pMount) renderPast(pMount, weekLog, keys.week, c, g);
-    };
-    paint(curr);
-    if (cMount) renderCalendar(cMount, dayLog, keys.day);
+
+      const games = gamesFor(curr);
+      let playerName = 'PLAYER';
+      try {
+        const raw = localStorage.getItem('booha_first_name') ||
+                    (localStorage.getItem('booha_user_name') || '').split(/\s+/)[0];
+        if (raw) playerName = raw.trim().slice(0, 12).toUpperCase();
+      } catch (_) {}
+
+      const title = document.getElementById('alog-title');
+      if (title) title.textContent = `${playerName}のぼうけんログ`;
+
+      const paint = (c) => {
+        try {
+          try { localStorage.setItem('booha_profile_curr', c); } catch (_) {}
+          const g = gamesFor(c);
+          const reference = {
+            average: recentFullWeekAverage(weekLog, keys.week, c, g),
+          };
+          renderWeek(wMount, weekStatus(weekLog[keys.week], c, g), c, playerName, paint, reference);
+          wMount.setAttribute('aria-busy', 'false');
+        } catch (error) {
+          showMountFallback(wMount, 'This week’s progress', error);
+          return;
+        }
+
+        if (pMount) {
+          try {
+            renderPast(pMount, weekLog, keys.week, c, gamesFor(c));
+          } catch (error) {
+            showMountFallback(pMount, 'Past progress', error);
+          }
+        }
+      };
+      paint(curr);
+
+      if (cMount) {
+        try {
+          renderCalendar(cMount, dayLog && typeof dayLog === 'object' ? dayLog : {}, keys.day);
+          cMount.setAttribute('aria-busy', 'false');
+        } catch (error) {
+          showMountFallback(cMount, 'Adventure calendar', error);
+        }
+      }
+    } catch (error) {
+      showMountFallback(wMount, 'This week’s progress', error);
+    }
   }
 
 // Boot after BoohaAdventure, whose identity gate guarantees booha_userid is
   // present — otherwise BoohaDayRecord reads the legacy save, not the student's.
+  showWeeklyLoading(document.getElementById('alog-week'));
+
   if (window.BOOHA_READY) {
     init();
   } else {
