@@ -6598,6 +6598,38 @@
     currentBg = image;
   }
 
+  // Keep the fade over a newly selected room until its first decode has
+  // completed. A bounded timeout prevents a broken or offline image from
+  // trapping the player behind the transition cover.
+  function waitForMuenbaImage(image, timeoutMs = 1600) {
+    if (!image) return Promise.resolve(false);
+    return new Promise(resolve => {
+      let settled = false;
+      let timer = 0;
+      const settle = ready => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        image.removeEventListener('load', onLoad);
+        image.removeEventListener('error', onError);
+        resolve(ready);
+      };
+      const decode = () => {
+        if (typeof image.decode !== 'function') { settle(image.naturalWidth > 0); return; }
+        image.decode().then(() => settle(image.naturalWidth > 0)).catch(() => settle(image.naturalWidth > 0));
+      };
+      const onLoad = () => decode();
+      const onError = () => settle(false);
+      image.addEventListener('load', onLoad, { once: true });
+      image.addEventListener('error', onError, { once: true });
+      timer = window.setTimeout(() => settle(image.naturalWidth > 0), timeoutMs);
+      if (image.complete) {
+        if (image.naturalWidth > 0) decode();
+        else settle(false);
+      }
+    });
+  }
+
   function updateMuenbaProfileLink() {
     if (!muenbaProfileLink) return;
     muenbaProfileLink.classList.toggle('is-visible', state.roomId === 'room_01');
@@ -6747,14 +6779,21 @@
 
   function transitionTo(exit) {
     if (!exit || state.transitioning) return;
+    const nextImage = getImage(exit.to);
+    preloadAdjacent(exit.to);
     state.transitioning = true;
     state.inputLocked = true;
     state.clickTarget = null;
     state.moving = false;
     fadeEl.style.transition = `opacity ${FADE_MS / 2}ms ease-in`;
     fadeEl.style.opacity = '1';
-    window.setTimeout(() => {
-      setRoom(exit.to, exit.spawn, exit.dir);
+    window.setTimeout(async () => {
+      try {
+        setRoom(exit.to, exit.spawn, exit.dir);
+        await waitForMuenbaImage(nextImage);
+      } catch (error) {
+        console.warn('[Muenba] Room image readiness failed; revealing fallback room.', error);
+      }
       fadeEl.style.transition = `opacity ${FADE_MS / 2}ms ease-out`;
       fadeEl.style.opacity = '0';
       window.setTimeout(() => {

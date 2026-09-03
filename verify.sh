@@ -1118,6 +1118,20 @@ else
   bad "Service-worker Pass 3 HTML/JavaScript coherence audit failed"
 fi
 
+echo "[transitions] Room-transition readiness audit"
+if node tests/room-transition-readiness-audit.cjs >/dev/null 2>&1; then
+  ok "Room-transition cache, decode-gate, and canvas-motion contracts pass"
+else
+  bad "Room-transition readiness audit failed"
+fi
+
+echo "[weekly] Utsuroba weekly ECHOES audit"
+if node tests/utsuroba-weekly-echoes-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba lifetime/weekly ECHOES separation contracts pass"
+else
+  bad "Utsuroba weekly ECHOES audit failed"
+fi
+
 echo "[profile] Adventure-log Pass 1 fail-soft audit"
 if node tests/adventure-log-fail-soft-audit.cjs >/dev/null 2>&1; then
   ok "Adventure-log weekly loading and error-state contracts pass"
