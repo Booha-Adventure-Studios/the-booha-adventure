@@ -140,7 +140,8 @@ const CURRENT_CACHES = {
   // cache-first JavaScript bundle.
   // Adventure-log Pass 1 adds fail-soft weekly rendering; invalidate the
   // cache-first JavaScript bundle.
-  assets: 'booha-assets-2026-503',
+  // Pass 2 adds adaptive DPR and visibility-aware Muenba rendering.
+  assets: 'booha-assets-2026-504',
   decks:  'booha-decks-2026-310',
 };
 

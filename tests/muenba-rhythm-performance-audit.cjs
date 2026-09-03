@@ -13,7 +13,7 @@ assert(tickStart >= 0 && initStart > tickStart, 'Muenba world tick must remain d
 const tickSource = source.slice(tickStart, initStart);
 
 assert(tickSource.includes('if (captureOpen)'), 'world tick must recognize an active capture session');
-assert(tickSource.includes('window.requestAnimationFrame(tick);'), 'world tick must resume after capture closes');
+assert(tickSource.includes('scheduleMuenbaFrame();'), 'world tick must resume after capture closes');
 assert(tickSource.indexOf('if (captureOpen)') < tickSource.indexOf('drawFrame(now)'),
   'capture sessions must bypass the world canvas draw pass');
 assert(tickSource.indexOf('if (captureOpen)') < tickSource.indexOf('tickGhost(now)'),
