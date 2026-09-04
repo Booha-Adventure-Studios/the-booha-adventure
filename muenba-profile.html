@@ -338,8 +338,8 @@
         const current = getReadingDifficulty();
         const descriptions = {
           start: {
-            note: 'Starter Memory uses very short sentences and easy words for younger readers.',
-            noteJP: '<ruby>小<rt>ちい</rt></ruby>さい<ruby>子<rt>こ</rt></ruby>どもが<ruby>読<rt>よ</rt></ruby>みやすい、<ruby>短<rt>みじか</rt></ruby>くてやさしい<ruby>文<rt>ぶん</rt></ruby>です。'
+            note: 'Starter Memory uses very short sentences and easy words for new readers.',
+            noteJP: '<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>読者<rt>どくしゃ</rt></ruby>が<ruby>読<rt>よ</rt></ruby>みやすい、<ruby>短<rt>みじか</rt></ruby>くてやさしい<ruby>文<rt>ぶん</rt></ruby>です。'
           },
           fresh: {
             note: 'Case Memory adds more detail and asks you to connect the clues.',
@@ -366,7 +366,7 @@
           <div class="difficulty-card">
             <p class="difficulty-intro">Choose a reading level for new ghost cases.<small><ruby>新<rt>あたら</rt></ruby>しい<ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>事件<rt>じけん</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びます。</small></p>
             <div class="difficulty-toggle" role="group" aria-label="Muenba case reading style">
-              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-muenba-difficulty="start" aria-pressed="${current === 'start'}">Starter Memory<small><ruby>子<rt>こ</rt></ruby>ども<ruby>向<rt>む</rt></ruby>けの<ruby>記憶<rt>きおく</rt></ruby></small></button>
+              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-muenba-difficulty="start" aria-pressed="${current === 'start'}">Starter Memory<small><ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby></small></button>
               <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-muenba-difficulty="fresh" aria-pressed="${current === 'fresh'}">Case Memory<small><ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby></small></button>
               <button type="button" class="difficulty-option${current === 'deep' ? ' is-active' : ''}" data-muenba-difficulty="deep" aria-pressed="${current === 'deep'}">Deep Memory<small><ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby></small></button>
             </div>
