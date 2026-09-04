@@ -1209,6 +1209,13 @@ else
   bad "Wanderer cache or shared performance tests failed"
 fi
 
+echo "[performance] Passes 6–7 image lifecycle audit"
+if node tests/performance-image-lifecycle-audit.cjs >/dev/null 2>&1; then
+  ok "Room-scoped Drifter and celebration-scoped dance image lifecycles pass"
+else
+  bad "Performance image lifecycle audit failed"
+fi
+
 echo "[assets] Performance asset-budget audit"
 if node tests/performance-asset-budget-audit.cjs >/dev/null 2>&1; then
   ok "WebP container, alpha, character-size, and deployed-image payload budgets pass"

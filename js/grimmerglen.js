@@ -225,6 +225,19 @@
     };
     return grimmerglenDanceImages;
   }
+
+  // Performance Pass 7: dance art is a celebration-only working set. Clear
+  // the source before dropping the descriptor so the browser can reclaim the
+  // decoded frames immediately after the final dance frame has been drawn.
+  // The next celebration calls ensureGrimmerglenDanceImages() and rebuilds it.
+  function releaseGrimmerglenDanceImages() {
+    if (!grimmerglenDanceImages) return;
+    [...grimmerglenDanceImages.marietta, ...grimmerglenDanceImages.booha].forEach(image => {
+      if (typeof image.removeAttribute === 'function') image.removeAttribute('src');
+      else image.src = '';
+    });
+    grimmerglenDanceImages = null;
+  }
   const grimmerglenDanceSparkles = [];
 
   function startGrimmerglenMusic() {
@@ -2307,6 +2320,7 @@
     state.inputLocked = false;
     updateGrimmerglenProfilePortal();
     grimmerglenDanceSparkles.length = 0;
+    releaseGrimmerglenDanceImages();
     stopGrimmerglenDanceMusic();
     startGrimmerglenMusic();
   }

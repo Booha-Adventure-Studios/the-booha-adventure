@@ -650,6 +650,18 @@
     return image.img;
   }
 
+  // Performance Pass 6: Drifter art is room-scoped. Keep the deferred
+  // descriptor so returning to a room can request the art again, but release
+  // the decoded bitmap for every Drifter that is no longer visible. The
+  // popup owns its own portrait element, so it does not need this canvas
+  // image to remain resident while the panel is open.
+  function releaseUtsurobaImage(image) {
+    if (!image || !image.requested) return;
+    if (typeof image.img.removeAttribute === 'function') image.img.removeAttribute('src');
+    else image.img.src = '';
+    image.requested = false;
+  }
+
   /* Pass 25C: keep all twelve drifter requests off the initial page load.
      The renderer activates only the drifter currently visible in the room;
      the popup still uses the same source when the player opens it. */
@@ -660,6 +672,15 @@
       img2: makeUtsurobaDeferredImage(d.sprite2),
     };
   });
+
+  function trimDrifterImagesToRoom(roomId) {
+    const visibleIds = new Set(driftersForRoom(roomId).map(drifter => drifter.id));
+    Object.entries(drifterImgs).forEach(([id, images]) => {
+      if (visibleIds.has(id)) return;
+      releaseUtsurobaImage(images.img1);
+      releaseUtsurobaImage(images.img2);
+    });
+  }
 
   function drifterRecord(id, utsu = null) {
     const data = utsu || getCachedDrifterState();
@@ -2931,6 +2952,7 @@
   function showRoom(roomId) {
     preloadAdjacent(roomId);
     trimRoomCachesToNeighborhood(roomId);
+    trimDrifterImagesToRoom(roomId);
     const image = getImage(roomId);
     if (!image) return null;
     image.className = 'utsuroba-bg';
