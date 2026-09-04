@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 9E: Grimmerglen and its profile shortcuts share the nine-game weekly
-// gate, while DEV mode can still open the room walker for calibration.
+// Pass 9E: Grimmerglen's profile only points back to the gated Karasuki
+// entrance, while DEV mode can still open the room walker for calibration.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -58,26 +58,32 @@ const devHelper = runtime.slice(devHelperStart, devHelperEnd);
 assert(devHelper.includes('window.__devGrimmerglen = true;'),
   'the DEV helper must set only the Grimmerglen test override');
 
-assert(profile.includes('<a class="back-link" id="grimmerglen-profile-back" href="grimmerglen.html?room=room_01&from=profile" hidden'),
-  'the Grimmerglen profile shortcut must start hidden');
-assert(profile.includes('<a class="back-link" id="grimmerglen-profile-karasuki" href="karasuki.html?from=profile" hidden'),
-  'the Karasuki profile shortcut must start hidden');
-const doorStart = profile.indexOf('function renderDoor()');
-const doorEnd = profile.indexOf('function renderStats()', doorStart);
-const door = profile.slice(doorStart, doorEnd);
-assert(door.includes('BoohaUnlockSystem.isGrimmerglenUnlocked()'),
-  'the profile doorway must use the shared Grimmerglen gate');
-assert(door.includes('document.getElementById(\'enter-world\').hidden = !open;'),
-  'the profile doorway must reveal Enter only after the gate opens');
+assert(!profile.includes('id="grimmerglen-profile-back"'),
+  'the profile must remove the direct Grimmerglen shortcut');
+assert(!profile.includes('id="enter-world"'),
+  'the profile must remove the direct hero entrance button');
+assert(profile.includes('<a class="back-link" id="grimmerglen-profile-karasuki" href="karasuki.html?room=room_14" hidden'),
+  'the Karasuki profile shortcut must start hidden and target the Grimmerglen entrance room');
+const statusStart = profile.indexOf('function renderWorldStatus()');
+const statusEnd = profile.indexOf('function renderStats()', statusStart);
+const status = profile.slice(statusStart, statusEnd);
+assert(status.includes('BoohaUnlockSystem.isGrimmerglenUnlocked()'),
+  'the profile status must use the shared Grimmerglen gate');
+assert(status.includes('GRIMMERGLEN IS LOCKED') && status.includes('GRIMMERGLEN IS OPEN'),
+  'the profile status must distinguish locked and open worlds');
+assert(status.includes('status.innerHTML') && status.includes('<ruby>'),
+  'the profile status must render static ruby markup safely');
+assert(!status.includes('textContent') && !status.includes('enter-world'),
+  'the profile status must not retain the old text-only doorway logic');
 const worldBackStart = profile.indexOf('function renderWorldBack()');
 const worldBackEnd = profile.indexOf('function renderStats()', worldBackStart);
 const worldBack = profile.slice(worldBackStart, worldBackEnd);
-assert(worldBack.includes('BoohaUnlockSystem.isWeeklyWorldGateOpen()'),
-  'profile shortcuts must use the shared weekly world gate');
-assert(worldBack.includes('grimmerglen-profile-back'),
-  'profile must render the Grimmerglen shortcut');
+assert(worldBack.includes('BoohaUnlockSystem.isGrimmerglenUnlocked()'),
+  'the Karasuki profile shortcut must use the specific Grimmerglen gate');
 assert(worldBack.includes('grimmerglen-profile-karasuki'),
   'profile must render the Karasuki shortcut');
+assert(!worldBack.includes('isWeeklyWorldGateOpen') && !worldBack.includes('grimmerglen-profile-back'),
+  'profile shortcuts must not retain the generic gate or direct Grimmerglen shortcut');
 
 for (const pageName of profilePages) {
   const source = fs.readFileSync(path.join(root, pageName), 'utf8');
@@ -103,4 +109,4 @@ assert(runtime.includes('stage.addEventListener(\'mouseleave\''),
 assert(verify.includes('tests/grimmerglen-pass9e-audit.cjs'),
   'verify.sh must run the Pass 9E lock-surface audit');
 
-console.log('Grimmerglen Pass 9E audit passed: weekly shortcuts, world gating, and DEV mouse coordinates are wired.');
+console.log('Grimmerglen Pass 9E audit passed: gated Karasuki entrance, world status, and DEV mouse coordinates are wired.');
