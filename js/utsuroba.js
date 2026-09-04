@@ -48,7 +48,7 @@
     lowPowerHint: LOW_POWER_HINT,
     onTierChange: tier => {
       perfTier = tier;
-      shadowsEnabled = false;
+      shadowsEnabled = tier !== 'low';
       resizeCanvas();
       trail.length = Math.min(trail.length, 30);
     },
@@ -2860,8 +2860,8 @@
   /* ═══════════════════════════════════════════
      PERF
   ═══════════════════════════════════════════ */
-  function updatePerfTier(now) {
-    worldPerf.sample(now);
+  function updatePerfTier(now, countForTier = true) {
+    worldPerf.sample(now, { countForTier });
     const averageFps = worldPerf.metrics().averageFps;
     perfTier = worldPerf.getTier();
     void averageFps;
@@ -3537,8 +3537,8 @@
   function tick(now) {
     rafHandle = null;
     if (pageHidden) return;
-    if (anyModalOpen() || staticFrameOverlayOpen()) worldPerf.pause();
-    else updatePerfTier(now);
+    if (staticFrameOverlayOpen() || state.exitingToKarasuki) worldPerf.pause();
+    else updatePerfTier(now, !state.transitioning && !state.celebrating);
     const dt = Math.min(50, Math.max(8, now-(lastTickTime||now)));
     lastTickTime = now; SPEED = BASE_SPEED * (dt/TARGET_DT);
     if (!anyModalOpen()) {
@@ -3652,7 +3652,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-506',
+      serviceWorkerCacheVersion: 'booha-assets-2026-507',
       averageFps: worldPerf.metrics().averageFps,
     }));
     worldInitialized = true;

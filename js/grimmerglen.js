@@ -129,7 +129,7 @@
     lowPowerHint: LOW_POWER_HINT,
     onTierChange: tier => {
       perfTier = tier;
-      shadowsEnabled = false;
+      shadowsEnabled = tier !== 'low';
       resizeCanvas();
       reseedSparkles(state.roomId);
     },
@@ -1222,8 +1222,8 @@
     drawBoohaTransformFX(now);
   }
 
-  function updatePerfTier(now) {
-    worldPerf.sample(now);
+  function updatePerfTier(now, countForTier = true) {
+    worldPerf.sample(now, { countForTier });
     perfTier = worldPerf.getTier();
   }
 
@@ -2908,8 +2908,8 @@
   function tick(now) {
     rafHandle = null;
     if (pageHidden) return;
-    if (staticFrameOverlayOpen() || state.transitioning) worldPerf.pause();
-    else updatePerfTier(now);
+    if (staticFrameOverlayOpen()) worldPerf.pause();
+    else updatePerfTier(now, !state.transitioning && !state.celebrating);
     const dt = Math.min(50, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * (dt / TARGET_DT);
@@ -2993,7 +2993,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-506',
+      serviceWorkerCacheVersion: 'booha-assets-2026-507',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleGrimmerglenFrame();
