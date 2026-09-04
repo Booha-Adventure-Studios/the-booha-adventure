@@ -39,12 +39,12 @@ assert.match(pages.adventure, /animation: outputProfileButtonPulse/,
   'the adventure profile navigation should visibly pulse its current button');
 assert.match(pages.utsuroba, /animation: outputProfileButtonPulse/,
   'the Utsuroba profile navigation should visibly pulse its current button');
-assert.match(pages.utsuroba, /id="utsuroba-profile-back"[^>]+hidden/,
-  'the Utsuroba profile back button should start hidden until the weekly gate opens');
+assert.doesNotMatch(pages.utsuroba, /id="utsuroba-profile-back"/,
+  'the Utsuroba profile must not expose a direct world entrance');
 assert.match(pages.utsuroba, /isWeeklyWorldGateOpen\(\)/,
-  'the Utsuroba profile back button should consume the shared weekly gate');
-assert.match(pages.utsuroba, /utsuroba\.html\?room=room_03/,
-  'the Utsuroba profile back button should return to the clean start room');
+  'the Utsuroba profile Karasuki route should consume the shared weekly gate');
+assert.match(pages.utsuroba, /id="utsuroba-profile-karasuki"[^>]+href="karasuki\.html\?room=room_03"[^>]+hidden/,
+  'the Utsuroba profile should keep its hidden Karasuki route to room_03');
 assert.doesNotMatch(pages.utsuroba, /← Output profile/,
   'the Utsuroba profile should not show a redundant Output profile back button');
 assert.match(pages.adventure, /<ruby>冒険<rt>ぼうけん<\/rt><\/ruby>/,
@@ -54,7 +54,7 @@ assert.match(pages.utsuroba, /<ruby>記憶<rt>きおく<\/rt><\/ruby>/,
 assert.match(pages.log, /UtsuFurigana\.rb\(DOW\[i\]\[0\], DOW\[i\]\[1\]\)/,
   'the log profile should render furigana for its weekday kanji');
 
-assert.match(utsurobaWorld, /utsuroba_icon\.png/,
+assert.match(utsurobaWorld, /utsuroba_icon\.webp/,
   'the Utsuroba world should use the profile icon at its entrance');
 assert.match(utsurobaWorld, /renderUtsurobaProfilePortal\(\)/,
   'the Utsuroba world should render its profile doorway');
@@ -80,8 +80,8 @@ assert.match(karasukiWorld, /recordWandererVisit\(w\)/,
   'Karasuki should record a permanent wanderer visit when a wanderer is opened');
 assert.match(karasukiWorld, /NEW WANDERER FOUND!/,
   'Karasuki should celebrate a first wanderer discovery');
-assert.match(karasukiWorld, /I'M BACK IN KARASUKI/,
-  'Karasuki should show an arrival moment from the profile');
+assert.match(karasukiWorld, /hasTrustedKarasukiEntry\(\)/,
+  'Karasuki should recognize trusted profile/world entry state');
 assert.match(karasukiWorld, /KARASUKI_WANDERER_DATA/,
   'Karasuki should consume the shared wanderer collection data');
 assert.match(karasukiWorld, /subHTML:/,
