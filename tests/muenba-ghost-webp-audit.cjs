@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Pass 26B: Muenba ghost artwork must use lossless WebP without changing
+// Performance pass: Muenba ghost artwork uses lossy WebP without changing
 // transparent canvases or the data-driven runtime paths.
 const assert = require('assert');
 const fs = require('fs');
@@ -25,25 +25,29 @@ const actual = fs.readdirSync(assetDir)
   .sort();
 assert.deepStrictEqual(actual, expected.slice().sort(), 'Muenba must contain the expected ghost WebP files');
 
-function readVp8l(file, name) {
+function readWebp(file, name) {
   assert(file.length > 25, `${name} must not be empty`);
   assert.strictEqual(file.subarray(0, 4).toString('ascii'), 'RIFF', `${name} must have a RIFF header`);
   assert.strictEqual(file.subarray(8, 12).toString('ascii'), 'WEBP', `${name} must have a WEBP signature`);
-  assert.strictEqual(file.subarray(12, 16).toString('ascii'), 'VP8L', `${name} must use lossless VP8L encoding`);
-  assert.strictEqual(file[20], 0x2f, `${name} must have a valid VP8L signature`);
-
-  const bits = file.readUInt32LE(21) >>> 0;
+  const chunks = [];
+  for (let offset = 12; offset + 8 <= file.length;) {
+    const type = file.subarray(offset, offset + 4).toString('ascii');
+    const size = file.readUInt32LE(offset + 4);
+    chunks.push(type);
+    offset += 8 + size + (size % 2);
+  }
+  assert(chunks.includes('VP8X') && chunks.includes('ALPH') && chunks.includes('VP8 '), `${name} must be a lossy transparent WebP`);
   return {
-    width: (bits & 0x3fff) + 1,
-    height: ((bits >>> 14) & 0x3fff) + 1,
-    hasAlpha: ((bits >>> 28) & 1) === 1,
-    version: bits >>> 29,
+    width: 1 + file[24] + (file[25] << 8) + (file[26] << 16),
+    height: 1 + file[27] + (file[28] << 8) + (file[29] << 16),
+    hasAlpha: (file[20] & 0x10) !== 0,
+    encoding: 'lossy',
   };
 }
 
 for (const name of expected) {
   const file = fs.readFileSync(path.join(assetDir, name));
-  assert.deepStrictEqual(readVp8l(file, name), { width: 2048, height: 2048, hasAlpha: true, version: 0 }, `${name} must preserve its transparent canvas`);
+  assert.deepStrictEqual(readWebp(file, name), { width: 2048, height: 2048, hasAlpha: true, encoding: 'lossy' }, `${name} must preserve its transparent canvas as lossy WebP`);
   assert(data.includes(`assets/img/muenba/ghosts/${name}`), `Muenba data must reference ${name}`);
 }
 
@@ -54,4 +58,4 @@ assert.strictEqual(
 );
 assert(!/assets\/img\/muenba\/ghosts\/[^'"\s]+\.png/i.test(data), 'Muenba must not reference retired ghost PNG paths');
 
-console.log('Muenba 26B ghost audit passed: all seven transparent ghost sprites are lossless WebP assets with stable canvases and live references.');
+console.log('Muenba ghost audit passed: all seven transparent ghost sprites are lossy WebP assets with stable canvases and live references.');
