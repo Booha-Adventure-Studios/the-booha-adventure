@@ -14,6 +14,13 @@ const data = context.window.MUENBA_DATA;
 assert(data && typeof data === 'object', 'MUENBA_DATA must be exported');
 assert(Array.isArray(data.caseOrder) && data.caseOrder.length > 0, 'caseOrder must be non-empty');
 assert(data.cases && typeof data.cases === 'object', 'cases must be an object');
+const expectedStarterIntros = {
+  fuzzle_case_01: 'Fuzzle wanted to scare Nuppi. He forgot which scare to use.',
+  glimmer_case_01: 'Glimmer had one small light. It made many lights, and Glimmer chased them.',
+  nibsy_case_01: 'Nibsy kept three little sounds. The sounds got mixed up.',
+  tinkley_case_01: 'Tinkley had an invisible bell. It rang before Nuppi came.',
+  twiddle_case_01: 'Twiddle saw two paths. Twiddle could not choose one.'
+};
 
 const japanese = /[\u3040-\u30ff\u3400-\u9fff]/;
 const ghostIds = new Set((data.ghosts || []).map(ghost => ghost.id));
@@ -78,6 +85,8 @@ for (const caseId of data.caseOrder) {
   englishOnly(caseData.title, `${caseId}.title`);
   englishOnly(caseData.eyebrow, `${caseId}.eyebrow`);
   englishOnly(caseData.intro, `${caseId}.intro`);
+  assert.strictEqual(caseData.intro, expectedStarterIntros[caseId], `${caseId}.intro must stay Starter-safe`);
+  assert(caseData.intro.trim().split(/\s+/).length <= 14, `${caseId}.intro must stay within the Starter introduction limit`);
   const correctPositions = [];
 
   for (const modeName of ['start', 'fresh', 'deep']) {
@@ -126,8 +135,10 @@ for (const caseId of data.caseOrder) {
     englishOnly(mode.resolution, `${caseId}.${modeName}.resolution`);
   }
   const modes = ['start', 'fresh', 'deep'];
-  const wordCount = mode => mode.clues.map(clue => clue.text).concat(mode.prompt, mode.choices).join(' ').trim().split(/\s+/).length;
-  assert(wordCount(caseData.start) < wordCount(caseData.fresh), `${caseId} Starter Memory should be shorter than Case Memory`);
+  const wordCount = (mode, includeIntro = false) => (includeIntro ? [caseData.intro] : [])
+    .concat(mode.clues.map(clue => clue.text), mode.prompt, mode.choices)
+    .join(' ').trim().split(/\s+/).length;
+  assert(wordCount(caseData.start, true) < wordCount(caseData.fresh), `${caseId} Starter Memory plus its introduction should be shorter than Case Memory`);
   assert(wordCount(caseData.fresh) <= wordCount(caseData.deep), `${caseId} Deep Memory should not be shorter than Case Memory`);
   for (const leftMode of modes) {
     for (const rightMode of modes) {
