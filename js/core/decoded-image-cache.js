@@ -85,12 +85,18 @@
 
     stats() {
       let loaded = 0;
+      let protectedBytes = 0;
       for (const entry of this.entries.values()) if (entry.loaded) loaded += 1;
+      for (const entry of this.entries.values()) {
+        if (entry.required || entry.popupPinned || entry.celebrationPinned) protectedBytes += entry.bytes;
+      }
       return {
         count: this.entries.size,
         loaded,
         usageBytes: this.usageBytes,
         budgetBytes: this.budgetBytes,
+        protectedBytes,
+        overBudget: this.usageBytes > this.budgetBytes,
         keys: Array.from(this.entries.keys()),
       };
     }
@@ -128,7 +134,10 @@
         if (entry.onError) entry.image.removeEventListener('error', entry.onError);
         entry.image.onload = null;
         entry.image.onerror = null;
-        try { entry.image.src = ''; } catch (_) {}
+        try {
+          if (typeof entry.image.removeAttribute === 'function') entry.image.removeAttribute('src');
+          else entry.image.src = '';
+        } catch (_) {}
       }
       if (this.onEvict) this.onEvict(entry.key, entry.image, entry);
       entry.onLoad = null;

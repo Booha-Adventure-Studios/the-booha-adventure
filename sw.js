@@ -10,7 +10,7 @@ const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
-  pages:  'booha-pages-2026-405',
+  pages:  'booha-pages-2026-406',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -146,7 +146,7 @@ const CURRENT_CACHES = {
   // Adventure-log Pass 1 adds fail-soft weekly rendering; invalidate the
   // cache-first JavaScript bundle.
   // Pass 2 adds adaptive DPR and visibility-aware Muenba rendering.
-  assets: 'booha-assets-2026-505',
+  assets: 'booha-assets-2026-506',
   decks:  'booha-decks-2026-310',
 };
 

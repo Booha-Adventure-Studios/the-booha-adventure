@@ -2865,8 +2865,8 @@ const HAPPY_HOUSE_PORTAL = {
   });
   const WANDERER_SIZE  = 22;
 
-  function getWandererImage(filename) {
-    return wandererImageCache.get(filename, { src: WANDERER_IMG_BASE + filename });
+  function getWandererImage(filename, options = {}) {
+    return wandererImageCache.get(filename, { src: WANDERER_IMG_BASE + filename, ...options });
   }
 
   function setWandererProtection(w, kind, value) {
@@ -2879,8 +2879,7 @@ const HAPPY_HOUSE_PORTAL = {
     (defs || []).forEach(def => {
       if (!def.frames) return;
       def.frames.forEach(filename => {
-        getWandererImage(filename);
-        wandererImageCache.protect(filename, 'required', true);
+        getWandererImage(filename, { required: true });
       });
     });
     wandererImageCache.evictIfNeeded();
@@ -5915,9 +5914,11 @@ function drawObserver(now) {
         decodedImageMemoryBytes: cache.usageBytes,
         wandererCacheUsageBytes: cache.usageBytes,
         wandererCacheBudgetBytes: cache.budgetBytes,
+        wandererProtectedBytes: cache.protectedBytes,
+        wandererCacheOverBudget: cache.overBudget,
         roomLoadDecodeMs,
         activeAudioBufferCount: 0,
-        serviceWorkerCacheVersion: 'booha-assets-2026-505',
+        serviceWorkerCacheVersion: 'booha-assets-2026-506',
         averageFps: worldPerf.metrics().averageFps,
       };
     });
