@@ -2,6 +2,7 @@
 'use strict';
 
 const assert = require('assert');
+const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -50,7 +51,94 @@ for (const file of converted) {
   assert(record.bytes <= 1.5 * 1024 * 1024, `${path.relative(root, file)} is unexpectedly oversized after conversion`);
 }
 
+// Pass 8: the remaining lossless files are intentional and explicit. This
+// prevents the deployed image set from quietly accumulating new VP8L files.
+const losslessAllowlist = new Set([
+  'utsuroba_icon.webp',
+  'grimmerglen/booha_grimmerglen.webp',
+  'grimmerglen/booha_grimmerglen_version_0.webp',
+  'memory_box.webp',
+  'juku-tree.webp',
+  'karasuki/observer-1.webp',
+  'karasuki/observer-2.webp',
+  'muenba/muenba_logo.webp',
+  'grimmerglen/collectibles/book.webp',
+  'grimmerglen/collectibles/backpack.webp',
+  'grimmerglen/collectibles/teddy_bear.webp',
+  'grimmerglen/collectibles/pillow.webp',
+  'grimmerglen/collectibles/ticket.webp',
+  'grimmerglen/collectibles/banner.webp',
+  'grimmerglen/collectibles/ball.webp',
+  'grimmerglen/collectibles/to_go_coffee_cup.webp',
+]);
+const actualLossless = new Set(vp8l.map(record => path.relative(imageRoot, record.file)));
+assert.deepStrictEqual([...actualLossless].sort(), [...losslessAllowlist].sort(), 'remaining VP8L files must match the intentional lossless allowlist');
+
+// The root conversion keeps the source canvas dimensions and transparency
+// contract stable for every live consumer.
+const convertedRootDimensions = new Map([
+  ['background-1.webp', [1536, 1024, false]],
+  ['blue-boo.webp', [1024, 1024, true]],
+  ['boo-moon.webp', [1024, 1024, true]],
+  ['extra-boo-aqua.webp', [1024, 1024, true]],
+  ['extra-boo-candy.webp', [1024, 1024, true]],
+  ['extra-boo-gold.webp', [1254, 1254, true]],
+  ['extra-boo-lime.webp', [1024, 1024, true]],
+  ['extra-boo-mint.webp', [1024, 1024, true]],
+  ['extra-boo-orange.webp', [1024, 1024, true]],
+  ['extra-boo-peach.webp', [1024, 1024, true]],
+  ['extra-boo-rose.webp', [1024, 1024, true]],
+  ['extra-boo-sky.webp', [1024, 1024, true]],
+  ['extra-boo-violet.webp', [1024, 1024, true]],
+  ['green-boo.webp', [1024, 1024, true]],
+  ['homework-tree.webp', [1536, 1024, true]],
+  ['karasuki1-tree.webp', [1024, 1536, true]],
+  ['karasuki2-tree.webp', [1024, 1536, true]],
+  ['maze.webp', [1536, 1024, false]],
+  ['pink-boo.webp', [1024, 1024, true]],
+  ['purple-boo.webp', [1024, 1024, true]],
+]);
+for (const [relative, [width, height, hasAlpha]] of convertedRootDimensions) {
+  const file = path.join(imageRoot, relative);
+  const record = records.find(candidate => candidate.file === file);
+  assert(record && record.lossy, `${relative} must use lossy VP8 encoding after root conversion`);
+  assert.strictEqual(record.alpha, hasAlpha, `${relative} must preserve its transparency contract`);
+  const dimensions = childProcess.execFileSync('ffprobe', [
+    '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
+    '-of', 'csv=p=0:s=x', file,
+  ], { encoding: 'utf8' }).trim().split('x').map(Number);
+  assert.deepStrictEqual(dimensions, [width, height], `${relative} must preserve its exact canvas dimensions`);
+}
+
+// Pass 9: use both local ceilings and a global ceiling. The file limits cover
+// every deployed image directory, including future files outside convertedRoots.
+const directoryBudgets = new Map([
+  ['root', 8 * 1024 * 1024],
+  ['drifters', 1.8 * 1024 * 1024],
+  ['grimmerglen', 12.9 * 1024 * 1024],
+  ['karasuki', 3.5 * 1024 * 1024],
+  ['muenba', 9.2 * 1024 * 1024],
+  ['utsuroba', 5.75 * 1024 * 1024],
+  ['wanderers', 11.5 * 1024 * 1024],
+]);
+for (const [directory, budget] of directoryBudgets) {
+  const bytes = records
+    .filter(record => {
+      const relative = path.relative(imageRoot, record.file);
+      return (relative.includes('/') ? relative.split('/')[0] : 'root') === directory;
+    })
+    .reduce((sum, record) => sum + record.bytes, 0);
+  assert(bytes <= budget, `${directory} image payload exceeds ${budget} bytes (got ${bytes})`);
+}
+records.forEach(record => {
+  const relative = path.relative(imageRoot, record.file);
+  if (losslessAllowlist.has(relative)) {
+    assert(record.bytes <= 2 * 1024 * 1024, `${relative} exceeds the explicit lossless-file ceiling`);
+  } else {
+    assert(record.bytes <= 700 * 1024, `${relative} exceeds the deployed per-file image ceiling`);
+  }
+});
+
 const totalBytes = records.reduce((sum, record) => sum + record.bytes, 0);
-assert(totalBytes <= 140 * 1024 * 1024, 'deployed image payload exceeds the performance budget');
-assert(vp8l.length < 80, 'lossless VP8L count remains too high after character-art conversion');
-console.log(`Asset budget audit passed: VP8L ${vp8l.length} files/${vp8l.reduce((s,r)=>s+r.bytes,0)} bytes; lossy ${lossy.length} files/${lossy.reduce((s,r)=>s+r.bytes,0)} bytes; transparent oversized 0; deployed image payload ${totalBytes} bytes.`);
+assert(totalBytes <= 50 * 1024 * 1024, `deployed image payload exceeds the 50 MiB performance budget (got ${totalBytes})`);
+console.log(`Asset budget audit passed: VP8L ${vp8l.length} files/${vp8l.reduce((s,r)=>s+r.bytes,0)} bytes; lossy ${lossy.length} files/${lossy.reduce((s,r)=>s+r.bytes,0)} bytes; explicit directory/file ceilings pass; deployed image payload ${totalBytes} bytes.`);
