@@ -205,18 +205,18 @@
     banner: {
       start: {
         story: { en: 'I remember making this banner with my friend.', jp: '友達とこの旗を作ったのを覚えている。', readings: { '友達': 'ともだち', '旗': 'はた', '作った': 'つくった', '覚えている': 'おぼえている' } },
-        target: 'I made this banner with my friend.', jp: 'わたしは友達とこの旗を作った。', readings: { '友達': 'ともだち', '旗': 'はた', '作った': 'つくった' },
-        full: ['I made this banner with my friend.', 'I played games with my friend.', 'I wrote this with my friend.'], partial: ['I made …', 'I played …', 'I wrote …']
+        target: 'I made this banner.', jp: 'わたしはこの旗を作った。', readings: { '旗': 'はた', '作った': 'つくった' },
+        full: ['I made this banner.', 'I found this banner.', 'I hung this banner.'], partial: ['I made …', 'I found …', 'I hung …']
       },
       case: {
-        story: { en: 'I remember making this banner with my friend Jamariko. We hung it up in her purple room when it felt too quiet.', jp: '友達のジャマリコとこの旗を作ったのを覚えている。静かすぎるとき、彼女の紫色の部屋にかざった。', readings: { '友達': 'ともだち', '旗': 'はた', '作った': 'つくった', '覚えている': 'おぼえている', '静か': 'しずか', '紫色': 'むらさきいろ', '部屋': 'へや', 'かざった': 'かざった' } },
-        target: 'I made this banner with my friend Jamariko.', jp: 'わたしは友達のジャマリコとこの旗を作った。', readings: { '友達': 'ともだち', '旗': 'はた', '作った': 'つくった' },
-        full: ['I made this banner with my friend Jamariko.', 'I played games with my friend Jamariko.', 'I wrote this with my friend Jamariko.'], partial: ['I made this banner …', 'I played games …', 'I wrote this …']
+        story: { en: 'I remember making this banner with Jamariko. I hung it in her purple room when it felt too quiet.', jp: 'ジャマリコとこの旗を作ったのを覚えている。静かすぎるとき、彼女の紫色の部屋にかざった。', readings: { '旗': 'はた', '作った': 'つくった', '覚えている': 'おぼえている', '静か': 'しずか', '紫色': 'むらさきいろ', '部屋': 'へや', 'かざった': 'かざった' } },
+        target: "I hung this banner in Jamariko's purple room when it felt too quiet.", jp: '静かすぎるとき、ジャマリコの紫色の部屋にこの旗をかざした。', readings: { '静か': 'しずか', '紫色': 'むらさきいろ', '部屋': 'へや', 'かざした': 'かざした' },
+        full: ["I hung this banner in Jamariko's purple room.", 'I found this banner in Jamariko’s purple room.', 'I made this banner in Jamariko’s purple room.'], partial: ['I hung this banner …', 'I found this banner …', 'I made this banner …']
       },
       deep: {
-        story: { en: 'I remember making this banner with my friend Jamariko, then hanging it in her purple room when it grew too quiet.', jp: '友達のジャマリコとこの旗を作って、静かすぎるときに彼女の紫色の部屋にかざしたのを覚えている。', readings: { '友達': 'ともだち', '旗': 'はた', '作って': 'つくって', '静か': 'しずか', '紫色': 'むらさきいろ', '部屋': 'へや', 'かざした': 'かざした', '覚えている': 'おぼえている' } },
-        target: 'I remember making this banner with my friend Jamariko, then hanging it in her purple room when it grew too quiet.', jp: '友達のジャマリコとこの旗を作って、静かすぎるときに彼女の紫色の部屋にかざしたのを覚えている。', readings: { '友達': 'ともだち', '旗': 'はた', '作って': 'つくって', '静か': 'しずか', '紫色': 'むらさきいろ', '部屋': 'へや', 'かざした': 'かざした', '覚えている': 'おぼえている' },
-        full: ['I remember making this banner with my friend Jamariko, then hanging it in her purple room when it grew too quiet.', 'I remember making this banner with my friend Jamariko, then carrying it through her purple room.', 'I remember making this banner with my friend Jamariko, then reading it in her purple room.'], partial: ['I remember making …', 'I remember carrying …', 'I remember reading …']
+        story: { en: 'I remember making this banner with Jamariko before hanging it in her purple room to brighten a quiet afternoon.', jp: '静かな午後を明るくするために、ジャマリコとこの旗を作って紫色の部屋にかざしたのを覚えている。', readings: { '静かな': 'しずかな', '午後': 'ごご', '明るくする': 'あかるくする', '旗': 'はた', '作って': 'つくって', '紫色': 'むらさきいろ', '部屋': 'へや', 'かざした': 'かざした', '覚えている': 'おぼえている' } },
+        target: 'I made this banner with Jamariko before hanging it in her purple room to brighten a quiet afternoon.', jp: '静かな午後を明るくするために、ジャマリコとこの旗を作って紫色の部屋にかざした。', readings: { '静かな': 'しずかな', '午後': 'ごご', '明るくする': 'あかるくする', '旗': 'はた', '作って': 'つくって', '紫色': 'むらさきいろ', '部屋': 'へや', 'かざした': 'かざした' },
+        full: ['I made this banner before hanging it in her purple room.', 'I carried this banner before hanging it in her purple room.', 'I painted this banner before hanging it in her purple room.'], partial: ['I made this banner before …', 'I carried this banner before …', 'I painted this banner before …']
       }
     },
     ticket: {
@@ -227,13 +227,13 @@
       },
       case: {
         story: { en: 'I remember holding this before I went to the station to meet my friend Uhibon. We were going to Utsuroba to meet Bryan.', jp: '友達のウヒボンに会うために駅へ行く前、これを持っていたのを覚えている。ブライアンに会うために、私たちはウツロバへ行くところだった。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行く': 'いく', '前': 'まえ', '持っていた': 'もっていた' } },
-        target: 'I went to the station to meet my friend Uhibon.', jp: 'わたしは友達のウヒボンに会うために駅へ行った。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行った': 'いった' },
-        full: ['I went to the station to meet my friend Uhibon.', 'I played games with my friend Uhibon.', 'I wrote a letter to my friend Uhibon.'], partial: ['I went to the station …', 'I played games …', 'I wrote a letter …']
+        target: 'I went to the station to meet Uhibon.', jp: 'ウヒボンに会うために駅へ行った。', readings: { '会う': 'あう', '駅': 'えき', '行った': 'いった' },
+        full: ['I went to the station to meet Uhibon.', 'I waited at the station to meet Uhibon.', 'I walked to the station to meet Uhibon.'], partial: ['I went to the station …', 'I waited at the station …', 'I walked to the station …']
       },
       deep: {
-        story: { en: 'I remember holding this ticket before I went to the station to meet my friend Uhibon. We were going to Utsuroba to meet Bryan, and I kept the ticket safe for our trip.', jp: '友達のウヒボンに会うために駅へ行く前、この切符を持っていたのを覚えている。ブライアンに会うためにウツロバへ行くので、旅のために切符を大切にしまっていた。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行く': 'いく', '前': 'まえ', '切符': 'きっぷ', '持っていた': 'もっていた', '覚えている': 'おぼえている', '旅': 'たび', '大切': 'たいせつ' } },
-        target: 'I remember holding this ticket before I went to the station to meet my friend Uhibon. We were going to Utsuroba to meet Bryan, and I kept the ticket safe for our trip.', jp: '友達のウヒボンに会うために駅へ行く前、この切符を持っていたのを覚えている。ブライアンに会うためにウツロバへ行くので、旅のために切符を大切にしまっていた。', readings: { '友達': 'ともだち', '会う': 'あう', '駅': 'えき', '行く': 'いく', '前': 'まえ', '切符': 'きっぷ', '持っていた': 'もっていた', '覚えている': 'おぼえている', '旅': 'たび', '大切': 'たいせつ' },
-        full: ['I remember holding this ticket before I went to the station to meet my friend Uhibon. We were going to Utsuroba to meet Bryan, and I kept the ticket safe for our trip.', 'I remember holding this ticket before I went to the station to meet my friend Uhibon, then putting it away at home.', 'I remember holding this ticket before I went to the station to meet my friend Uhibon, then showing it to Bryan.'], partial: ['I remember holding …', 'I remember putting …', 'I remember showing …']
+        story: { en: 'I remember keeping my ticket safe because I needed it to reach the station and meet Uhibon.', jp: '駅に行ってウヒボンに会うために必要だったので、切符を大切にしたのを覚えている。', readings: { '駅': 'えき', '行って': 'いって', '会う': 'あう', '必要だった': 'ひつようだった', '切符': 'きっぷ', '大切にした': 'たいせつにした', '覚えている': 'おぼえている' } },
+        target: 'I kept my ticket safe because I needed it to reach the station.', jp: '駅に行くために必要だったので、切符を大切にした。', readings: { '駅': 'えき', '行く': 'いく', '切符': 'きっぷ', '必要だった': 'ひつようだった', '大切にした': 'たいせつにした' },
+        full: ['I kept my ticket safe because I needed it to reach the station.', 'I lost my ticket because I needed it to reach the station.', 'I shared my ticket because I needed it to reach the station.'], partial: ['I kept my ticket safe because …', 'I lost my ticket because …', 'I shared my ticket because …']
       }
     },
     pillow: {
@@ -244,64 +244,64 @@
       },
       case: {
         story: { en: 'I remember resting here near the Destruction Tree after a long day playing with my friend Chillicothe.', jp: '友達のチリコシーと長い一日を遊んだあと、破壊の木の近くでここに休んだのを覚えている。', readings: { '友達': 'ともだち', '長い': 'ながい', '一日': 'いちにち', '遊んだ': 'あそんだ', '破壊の木': 'はかいのき', '近く': 'ちかく', '休んだ': 'やすんだ', '覚えている': 'おぼえている' } },
-        target: 'I rested here near the Destruction Tree.', jp: '破壊の木の近くでここに休んだ。', readings: { '破壊の木': 'はかいのき', '近く': 'ちかく', '休んだ': 'やすんだ' },
-        full: ['I rested here near the Destruction Tree.', 'I played here near the Destruction Tree.', 'I slept here near the Destruction Tree.'], partial: ['I rested here …', 'I played here …', 'I slept here …']
+        target: 'I rested here after playing with my friend.', jp: '友達と遊んだあと、ここで休んだ。', readings: { '友達': 'ともだち', '遊んだ': 'あそんだ', '休んだ': 'やすんだ' },
+        full: ['I rested here after playing with my friend.', 'I slept here after playing with my friend.', 'I waited here after playing with my friend.'], partial: ['I rested here after …', 'I slept here after …', 'I waited here after …']
       },
       deep: {
-        story: { en: 'I remember resting here near the Destruction Tree after a long day playing with my friend Chillicothe.', jp: '友達のチリコシーと長い一日を遊んだあと、破壊の木の近くでここに休んだのを覚えている。', readings: { '友達': 'ともだち', '長い': 'ながい', '一日': 'いちにち', '遊んだ': 'あそんだ', '破壊の木': 'はかいのき', '近く': 'ちかく', '休んだ': 'やすんだ', '覚えている': 'おぼえている' } },
-        target: 'I remember resting here near the Destruction Tree after a long day playing with my friend Chillicothe.', jp: '友達のチリコシーと長い一日を遊んだあと、破壊の木の近くでここに休んだのを覚えている。', readings: { '友達': 'ともだち', '長い': 'ながい', '一日': 'いちにち', '遊んだ': 'あそんだ', '破壊の木': 'はかいのき', '近く': 'ちかく', '休んだ': 'やすんだ', '覚えている': 'おぼえている' },
+        story: { en: 'I remember resting here so I could feel calm after a tiring day with my friend Chillicothe.', jp: '友達のチリコシーとのつかれた一日のあと、落ち着くためにここで休んだのを覚えている。', readings: { '友達': 'ともだち', 'つかれた': 'つかれた', '一日': 'いちにち', '落ち着く': 'おちつく', '休んだ': 'やすんだ', '覚えている': 'おぼえている' } },
+        target: 'I rested here so I could feel calm after a tiring day.', jp: 'つかれた一日のあと、落ち着くためにここで休んだ。', readings: { 'つかれた': 'つかれた', '一日': 'いちにち', '落ち着く': 'おちつく', '休んだ': 'やすんだ' },
         full: ['I remember resting here near the Destruction Tree after a long day playing with my friend Chillicothe.', 'I remember sleeping here near the Destruction Tree after a long day playing with my friend Chillicothe.', 'I remember laughing here near the Destruction Tree after a long day playing with my friend Chillicothe.'], partial: ['I remember resting …', 'I remember sleeping …', 'I remember laughing …']
       }
     },
     backpack: {
       start: {
-        story: { en: 'I remember carrying my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
-        target: 'I carry my favorite daydreams in this.', jp: 'お気に入りの夢をこれに入れて運ぶ。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運ぶ': 'はこぶ' },
-        full: ['I carry my favorite daydreams in this.', 'I keep my favorite books in this.', 'I carry my favorite snacks in this.'], partial: ['I carry daydreams …', 'I keep books …', 'I carry snacks …']
+        story: { en: 'I remember carrying my favorite daydreams in this backpack.', jp: 'お気に入りの夢をこのリュックに入れて運んだのを覚えている。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
+        target: 'I carry my dreams in this.', jp: '夢をこれに入れて運ぶ。', readings: { '夢': 'ゆめ', '入れて': 'いれて', '運ぶ': 'はこぶ' },
+        full: ['I carry my dreams in this.', 'I keep my books in this.', 'I carry my snacks in this.'], partial: ['I carry dreams …', 'I keep books …', 'I carry snacks …']
       },
       case: {
-        story: { en: 'I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。夢のいくつかはこわい！', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
-        target: 'I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', jp: 'お気に入りの夢をこれに入れて運んだのを覚えている。夢のいくつかはこわい！', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' },
-        full: ['I remember carrying my favorite daydreams in this. Some of the daydreams are scary!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are sunny!', 'I remember carrying my favorite daydreams in this. Some of the daydreams are funny!'], partial: ['I remember carrying … scary!', 'I remember carrying … sunny!', 'I remember carrying … funny!']
+        story: { en: 'I remember keeping my favorite dreams safe in this backpack. Some dreams were scary.', jp: 'お気に入りの夢をこのリュックに大切にしまったのを覚えている。こわい夢もあった。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '大切にしまった': 'たいせつにしまった', 'こわい': 'こわい', '覚えている': 'おぼえている' } },
+        target: 'I keep my favorite dreams safe because this backpack protects them.', jp: 'このリュックが守ってくれるので、お気に入りの夢を安全にしまう。', readings: { 'お気に入り': 'おきにいり', '夢': 'ゆめ', '守ってくれる': 'まもってくれる', '安全に': 'あんぜんに', 'しまう': 'しまう' },
+        full: ['I keep my favorite dreams safe because this backpack protects them.', 'I keep my favorite books safe because this backpack protects them.', 'I keep my favorite snacks safe because this backpack protects them.'], partial: ['I keep my favorite dreams safe because …', 'I keep my favorite books safe because …', 'I keep my favorite snacks safe because …']
       },
       deep: {
-        story: { en: 'I remember carrying my favorite daydreams in this backpack, even when the scary ones followed me home.', jp: 'こわい夢が家までついてきたときも、お気に入りの夢をこのリュックに入れて運んだのを覚えている。', readings: { '夢': 'ゆめ', '家': 'いえ', 'お気に入り': 'おきにいり', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
-        target: 'I remember carrying my favorite daydreams in this backpack, even when the scary ones followed me home.', jp: 'こわい夢が家までついてきたときも、お気に入りの夢をこのリュックに入れて運んだのを覚えている。', readings: { '夢': 'ゆめ', '家': 'いえ', 'お気に入り': 'おきにいり', '入れて': 'いれて', '運んだ': 'はこんだ', '覚えている': 'おぼえている' },
-        full: ['I remember carrying my favorite daydreams in this backpack, even when the scary ones followed me home.', 'I remember keeping my favorite daydreams in this backpack, even when the sunny ones followed me home.', 'I remember carrying my favorite books in this backpack, even when the funny ones followed me home.'], partial: ['I remember carrying …', 'I remember keeping …', 'I remember carrying books …']
+        story: { en: 'I remember carrying my favorite daydreams home when the scary ones followed me.', jp: 'こわい夢がついてきたときも、お気に入りの夢を家まで運んだのを覚えている。', readings: { '夢': 'ゆめ', 'ついてきた': 'ついてきた', 'お気に入り': 'おきにいり', '家': 'いえ', '運んだ': 'はこんだ', '覚えている': 'おぼえている' } },
+        target: 'I carry my favorite daydreams home when the scary ones follow me.', jp: 'こわい夢がついてくるとき、お気に入りの夢を家まで運ぶ。', readings: { '夢': 'ゆめ', 'ついてくる': 'ついてくる', 'お気に入り': 'おきにいり', '家': 'いえ', '運ぶ': 'はこぶ' },
+        full: ['I carry my favorite daydreams home when the scary ones follow me.', 'I carry my favorite books home when the funny ones follow me.', 'I carry my favorite snacks home when the hungry ones follow me.'], partial: ['I carry my favorite daydreams …', 'I carry my favorite books …', 'I carry my favorite snacks …']
       }
     },
     book: {
       start: {
-        story: { en: 'I remember writing in this for my friend and giving it to her in the fall.', jp: '友達のためにこれに書いて、秋に彼女へ渡したのを覚えている。', readings: { '友達': 'ともだち', '書いて': 'かいて', '秋': 'あき', '渡した': 'わたした', '覚えている': 'おぼえている' } },
-        target: 'I remember writing in this for my friend and giving it to her in the fall.', jp: '友達のためにこれに書いて、秋に彼女へ渡したのを覚えている。', readings: { '友達': 'ともだち', '書いて': 'かいて', '秋': 'あき', '渡した': 'わたした', '覚えている': 'おぼえている' },
-        full: ['I remember writing in this for my friend and giving it to her in the fall.', 'I remember drawing in this for my friend.', 'I remember reading this with my friend.'], partial: ['I remember writing …', 'I remember drawing …', 'I remember reading …']
+        story: { en: 'I wrote in this book for my friend. I gave it to her in the fall.', jp: '友達のためにこの本に書いた。秋に彼女へ渡した。', readings: { '友達': 'ともだち', '書いた': 'かいた', '秋': 'あき', '渡した': 'わたした' } },
+        target: 'I wrote this book for my friend.', jp: '友達のためにこの本を書いた。', readings: { '友達': 'ともだち', '書いた': 'かいた', '本': 'ほん' },
+        full: ['I wrote this book for my friend.', 'I drew this book for my friend.', 'I read this book with my friend.'], partial: ['I wrote this book …', 'I drew this book …', 'I read this book …']
       },
       case: {
-        story: { en: 'I remember writing in this for October. She is my friend, and we always meet around Halloween time.', jp: 'オクトーバーのためにこれに書いたのを覚えている。彼女は友達で、私たちはいつもハロウィンのころに会う。', readings: { '書いた': 'かいた', '覚えている': 'おぼえている', '友達': 'ともだち', '会う': 'あう' } },
-        target: 'I remember writing in this for October. She is my friend, and we always meet around Halloween time.', jp: 'オクトーバーのためにこれに書いたのを覚えている。彼女は友達で、私たちはいつもハロウィンのころに会う。', readings: { '書いた': 'かいた', '覚えている': 'おぼえている', '友達': 'ともだち', '会う': 'あう' },
-        full: ['I remember writing in this for October. She is my friend, and we always meet around Halloween time.', 'I remember drawing in this for October. She is my friend, and we always meet around Halloween time.', 'I remember reading this in October. She is my friend, and we always meet around Halloween time.'], partial: ['I remember writing …', 'I remember drawing …', 'I remember reading …']
+        story: { en: 'I wrote this book for October. I gave it to her when autumn arrived.', jp: 'オクトーバーのためにこの本を書いた。秋が来たとき、彼女に渡した。', readings: { '本': 'ほん', '書いた': 'かいた', '秋': 'あき', '来た': 'きた', '渡した': 'わたした' } },
+        target: 'I gave October the book when autumn arrived.', jp: '秋が来たとき、オクトーバーにその本を渡した。', readings: { '秋': 'あき', '来た': 'きた', '本': 'ほん', '渡した': 'わたした' },
+        full: ['I gave October the book when autumn arrived.', 'I showed October the book when autumn arrived.', 'I mailed October the book when autumn arrived.'], partial: ['I gave October the book …', 'I showed October the book …', 'I mailed October the book …']
       },
       deep: {
-        story: { en: 'I remember writing this for my friend and giving it to her in the fall, when October made the nights feel magical.', jp: 'オクトーバーが夜をふしぎに感じさせる秋に、友達のためにこれを書いて彼女へ渡したのを覚えている。', readings: { '秋': 'あき', '夜': 'よる', '友達': 'ともだち', '書いて': 'かいて', '渡した': 'わたした', '感じさせる': 'かんじさせる', '覚えている': 'おぼえている' } },
-        target: 'I remember writing this for my friend and giving it to her in the fall, when October made the nights feel magical.', jp: 'オクトーバーが夜をふしぎに感じさせる秋に、友達のためにこれを書いて彼女へ渡したのを覚えている。', readings: { '秋': 'あき', '夜': 'よる', '友達': 'ともだち', '書いて': 'かいて', '渡した': 'わたした', '感じさせる': 'かんじさせる', '覚えている': 'おぼえている' },
+        story: { en: 'I gave October the book, hoping its words would preserve a memory that autumn could not.', jp: '秋には残せない記憶をその言葉で残せるよう願い、オクトーバーに本を渡した。', readings: { '言葉': 'ことば', '残せる': 'のこせる', '記憶': 'きおく', '秋': 'あき', '願い': 'ねがい', '渡した': 'わたした' } },
+        target: 'I gave October the book, hoping its words would preserve a memory that autumn could not.', jp: '秋には残せない記憶をその言葉で残せるよう願い、オクトーバーに本を渡した。', readings: { '言葉': 'ことば', '残せる': 'のこせる', '記憶': 'きおく', '秋': 'あき', '願い': 'ねがい', '渡した': 'わたした' },
         full: ['I remember writing this for my friend and giving it to her in the fall, when October made the nights feel magical.', 'I remember drawing this for my friend and giving it to her in the fall, when October made the nights feel magical.', 'I remember reading this with my friend in the fall, when October made the nights feel magical.'], partial: ['I remember writing …', 'I remember drawing …', 'I remember reading …']
       }
     },
     teddyBear: {
       start: {
         story: { en: 'I remember hugging this when the night felt spooky.', jp: '夜がこわく感じたとき、これを抱きしめたのを覚えている。', readings: { '夜': 'よる', '感じた': 'かんじた', '抱きしめた': 'だきしめた', '覚えている': 'おぼえている' } },
-        target: 'I hug this when the night feels spooky.', jp: '夜がこわいとき、これを抱きしめる。', readings: { '夜': 'よる', '抱きしめる': 'だきしめる' },
-        full: ['I hug this when the night feels spooky.', 'I hold this when the day feels sunny.', 'I play with this when the night feels quiet.'], partial: ['I hug …', 'I hold …', 'I play …']
+        target: 'I hug this teddy bear at night.', jp: '夜にこのテディベアを抱きしめる。', readings: { '夜': 'よる', '抱きしめる': 'だきしめる' },
+        full: ['I hug this teddy bear at night.', 'I hold this teddy bear at night.', 'I play with this teddy bear at night.'], partial: ['I hug …', 'I hold …', 'I play …']
       },
       case: {
-        story: { en: 'I remember hugging this when the night felt spooky and I could hear a Gorogui moving around Karasuki.', jp: '夜がこわく感じて、カラスキのあたりを動くゴロギの音が聞こえたとき、これを抱きしめたのを覚えている。', readings: { '夜': 'よる', '感じて': 'かんじて', '動く': 'うごく', '音': 'おと', '聞こえた': 'きこえた', '抱きしめた': 'だきしめた' } },
-        target: 'I hugged this when the night felt spooky.', jp: '夜がこわく感じたとき、これを抱きしめた。', readings: { '夜': 'よる', '感じた': 'かんじた', '抱きしめた': 'だきしめた' },
-        full: ['I hugged this when the night felt spooky.', 'I held this when the night felt sunny.', 'I played with this when the night felt quiet.'], partial: ['I hugged …', 'I held …', 'I played …']
+        story: { en: 'I remember hugging this when the night felt spooky. I heard Gorogui nearby.', jp: '夜がこわく感じたとき、これを抱きしめたのを覚えている。近くでゴロギの音が聞こえた。', readings: { '夜': 'よる', '感じた': 'かんじた', '抱きしめた': 'だきしめた', '近く': 'ちかく', '聞こえた': 'きこえた' } },
+        target: 'I hugged my teddy bear because the spooky night scared me.', jp: 'こわい夜がこわかったので、テディベアを抱きしめた。', readings: { '夜': 'よる', 'こわかった': 'こわかった', '抱きしめた': 'だきしめた' },
+        full: ['I hugged my teddy bear because the spooky night scared me.', 'I held my teddy bear because the spooky night scared me.', 'I carried my teddy bear because the spooky night scared me.'], partial: ['I hugged my teddy bear because …', 'I held my teddy bear because …', 'I carried my teddy bear because …']
       },
       deep: {
-        story: { en: 'I remember hugging this when the night felt spooky and hearing Gorogui moving somewhere around Karasuki.', jp: '夜がこわく感じたとき、カラスキのどこかでゴロギが動く音を聞きながら、これを抱きしめたのを覚えている。', readings: { '夜': 'よる', '感じた': 'かんじた', '動く': 'うごく', '音': 'おと', '聞きながら': 'ききながら', '抱きしめた': 'だきしめた', '覚えている': 'おぼえている' } },
-        target: 'I remember hugging this when the night felt spooky and hearing Gorogui moving somewhere around Karasuki.', jp: '夜がこわく感じたとき、カラスキのどこかでゴロギが動く音を聞きながら、これを抱きしめたのを覚えている。', readings: { '夜': 'よる', '感じた': 'かんじた', '動く': 'うごく', '音': 'おと', '聞きながら': 'ききながら', '抱きしめた': 'だきしめた', '覚えている': 'おぼえている' },
-        full: ['I remember hugging this when the night felt spooky and hearing Gorogui moving somewhere around Karasuki.', 'I remember holding this when the night felt spooky and hearing Gorogui moving somewhere around Karasuki.', 'I remember carrying this when the night felt spooky and hearing Gorogui moving somewhere around Karasuki.'], partial: ['I remember hugging …', 'I remember holding …', 'I remember carrying …']
+        story: { en: 'I remember hugging this whenever the night felt spooky, although I heard Gorogui outside.', jp: '夜がこわいとき、外でゴロギの音が聞こえても、これを抱きしめたのを覚えている。', readings: { '夜': 'よる', '外': 'そと', '聞こえても': 'きこえても', '抱きしめた': 'だきしめた', '覚えている': 'おぼえている' } },
+        target: 'I hugged my teddy bear whenever the night felt spooky, although I heard Gorogui outside.', jp: '夜がこわいとき、外でゴロギの音が聞こえても、テディベアを抱きしめた。', readings: { '夜': 'よる', '外': 'そと', '聞こえても': 'きこえても', '抱きしめた': 'だきしめた' },
+        full: ['I hugged my teddy bear whenever the night felt spooky, although I heard Gorogui outside.', 'I held my teddy bear whenever the night felt spooky, although I heard Gorogui outside.', 'I carried my teddy bear whenever the night felt spooky, although I heard Gorogui outside.'], partial: ['I hugged my teddy bear whenever …', 'I held my teddy bear whenever …', 'I carried my teddy bear whenever …']
       }
     },
     toGoCoffeeCup: {
@@ -311,31 +311,84 @@
         full: ['I drink a warm cup of Pamuri.', 'I make a warm cup of tea.', 'I carry a warm cup of cocoa.'], partial: ['I drink …', 'I make …', 'I carry …']
       },
       case: {
-        story: { en: 'I remember drinking a warm cup of Pamuri with Takachika while watching the Booha dance in the clouds.', jp: 'タカチカと一緒に、雲の中でブーハが踊るのを見ながら、あたたかいパムリを飲んだのを覚えている。', readings: { '一緒に': 'いっしょに', '雲': 'くも', '踊る': 'おどる', '見ながら': 'みながら', '飲んだ': 'のんだ', '覚えている': 'おぼえている' } },
-        target: 'I drink a warm cup of Pamuri with Takachika.', jp: 'タカチカと一緒にあたたかいパムリを飲む。', readings: { '一緒に': 'いっしょに', '飲む': 'のむ' },
-        full: ['I drink a warm cup of Pamuri with Takachika.', 'I make a warm cup of tea with Takachika.', 'I carry a warm cup of cocoa with Takachika.'], partial: ['I drink …', 'I make …', 'I carry …']
+        story: { en: 'I remember drinking warm Pamuri with Takachika while watching Booha dance.', jp: 'タカチカと温かいパムリを飲みながら、ブーハが踊るのを見たのを覚えている。', readings: { '温かい': 'あたたかい', '踊る': 'おどる', '見た': 'みた', '飲みながら': 'のみながら', '覚えている': 'おぼえている' } },
+        target: 'I drank warm Pamuri while watching Booha dance.', jp: 'ブーハが踊るのを見ながら、温かいパムリを飲んだ。', readings: { '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ' },
+        full: ['I drank warm Pamuri while watching Booha dance.', 'I made warm Pamuri while watching Booha dance.', 'I carried warm Pamuri while watching Booha dance.'], partial: ['I drank warm Pamuri while …', 'I made warm Pamuri while …', 'I carried warm Pamuri while …']
       },
       deep: {
-        story: { en: 'I remember drinking warm Pamuri with Takachika while we watched Booha dance through the clouds above Karasuki.', jp: 'カラスキの上の雲をブーハが踊りながら通るのを見ているあいだ、タカチカと温かいパムリを飲んだのを覚えている。', readings: { '上': 'うえ', '雲': 'くも', '踊りながら': 'おどりながら', '通る': 'とおる', '見ている': 'みている', '温かい': 'あたたかい', '飲んだ': 'のんだ', '覚えている': 'おぼえている' } },
-        target: 'I remember drinking warm Pamuri with Takachika while we watched Booha dance through the clouds above Karasuki.', jp: 'カラスキの上の雲をブーハが踊りながら通るのを見ているあいだ、タカチカと温かいパムリを飲んだのを覚えている。', readings: { '上': 'うえ', '雲': 'くも', '踊りながら': 'おどりながら', '通る': 'とおる', '見ている': 'みている', '温かい': 'あたたかい', '飲んだ': 'のんだ', '覚えている': 'おぼえている' },
-        full: ['I remember drinking warm Pamuri with Takachika while we watched Booha dance through the clouds above Karasuki.', 'I remember making warm Pamuri with Takachika while we watched Booha dance through the clouds above Karasuki.', 'I remember carrying warm Pamuri with Takachika while we watched Booha dance through the clouds above Karasuki.'], partial: ['I remember drinking …', 'I remember making …', 'I remember carrying …']
+        story: { en: 'I remember drinking warm Pamuri while watching Booha dance above the clouds at sunset in Karasuki.', jp: 'カラスキで、夕暮れに雲の上をブーハが踊るのを見ながら、温かいパムリを飲んだのを覚えている。', readings: { '夕暮れ': 'ゆうぐれ', '雲': 'くも', '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ', '覚えている': 'おぼえている' } },
+        target: 'I drank warm Pamuri while watching Booha dance above the clouds at sunset.', jp: '夕暮れに雲の上をブーハが踊るのを見ながら、温かいパムリを飲んだ。', readings: { '夕暮れ': 'ゆうぐれ', '雲': 'くも', '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ' },
+        full: ['I drank warm Pamuri while watching Booha dance above the clouds at sunset.', 'I made warm Pamuri while watching Booha dance above the clouds at sunset.', 'I carried warm Pamuri while watching Booha dance above the clouds at sunset.'], partial: ['I drank warm Pamuri while …', 'I made warm Pamuri while …', 'I carried warm Pamuri while …']
       }
     },
     ball: {
       start: {
         story: { en: 'I remember playing games every day with my friend.', jp: '友達と毎日ゲームをして遊んだのを覚えている。', readings: { '友達': 'ともだち', '毎日': 'まいにち', '遊んだ': 'あそんだ', '覚えている': 'おぼえている' } },
-        target: 'I play games every day with my friend.', jp: '友達と毎日ゲームをして遊ぶ。', readings: { '友達': 'ともだち', '毎日': 'まいにち', '遊ぶ': 'あそぶ' },
-        full: ['I play games every day with my friend.', 'I ride my bike every day with my friend.', 'I write stories every day with my friend.'], partial: ['I play …', 'I ride …', 'I write …']
+        target: 'I play games with my friend.', jp: '友達とゲームをして遊ぶ。', readings: { '友達': 'ともだち', '遊ぶ': 'あそぶ' },
+        full: ['I play games with my friend.', 'I play ball with my friend.', 'I read books with my friend.'], partial: ['I play games …', 'I play ball …', 'I read books …']
       },
       case: {
-        story: { en: 'I remember playing games with Columbus in his daydreams. He’s a good pet.', jp: 'コロンブスの夢の中で一緒にゲームをして遊んだのを覚えている。彼はいいペットだよ。', readings: { '夢': 'ゆめ', '一緒に': 'いっしょに', '遊んだ': 'あそんだ', '覚えている': 'おぼえている', '良い': 'いい' } },
-        target: 'I play games with Columbus in his daydreams.', jp: 'コロンブスの夢の中で一緒にゲームをして遊ぶ。', readings: { '夢': 'ゆめ', '一緒に': 'いっしょに', '遊ぶ': 'あそぶ' },
-        full: ['I play games with Columbus in his daydreams.', 'I ride my bike with Columbus in his daydreams.', 'I write stories with Columbus in his daydreams.'], partial: ['I play games …', 'I ride my bike …', 'I write stories …']
+        story: { en: 'I remember playing ball with Columbus when he felt lonely. He is a good pet.', jp: 'コロンブスがさびしいとき、ボールで遊んだのを覚えている。彼はいいペットだよ。', readings: { 'さびしい': 'さびしい', '遊んだ': 'あそんだ', '覚えている': 'おぼえている', '良い': 'いい' } },
+        target: 'I played ball with Columbus when he felt lonely.', jp: 'コロンブスがさびしいとき、ボールで遊んだ。', readings: { 'さびしい': 'さびしい', '遊んだ': 'あそんだ' },
+        full: ['I played ball with Columbus when he felt lonely.', 'I watched birds with Columbus when he felt lonely.', 'I shared snacks with Columbus when he felt lonely.'], partial: ['I played ball with Columbus when …', 'I watched birds with Columbus when …', 'I shared snacks with Columbus when …']
       },
       deep: {
-        story: { en: 'I remember playing games with Columbus in his daydreams because he is a good pet who always makes me laugh.', jp: 'コロンブスはいつも私を笑わせてくれるいいペットだから、彼の夢の中で一緒にゲームをして遊んだのを覚えている。', readings: { 'いつも': 'いつも', '笑わせてくれる': 'わらわせてくれる', '良い': 'いい', '夢': 'ゆめ', '一緒に': 'いっしょに', '遊んだ': 'あそんだ', '覚えている': 'おぼえている' } },
-        target: 'I remember playing games with Columbus in his daydreams because he is a good pet who always makes me laugh.', jp: 'コロンブスはいつも私を笑わせてくれるいいペットだから、彼の夢の中で一緒にゲームをして遊んだのを覚えている。', readings: { 'いつも': 'いつも', '笑わせてくれる': 'わらわせてくれる', '良い': 'いい', '夢': 'ゆめ', '一緒に': 'いっしょに', '遊んだ': 'あそんだ', '覚えている': 'おぼえている' },
-        full: ['I remember playing games with Columbus in his daydreams because he is a good pet who always makes me laugh.', 'I remember riding bikes with Columbus in his daydreams because he is a good pet who always makes me laugh.', 'I remember writing stories with Columbus in his daydreams because he is a good pet who always makes me laugh.'], partial: ['I remember playing …', 'I remember riding …', 'I remember writing …']
+        story: { en: 'I remember playing ball with Columbus because he always made me laugh after school.', jp: '放課後、いつも私を笑わせてくれたので、コロンブスとボールで遊んだのを覚えている。', readings: { '放課後': 'ほうかご', 'いつも': 'いつも', '笑わせてくれた': 'わらわせてくれた', '遊んだ': 'あそんだ', '覚えている': 'おぼえている' } },
+        target: 'I played ball with Columbus because he always made me laugh after school.', jp: '放課後、いつも私を笑わせてくれたので、コロンブスとボールで遊んだ。', readings: { '放課後': 'ほうかご', 'いつも': 'いつも', '笑わせてくれた': 'わらわせてくれた', '遊んだ': 'あそんだ' },
+        full: ['I played ball with Columbus because he always made me laugh after school.', 'I watched birds with Columbus because he always made me laugh after school.', 'I shared snacks with Columbus because he always made me laugh after school.'], partial: ['I played ball because …', 'I watched birds because …', 'I shared snacks because …']
+      }
+    }
+  };
+
+  // Human-reviewed production rubric. Word counts and sentence counts are
+  // enforceable in CI; the focus notes preserve the language judgment that a
+  // length-only test cannot make.
+  const MEMORY_DIFFICULTY_MANIFEST = {
+    limits: {
+      start: { minWords: 4, maxWords: 9, maxSentences: 1 },
+      case: { minWords: 8, maxWords: 14, maxSentences: 1 },
+      deep: { minWords: 12, maxWords: 20, maxSentences: 1 }
+    },
+    reviewed: {
+      banner: {
+        start: { level: 'Eiken 5–4', focus: 'simple past' },
+        case: { level: 'Eiken 3–2', focus: 'when relationship' },
+        deep: { level: 'Eiken 1', focus: 'before sequence and purpose' }
+      },
+      ticket: {
+        start: { level: 'Eiken 5–4', focus: 'simple past' },
+        case: { level: 'Eiken 3–2', focus: 'purpose with to' },
+        deep: { level: 'Eiken 1', focus: 'because relationship' }
+      },
+      pillow: {
+        start: { level: 'Eiken 5–4', focus: 'simple past' },
+        case: { level: 'Eiken 3–2', focus: 'after relationship' },
+        deep: { level: 'Eiken 1', focus: 'purpose with so ... could' }
+      },
+      backpack: {
+        start: { level: 'Eiken 5–4', focus: 'simple present' },
+        case: { level: 'Eiken 3–2', focus: 'because relationship' },
+        deep: { level: 'Eiken 1', focus: 'when relationship and lore vocabulary' }
+      },
+      book: {
+        start: { level: 'Eiken 5–4', focus: 'simple past and one fact' },
+        case: { level: 'Eiken 3–2', focus: 'when relationship and indirect object' },
+        deep: { level: 'Eiken 1', focus: 'hoping participle and relative clause' }
+      },
+      teddyBear: {
+        start: { level: 'Eiken 5–4', focus: 'simple present' },
+        case: { level: 'Eiken 3–2', focus: 'because relationship' },
+        deep: { level: 'Eiken 1', focus: 'although and whenever relationships' }
+      },
+      toGoCoffeeCup: {
+        start: { level: 'Eiken 5–4', focus: 'simple present' },
+        case: { level: 'Eiken 3–2', focus: 'while relationship' },
+        deep: { level: 'Eiken 1', focus: 'while relationship with time and place' }
+      },
+      ball: {
+        start: { level: 'Eiken 5–4', focus: 'simple present' },
+        case: { level: 'Eiken 3–2', focus: 'when relationship' },
+        deep: { level: 'Eiken 1', focus: 'because relationship' }
       }
     }
   };
@@ -416,6 +469,7 @@
     // Content Pass 2 live source. The quest, exercise, replay, and profile
     // renderers resolve the current weekly tier from this manifest.
     tierMemories: MEMORY_TIERS,
+    difficultyManifest: MEMORY_DIFFICULTY_MANIFEST,
 
     // Pass 7: the 8 object types' canonical key list, matching the
     // `collectibles` art-path keys above exactly (same 8 strings) so
@@ -460,7 +514,7 @@
     // difficulty in line with each tier, not because the names themselves
     // were a problem -- easy to restore in full during real content review.
     // Retained as a content reference while the live exercises below use the
-    // clarified same-sentence, fading-helper design.
+    // clarified story-versus-target, fading-helper design.
     legacyMemories: {
       banner: {
         start: {

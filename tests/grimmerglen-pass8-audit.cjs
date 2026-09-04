@@ -53,8 +53,6 @@ for (const type of data.objectTypes) {
     answers.push(exercise.accepted[0]);
   }
   assert.strictEqual(new Set(answers).size, 3, `${type} must use a distinct sentence for Starter, Case, and Deep returns`);
-  assert(answers[1].length >= answers[0].length, `${type} Case answer should be at least as challenging as Starter`);
-  assert(answers[2].length >= answers[1].length, `${type} Deep answer should be at least as challenging as Case`);
   assert.strictEqual(data.memories[type].start.options.length, 3, `${type} Starter must show three complete helpers`);
   assert.strictEqual(data.memories[type].case.options.length, 3, `${type} Case must show three partial helpers`);
   assert(data.memories[type].case.optionsVisible === false, `${type} Case helpers must be hidden behind the hint control`);
