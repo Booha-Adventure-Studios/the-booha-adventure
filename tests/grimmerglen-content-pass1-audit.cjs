@@ -30,17 +30,19 @@ for (const type of data.objectTypes) {
     assert(Array.isArray(entry.full) && entry.full.length >= 1, `${type} ${tier} needs authored choices`);
     assert(Array.isArray(entry.partial) && entry.partial.length >= 1, `${type} ${tier} needs partial helpers`);
   }
-  assert(tiers[type].case.story.en.length >= tiers[type].start.story.en.length, `${type} Case story should not be shorter than Starter`);
-assert(tiers[type].case.target.length >= tiers[type].start.target.length, `${type} Case target should not be shorter than Starter`);
-  assert(tiers[type].deep.target.length >= tiers[type].case.target.length, `${type} Deep target should not be shorter than Case`);
 }
 
-assert.match(tiers.book.start.story.en, /writing in this .* in the fall/i, 'Book Starter must use the requested writing memory');
-assert.match(tiers.book.case.story.en, /writing in this for October/i, 'Book Case must correct wringing to writing');
+assert.strictEqual(tiers.book.start.story.en, 'I wrote in this book for my friend. I gave it to her in the fall.', 'Book Starter must use the short two-sentence memory story');
+assert.strictEqual(tiers.book.start.target, 'I wrote this book for my friend.', 'Book Starter must extract one simple fact');
+assert.strictEqual(tiers.book.case.story.en, 'I wrote this book for October. I gave it to her when autumn arrived.', 'Book Case must use the time-relationship story');
+assert.strictEqual(tiers.book.case.target, 'I gave October the book when autumn arrived.', 'Book Case must extract the time relationship');
+assert.strictEqual(tiers.book.deep.target, 'I gave October the book, hoping its words would preserve a memory that autumn could not.', 'Book Deep must retain the reviewed advanced target');
 assert.doesNotMatch(tiers.banner.case.story.en, /too quiet.*too quiet/i, 'Banner Case should contain the corrected quiet phrasing once');
 for (const name of names) {
   assert(Object.values(tiers).some(memory => Object.values(memory).some(entry => entry.story.en.includes(name))), `${name} must remain connected to the authored lore`);
 }
 
+assert(data.difficultyManifest?.limits && data.difficultyManifest.reviewed, 'Pass 1 must expose the reviewed difficulty manifest');
+
 assert.match(verify, /tests\/grimmerglen-content-pass1-audit\.cjs/, 'verify.sh must run the Grimmerglen Content Pass 1 audit');
-console.log('Grimmerglen Content Pass 1 audit passed: 24 bilingual tier records, difficulty ordering, corrections, and lore names are staged.');
+console.log('Grimmerglen Content Pass 1 audit passed: 24 bilingual tier records, reviewed difficulty limits, corrections, and lore names are staged.');
