@@ -789,6 +789,13 @@ else
   bad "Grimmerglen Pass 9H final-memory celebration audit failed"
 fi
 
+echo "[regression] Grimmerglen reload-state audit"
+if node tests/grimmerglen-reload-state-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen accepted quests survive leave/reload and new weeks relock exits"
+else
+  bad "Grimmerglen reload-state audit failed"
+fi
+
 echo "[89/94] Grimmerglen Pass 9I leaf-vignette audit"
 if node tests/grimmerglen-pass9i-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen denser small-leaf vignette and opacity-variation contracts pass"
