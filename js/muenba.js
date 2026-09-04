@@ -319,9 +319,16 @@
     || REDUCED_MOTION
   );
   let perfTier       = LOW_POWER_HINT ? 'low' : 'high';
-  let perfFrameCount = 0;
-  let perfFirstTime  = 0;
   let shadowsEnabled = perfTier !== 'low';
+  const worldPerf = window.BoohaPerformance.create({
+    name: 'Muenba',
+    lowPowerHint: LOW_POWER_HINT,
+    onTierChange: tier => {
+      perfTier = tier;
+      shadowsEnabled = false;
+      resizeCanvas();
+    },
+  });
   let rafHandle      = null;
   let pageHidden     = document.hidden;
   let worldInitialized = false;
@@ -849,8 +856,7 @@
     if (document.hidden) {
       if (rafHandle) window.cancelAnimationFrame(rafHandle);
       rafHandle = null;
-      perfFrameCount = 0;
-      perfFirstTime = 0;
+      worldPerf.pause();
       if (dangerScreamStateIsActive()) {
         dangerScreamVisibilityPaused = true;
         stopDangerScream();
@@ -858,8 +864,7 @@
       pauseRhythmForVisibility();
       return;
     }
-    perfFrameCount = 0;
-    perfFirstTime = 0;
+    worldPerf.reset();
     state.lastTickTime = 0;
     scheduleMuenbaFrame();
     if (captureSession?.phase === 'rhythm-paused') {
@@ -7810,17 +7815,8 @@
   }
 
   function updateMuenbaPerfTier(now) {
-    if (perfTier === 'low') return;
-    perfFrameCount += 1;
-    if (perfFrameCount === 1) { perfFirstTime = now; return; }
-    if (perfFrameCount === 90) {
-      const averageFps = 89 / ((now - perfFirstTime) / 1000);
-      if (averageFps < 40) {
-        perfTier = 'low';
-        shadowsEnabled = false;
-        resizeCanvas();
-      }
-    }
+    worldPerf.sample(now);
+    perfTier = worldPerf.getTier();
   }
 
   // Keep the world canvas static while a DOM panel owns the foreground. The
@@ -7841,8 +7837,7 @@
     if (pageHidden) return;
     if (staticFrameOverlayOpen()) {
       // Do not let time spent behind a panel distort the measured world FPS.
-      perfFrameCount = 0;
-      perfFirstTime = 0;
+      worldPerf.pause();
     } else {
       updateMuenbaPerfTier(now);
     }
@@ -7876,7 +7871,7 @@
         tickGhost(now);
       }
     }
-    if (!staticFrameOverlayOpen()) drawFrame(now);
+    if (!staticFrameOverlayOpen() && worldPerf.shouldRender(now)) drawFrame(now);
     scheduleMuenbaFrame();
   }
 
@@ -7899,6 +7894,18 @@
     bindInput();
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     worldInitialized = true;
+    worldPerf.enableOverlay(() => ({
+      dpr: Math.min(perfTier === 'low' ? 1 : (TOUCH_DEVICE ? 1.5 : 2), Math.max(1, window.devicePixelRatio || 1)),
+      loadedRoomImageCount: imageCache.size,
+      loadedCharacterImageCount: GHOSTS.length,
+      decodedImageMemoryBytes: 0,
+      wandererCacheUsageBytes: 0,
+      wandererCacheBudgetBytes: 0,
+      roomLoadDecodeMs: 0,
+      activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
+      serviceWorkerCacheVersion: 'booha-assets-2026-505',
+      averageFps: worldPerf.metrics().averageFps,
+    }));
     scheduleMuenbaFrame();
     // Nuppi's dialogue is player-invoked from his room hit target. Entry and
     // profile-return flows should leave Booha in free roam without a modal.
