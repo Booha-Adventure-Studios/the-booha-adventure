@@ -43,19 +43,17 @@ assert.match(profile, /UTSUROBA IS LOCKED NOW\./,
   'locked Utsuroba status copy must exist');
 assert.match(profile, /UTSUROBA IS OPEN\./,
   'open Utsuroba status copy must exist');
-assert.match(profile, /THE DRIFTERS ARE WAITING\./,
-  'open Utsuroba waiting copy must exist');
+assert.doesNotMatch(profile, /THE DRIFTERS ARE WAITING|utsuroba-world-status-waiting/,
+  'Utsuroba profile must omit the open-world waiting copy');
 assert.match(profile, /うつろばは<ruby>今<rt>いま<\/rt><\/ruby>、<ruby>閉<rt>と<\/rt><\/ruby>じています。/,
   'locked Japanese status copy must include furigana');
 assert.match(profile, /うつろばは<ruby>開<rt>ひら<\/rt><\/ruby>いています。/,
   'open Japanese status copy must include furigana');
-assert.match(profile, /ドリフターたちが<ruby>待<rt>ま<\/rt><\/ruby>っています。/,
-  'the open status must identify the waiting drifters in Japanese with furigana');
 
 assert.match(profile, /src="assets\/img\/drifters\/kurobane_shizuma-profile\.webp"[^>]+width="768"[^>]+height="768"[^>]+decoding="async"/,
   'the Utsuroba hero must reference the Kurobane profile asset with intrinsic dimensions and async decoding');
-assert.match(profile, /\.hero-art[\s\S]*?245px/,
-  'the Utsuroba hero must reserve the intended desktop artwork footprint');
+assert.match(profile, /\.hero-art[\s\S]*?280px/,
+  'the Utsuroba hero must reserve the larger Marietta-matched artwork footprint');
 assert.match(profile, /\.hero-art img[\s\S]*?object-fit: contain/,
   'the Kurobane art must stay contained inside its hero slot');
 assert.match(profile, /radial-gradient\(circle, rgba\(216,168,255/,
