@@ -15,9 +15,10 @@ vm.runInNewContext(cacheSource, { module: cacheModule, console });
 const DecodedImageCache = cacheModule.exports;
 
 class FakeImage {
-  constructor() { this.listeners = {}; this.naturalWidth = 0; this.naturalHeight = 0; this.complete = false; this.src = ''; }
+  constructor() { this.listeners = {}; this.naturalWidth = 0; this.naturalHeight = 0; this.complete = false; this.src = ''; this.removeAttributeCalls = 0; }
   addEventListener(name, fn) { (this.listeners[name] ||= []).push(fn); }
   removeEventListener(name, fn) { this.listeners[name] = (this.listeners[name] || []).filter((listener) => listener !== fn); }
+  removeAttribute(name) { if (name === 'src') { this.removeAttributeCalls += 1; this.src = ''; } }
   emit(name) { for (const fn of this.listeners[name] || []) fn(); }
   load(width, height) { this.naturalWidth = width; this.naturalHeight = height; this.complete = true; this.emit('load'); }
   fail() { this.complete = true; this.emit('error'); }
@@ -34,6 +35,8 @@ const a = cache.get('room-a-1', { src: 'a', required: true });
 const b = cache.get('room-a-2', { src: 'b', required: true });
 a.load(1024, 1024); b.load(1024, 1024);
 assert.strictEqual(cache.stats().count, 2, 'required current-room images accumulate');
+assert.strictEqual(cache.stats().protectedBytes, 8 * 1024 * 1024, 'required images count as protected decoded bytes');
+assert.strictEqual(cache.stats().overBudget, false, 'cache reports an in-budget protected set');
 
 const popup = cache.get('popup', { src: 'popup', popupPinned: true });
 popup.load(1536, 1024);
@@ -54,6 +57,26 @@ cache.protect('popup', 'popup', false);
 cache.protect('celebration', 'celebration', false);
 cache.evictIfNeeded();
 assert(cache.stats().usageBytes <= cache.budgetBytes, 'cache returns beneath decoded-memory budget');
+
+const admissionImages = [];
+const admissionCache = new DecodedImageCache({
+  budgetBytes: 7 * 1024 * 1024,
+  temporaryBytes: 2 * 1024 * 1024,
+  createImage: () => { const image = new FakeImage(); admissionImages.push(image); return image; },
+});
+const alreadyProtected = admissionCache.get('already-protected', { required: true });
+alreadyProtected.load(1536, 1024);
+const admittedProtected = admissionCache.get('admitted-protected', { required: true });
+assert(admissionCache.stats().keys.includes('admitted-protected'), 'required images are protected before eviction runs');
+assert(admissionCache.stats().overBudget, 'all-protected pressure is explicitly reported');
+assert.strictEqual(admissionCache.stats().protectedBytes, admissionCache.stats().usageBytes, 'all retained bytes are reported as protected');
+assert(admittedProtected, 'the admitted protected image remains available to the world');
+
+const cleanupCache = new DecodedImageCache({ budgetBytes: 4 * 1024 * 1024, temporaryBytes: 1 * 1024 * 1024, createImage: () => new FakeImage() });
+const evictedImage = cleanupCache.get('evicted', { src: 'evicted' });
+evictedImage.load(1024, 1024);
+cleanupCache.get('newer', { src: 'newer' }).load(1024, 1024);
+assert(evictedImage.removeAttributeCalls > 0, 'eviction removes the image src attribute safely');
 
 const beforeReentry = images.length;
 cache.get('room-a-1', { src: 'a-return', required: true }).load(1024, 1024);

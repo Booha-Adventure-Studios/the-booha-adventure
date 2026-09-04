@@ -112,7 +112,8 @@
           `${options.name || 'world'}  ${m.tier || tier}  ${Number(m.currentFps || 0).toFixed(0)} fps`,
           `avg ${Number(m.averageFps || 0).toFixed(0)}  worst ${Number(m.worstFrame || 0).toFixed(0)}ms  dpr ${m.dpr ?? '—'}`,
           `room imgs ${m.loadedRoomImageCount ?? '—'}  chars ${m.loadedCharacterImageCount ?? '—'}`,
-          `decoded ${formatBytes(m.decodedImageMemoryBytes)}  wanderer ${formatBytes(m.wandererCacheUsageBytes)}/${formatBytes(m.wandererCacheBudgetBytes)}`,
+          `decoded ${formatBytes(m.decodedImageMemoryBytes)}  wanderer ${formatBytes(m.wandererCacheUsageBytes)}/${formatBytes(m.wandererCacheBudgetBytes)}${m.wandererCacheOverBudget ? ' OVER' : ''}`,
+          `protected ${formatBytes(m.wandererProtectedBytes)}`,
           `room decode ${m.roomLoadDecodeMs ?? '—'}ms  audio ${m.activeAudioBufferCount ?? '—'}`,
           `sw ${m.serviceWorkerCacheVersion || '—'}`,
         ];
