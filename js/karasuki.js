@@ -37,7 +37,7 @@
     lowPowerHint: LOW_POWER_HINT,
     onTierChange: tier => {
       perfTier = tier;
-      shadowsEnabled = false;
+      shadowsEnabled = tier !== 'low';
       resizeCanvas();
     },
   });
@@ -5120,8 +5120,8 @@ const HAPPY_HOUSE_PORTAL = {
     );
   }
 
-  function updatePerfTier(now) {
-    worldPerf.sample(now);
+  function updatePerfTier(now, countForTier = true) {
+    worldPerf.sample(now, { countForTier });
     perfTier = worldPerf.getTier();
   }
 
@@ -5142,8 +5142,8 @@ const HAPPY_HOUSE_PORTAL = {
 function tick(now) {
   rafHandle = null;
   if (pageHidden) return;
-  if (anyModalOpen() || staticFrameOverlayOpen()) worldPerf.pause();
-  else updatePerfTier(now);
+  if (staticFrameOverlayOpen()) worldPerf.pause();
+  else updatePerfTier(now, !state.transitioning);
   // Keep motion stable on Android when frames stutter.
   // 32ms max = about a 30fps floor.
   const dt = Math.min(32, Math.max(8, now - (lastTickTime || now)));
@@ -5918,7 +5918,7 @@ function drawObserver(now) {
         wandererCacheOverBudget: cache.overBudget,
         roomLoadDecodeMs,
         activeAudioBufferCount: 0,
-        serviceWorkerCacheVersion: 'booha-assets-2026-506',
+        serviceWorkerCacheVersion: 'booha-assets-2026-507',
         averageFps: worldPerf.metrics().averageFps,
       };
     });
