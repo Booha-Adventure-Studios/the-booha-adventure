@@ -18,6 +18,17 @@ const sandbox = { window: {} };
 vm.runInNewContext(dataSource, sandbox, { filename: 'grimmerglen-data.js' });
 const data = sandbox.window.GRIMMERGLEN_DATA;
 
+const difficulty = data.difficultyManifest;
+assert(difficulty?.limits && difficulty.reviewed, 'QA must use the reviewed difficulty manifest');
+
+function wordCount(value) {
+  return String(value || '').replace(/[.!?,;:]+/g, ' ').trim().split(/\s+/).filter(Boolean).length;
+}
+
+function sentenceCount(value) {
+  return String(value || '').split(/[.!?]+/).filter(part => part.trim()).length;
+}
+
 function normalize(value) {
   return String(value || '').toLowerCase().replace(/[’']/g, '').trim().replace(/\s+/g, ' ').replace(/[.!?,;:]+$/g, '');
 }
@@ -44,12 +55,29 @@ for (const type of data.objectTypes) {
     assert(exercise.answerReadings === entry.readings, `${type} ${tier} replay must retain target readings`);
     assert(new Set(entry.full).size === entry.full.length, `${type} ${tier} full choices must not contain duplicates`);
     assert(new Set(entry.partial).size === entry.partial.length, `${type} ${tier} partial choices must not contain duplicates`);
+
+    const limits = difficulty.limits[tier];
+    const review = difficulty.reviewed[type]?.[tier];
+    const targetWords = wordCount(entry.target);
+    assert(review?.level && review.focus, `${type} ${tier} must have a reviewed difficulty note`);
+    assert(targetWords >= limits.minWords && targetWords <= limits.maxWords,
+      `${type} ${tier} target must contain ${limits.minWords}-${limits.maxWords} words (got ${targetWords})`);
+    assert(sentenceCount(entry.target) <= limits.maxSentences,
+      `${type} ${tier} target must contain at most ${limits.maxSentences} sentence`);
+    if (tier === 'start') {
+      assert(!/\b(and|but|because|when|although|while|before|that)\b/i.test(entry.target),
+        `${type} Starter target must stay a single ordinary clause`);
+    }
+    if (tier === 'case') {
+      assert(/\b(to|after|when|because|while)\b/i.test(entry.target),
+        `${type} Case target must contain a meaningful grammatical relationship`);
+    }
   }
 
-  assert(entries[1].story.en.length >= entries[0].story.en.length, `${type} Case story must not be shorter than Starter`);
-  assert(entries[2].story.en.length >= entries[1].story.en.length, `${type} Deep story must not be shorter than Case`);
-  assert(entries[1].target.length >= entries[0].target.length, `${type} Case target must not be shorter than Starter`);
-  assert(entries[2].target.length >= entries[1].target.length, `${type} Deep target must not be shorter than Case`);
+  assert(wordCount(entries[2].target) >= difficulty.limits.deep.minWords,
+    `${type} Deep target must remain a substantive advanced prompt`);
+  assert(/\b(before|because|although|whenever|while|hoping|that|so|when)\b/i.test(entries[2].target),
+    `${type} Deep target must use a reviewed relationship or advanced structure`);
   assert(exercises[0].options?.length === 3 && exercises[0].optionsVisible === true, `${type} Starter must expose three complete choices`);
   assert(exercises[1].options?.length === 3 && exercises[1].optionsVisible === false, `${type} Case must hide three partial choices behind a hint`);
   assert(exercises[2].options === null && exercises[2].optionsVisible === false && exercises[2].helpText, `${type} Deep must be recall-only with Japanese help`);
@@ -63,4 +91,4 @@ assert(runtimeSource.includes('memoryComplete, memoryTier'), 'runtime QA must re
 assert(/assets:\s+'booha-assets-2026-504'/.test(serviceWorker), 'service worker must ship the current Muenba canonical target update');
 assert(verify.includes('tests/grimmerglen-pass4-qa-audit.cjs'), 'verify.sh must run the Pass 4 QA audit');
 
-console.log('Grimmerglen Pass 4 QA audit passed: 24 tier records, answer/replay alignment, unique clues, difficulty ordering, and Ticket copy are clean.');
+console.log('Grimmerglen Pass 4 QA audit passed: 24 tier records, answer/replay alignment, unique clues, production limits, reviewed difficulty notes, and Ticket copy are clean.');
