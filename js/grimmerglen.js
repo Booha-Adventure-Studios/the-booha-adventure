@@ -593,6 +593,16 @@
       }
       event.stopPropagation();
     });
+    grimmerglenProfilePortal.addEventListener('touchend', event => {
+      if (state.celebrating) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      // Let the browser synthesize the anchor click, but keep the stage
+      // touch handler from turning the profile tap into a move.
+      event.stopPropagation();
+    }, { passive: false });
     stage.appendChild(grimmerglenProfilePortal);
     updateGrimmerglenProfilePortal();
   }
