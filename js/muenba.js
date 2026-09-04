@@ -325,7 +325,7 @@
     lowPowerHint: LOW_POWER_HINT,
     onTierChange: tier => {
       perfTier = tier;
-      shadowsEnabled = false;
+      shadowsEnabled = tier !== 'low';
       resizeCanvas();
     },
   });
@@ -7814,8 +7814,8 @@
     document.addEventListener('touchend', startMusic, { once: true, passive: true });
   }
 
-  function updateMuenbaPerfTier(now) {
-    worldPerf.sample(now);
+  function updateMuenbaPerfTier(now, countForTier = true) {
+    worldPerf.sample(now, { countForTier });
     perfTier = worldPerf.getTier();
   }
 
@@ -7839,7 +7839,7 @@
       // Do not let time spent behind a panel distort the measured world FPS.
       worldPerf.pause();
     } else {
-      updateMuenbaPerfTier(now);
+      updateMuenbaPerfTier(now, !state.transitioning && !state.celebrating);
     }
     // Match Karasuki/Utsuroba: use elapsed time directly so a 30fps phone
     // still covers the same distance per second as a 60fps tablet.
@@ -7903,7 +7903,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
-      serviceWorkerCacheVersion: 'booha-assets-2026-506',
+      serviceWorkerCacheVersion: 'booha-assets-2026-507',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleMuenbaFrame();

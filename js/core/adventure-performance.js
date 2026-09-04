@@ -10,16 +10,23 @@
 
   function create(options = {}) {
     const lowPowerHint = options.lowPowerHint === true;
+    const promotionAllowed = options.allowPromotion !== false && !lowPowerHint;
     const poorAverageFps = Number(options.poorAverageFps) || 40;
     const poorLongFrameMs = Number(options.poorLongFrameMs) || 100;
     let tier = lowPowerHint ? 'low' : 'high';
+    const initialTier = tier;
     let paused = true;
     let windowStart = 0;
     let lastSample = 0;
     let frameCount = 0;
     let windowWorstFrame = 0;
     let poorWindows = 0;
-    let currentFps = 0;
+    let healthyWindows = 0;
+    let windowEligible = true;
+    let dynamicallyDowngraded = false;
+    let recentFrameIntervals = [];
+    let recentFps = 0;
+    let windowFps = 0;
     let averageFps = 0;
     let worstFrame = 0;
     let lastRenderedAt = 0;
@@ -32,7 +39,10 @@
       lastSample = Number(now) || 0;
       frameCount = 0;
       windowWorstFrame = 0;
-      currentFps = 0;
+      windowEligible = true;
+      recentFrameIntervals = [];
+      recentFps = 0;
+      windowFps = 0;
       lastRenderedAt = 0;
     }
 
@@ -40,8 +50,9 @@
       reset();
     }
 
-    function sample(now) {
+    function sample(now, sampleOptions = {}) {
       const timestamp = Number(now) || 0;
+      if (sampleOptions.countForTier === false) windowEligible = false;
       if (paused) {
         paused = false;
         windowStart = timestamp;
@@ -57,20 +68,45 @@
       windowWorstFrame = Math.max(windowWorstFrame, elapsed);
       worstFrame = Math.max(worstFrame, elapsed);
       const windowElapsed = timestamp - windowStart;
-      currentFps = frameCount / Math.max(elapsed, windowElapsed || elapsed) * 1000;
+      recentFrameIntervals.push(elapsed);
+      if (recentFrameIntervals.length > 30) recentFrameIntervals.shift();
+      const recentElapsed = recentFrameIntervals.reduce((sum, interval) => sum + interval, 0);
+      recentFps = recentFrameIntervals.length ? recentFrameIntervals.length / recentElapsed * 1000 : 0;
       if (windowElapsed < WINDOW_MS) return false;
 
-      averageFps = frameCount / windowElapsed * 1000;
+      windowFps = frameCount / windowElapsed * 1000;
+      averageFps = windowFps;
       const poor = averageFps < poorAverageFps || windowWorstFrame >= poorLongFrameMs;
-      poorWindows = poor ? poorWindows + 1 : 0;
-      if (tier === 'high' && poorWindows >= 2) {
-        tier = 'low';
-        if (typeof options.onTierChange === 'function') options.onTierChange(tier, metrics());
+      const tierEligible = windowEligible;
+      if (tierEligible) {
+        if (poor) {
+          poorWindows += 1;
+          healthyWindows = 0;
+        } else {
+          poorWindows = 0;
+          healthyWindows += 1;
+        }
+        if (tier === 'high' && poorWindows >= 2) {
+          tier = 'low';
+          dynamicallyDowngraded = initialTier === 'high';
+          if (typeof options.onTierChange === 'function') options.onTierChange(tier, metrics());
+        } else if (tier === 'low' && dynamicallyDowngraded && promotionAllowed && healthyWindows >= 4) {
+          tier = 'high';
+          healthyWindows = 0;
+          poorWindows = 0;
+          if (typeof options.onTierChange === 'function') options.onTierChange(tier, metrics());
+        }
+      } else {
+        // A transition or celebration can still be visible in telemetry, but
+        // its frame window must not advance either tier hysteresis counter.
+        poorWindows = 0;
+        healthyWindows = 0;
       }
       windowStart = timestamp;
       frameCount = 0;
       windowWorstFrame = 0;
-      return poor;
+      windowEligible = true;
+      return tierEligible ? poor : false;
     }
 
     function shouldRender(now) {
@@ -86,10 +122,14 @@
     function metrics(extra = {}) {
       return {
         tier,
-        currentFps,
+        recentFps,
+        windowFps,
         averageFps,
         worstFrame,
         poorWindows,
+        healthyWindows,
+        windowEligible,
+        dynamicallyDowngraded,
         ...extra,
       };
     }
@@ -109,8 +149,8 @@
         try { extra = typeof getMetrics === 'function' ? (getMetrics() || {}) : {}; } catch (_) {}
         const m = metrics(extra);
         const lines = [
-          `${options.name || 'world'}  ${m.tier || tier}  ${Number(m.currentFps || 0).toFixed(0)} fps`,
-          `avg ${Number(m.averageFps || 0).toFixed(0)}  worst ${Number(m.worstFrame || 0).toFixed(0)}ms  dpr ${m.dpr ?? '—'}`,
+          `${options.name || 'world'}  ${m.tier || tier}  ${Number(m.recentFps || 0).toFixed(0)} fps`,
+          `window ${Number(m.windowFps || 0).toFixed(0)}  worst ${Number(m.worstFrame || 0).toFixed(0)}ms  dpr ${m.dpr ?? '—'}`,
           `room imgs ${m.loadedRoomImageCount ?? '—'}  chars ${m.loadedCharacterImageCount ?? '—'}`,
           `decoded ${formatBytes(m.decodedImageMemoryBytes)}  wanderer ${formatBytes(m.wandererCacheUsageBytes)}/${formatBytes(m.wandererCacheBudgetBytes)}${m.wandererCacheOverBudget ? ' OVER' : ''}`,
           `protected ${formatBytes(m.wandererProtectedBytes)}`,
