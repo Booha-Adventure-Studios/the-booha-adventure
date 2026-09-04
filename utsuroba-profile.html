@@ -104,7 +104,7 @@
     @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
 
     .hero {
-      display: grid; grid-template-columns: minmax(0, 1fr) 245px; align-items: center; gap: 30px;
+      display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: center; gap: 30px;
       position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px) clamp(22px, 6vw, 72px);
       border: 1px solid var(--line); border-radius: 24px;
       background: linear-gradient(145deg, rgba(37,18,52,.9), rgba(10,7,17,.78));
@@ -120,7 +120,7 @@
     .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
     .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
     .hero-art {
-      width: 245px; height: 245px; justify-self: center; display: grid; place-items: center;
+      width: 280px; height: 280px; justify-self: center; display: grid; place-items: center;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(216,168,255,.18) 0 34%, rgba(159,228,186,.1) 56%, transparent 75%);
       filter: drop-shadow(0 0 18px rgba(216,168,255,.18));
@@ -131,8 +131,6 @@
     .world-status-dot.is-open { background: var(--mint); box-shadow: 0 0 0 3px rgba(159,228,186,.16), 0 0 14px rgba(159,228,186,.82); }
     .world-status-copy { display: flex; flex-direction: column; gap: 3px; }
     .world-status-en { color: #f0e6ff; font: 700 .68rem/1.25 var(--sans); letter-spacing: .09em; }
-    .world-status-waiting { color: var(--gold); font: 700 .64rem/1.3 var(--sans); letter-spacing: .1em; }
-    .world-status-waiting small { display: block; margin-top: 3px; color: var(--quiet); font: .76rem/1.35 var(--font); letter-spacing: 0; }
     .world-status-jp { color: var(--quiet); font: .76rem/1.35 var(--font); }
     .world-status-jp ruby { ruby-position: over; }
     .world-status-jp rt { font-size: .7em; }
@@ -218,7 +216,7 @@
 
     @media (max-width: 760px) {
       .hero { grid-template-columns: 1fr; }
-      .hero-art { order: 2; width: 230px; height: 230px; margin: 4px auto 0; }
+      .hero-art { order: 2; width: 250px; height: 250px; margin: 4px auto 0; }
       .stats { grid-template-columns: repeat(2, 1fr); }
       .drifter-grid { grid-template-columns: repeat(2, 1fr); }
       .lower-grid { grid-template-columns: 1fr; }
@@ -228,7 +226,7 @@
       .topbar { margin-bottom: 15px; }
       .case-label { display: none; }
       .hero { border-radius: 19px; padding: 30px 20px 34px; }
-      .hero-art { width: 210px; height: 210px; }
+      .hero-art { width: 225px; height: 225px; }
       .echo-top { align-items: start; flex-direction: column; gap: 10px; }
       .echo-status { text-align: left; }
       .drifter-grid { grid-template-columns: 1fr; }
@@ -296,7 +294,6 @@
             <span class="world-status-en">UTSUROBA IS LOCKED NOW.</span>
             <span class="world-status-jp">うつろばは<ruby>今<rt>いま</rt></ruby>、<ruby>閉<rt>と</rt></ruby>じています。</span>
           </span>
-          <span class="world-status-waiting" id="utsuroba-world-status-waiting" hidden>THE DRIFTERS ARE WAITING.<small>ドリフターたちが<ruby>待<rt>ま</rt></ruby>っています。</small></span>
         </div>
       </div>
       <div class="hero-art">
@@ -422,8 +419,6 @@
         }
         const dot = document.getElementById('utsuroba-world-status-dot');
         if (dot) dot.classList.toggle('is-open', open);
-        const waiting = document.getElementById('utsuroba-world-status-waiting');
-        if (waiting) waiting.hidden = !open;
         const karasukiLink = document.getElementById('utsuroba-profile-karasuki');
         if (karasukiLink) karasukiLink.hidden = !open;
       }

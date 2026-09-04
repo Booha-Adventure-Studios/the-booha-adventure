@@ -33,8 +33,8 @@ assert(access.includes('muenba-profile-karasuki'), 'Muenba access renderer must 
 
 assert(profile.includes('MUENBA IS LOCKED') && profile.includes('MUENBA IS OPEN'),
   'Muenba profile must include locked and open status copy');
-assert(profile.includes('THE GHOSTS ARE WAITING'),
-  'Muenba profile must include the open-world waiting copy');
+assert(!profile.includes('THE GHOSTS ARE WAITING') && !profile.includes('world-waiting'),
+  'Muenba profile must omit the open-world waiting copy');
 assert(profile.includes('むえんばは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。'),
   'locked Muenba status must include ruby furigana');
 assert(profile.includes('むえんばは<ruby>開<rt>ひら</rt></ruby>いています。'),
@@ -44,12 +44,12 @@ assert(profile.includes('class="hero-art"'), 'Muenba hero must retain the Nuppi 
 assert(profile.includes('class="hero-art"><img src="assets/img/muenba/nuppi_profile.webp"'),
   'Muenba hero must use the profile Nuppi asset');
 assert(profile.includes('decoding="async"'), 'Nuppi profile image must decode asynchronously');
-assert(profile.includes('grid-template-columns: minmax(0, 1fr) 245px'),
+assert(profile.includes('grid-template-columns: minmax(0, 1fr) 280px'),
   'Muenba hero must use a two-column desktop layout');
 assert(profile.includes('@media (max-width: 760px)') && profile.includes('.hero { grid-template-columns: 1fr; }'),
   'Muenba hero must stack on narrow screens');
-assert(profile.includes('width: 245px; height: 245px'),
-  'Nuppi profile art must retain the approximate 245px footprint');
+assert(profile.includes('width: 280px; height: 280px'),
+  'Nuppi profile art must use the larger Marietta-matched footprint');
 
 assert(fs.existsSync(assetPath), 'Nuppi profile WebP must exist');
 const asset = fs.readFileSync(assetPath);
