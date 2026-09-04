@@ -1172,8 +1172,10 @@
       state.boohaTransforming = false;
       state.boohaTransformed = true;
       state.inputLocked = false;
-      state.navigationUnlocked = false;
-      state.entryWelcomePending = state.spawnId === 'fromKarasuki';
+      // A quest accepted earlier this week must stay open across the
+      // transformation/re-entry path. A fresh weekly quest still begins
+      // behind Marietta's help choice.
+      state.entryWelcomePending = state.spawnId === 'fromKarasuki' && !state.helpAccepted;
       state.boohaTransformPoofUntil = performance.now() + BOOHA_TRANSFORM_POOF_MS;
       boohaShakeUntil = 0;
       spawnBoohaTransformSparkles();
@@ -2960,6 +2962,12 @@
       showLockedWorld();
       return;
     }
+    // The weekly quest is the source of truth for the live entry lock. Keep
+    // both runtime flags in sync before the room/transform path starts so a
+    // reload in room_01 does not require Marietta's Help button again.
+    const weekly = readGrimmerglenWeekly();
+    state.helpAccepted = weekly.memoryQuestAccepted === true;
+    state.navigationUnlocked = state.helpAccepted;
     injectStyles();
     buildApp();
     bindGrimmerglenViewportMetrics();
