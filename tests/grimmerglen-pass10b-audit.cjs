@@ -21,6 +21,10 @@ assert(profilePortal.includes("href = 'grimmerglen-profile.html'"),
   'profile doorway must link to the Grimmerglen profile page');
 assert(profilePortal.includes("innerHTML = '<span aria-hidden=\"true\">G</span>'"),
   'profile doorway must use the requested circular G icon');
+assert(profilePortal.includes("addEventListener('touchend'"),
+  'profile doorway must intercept mobile touchend before the stage handler');
+assert(profilePortal.includes('event.stopPropagation();'),
+  'profile doorway must keep mobile taps from becoming stage movement');
 assert(runtime.includes('state.roomId === GRIMMERGLEN_PROFILE_PORTAL.roomId'),
   'profile doorway must only be visible in room_01');
 assert(runtime.includes('buildGrimmerglenProfilePortal();'),
