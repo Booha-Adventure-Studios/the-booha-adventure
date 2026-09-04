@@ -27,7 +27,7 @@ const expectedDimensions = {
 };
 
 const actual = fs.readdirSync(assetDir)
-  .filter((name) => /^.+\.webp$/.test(name))
+  .filter((name) => /^.+\.webp$/.test(name) && name !== 'kurobane_shizuma-profile.webp')
   .sort();
 assert.deepStrictEqual(actual, Object.keys(expectedDimensions).sort(), 'Utsuroba must contain the expected 12 drifter WebP files');
 

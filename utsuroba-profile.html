@@ -104,6 +104,7 @@
     @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
 
     .hero {
+      display: grid; grid-template-columns: minmax(0, 1fr) 245px; align-items: center; gap: 30px;
       position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px) clamp(22px, 6vw, 72px);
       border: 1px solid var(--line); border-radius: 24px;
       background: linear-gradient(145deg, rgba(37,18,52,.9), rgba(10,7,17,.78));
@@ -118,6 +119,23 @@
     .hero-jp { margin: 14px 0 0; color: #ead8f7; font-size: clamp(1rem, 2.8vw, 1.35rem); letter-spacing: .18em; }
     .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
     .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
+    .hero-art {
+      width: 245px; height: 245px; justify-self: center; display: grid; place-items: center;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(216,168,255,.18) 0 34%, rgba(159,228,186,.1) 56%, transparent 75%);
+      filter: drop-shadow(0 0 18px rgba(216,168,255,.18));
+    }
+    .hero-art img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 16px 12px rgba(0,0,0,.45)); }
+    .world-status-strip { display: flex; align-items: flex-start; gap: 10px; margin-top: 22px; }
+    .world-status-dot { width: 10px; height: 10px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: #5f566b; box-shadow: 0 0 0 3px rgba(95,86,107,.12); }
+    .world-status-dot.is-open { background: var(--mint); box-shadow: 0 0 0 3px rgba(159,228,186,.16), 0 0 14px rgba(159,228,186,.82); }
+    .world-status-copy { display: flex; flex-direction: column; gap: 3px; }
+    .world-status-en { color: #f0e6ff; font: 700 .68rem/1.25 var(--sans); letter-spacing: .09em; }
+    .world-status-waiting { color: var(--gold); font: 700 .64rem/1.3 var(--sans); letter-spacing: .1em; }
+    .world-status-waiting small { display: block; margin-top: 3px; color: var(--quiet); font: .76rem/1.35 var(--font); letter-spacing: 0; }
+    .world-status-jp { color: var(--quiet); font: .76rem/1.35 var(--font); }
+    .world-status-jp ruby { ruby-position: over; }
+    .world-status-jp rt { font-size: .7em; }
 
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 28px; }
     .stat { min-height: 106px; padding: 17px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(20,12,30,.7); }
@@ -199,6 +217,8 @@
     .loading small { display: block; margin-top: 6px; color: var(--quiet); }
 
     @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-art { order: 2; width: 230px; height: 230px; margin: 4px auto 0; }
       .stats { grid-template-columns: repeat(2, 1fr); }
       .drifter-grid { grid-template-columns: repeat(2, 1fr); }
       .lower-grid { grid-template-columns: 1fr; }
@@ -208,6 +228,7 @@
       .topbar { margin-bottom: 15px; }
       .case-label { display: none; }
       .hero { border-radius: 19px; padding: 30px 20px 34px; }
+      .hero-art { width: 210px; height: 210px; }
       .echo-top { align-items: start; flex-direction: column; gap: 10px; }
       .echo-status { text-align: left; }
       .drifter-grid { grid-template-columns: 1fr; }
@@ -244,13 +265,8 @@
 <body>
   <main class="page">
     <div class="topbar">
-      <a class="back-link" id="utsuroba-profile-back" href="utsuroba.html?room=room_03" hidden aria-label="Back to Utsuroba start page">← Utsuroba / うつろばへ</a>
       <div class="case-label">UTSUROBA / MEMORY ARCHIVE<br><ruby>記憶<rt>きおく</rt></ruby>の<ruby>保管<rt>ほかん</rt></ruby><ruby>場所<rt>ばしょ</rt></ruby></div>
-      <!-- Pass 4 (finalized spec): utsuroba-profile.html -> Karasuki, the one
-           door this room was missing from the three-profile network. Gated
-           the same as utsuroba-profile-back above, since walking into
-           Karasuki from here is a world door, not a profile-to-profile hop. -->
-      <a class="back-link" id="utsuroba-profile-karasuki" href="karasuki.html?from=profile" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
+      <a class="back-link" id="utsuroba-profile-karasuki" href="karasuki.html?room=room_03" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
     </div>
 
     <nav class="profile-network" aria-label="Output profiles">
@@ -265,14 +281,27 @@
     </nav>
 
     <section class="hero" aria-labelledby="page-title">
-      <p class="eyebrow">A room for what stayed</p>
-      <h1 id="page-title">Utsuroba</h1>
-      <p class="hero-jp">うつろば — <ruby>記憶<rt>きおく</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></p>
-      <p class="hero-copy">
-        Some memories disappear. Some wait for you to notice them again.
-        This is the record of the ones that stayed.
-        <small>消えてしまう<ruby>記憶<rt>きおく</rt></ruby>もあれば、もう<ruby>一度<rt>いちど</rt></ruby>気づかれるのを<ruby>待<rt>ま</rt></ruby>つ<ruby>記憶<rt>きおく</rt></ruby>もあります。</small>
-      </p>
+      <div class="hero-copy-block">
+        <p class="eyebrow">A room for what stayed</p>
+        <h1 id="page-title">Utsuroba</h1>
+        <p class="hero-jp">うつろば — <ruby>記憶<rt>きおく</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></p>
+        <p class="hero-copy">
+          Some memories disappear. Some wait for you to notice them again.
+          This is the record of the ones that stayed.
+          <small>消えてしまう<ruby>記憶<rt>きおく</rt></ruby>もあれば、もう<ruby>一度<rt>いちど</rt></ruby>気づかれるのを<ruby>待<rt>ま</rt></ruby>つ<ruby>記憶<rt>きおく</rt></ruby>もあります。</small>
+        </p>
+        <div class="world-status-strip" aria-live="polite">
+          <span class="world-status-dot" id="utsuroba-world-status-dot" aria-hidden="true"></span>
+          <span class="world-status-copy" id="utsuroba-world-status">
+            <span class="world-status-en">UTSUROBA IS LOCKED NOW.</span>
+            <span class="world-status-jp">うつろばは<ruby>今<rt>いま</rt></ruby>、<ruby>閉<rt>と</rt></ruby>じています。</span>
+          </span>
+          <span class="world-status-waiting" id="utsuroba-world-status-waiting" hidden>THE DRIFTERS ARE WAITING.<small>ドリフターたちが<ruby>待<rt>ま</rt></ruby>っています。</small></span>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img src="assets/img/drifters/kurobane_shizuma-profile.webp" alt="Kurobane Shizuma looking down at an extinguished lantern" width="768" height="768" decoding="async">
+      </div>
     </section>
 
     <section id="profile-content" aria-live="polite">
@@ -379,21 +408,22 @@
         </section>`;
       }
 
-      function renderWorldBack() {
+      function renderWorldGateState() {
         let open = false;
         try {
           open = !!(window.BoohaUnlockSystem && typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' && BoohaUnlockSystem.isWeeklyWorldGateOpen());
         } catch (_) {}
 
-        const link = document.getElementById('utsuroba-profile-back');
-        if (link) {
-          link.hidden = !open;
-          if (open) link.href = 'utsuroba.html?room=room_03';
+        const status = document.getElementById('utsuroba-world-status');
+        if (status) {
+          status.innerHTML = open
+            ? '<span class="world-status-en">UTSUROBA IS OPEN.</span><span class="world-status-jp">うつろばは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
+            : '<span class="world-status-en">UTSUROBA IS LOCKED NOW.</span><span class="world-status-jp">うつろばは<ruby>今<rt>いま</rt></ruby>、<ruby>閉<rt>と</rt></ruby>じています。</span>';
         }
-
-        // Pass 4 (finalized spec): the door this room was missing — same
-        // weekly gate as the Utsuroba-world link above, since walking into
-        // Karasuki from here is a world door, not a profile-to-profile hop.
+        const dot = document.getElementById('utsuroba-world-status-dot');
+        if (dot) dot.classList.toggle('is-open', open);
+        const waiting = document.getElementById('utsuroba-world-status-waiting');
+        if (waiting) waiting.hidden = !open;
         const karasukiLink = document.getElementById('utsuroba-profile-karasuki');
         if (karasukiLink) karasukiLink.hidden = !open;
       }
@@ -430,6 +460,7 @@
       }
 
       function render() {
+        renderWorldGateState();
         const data = getSave();
         const utsu = data.utsuroba || {};
         const weeklyUtsuroba = data.weekly?.worlds?.utsuroba && typeof data.weekly.worlds.utsuroba === 'object'
@@ -576,16 +607,13 @@
       }
 
       function boot() {
-        renderWorldBack();
         render();
         if (window.UTSUROBA_EPISODES_READY && typeof window.UTSUROBA_EPISODES_READY.then === 'function') {
           window.UTSUROBA_EPISODES_READY.then(render).catch(() => {});
         }
         document.addEventListener('booha:saved', render);
         document.addEventListener('booha:weeklyReset', render);
-        document.addEventListener('booha:saved', renderWorldBack);
-        document.addEventListener('booha:weeklyReset', renderWorldBack);
-        document.addEventListener('booha:newWeek', renderWorldBack);
+        document.addEventListener('booha:newWeek', render);
       }
 
       if (window.BOOHA_READY) boot();
