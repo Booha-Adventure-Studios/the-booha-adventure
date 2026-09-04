@@ -1146,6 +1146,13 @@ else
   bad "Utsuroba weekly ECHOES audit failed"
 fi
 
+echo "[profile] Utsuroba physical-entry audit"
+if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"
+else
+  bad "Utsuroba physical-entry profile audit failed"
+fi
+
 echo "[profile] Adventure-log Pass 1 fail-soft audit"
 if node tests/adventure-log-fail-soft-audit.cjs >/dev/null 2>&1; then
   ok "Adventure-log weekly loading and error-state contracts pass"
