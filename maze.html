@@ -1279,6 +1279,7 @@
 <script src="./js/core/adventure-core.js"></script>
 <script src="./js/core/save-file.js"></script>
 <script src="./js/sync-client.js"></script>
+<script src="./js/core/adventure-performance.js"></script>
 <script>
 const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
 
@@ -1575,16 +1576,22 @@ function playBgMusic(){
 const FADE_MS=520;
 
 // The Maze is a full-viewport canvas with several animated glow layers.
-// Keep its backing store bounded on high-DPR devices, then fall back to a
-// single-pixel ratio if the first 90 frames show sustained frame pressure.
+// Keep its backing store bounded on high-DPR devices and use the same rolling
+// performance policy as the four explorable worlds.
 const MAZE_LOW_POWER_HINT = Boolean(
   (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
   || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 );
 let mazePerfTier = MAZE_LOW_POWER_HINT ? 'low' : 'high';
-let mazePerfFrameCount = 0;
-let mazePerfFirstTime = 0;
 let pageHidden = document.hidden;
+const worldPerf = window.BoohaPerformance.create({
+  name: 'maze',
+  lowPowerHint: MAZE_LOW_POWER_HINT,
+  onTierChange: tier => {
+    mazePerfTier = tier;
+    resizeCanvas();
+  },
+});
 
 // Canvas
 const ctx=canvas.getContext('2d');
@@ -2257,24 +2264,35 @@ function drawFrame(now){
 }
 
 function updateMazePerfTier(now){
-  if(mazePerfTier==='low')return;
-  mazePerfFrameCount+=1;
-  if(mazePerfFrameCount===1){mazePerfFirstTime=now;return;}
-  if(mazePerfFrameCount===90){
-    const averageFps=89/((now-mazePerfFirstTime)/1000);
-    if(averageFps<40){mazePerfTier='low';resizeCanvas();}
-  }
+  worldPerf.sample(now);
+  mazePerfTier=worldPerf.getTier();
 }
 
 function scheduleMazeFrame(){if(!pageHidden&&!rafHandle)rafHandle=requestAnimationFrame(loop);}
 function loop(now){
   rafHandle=null;
   if(pageHidden)return;
-  updateMazePerfTier(now);
-  if(!popupOpen())drawFrame(now);
+  const isPopupOpen=popupOpen();
+  if(isPopupOpen)worldPerf.pause();
+  else updateMazePerfTier(now);
+  if(!isPopupOpen&&worldPerf.shouldRender(now))drawFrame(now);
   scheduleMazeFrame();
 }
 function startLoop(){scheduleMazeFrame();}
+
+worldPerf.enableOverlay(() => ({
+  dpr: Math.min(window.devicePixelRatio || 1, mazeDprCap()),
+  loadedRoomImageCount: mazeImg.complete && mazeImg.naturalWidth > 0 ? 1 : 0,
+  loadedCharacterImageCount: [...ghostImgs, ...extraGhostImgs, homeworkImg, karasuki1Img, karasuki2Img, jukuImg]
+    .filter(image => image && image.complete && image.naturalWidth > 0).length,
+  decodedImageMemoryBytes: 0,
+  wandererCacheUsageBytes: 0,
+  wandererCacheBudgetBytes: 0,
+  roomLoadDecodeMs: 0,
+  activeAudioBufferCount: 0,
+  serviceWorkerCacheVersion: 'booha-assets-2026-509',
+  averageFps: worldPerf.metrics().windowFps,
+}));
 
 const HIT_R=40;
 function hitTest(clientX,clientY){
@@ -2698,10 +2716,10 @@ document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
     if(rafHandle)cancelAnimationFrame(rafHandle);
     rafHandle=null;
+    worldPerf.pause();
     try{toMazeVideo.pause();}catch(e){}
     if(!mazeLaunched)try{bgMusic.pause();}catch(e){}
   } else {
-    mazePerfFirstTime=0;
     if(videoPlayed&&!o2shown)try{loadMediaSource(toMazeVideo);toMazeVideo.play();}catch(e){}
     if(mazeLaunched)try{bgMusic.loop=true;bgMusic.volume=.65;playBgMusic().catch(()=>{});}catch(e){}
     if(mazeStarted)startLoop();
