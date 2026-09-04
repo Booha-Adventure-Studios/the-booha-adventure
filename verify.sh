@@ -1062,6 +1062,13 @@ else
   bad "Muenba Pass A3 profile audit failed"
 fi
 
+echo "[profile] Muenba world-access audit"
+if node tests/muenba-profile-access-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba physical entrance, status, and Nuppi asset contracts pass"
+else
+  bad "Muenba world-access audit failed"
+fi
+
 echo "[popup] Muenba Pass B popup-shell audit"
 if node tests/muenba-popup-b-audit.cjs >/dev/null 2>&1; then
   ok "Muenba single-scroll popup and responsive rhythm-shell contracts pass"

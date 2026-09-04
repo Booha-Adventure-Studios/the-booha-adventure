@@ -125,6 +125,7 @@
     @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
 
     .hero {
+      display: grid; grid-template-columns: minmax(0, 1fr) 245px; align-items: center; gap: 30px;
       position: relative; overflow: hidden; padding: clamp(30px, 6vw, 62px) clamp(22px, 6vw, 72px);
       border: 1px solid rgba(118,151,143,.34); border-left: 4px solid rgba(143,220,178,.42);
       border-radius: 6px 28px 6px 28px;
@@ -138,6 +139,19 @@
     .hero-jp { margin: 16px 0 0; color: #c6ddd0; font-family: var(--muenba-display); font-size: clamp(.92rem, 2.8vw, 1.2rem); letter-spacing: .2em; }
     .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
     .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
+    .hero-art { width: 245px; height: 245px; justify-self: center; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, rgba(107,157,119,.2) 0 38%, rgba(53,91,68,.12) 58%, transparent 72%); filter: drop-shadow(0 0 18px rgba(103,160,120,.18)); }
+    .hero-art img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 16px 12px rgba(0,0,0,.46)); }
+    .status-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 20px; }
+    .status-pill { display: inline-flex; align-items: flex-start; gap: 9px; padding: 9px 12px; border: 1px solid rgba(143,220,178,.2); border-radius: 10px; background: rgba(2,8,7,.78); box-shadow: inset 0 0 18px rgba(143,220,178,.035); }
+    .status-dot { width: 9px; height: 9px; flex: 0 0 auto; margin-top: 4px; border-radius: 50%; background: #4d6258; box-shadow: 0 0 0 3px rgba(77,98,88,.12); }
+    .status-dot.open { background: var(--moss); box-shadow: 0 0 0 3px rgba(143,220,178,.16), 0 0 14px rgba(143,220,178,.82); }
+    .world-status-copy { display: flex; flex-direction: column; gap: 2px; }
+    .world-status-en { color: var(--spectral); font: 700 .68rem/1.25 var(--sans); letter-spacing: .09em; }
+    .world-status-jp { color: var(--quiet); font: .74rem/1.35 var(--font); }
+    .world-status-jp ruby { ruby-position: over; }
+    .world-status-jp rt { font-size: .7em; }
+    .world-status-waiting { color: var(--gold); font: 700 .64rem/1.3 var(--sans); letter-spacing: .12em; }
+    .world-status-waiting[hidden] { display: none; }
 
     .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 28px; }
     .stat { min-height: 92px; padding: 15px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(9,24,18,.7); }
@@ -231,6 +245,8 @@
     .loading small { display: block; margin-top: 6px; color: var(--quiet); }
 
     @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-art { order: 2; margin: 2px auto 0; }
       .stats { grid-template-columns: repeat(2, 1fr); }
       .ghost-grid { grid-template-columns: repeat(3, 1fr); }
       .lower-grid { grid-template-columns: 1fr; }
@@ -251,9 +267,8 @@
 <body>
   <main class="page">
     <div class="topbar">
-      <a class="back-link" id="muenba-profile-back" href="muenba.html?room=room_01&from=profile" hidden aria-label="Enter Muenba / むえんばへ">← Muenba / むえんばへ</a>
       <div class="case-label">MUENBA / GHOST LEDGER<br><ruby>幽霊<rt>ゆうれい</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></div>
-      <a class="back-link" id="muenba-profile-karasuki" href="karasuki.html?from=profile" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
+      <a class="back-link" id="muenba-profile-karasuki" href="karasuki.html?room=room_13" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
     </div>
 
       <nav class="profile-network" aria-label="Output profiles">
@@ -265,15 +280,25 @@
       </nav>
 
     <section class="hero" aria-labelledby="page-title">
-      <p class="eyebrow">A ledger of who's still hiding</p>
-      <h1 id="page-title">Muenba</h1>
-      <p class="hero-jp">むえんば — <ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>探<rt>さが</rt></ruby>しの<ruby>記録<rt>きろく</rt></ruby></p>
-      <p class="hero-copy">
-        Fifteen fog-filled rooms, and something in each one that doesn't
-        always want to be found. This ledger tracks collected ghost energy
-        separately from the memory styles used to understand each case.
-        <small>15の霧に<ruby>包<rt>つつ</rt></ruby>まれた<ruby>部屋<rt>へや</rt></ruby>には、<ruby>見<rt>み</rt></ruby>つかりたがらないものがいます。ここでは、<ruby>集<rt>あつ</rt></ruby>めた<ruby>幽霊<rt>ゆうれい</rt></ruby>エネルギーと、<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>を<ruby>別<rt>べつ</rt></ruby>に<ruby>記録<rt>きろく</rt></ruby>します。</small>
-      </p>
+      <div class="hero-copy-block">
+        <p class="eyebrow">A ledger of who's still hiding</p>
+        <h1 id="page-title">Muenba</h1>
+        <p class="hero-jp">むえんば — <ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>探<rt>さが</rt></ruby>しの<ruby>記録<rt>きろく</rt></ruby></p>
+        <p class="hero-copy">
+          Fifteen fog-filled rooms, and something in each one that doesn't
+          always want to be found. This ledger tracks collected ghost energy
+          separately from the memory styles used to understand each case.
+          <small>15の霧に<ruby>包<rt>つつ</rt></ruby>まれた<ruby>部屋<rt>へや</rt></ruby>には、<ruby>見<rt>み</rt></ruby>つかりたがらないものがいます。ここでは、<ruby>集<rt>あつ</rt></ruby>めた<ruby>幽霊<rt>ゆうれい</rt></ruby>エネルギーと、<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>を<ruby>別<rt>べつ</rt></ruby>に<ruby>記録<rt>きろく</rt></ruby>します。</small>
+        </p>
+        <div class="status-strip" aria-live="polite">
+          <span class="status-pill">
+            <i class="status-dot" id="world-dot" aria-hidden="true"></i>
+            <span id="world-status" class="world-status-copy"><span class="world-status-en">MUENBA IS LOCKED</span><span class="world-status-jp">むえんばは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span></span>
+          </span>
+          <span id="world-waiting" class="world-status-waiting" hidden>THE GHOSTS ARE WAITING</span>
+        </div>
+      </div>
+      <div class="hero-art"><img src="assets/img/muenba/nuppi_profile.webp" alt="Nuppi welcoming Booha toward Muenba" decoding="async"></div>
     </section>
 
     <section id="profile-content" aria-live="polite">
@@ -375,22 +400,30 @@
         </section>`;
       }
 
-      // Both world arrows follow the same weekly gate as Utsuroba. They
-      // disappear again when the new week closes the output-world gate.
-      function renderWorldBack() {
-        const link = document.getElementById('muenba-profile-back');
+      // The profile is a record surface; Karasuki remains Muenba's physical
+      // entrance. Keep both signals on the specific Muenba gate.
+      function renderWorldAccess() {
         let open = false;
         try {
           open = !!(window.BoohaUnlockSystem &&
-            typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' &&
-            BoohaUnlockSystem.isWeeklyWorldGateOpen());
+            typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
+            BoohaUnlockSystem.isMuenbaUnlocked());
         } catch (_) {}
-        if (link) link.hidden = !open;
+        const status = document.getElementById('world-status');
+        if (status) {
+          status.innerHTML = open
+            ? '<span class="world-status-en">MUENBA IS OPEN</span><span class="world-status-jp">むえんばは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
+            : '<span class="world-status-en">MUENBA IS LOCKED</span><span class="world-status-jp">むえんばは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span>';
+        }
+        document.getElementById('world-dot')?.classList.toggle('open', open);
+        const waiting = document.getElementById('world-waiting');
+        if (waiting) waiting.hidden = !open;
         const karasukiLink = document.getElementById('muenba-profile-karasuki');
         if (karasukiLink) karasukiLink.hidden = !open;
       }
 
       function render() {
+        renderWorldAccess();
         const data = getSave();
         const mu = data.muenba || {};
         const weeklyMuenba = data.weekly?.worlds?.muenba && typeof data.weekly.worlds.muenba === 'object'
@@ -552,13 +585,10 @@
       }
 
       function boot() {
-        renderWorldBack();
         render();
         document.addEventListener('booha:saved', render);
         document.addEventListener('booha:weeklyReset', render);
-        document.addEventListener('booha:saved', renderWorldBack);
-        document.addEventListener('booha:weeklyReset', renderWorldBack);
-        document.addEventListener('booha:newWeek', renderWorldBack);
+        document.addEventListener('booha:newWeek', render);
       }
 
       if (window.BOOHA_READY) boot();
