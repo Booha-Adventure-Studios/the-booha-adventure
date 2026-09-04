@@ -209,7 +209,7 @@
       ghostId: 'fuzzle',
       title: 'Fuzzle Forgot the Fright',
       eyebrow: 'CASE FILE / CASE 01',
-      intro: 'Fuzzle had one job: scare the next visitor. Now Fuzzle cannot remember what the scare was supposed to be.',
+      intro: 'Fuzzle wanted to scare Nuppi. He forgot which scare to use.',
       start: {
         clues: [
           {
@@ -349,7 +349,7 @@
       ghostId: 'glimmer',
       title: 'Glimmer Chased the Shine',
       eyebrow: 'CASE FILE / CASE 02',
-      intro: 'Glimmer wanted one perfect sparkle. After polishing it all night, Glimmer could not stop chasing every reflection it made.',
+      intro: 'Glimmer had one small light. It made many lights, and Glimmer chased them.',
       start: {
         clues: [
           {
@@ -489,7 +489,7 @@
       ghostId: 'nibsy',
       title: 'Nibsy Lost the Little Sounds',
       eyebrow: 'CASE FILE / CASE 03',
-      intro: 'Nibsy collected tiny noises from every corner of Muenba. Now the sounds have mixed together, and Nibsy cannot remember which one belongs to which place.',
+      intro: 'Nibsy kept three little sounds. The sounds got mixed up.',
       start: {
         clues: [
           {
@@ -629,7 +629,7 @@
       ghostId: 'tinklet',
       title: 'Tinkley Rang Too Soon',
       eyebrow: 'CASE FILE / CASE 04',
-      intro: 'Tinkley prepared an invisible bell for a grand entrance. The bell kept ringing before the entrance happened, and the moment never felt right.',
+      intro: 'Tinkley had an invisible bell. It rang before Nuppi came.',
       start: {
         clues: [
           {
@@ -769,7 +769,7 @@
       ghostId: 'twiddle',
       title: 'Twiddle Turned in Circles',
       eyebrow: 'CASE FILE / CASE 05',
-      intro: 'Twiddle found two possible paths through the cemetery. Every time a choice felt serious, Twiddle turned around and started the decision again.',
+      intro: 'Twiddle saw two paths. Twiddle could not choose one.',
       start: {
         clues: [
           {
