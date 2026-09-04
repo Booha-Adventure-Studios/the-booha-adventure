@@ -38,10 +38,14 @@ assert(/if\s*\(!staticFrameOverlayOpen\(\)\s*&&\s*worldPerf\.shouldRender\(now\)
   'Muenba must hold a static frame behind open panels');
 
 assert(maze.includes('MAZE_LOW_POWER_HINT'), 'Maze must detect low-power device hints');
-assert(maze.includes('mazePerfTier'), 'Maze must measure an adaptive performance tier');
+assert(maze.includes('BoohaPerformance.create'), 'Maze must use the shared performance monitor');
+assert(maze.includes('worldPerf.sample(now'), 'Maze must measure active world frames periodically');
+assert(maze.includes('worldPerf.pause()'), 'Maze must pause shared performance measurement while hidden or modal');
+assert(maze.includes('worldPerf.shouldRender(now)'), 'Maze must intentionally schedule low-mode renders');
+assert(maze.includes('mazePerfTier'), 'Maze must expose an adaptive performance tier');
 assert(maze.includes('function mazeDprCap(){ return mazePerfTier === \'low\' ? 1 : 1.5; }'), 'Maze must cap normal DPR at 1.5 and low-power DPR at 1');
-assert(maze.includes('if(!popupOpen())drawFrame(now);'), 'Maze must hold a static frame behind popups');
+assert(maze.includes('if(!isPopupOpen&&worldPerf.shouldRender(now))drawFrame(now);'), 'Maze must hold a static frame behind popups');
 assert(maze.includes('pageHidden=document.hidden'), 'Maze must pause its render loop while hidden');
-assert(sw.includes('booha-assets-2026-508'), 'Pass 5 changes must bump the asset cache');
+assert(sw.includes('booha-assets-2026-509'), 'Pass 5 changes must bump the asset cache');
 
 console.log('Adaptive low-power audit passed: hidden pages suspend rendering, popups hold static frames, and slow-device fallbacks are wired across the worlds.');

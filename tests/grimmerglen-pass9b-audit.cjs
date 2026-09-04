@@ -28,6 +28,6 @@ assert(runtime.includes('markMariettaIntroSeenThisWeek(true)'), 'skipped introdu
 assert(saveFile.includes('mariettaIntroSeen: false'), 'weekly Grimmerglen defaults must include the intro seen flag');
 assert(saveFile.includes('mariettaIntroSkipped: false'), 'weekly Grimmerglen defaults must include the intro skipped flag');
 assert(/worlds:\s+_defaultWeeklyWorlds\(\)/.test(saveFile), 'weekly reset must recreate the Grimmerglen intro state');
-assert(/assets:\s+'booha-assets-2026-508'/.test(serviceWorker), 'asset cache must be bumped for the Muenba canonical target update');
+assert(/assets:\s+'booha-assets-2026-509'/.test(serviceWorker), 'asset cache must be bumped for the Muenba canonical target update');
 
 console.log('Grimmerglen Pass 9B audit passed: first-ever intro is mandatory, later weekly intros are skippable, and weekly state resets cleanly.');

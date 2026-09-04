@@ -25,6 +25,6 @@ assert(grimmerglen.includes('releaseGrimmerglenDanceImages();'), 'Grimmerglen mu
 assert(grimmerglen.includes('ensureGrimmerglenDanceImages();'), 'Grimmerglen must rebuild dance images for a later celebration');
 
 assert(verify.includes('tests/performance-image-lifecycle-audit.cjs'), 'verify.sh must run the image-lifecycle audit');
-assert(sw.includes('booha-assets-2026-508'), 'image lifecycle changes must bump the asset cache');
+assert(sw.includes('booha-assets-2026-509'), 'image lifecycle changes must bump the asset cache');
 
 console.log('Performance Passes 6–7 image lifecycle audit passed: Drifter art is room-scoped and Grimmerglen dance art is celebration-scoped.');
