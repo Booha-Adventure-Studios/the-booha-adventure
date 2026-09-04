@@ -28,13 +28,13 @@ for (const [name, source] of [['Utsuroba', utsuroba], ['Muenba', muenba], ['Grim
 
 assert(utsuroba.includes("const dpr = perfTier === 'low' ? 1 : MAX_DPR;"),
   'Utsuroba must lower its canvas DPR after a low-performance downgrade');
-assert(utsuroba.includes('resizeCanvas();\n        trail.length'),
+assert(/resizeCanvas\(\);\s+trail\.length/.test(utsuroba),
   'Utsuroba must apply the low-performance canvas downgrade immediately');
 assert(muenba.includes("const maxDpr = perfTier === 'low' ? 1 :"),
   'Muenba must lower all world canvas DPRs on low-performance devices');
 assert(muenba.includes('function scheduleMuenbaFrame()'),
   'Muenba must own a visibility-aware world-frame scheduler');
-assert(muenba.includes('if (!staticFrameOverlayOpen()) drawFrame(now);'),
+assert(/if\s*\(!staticFrameOverlayOpen\(\)\s*&&\s*worldPerf\.shouldRender\(now\)\)\s*drawFrame\(now\)/.test(muenba),
   'Muenba must hold a static frame behind open panels');
 
 assert(maze.includes('MAZE_LOW_POWER_HINT'), 'Maze must detect low-power device hints');
@@ -42,6 +42,6 @@ assert(maze.includes('mazePerfTier'), 'Maze must measure an adaptive performance
 assert(maze.includes('function mazeDprCap(){ return mazePerfTier === \'low\' ? 1 : 1.5; }'), 'Maze must cap normal DPR at 1.5 and low-power DPR at 1');
 assert(maze.includes('if(!popupOpen())drawFrame(now);'), 'Maze must hold a static frame behind popups');
 assert(maze.includes('pageHidden=document.hidden'), 'Maze must pause its render loop while hidden');
-assert(sw.includes('booha-assets-2026-504'), 'Pass 5 changes must bump the asset cache');
+assert(sw.includes('booha-assets-2026-505'), 'Pass 5 changes must bump the asset cache');
 
 console.log('Adaptive low-power audit passed: hidden pages suspend rendering, popups hold static frames, and slow-device fallbacks are wired across the worlds.');

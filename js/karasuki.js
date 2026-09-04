@@ -31,9 +31,16 @@
     || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   );
   let   perfTier        = LOW_POWER_HINT ? 'low' : 'high';
-  let   perfFrameCount  = 0;
-  let   perfFirstTime   = 0;
   let   shadowsEnabled  = perfTier !== 'low';
+  const worldPerf = window.BoohaPerformance.create({
+    name: 'Karasuki',
+    lowPowerHint: LOW_POWER_HINT,
+    onTierChange: tier => {
+      perfTier = tier;
+      shadowsEnabled = false;
+      resizeCanvas();
+    },
+  });
 
   const PORTAL = { x: 357, y: 342, r: 40, href: "adventure-profile.html" };
   const PAGE_ID = 'karasuki';
@@ -2737,6 +2744,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function showWandererDiscovery(w) {
     if (!window.UtsuCard || typeof window.UtsuCard.showCelebrationPop !== 'function' || !w || !w.name) return;
+    setWandererProtection(w, 'celebration', true);
     const comment = wandererComment(w);
     const furiMap = { ...(WANDERER_FURIGANA[w.name] || {}), ...((comment && comment.furigana) || {}) };
     const jp = window.UtsuFurigana && window.UtsuFurigana.sentence
@@ -2763,11 +2771,13 @@ const HAPPY_HOUSE_PORTAL = {
       copyOverlay: true,
       copyCompact: true,
       sfx: 'wandererFound',
+      onClose: () => setWandererProtection(w, 'celebration', false),
     });
   }
 
   function showWandererReturn(w) {
     if (!window.UtsuCard || typeof window.UtsuCard.showCelebrationPop !== 'function' || !w || !w.name) return;
+    setWandererProtection(w, 'celebration', true);
     const jp = window.UtsuFurigana && window.UtsuFurigana.sentence
       ? window.UtsuFurigana.sentence('また会えたね！戻ってきたよ。', {
         '会': 'あ',
@@ -2788,6 +2798,7 @@ const HAPPY_HOUSE_PORTAL = {
       copyOverlay: true,
       copyCompact: true,
       sfx: 'wandererReturn',
+      onClose: () => setWandererProtection(w, 'celebration', false),
     });
   }
 
@@ -2846,18 +2857,33 @@ const HAPPY_HOUSE_PORTAL = {
      WANDERER RUNTIME
   ═══════════════════════════════════════════ */
   let activeWanderers  = [];
-  const wandererImages = {};
+  const WANDERER_CACHE_BUDGET_BYTES = 48 * 1024 * 1024;
+  const WANDERER_TEMP_BYTES = 8 * 1024 * 1024;
+  const wandererImageCache = new window.BoohaDecodedImageCache({
+    budgetBytes: WANDERER_CACHE_BUDGET_BYTES,
+    temporaryBytes: WANDERER_TEMP_BYTES,
+  });
   const WANDERER_SIZE  = 22;
 
+  function getWandererImage(filename) {
+    return wandererImageCache.get(filename, { src: WANDERER_IMG_BASE + filename });
+  }
+
+  function setWandererProtection(w, kind, value) {
+    if (!w || !w.frames) return;
+    w.frames.forEach(filename => wandererImageCache.protect(filename, kind, value));
+  }
+
   function preloadWandererImages(defs) {
+    wandererImageCache.clearProtection('required');
     (defs || []).forEach(def => {
       if (!def.frames) return;
       def.frames.forEach(filename => {
-        if (wandererImages[filename]) return;
-        const img = new Image(); img.src = WANDERER_IMG_BASE + filename;
-        wandererImages[filename] = img;
+        getWandererImage(filename);
+        wandererImageCache.protect(filename, 'required', true);
       });
     });
+    wandererImageCache.evictIfNeeded();
   }
 
  function refreshWanderersForRoom() {
@@ -2882,7 +2908,7 @@ const HAPPY_HOUSE_PORTAL = {
   // wanderers in this room keeps Karasuki responsive on classroom devices.
   preloadWandererImages(roomDefs);
   activeWanderers = roomDefs
-    .map(def => ({ ...def, rx: def.x, ry: def.y, wobblePhase: Math.random() * Math.PI * 2, hauntAngle: Math.random() * Math.PI * 2, pose: 0, frozen: false, glitter: [], glitterNextAt: 0, images: (def.frames || []).map(f => wandererImages[f]).filter(Boolean) }));
+    .map(def => ({ ...def, rx: def.x, ry: def.y, wobblePhase: Math.random() * Math.PI * 2, hauntAngle: Math.random() * Math.PI * 2, pose: 0, frozen: false, glitter: [], glitterNextAt: 0, images: (def.frames || []).map(getWandererImage).filter(Boolean) }));
 }
 
   function initWanderers() { refreshWanderersForRoom(); }
@@ -2939,6 +2965,7 @@ const HAPPY_HOUSE_PORTAL = {
     if (!w.name) return;
     const visit = recordWandererVisit(w);
     currentPopWanderer = w; w.pose = 1;
+    setWandererProtection(w, 'popup', true);
     if (w.type === 'drift') w.frozen = true;
     const box        = document.getElementById('wanderer-pop-box');
     const portrait   = document.getElementById('wanderer-pop-portrait');
@@ -2977,7 +3004,13 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function closeWandererPop() {
-    if (currentPopWanderer) { currentPopWanderer.pose = 0; if (currentPopWanderer.type === 'drift') currentPopWanderer.frozen = false; currentPopWanderer = null; }
+    if (currentPopWanderer) {
+      setWandererProtection(currentPopWanderer, 'popup', false);
+      setWandererProtection(currentPopWanderer, 'celebration', false);
+      currentPopWanderer.pose = 0;
+      if (currentPopWanderer.type === 'drift') currentPopWanderer.frozen = false;
+      currentPopWanderer = null;
+    }
     if (window.UtsuSfx && typeof window.UtsuSfx.popupClose === 'function') window.UtsuSfx.popupClose();
     wandererPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
     wandererPopOverlay.style.background = 'rgba(0,0,0,0)';
@@ -4684,6 +4717,7 @@ const HAPPY_HOUSE_PORTAL = {
   function getSpawn(room, spawnId) { return room.spawns?.[spawnId] || room.spawns?.default || { x: 480, y: 270 }; }
   function placeGhost(x, y) { state.x = x; state.y = y; }
   const imageCache = new Map();
+  let roomLoadDecodeMs = 0;
 
   function getImage(roomId) {
     if (imageCache.has(roomId)) return imageCache.get(roomId);
@@ -4725,6 +4759,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function waitForKarasukiImage(image, timeoutMs = 1600) {
     if (!image) return Promise.resolve(false);
+    const startedAt = performance.now();
     return new Promise(resolve => {
       let settled = false;
       let timer = 0;
@@ -4734,6 +4769,7 @@ const HAPPY_HOUSE_PORTAL = {
         window.clearTimeout(timer);
         image.removeEventListener('load', onLoad);
         image.removeEventListener('error', onError);
+        roomLoadDecodeMs = Math.round(performance.now() - startedAt);
         resolve(ready);
       };
       const decode = () => {
@@ -5086,17 +5122,8 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function updatePerfTier(now) {
-    if (perfTier === 'low') return;
-    perfFrameCount += 1;
-    if (perfFrameCount === 1) { perfFirstTime = now; return; }
-    if (perfFrameCount === 90) {
-      const averageFps = 89 / ((now - perfFirstTime) / 1000);
-      if (averageFps < 40) {
-        perfTier = 'low';
-        shadowsEnabled = false;
-        resizeCanvas();
-      }
-    }
+    worldPerf.sample(now);
+    perfTier = worldPerf.getTier();
   }
 
   function staticFrameOverlayOpen() {
@@ -5116,7 +5143,8 @@ const HAPPY_HOUSE_PORTAL = {
 function tick(now) {
   rafHandle = null;
   if (pageHidden) return;
-  updatePerfTier(now);
+  if (anyModalOpen() || staticFrameOverlayOpen()) worldPerf.pause();
+  else updatePerfTier(now);
   // Keep motion stable on Android when frames stutter.
   // 32ms max = about a 30fps floor.
   const dt = Math.min(32, Math.max(8, now - (lastTickTime || now)));
@@ -5169,7 +5197,7 @@ function tick(now) {
     }
   }
 
-  if (!staticFrameOverlayOpen()) drawFrame(now);
+  if (!staticFrameOverlayOpen() && worldPerf.shouldRender(now)) drawFrame(now);
   scheduleKarasukiFrame();
 }
 
@@ -5878,6 +5906,25 @@ function drawObserver(now) {
     restoreProfileRoom();
     fitStage(); resizeCanvas();
     initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    worldPerf.enableOverlay(() => {
+      const cache = wandererImageCache.stats();
+      return {
+        dpr: Math.min(window.devicePixelRatio || 1, perfTier === 'low' ? 1 : (IS_PHONE ? 1.5 : 2)),
+        loadedRoomImageCount: imageCache.size,
+        loadedCharacterImageCount: cache.loaded,
+        decodedImageMemoryBytes: cache.usageBytes,
+        wandererCacheUsageBytes: cache.usageBytes,
+        wandererCacheBudgetBytes: cache.budgetBytes,
+        roomLoadDecodeMs,
+        activeAudioBufferCount: 0,
+        serviceWorkerCacheVersion: 'booha-assets-2026-505',
+        averageFps: worldPerf.metrics().averageFps,
+      };
+    });
+    KarasukiAtmos.setRenderPolicy({
+      isBlocked: () => pageHidden || staticFrameOverlayOpen(),
+      shouldRender: now => worldPerf.shouldRender(now),
+    });
     document.addEventListener('booha:weeklyReset', () => {
       lastLitEchoIds = null;
       renderEchoesTracker();
@@ -5893,6 +5940,7 @@ function drawObserver(now) {
     if (pageHidden) {
       if (rafHandle) cancelAnimationFrame(rafHandle);
       rafHandle = null;
+      worldPerf.pause();
       return;
     }
     lastTickTime = 0;

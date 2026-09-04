@@ -42,9 +42,17 @@
     || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   );
   let perfTier       = LOW_POWER_HINT ? 'low' : 'high';
-  let perfFrameCount = 0;
-  let perfFirstTime  = 0;
   let shadowsEnabled = perfTier !== 'low';
+  const worldPerf = window.BoohaPerformance.create({
+    name: 'Utsuroba',
+    lowPowerHint: LOW_POWER_HINT,
+    onTierChange: tier => {
+      perfTier = tier;
+      shadowsEnabled = false;
+      resizeCanvas();
+      trail.length = Math.min(trail.length, 30);
+    },
+  });
 
   const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   const NPP_RADIUS    = isTouchDevice ? 58 : 40;
@@ -2853,18 +2861,10 @@
      PERF
   ═══════════════════════════════════════════ */
   function updatePerfTier(now) {
-    if (perfTier === 'low') return;
-    perfFrameCount++;
-    if (perfFrameCount === 1) { perfFirstTime = now; return; }
-    if (perfFrameCount === 90) {
-      const averageFps = 89 / ((now - perfFirstTime) / 1000);
-      if (averageFps < 40) {
-        perfTier = 'low';
-        shadowsEnabled = false;
-        resizeCanvas();
-        trail.length = Math.min(trail.length, 30);
-      }
-    }
+    worldPerf.sample(now);
+    const averageFps = worldPerf.metrics().averageFps;
+    perfTier = worldPerf.getTier();
+    void averageFps;
   }
 
   /* ═══════════════════════════════════════════
@@ -3537,7 +3537,8 @@
   function tick(now) {
     rafHandle = null;
     if (pageHidden) return;
-    updatePerfTier(now);
+    if (anyModalOpen() || staticFrameOverlayOpen()) worldPerf.pause();
+    else updatePerfTier(now);
     const dt = Math.min(50, Math.max(8, now-(lastTickTime||now)));
     lastTickTime = now; SPEED = BASE_SPEED * (dt/TARGET_DT);
     if (!anyModalOpen()) {
@@ -3549,7 +3550,7 @@
         if (unlocked) { const exit = getNPPExit(now); if (exit) { state.clickTarget=null; state.moving=false; transitionTo(exit); } }
       }
     }
-    if (!staticFrameOverlayOpen()) drawFrame(now);
+    if (!staticFrameOverlayOpen() && worldPerf.shouldRender(now)) drawFrame(now);
     scheduleUtsurobaFrame();
   }
 
@@ -3639,6 +3640,21 @@
     document.addEventListener('booha:weeklyReset', handleUtsurobaWeeklyReset);
     window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     markVisited();
+    worldPerf.enableOverlay(() => ({
+      dpr: canvasDpr,
+      loadedRoomImageCount: imageCache.size,
+      loadedCharacterImageCount: DATA.drifters.filter(d => {
+        const imgs = drifterImgs[d.id];
+        return imgs && ((imgs.img1.img.complete && imgs.img1.img.naturalWidth > 0) || (imgs.img2.img.complete && imgs.img2.img.naturalWidth > 0));
+      }).length,
+      decodedImageMemoryBytes: 0,
+      wandererCacheUsageBytes: 0,
+      wandererCacheBudgetBytes: 0,
+      roomLoadDecodeMs: 0,
+      activeAudioBufferCount: 0,
+      serviceWorkerCacheVersion: 'booha-assets-2026-505',
+      averageFps: worldPerf.metrics().averageFps,
+    }));
     worldInitialized = true;
     scheduleUtsurobaFrame();
   }
@@ -3648,6 +3664,7 @@
     if (pageHidden) {
       if (rafHandle) cancelAnimationFrame(rafHandle);
       rafHandle = null;
+      worldPerf.pause();
       return;
     }
     lastTickTime = 0;

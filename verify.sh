@@ -1195,6 +1195,27 @@ else
   bad "Pass 6 profile/performance audit failed"
 fi
 
+echo "[performance] Shared runtime monitor audit"
+if node tests/performance-runtime-audit.cjs >/dev/null 2>&1; then
+  ok "Shared rolling monitor, 30fps low mode, overlay, and budget document contracts pass"
+else
+  bad "Shared performance runtime audit failed"
+fi
+
+echo "[performance] Wanderer decoded-image cache audit"
+if node tests/karasuki-wanderer-cache-audit.cjs >/dev/null 2>&1 && node tests/karasuki-wanderer-cache.test.cjs >/dev/null 2>&1 && node tests/karasuki-wanderer-cache-traversal.test.cjs >/dev/null 2>&1 && node tests/adventure-performance.test.cjs >/dev/null 2>&1; then
+  ok "Wanderer LRU protection/eviction and rolling performance tests pass"
+else
+  bad "Wanderer cache or shared performance tests failed"
+fi
+
+echo "[assets] Performance asset-budget audit"
+if node tests/performance-asset-budget-audit.cjs >/dev/null 2>&1; then
+  ok "WebP container, alpha, character-size, and deployed-image payload budgets pass"
+else
+  bad "Performance asset-budget audit failed"
+fi
+
 # ── Summary ──────────────────────────────────────────────────
 echo "───────────────────────────────────"
 echo "✅ $PASS passed   ⚠️  $WARN warnings   ❌ $FAIL failed"

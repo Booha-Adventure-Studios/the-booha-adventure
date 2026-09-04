@@ -38,7 +38,7 @@ window.KarasukiAtmos = (() => {
   const IS_PHONE = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768;
   const REDUCED  = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let canvas = null, ctx = null, rafId = 0, running = false;
+  let canvas = null, ctx = null, rafId = 0, running = false, renderPolicy = null;
   let roomId = null, room = null, observerRoom = null;
 
   const S = {
@@ -557,6 +557,14 @@ window.KarasukiAtmos = (() => {
   let last = 0;
   function frame(now) {
     if (!running) return;
+    if (renderPolicy && renderPolicy.isBlocked && renderPolicy.isBlocked()) {
+      rafId = requestAnimationFrame(frame);
+      return;
+    }
+    if (renderPolicy && renderPolicy.shouldRender && !renderPolicy.shouldRender(now)) {
+      rafId = requestAnimationFrame(frame);
+      return;
+    }
     const dt = Math.min(0.05, (now - (last || now)) / 1000);
     last = now;
 
@@ -637,5 +645,7 @@ window.KarasukiAtmos = (() => {
 
   function refreshVitality() { if (room) { computeVitality(); reseed(); } }
 
-  return { init, setRoom, refreshVitality };
+  function setRenderPolicy(policy) { renderPolicy = policy || null; }
+
+  return { init, setRoom, refreshVitality, setRenderPolicy };
 })();

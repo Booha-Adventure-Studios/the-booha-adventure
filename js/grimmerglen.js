@@ -123,9 +123,17 @@
   let pageHidden = document.hidden;
   let worldInitialized = false;
   let perfTier = LOW_POWER_HINT ? 'low' : 'high';
-  let perfFrameCount = 0;
-  let perfFirstTime = 0;
   let shadowsEnabled = perfTier !== 'low';
+  const worldPerf = window.BoohaPerformance.create({
+    name: 'Grimmerglen',
+    lowPowerHint: LOW_POWER_HINT,
+    onTierChange: tier => {
+      perfTier = tier;
+      shadowsEnabled = false;
+      resizeCanvas();
+      reseedSparkles(state.roomId);
+    },
+  });
   let devPanel, devReadout, devMousePoint = null;
   let entryDrift = null;
   let mariettaPanel = null, mariettaPanelOpen = false, mariettaPanelCooldown = 0;
@@ -1215,18 +1223,8 @@
   }
 
   function updatePerfTier(now) {
-    if (perfTier === 'low') return;
-    perfFrameCount += 1;
-    if (perfFrameCount === 1) { perfFirstTime = now; return; }
-    if (perfFrameCount === 90) {
-      const averageFps = 89 / ((now - perfFirstTime) / 1000);
-      if (averageFps < 40) {
-        perfTier = 'low';
-        shadowsEnabled = false;
-        resizeCanvas();
-        reseedSparkles(state.roomId);
-      }
-    }
+    worldPerf.sample(now);
+    perfTier = worldPerf.getTier();
   }
 
   function staticFrameOverlayOpen() {
@@ -2910,7 +2908,8 @@
   function tick(now) {
     rafHandle = null;
     if (pageHidden) return;
-    updatePerfTier(now);
+    if (staticFrameOverlayOpen() || state.transitioning) worldPerf.pause();
+    else updatePerfTier(now);
     const dt = Math.min(50, Math.max(8, now - (state.lastTickTime || now)));
     state.lastTickTime = now;
     state.speed = BASE_SPEED * (dt / TARGET_DT);
@@ -2923,7 +2922,7 @@
       checkReturnPortalProximity(now);
       if (DEV_MODE) updateDevReadout();
     }
-    if (!staticFrameOverlayOpen()) drawFrame(now);
+    if (!staticFrameOverlayOpen() && worldPerf.shouldRender(now)) drawFrame(now);
     scheduleGrimmerglenFrame();
   }
 
@@ -2985,6 +2984,18 @@
       constrainObjectLayoutToViewport();
     });
     worldInitialized = true;
+    worldPerf.enableOverlay(() => ({
+      dpr: Math.min(perfTier === 'low' ? 1 : (TOUCH_DEVICE ? 1.5 : 2), Math.max(1, window.devicePixelRatio || 1)),
+      loadedRoomImageCount: imageCache.size,
+      loadedCharacterImageCount: objectImageCache.size + (grimmerglenDanceImages ? grimmerglenDanceImages.marietta.length + grimmerglenDanceImages.booha.length : 0),
+      decodedImageMemoryBytes: 0,
+      wandererCacheUsageBytes: 0,
+      wandererCacheBudgetBytes: 0,
+      roomLoadDecodeMs: 0,
+      activeAudioBufferCount: 0,
+      serviceWorkerCacheVersion: 'booha-assets-2026-505',
+      averageFps: worldPerf.metrics().averageFps,
+    }));
     scheduleGrimmerglenFrame();
     triggerBoohaTransformIfNeeded();
   }
@@ -2994,6 +3005,7 @@
     if (pageHidden) {
       if (rafHandle) window.cancelAnimationFrame(rafHandle);
       rafHandle = null;
+      worldPerf.pause();
       return;
     }
     state.lastTickTime = 0;
