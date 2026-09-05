@@ -119,6 +119,7 @@
   };
 
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
+  let grimmerglenStageScale = 1;
   let rafHandle = null;
   let pageHidden = document.hidden;
   let worldInitialized = false;
@@ -765,6 +766,7 @@
       actorCtx.save();
       actorCtx.translate(x, y);
       actorCtx.rotate(angle);
+      actorCtx.scale(responsiveVisualScale(26, 20), responsiveVisualScale(26, 20));
       // A broad low-opacity halo makes the direction discoverable without
       // enlarging the hitbox or changing the room's calibrated exit point.
       actorCtx.globalAlpha = arrowAlpha;
@@ -807,7 +809,7 @@
     if (!sprite.complete || sprite.naturalWidth === 0) return;
     const seconds = now / 1000;
     const pulse = REDUCED_MOTION ? .82 : .72 + Math.sin(seconds * 2.2) * .1;
-    const size = MARIETTA.drawR * 2;
+    const size = responsiveWorldSize(MARIETTA.drawR * 2, 32);
     const haloRadius = size * (waitingForMemory ? 1.78 : 1.45);
     actorCtx.save();
     const halo = actorCtx.createRadialGradient(MARIETTA.x, MARIETTA.y, 5, MARIETTA.x, MARIETTA.y, haloRadius);
@@ -920,7 +922,10 @@
     // Keep both the drawn object and its pickup radius inside the visible
     // crop. This matters on landscape phones, where fitStage intentionally
     // fills the viewport and trims a little from the top and bottom.
-    const margin = Math.max(OBJECT_HIT_R, OBJECT_DRAW_SIZE / 2) + 8;
+    const margin = Math.max(
+      responsiveWorldRadius(OBJECT_HIT_R, 44),
+      responsiveWorldSize(OBJECT_DRAW_SIZE, 32) / 2
+    ) + 8;
     return {
       minX: Math.max(margin, (WORLD_W - visibleWorldW) / 2 + margin),
       maxX: Math.min(WORLD_W - margin, (WORLD_W + visibleWorldW) / 2 - margin),
@@ -1018,16 +1023,18 @@
       if (!image || !image.complete || image.naturalWidth === 0) return;
       const bob = REDUCED_MOTION ? 0 : Math.sin(seconds * 2.2 + index * 1.7) * 3;
       const glow = getRoomGlowRgb(state.roomId);
+      const drawSize = responsiveWorldSize(OBJECT_DRAW_SIZE, 32);
+      const haloRadius = Math.max(31, drawSize / 2 + 8);
       actorCtx.save();
       actorCtx.globalAlpha = .95;
       actorCtx.shadowColor = `rgba(${glow.r},${glow.g},${glow.b},.9)`;
       actorCtx.shadowBlur = 15;
       actorCtx.beginPath();
       actorCtx.fillStyle = `rgba(255,255,255,${REDUCED_MOTION ? .24 : .16 + .06 * Math.sin(seconds * 2.2 + index)})`;
-      actorCtx.arc(object.x, object.y + bob, 31, 0, Math.PI * 2);
+      actorCtx.arc(object.x, object.y + bob, haloRadius, 0, Math.PI * 2);
       actorCtx.fill();
       actorCtx.shadowBlur = 0;
-      actorCtx.drawImage(image, object.x - OBJECT_DRAW_SIZE / 2, object.y - OBJECT_DRAW_SIZE / 2 + bob, OBJECT_DRAW_SIZE, OBJECT_DRAW_SIZE);
+      actorCtx.drawImage(image, object.x - drawSize / 2, object.y - drawSize / 2 + bob, drawSize, drawSize);
       actorCtx.restore();
     });
   }
@@ -1069,7 +1076,8 @@
     actorCtx.globalAlpha = .98;
     actorCtx.shadowColor = 'rgba(255,159,194,.85)';
     actorCtx.shadowBlur = 12;
-    actorCtx.drawImage(image, state.x + 27, state.y - 54 + bob, 42, 42);
+    const carriedSize = responsiveWorldSize(42, 24);
+    actorCtx.drawImage(image, state.x + 27, state.y - 54 + bob, carriedSize, carriedSize);
     actorCtx.restore();
   }
 
@@ -1091,12 +1099,12 @@
     actorCtx.globalAlpha = .96;
     const sprite = state.boohaTransformed ? boohaGrimmerglenImg : boohaImg;
     if (sprite.complete && sprite.naturalWidth > 0) {
-      const boxSize = BOOHA_R * 2;
+      const boxSize = responsiveWorldSize(BOOHA_R * 2, 32);
       actorCtx.drawImage(sprite, -boxSize / 2, -boxSize / 2, boxSize, boxSize);
     } else {
       actorCtx.fillStyle = '#ffe56d';
       actorCtx.beginPath();
-      actorCtx.arc(0, 0, BOOHA_R * .72, 0, Math.PI * 2);
+      actorCtx.arc(0, 0, responsiveWorldSize(BOOHA_R * 2, 32) * .36, 0, Math.PI * 2);
       actorCtx.fill();
     }
     actorCtx.restore();
@@ -2386,7 +2394,7 @@
 
   function clickCheckGrimmerglenObject(worldX, worldY) {
     if (mariettaPanelOpen || returnPortalOpen || state.entryWelcomePending) return false;
-    const object = getNearestUnfoundObject(worldX, worldY, OBJECT_HIT_R);
+    const object = getNearestUnfoundObject(worldX, worldY, responsiveWorldRadius(OBJECT_HIT_R, 44));
     if (!object) return false;
     // Booha can change his mind: clicking another collectible drops the
     // carried item back at its current room coordinate and picks up the new
@@ -2403,7 +2411,7 @@
   function checkGrimmerglenObjectProximity(now) {
     if (mariettaPanelOpen || returnPortalOpen || carriedObject || state.entryWelcomePending) return;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
-    const object = getNearestUnfoundObject(state.x, state.y, OBJECT_PROXIMITY_R);
+    const object = getNearestUnfoundObject(state.x, state.y, responsiveWorldRadius(OBJECT_PROXIMITY_R, 44));
     if (object) pickUpGrimmerglenObject(object);
   }
 
@@ -2422,7 +2430,7 @@
   function clickCheckMarietta(worldX, worldY) {
     if (!MARIETTA || state.roomId !== MARIETTA.roomId || mariettaPanelOpen || state.boohaTransforming || !state.boohaTransformed) return false;
     const bob = REDUCED_MOTION ? 0 : Math.sin(performance.now() / 1000 * 2.6) * 6;
-    if (Math.hypot(worldX - MARIETTA.x, worldY - (MARIETTA.y + bob)) > MARIETTA.hitR) return false;
+    if (Math.hypot(worldX - MARIETTA.x, worldY - (MARIETTA.y + bob)) > responsiveWorldRadius(MARIETTA.hitR, 44)) return false;
     openMariettaPanel();
     return true;
   }
@@ -2494,14 +2502,14 @@
     if (now < returnPortalCooldownUntil) return;
     if (state.distMovedSinceSpawn < ARROW_MOVE_THRESHOLD) return;
     const d = Math.hypot(state.x - MARIETTA_RETURN_PORTAL.x, state.y - MARIETTA_RETURN_PORTAL.y);
-    if (d <= MARIETTA_RETURN_PORTAL.triggerR) openReturnPortalPopup();
+    if (d <= responsiveWorldRadius(MARIETTA_RETURN_PORTAL.triggerR, 44)) openReturnPortalPopup();
   }
 
   function clickCheckReturnPortal(worldX, worldY) {
     if (!inReturnPortalRoom() || returnPortalOpen || mariettaPanelOpen || state.celebrating || state.returnExiting) return false;
     if (performance.now() < returnPortalCooldownUntil) return false;
     const d = Math.hypot(worldX - MARIETTA_RETURN_PORTAL.x, worldY - MARIETTA_RETURN_PORTAL.y);
-    if (d <= MARIETTA_RETURN_PORTAL.r) { openReturnPortalPopup(); return true; }
+    if (d <= responsiveWorldRadius(MARIETTA_RETURN_PORTAL.r, 44)) { openReturnPortalPopup(); return true; }
     return false;
   }
 
@@ -2512,15 +2520,17 @@
     const cx = MARIETTA_RETURN_PORTAL.x;
     const cy = MARIETTA_RETURN_PORTAL.y;
     actorCtx.save();
-    const gradient = actorCtx.createRadialGradient(cx, cy, 0, cx, cy, 46);
+    const glowRadius = responsiveWorldRadius(46, 36);
+    const ringRadius = responsiveWorldRadius(22, 28);
+    const gradient = actorCtx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
     gradient.addColorStop(0, `rgba(255,214,140,${.55 * pulse})`);
     gradient.addColorStop(1, 'rgba(255,214,140,0)');
     actorCtx.fillStyle = gradient;
-    actorCtx.beginPath(); actorCtx.arc(cx, cy, 46, 0, Math.PI * 2); actorCtx.fill();
+    actorCtx.beginPath(); actorCtx.arc(cx, cy, glowRadius, 0, Math.PI * 2); actorCtx.fill();
     actorCtx.globalAlpha = .8 + pulse * .2;
     actorCtx.strokeStyle = 'rgba(255,255,255,.85)';
-    actorCtx.lineWidth = 2.4;
-    actorCtx.beginPath(); actorCtx.arc(cx, cy, 22, 0, Math.PI * 2); actorCtx.stroke();
+    actorCtx.lineWidth = responsiveWorldSize(2.4, 2);
+    actorCtx.beginPath(); actorCtx.arc(cx, cy, ringRadius, 0, Math.PI * 2); actorCtx.stroke();
     actorCtx.restore();
   }
 
@@ -2587,6 +2597,22 @@
   // is the real caller); this exists purely so the engine can actually
   // be tried in a browser before that pass wires it in for real.
   let typingTestPanel = null;
+
+  // Pass 1: keep important world targets legible and comfortably tappable
+  // after the fixed world is scaled down to fit a small landscape phone.
+  function responsiveWorldSize(baseSize, minimumCssPixels) {
+    if (!TOUCH_DEVICE) return baseSize;
+    return Math.max(baseSize, minimumCssPixels / Math.max(grimmerglenStageScale, .001));
+  }
+
+  function responsiveWorldRadius(baseRadius, minimumDiameterCssPixels) {
+    if (!TOUCH_DEVICE) return baseRadius;
+    return Math.max(baseRadius, (minimumDiameterCssPixels / 2) / Math.max(grimmerglenStageScale, .001));
+  }
+
+  function responsiveVisualScale(baseSize, minimumCssPixels) {
+    return responsiveWorldSize(baseSize, minimumCssPixels) / baseSize;
+  }
   function openTypingTestHarness() {
     if (!window.GrimmerglenTyping) return;
     if (!typingTestPanel) {
@@ -2752,7 +2778,9 @@
 
   function fitStage() {
     const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
+    grimmerglenStageScale = scale;
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    stage.style.setProperty('--grimmerglen-profile-portal-size', `${responsiveWorldSize(70, 44)}px`);
   }
 
   function updateGrimmerglenViewportMetrics() {
@@ -2910,7 +2938,7 @@
       #grimmerglen-marietta-panel .mg-memory-replay-scroll-cue rt{font-size:.62em;color:#aa6a91;}
       @keyframes mgMemoryReplayScrollCue{0%,100%{transform:translateY(0);opacity:.86;}50%{transform:translateY(4px);opacity:1;}}
       @media(prefers-reduced-motion:reduce){#grimmerglen-marietta-panel .mg-memory-replay-scroll-cue{animation:none;}}
-      #grimmerglen-profile-portal{position:absolute;left:${GRIMMERGLEN_PROFILE_PORTAL.x}px;top:${GRIMMERGLEN_PROFILE_PORTAL.y}px;z-index:15;display:none;place-items:center;width:70px;height:70px;transform:translate(-50%,-50%);border:2px solid rgba(255,159,194,.8);border-radius:50%;background:radial-gradient(circle at 38% 30%,#fff8fd 0%,#ffd1e8 42%,#d8c7ff 100%);color:#8f4c9f;text-decoration:none;box-shadow:0 0 12px rgba(255,159,194,.75),0 0 28px rgba(184,164,255,.58),inset 0 0 14px rgba(255,255,255,.92);cursor:pointer;transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;}
+      #grimmerglen-profile-portal{position:absolute;left:${GRIMMERGLEN_PROFILE_PORTAL.x}px;top:${GRIMMERGLEN_PROFILE_PORTAL.y}px;z-index:15;display:none;place-items:center;width:var(--grimmerglen-profile-portal-size,70px);height:var(--grimmerglen-profile-portal-size,70px);transform:translate(-50%,-50%);border:2px solid rgba(255,159,194,.8);border-radius:50%;background:radial-gradient(circle at 38% 30%,#fff8fd 0%,#ffd1e8 42%,#d8c7ff 100%);color:#8f4c9f;text-decoration:none;box-shadow:0 0 12px rgba(255,159,194,.75),0 0 28px rgba(184,164,255,.58),inset 0 0 14px rgba(255,255,255,.92);cursor:pointer;touch-action:manipulation;transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;}
       #grimmerglen-profile-portal.is-visible{display:grid;}
       #grimmerglen-profile-portal::before{content:'';position:absolute;inset:-9px;border:1px solid rgba(255,224,102,.42);border-radius:50%;box-shadow:0 0 17px rgba(255,224,102,.42);animation:grimmerglenProfilePortalPulse 2.5s ease-in-out infinite;}
       #grimmerglen-profile-portal span{position:relative;display:grid;place-items:center;color:#a24c9e;font:900 2rem/1 ui-rounded,'Avenir Next Rounded','Trebuchet MS',sans-serif;letter-spacing:-.08em;text-shadow:0 2px 0 #fff,0 0 9px rgba(255,255,255,.9);}
@@ -3017,7 +3045,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-509',
+      serviceWorkerCacheVersion: 'booha-assets-2026-511',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleGrimmerglenFrame();

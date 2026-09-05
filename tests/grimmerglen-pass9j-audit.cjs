@@ -16,8 +16,8 @@ assert(placement.includes('const scale = Math.max(window.innerWidth / WORLD_W, w
   'object safety bounds must follow the same cover scale as the world stage');
 assert(placement.includes('visibleWorldW') && placement.includes('visibleWorldH'),
   'object safety bounds must calculate the visible world crop');
-assert(placement.includes('const margin = Math.max(OBJECT_HIT_R, OBJECT_DRAW_SIZE / 2) + 8'),
-  'memory items must keep both their pickup radius and art inside the viewport');
+assert(placement.includes('responsiveWorldRadius(OBJECT_HIT_R, 44)') && placement.includes('responsiveWorldSize(OBJECT_DRAW_SIZE, 32)'),
+  'memory items must keep both their pickup radius and art inside the viewport at mobile scale');
 assert(placement.includes('function safeObjectRange('),
   'clearing ranges must be clipped safely when a mobile crop trims an edge');
 assert(placement.includes('function constrainObjectLayoutToViewport('),
