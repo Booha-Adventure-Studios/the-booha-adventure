@@ -29,7 +29,9 @@ while IFS= read -r f; do
     json_bad=$((json_bad+1))
   fi
 done < <(find content data -name "*.json" 2>/dev/null)
-[ $json_bad -eq 0 ] && ok "$json_ok JSON files valid ($json_empty empty placeholders skipped)"
+if [ $json_bad -eq 0 ]; then
+  ok "$json_ok JSON files valid ($json_empty empty placeholders skipped)"
+fi
 
 # ── 2. Service worker manifest: every CORE_FILES path exists ─
 echo "[2/36] sw.js CORE_FILES exist on disk (addAll is all-or-nothing)"
@@ -1305,6 +1307,36 @@ if node tests/performance-asset-budget-audit.cjs >/dev/null 2>&1; then
   ok "WebP container, alpha, character-size, and deployed-image payload budgets pass"
 else
   bad "Performance asset-budget audit failed"
+fi
+
+# ── Test inventory and manifest-wired current tests ─────────
+echo "[inventory] Test manifest and current orphan tests"
+# MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
+if node tests/verification-manifest-audit.cjs >/dev/null 2>&1; then
+  ok "all tests are wired or explicitly classified in the verification manifest"
+else
+  bad "verification manifest audit failed"
+fi
+manifest_extra_bad=0
+while IFS= read -r manifest_test; do
+  [ -z "$manifest_test" ] && continue
+  if node "$manifest_test" >/dev/null 2>&1; then
+    ok "manifest-wired test passed: $manifest_test"
+  else
+    bad "manifest-wired test failed: $manifest_test"
+    manifest_extra_bad=$((manifest_extra_bad+1))
+  fi
+done < <(python3 - <<'PYEOF'
+import json
+with open('tests/verification-manifest.json', encoding='utf-8') as handle:
+    manifest = json.load(handle)
+for entry in manifest.get('exceptions', []):
+    if entry.get('status') == 'verify':
+        print(entry['path'])
+PYEOF
+)
+if [ $manifest_extra_bad -eq 0 ]; then
+  ok "all manifest-wired current tests pass"
 fi
 
 # ── Summary ──────────────────────────────────────────────────
