@@ -1265,7 +1265,11 @@
   }
 
   function scheduleGrimmerglenFrame() {
-    if (worldInitialized && !pageHidden && !rafHandle) rafHandle = window.requestAnimationFrame(tick);
+    // Pass 6: modal surfaces own the screen, so the world does not need a
+    // battery-costly animation frame until the surface closes again.
+    if (worldInitialized && !pageHidden && !staticFrameOverlayOpen() && !rafHandle) {
+      rafHandle = window.requestAnimationFrame(tick);
+    }
   }
 
 
@@ -2111,6 +2115,7 @@
     mariettaPanelOpen = false;
     handoffObject = null;
     mariettaPanel.classList.remove('open');
+    scheduleGrimmerglenFrame();
   }
 
   function unlockGrimmerglenNavigation() {
@@ -2498,6 +2503,7 @@
     if (window.UtsuSfx) window.UtsuSfx.popupClose();
     returnPortalCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
     returnPortalOverlay.classList.remove('open');
+    scheduleGrimmerglenFrame();
   }
 
   function inReturnPortalRoom() { return state.roomId === MARIETTA_RETURN_PORTAL.roomId; }
@@ -2745,6 +2751,7 @@
   function closeBoohaChangePrompt() {
     boohaChangePromptOpen = false;
     boohaChangeOverlay?.classList.remove('open');
+    scheduleGrimmerglenFrame();
   }
 
   function beginBoohaChange() {
@@ -3115,7 +3122,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-515',
+      serviceWorkerCacheVersion: 'booha-assets-2026-516',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleGrimmerglenFrame();
