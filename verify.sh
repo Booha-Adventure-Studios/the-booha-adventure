@@ -1236,6 +1236,13 @@ else
   bad "Utsuroba weekly ECHOES audit failed"
 fi
 
+echo "[stats] Tokyo daily-stats audit"
+if node tests/stats-tokyo-date-audit.cjs >/dev/null 2>&1; then
+  ok "Tokyo-anchored daily stats and legacy date migration contracts pass"
+else
+  bad "Tokyo daily-stats audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

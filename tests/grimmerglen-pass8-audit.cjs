@@ -180,7 +180,7 @@ assert(!coreAssetsSource.includes('grimmerglen/room_'), 'service worker must NOT
 assert(!coreAssetsSource.includes('grimmerglen/collectibles/'), 'service worker must NOT eagerly precache the 8 collectibles');
 assert(coreAssetsSource.includes('${BASE}/assets/img/grimmerglen/grimmerglen.css'), 'service worker must still precache the small always-needed Grimmerglen stylesheet');
 assert(coreAssetsSource.includes('${BASE}/assets/img/grimmerglen/booha_grimmerglen_version_1.webp'), 'service worker must still precache the small always-needed default Booha sprite');
-assert(/assets:\s+'booha-assets-2026-522'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen eager-precache perf fix');
+assert(/assets:\s+'booha-assets-2026-523'/.test(serviceWorker), 'asset cache must be bumped for the Grimmerglen eager-precache perf fix');
 
 // The lazy loaders these files now depend on must actually exist and be
 // wired to the right moments, not merely removed from CORE_ASSETS.
