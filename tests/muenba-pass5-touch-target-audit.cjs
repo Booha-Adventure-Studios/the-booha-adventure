@@ -25,9 +25,9 @@ assert(runtime.includes('.muenba-mission-hint-toggle { display:inline-flex')
 assert(runtime.includes('html.muenba-phone-portrait .muenba-lobby-actions button,')
   && runtime.includes('min-height:48px;'),
   'portrait popup action controls must retain their larger phone target');
-assert(runtime.includes("serviceWorkerCacheVersion: 'booha-assets-2026-524'"),
+assert(runtime.includes("serviceWorkerCacheVersion: 'booha-assets-2026-525'"),
   'Muenba performance telemetry must report the current asset cache version');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-524'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-525'"),
   'Muenba touch-target changes must bump the asset cache');
 assert(verify.includes('tests/muenba-pass5-touch-target-audit.cjs'),
   'verify.sh must run the Muenba Pass 5 touch-target audit');
