@@ -1078,14 +1078,18 @@
   let app, stage, canvas, ctx, roomLayer, echoLayer, echoesTrackerEl;
   let coordToggle, coordReadout, pinLog, readingJournalButton, readingChallengeButton;
   let exitPopOverlay = null, exitPopCooldownUntil = 0;
+  let exitPopPreviousFocus = null;
   let drifterPanel = null, drifterPanelOpen = false, drifterPanelCooldown = 0;
+  let drifterPanelPreviousFocus = null;
   let readingJournalOverlay = null, readingJournalOpen = false;
   let weeklyChallengeOverlay = null, weeklyChallengeOpen = false;
   let modalPreviousFocus = null;
   let convergenceOverlay = null, convergenceOpen = false;
+  let convergencePreviousFocus = null;
   let gardenOverlay = null, gardenOpen = false;
+  let gardenPreviousFocus = null;
   let utsuProfilePortal = null;
-  let utsuProfileOverlay = null, utsuProfileOpen = false;
+  let utsuProfileOverlay = null, utsuProfileOpen = false, utsuProfilePreviousFocus = null;
   let utsurobaRotateOverlay = null;
   let utsurobaViewportRefreshFrame = 0;
 
@@ -1370,7 +1374,17 @@
       .weekly-reading-complete{margin:0;padding:11px;border-left:3px solid #9fe4ba;color:#d7ffe3;font-size:.9rem;line-height:1.45;background:rgba(159,228,186,.06);}
       .weekly-reading-complete small{display:block;margin-top:4px;color:rgba(215,255,227,.68);font-size:.92em;}
       .weekly-reading-close-btn{margin-top:17px;padding:10px 19px;border:1px solid #9fe4ba;border-radius:7px;background:rgba(159,228,186,.14);color:#d7ffe3;cursor:pointer;font:700 .86rem Georgia,serif;}
-      @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card{padding:21px 16px}.weekly-reading-close,.weekly-reading-close-btn,.reading-journal-close{min-width:44px;min-height:44px}}
+      .utsu-profile-pop-box,.memory-convergence-card,.memory-garden-card,.reading-journal-card,.weekly-reading-card{overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;}
+      .utsu-profile-pop-overlay,#utsuroba-memory-convergence,#utsuroba-memory-garden,#utsuroba-reading-journal,#utsuroba-weekly-reading{overscroll-behavior:none;touch-action:none;}
+      .utsu-profile-pop-close,.memory-convergence-close,.memory-garden-close,.reading-journal-close,.weekly-reading-close{display:grid;place-items:center;min-width:44px;min-height:44px;}
+      .memory-convergence-close-btn,.memory-garden-close-btn,.weekly-reading-close-btn,.reading-journal-review,.reading-journal-practice-start{min-height:44px;}
+      .memory-convergence-clue-choice,.memory-convergence-choice,.reading-journal-word,.reading-word-practice-option{min-height:44px;}
+      #utsuroba-exit-overlay{padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));box-sizing:border-box;overscroll-behavior:none;touch-action:none;}
+      #utsuroba-exit-overlay>div{max-height:calc(var(--utsuroba-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 32px);overflow:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;}
+      #utsuroba-exit-overlay button{min-width:44px;min-height:44px;}
+      #utsuroba-drifter-panel{width:min(560px,calc(var(--utsuroba-viewport-width,100vw) - 16px));max-height:min(38dvh,260px,calc(var(--utsuroba-viewport-height,100dvh) * .38));overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;scrollbar-gutter:stable;}
+      #utsuroba-drifter-panel .dp-btn{min-height:44px;}
+      @media(max-width:700px){#utsuroba-reading-challenge-button{top:51px;right:10px;padding:7px 10px;font-size:10px}.weekly-reading-card,.reading-journal-card{padding:21px 16px}.utsu-profile-pop-box{padding:32px 20px 24px}.weekly-reading-close,.weekly-reading-close-btn,.reading-journal-close{min-width:44px;min-height:44px}}
       /* ══ DRIFTER PANEL ══
          Round 2 Pass 1: the drifter-panel-specific CSS that used to live
          here (its own #utsuroba-drifter-panel sizing plus a full copy of
@@ -1490,6 +1504,11 @@
     if (exitPopOverlay) return;
     exitPopOverlay = document.createElement('div');
     exitPopOverlay.id = 'utsuroba-exit-overlay';
+    exitPopOverlay.setAttribute('role', 'dialog');
+    exitPopOverlay.setAttribute('aria-modal', 'true');
+    exitPopOverlay.setAttribute('aria-label', 'Leave Utsuroba');
+    exitPopOverlay.setAttribute('aria-hidden', 'true');
+    exitPopOverlay.tabIndex = -1;
     exitPopOverlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9200;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.35s ease;';
     exitPopOverlay.innerHTML = `
       <div style="background:linear-gradient(160deg,#06000f,#0c0018 60%,#04000a);border:1px solid rgba(100,0,180,.45);border-radius:6px;padding:clamp(24px,5vw,40px) clamp(22px,6vw,48px) clamp(20px,4vw,32px);max-width:min(400px,94vw);width:94vw;text-align:center;box-shadow:0 0 40px rgba(40,0,80,.8);font-family:'Georgia',serif;position:relative;animation:utsuPopIn 0.3s ease-out;">
@@ -1507,18 +1526,39 @@
     document.getElementById('utsuroba-exit-no').addEventListener('click', closeExitPop);
     document.getElementById('utsuroba-exit-yes').addEventListener('click', doExitToKarasuki);
     exitPopOverlay.addEventListener('click', e => { if (e.target === exitPopOverlay) closeExitPop(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && isExitPopOpen()) closeExitPop(); });
+    exitPopOverlay.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { e.preventDefault(); closeExitPop(); return; }
+      trapOverlayFocus(exitPopOverlay, e);
+    });
   }
   function isExitPopOpen() { return exitPopOverlay?.style.display === 'flex'; }
-  function openExitPop() { exitPopOverlay.style.display = 'flex'; exitPopOverlay.style.background = 'rgba(0,0,0,0.88)'; state.clickTarget = null; }
+  function openExitPop() {
+    if (!exitPopOverlay) return;
+    exitPopPreviousFocus = document.activeElement;
+    exitPopOverlay.style.display = 'flex';
+    exitPopOverlay.style.background = 'rgba(0,0,0,0.88)';
+    exitPopOverlay.setAttribute('aria-hidden', 'false');
+    state.clickTarget = null;
+    requestAnimationFrame(() => document.getElementById('utsuroba-exit-close')?.focus());
+  }
   function closeExitPop() {
+    if (!exitPopOverlay) return;
     exitPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
     exitPopOverlay.style.background = 'rgba(0,0,0,0)';
-    setTimeout(() => { exitPopOverlay.style.display = 'none'; }, 350);
+    exitPopOverlay.setAttribute('aria-hidden', 'true');
+    const previousFocus = exitPopPreviousFocus;
+    exitPopPreviousFocus = null;
+    setTimeout(() => {
+      exitPopOverlay.style.display = 'none';
+      if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
+        try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+      }
+    }, 350);
   }
   function doExitToKarasuki() {
     if (state.exitingToKarasuki) return;
     state.exitingToKarasuki = true; state.clickTarget = null; state.moving = false;
+    exitPopPreviousFocus = null;
     try { music.pause(); music.currentTime = 0; } catch(_) {}
     exitPopOverlay.style.display = 'none';
     const fadeEl = document.getElementById('buki-fade');
@@ -1538,8 +1578,15 @@
     drifterPanel = document.createElement('div');
     drifterPanel.id = 'utsuroba-drifter-panel';
     drifterPanel.className = 'utsu-card is-floating';
+    drifterPanel.setAttribute('role', 'dialog');
+    drifterPanel.setAttribute('aria-modal', 'true');
+    drifterPanel.setAttribute('aria-label', 'Drifter memory conversation');
+    drifterPanel.setAttribute('aria-hidden', 'true');
     document.body.appendChild(drifterPanel);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && drifterPanelOpen) closeDrifterPanel(); });
+    drifterPanel.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { e.preventDefault(); closeDrifterPanel(); return; }
+      trapOverlayFocus(drifterPanel, e);
+    });
     /* Round 2 Pass 3: one delegated listener covers every .dp-btn this
        panel will ever render (its innerHTML is rebuilt per-quest-state),
        so a fresh listener never needs to be attached after each render. */
@@ -1667,15 +1714,25 @@
 
   function closeUtsurobaProfilePopup() {
     utsuProfileOpen = false;
-    if (utsuProfileOverlay) utsuProfileOverlay.classList.remove('is-open');
+    if (utsuProfileOverlay) {
+      utsuProfileOverlay.classList.remove('is-open');
+      utsuProfileOverlay.setAttribute('aria-hidden', 'true');
+    }
     state.inputLocked = false;
+    const previousFocus = utsuProfilePreviousFocus;
+    utsuProfilePreviousFocus = null;
+    if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
+      try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+    }
   }
 
   function openUtsurobaProfilePopup() {
     if (utsuProfileOpen || state.roomId !== DATA.startRoom || !utsuProfileOverlay) return;
+    utsuProfilePreviousFocus = document.activeElement;
     utsuProfileOpen = true;
     state.inputLocked = true;
     utsuProfileOverlay.classList.add('is-open');
+    utsuProfileOverlay.setAttribute('aria-hidden', 'false');
     const close = utsuProfileOverlay.querySelector('.utsu-profile-pop-close');
     if (close) close.focus();
   }
@@ -1685,6 +1742,11 @@
     utsuProfileOverlay = document.createElement('div');
     utsuProfileOverlay.id = 'utsu-profile-pop-overlay';
     utsuProfileOverlay.className = 'utsu-profile-pop-overlay';
+    utsuProfileOverlay.setAttribute('role', 'dialog');
+    utsuProfileOverlay.setAttribute('aria-modal', 'true');
+    utsuProfileOverlay.setAttribute('aria-label', 'Utsuroba profile');
+    utsuProfileOverlay.setAttribute('aria-hidden', 'true');
+    utsuProfileOverlay.tabIndex = -1;
     utsuProfileOverlay.innerHTML = `
       <div class="utsu-profile-pop-box" role="dialog" aria-modal="true" aria-labelledby="utsu-profile-pop-title">
         <button class="utsu-profile-pop-close" type="button" aria-label="Close / 閉じる">✕</button>
@@ -1708,8 +1770,9 @@
     utsuProfileOverlay.addEventListener('click', event => {
       if (event.target === utsuProfileOverlay) closeUtsurobaProfilePopup();
     });
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && utsuProfileOpen) closeUtsurobaProfilePopup();
+    utsuProfileOverlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeUtsurobaProfilePopup(); return; }
+      trapOverlayFocus(utsuProfileOverlay, event);
     });
   }
 
@@ -1811,6 +1874,11 @@
     if (convergenceOverlay) convergenceOverlay.remove();
     convergenceOverlay = null;
     state.inputLocked = false;
+    const previousFocus = convergencePreviousFocus;
+    convergencePreviousFocus = null;
+    if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
+      try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+    }
   }
 
   function closeMemoryGarden() {
@@ -1818,32 +1886,58 @@
     if (gardenOverlay) gardenOverlay.remove();
     gardenOverlay = null;
     state.inputLocked = false;
+    const previousFocus = gardenPreviousFocus;
+    gardenPreviousFocus = null;
+    if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
+      try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+    }
   }
 
   function openMemoryGarden() {
     if (gardenOpen || !allRequiredEchoesRestoredThisWeek() || !readUtsuroba().flags?.convergenceSeen || drifterPanelOpen || readingJournalOpen || convergenceOpen) return;
     const garden = DATA.readingConvergence?.garden;
     if (!garden) return;
+    gardenPreviousFocus = document.activeElement;
     gardenOpen = true;
     state.inputLocked = true;
     gardenOverlay = document.createElement('div');
     gardenOverlay.id = 'utsuroba-memory-garden';
+    gardenOverlay.setAttribute('role', 'dialog');
+    gardenOverlay.setAttribute('aria-modal', 'true');
+    gardenOverlay.setAttribute('aria-label', 'Memory garden');
+    gardenOverlay.setAttribute('aria-hidden', 'false');
+    gardenOverlay.tabIndex = -1;
     const quotes = garden.quotes.map(quote => `<article class="memory-garden-quote"><strong>${escapeHTML(quote.name)}</strong><p>${escapeHTML(quote.quote)}</p></article>`).join('');
     gardenOverlay.innerHTML = `<div class="memory-garden-card"><button class="memory-garden-close" type="button" aria-label="Close memory garden">✕</button><div class="memory-garden-eyebrow">THE WORLD NOW / 世界の変化</div><h2>${escapeHTML(garden.title)}<span>${escapeHTML(garden.titleJP)}</span></h2><p class="memory-garden-intro">${escapeHTML(garden.intro)}<small>${escapeHTML(garden.introJP)}</small></p><div class="memory-garden-quotes">${quotes}</div><p class="memory-garden-return">${escapeHTML(garden.returnText)}<small>${escapeHTML(garden.returnTextJP)}</small></p><button class="memory-garden-close-btn" type="button" id="memory-garden-done">Close the garden / 庭を閉じる</button></div>`;
     document.body.appendChild(gardenOverlay);
     gardenOverlay.querySelector('.memory-garden-close').addEventListener('click', closeMemoryGarden);
     gardenOverlay.querySelector('#memory-garden-done').addEventListener('click', closeMemoryGarden);
+    gardenOverlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeMemoryGarden(); return; }
+      trapOverlayFocus(gardenOverlay, event);
+    });
     gardenOverlay.addEventListener('click', event => { if (event.target === gardenOverlay) closeMemoryGarden(); });
+    requestAnimationFrame(() => gardenOverlay?.querySelector('.memory-garden-close')?.focus());
   }
 
   async function openMemoryConvergence() {
     if (convergenceOpen || !allRequiredEchoesRestoredThisWeek() || drifterPanelOpen || readingJournalOpen) return;
+    convergencePreviousFocus = document.activeElement;
     convergenceOpen = true;
     state.inputLocked = true;
     convergenceOverlay = document.createElement('div');
     convergenceOverlay.id = 'utsuroba-memory-convergence';
+    convergenceOverlay.setAttribute('role', 'dialog');
+    convergenceOverlay.setAttribute('aria-modal', 'true');
+    convergenceOverlay.setAttribute('aria-label', 'Memory gate');
+    convergenceOverlay.setAttribute('aria-hidden', 'false');
+    convergenceOverlay.tabIndex = -1;
     convergenceOverlay.innerHTML = '<div class="memory-convergence-card"><div class="memory-convergence-eyebrow">MEMORY GATE / 記憶の門</div><h2>Opening the gate…<span>門を開いています…</span></h2></div>';
     document.body.appendChild(convergenceOverlay);
+    convergenceOverlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeMemoryConvergence(); return; }
+      trapOverlayFocus(convergenceOverlay, event);
+    });
     try {
       await window.UTSUROBA_EPISODES_READY;
       if (!convergenceOpen) return;
@@ -1902,10 +1996,12 @@
       };
       render();
       convergenceOverlay.addEventListener('click', event => { if (event.target === convergenceOverlay) closeMemoryConvergence(); });
+      requestAnimationFrame(() => convergenceOverlay?.querySelector('.memory-convergence-close')?.focus());
     } catch (error) {
       console.error('[Utsuroba] Could not open memory gate:', error);
       convergenceOverlay.innerHTML = '<div class="memory-convergence-card"><button class="memory-convergence-close" type="button">Close / 閉じる</button><p class="memory-convergence-intro">The gate is cloudy. Please try again.<small>門がぼやけています。もう一度試してください。</small></p></div>';
       convergenceOverlay.querySelector('.memory-convergence-close').addEventListener('click', closeMemoryConvergence);
+      requestAnimationFrame(() => convergenceOverlay?.querySelector('.memory-convergence-close')?.focus());
     }
   }
 
@@ -2343,9 +2439,11 @@
     if (performance.now() < drifterPanelCooldown || !drifter || !drifterPanel) return;
 
     if (window.UtsuSfx) window.UtsuSfx.panelOpen();
+    drifterPanelPreviousFocus = document.activeElement;
     drifterPanelOpen  = true;
     state.inputLocked = true;
     state.clickTarget = null;
+    drifterPanel.setAttribute('aria-hidden', 'false');
     try { music.pause(); } catch(_) {}
 
     /* Round 2 Pass 1: accent the shared card with this drifter's own
@@ -2473,6 +2571,7 @@
       btn.addEventListener('click', closeDrifterPanel));
 
     requestAnimationFrame(() => requestAnimationFrame(() => drifterPanel.classList.add('open')));
+    requestAnimationFrame(() => drifterPanel.querySelector('.dp-close-x')?.focus());
 
     /* ── typewriter engine ── */
     const twContainer = drifterPanel.querySelector('#dp-typewriter-lines');
@@ -2658,7 +2757,13 @@
     drifterPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
     drifterPanelOpen     = false;
     drifterPanel.classList.remove('open');
+    drifterPanel.setAttribute('aria-hidden', 'true');
+    const previousFocus = drifterPanelPreviousFocus;
+    drifterPanelPreviousFocus = null;
     setTimeout(() => { state.inputLocked = false; }, PANEL_SLIDE_MS);
+    if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
+      try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+    }
     try { playUtsurobaMusic(); } catch(_) {}
   }
 
