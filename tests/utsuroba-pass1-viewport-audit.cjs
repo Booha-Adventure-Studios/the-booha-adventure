@@ -36,7 +36,7 @@ assert(runtime.includes('env(safe-area-inset-top,0px)') && runtime.includes('env
   'Utsuroba modal surfaces and rotate gate must respect safe areas');
 assert(!runtime.includes('max-height:calc(100vh - 36px)'),
   'Utsuroba modal cards must not size from the stale layout viewport');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-518'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-519'"),
   'Utsuroba viewport changes must bump the asset cache');
 assert(verify.includes('tests/utsuroba-pass1-viewport-audit.cjs'),
   'verify.sh must run the Utsuroba Pass 1 viewport audit');
