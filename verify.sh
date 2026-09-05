@@ -900,6 +900,13 @@ else
   bad "Utsuroba Pass 3 performance audit failed"
 fi
 
+echo "[90J/95] Pass 9 mobile/input regression audit"
+if node tests/mobile-input-regression-audit.cjs >/dev/null 2>&1; then
+  ok "Cross-world visible-viewport and mobile input contracts pass"
+else
+  bad "Pass 9 mobile/input regression audit failed"
+fi
+
 echo "[91/96] Grimmerglen Pass 10A release-entrance audit"
 if node tests/grimmerglen-pass10a-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen live entrance, locked arrow, sparkle, and popup contracts pass"
