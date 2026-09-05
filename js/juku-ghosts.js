@@ -39,7 +39,7 @@
     ['extra-boo-sky.webp', '#90c8f0'], ['extra-boo-violet.webp', '#a898e8']
   ];
   const IMG_DIR = 'assets/img/';
-  const TREE_IMG = IMG_DIR + 'tree-arch.png';
+  const TREE_IMG = IMG_DIR + 'tree-arch.webp';
   const SNACK_IMG = 'assets/feed/candy.webp';
   const GOLDS = ['#e8c46a', '#fff3c0'];
 

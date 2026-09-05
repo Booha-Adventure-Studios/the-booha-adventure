@@ -26,6 +26,6 @@ assert(maze.includes('requestMazeVisuals();\n  resizeCanvas();buildWanderers();s
 assert(!/const (homeworkImg|karasuki1Img|karasuki2Img|jukuImg)=new Image\(\);[^\n]*\.src=/.test(maze), 'tree art must not assign src at declaration');
 assert(!/const i = new Image\(\);\s*i\.src = src;/.test(maze), 'ghost preloads must not assign src inside the map');
 assert(sw.includes('booha-pages-2026-410'), 'service-worker page cache must include the current page bump');
-assert(sw.includes('booha-assets-2026-524'), 'service-worker asset cache must include the current Muenba canonical target bump');
+assert(sw.includes('booha-assets-2026-525'), 'service-worker asset cache must include the current Muenba canonical target bump');
 
 console.log('Maze 23B image-loading audit passed: ghost, tree, and popup art requests are deferred until needed.');
