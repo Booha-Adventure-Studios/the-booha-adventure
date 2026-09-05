@@ -157,7 +157,7 @@ for (const asset of ['grimmerglen-data.js', 'grimmerglen-typing.js', 'grimmergle
 }
 assert(serviceWorker.includes('`${BASE}/js/`'), 'service worker must cache Grimmerglen JS at runtime');
 assert(serviceWorker.includes('`${BASE}/assets/`'), 'service worker must cache Grimmerglen art at runtime');
-assert(/pages:\s+'booha-pages-2026-409'/.test(serviceWorker), 'page cache must be bumped for the performance pass');
+assert(/pages:\s+'booha-pages-2026-410'/.test(serviceWorker), 'page cache must be bumped for the performance pass');
 // Perf pass: the install-time precache used to force all 15 room
 // backgrounds, all 6 dance frames, all 5 Marietta poses, the 8
 // collectibles, and the bgm/dance/change audio into the cache in one shot

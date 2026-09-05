@@ -20,7 +20,7 @@ assert(maze.includes('worldPerf.enableOverlay'), 'Maze must expose the shared de
 assert(maze.includes('onTierChange'), 'Maze must resize immediately when the shared tier changes');
 assert(!maze.includes('mazePerfFrameCount'), 'Maze must retire the one-shot frame counter');
 assert(!maze.includes('mazePerfFirstTime'), 'Maze must retire the one-shot first-frame timestamp');
-assert(sw.includes('booha-pages-2026-409'), 'Maze HTML changes must bump the page cache');
+assert(sw.includes('booha-pages-2026-410'), 'Maze HTML changes must bump the page cache');
 assert(sw.includes('booha-assets-2026-523'), 'Maze/shared-runtime changes must bump the asset cache');
 
 console.log('Maze shared-performance audit passed: rolling monitor, low-tier scheduling, visibility/modal pause, and developer overlay are wired.');

@@ -1327,6 +1327,13 @@ else
   bad "Performance asset-budget audit failed"
 fi
 
+echo "[security] Liar Machine name HTML-safety audit"
+if node tests/liar-machine-name-safety-audit.cjs >/dev/null 2>&1; then
+  ok "Liar Machine live and stored-name HTML escaping contracts pass"
+else
+  bad "Liar Machine name HTML-safety audit failed"
+fi
+
 # ── Test inventory and manifest-wired current tests ─────────
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
