@@ -61,7 +61,7 @@ assert(source.includes('.muenba-lobby-box { overflow-x:hidden; }') && source.inc
   'responsive popup content must wrap instead of clipping at narrow widths');
 assert(source.includes('.muenba-lobby-box.is-case-board { width:min(100%,calc(100vw - 24px)); padding:24px 16px 22px; }'),
   'the de-cluttered case board must keep safe mobile insets');
-assert(source.includes('.muenba-mission-hint-toggle { min-height:42px; }'),
+assert(source.includes('.muenba-mission-hint-toggle { min-height:44px; }'),
   'the mission hint must remain a comfortable mobile touch target');
 assert(source.includes('.muenba-case-check-panel.is-locked'),
   'locked and unlocked check panels must have distinct visual states');

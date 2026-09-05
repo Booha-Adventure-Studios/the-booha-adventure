@@ -5260,7 +5260,7 @@
       .muenba-return-box ruby { ruby-position:over; }
       .muenba-return-box rt { font-size:.72em; }
       .muenba-return-actions { display:flex; gap:10px; justify-content:center; }
-      .muenba-return-actions button { flex:1; max-width:150px; padding:9px 14px; border-radius:999px; font:700 12px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      .muenba-return-actions button { flex:1; max-width:150px; min-height:48px; padding:9px 14px; border-radius:999px; font:700 12px ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
       #muenba-return-yes { border:1px solid rgba(156,203,182,.7); color:#e0f4e9; background:rgba(52,104,78,.28); box-shadow:0 0 16px rgba(93,162,124,.22); }
       #muenba-return-yes:hover, #muenba-return-yes:focus-visible { background:rgba(52,104,78,.44); outline:none; }
       #muenba-return-no { border:1px solid rgba(90,130,112,.5); color:#aec8bb; background:transparent; }
@@ -5407,7 +5407,7 @@
       /* Hide button (Pass 7) — always visible during free-roam, not a DEV
          tool. Matches the exit button's box language but sits bottom-left
          so it never competes with the DEV-only bottom-right room list. */
-      #muenba-hide { position:fixed; left:12px; bottom:78px; z-index:100; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:7px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
+      #muenba-hide { position:fixed; left:12px; bottom:78px; z-index:100; display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; min-height:44px; border:1px solid rgba(156,203,182,.72); border-radius:8px; background:rgba(0,8,12,.82); color:#e6fff1; padding:7px 16px; font:700 11px ui-monospace,monospace; letter-spacing:.05em; cursor:pointer; box-shadow:0 0 12px rgba(93,208,140,.28), inset 0 0 10px rgba(93,208,140,.08); animation:muenbaHideGlow 1.8s ease-in-out infinite; }
       #muenba-profile-link { position:fixed; right:max(18px, env(safe-area-inset-right, 0px)); bottom:max(30px, calc(env(safe-area-inset-bottom, 0px) + 22px)); z-index:100; display:none; place-items:center; box-sizing:border-box; width:clamp(44px, 6vw, 62px); height:clamp(44px, 6vw, 62px); padding:clamp(4px, .7vw, 7px); border:1px solid rgba(216,201,139,.66); border-radius:clamp(10px, 1.2vw, 14px); background:rgba(6,15,12,.86); box-shadow:0 0 18px rgba(216,201,139,.2), inset 0 0 14px rgba(216,201,139,.08); transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
       #muenba-profile-link.is-visible { display:grid; }
       #muenba-profile-link img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 8px rgba(216,201,139,.42)); }
@@ -5456,7 +5456,7 @@
       .muenba-rhythm-status.decoy { color:#ffe09b !important; }
       .muenba-rhythm-tier { margin:0 0 7px !important; color:#d8c98b !important; font:700 .68rem/1.35 ui-monospace,monospace !important; letter-spacing:.08em; text-align:center !important; text-transform:uppercase; }
       .muenba-rhythm-tier small { display:block; margin-top:3px; color:#a99d75; font:400 .72rem/1.3 Georgia,'Times New Roman',serif; letter-spacing:0; text-transform:none; }
-      .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:30px; height:30px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
+      .muenba-rhythm-help-button { position:absolute; top:10px; left:10px; z-index:8; display:grid; place-items:center; width:44px; height:44px; min-width:44px; min-height:44px; padding:0; border:1px solid rgba(216,201,139,.72); border-radius:50%; color:#fff5d5; background:rgba(40,32,12,.72); box-shadow:0 0 14px rgba(216,201,139,.28); font:900 17px/1 Georgia,'Times New Roman',serif; cursor:pointer; }
       .muenba-rhythm-help-button:hover, .muenba-rhythm-help-button:focus-visible { border-color:#fff1ae; background:rgba(126,111,48,.58); box-shadow:0 0 24px rgba(216,201,139,.48); outline:none; }
       .muenba-rhythm-help-box { border-color:rgba(216,201,139,.54); box-shadow:0 24px 80px rgba(0,0,0,.82),0 0 60px rgba(126,111,48,.22),inset 0 0 70px rgba(0,0,0,.58); }
       .muenba-rhythm-halloween-box { border-color:rgba(157,116,255,.7); background:radial-gradient(circle at 50% 8%,rgba(116,46,168,.22),transparent 42%),linear-gradient(145deg,rgba(19,11,43,.96),rgba(6,13,25,.97)); box-shadow:0 24px 80px rgba(0,0,0,.86),0 0 55px rgba(111,66,210,.25),inset 0 0 55px rgba(49,205,154,.08); }
@@ -6004,7 +6004,7 @@
       /* Pass 19D: let the English mission lead, with Japanese available as
          an intentional hint, and reduce the case-board scene to one eyebrow
          directly above the case title. */
-      .muenba-mission-hint-toggle { display:inline-flex; flex-direction:column; align-items:center; gap:2px; margin:4px 0 0; padding:7px 14px; border:1px solid rgba(216,201,139,.5); border-radius:999px; background:rgba(126,111,48,.12); color:#f1d78d; font:700 .72rem/1.25 ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
+      .muenba-mission-hint-toggle { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:44px; margin:4px 0 0; padding:7px 14px; border:1px solid rgba(216,201,139,.5); border-radius:999px; background:rgba(126,111,48,.12); color:#f1d78d; font:700 .72rem/1.25 ui-monospace,monospace; letter-spacing:.04em; cursor:pointer; }
       .muenba-mission-hint-toggle small { color:#a8cbbb; font:400 .76rem/1.3 Georgia,'Times New Roman',serif; letter-spacing:0; }
       .muenba-mission-hint-toggle:hover,
       .muenba-mission-hint-toggle:focus-visible { border-color:#fff0ad; background:rgba(126,111,48,.28); box-shadow:0 0 18px rgba(216,201,139,.2); outline:none; }
@@ -6029,7 +6029,7 @@
         .muenba-lobby-case-board { padding:17px 15px 16px; }
         .muenba-lobby-case-board h3 { font-size:clamp(1.15rem,6vw,1.45rem); line-height:1.25; }
         .muenba-nuppi-mission p { font-size:.9rem; line-height:1.6; }
-        .muenba-mission-hint-toggle { min-height:42px; }
+        .muenba-mission-hint-toggle { min-height:44px; }
         .muenba-room-hunt-target { padding:11px 12px 12px; }
         .muenba-room-hunt-target-portrait { flex-basis:64px; width:64px; height:64px; }
       }
@@ -7913,7 +7913,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
-      serviceWorkerCacheVersion: 'booha-assets-2026-520',
+      serviceWorkerCacheVersion: 'booha-assets-2026-521',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleMuenbaFrame();
