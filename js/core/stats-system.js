@@ -77,10 +77,21 @@ const BoohaStatsSystem = (() => {
   };
 
   // ── Daily play tracking ───────────────────────────────────────────────────
+  function getTokyoTodayKey() {
+    if (!window.CALENDAR || typeof window.CALENDAR.getTodayKey !== 'function') {
+      throw new Error('[Stats] calendar.js must load before stats-system.js');
+    }
+    return window.CALENDAR.getTodayKey();
+  }
+
   function trackDailyPlay() {
-    const today    = new Date().toDateString();
+    const today    = getTokyoTodayKey();
     const last     = get(KEYS.LAST_PLAYED_DATE);
     if (last !== today) {
+      // Legacy values written by Date#toDateString() intentionally count as a
+      // new boundary once. Their original timezone is unknowable, so guessing
+      // a conversion could silently lose a real play day. The next write
+      // replaces the value with the canonical Tokyo YYYY-MM-DD key.
       increment(KEYS.DAYS_PLAYED);
       set(KEYS.LAST_PLAYED_DATE, today);
     }
