@@ -2822,6 +2822,10 @@
         // A height change can alter the vertical crop on landscape phones;
         // keep the authored object layout inside the newly visible bounds.
         if (worldInitialized) constrainObjectLayoutToViewport();
+        const focusedInput = document.querySelector('#grimmerglen-marietta-panel .mgty-input:focus');
+        if (focusedInput) {
+          try { focusedInput.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (_) {}
+        }
       });
     };
     refresh();
@@ -3088,7 +3092,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-513',
+      serviceWorkerCacheVersion: 'booha-assets-2026-514',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleGrimmerglenFrame();
