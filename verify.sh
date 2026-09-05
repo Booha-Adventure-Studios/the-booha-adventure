@@ -845,6 +845,13 @@ else
   bad "Grimmerglen Pass 5 orientation audit failed"
 fi
 
+echo "[90F/95] Grimmerglen Pass 6 performance audit"
+if node tests/grimmerglen-pass6-performance-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen modal render-pause and adaptive performance contracts pass"
+else
+  bad "Grimmerglen Pass 6 performance audit failed"
+fi
+
 echo "[91/96] Grimmerglen Pass 10A release-entrance audit"
 if node tests/grimmerglen-pass10a-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen live entrance, locked arrow, sparkle, and popup contracts pass"

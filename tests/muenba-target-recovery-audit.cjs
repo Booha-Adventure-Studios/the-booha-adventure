@@ -34,7 +34,7 @@ assert(muenba.includes('activeHuntGhostId: knownGhost.id'),
   'hunt acceptance must persist the displayed ghost id');
 assert(muenba.includes('const huntAccepted = !pending && weekly.huntAccepted === true;'),
   'the room popup must use the canonical target and remain empty during handoff');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-515'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-516'"),
   'the target-recovery runtime must be shipped through the current asset cache');
 
 console.log('Muenba target recovery audit passed: legacy accepted hunts, handoff safety, completion cleanup, and cache delivery are covered.');
