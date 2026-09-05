@@ -147,7 +147,7 @@ const CURRENT_CACHES = {
   // cache-first JavaScript bundle.
   // Pass 2 adds adaptive DPR and visibility-aware Muenba rendering.
   // Grimmerglen Pass 1 mobile target sizing (js/grimmerglen.js).
-  assets: 'booha-assets-2026-517',
+  assets: 'booha-assets-2026-518',
   decks:  'booha-decks-2026-310',
 };
 
