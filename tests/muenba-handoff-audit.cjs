@@ -19,8 +19,8 @@ function section(startNeedle, endNeedle) {
 const caseSession = section('function beginCaptureSession(ghost)', '  function captureBox');
 assert(caseSession.includes("ghostRoleFor(ghost) !== 'hunt-target'"), 'only the assigned hunt ghost may open a case session');
 assert(caseSession.includes('const huntTarget = getMuenbaHuntTarget();'), 'a hunt capture must resolve the canonical target');
-assert(caseSession.includes('const caseData = huntTarget.caseData;'), 'a hunt capture must resolve its authored case context');
-assert(caseSession.includes("phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready'"), 'unfinished cases must open the reading flow before rhythm');
+assert(caseSession.includes('const caseData = huntTarget.caseData'), 'capture must resolve the hunt case before choosing the handoff');
+assert(caseSession.includes("phase: caseData ? 'case-intro' : 'ready'"), 'authored cases must open the reading flow before rhythm');
 assert(caseSession.includes('state.moving = false;'), 'opening a case must pause room movement');
 
 const dangerSession = section('function beginDangerEncounter(ghost', '  function renderDangerReady');

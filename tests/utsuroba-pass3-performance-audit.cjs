@@ -30,9 +30,9 @@ assert(runtime.includes('onClose: () => { state.inputLocked = false; scheduleUts
   'reading surfaces must explicitly resume the world loop on close');
 assert(runtime.includes('scheduleUtsurobaFrame();\n    try { playUtsurobaMusic(); }'),
   'drifter popup close must resume scheduling');
-assert(runtime.includes("serviceWorkerCacheVersion: 'booha-assets-2026-521'"),
+assert(runtime.includes("serviceWorkerCacheVersion: 'booha-assets-2026-522'"),
   'the performance overlay must report the current asset cache version');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-521'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-522'"),
   'Utsuroba performance changes must bump the asset cache');
 assert(verify.includes('tests/utsuroba-pass3-performance-audit.cjs'),
   'verify.sh must run the Utsuroba Pass 3 performance audit');

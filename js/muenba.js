@@ -2279,10 +2279,10 @@
     return target && target.ghost.id === ghostId ? target.caseData : null;
   }
 
-  // Weekly hunt availability is separate from lifetime case memory. Once a
-  // player has finished every authored tier, the next weekly ghost still
-  // needs a case-board preview; its completed memory record will correctly
-  // let the capture go straight to rhythm afterward.
+  // Weekly hunt availability is separate from lifetime case memory. Even
+  // when a selected memory tier is already complete, a weekly ghost still
+  // has authored English content. beginCaptureSession re-opens that case
+  // flow so the handoff is consistent across devices and viewport sizes.
   function nextMuenbaHuntCase() {
     const nextCase = nextMuenbaCase();
     if (nextCase) return nextCase;
@@ -2290,10 +2290,6 @@
     return weeklyGhost
       ? orderedMuenbaCases().find(caseData => caseData.ghostId === weeklyGhost.id) || null
       : null;
-  }
-
-  function caseRecordComplete(caseData) {
-    return caseModeIsComplete(caseData, getMuenbaReadingDifficulty());
   }
 
   function buildCaptureOverlay() {
@@ -2339,7 +2335,12 @@
     }
     captureOpen = true;
     if (captureOverlay) captureOverlay.setAttribute('aria-hidden', 'false');
-    const caseData = huntTarget.caseData;
+    // A legacy weekly pin may identify only the ghost after a completed tier
+    // was migrated. Recover the authored case here so that an otherwise valid
+    // target cannot fall through to the rhythm-only screen.
+    const caseData = huntTarget.caseData
+      || orderedMuenbaCases().find(candidate => candidate.ghostId === ghost.id)
+      || null;
     const caseDifficulty = caseData ? getMuenbaReadingDifficulty() : null;
     captureSession = {
       ghost,
@@ -2358,7 +2359,10 @@
       readGateRemainingMs: 0,
       readGateStartedAt: 0,
       readGatePaused: false,
-      phase: caseData && !caseRecordComplete(caseData) ? 'case-intro' : 'ready',
+      // Every authored ghost owns an English case. Replaying a completed
+      // tier still starts with that reading surface; only malformed/legacy
+      // targets with no authored case use the rhythm-only fallback.
+      phase: caseData ? 'case-intro' : 'ready',
       openedAt: performance.now()
     };
     state.clickTarget = null;
@@ -7913,7 +7917,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
-      serviceWorkerCacheVersion: 'booha-assets-2026-521',
+      serviceWorkerCacheVersion: 'booha-assets-2026-522',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleMuenbaFrame();
