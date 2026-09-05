@@ -418,6 +418,7 @@
   let orientationOverlay = null;
   let orientationMode = 'landscape';
   let orientationCheckTimer = 0;
+  let muenbaViewportRefreshFrame = 0;
   // Pass 8A: one explicit capture session owns the hand-off from the
   // wandering ghost to the future rhythm game. Keeping the phase here means
   // Pass 8B can attach timing/input without also changing movement, ghost AI,
@@ -5227,7 +5228,7 @@
     style.textContent = `
       html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
       body { font-family: system-ui, -apple-system, sans-serif; }
-      #muenba-app { position:relative; width:100vw; height:100vh; overflow:hidden; background:#000; }
+      #muenba-app { position:relative; width:var(--muenba-viewport-width,100vw); height:var(--muenba-viewport-height,100dvh); min-height:var(--muenba-viewport-height,100dvh); overflow:hidden; background:#000; }
       #muenba-stage { position:absolute; left:50%; top:50%; width:${WORLD_W}px; height:${WORLD_H}px; transform-origin:50% 50%; overflow:hidden; cursor:crosshair; }
       #muenba-room-layer, #muenba-room-tint, #muenba-atmosphere, #muenba-canvas, #muenba-fade { position:absolute; inset:0; }
       #muenba-room-layer { z-index:1; }
@@ -5236,7 +5237,7 @@
       #muenba-atmosphere { z-index:4; pointer-events:none; }
       #muenba-canvas { z-index:10; pointer-events:none; }
       #muenba-fade { z-index:30; background:#000; opacity:0; pointer-events:none; }
-      #muenba-rotate-overlay { display:none; position:fixed; inset:0; z-index:9999; background:#000; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:32px; box-sizing:border-box; }
+      #muenba-rotate-overlay { display:none; position:fixed; inset:0; z-index:9999; background:#000; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:max(32px,env(safe-area-inset-top,0px)) max(32px,env(safe-area-inset-right,0px)) max(32px,env(safe-area-inset-bottom,0px)) max(32px,env(safe-area-inset-left,0px)); box-sizing:border-box; overscroll-behavior:none; touch-action:none; }
       #muenba-rotate-overlay.is-visible { display:flex !important; }
       .muenba-rotate-phone { display:inline-flex; align-items:center; justify-content:center; color:#d8f4e6; transform-origin:center; animation:muenbaRotateHint 2.4s ease-in-out infinite; }
       @keyframes muenbaRotateHint { 0%,100% { transform:rotate(0deg); } 40%,60% { transform:rotate(-90deg); } }
@@ -6130,7 +6131,8 @@
   }
 
   function fitStage() {
-    const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
+    const { width, height } = currentMuenbaViewport();
+    const scale = Math.max(width / WORLD_W, height / WORLD_H);
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
   }
 
@@ -6140,14 +6142,15 @@
   // the stable fallback for browsers that do not expose it.
   function currentMuenbaViewport() {
     const viewport = window.visualViewport;
-    const width = Number(viewport?.width) || window.innerWidth;
-    const height = Number(viewport?.height) || window.innerHeight;
-    return { width, height };
+    const width = Number(viewport?.width) || Number(window.innerWidth) || WORLD_W;
+    const height = Number(viewport?.height) || Number(window.innerHeight) || WORLD_H;
+    return { width: Math.max(1, width), height: Math.max(1, height) };
   }
 
   function updateMuenbaViewportMetrics() {
-    const { height } = currentMuenbaViewport();
-    document.documentElement.style.setProperty('--muenba-viewport-height', `${Math.max(1, Math.round(height))}px`);
+    const { width, height } = currentMuenbaViewport();
+    document.documentElement.style.setProperty('--muenba-viewport-width', `${Math.round(width)}px`);
+    document.documentElement.style.setProperty('--muenba-viewport-height', `${Math.round(height)}px`);
   }
 
   function isMuenbaPhoneViewport() {
@@ -6240,14 +6243,22 @@
 
   function bindMuenbaOrientationController() {
     const refreshMuenbaViewport = () => {
-      updateMuenbaViewportMetrics();
-      scheduleMuenbaOrientationCheck();
+      if (muenbaViewportRefreshFrame) return;
+      muenbaViewportRefreshFrame = window.requestAnimationFrame(() => {
+        muenbaViewportRefreshFrame = 0;
+        updateMuenbaViewportMetrics();
+        fitStage();
+        if (roomTintCanvas && atmosphereCanvas && actorCanvas) resizeCanvas();
+        scheduleMuenbaOrientationCheck();
+      });
     };
     updateMuenbaViewportMetrics();
+    refreshMuenbaViewport();
     window.addEventListener('resize', refreshMuenbaViewport, { passive: true });
     window.addEventListener('orientationchange', refreshMuenbaViewport, { passive: true });
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', refreshMuenbaViewport, { passive: true });
+      window.visualViewport.addEventListener('scroll', refreshMuenbaViewport, { passive: true });
     }
     updateMuenbaOrientationGate();
   }
@@ -7892,7 +7903,6 @@
     setRoom(state.roomId, state.spawnId, null);
     state.navigationUnlocked = readMuenbaWeekly().huntAccepted === true;
     bindInput();
-    window.addEventListener('resize', () => { fitStage(); resizeCanvas(); });
     worldInitialized = true;
     worldPerf.enableOverlay(() => ({
       dpr: Math.min(perfTier === 'low' ? 1 : (TOUCH_DEVICE ? 1.5 : 2), Math.max(1, window.devicePixelRatio || 1)),
@@ -7903,7 +7913,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
-      serviceWorkerCacheVersion: 'booha-assets-2026-509',
+      serviceWorkerCacheVersion: 'booha-assets-2026-520',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleMuenbaFrame();
