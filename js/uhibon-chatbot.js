@@ -3,11 +3,11 @@ window.uhibonInit = function () {
   if (document.getElementById('uhibon-launcher')) return; // guard
   (function () {
   const IMG_BASE = 'assets/img/uhibon/';
-  const IMG_ICON = IMG_BASE + 'chat-uhi.png';
-  const IMG_OPEN = IMG_BASE + 'uhi-w.png';
-  const IMG_STUDENT = IMG_BASE + 'uhi-st.png';
-  const IMG_TALK_1 = IMG_BASE + 'uhi-t1.png';
-  const IMG_TALK_2 = IMG_BASE + 'uhi-t2.png';
+  const IMG_ICON = IMG_BASE + 'chat-uhi.webp';
+  const IMG_OPEN = IMG_BASE + 'uhi-w.webp';
+  const IMG_STUDENT = IMG_BASE + 'uhi-st.webp';
+  const IMG_TALK_1 = IMG_BASE + 'uhi-t1.webp';
+  const IMG_TALK_2 = IMG_BASE + 'uhi-t2.webp';
 
   const root = document.getElementById('uhibon-chat-root');
   if (!root) return;

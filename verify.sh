@@ -1292,6 +1292,13 @@ else
   bad "Pass 3 asset-weight audit failed"
 fi
 
+echo "[assets] Pass 5 production asset audit"
+if node tests/pass5-production-asset-audit.cjs >/dev/null 2>&1; then
+  ok "Live homework, Juku, Uhibon, and Utsuroba payload contracts pass"
+else
+  bad "Pass 5 production asset audit failed"
+fi
+
 echo "[profile/performance] Pass 6 hardening and budgets audit"
 if node tests/pass6-hardening-budget-audit.cjs >/dev/null 2>&1; then
   ok "Profile fail-soft rendering, day-record repaint, and performance budgets pass"

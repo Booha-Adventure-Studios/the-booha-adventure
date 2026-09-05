@@ -55,6 +55,12 @@ for (const file of converted) {
 // prevents the deployed image set from quietly accumulating new VP8L files.
 const losslessAllowlist = new Set([
   'utsuroba_icon.webp',
+  'tree-arch.webp',
+  'uhibon/chat-uhi.webp',
+  'uhibon/uhi-st.webp',
+  'uhibon/uhi-t1.webp',
+  'uhibon/uhi-t2.webp',
+  'uhibon/uhi-w.webp',
   'grimmerglen/booha_grimmerglen.webp',
   'grimmerglen/booha_grimmerglen_version_0.webp',
   'memory_box.webp',
@@ -108,6 +114,24 @@ for (const [relative, [width, height, hasAlpha]] of convertedRootDimensions) {
     '-of', 'csv=p=0:s=x', file,
   ], { encoding: 'utf8' }).trim().split('x').map(Number);
   assert.deepStrictEqual(dimensions, [width, height], `${relative} must preserve its exact canvas dimensions`);
+}
+
+const losslessDimensions = new Map([
+  ['utsuroba_icon.webp', [384, 576]],
+  ['tree-arch.webp', [1536, 1024]],
+  ['uhibon/chat-uhi.webp', [384, 384]],
+  ['uhibon/uhi-st.webp', [384, 384]],
+  ['uhibon/uhi-t1.webp', [384, 384]],
+  ['uhibon/uhi-t2.webp', [384, 384]],
+  ['uhibon/uhi-w.webp', [384, 384]],
+]);
+for (const [relative, [width, height]] of losslessDimensions) {
+  const file = path.join(imageRoot, relative);
+  const dimensions = childProcess.execFileSync('ffprobe', [
+    '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
+    '-of', 'csv=p=0:s=x', file,
+  ], { encoding: 'utf8' }).trim().split('x').map(Number);
+  assert.deepStrictEqual(dimensions, [width, height], `${relative} must keep its production display-resolution canvas`);
 }
 
 // Pass 9: use both local ceilings and a global ceiling. The file limits cover
