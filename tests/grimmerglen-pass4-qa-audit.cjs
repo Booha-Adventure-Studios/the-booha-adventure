@@ -88,7 +88,7 @@ assert(ticketAnswers.every(answer => /station/i.test(answer)), 'Ticket QA must r
 assert(ticketAnswers.every(answer => !/bike/i.test(answer)), 'Ticket QA must not regress to the bike lesson');
 assert(runtimeSource.includes('getGrimmerglenObjectsProgress'), 'runtime QA must retain weekly tier resolution');
 assert(runtimeSource.includes('memoryComplete, memoryTier'), 'runtime QA must retain tier-aware completion handling');
-assert(/assets:\s+'booha-assets-2026-521'/.test(serviceWorker), 'service worker must ship the current Muenba canonical target update');
+assert(/assets:\s+'booha-assets-2026-522'/.test(serviceWorker), 'service worker must ship the current Muenba canonical target update');
 assert(verify.includes('tests/grimmerglen-pass4-qa-audit.cjs'), 'verify.sh must run the Pass 4 QA audit');
 
 console.log('Grimmerglen Pass 4 QA audit passed: 24 tier records, answer/replay alignment, unique clues, production limits, reviewed difficulty notes, and Ticket copy are clean.');
