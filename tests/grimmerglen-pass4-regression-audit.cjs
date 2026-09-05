@@ -50,7 +50,7 @@ assert(saveFile.includes('worlds:            _defaultWeeklyWorlds()'),
   'weekly reset must continue to recreate transient world state');
 assert(/pages:\s+'booha-pages-2026-409'/.test(serviceWorker),
   'the current profile page cache must remain active');
-assert(/assets:\s+'booha-assets-2026-511'/.test(serviceWorker),
+assert(/assets:\s+'booha-assets-2026-512'/.test(serviceWorker),
   'the current runtime asset cache must remain active');
 assert(verify.includes('tests/grimmerglen-pass4-regression-audit.cjs'),
   'verify.sh must run the consolidated Grimmerglen regression audit');

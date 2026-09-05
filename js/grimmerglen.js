@@ -120,6 +120,7 @@
 
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
   let grimmerglenStageScale = 1;
+  let grimmerglenViewportRefreshFrame = 0;
   let rafHandle = null;
   let pageHidden = document.hidden;
   let worldInitialized = false;
@@ -2776,25 +2777,48 @@
     roomGlowCache.clear();
   }
 
+  // Pass 2: mobile browser chrome can leave window.innerHeight one resize
+  // behind the pixels the player can actually see. Keep the world fit and
+  // popup metrics on the same visible viewport measurement.
+  function currentGrimmerglenViewport() {
+    const viewport = window.visualViewport;
+    const width = Number(viewport?.width) || Number(window.innerWidth) || WORLD_W;
+    const height = Number(viewport?.height) || Number(window.innerHeight) || WORLD_H;
+    return { width: Math.max(1, width), height: Math.max(1, height) };
+  }
+
   function fitStage() {
-    const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
+    const { width, height } = currentGrimmerglenViewport();
+    const scale = Math.max(width / WORLD_W, height / WORLD_H);
     grimmerglenStageScale = scale;
     stage.style.transform = `translate(-50%, -50%) scale(${scale})`;
     stage.style.setProperty('--grimmerglen-profile-portal-size', `${responsiveWorldSize(70, 44)}px`);
   }
 
   function updateGrimmerglenViewportMetrics() {
+    const { width, height } = currentGrimmerglenViewport();
     const viewport = window.visualViewport;
-    const viewportHeight = Number(viewport?.height) || Number(window.innerHeight) || 1;
     const viewportOffsetTop = Number(viewport?.offsetTop) || 0;
-    const layoutHeight = Number(window.innerHeight) || viewportHeight;
-    const keyboardInset = Math.max(0, layoutHeight - viewportHeight - viewportOffsetTop);
-    document.documentElement.style.setProperty('--grimmerglen-viewport-height', `${Math.max(1, Math.round(viewportHeight))}px`);
+    const layoutHeight = Number(window.innerHeight) || height;
+    const keyboardInset = Math.max(0, layoutHeight - height - viewportOffsetTop);
+    document.documentElement.style.setProperty('--grimmerglen-viewport-width', `${Math.round(width)}px`);
+    document.documentElement.style.setProperty('--grimmerglen-viewport-height', `${Math.round(height)}px`);
     document.documentElement.style.setProperty('--grimmerglen-keyboard-inset', `${Math.round(keyboardInset)}px`);
   }
 
   function bindGrimmerglenViewportMetrics() {
-    const refresh = () => updateGrimmerglenViewportMetrics();
+    const refresh = () => {
+      if (grimmerglenViewportRefreshFrame) return;
+      grimmerglenViewportRefreshFrame = window.requestAnimationFrame(() => {
+        grimmerglenViewportRefreshFrame = 0;
+        updateGrimmerglenViewportMetrics();
+        fitStage();
+        resizeCanvas();
+        // A height change can alter the vertical crop on landscape phones;
+        // keep the authored object layout inside the newly visible bounds.
+        if (worldInitialized) constrainObjectLayoutToViewport();
+      });
+    };
     refresh();
     window.addEventListener('resize', refresh, { passive: true });
     if (window.visualViewport) {
@@ -2839,7 +2863,7 @@
     style.textContent = `
       html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#fff6fa; }
       body { font-family: system-ui, -apple-system, sans-serif; }
-      #grimmerglen-app { position:relative; width:100vw; height:100vh; overflow:hidden; background:#fff6fa; }
+      #grimmerglen-app { position:relative; width:var(--grimmerglen-viewport-width,100vw); height:var(--grimmerglen-viewport-height,100dvh); min-height:var(--grimmerglen-viewport-height,100dvh); overflow:hidden; background:#fff6fa; }
       #grimmerglen-stage { position:absolute; left:50%; top:50%; width:${WORLD_W}px; height:${WORLD_H}px; transform-origin:50% 50%; overflow:hidden; cursor:pointer; }
       #grimmerglen-room-layer, #grimmerglen-atmosphere, #grimmerglen-canvas, #grimmerglen-fade { position:absolute; inset:0; }
       #grimmerglen-room-layer { z-index:1; }
@@ -3021,20 +3045,13 @@
     state.navigationUnlocked = state.helpAccepted;
     injectStyles();
     buildApp();
-    bindGrimmerglenViewportMetrics();
     fitStage();
     resizeCanvas();
+    bindGrimmerglenViewportMetrics();
     if (state.spawnId === 'fromKarasuki') markGrimmerglenGardenVisited();
     setRoom(state.roomId, state.spawnId, null);
     restoreGrimmerglenCarriedObject();
     bindInput();
-    window.addEventListener('resize', () => {
-      fitStage();
-      resizeCanvas();
-      // Orientation changes can alter the cropped world area without a
-      // reload; preserve item layout while keeping every item reachable.
-      constrainObjectLayoutToViewport();
-    });
     worldInitialized = true;
     worldPerf.enableOverlay(() => ({
       dpr: Math.min(perfTier === 'low' ? 1 : (TOUCH_DEVICE ? 1.5 : 2), Math.max(1, window.devicePixelRatio || 1)),
@@ -3045,7 +3062,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-511',
+      serviceWorkerCacheVersion: 'booha-assets-2026-512',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleGrimmerglenFrame();
