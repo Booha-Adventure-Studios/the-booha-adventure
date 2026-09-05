@@ -38,7 +38,7 @@ assert(runtime.includes('requestAnimationFrame(() => document.getElementById(\'u
 assert(runtime.includes("requestAnimationFrame(() => gardenOverlay?.querySelector('.memory-garden-close')?.focus())")
   && runtime.includes("requestAnimationFrame(() => convergenceOverlay?.querySelector('.memory-convergence-close')?.focus())"),
   'memory popups must focus their close control on open');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-519'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-520'"),
   'Utsuroba popup changes must bump the asset cache');
 assert(verify.includes('tests/utsuroba-pass2-popup-audit.cjs'),
   'verify.sh must run the Utsuroba Pass 2 popup audit');
