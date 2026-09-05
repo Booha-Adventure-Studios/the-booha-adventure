@@ -1,9 +1,8 @@
-
 #!/usr/bin/env bash
 # ============================================================
 #  The Booha Adventure — pre-deploy verification
 #  Usage: ./verify.sh   (from repo root, before every push)
-#  Exit 0 = safe to deploy. Exit 1 = fix something first.
+#  Exit 0 = automated checks passed. Exit 1 = fix something first.
 # ============================================================
 set -u
 cd "$(dirname "$0")"
@@ -16,12 +15,24 @@ warn() { echo "  ⚠️  $1"; WARN=$((WARN+1)); }
 echo "🔍 Booha Adventure pre-deploy check"
 echo "───────────────────────────────────"
 
-# ── 1. JSON validity (non-empty files must parse) ────────────
+# ── 1. JSON validity with explicit empty-file whitelist ──────
 echo "[1/36] Content JSON validity"
 json_bad=0; json_empty=0; json_ok=0
+allowed_empty_json() {
+  case "$1" in
+    data/core-games.json|data/maze.json) return 0 ;;
+    *) return 1 ;;
+  esac
+}
 while IFS= read -r f; do
-  if [ "$(wc -c < "$f")" -le 2 ]; then
-    json_empty=$((json_empty+1))
+  compact=$(tr -d '[:space:]' < "$f")
+  if [ -z "$compact" ]; then
+    if allowed_empty_json "$f"; then
+      json_empty=$((json_empty+1))
+    else
+      bad "unexpected empty JSON: $f"
+      json_bad=$((json_bad+1))
+    fi
   elif python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f" 2>/dev/null; then
     json_ok=$((json_ok+1))
   else
@@ -30,7 +41,7 @@ while IFS= read -r f; do
   fi
 done < <(find content data -name "*.json" 2>/dev/null)
 if [ $json_bad -eq 0 ]; then
-  ok "$json_ok JSON files valid ($json_empty empty placeholders skipped)"
+  ok "$json_ok JSON files valid ($json_empty explicitly whitelisted empty placeholders)"
 fi
 
 # ── 2. Service worker manifest: every CORE_FILES path exists ─
@@ -1312,6 +1323,11 @@ fi
 # ── Test inventory and manifest-wired current tests ─────────
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
+if node tests/verification-script-audit.cjs >/dev/null 2>&1; then
+  ok "verify.sh shebang, empty-JSON whitelist, and failure exit contracts pass"
+else
+  bad "verification-script hardening audit failed"
+fi
 if node tests/verification-manifest-audit.cjs >/dev/null 2>&1; then
   ok "all tests are wired or explicitly classified in the verification manifest"
 else
@@ -1346,5 +1362,5 @@ if [ $FAIL -gt 0 ]; then
   echo "🚫 DO NOT DEPLOY"
   exit 1
 fi
-echo "🚀 Safe to deploy"
+echo "🚀 Automated checks passed"
 exit 0
