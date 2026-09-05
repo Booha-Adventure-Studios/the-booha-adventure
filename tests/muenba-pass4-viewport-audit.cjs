@@ -28,9 +28,9 @@ assert(!runtime.includes("window.addEventListener('resize', () => { fitStage(); 
 assert(runtime.includes('env(safe-area-inset-top,0px)')
   && runtime.includes('overscroll-behavior:none; touch-action:none;'),
   'Muenba rotate guidance must respect safe areas and own the gesture');
-assert(runtime.includes("serviceWorkerCacheVersion: 'booha-assets-2026-520'"),
+assert(runtime.includes("serviceWorkerCacheVersion: 'booha-assets-2026-521'"),
   'Muenba performance telemetry must report the current asset cache version');
-assert(serviceWorker.includes("assets: 'booha-assets-2026-520'"),
+assert(serviceWorker.includes("assets: 'booha-assets-2026-521'"),
   'Muenba viewport changes must bump the asset cache');
 assert(verify.includes('tests/muenba-pass4-viewport-audit.cjs'),
   'verify.sh must run the Muenba Pass 4 viewport audit');
