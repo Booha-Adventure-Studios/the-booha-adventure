@@ -31,7 +31,8 @@
   const GHOST_ART_CROP = { x: 256, y: 256, size: 1536 };
   const CENTER_X = WORLD_W / 2;
   const CENTER_Y = WORLD_H / 2;
-  const BASE_SPEED = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768 ? 8 : 5.5;
+  const INITIAL_VIEWPORT_WIDTH = Number(window.visualViewport?.width) || Number(window.innerWidth) || 0;
+  const BASE_SPEED = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && INITIAL_VIEWPORT_WIDTH < 768 ? 8 : 5.5;
   const TARGET_DT = 1000 / 60;
   const FADE_MS = 600;
   const TRANSITION_COOLDOWN_MS = 1400;
@@ -7917,7 +7918,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
-      serviceWorkerCacheVersion: 'booha-assets-2026-523',
+      serviceWorkerCacheVersion: 'booha-assets-2026-524',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleMuenbaFrame();

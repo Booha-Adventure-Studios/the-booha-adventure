@@ -12,8 +12,9 @@ const end = runtime.indexOf('function drawGrimmerglenObjects(', start);
 assert(start >= 0 && end > start, 'mobile object placement helpers must remain discoverable');
 const placement = runtime.slice(start, end);
 
-assert(placement.includes('const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H)'),
-  'object safety bounds must follow the same cover scale as the world stage');
+assert(placement.includes('const { width, height } = currentGrimmerglenViewport();') &&
+       placement.includes('const scale = Math.max(width / WORLD_W, height / WORLD_H)'),
+  'object safety bounds must follow the same visible-viewport cover scale as the world stage');
 assert(placement.includes('visibleWorldW') && placement.includes('visibleWorldH'),
   'object safety bounds must calculate the visible world crop');
 assert(placement.includes('responsiveWorldRadius(OBJECT_HIT_R, 44)') && placement.includes('responsiveWorldSize(OBJECT_DRAW_SIZE, 32)'),

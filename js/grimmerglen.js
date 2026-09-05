@@ -30,7 +30,8 @@
   const BOOHA_R = 26;
   const CENTER_X = WORLD_W / 2;
   const CENTER_Y = WORLD_H / 2;
-  const BASE_SPEED = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768 ? 8 : 5.5;
+  const INITIAL_VIEWPORT_WIDTH = Number(window.visualViewport?.width) || Number(window.innerWidth) || 0;
+  const BASE_SPEED = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && INITIAL_VIEWPORT_WIDTH < 768 ? 8 : 5.5;
   const TARGET_DT = 1000 / 60;
   const FADE_MS = 600;
   const TRANSITION_COOLDOWN_MS = 1400;
@@ -918,9 +919,10 @@
   }
 
   function getObjectViewportBounds() {
-    const scale = Math.max(window.innerWidth / WORLD_W, window.innerHeight / WORLD_H);
-    const visibleWorldW = Math.min(WORLD_W, window.innerWidth / scale);
-    const visibleWorldH = Math.min(WORLD_H, window.innerHeight / scale);
+    const { width, height } = currentGrimmerglenViewport();
+    const scale = Math.max(width / WORLD_W, height / WORLD_H);
+    const visibleWorldW = Math.min(WORLD_W, width / scale);
+    const visibleWorldH = Math.min(WORLD_H, height / scale);
     // Keep both the drawn object and its pickup radius inside the visible
     // crop. This matters on landscape phones, where fitStage intentionally
     // fills the viewport and trims a little from the top and bottom.
