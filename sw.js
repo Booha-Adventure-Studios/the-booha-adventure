@@ -146,8 +146,8 @@ const CURRENT_CACHES = {
   // Adventure-log Pass 1 adds fail-soft weekly rendering; invalidate the
   // cache-first JavaScript bundle.
   // Pass 2 adds adaptive DPR and visibility-aware Muenba rendering.
-  // Grimmerglen profile doorway mobile touch fix (js/grimmerglen.js).
-  assets: 'booha-assets-2026-510',
+  // Grimmerglen Pass 1 mobile target sizing (js/grimmerglen.js).
+  assets: 'booha-assets-2026-511',
   decks:  'booha-decks-2026-310',
 };
 
