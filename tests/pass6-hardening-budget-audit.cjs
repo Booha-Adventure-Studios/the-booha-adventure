@@ -64,7 +64,7 @@ assert(!muenba.includes("const music = new Audio('assets/img/muenba/Muenba_BGM.m
 
 // Pass 5 remains part of the enforced regression surface, including DPR caps
 // and hidden-page suspension, and this pass must invalidate cache-first JS.
-assert(sw.includes("assets: 'booha-assets-2026-520'"), 'Pass 6 JS changes must bump the asset cache');
+assert(sw.includes("assets: 'booha-assets-2026-521'"), 'Pass 6 JS changes must bump the asset cache');
 assert(read('tests/adaptive-low-power-audit.cjs').includes('document.hidden'), 'Pass 5 hidden-page audit must remain in the suite');
 assert(read('tests/adaptive-low-power-audit.cjs').includes('mazeDprCap'), 'Pass 5 DPR-cap audit must remain in the suite');
 

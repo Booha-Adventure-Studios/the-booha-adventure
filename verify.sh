@@ -698,6 +698,13 @@ else
   bad "Muenba Pass 4 viewport audit failed"
 fi
 
+echo "[74B/76] Muenba Pass 5 touch-target audit"
+if node tests/muenba-pass5-touch-target-audit.cjs >/dev/null 2>&1; then
+  ok "Muenba final mobile touch-target contracts pass"
+else
+  bad "Muenba Pass 5 touch-target audit failed"
+fi
+
 echo "[75/75] Muenba scream asset audit"
 if node tests/muenba-scream-assets-audit.cjs >/dev/null 2>&1; then
   ok "Muenba scream assets pass"
