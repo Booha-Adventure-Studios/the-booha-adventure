@@ -866,6 +866,13 @@ else
   bad "Utsuroba Pass 2 popup audit failed"
 fi
 
+echo "[90I/95] Utsuroba Pass 3 performance audit"
+if node tests/utsuroba-pass3-performance-audit.cjs >/dev/null 2>&1; then
+  ok "Utsuroba touch DPR and modal frame-loop contracts pass"
+else
+  bad "Utsuroba Pass 3 performance audit failed"
+fi
+
 echo "[91/96] Grimmerglen Pass 10A release-entrance audit"
 if node tests/grimmerglen-pass10a-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen live entrance, locked arrow, sparkle, and popup contracts pass"

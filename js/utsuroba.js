@@ -11,7 +11,8 @@
   const GHOST_R         = 26;
   const GHOST_RADIUS    = 18;
 
-  const IS_PHONE        = ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.innerWidth < 768;
+  const isTouchDevice   = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  const IS_PHONE        = isTouchDevice && window.innerWidth < 768;
   const BASE_SPEED      = IS_PHONE ? 8.0 : 5.5;
 
   const FADE_MS         = 600;
@@ -34,8 +35,9 @@
   let pageHidden   = document.hidden;
   let worldInitialized = false;
 
-  const MAX_DPR = Math.min(window.devicePixelRatio || 1, 2);
-  let canvasDpr    = MAX_DPR;
+  const MAX_DPR       = Math.min(window.devicePixelRatio || 1, 2);
+  const TOUCH_MAX_DPR = Math.min(MAX_DPR, 1.5);
+  let canvasDpr       = MAX_DPR;
 
   const LOW_POWER_HINT = Boolean(
     (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
@@ -54,7 +56,6 @@
     },
   });
 
-  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   const NPP_RADIUS    = isTouchDevice ? 58 : 40;
 
   const ARRIVAL_ARROW_DELAY_MS        = 2000;
@@ -1535,6 +1536,7 @@
   function openExitPop() {
     if (!exitPopOverlay) return;
     exitPopPreviousFocus = document.activeElement;
+    pauseUtsurobaFrameLoop();
     exitPopOverlay.style.display = 'flex';
     exitPopOverlay.style.background = 'rgba(0,0,0,0.88)';
     exitPopOverlay.setAttribute('aria-hidden', 'false');
@@ -1553,6 +1555,7 @@
       if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
         try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
       }
+      scheduleUtsurobaFrame();
     }, 350);
   }
   function doExitToKarasuki() {
@@ -1724,11 +1727,13 @@
     if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
       try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
     }
+    scheduleUtsurobaFrame();
   }
 
   function openUtsurobaProfilePopup() {
     if (utsuProfileOpen || state.roomId !== DATA.startRoom || !utsuProfileOverlay) return;
     utsuProfilePreviousFocus = document.activeElement;
+    pauseUtsurobaFrameLoop();
     utsuProfileOpen = true;
     state.inputLocked = true;
     utsuProfileOverlay.classList.add('is-open');
@@ -1879,6 +1884,7 @@
     if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
       try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
     }
+    scheduleUtsurobaFrame();
   }
 
   function closeMemoryGarden() {
@@ -1891,6 +1897,7 @@
     if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
       try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
     }
+    scheduleUtsurobaFrame();
   }
 
   function openMemoryGarden() {
@@ -1898,6 +1905,7 @@
     const garden = DATA.readingConvergence?.garden;
     if (!garden) return;
     gardenPreviousFocus = document.activeElement;
+    pauseUtsurobaFrameLoop();
     gardenOpen = true;
     state.inputLocked = true;
     gardenOverlay = document.createElement('div');
@@ -1923,6 +1931,7 @@
   async function openMemoryConvergence() {
     if (convergenceOpen || !allRequiredEchoesRestoredThisWeek() || drifterPanelOpen || readingJournalOpen) return;
     convergencePreviousFocus = document.activeElement;
+    pauseUtsurobaFrameLoop();
     convergenceOpen = true;
     state.inputLocked = true;
     convergenceOverlay = document.createElement('div');
@@ -2107,6 +2116,7 @@
     state.inputLocked = false;
     if (modalPreviousFocus && typeof modalPreviousFocus.focus === 'function') modalPreviousFocus.focus();
     modalPreviousFocus = null;
+    scheduleUtsurobaFrame();
   }
 
   function trapOverlayFocus(container, event) {
@@ -2133,6 +2143,7 @@
     const progress = weeklyReadingChallengeProgress();
     if (!progress.challenge) return;
     modalPreviousFocus = document.activeElement;
+    pauseUtsurobaFrameLoop();
     weeklyChallengeOpen = true;
     state.inputLocked = true;
     weeklyChallengeOverlay = document.createElement('div');
@@ -2203,6 +2214,7 @@
     state.inputLocked = false;
     if (modalPreviousFocus && typeof modalPreviousFocus.focus === 'function') modalPreviousFocus.focus();
     modalPreviousFocus = null;
+    scheduleUtsurobaFrame();
   }
 
   async function openReadingReview(entry) {
@@ -2213,6 +2225,7 @@
     };
     closeReadingJournal();
     if (!window.UtsurobaReading) return;
+    pauseUtsurobaFrameLoop();
     const adaptiveMode = Number(reviewEntry.masteryLevel) >= 1 ? 'independent' : 'guided';
     window.UtsurobaReading.start({
       drifter,
@@ -2220,7 +2233,7 @@
       skipOnboarding: true,
       adaptiveMode,
       quest: { episodeId: reviewEntry.episodeId, readingDifficulty: readingMode(reviewEntry.difficulty || 'start'), readingIndex: 0, mechanicIndex: 0, postcard: reviewEntry.postcard || null },
-      onClose: () => { state.inputLocked = false; },
+      onClose: () => { state.inputLocked = false; scheduleUtsurobaFrame(); },
       onReadingEvent: recordWeeklyReadingEvent,
       onReviewComplete: result => recordReadingReview(reviewEntry, result),
       onPostcardSave: postcard => recordReadingPostcard(reviewEntry, postcard),
@@ -2293,6 +2306,7 @@
   async function openReadingJournal() {
     if (readingJournalOpen || weeklyChallengeOpen || drifterPanelOpen || state.celebrating) return;
     modalPreviousFocus = document.activeElement;
+    pauseUtsurobaFrameLoop();
     readingJournalOpen = true;
     state.inputLocked = true;
     const R = UtsuFurigana.rb;
@@ -2440,6 +2454,7 @@
 
     if (window.UtsuSfx) window.UtsuSfx.panelOpen();
     drifterPanelPreviousFocus = document.activeElement;
+    pauseUtsurobaFrameLoop();
     drifterPanelOpen  = true;
     state.inputLocked = true;
     state.clickTarget = null;
@@ -2764,6 +2779,7 @@
     if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
       try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
     }
+    scheduleUtsurobaFrame();
     try { playUtsurobaMusic(); } catch(_) {}
   }
 
@@ -2788,6 +2804,7 @@
   function startReadingChallenge(drifter, quest) {
     if (!window.UtsurobaReading) return false;
     closeDrifterPanel();
+    pauseUtsurobaFrameLoop();
     try { music.pause(); } catch (_) {}
     window.UtsurobaReading.start({
       drifter,
@@ -2799,6 +2816,7 @@
       onReadingEvent: recordWeeklyReadingEvent,
       onClose: () => {
         state.inputLocked = false;
+        scheduleUtsurobaFrame();
         setTimeout(() => {
           if (!state.celebrating && !state.exitingToKarasuki) {
             try { playUtsurobaMusic(); } catch(_) {}
@@ -2977,8 +2995,12 @@
   /* ═══════════════════════════════════════════
      CANVAS / FIT
   ═══════════════════════════════════════════ */
+  function targetCanvasDpr() {
+    if (perfTier === 'low') return 1;
+    return isTouchDevice ? TOUCH_MAX_DPR : MAX_DPR;
+  }
   function resizeCanvas() {
-    const dpr = perfTier === 'low' ? 1 : MAX_DPR;
+    const dpr = targetCanvasDpr();
     canvasDpr = dpr;
     canvas.style.width = WORLD_W+'px'; canvas.style.height = WORLD_H+'px';
     canvas.width  = Math.round(WORLD_W*dpr);
@@ -3703,18 +3725,33 @@
       || isExitPopOpen() || utsuProfileOpen;
   }
 
+  // Pass 3: DOM popups do not need the world canvas to keep repainting behind
+  // them. Cancel the pending frame immediately and let close paths schedule a
+  // fresh frame when the world is visible again.
+  function pauseUtsurobaFrameLoop() {
+    if (rafHandle) cancelAnimationFrame(rafHandle);
+    rafHandle = null;
+    lastTickTime = 0;
+    worldPerf.pause();
+  }
+
   /* ═══════════════════════════════════════════
      MAIN LOOP
   ═══════════════════════════════════════════ */
   function scheduleUtsurobaFrame() {
-    if (worldInitialized && !pageHidden && !rafHandle) rafHandle = requestAnimationFrame(tick);
+    if (worldInitialized && !pageHidden && !rafHandle && !staticFrameOverlayOpen() && !state.exitingToKarasuki) {
+      rafHandle = requestAnimationFrame(tick);
+    }
   }
 
   function tick(now) {
     rafHandle = null;
     if (pageHidden) return;
-    if (staticFrameOverlayOpen() || state.exitingToKarasuki) worldPerf.pause();
-    else updatePerfTier(now, !state.transitioning && !state.celebrating);
+    if (staticFrameOverlayOpen() || state.exitingToKarasuki) {
+      pauseUtsurobaFrameLoop();
+      return;
+    }
+    updatePerfTier(now, !state.transitioning && !state.celebrating);
     const dt = Math.min(50, Math.max(8, now-(lastTickTime||now)));
     lastTickTime = now; SPEED = BASE_SPEED * (dt/TARGET_DT);
     if (!anyModalOpen()) {
@@ -3726,7 +3763,7 @@
         if (unlocked) { const exit = getNPPExit(now); if (exit) { state.clickTarget=null; state.moving=false; transitionTo(exit); } }
       }
     }
-    if (!staticFrameOverlayOpen() && worldPerf.shouldRender(now)) drawFrame(now);
+    if (worldPerf.shouldRender(now)) drawFrame(now);
     scheduleUtsurobaFrame();
   }
 
@@ -3830,7 +3867,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-509',
+      serviceWorkerCacheVersion: 'booha-assets-2026-519',
       averageFps: worldPerf.metrics().averageFps,
     }));
     worldInitialized = true;
