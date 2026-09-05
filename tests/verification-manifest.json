@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Classification for every test script that is not directly named by verify.sh.",
+  "classificationRule": "A tests/*.cjs file named directly by verify.sh is current. Exceptions below record orphaned scripts that need an explicit classification.",
+  "statuses": {
+    "verify": "Current automated test; verify.sh runs it through the manifest extras block.",
+    "manual": "Human-run utility or manual QA support; not part of automated verification.",
+    "superseded": "Historical test whose assumptions no longer match the current implementation; retained for audit history.",
+    "obsolete": "No longer relevant to the production surface; retained until an approved cleanup pass.",
+    "uncertain": "Needs owner review before it can be treated as current or retired."
+  },
+  "exceptions": [
+    {
+      "path": "tests/adventure-collection.test.cjs",
+      "status": "verify",
+      "reason": "Current adventure-profile collection contract."
+    },
+    {
+      "path": "tests/feed-booha-reactions.test.cjs",
+      "status": "verify",
+      "reason": "Current Feed Booha reaction-hop unit test."
+    },
+    {
+      "path": "tests/feed-bounce-collision.test.cjs",
+      "status": "verify",
+      "reason": "Current Feed Booha swept-collision unit test."
+    },
+    {
+      "path": "tests/feed-bounce-combo.test.cjs",
+      "status": "verify",
+      "reason": "Current Feed Booha bounce-combo unit test."
+    },
+    {
+      "path": "tests/feed-new-best.test.cjs",
+      "status": "verify",
+      "reason": "Current Feed Booha new-best unit test."
+    },
+    {
+      "path": "tests/feed-rescue-fx.test.cjs",
+      "status": "verify",
+      "reason": "Current Feed Booha rescue-effects unit test."
+    },
+    {
+      "path": "tests/feed-star-rating.test.cjs",
+      "status": "verify",
+      "reason": "Current Feed Booha star-rating unit test."
+    },
+    {
+      "path": "tests/feed-visual-polish.test.cjs",
+      "status": "verify",
+      "reason": "Current Feed Booha visual-polish unit test."
+    },
+    {
+      "path": "tests/invaders-pass1.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders pass 1 contract."
+    },
+    {
+      "path": "tests/invaders-pass11.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders pass 11 contract."
+    },
+    {
+      "path": "tests/invaders-pass12.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders bilingual-copy contract."
+    },
+    {
+      "path": "tests/invaders-pass3.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders pass 3 contract."
+    },
+    {
+      "path": "tests/invaders-pass4.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders pass 4 contract."
+    },
+    {
+      "path": "tests/invaders-pass5.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders pass 5 contract."
+    },
+    {
+      "path": "tests/invaders-pass6.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders pass 6 contract."
+    },
+    {
+      "path": "tests/invaders-pass7.test.cjs",
+      "status": "verify",
+      "reason": "Current Booha Invaders pass 7 contract."
+    },
+    {
+      "path": "tests/juku-smoke.test.cjs",
+      "status": "verify",
+      "reason": "Current Juku smoke and audio-preflight contract."
+    },
+    {
+      "path": "tests/karasuki-wanderer-collection.test.cjs",
+      "status": "verify",
+      "reason": "Current Karasuki collection and visit-state contract."
+    },
+    {
+      "path": "tests/output-profile-network.test.cjs",
+      "status": "verify",
+      "reason": "Current Output profile-network contract."
+    },
+    {
+      "path": "tests/profile-highlights.test.cjs",
+      "status": "verify",
+      "reason": "Current profile highlights contract."
+    },
+    {
+      "path": "tests/profile-language.test.cjs",
+      "status": "verify",
+      "reason": "Current profile language and accessibility contract."
+    },
+    {
+      "path": "tests/utsuroba-dialogue.test.cjs",
+      "status": "verify",
+      "reason": "Current Utsuroba ambient-dialogue contract."
+    },
+    {
+      "path": "tests/weekly-world-gate.test.cjs",
+      "status": "verify",
+      "reason": "Current weekly Output-world gate contract."
+    },
+    {
+      "path": "tests/invaders-pass10.test.cjs",
+      "status": "superseded",
+      "reason": "Mute behavior assertion expects candy-SFX stopping that the current engine does not implement."
+    },
+    {
+      "path": "tests/invaders-pass2.test.cjs",
+      "status": "superseded",
+      "reason": "Historical weapon/audio assertions no longer match the current Invaders engine."
+    },
+    {
+      "path": "tests/invaders-pass8.test.cjs",
+      "status": "superseded",
+      "reason": "Historical candy-SFX implementation assertions no longer match the current engine."
+    },
+    {
+      "path": "tests/invaders-pass9.test.cjs",
+      "status": "superseded",
+      "reason": "Historical save-menu wiring assertion no longer matches the current page wiring."
+    },
+    {
+      "path": "tests/karasuki-arrival.test.cjs",
+      "status": "superseded",
+      "reason": "Historical arrival-hook assertion no longer matches the current Karasuki arrival implementation."
+    },
+    {
+      "path": "tests/serve-preview.cjs",
+      "status": "manual",
+      "reason": "Local preview-server utility used by browser/manual QA, not a test."
+    }
+  ]
+}
