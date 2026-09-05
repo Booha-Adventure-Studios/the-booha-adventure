@@ -810,6 +810,13 @@ else
   bad "Grimmerglen Pass 9J mobile object visibility audit failed"
 fi
 
+echo "[90A/95] Grimmerglen Pass 1 mobile target audit"
+if node tests/grimmerglen-pass1-mobile-target-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen small-device visual and touch-target contracts pass"
+else
+  bad "Grimmerglen Pass 1 mobile target audit failed"
+fi
+
 echo "[91/96] Grimmerglen Pass 10A release-entrance audit"
 if node tests/grimmerglen-pass10a-audit.cjs >/dev/null 2>&1; then
   ok "Grimmerglen live entrance, locked arrow, sparkle, and popup contracts pass"
