@@ -121,6 +121,7 @@
   let app, stage, roomLayer, atmosphereCanvas, atmosphereCtx, actorCanvas, actorCtx, fadeEl, currentBg;
   let grimmerglenStageScale = 1;
   let grimmerglenViewportRefreshFrame = 0;
+  let grimmerglenRotateOverlay = null;
   let rafHandle = null;
   let pageHidden = document.hidden;
   let worldInitialized = false;
@@ -2792,6 +2793,23 @@
     return { width: Math.max(1, width), height: Math.max(1, height) };
   }
 
+  // Pass 5: Grimmerglen is a landscape world on phone-sized touch devices,
+  // but tablets and desktop windows should not be blocked by a broad CSS
+  // portrait rule. Use the same visible viewport as Pass 2 so browser chrome
+  // and rotation update the gate together.
+  function isGrimmerglenPhoneViewport() {
+    const { width, height } = currentGrimmerglenViewport();
+    return TOUCH_DEVICE && Math.min(width, height) <= 540;
+  }
+
+  function updateGrimmerglenOrientationGate() {
+    if (!grimmerglenRotateOverlay) return;
+    const { width, height } = currentGrimmerglenViewport();
+    const needsLandscape = isGrimmerglenPhoneViewport() && height > width;
+    grimmerglenRotateOverlay.classList.toggle('is-visible', needsLandscape);
+    grimmerglenRotateOverlay.setAttribute('aria-hidden', String(!needsLandscape));
+  }
+
   function fitStage() {
     const { width, height } = currentGrimmerglenViewport();
     const scale = Math.max(width / WORLD_W, height / WORLD_H);
@@ -2817,6 +2835,7 @@
       grimmerglenViewportRefreshFrame = window.requestAnimationFrame(() => {
         grimmerglenViewportRefreshFrame = 0;
         updateGrimmerglenViewportMetrics();
+        updateGrimmerglenOrientationGate();
         fitStage();
         resizeCanvas();
         // A height change can alter the vertical crop on landscape phones;
@@ -2854,10 +2873,14 @@
     document.body.replaceChildren(app);
     buildGrimmerglenProfilePortal();
 
-    const rotateOverlay = document.createElement('div');
-    rotateOverlay.id = 'grimmerglen-rotate-overlay';
-    rotateOverlay.innerHTML = '<span class="grimmerglen-rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="grimmerglen-rotate-bar"></div><p class="grimmerglen-rotate-title">Turn your phone sideways!</p><p class="grimmerglen-rotate-sub">Explore Grimmerglen in landscape mode.<br>スマホを<ruby>横向<rt>よこむ</rt></ruby>きにしてね。</p>';
-    document.body.appendChild(rotateOverlay);
+    grimmerglenRotateOverlay = document.createElement('div');
+    grimmerglenRotateOverlay.id = 'grimmerglen-rotate-overlay';
+    grimmerglenRotateOverlay.setAttribute('role', 'status');
+    grimmerglenRotateOverlay.setAttribute('aria-live', 'polite');
+    grimmerglenRotateOverlay.setAttribute('aria-hidden', 'true');
+    grimmerglenRotateOverlay.innerHTML = '<span class="grimmerglen-rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="grimmerglen-rotate-bar"></div><p class="grimmerglen-rotate-title">Turn your phone sideways!</p><p class="grimmerglen-rotate-sub">Explore Grimmerglen in landscape mode.<br>スマホを<ruby>横向<rt>よこむ</rt></ruby>きにしてね。</p>';
+    document.body.appendChild(grimmerglenRotateOverlay);
+    updateGrimmerglenOrientationGate();
 
     atmosphereCtx = atmosphereCanvas.getContext('2d');
     actorCtx = actorCanvas.getContext('2d');
@@ -2880,8 +2903,8 @@
       #grimmerglen-atmosphere { z-index:4; pointer-events:none; }
       #grimmerglen-canvas { z-index:10; pointer-events:none; }
       #grimmerglen-fade { z-index:30; background:#fff; opacity:0; pointer-events:none; }
-      #grimmerglen-rotate-overlay { display:none; position:fixed; inset:0; z-index:9999; background:#fff0f6; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:32px; box-sizing:border-box; }
-      @media screen and (orientation:portrait) and (max-width:1023px) { #grimmerglen-rotate-overlay { display:flex; } }
+      #grimmerglen-rotate-overlay { display:none; position:fixed; inset:0; z-index:9999; background:#fff0f6; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); box-sizing:border-box; overscroll-behavior:none; touch-action:none; }
+      #grimmerglen-rotate-overlay.is-visible { display:flex; }
       .grimmerglen-rotate-phone { display:inline-flex; align-items:center; justify-content:center; color:#e0559e; transform-origin:center; animation:grimmerglenRotateHint 2.4s ease-in-out infinite; }
       @keyframes grimmerglenRotateHint { 0%,100% { transform:rotate(0deg); } 40%,60% { transform:rotate(-90deg); } }
       .grimmerglen-rotate-bar { width:120px; height:3px; border-radius:999px; background:linear-gradient(90deg,#ffb3c6,#ffe066,#ffb3c6); background-size:200%; animation:grimmerglenBarShimmer 2s linear infinite; box-shadow:0 0 14px rgba(255,179,198,.55); }
@@ -3092,7 +3115,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-514',
+      serviceWorkerCacheVersion: 'booha-assets-2026-515',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleGrimmerglenFrame();
