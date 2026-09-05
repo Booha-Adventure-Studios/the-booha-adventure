@@ -1237,6 +1237,16 @@ function getBoohaFirstName() {
 function getP1Name() { return getBoohaFirstName(); }
 function getP2Name() { return 'PLAYER 2'; }
 
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
   
 function saveRecords(data) {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch(e) {}
@@ -1606,6 +1616,7 @@ function setupHandoff(player) {
   const isP2 = (player === 2);
   const p1Name = STATE.p1Name || getP1Name();
   const p2Name = STATE.p2Name || getP2Name();
+  const p1NameHTML = escapeHTML(p1Name);
 
   document.getElementById('handoff-player-label').textContent =
     isP2 ? p2Name : p1Name;
@@ -1615,27 +1626,27 @@ function setupHandoff(player) {
 
   document.getElementById('handoff-turn-label').innerHTML = isP2
     ? 'P2 GOES FIRST<br><span class="jp-small">P2からスタート</span>'
-    : `${p1Name} TURN<br><span class="jp-small">P1の番</span>`;
+    : `${p1NameHTML} TURN<br><span class="jp-small">P1の番</span>`;
 
   document.getElementById('handoff-instruction').innerHTML = isP2
     ? `Give the device to Player 2.<br>
        <span class="jp-line">P2にわたしてね。</span><br><br>
        Player 2 plays first.<br>
        <span class="jp-line">P2が先にプレイします。</span>`
-    : `Give it back to ${p1Name}.<br>
-       <span class="jp-line">${p1Name}に返してね。</span><br><br>
-       ${p1Name} will calculate the results after playing.<br>
+    : `Give it back to ${p1NameHTML}.<br>
+       <span class="jp-line">${p1NameHTML}に返してね。</span><br><br>
+       ${p1NameHTML} will calculate the results after playing.<br>
        <span class="jp-line">P1がプレイしたあと、結果を見ます。</span>`;
 
   document.getElementById('handoff-rule').innerHTML = isP2
     ? `&#9888; SCORES ARE HIDDEN<br>
        <span class="jp-line">スコアはまだ見えません</span>`
-    : `&#9888; GIVE BACK TO THE SUPER COOL GENIUS ${p1Name}<br>
-       <span class="jp-line">天才プレイヤー${p1Name}に返しましょう</span>`;
+    : `&#9888; GIVE BACK TO THE SUPER COOL GENIUS ${p1NameHTML}<br>
+       <span class="jp-line">天才プレイヤー${p1NameHTML}に返しましょう</span>`;
 
   document.getElementById('handoff-start-btn').innerHTML = isP2
     ? `READY &#8594; START<br><span class="jp-line">スタート</span>`
-    : `${p1Name} &#8594; START<br><span class="jp-line">P1スタート</span>`;
+    : `${p1NameHTML} &#8594; START<br><span class="jp-line">P1スタート</span>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1948,6 +1959,8 @@ function showResult() {
   const p1 = STATE.runs.p1;
   const p2 = STATE.runs.p2;
   const { winner, reason } = determineWinner(p1, p2);
+  const p1DisplayName = escapeHTML(p1.name);
+  const p2DisplayName = escapeHTML(p2.name);
 
   // Save to records
   recordDuel({ mode: STATE.mode, p1, p2 });
@@ -1971,29 +1984,29 @@ function showResult() {
   const grid = document.getElementById('result-grid');
   grid.innerHTML = `
     <div class="result-cell">
-      <div class="result-cell-label">${p1.name} TIME / タイム</div>
+      <div class="result-cell-label">${p1DisplayName} TIME / タイム</div>
       <div class="result-cell-val p1c">${(p1.timeMs/1000).toFixed(1)}s</div>
       ${penLine(p1)}
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p2.name} TIME / タイム</div>
+      <div class="result-cell-label">${p2DisplayName} TIME / タイム</div>
       <div class="result-cell-val p2c">${(p2.timeMs/1000).toFixed(1)}s</div>
       ${penLine(p2)}
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p1.name} せいかい率</div>
+      <div class="result-cell-label">${p1DisplayName} せいかい率</div>
       <div class="result-cell-val p1c">${p1.accuracy}%</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p2.name} せいかい率</div>
+      <div class="result-cell-label">${p2DisplayName} せいかい率</div>
       <div class="result-cell-val p2c">${p2.accuracy}%</div>
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p1.name} けっか</div>
+      <div class="result-cell-label">${p1DisplayName} けっか</div>
       ${statusCell(p1, 'p1c')}
     </div>
     <div class="result-cell">
-      <div class="result-cell-label">${p2.name} けっか</div>
+      <div class="result-cell-label">${p2DisplayName} けっか</div>
       ${statusCell(p2, 'p2c')}
     </div>
   `;
@@ -2018,10 +2031,10 @@ function showResult() {
   detailEl.textContent = detail;
 
   if (winner === 'p1') {
-    nameEl.innerHTML = `${p1.name} WINS<br><span style="font-size:0.5em;color:var(--jp-col)">${p1.name}の勝ち！</span>`;
+    nameEl.innerHTML = `${p1DisplayName} WINS<br><span style="font-size:0.5em;color:var(--jp-col)">${p1DisplayName}の勝ち！</span>`;
     nameEl.className  = 'result-winner-name';
   } else if (winner === 'p2') {
-    nameEl.innerHTML = `${p2.name} WINS<br><span style="font-size:0.5em;color:var(--jp-col)">${p2.name}の勝ち！</span>`;
+    nameEl.innerHTML = `${p2DisplayName} WINS<br><span style="font-size:0.5em;color:var(--jp-col)">${p2DisplayName}の勝ち！</span>`;
     nameEl.className  = 'result-winner-name';
     banner.classList.add('loser');
     nameEl.classList.add('loser');
@@ -2057,6 +2070,8 @@ function renderRecords() {
   const draws = rec.draws;
   const p1Name = getP1Name();
   const p2Name = getP2Name();
+  const p1NameHTML = escapeHTML(p1Name);
+  const p2NameHTML = escapeHTML(p2Name);
   const winRate = total === 0 ? '—' : Math.round(p1w / total * 100) + '%';
 
   const fmtBest = (b) => {
@@ -2071,10 +2086,12 @@ function renderRecords() {
    rec.recentRuns.forEach(r => {
   const p1RunName = r.p1.name || p1Name;
   const p2RunName = r.p2.name || p2Name;
+  const p1RunNameHTML = escapeHTML(p1RunName);
+  const p2RunNameHTML = escapeHTML(p2RunName);
 
   const winnerLabel =
-    r.winner === 'p1' ? `${p1RunName} WIN` :
-    r.winner === 'p2' ? `${p2RunName} WIN` :
+    r.winner === 'p1' ? `${p1RunNameHTML} WIN` :
+    r.winner === 'p2' ? `${p2RunNameHTML} WIN` :
     'DRAW';
 
   const winnerClass =
@@ -2083,9 +2100,9 @@ function renderRecords() {
     '';
 
   recentHTML += `
-    <div class="recent-run">
+      <div class="recent-run">
       <span class="rr-mode">${r.mode.toUpperCase()}</span>
-      <span class="rr-time">${p1RunName}: ${(r.p1.timeMs/1000).toFixed(1)}s</span>
+      <span class="rr-time">${p1RunNameHTML}: ${(r.p1.timeMs/1000).toFixed(1)}s</span>
       <span class="rr-acc">${r.p1.accuracy}%</span>
       <span class="rr-outcome ${winnerClass}">${winnerLabel}</span>
       <span class="rr-date">${r.date}</span>
@@ -2115,11 +2132,11 @@ function renderRecords() {
       <div class="records-stat-row">
         <div class="records-stat-cell">
           <div class="records-stat-num" style="color:var(--yes)">${p1w}</div>
-          <div class="records-stat-label">${p1Name} WINS</div>
+          <div class="records-stat-label">${p1NameHTML} WINS</div>
         </div>
         <div class="records-stat-cell">
           <div class="records-stat-num" style="color:var(--accent2)">${p2w}</div>
-          <div class="records-stat-label">${p2Name} WINS</div>
+          <div class="records-stat-label">${p2NameHTML} WINS</div>
         </div>
         <div class="records-stat-cell">
           <div class="records-stat-num" style="color:var(--dim)">${draws}</div>
