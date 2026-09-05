@@ -223,7 +223,7 @@
         ${showHintToggle ? `<button type="button" class="mgty-hint-btn">Need a hint? / ${furiJP('ヒントが必要？', { '必要': 'ひつよう' })}</button>` : ''}
         ${showFuriganaHelp ? `<button type="button" class="mgty-help-btn">Help me / ${furiJP('助けて', { '助けて': 'たすけて' })}</button><p class="mgty-help" hidden>${furiJP(ex.helpText, ex.helpReadings || {})}</p>` : ''}
         <div class="mgty-input-row">
-          <label class="mgty-input-label"><span>Type here / ${furiJP('答えをタイプしてね', { '答え': 'こたえ' })}</span><input type="text" class="mgty-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type your answer" placeholder="Type here"></label>
+          <label class="mgty-input-label"><span>Type here / ${furiJP('答えをタイプしてね', { '答え': 'こたえ' })}</span><input type="text" class="mgty-input" inputmode="text" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type your answer" placeholder="Type here"></label>
           <button type="button" class="mgty-submit">Check / ${furiJP('たしかめる', {})}</button>
         </div>
         <p class="mgty-feedback" aria-live="polite"></p>
@@ -279,7 +279,17 @@
       if (event.key === 'Enter') { event.preventDefault(); submit(); }
     });
 
-    setTimeout(() => { try { refs.inputEl.focus({ preventScroll: true }); } catch (_) { refs.inputEl.focus(); } }, 50);
+    const keepInputVisible = () => {
+      if (refs.inputEl.disabled || document.activeElement !== refs.inputEl) return;
+      window.requestAnimationFrame(() => {
+        try { refs.inputEl.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (_) {}
+      });
+    };
+    refs.inputEl.addEventListener('focus', keepInputVisible);
+    setTimeout(() => {
+      try { refs.inputEl.focus({ preventScroll: true }); } catch (_) { refs.inputEl.focus(); }
+      keepInputVisible();
+    }, 50);
 
     return refs;
   }
@@ -296,12 +306,12 @@
       .mgty-chips{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 10px;}
       .mgty-chip{display:inline-block;padding:6px 12px;border-radius:999px;font:700 .8rem/1 'Georgia',serif;
         background:rgba(255,159,194,.16);border:1px solid rgba(224,85,158,.4);color:#7a1f4b;user-select:none;}
-      .mgty-hint-btn{display:inline-block;margin:0 0 10px;padding:8px 14px;border-radius:999px;cursor:pointer;
+      .mgty-hint-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 10px;padding:8px 14px;border-radius:999px;cursor:pointer;touch-action:manipulation;
         font:700 .76rem/1 'Georgia',serif;letter-spacing:.02em;background:linear-gradient(135deg,rgba(255,231,242,.98),rgba(255,247,210,.98));
         border:1px solid rgba(224,85,158,.58);color:#a9548a;box-shadow:0 0 9px rgba(255,159,194,.48),0 0 17px rgba(255,209,102,.18);
         animation:mgtyHintGlow 2.2s ease-in-out infinite;}
       .mgty-hint-btn:hover{background:linear-gradient(135deg,rgba(255,215,234,1),rgba(255,241,184,1));box-shadow:0 0 13px rgba(255,159,194,.7),0 0 22px rgba(255,209,102,.3);}
-      .mgty-help-btn{display:inline-block;margin:0 0 10px;padding:6px 13px;border-radius:999px;cursor:pointer;
+      .mgty-help-btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 10px;padding:6px 13px;border-radius:999px;cursor:pointer;touch-action:manipulation;
         font:700 .76rem/1 'Georgia',serif;letter-spacing:.02em;background:rgba(184,164,255,.12);
         border:1px dashed rgba(126,99,196,.55);color:#6851a6;}
       .mgty-help-btn:hover{background:rgba(184,164,255,.22);}
@@ -309,14 +319,14 @@
       .mgty-input-row{position:relative;display:flex;gap:8px;margin:0 0 6px;}
       .mgty-input-label{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;color:#6a5030;font-size:.72rem;font-weight:700;line-height:1.35;}
       .mgty-input-label ruby{ruby-position:over;} .mgty-input-label rt{font-size:.78em;color:#8a6a42;}
-      .mgty-input{width:100%;min-width:0;box-sizing:border-box;padding:11px 14px;border-radius:12px;
+      .mgty-input{width:100%;min-width:0;min-height:44px;box-sizing:border-box;padding:9px 14px;border-radius:12px;
         border:2px solid rgba(224,85,158,.35);background:#fffdf9;color:#2a1408;
-        font:600 clamp(1rem,3vw,1.14rem)/1.3 'Georgia',serif;letter-spacing:.01em;
+        font:600 max(1rem,clamp(1rem,3vw,1.14rem))/1.3 'Georgia',serif;letter-spacing:.01em;
         transition:border-color .18s,box-shadow .18s;}
       .mgty-input:focus{outline:none;border-color:#e0559e;box-shadow:0 0 0 3px rgba(255,159,194,.28);}
       .mgty-input.is-correct{border-color:#5cb87a;box-shadow:0 0 0 3px rgba(92,184,122,.28);background:#f3fff6;color:#1c5c33;}
       .mgty-input.is-wrong{border-color:#e2513f;box-shadow:0 0 0 3px rgba(226,81,63,.24);animation:utsuToastShake .5s;}
-      .mgty-submit{flex-shrink:0;padding:0 16px;border-radius:12px;cursor:pointer;
+      .mgty-submit{flex-shrink:0;min-height:44px;padding:0 16px;border-radius:12px;cursor:pointer;touch-action:manipulation;
         font:700 .82rem/1 'Georgia',serif;letter-spacing:.03em;color:#fff;
         background:linear-gradient(135deg,#ff8fc0,#ffd166);border:1px solid rgba(224,85,158,.6);
         box-shadow:0 0 12px rgba(255,150,190,.4);}
@@ -333,6 +343,7 @@
         18%{opacity:1;transform:translate(calc(var(--mgty-dx) * .3),calc(var(--mgty-dy) * .3)) scale(1);}
         100%{opacity:0;transform:translate(var(--mgty-dx),var(--mgty-dy)) scale(.5);}}
       @keyframes mgtyHintGlow{0%,100%{box-shadow:0 0 8px rgba(255,159,194,.42),0 0 15px rgba(255,209,102,.16);}50%{box-shadow:0 0 13px rgba(255,159,194,.68),0 0 23px rgba(255,209,102,.28);}}
+      @media (orientation:landscape) and (max-height:480px){.mgty-input-row{flex-wrap:wrap;}.mgty-input-label{flex:0 0 100%;}.mgty-submit{flex:0 0 100%;}.mgty-input{scroll-margin-block:16px;}}
       @media (prefers-reduced-motion: reduce){.mgty-spark{animation:none;display:none;}.mgty-input.is-wrong{animation:none;}.mgty-hint-btn{animation:none;}}
     `;
     document.head.appendChild(style);
