@@ -4197,7 +4197,7 @@ const HAPPY_HOUSE_PORTAL = {
       wpopSetText(bodyEn, 'A dreamy path has opened.\nDo you want to enter Grimmerglen?');
       wpopSetText(bodyJp, '夢のような道が開いた。\nグリマーグレンに入りますか？');
       wpopSetActions('grimmerglen-pop', [
-        { en: 'Yes', jp: 'はい', border: `1px solid ${GRIMMERGLEN_THEME.btnBorder}`, color: '#fff', background: 'linear-gradient(135deg,#ff8fc0,#ffd166)', boxShadow: '0 0 18px rgba(255,150,190,.5)', onClick: () => { closeGrimmerglenPopup(); enterGrimmerglen(); } },
+        { en: 'Yes', jp: 'はい', border: `1px solid ${GRIMMERGLEN_THEME.btnBorder}`, color: '#fff', background: 'linear-gradient(135deg,#ff8fc0,#ffd166)', boxShadow: '0 0 18px rgba(255,150,190,.5)', onClick: () => { enterGrimmerglen(); } },
         { en: 'No', jp: 'いいえ', border: '1px solid rgba(224,85,158,.4)', color: '#a9548a', onClick: closeGrimmerglenPopup }
       ]);
     } else {
@@ -5108,6 +5108,7 @@ const HAPPY_HOUSE_PORTAL = {
       state.transitioning        ||
       state.mazeExiting          ||
       state.muenbaExiting        ||
+      state.grimmerglenExiting   ||
       isPortalOpen()             ||
       isBonusPopOpen()           ||
       isWandererPopOpen()        ||
@@ -5129,7 +5130,8 @@ const HAPPY_HOUSE_PORTAL = {
     return state.mazeExiting || state.muenbaExiting || isPortalOpen()
       || isBonusPopOpen() || isWandererPopOpen() || isUtsuobaPopOpen()
       || isMuenbaPopupOpen() || isObserverPopOpen() || isNuppiPopOpen()
-      || isOrbPanelOpen() || isHappyHousePopOpen();
+      || isOrbPanelOpen() || isHappyHousePopOpen() || isGrimmerglenPopupOpen()
+      || state.grimmerglenExiting;
   }
 
   function scheduleKarasukiFrame() {

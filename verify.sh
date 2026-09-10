@@ -431,6 +431,13 @@ else
   bad "Karasuki popup foreground audit failed"
 fi
 
+echo "[transition] Karasuki Grimmerglen exit audit"
+if node tests/karasuki-grimmerglen-transition-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki Grimmerglen popup freeze and single-exit contracts pass"
+else
+  bad "Karasuki Grimmerglen transition audit failed"
+fi
+
 echo "[36/36] Karasuki 20J Wanderer consistency audit"
 if node tests/karasuki-wanderer-consistency-audit.cjs >/dev/null 2>&1; then
   ok "Karasuki Wanderer consistency contracts pass"
