@@ -148,7 +148,8 @@ const CURRENT_CACHES = {
   // Pass 2 adds adaptive DPR and visibility-aware Muenba rendering.
   // Grimmerglen Pass 1 mobile target sizing (js/grimmerglen.js).
   // Pass 1: freeze Karasuki during the Grimmerglen popup/exit transition.
-  assets: 'booha-assets-2026-526',
+  // Pass 2: defer Grimmerglen collectible images until their room needs them.
+  assets: 'booha-assets-2026-527',
   decks:  'booha-decks-2026-310',
 };
 

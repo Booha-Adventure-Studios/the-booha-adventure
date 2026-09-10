@@ -438,6 +438,13 @@ else
   bad "Karasuki Grimmerglen transition audit failed"
 fi
 
+echo "[performance] Grimmerglen collectible image lifecycle audit"
+if node tests/grimmerglen-collectible-image-lifecycle-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen collectible art loads on demand"
+else
+  bad "Grimmerglen collectible image lifecycle audit failed"
+fi
+
 echo "[36/36] Karasuki 20J Wanderer consistency audit"
 if node tests/karasuki-wanderer-consistency-audit.cjs >/dev/null 2>&1; then
   ok "Karasuki Wanderer consistency contracts pass"
