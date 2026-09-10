@@ -312,12 +312,21 @@
     mariettaWaitingImg.src = MARIETTA.poses[4];
   }
 
-  Object.keys(DATA.collectibles || {}).forEach(type => {
-    const image = new Image();
-    image.decoding = 'async';
-    image.src = DATA.collectibles[type];
-    objectImageCache.set(type, image);
-  });
+  // Collectible art is room-scoped demand: room_01 intentionally has no
+  // objects, so do not decode all eight types during world entry. The first
+  // visible or carried object of a type requests and caches its image.
+  function ensureGrimmerglenObjectImage(type) {
+    const src = DATA.collectibles && DATA.collectibles[type];
+    if (!src) return null;
+    let image = objectImageCache.get(type);
+    if (!image) {
+      image = new Image();
+      image.decoding = 'async';
+      image.src = src;
+      objectImageCache.set(type, image);
+    }
+    return image;
+  }
 
   // ── Pastel room glow (cached gradient, built once per room, drawn with
   //    drawImage every frame — same discipline the Maze/Utsuroba/Muenba
@@ -1023,7 +1032,7 @@
     objects.forEach((object, index) => {
       if (isGrimmerglenObjectFound(object, progress, slots)) return;
       if (carriedObject && carriedObject.id === object.id) return;
-      const image = objectImageCache.get(object.type);
+      const image = ensureGrimmerglenObjectImage(object.type);
       if (!image || !image.complete || image.naturalWidth === 0) return;
       const bob = REDUCED_MOTION ? 0 : Math.sin(seconds * 2.2 + index * 1.7) * 3;
       const glow = getRoomGlowRgb(state.roomId);
@@ -1073,7 +1082,7 @@
 
   function drawCarriedObject(now) {
     if (!carriedObject) return;
-    const image = objectImageCache.get(carriedObject.type);
+    const image = ensureGrimmerglenObjectImage(carriedObject.type);
     if (!image || !image.complete || image.naturalWidth === 0) return;
     const bob = REDUCED_MOTION ? 0 : Math.sin(now / 1000 * 3.4) * 2;
     actorCtx.save();
