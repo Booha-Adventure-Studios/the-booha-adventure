@@ -1488,6 +1488,13 @@ else
   bad "Blitz ruby-popup audit failed"
 fi
 
+echo "[blitz] viewport-safe-area audit"
+if node tests/blitz-pass33-viewport-safe-area-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz viewport-safe-area audit passed"
+else
+  bad "Blitz viewport-safe-area audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"

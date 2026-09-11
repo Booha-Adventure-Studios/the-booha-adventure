@@ -3868,7 +3868,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-559',
+      serviceWorkerCacheVersion: 'booha-assets-2026-560',
       averageFps: worldPerf.metrics().averageFps,
     }));
     worldInitialized = true;

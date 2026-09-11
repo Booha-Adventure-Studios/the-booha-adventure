@@ -306,6 +306,24 @@ window.BoohaBlitzEngine = (() => {
         isolation: isolate;
         contain: layout style;
       }
+      #vb-overlay, #sb-overlay, #qb-overlay {
+        height: 100vh;
+        height: var(--blitz-viewport-height, 100dvh);
+        max-height: var(--blitz-viewport-height, 100dvh);
+      }
+      #vb-overlay #vb-quit, #sb-overlay #sb-quit, #qb-overlay #qb-quit {
+        right: max(env(safe-area-inset-right, 0px) + 16px, 16px);
+      }
+      #vb-win, #sb-win, #qb-win {
+        padding-top: max(env(safe-area-inset-top, 0px) + 16px, 16px);
+        padding-right: max(env(safe-area-inset-right, 0px) + 16px, 16px);
+        padding-bottom: max(env(safe-area-inset-bottom, 0px) + 16px, 16px);
+        padding-left: max(env(safe-area-inset-left, 0px) + 16px, 16px);
+      }
+      .booha-blitz-final-card {
+        max-height: min(92vh, 860px);
+        max-height: min(92dvh, 860px);
+      }
       #vb-wrong-popup.blitz-wrong-feedback,
       #sb-wrong-popup.blitz-wrong-feedback,
       #qb-wrong-popup.blitz-wrong-feedback {
@@ -1466,6 +1484,31 @@ window.BoohaBlitzEngine = (() => {
     document.head.appendChild(style);
   }
 
+  function bindViewportMetrics(overlay) {
+    const visualViewport = window.visualViewport;
+    const update = () => {
+      const height = visualViewport?.height || window.innerHeight;
+      const width = visualViewport?.width || window.innerWidth;
+      if (Number.isFinite(height) && height > 0) {
+        overlay.style.setProperty('--blitz-viewport-height', `${Math.round(height)}px`);
+      }
+      if (Number.isFinite(width) && width > 0) {
+        overlay.style.setProperty('--blitz-viewport-width', `${Math.round(width)}px`);
+      }
+    };
+    update();
+    window.addEventListener('resize', update, { passive: true });
+    window.addEventListener('orientationchange', update, { passive: true });
+    visualViewport?.addEventListener('resize', update, { passive: true });
+    visualViewport?.addEventListener('scroll', update, { passive: true });
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+      visualViewport?.removeEventListener('resize', update);
+      visualViewport?.removeEventListener('scroll', update);
+    };
+  }
+
   function createStartCard(overlay, palette) {
     const card = document.createElement('section');
     card.className = 'booha-blitz-start-card';
@@ -1884,6 +1927,7 @@ window.BoohaBlitzEngine = (() => {
     function closeGame(overlay, stopTimer, stopBGM) {
       stopTimer();
       stopBGM();
+      overlay._boohaBlitzViewportCleanup?.();
       overlay.remove();
       const api = window[config.apiName];
       if (api && typeof api._onClose === 'function') api._onClose();
@@ -2002,8 +2046,12 @@ window.BoohaBlitzEngine = (() => {
       }
 
       const existing = document.getElementById(config.overlayId);
-      if (existing) existing.remove();
+      if (existing) {
+        existing._boohaBlitzViewportCleanup?.();
+        existing.remove();
+      }
       const overlay = config.buildOverlay();
+      overlay._boohaBlitzViewportCleanup = bindViewportMetrics(overlay);
       overlay.classList.add('blitz-compositor');
       applyPalette(overlay, palette);
 
@@ -2587,6 +2635,7 @@ window.BoohaBlitzEngine = (() => {
         stopStreakBeat();
         stopTimer();
         stopBGM();
+        overlay._boohaBlitzViewportCleanup?.();
         overlay.remove();
         launch({ curr, monthSlug, weekNumber });
       });
