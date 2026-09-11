@@ -8,12 +8,14 @@ const questions = fs.readFileSync('js/question-blitz.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
 for (const [source, label] of [[vocab, 'vocab'], [sentence, 'sentence'], [questions, 'question']]) {
-  assert.match(source, /feel: 'playful'/, `${label} palette must include the playful Pre-Boo feel`);
-  assert.match(source, /feel: 'arcade'/, `${label} palette must include the arcade Boo-riculum feel`);
-  assert.match(source, /feel: 'sleek'/, `${label} palette must include the sleek Boo-continuum feel`);
-  assert.match(source, /rewardColors:/, `${label} palette must define colors distinct from its live-game accent`);
-  assert.match(source, /nameEasing:/, `${label} palette must define its celebration motion character`);
+  assert.match(source, /const PALETTES = BoohaBlitzEngine\.themes;/, `${label} must consume the shared curriculum themes`);
 }
+
+for (const feel of ['playful', 'arcade', 'sleek']) {
+  assert.match(engine, new RegExp(`feel: '${feel}'`), `shared themes must include the ${feel} curriculum feel`);
+}
+assert.match(engine, /rewardColors:/, 'shared themes must define colors distinct from live-game accents');
+assert.match(engine, /nameEasing:/, 'shared themes must define celebration motion character');
 
 assert.match(engine, /palette\.hueStep/, 'curriculum palettes must control background hue movement');
 assert.match(engine, /palette\.particleEasing/, 'curriculum palettes must control particle motion easing');
