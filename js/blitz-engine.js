@@ -1793,6 +1793,32 @@ window.BoohaBlitzEngine = (() => {
           // Audio is optional first-impression feedback.
         }
       }
+      function playWrongHit() {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor) return;
+        try {
+          if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
+          if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
+          const notes = palette.feel === 'arcade' ? [196, 147] : palette.feel === 'sleek' ? [330, 247] : [262, 196];
+          const now = streakAudioCtx.currentTime + 0.005;
+          notes.forEach((frequency, index) => {
+            const startAt = now + index * 0.045;
+            const oscillator = streakAudioCtx.createOscillator();
+            const gain = streakAudioCtx.createGain();
+            oscillator.type = palette.feel === 'arcade' ? 'square' : 'triangle';
+            oscillator.frequency.setValueAtTime(frequency, startAt);
+            gain.gain.setValueAtTime(0.0001, startAt);
+            gain.gain.exponentialRampToValueAtTime(0.018, startAt + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.16);
+            oscillator.connect(gain);
+            gain.connect(streakAudioCtx.destination);
+            oscillator.start(startAt);
+            oscillator.stop(startAt + 0.18);
+          });
+        } catch (_) {
+          // Audio is optional feedback and must never block recovery.
+        }
+      }
 
       const timerEl = overlay.querySelector(selector('timer'));
       const progressEl = overlay.querySelector(selector('progress'));
@@ -2102,6 +2128,7 @@ window.BoohaBlitzEngine = (() => {
           if (b.textContent === correct.en) b.classList.add('correct');
         });
         emitWrongMicroFeedback(btn);
+        playWrongHit();
         overlay.classList.add('shake');
         overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
         stopTimer();
