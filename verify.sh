@@ -1369,6 +1369,13 @@ else
   bad "Blitz Pass 3 final-energy audit failed"
 fi
 
+echo "[blitz] Pass 4 wrong-recovery audit"
+if node tests/blitz-pass16-wrong-recovery-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz Pass 4 wrong-recovery audit passed"
+else
+  bad "Blitz Pass 4 wrong-recovery audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"

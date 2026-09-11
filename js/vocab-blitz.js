@@ -573,8 +573,8 @@ const SCOLDS = [
         <div class="vb-wrong-scold-jp"   id="vsj"></div>
         <div class="vb-wrong-scold-hira" id="vsh"></div>
         <div class="vb-wrong-scold-en"   id="vse"></div>
-        <div id="vb-wrong-status">RUN ENDED — NO SCORE</div>
-        <button id="vb-wrong-close" type="button">もどる</button>
+        <div id="vb-wrong-status">READY FOR THE NEXT TRY</div>
+        <button id="vb-wrong-close" type="button">つづける</button>
       </div>
 
      <div id="vb-win">
