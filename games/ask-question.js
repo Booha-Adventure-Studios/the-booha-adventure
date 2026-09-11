@@ -21,6 +21,8 @@ const PASS = 80;
 
 /* ═══ PRE-LOAD SFX — clone pattern ═══ */
 const SFX = {};
+const voiceGate = U.createAudioGate({ cooldownMs: 650, timeoutMs: 8000 });
+const lastSfxAt = Object.create(null);
 function loadSfx(name, url) {
   return new Promise(resolve => {
     const a = new Audio(url);
@@ -33,6 +35,9 @@ function loadSfx(name, url) {
 }
 function playSfx(name) {
   const src = SFX[name]; if (!src) return;
+  const now = Date.now();
+  if (now - (lastSfxAt[name] || 0) < 140) return;
+  lastSfxAt[name] = now;
   try { const c = src.cloneNode(); c.setAttribute('playsinline',''); c.setAttribute('webkit-playsinline',''); c.play().catch(()=>{}); } catch(e) {}
 }
 
@@ -389,9 +394,7 @@ function playSuccessThenAdvance(mp3) {
     a.setAttribute('preload','auto');
     let done = false;
     const finish = () => { if (done) return; done = true; goNext(); };
-    a.onended = finish; a.onerror = finish;
-    setTimeout(finish, 4000);
-    a.play().catch(finish);
+    voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: finish });
   };
   const ding = SFX['ding'] ? SFX['ding'].cloneNode() : null;
   if (!ding) { playAnswer(); return; }
@@ -419,9 +422,8 @@ playBtn.addEventListener('click', () => {
       playBtn.classList.remove('playing');
       playBtn.textContent = '▶';
     };
-    a.onended = done; a.onerror = done;
-    setTimeout(done, 8000);
-    a.play().catch(done);
+    const started = voiceGate.play(a, { button: playBtn, onEnd: done });
+    if (!started) done();
   } catch(e) {
     playBtn.disabled = false;
     playBtn.classList.remove('playing');

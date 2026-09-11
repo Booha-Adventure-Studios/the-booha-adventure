@@ -21,19 +21,32 @@ await Promise.all([
 ]);
 
 let activeLvl4 = null;
+const streakAudioCache = {};
+
+function getStreakAudio(file) {
+  if (streakAudioCache[file]) return streakAudioCache[file];
+  const a = new Audio(CFG.sfxBase + file);
+  a.setAttribute('playsinline', '');
+  a.preload = 'auto';
+  streakAudioCache[file] = a;
+  return a;
+}
 
 function playFireSound(level) {
   if (level >= 4) {
     stopLvl4();
-    const a = new Audio(CFG.sfxBase + 'level4.mp3');
-    a.setAttribute('playsinline', ''); a.loop = false;
+    const a = getStreakAudio('level4.mp3');
+    a.loop = false;
+    try { a.currentTime = 0; } catch {}
     a.play().catch(() => {});
     activeLvl4 = a;
     a.onended = () => { if (activeLvl4 === a) activeLvl4 = null; };
     return;
   }
-  const a = new Audio(CFG.sfxBase + 'fire.mp3');
-  a.setAttribute('playsinline', ''); a.loop = false;
+  const a = getStreakAudio('fire.mp3');
+  a.loop = false;
+  if (!a.paused) return;
+  try { a.currentTime = 0; } catch {}
   a.play().catch(() => {});
 }
 

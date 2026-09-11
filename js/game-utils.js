@@ -36,6 +36,7 @@ const UTILS = {
   _master: null,
   _buf: new Map(),
   _unlocked: false,
+  _sfxLastPlayed: new Map(),
 
   _ensureCtx() {
     if (!this._ctx) {
@@ -75,6 +76,10 @@ const UTILS = {
     if (!this._ctx) return;
     const buf = this._buf.get(name);
     if (!buf) return;
+    const now = Date.now();
+    const last = this._sfxLastPlayed.get(name) || 0;
+    if (now - last < 140) return false;
+    this._sfxLastPlayed.set(name, now);
     if (this._ctx.state === 'suspended') this._ctx.resume().catch(() => {});
     const src = this._ctx.createBufferSource();
     src.buffer = buf;
@@ -82,7 +87,91 @@ const UTILS = {
     g.gain.value = Math.max(0, Math.min(1, vol));
     src.connect(g);
     g.connect(this._master);
-    try { src.start(0); } catch(e) {}
+    try { src.start(0); } catch(e) { return false; }
+    return true;
+  },
+
+  /*
+   * One active HTMLAudio clip per interaction. Normal listen controls use the
+   * default ignore-while-playing policy; controlled answer narration can opt
+   * into replacement. The cooldown applies after the accepted press as well
+   * as after playback, which prevents rapid replay on older touch devices.
+   */
+  createAudioGate({ cooldownMs = 650, timeoutMs = 8000 } = {}) {
+    let active = null;
+    let lastAccepted = 0;
+    let safety = null;
+
+    const clearButton = button => {
+      if (!button) return;
+      button.disabled = false;
+      button.classList.remove('audio-playing');
+      button.removeAttribute('aria-busy');
+      button.removeAttribute('data-audio-state');
+    };
+
+    const stop = () => {
+      if (safety) clearTimeout(safety);
+      safety = null;
+      if (!active) return;
+      const { audio, button } = active;
+      try { audio.pause(); audio.currentTime = 0; } catch (_) {}
+      audio.onended = null;
+      audio.onerror = null;
+      clearButton(button);
+      active = null;
+    };
+
+    const play = (audio, { button = null, onStart = null, onEnd = null, replace = false, ignoreCooldown = false } = {}) => {
+      if (!audio) {
+        if (onEnd) setTimeout(onEnd, 0);
+        return false;
+      }
+      const now = Date.now();
+      if (active && !replace) return false;
+      if (!ignoreCooldown && now - lastAccepted < cooldownMs) return false;
+      if (active) stop();
+      lastAccepted = now;
+      active = { audio, button };
+      if (button) {
+        button.disabled = true;
+        button.classList.add('audio-playing');
+        button.setAttribute('aria-busy', 'true');
+        button.setAttribute('data-audio-state', 'playing');
+      }
+      if (onStart) onStart();
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        if (safety) clearTimeout(safety);
+        safety = null;
+        audio.onended = null;
+        audio.onerror = null;
+        if (active?.audio === audio) {
+          clearButton(active.button);
+          active = null;
+        }
+        if (onEnd) onEnd();
+      };
+      audio.onended = finish;
+      audio.onerror = finish;
+      safety = setTimeout(finish, timeoutMs);
+      try {
+        const result = audio.play();
+        if (result && result.catch) result.catch(finish);
+      } catch (_) {
+        finish();
+      }
+      return true;
+    };
+
+    return {
+      play,
+      stop,
+      isPlaying: () => !!active,
+      lastAccepted: () => lastAccepted,
+    };
   },
 
   /* ── HTML audio fallback (for result sounds, sage voice) ── */
