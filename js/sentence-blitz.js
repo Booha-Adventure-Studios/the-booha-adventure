@@ -305,19 +305,31 @@ window.SentenceBlitz = (() => {
         background: rgba(0,0,0,0.90);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        padding: 24px; text-align: center; gap: 8px;
+        box-sizing: border-box;
+        padding: clamp(18px, 4vw, 42px) 18px; text-align: center; gap: 8px;
         overflow-y: auto;
       }
       #sb-wrong-popup.show { display: flex; }
 
       .sb-wrong-jp {
-        font-size: clamp(48px,12vw,88px);
+        font-size: clamp(34px, 9vw, 78px);
         font-weight: 900; color: #ff3b3b;
         text-shadow: 0 0 24px rgba(255,59,59,0.8);
         line-height: 1.3;
         animation: sbWordPop 350ms cubic-bezier(.34,1.56,.64,1) both;
-        max-width: 560px;
+        max-width: min(92vw, 760px);
+        width: 100%;
+        overflow-wrap: anywhere;
       }
+      .sb-wrong-jp ruby { ruby-position: over; }
+      .sb-wrong-jp rt {
+        display: ruby-text;
+        font-size: .34em;
+        color: rgba(255, 190, 190, .9);
+        letter-spacing: .08em;
+        line-height: 1;
+      }
+      .sb-wrong-hira[hidden], .sb-wrong-scold-hira[hidden] { display: none; }
       .sb-wrong-hira {
         font-size: clamp(14px,3.5vw,22px);
         color: rgba(255,150,150,0.85); letter-spacing: 1.5px;

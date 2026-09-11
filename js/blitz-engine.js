@@ -211,30 +211,53 @@ window.BoohaBlitzEngine = (() => {
     style.textContent = `
       .booha-blitz-nameplate {
         position: fixed;
-        top: max(env(safe-area-inset-top, 0px) + 58px, 58px);
+        top: clamp(96px, 13vh, 148px);
         left: 50%;
         transform: translateX(-50%);
         z-index: 18;
-        min-width: min(280px, calc(100vw - 32px));
-        padding: 8px 18px 9px;
-        border: 1px solid var(--blitz-accent);
+        width: min(420px, calc(100vw - 28px));
+        min-height: clamp(34px, 5vw, 48px);
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 7px 14px 8px;
+        border: 2px solid var(--streak-color, var(--blitz-accent));
         border-radius: 999px;
-        background: rgba(0, 0, 0, .34);
+        background: linear-gradient(180deg, rgba(0, 0, 0, .56), rgba(0, 0, 0, .32));
         color: #fff;
         text-align: center;
-        font-size: clamp(11px, 2.8vw, 14px);
+        font-size: clamp(10px, 2.8vw, 16px);
         font-weight: 950;
-        letter-spacing: 1.2px;
-        text-shadow: 0 0 14px var(--blitz-accent);
+        letter-spacing: clamp(.6px, .25vw, 1.8px);
+        text-shadow: 0 0 14px var(--streak-color, var(--blitz-accent));
+        opacity: 0;
         box-shadow: 0 0 18px var(--blitz-accent);
         pointer-events: none;
-        transition: opacity 180ms ease, transform 180ms ease;
+        transition: opacity 180ms ease, transform 180ms ease, border-color 180ms ease,
+          background 180ms ease, box-shadow 180ms ease;
+        will-change: transform, opacity;
       }
-      .booha-blitz-nameplate-name { color: var(--blitz-accent); }
+      .booha-blitz-nameplate.streak-active {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+        animation: boohaBlitzStreakIn 260ms cubic-bezier(.2, 1.4, .3, 1) both;
+      }
+      .booha-blitz-nameplate-name { color: var(--streak-color, var(--blitz-accent)); }
       .booha-blitz-nameplate-streak { margin-left: 8px; color: #fff; }
+      .booha-blitz-nameplate.streak-tier-1 { --streak-color: #ffffff; }
+      .booha-blitz-nameplate.streak-tier-2 { --streak-color: #ffe66b; }
+      .booha-blitz-nameplate.streak-tier-3 { --streak-color: #ff9d2e; }
+      .booha-blitz-nameplate.streak-tier-4 { --streak-color: #ff4b3e; }
+      .booha-blitz-nameplate.streak-tier-5 { --streak-color: #ff3bbd; }
       .booha-blitz-nameplate.complete {
         opacity: 0;
         transform: translate(-50%, -8px) scale(.96);
+      }
+      @keyframes boohaBlitzStreakIn {
+        0% { transform: translateX(-50%) translateY(6px) scale(.82); }
+        65% { transform: translateX(-50%) translateY(-1px) scale(1.04); }
+        100% { transform: translateX(-50%) translateY(0) scale(1); }
       }
       .booha-blitz-callout {
         position: fixed;
@@ -254,6 +277,29 @@ window.BoohaBlitzEngine = (() => {
         pointer-events: none;
       }
       .booha-blitz-callout.show { animation: boohaBlitzCallout 1050ms cubic-bezier(.2,.8,.2,1) both; }
+      .booha-blitz-callout.fire.show {
+        animation: boohaBlitzFire 2200ms cubic-bezier(.18,.9,.2,1) both;
+      }
+      .booha-blitz-callout.fire {
+        font-family: Impact, Haettenschweiler, "Arial Black", system-ui, sans-serif;
+        font-size: clamp(26px, 8vw, 72px);
+        letter-spacing: clamp(1px, .5vw, 4px);
+        background: linear-gradient(180deg, #fffbd0 0%, #ffe45b 24%, #ff9d18 58%, #ff321d 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 242, 152, .35);
+        text-shadow: 0 -6px 0 rgba(255, 255, 220, .18),
+          0 4px 0 #ff7a00, 0 9px 0 #e52b16,
+          0 0 18px #fff29b, 0 0 42px #ff8a00, 0 0 80px #ff2d00;
+      }
+      @keyframes boohaBlitzFire {
+        0% { opacity: 0; transform: translate(-50%, 22px) scale(.7) skewX(-5deg); filter: brightness(.8); }
+        14% { opacity: 1; transform: translate(-50%, -5px) scale(1.08) skewX(2deg); filter: brightness(1.25); }
+        28%, 72% { opacity: 1; transform: translate(-50%, 0) scale(1) skewX(-1deg); filter: brightness(1); }
+        48% { transform: translate(-50%, -3px) scale(1.04) skewX(1deg); filter: brightness(1.35); }
+        100% { opacity: 0; transform: translate(-50%, -28px) scale(1.12) skewX(3deg); filter: brightness(1.15); }
+      }
       .booha-blitz-callout.final {
         top: 20%;
         color: #ffe66b;
@@ -272,6 +318,10 @@ window.BoohaBlitzEngine = (() => {
         gap: 8px 12px;
         width: min(100%, 360px);
         margin: 12px auto 2px;
+        padding: 8px 12px;
+        border: 1px solid var(--blitz-finish-accent, #ffe66b);
+        border-radius: 18px;
+        background: rgba(0, 0, 0, .25);
       }
       .booha-blitz-final-badge,
       .booha-blitz-final-streak {
@@ -300,6 +350,43 @@ window.BoohaBlitzEngine = (() => {
         text-align: center;
       }
       .booha-blitz-final-hold.ready { color: #ffe66b; }
+      #vb-win.blitz-finish,
+      #sb-win.blitz-finish,
+      #qb-win.blitz-finish {
+        border: 1px solid var(--blitz-finish-accent, var(--blitz-accent));
+        background:
+          radial-gradient(circle at 50% 18%, var(--blitz-finish-glow, var(--blitz-glow)), transparent 38%),
+          linear-gradient(180deg, rgba(16, 7, 30, .92), rgba(0, 0, 0, .97));
+      }
+      #vb-win.blitz-finish.record-mode,
+      #sb-win.blitz-finish.record-mode,
+      #qb-win.blitz-finish.record-mode {
+        background:
+          radial-gradient(circle at 50% 18%, rgba(255, 213, 72, .34), transparent 34%),
+          radial-gradient(circle at 15% 35%, var(--blitz-glow), transparent 28%),
+          linear-gradient(180deg, rgba(30, 10, 10, .92), rgba(0, 0, 0, .97));
+      }
+      #vb-win.blitz-finish .booha-blitz-final-badge,
+      #sb-win.blitz-finish .booha-blitz-final-badge,
+      #qb-win.blitz-finish .booha-blitz-final-badge {
+        color: var(--blitz-finish-accent, #ffe66b);
+        border-color: var(--blitz-finish-accent, #ffe66b);
+      }
+      .booha-blitz-ruby-text ruby { ruby-position: over; }
+      .booha-blitz-ruby-text rt {
+        color: rgba(255, 190, 190, .9);
+        font-size: .34em;
+        font-weight: 700;
+        letter-spacing: .08em;
+        line-height: 1;
+      }
+      .booha-blitz-celebration-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 19;
+        overflow: hidden;
+        pointer-events: none;
+      }
       .booha-blitz-final-summary + .booha-blitz-final-hold + .vb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .sb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .qb-win-buttons { margin-top: 4px; }
@@ -313,7 +400,9 @@ window.BoohaBlitzEngine = (() => {
       }
       @media (prefers-reduced-motion: reduce) {
         .booha-blitz-callout.show { animation: none; opacity: 1; transform: translate(-50%, 0); }
+        .booha-blitz-callout.fire.show { animation: none; }
         .booha-blitz-nameplate { transition: none; }
+        .booha-blitz-nameplate.streak-active { animation: none; }
       }
     `;
     document.head.appendChild(style);
@@ -404,10 +493,11 @@ window.BoohaBlitzEngine = (() => {
       overlay.appendChild(callout);
 
       let announceToken = 0;
-      function announce(message, final = false) {
+      function announce(message, final = false, variant = '') {
         announceToken++;
         callout.classList.remove('show');
         callout.classList.toggle('final', final);
+        callout.classList.toggle('fire', variant === 'fire');
         callout.textContent = message;
         void callout.offsetWidth;
         callout.classList.add('show');
@@ -418,10 +508,39 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function setStreak(streak) {
-        streakEl.textContent = streak ? `STREAK ×${streak}` : 'READY';
+        nameplate.classList.remove('streak-tier-1', 'streak-tier-2', 'streak-tier-3', 'streak-tier-4', 'streak-tier-5');
+        if (!streak) {
+          streakEl.textContent = 'READY';
+          nameplate.classList.remove('streak-active');
+          return;
+        }
+        const tier = streak >= 10 ? 5 : streak >= 8 ? 4 : streak >= 5 ? 3 : streak >= 3 ? 2 : 1;
+        nameplate.classList.add('streak-active', `streak-tier-${tier}`);
+        nameplate.dataset.streak = String(streak);
+        streakEl.textContent = `STREAK ×${streak}`;
+        nameplate.classList.remove('streak-pop');
+        void nameplate.offsetWidth;
+        nameplate.classList.add('streak-pop');
       }
 
-      return { playerName, nameplate, callout, announce, setStreak };
+      function resetStreak() {
+        nameplate.classList.remove('streak-pop');
+        setStreak(0);
+      }
+
+      return { playerName, nameplate, callout, announce, setStreak, resetStreak };
+    }
+
+    function renderFurigana(container, jp, hira) {
+      while (container.firstChild) container.removeChild(container.firstChild);
+      const ruby = document.createElement('ruby');
+      ruby.appendChild(document.createTextNode(jp));
+      const rt = document.createElement('rt');
+      rt.textContent = hira;
+      ruby.appendChild(rt);
+      container.appendChild(ruby);
+      container.classList.add('booha-blitz-ruby-text');
+      container.setAttribute('aria-label', `${jp} ${hira}`);
     }
 
     function ensureFinalCard(winScreen) {
@@ -546,7 +665,11 @@ window.BoohaBlitzEngine = (() => {
           fragment.appendChild(line);
         }
       }
-      overlay.appendChild(fragment);
+      const layer = document.createElement('div');
+      layer.className = 'booha-blitz-celebration-layer';
+      layer.appendChild(fragment);
+      overlay.appendChild(layer);
+      setTimeout(() => layer.remove(), 5600);
     }
 
     function startGame(allCards, curr, weekNumber, palette, monthSlug) {
@@ -634,7 +757,9 @@ window.BoohaBlitzEngine = (() => {
           8: `${spotlight.playerName} OWNS THIS RUN!`,
           10: `${spotlight.playerName} HAS THE RHYTHM!`,
         };
-        if (messages[streak]) spotlight.announce(messages[streak]);
+        if (messages[streak]) {
+          spotlight.announce(messages[streak], false, streak === 3 ? 'fire' : '');
+        }
       }
 
       function stopFinalHold() {
@@ -748,11 +873,17 @@ window.BoohaBlitzEngine = (() => {
 
       function showWrongPopup(correct) {
         const scold = config.scolds[Math.floor(Math.random() * config.scolds.length)];
-        overlay.querySelector(selector('wrongJp')).textContent = correct.jp;
-        overlay.querySelector(selector('wrongHira')).textContent = correct.hira;
+        const wrongJp = overlay.querySelector(selector('wrongJp'));
+        const wrongHira = overlay.querySelector(selector('wrongHira'));
+        const scoldJp = overlay.querySelector(selector('scoldJp'));
+        const scoldHira = overlay.querySelector(selector('scoldHira'));
+        renderFurigana(wrongJp, correct.jp, correct.hira);
+        renderFurigana(scoldJp, scold.jp, scold.hira);
+        wrongHira.textContent = correct.hira;
+        scoldHira.textContent = scold.hira;
+        wrongHira.hidden = true;
+        scoldHira.hidden = true;
         overlay.querySelector(selector('wrongEn')).textContent = correct.en;
-        overlay.querySelector(selector('scoldJp')).textContent = scold.jp;
-        overlay.querySelector(selector('scoldHira')).textContent = scold.hira;
         overlay.querySelector(selector('scoldEn')).textContent = scold.en;
         wrongPopup.classList.add('show');
       }
@@ -771,6 +902,7 @@ window.BoohaBlitzEngine = (() => {
         }
 
         btn.classList.add('wrong');
+        spotlight.resetStreak();
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
           if (b.textContent === correct.en) b.classList.add('correct');
         });
@@ -825,6 +957,9 @@ window.BoohaBlitzEngine = (() => {
         const isRecord = result.isAllTimeRecord;
         const oldRecord = result.oldRecord;
         winScreen.classList.toggle('record-mode', isRecord);
+        winScreen.classList.add('blitz-finish');
+        winScreen.style.setProperty('--blitz-finish-accent', isRecord ? '#ffd700' : palette.accent);
+        winScreen.style.setProperty('--blitz-finish-glow', isRecord ? 'rgba(255, 215, 0, .34)' : palette.glow);
         winScreen.querySelector(selector('winName')).textContent = playerName;
         winScreen.querySelector(selector('winScream')).textContent = isRecord ? config.winCopy.record : config.winCopy.clear;
         winScreen.querySelector(selector('winJp')).textContent = isRecord ? config.winCopy.jp : 'クリア。';
