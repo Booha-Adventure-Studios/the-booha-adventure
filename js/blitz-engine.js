@@ -89,11 +89,18 @@ window.BoohaBlitzEngine = (() => {
   }
 
   function backgroundFor(palette, index = 0) {
-    const hue = (palette.baseHue + index * (palette.hueStep || 51)) % 360;
-    const main = index === 0 && palette.background?.main
+    const streak = arguments.length > 2 ? arguments[2] : 0;
+    const energy = Math.min(15, Math.max(0, Number(streak) || 0));
+    const hue = (palette.baseHue + index * (palette.hueStep || 51) + energy * (palette.feel === 'sleek' ? 1 : 2)) % 360;
+    const saturation = Math.min(100, palette.bgSat + energy * (palette.feel === 'arcade' ? 0.7 : 0.45));
+    const lightness = Math.min(42, palette.bgLit + energy * (palette.feel === 'playful' ? 0.4 : 0.25));
+    const main = index === 0 && energy === 0 && palette.background?.main
       ? palette.background.main
-      : `hsl(${hue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
-    const secondary = palette.background?.secondary || main;
+      : `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    const secondaryHue = (hue + (palette.hueStep || 51) / 2 + energy) % 360;
+    const secondary = energy === 0 && palette.background?.secondary
+      ? palette.background.secondary
+      : `hsl(${secondaryHue}, ${Math.min(100, saturation + 4)}%, ${Math.min(46, lightness + 3)}%)`;
     return `linear-gradient(145deg, ${main} 0%, ${secondary} 100%)`;
   }
 
@@ -791,6 +798,35 @@ window.BoohaBlitzEngine = (() => {
       .booha-blitz-callout.chain.show {
         animation: boohaBlitzChain 1050ms cubic-bezier(.22, .8, .24, 1) both;
       }
+      .booha-blitz-perfect-flash {
+        position: absolute;
+        inset: 0;
+        z-index: 60;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        box-sizing: border-box;
+        color: #fffbe1;
+        background: radial-gradient(circle at 50% 48%, rgba(255,255,255,.82), var(--blitz-glow) 18%, transparent 62%);
+        text-align: center;
+        pointer-events: none;
+        animation: boohaBlitzPerfectFlash 900ms cubic-bezier(.16,.9,.2,1) both;
+      }
+      .booha-blitz-perfect-flash-label {
+        max-width: 92vw;
+        font-family: Impact, Haettenschweiler, "Arial Black", system-ui, sans-serif;
+        font-size: clamp(30px, 10vw, 88px);
+        font-weight: 1000;
+        letter-spacing: clamp(1px, .6vw, 6px);
+        line-height: .95;
+        text-shadow: 0 0 12px #fff, 0 0 34px var(--blitz-accent), 0 0 72px var(--blitz-glow);
+      }
+      @keyframes boohaBlitzPerfectFlash {
+        0% { opacity: 0; transform: scale(.74); }
+        16% { opacity: 1; transform: scale(1.08); }
+        42% { opacity: .92; transform: scale(1); }
+        100% { opacity: 0; transform: scale(1.12); }
+      }
       @keyframes boohaBlitzCombo {
         0% { opacity: 0; transform: translate(-50%, calc(-50% + 18px)) scale(.65) skewX(-8deg); }
         22% { opacity: 1; transform: translate(-50%, calc(-50% - 3px)) scale(1.12) skewX(2deg); }
@@ -1155,6 +1191,7 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-streak-spark { display: none; }
         .booha-blitz-correct-spark { display: none; }
         .booha-blitz-wrong-spark { display: none; }
+        .booha-blitz-perfect-flash { animation: none; opacity: .88; }
         .booha-blitz-start-card::before,
         .booha-blitz-start-card::after { animation: none; }
         .booha-blitz-start-card,
@@ -1498,6 +1535,19 @@ window.BoohaBlitzEngine = (() => {
       container.appendChild(ruby);
       container.classList.add('booha-blitz-ruby-text');
       container.setAttribute('aria-label', `${jp} ${hira}`);
+    }
+
+    function emitPerfectFlash(overlay, palette, playerName) {
+      const flash = document.createElement('div');
+      flash.className = 'booha-blitz-perfect-flash';
+      flash.style.setProperty('--blitz-accent', palette.accent);
+      flash.style.setProperty('--blitz-glow', palette.glow);
+      const label = document.createElement('div');
+      label.className = 'booha-blitz-perfect-flash-label';
+      label.textContent = `${playerName} · PERFECT!`;
+      flash.appendChild(label);
+      overlay.appendChild(flash);
+      setTimeout(() => flash.remove(), REDUCED_MOTION ? 320 : 900);
     }
 
     function ensureFinalCard(winScreen, palette) {
@@ -1900,6 +1950,7 @@ window.BoohaBlitzEngine = (() => {
         bestStreak = Math.max(bestStreak, streak);
         const eventThreshold = STREAK_EVENT_THRESHOLDS.includes(streak) ? streak : 0;
         spotlight.setStreak(streak, eventThreshold);
+        overlay.style.background = backgroundFor(palette, bgIndex, streak);
         if (eventThreshold) playStreakBeat(eventThreshold);
         const messagesByFeel = {
           playful: {
@@ -1934,12 +1985,15 @@ window.BoohaBlitzEngine = (() => {
           },
         };
         const messages = messagesByFeel[palette.feel] || messagesByFeel.playful;
-        if (messages[streak]) {
-          const variant = eventThreshold
-            ? (palette.feel === 'playful' ? 'fire' : palette.feel === 'arcade' ? 'combo' : 'chain')
-            : '';
-          spotlight.announce(messages[streak], false, variant);
-        }
+        const fallbackMessages = {
+          playful: `${spotlight.playerName} NICE ×${streak}!`,
+          arcade: `${spotlight.playerName} COMBO ×${streak}!`,
+          sleek: `${spotlight.playerName} CHAIN ×${streak}.`,
+        };
+        const variant = eventThreshold
+          ? (palette.feel === 'playful' ? 'fire' : palette.feel === 'arcade' ? 'combo' : 'chain')
+          : '';
+        spotlight.announce(messages[streak] || fallbackMessages[palette.feel] || fallbackMessages.playful, false, variant);
       }
 
       function stopFinalHold() {
@@ -2160,6 +2214,7 @@ window.BoohaBlitzEngine = (() => {
 
         btn.classList.add('wrong');
         spotlight.resetStreak();
+        overlay.style.background = backgroundFor(palette, bgIndex, 0);
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
           if (b.textContent === correct.en) b.classList.add('correct');
         });
@@ -2176,7 +2231,7 @@ window.BoohaBlitzEngine = (() => {
         locked = false;
         const card = queue[current];
         bgIndex++;
-        overlay.style.background = backgroundFor(palette, bgIndex);
+        overlay.style.background = backgroundFor(palette, bgIndex, streak);
         jpWordEl.style.animation = 'none';
         hiraEl.style.animation = 'none';
         requestAnimationFrame(() => {
@@ -2279,6 +2334,7 @@ window.BoohaBlitzEngine = (() => {
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         spotlight.nameplate.classList.add('complete');
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
+        if (isPerfectRun) emitPerfectFlash(overlay, palette, playerName);
         winScreen.classList.add('show');
         playFinalStinger(isRecord, isPerfectRun);
         startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
