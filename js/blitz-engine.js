@@ -9,25 +9,25 @@ window.BoohaBlitzEngine = (() => {
   const THEMES = Object.freeze({
     pb: Object.freeze({
       id: 'pb', name: 'Pre-Boo', nameJp: 'プレブー',
-      baseHue: 318, bgSat: 68, bgLit: 14,
-      background: Object.freeze({ main: 'hsl(318, 68%, 14%)', secondary: 'hsl(318, 52%, 19%)' }),
-      accent: '#ff5ac8', accent2: '#ffe16a', glow: 'rgba(255,90,200,0.72)',
-      optionBg: 'rgba(255,90,200,0.16)', optionBorder: '#ff5ac8', optionHover: 'rgba(255,90,200,0.34)',
-      timerColor: '#ffe16a', wordColor: '#ffffff', hiraColor: '#ffc0ec',
+      baseHue: 330, bgSat: 76, bgLit: 24,
+      background: Object.freeze({ main: 'hsl(330, 76%, 24%)', secondary: 'hsl(24, 88%, 20%)' }),
+      accent: '#ff6fb5', accent2: '#ffe27a', glow: 'rgba(255,111,181,0.62)',
+      optionBg: 'rgba(255,255,255,0.14)', optionBorder: '#ffb4d8', optionHover: 'rgba(255,226,122,0.28)',
+      timerColor: '#fff0a8', wordColor: '#ffffff', hiraColor: '#ffd1e6',
       correct: Object.freeze({ color: '#00ff86', glow: 'rgba(0,255,134,.58)' }),
       wrong: Object.freeze({ color: '#ff536d', glow: 'rgba(255,83,109,.58)' }),
-      popup: Object.freeze({ background: 'rgba(47,12,38,.92)', accent: '#ff8edb' }),
-      streak: Object.freeze({ colors: ['#ffffff', '#ffe66b', '#ff9d2e', '#ff4b3e', '#ff3bbd'], glow: 'rgba(255,102,208,.68)' }),
-      reward: Object.freeze({ colors: ['#fff8ce', '#ffe166', '#ff72d2', '#ffffff'], glow: 'rgba(255,165,48,.78)' }),
+      popup: Object.freeze({ background: 'rgba(92,24,68,.92)', accent: '#ffb7dc' }),
+      streak: Object.freeze({ colors: ['#ffffff', '#ffe66b', '#ffad55', '#ff6d78', '#ff6ccf'], glow: 'rgba(255,125,196,.62)' }),
+      reward: Object.freeze({ colors: ['#fffbe1', '#ffe27a', '#ff8ec8', '#ffffff'], glow: 'rgba(255,184,72,.72)' }),
       shape: Object.freeze({ optionRadius: 'round', popupRadius: '28px', particle: 'round' }),
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72 }),
       particleShape: 'round', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, feel: 'playful',
-      rewardColors: ['#fff8ce', '#ffe166', '#ff72d2', '#ffffff'], rewardGlow: 'rgba(255,165,48,.78)',
+      rewardColors: ['#fffbe1', '#ffe27a', '#ff8ec8', '#ffffff'], rewardGlow: 'rgba(255,184,72,.72)',
     }),
     br: Object.freeze({
       id: 'br', name: 'Boo-riculum', nameJp: 'ブーリキュラム',
-      baseHue: 185, bgSat: 85, bgLit: 10,
-      background: Object.freeze({ main: 'hsl(185, 85%, 10%)', secondary: 'hsl(180, 78%, 13%)' }),
+      baseHue: 185, bgSat: 92, bgLit: 11,
+      background: Object.freeze({ main: 'hsl(185, 92%, 11%)', secondary: 'hsl(264, 75%, 14%)' }),
       accent: '#00ffee', accent2: '#39ff14', glow: 'rgba(0,255,238,0.7)',
       optionBg: 'rgba(0,255,238,0.14)', optionBorder: '#00ffee', optionHover: 'rgba(0,255,238,0.32)',
       timerColor: '#39ff14', wordColor: '#ffffff', hiraColor: '#80ffee',
@@ -43,8 +43,8 @@ window.BoohaBlitzEngine = (() => {
     }),
     bc: Object.freeze({
       id: 'bc', name: 'Boo-continuum', nameJp: 'ブーコンティニューム',
-      baseHue: 222, bgSat: 42, bgLit: 8,
-      background: Object.freeze({ main: 'hsl(222, 42%, 8%)', secondary: 'hsl(225, 45%, 12%)' }),
+      baseHue: 222, bgSat: 46, bgLit: 10,
+      background: Object.freeze({ main: 'hsl(222, 46%, 10%)', secondary: 'hsl(205, 48%, 15%)' }),
       accent: '#f0c96a', accent2: '#dfeaff', glow: 'rgba(240,201,106,0.58)',
       optionBg: 'rgba(240,201,106,0.10)', optionBorder: '#f0c96a', optionHover: 'rgba(240,201,106,0.22)',
       timerColor: '#ffe7a0', wordColor: '#ffffff', hiraColor: '#b8d1ff',
@@ -70,6 +70,15 @@ window.BoohaBlitzEngine = (() => {
 
   function effectCount(fullCount) {
     return LOW_POWER ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
+  }
+
+  function backgroundFor(palette, index = 0) {
+    const hue = (palette.baseHue + index * (palette.hueStep || 51)) % 360;
+    const main = index === 0 && palette.background?.main
+      ? palette.background.main
+      : `hsl(${hue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
+    const secondary = palette.background?.secondary || main;
+    return `linear-gradient(145deg, ${main} 0%, ${secondary} 100%)`;
   }
 
   function shuffle(arr) {
@@ -471,6 +480,42 @@ window.BoohaBlitzEngine = (() => {
       }
       .blitz-feel-playful .booha-blitz-callout,
       .blitz-feel-playful .booha-blitz-final-flourish { letter-spacing: .5px; }
+      #vb-overlay.blitz-feel-playful .vb-opt,
+      #sb-overlay.blitz-feel-playful .sb-opt,
+      #qb-overlay.blitz-feel-playful .qb-opt {
+        border-radius: 24px;
+        box-shadow: 0 8px 22px rgba(74, 14, 55, .24), inset 0 1px 0 rgba(255,255,255,.22);
+        transition-timing-function: cubic-bezier(.2,1.35,.3,1);
+      }
+      #vb-overlay.blitz-feel-playful .vb-opt:hover,
+      #sb-overlay.blitz-feel-playful .sb-opt:hover,
+      #qb-overlay.blitz-feel-playful .qb-opt:hover {
+        transform: translateY(-3px) scale(1.02);
+      }
+      #vb-overlay.blitz-feel-arcade .vb-opt,
+      #sb-overlay.blitz-feel-arcade .sb-opt,
+      #qb-overlay.blitz-feel-arcade .qb-opt {
+        border-radius: 10px;
+        box-shadow: 0 6px 18px rgba(0, 10, 24, .42), inset 0 1px 0 rgba(255,255,255,.16);
+        letter-spacing: .5px;
+      }
+      #vb-overlay.blitz-feel-arcade .vb-opt:hover,
+      #sb-overlay.blitz-feel-arcade .sb-opt:hover,
+      #qb-overlay.blitz-feel-arcade .qb-opt:hover {
+        transform: translateY(-2px) scale(1.015);
+      }
+      #vb-overlay.blitz-feel-sleek .vb-opt,
+      #sb-overlay.blitz-feel-sleek .sb-opt,
+      #qb-overlay.blitz-feel-sleek .qb-opt {
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 8, 24, .38), inset 0 1px 0 rgba(255,255,255,.14);
+        letter-spacing: .25px;
+      }
+      #vb-overlay.blitz-feel-sleek .vb-opt:hover,
+      #sb-overlay.blitz-feel-sleek .sb-opt:hover,
+      #qb-overlay.blitz-feel-sleek .qb-opt:hover {
+        transform: translateY(-1px);
+      }
       .blitz-feel-sleek .booha-blitz-nameplate {
         border-radius: 14px;
         letter-spacing: 2px;
@@ -564,7 +609,7 @@ window.BoohaBlitzEngine = (() => {
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
         overlay.style.setProperty(name, typeof value === 'function' ? value(palette) : value);
       });
-      overlay.style.background = `hsl(${palette.baseHue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
+      overlay.style.background = backgroundFor(palette);
       const timer = overlay.querySelector(selector('timer'));
       if (timer) timer.style.color = palette.timerColor;
     }
@@ -1035,8 +1080,7 @@ window.BoohaBlitzEngine = (() => {
         locked = false;
         const card = queue[current];
         bgIndex++;
-        const hue = (palette.baseHue + bgIndex * (palette.hueStep || 51)) % 360;
-        overlay.style.background = `hsl(${hue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
+        overlay.style.background = backgroundFor(palette, bgIndex);
         jpWordEl.style.animation = 'none';
         hiraEl.style.animation = 'none';
         requestAnimationFrame(() => {
