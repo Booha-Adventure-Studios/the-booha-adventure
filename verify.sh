@@ -1264,6 +1264,13 @@ else
   bad "Tokyo daily-stats audit failed"
 fi
 
+echo "[blitz] Pass 1 performance audit"
+if node tests/blitz-pass1-performance-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz timer, low-power effects, batched particles, and blur fallback contracts pass"
+else
+  bad "Blitz Pass 1 performance audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

@@ -149,7 +149,8 @@ const CURRENT_CACHES = {
   // Grimmerglen Pass 1 mobile target sizing (js/grimmerglen.js).
   // Pass 1: freeze Karasuki during the Grimmerglen popup/exit transition.
   // Pass 2: defer Grimmerglen collectible images until their room needs them.
-  assets: 'booha-assets-2026-527',
+  // Blitz Pass 1: throttle timer paints and reduce celebration paint pressure.
+  assets: 'booha-assets-2026-528',
   decks:  'booha-decks-2026-310',
 };
 

@@ -321,6 +321,18 @@ window.SentenceBlitz = (() => {
     return a;
   }
 
+  const BLITZ_TIMER_PAINT_INTERVAL_MS = 100;
+  const BLITZ_LOW_POWER =
+    (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+    (typeof navigator !== 'undefined' && (
+      (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
+      (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
+    ));
+
+  function effectCount(fullCount) {
+    return BLITZ_LOW_POWER ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
+  }
+
   /* ── Format time ─────────────────────────────────────────────── */
   function fmtTime(ms) {
     if (ms === null || ms === undefined) return '--';
@@ -564,6 +576,12 @@ window.SentenceBlitz = (() => {
         -webkit-backdrop-filter: blur(16px);
         padding: 28px 24px; text-align: center; gap: 8px;
       }
+      #sb-overlay.low-power #sb-wrong-popup,
+      #sb-overlay.low-power #sb-win {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(0,0,0,0.96);
+      }
       #sb-win.show { display: flex; }
 
       .sb-win-label {
@@ -712,6 +730,7 @@ window.SentenceBlitz = (() => {
   function buildOverlay() {
     const el = document.createElement('div');
     el.id = 'sb-overlay';
+    if (BLITZ_LOW_POWER) el.classList.add('low-power');
     el.innerHTML = `
       <div id="sb-flash"></div>
       <div id="sb-timer-bar">
@@ -769,7 +788,8 @@ window.SentenceBlitz = (() => {
     const W = window.innerWidth, H = window.innerHeight;
 
     /* 1 ── Names SLAM down and squash on impact ────────────────── */
-    for (let i = 0; i < (isRecord ? 40 : 26); i++) {
+    const nameNodes = document.createDocumentFragment();
+    for (let i = 0; i < effectCount(isRecord ? 40 : 26); i++) {
       const d     = document.createElement('div');
       const color = colors[Math.floor(Math.random() * colors.length)];
       const size  = 14 + Math.random() * (isRecord ? 28 : 22);
@@ -787,13 +807,15 @@ window.SentenceBlitz = (() => {
         --cdur:${1400 + Math.random() * 1000}ms;
         --cdelay:${Math.random() * 1100}ms;
       `;
-      overlay.appendChild(d);
       d.addEventListener('animationend', () => d.remove());
+      nameNodes.appendChild(d);
     }
+    overlay.appendChild(nameNodes);
 
     /* 2 ── Rubble kicks UP from the ground under the impacts ───── */
     setTimeout(() => {
-      for (let i = 0; i < (isRecord ? 60 : 40); i++) {
+      const rubbleNodes = document.createDocumentFragment();
+      for (let i = 0; i < effectCount(isRecord ? 60 : 40); i++) {
         const p     = document.createElement('div');
         const angle = -Math.PI * (0.15 + Math.random() * 0.7);
         const dist  = 80 + Math.random() * (isRecord ? 340 : 240);
@@ -814,9 +836,10 @@ window.SentenceBlitz = (() => {
           --pdelay:${Math.random() * 260}ms;
           animation: sbParticle var(--pdur) ease-out var(--pdelay) both;
         `;
-        overlay.appendChild(p);
         p.addEventListener('animationend', () => p.remove());
+        rubbleNodes.appendChild(p);
       }
+      overlay.appendChild(rubbleNodes);
     }, 900);
   }
 
@@ -880,11 +903,15 @@ window.SentenceBlitz = (() => {
     let current = 0, startTime = null, elapsed = 0;
     let clearElapsed = null;
     let rafId = null, locked = false, bgIndex = 0;
+    let lastTimerPaint = -Infinity;
 
     function tick() {
       if (startTime === null) { rafId = requestAnimationFrame(tick); return; }
       elapsed = performance.now() - startTime;
-      timerEl.textContent = fmtTime(elapsed);
+      if (elapsed - lastTimerPaint >= BLITZ_TIMER_PAINT_INTERVAL_MS) {
+        timerEl.textContent = fmtTime(elapsed);
+        lastTimerPaint = elapsed;
+      }
       rafId = requestAnimationFrame(tick);
     }
     function stopTimer() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
@@ -925,7 +952,8 @@ window.SentenceBlitz = (() => {
         const cy  = r.top  - ovr.top  + r.height / 2;
         const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
 
-        for (let i = 0; i < 18; i++) {
+        const particleNodes = document.createDocumentFragment();
+        for (let i = 0; i < effectCount(18); i++) {
           const p = document.createElement('div');
           const angle = (i / 18) * Math.PI * 2;
           const dist  = 50 + Math.random() * 100;
@@ -942,9 +970,10 @@ window.SentenceBlitz = (() => {
             
             animation: sbParticle var(--pdur) ease-out var(--pdelay) both;
           `;
-          overlay.appendChild(p);
           p.addEventListener('animationend', () => p.remove());
+          particleNodes.appendChild(p);
         }
+        overlay.appendChild(particleNodes);
       }, 90);
 
       setTimeout(() => {
