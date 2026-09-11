@@ -334,20 +334,33 @@ const SCOLDS = [
         background: rgba(0,0,0,0.88);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        padding: 24px;
+        box-sizing: border-box;
+        padding: clamp(18px, 4vw, 42px) 18px;
         text-align: center;
         gap: 10px;
       }
       #vb-wrong-popup.show { display: flex; }
 
       .vb-wrong-kanji {
-        font-size: clamp(52px,14vw,96px);
+        font-size: clamp(34px, 9vw, 78px);
         font-weight: 900;
         color: #ff3b3b;
         text-shadow: 0 0 32px rgba(255,59,59,0.9), 0 0 64px rgba(255,59,59,0.5);
-        line-height: 1;
+        line-height: 1.25;
+        max-width: min(92vw, 760px);
+        width: 100%;
+        overflow-wrap: anywhere;
         animation: vbWordPop 350ms cubic-bezier(.34,1.56,.64,1) both;
       }
+      .vb-wrong-kanji ruby { ruby-position: over; }
+      .vb-wrong-kanji rt {
+        display: ruby-text;
+        font-size: .34em;
+        color: rgba(255, 190, 190, .9);
+        letter-spacing: .08em;
+        line-height: 1;
+      }
+      .vb-wrong-hira[hidden], .vb-wrong-scold-hira[hidden] { display: none; }
       .vb-wrong-hira {
         font-size: clamp(14px,3.5vw,22px);
         color: rgba(255,150,150,0.9);
@@ -914,6 +927,8 @@ const SCOLDS = [
     return BoohaBlitzEngine.getWeeklyScoreFor(gameType, curr, currentWeekId);
   }
 
+  const formatBlitzTime = BoohaBlitzEngine.fmtTime;
+
   function buildBlitzPane(gameType, currentWeekId) {
     const rows = [
       { curr: 'pb', name: 'Pre-Boo',       jp: 'プレブー',             color: '#ff3bff' },
@@ -928,7 +943,7 @@ const SCOLDS = [
       const weeklyName = played ? blitzScoreName(weekly.name) : '';
       const weeklyBlock = played
         ? `<div class="vb-fp-weekly">
-             <div class="vb-fp-time">${fmtTime(weekly.ms)}</div>
+             <div class="vb-fp-time">${formatBlitzTime(weekly.ms)}</div>
              ${weeklyName ? `<div class="vb-fp-who">${weeklyName}</div>` : ''}
            </div>`
         : `<div class="vb-fp-unplayed">
@@ -938,7 +953,7 @@ const SCOLDS = [
 
       const recordName = record ? blitzScoreName(record.name) : '';
       const recordBlock = record
-        ? `<div class="vb-fp-alltime">ベスト ${fmtTime(record.ms)}${recordName ? ` · ${recordName}` : ''}</div>`
+        ? `<div class="vb-fp-alltime">ベスト ${formatBlitzTime(record.ms)}${recordName ? ` · ${recordName}` : ''}</div>`
         : `<div class="vb-fp-alltime">ベスト --</div>`;
 
       return `
@@ -963,10 +978,12 @@ function openFastestPanel(gameType = 'vocab', ctx = {}) {
 
     // Resolve the live curriculum week so stale weekly buckets read as
     // "not played." Without it, a new week shows last week's scores.
-    const currentWeekId =
-      (ctx && ctx.monthSlug && ctx.weekNumber)
-        ? BoohaBlitzEngine.makeWeekId(ctx.monthSlug, ctx.weekNumber)
-        : null;
+    const liveWeek = (ctx && ctx.monthSlug && ctx.weekNumber)
+      ? ctx
+      : (window.CALENDAR?.getCurrentCurriculumWeek?.() || null);
+    const currentWeekId = liveWeek?.monthSlug && liveWeek?.weekNumber
+      ? BoohaBlitzEngine.makeWeekId(liveWeek.monthSlug, liveWeek.weekNumber)
+      : null;
 
     ['vocab', 'sentences', 'questions'].forEach(type => {
       const pane = panel.querySelector(`.vb-fp-pane[data-pane="${type}"]`);
