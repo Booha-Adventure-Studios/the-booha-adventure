@@ -8,62 +8,7 @@
 window.VocabBlitz = (() => {
 
   /* ── Palettes ────────────────────────────────────────────────── */
- const PALETTES = {
-    pb: {
-      name: 'Pre-Boo',
-      nameJp: 'プレブー',
-      baseHue: 318, bgSat: 68, bgLit: 14,
-      accent: '#ff5ac8',
-      accent2: '#ffe16a',
-      glow: 'rgba(255,90,200,0.72)',
-      optionBg: 'rgba(255,90,200,0.16)',
-      optionBorder: '#ff5ac8',
-      optionHover: 'rgba(255,90,200,0.34)',
-      timerColor: '#ffe16a',
-      wordColor: '#ffffff',
-      hiraColor: '#ffc0ec',
-      particleShape: 'round', particleEasing: 'cubic-bezier(.16,1.5,.3,1)',
-      nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, feel: 'playful',
-      rewardColors: ['#fff8ce', '#ffe166', '#ff72d2', '#ffffff'],
-      rewardGlow: 'rgba(255,165,48,.78)',
-    },
-    br: {
-      name: 'Boo-riculum',
-      nameJp: 'ブーリキュラム',
-      baseHue: 185, bgSat: 85, bgLit: 10,
-      accent: '#00ffee',
-      accent2: '#39ff14',
-      glow: 'rgba(0,255,238,0.7)',
-      optionBg: 'rgba(0,255,238,0.14)',
-      optionBorder: '#00ffee',
-      optionHover: 'rgba(0,255,238,0.32)',
-      timerColor: '#39ff14',
-      wordColor: '#ffffff',
-      hiraColor: '#80ffee',
-      particleShape: 'arcade', particleEasing: 'ease-out',
-      nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, feel: 'arcade',
-      rewardColors: ['#f5ffcf', '#39ff14', '#00ffee', '#ffffff'],
-      rewardGlow: 'rgba(0,255,210,.78)',
-    },
-    bc: {
-      name: 'Boo-continuum',
-      nameJp: 'ブーコンティニューム',
-      baseHue: 222, bgSat: 42, bgLit: 8,
-      accent: '#f0c96a',
-      accent2: '#dfeaff',
-      glow: 'rgba(240,201,106,0.58)',
-      optionBg: 'rgba(240,201,106,0.10)',
-      optionBorder: '#f0c96a',
-      optionHover: 'rgba(240,201,106,0.22)',
-      timerColor: '#ffe7a0',
-      wordColor: '#ffffff',
-      hiraColor: '#b8d1ff',
-      particleShape: 'diamond', particleEasing: 'cubic-bezier(.2,.7,.2,1)',
-      nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, feel: 'sleek',
-      rewardColors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'],
-      rewardGlow: 'rgba(240,201,106,.72)',
-    },
-  };
+  const PALETTES = BoohaBlitzEngine.themes;
 
 /* ── Scolding bank ───────────────────────────────────────────── */
 const SCOLDS = [

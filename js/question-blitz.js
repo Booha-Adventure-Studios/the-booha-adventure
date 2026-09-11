@@ -8,40 +8,7 @@
 window.QuestionBlitz = (() => {
 
   /* ── Palettes ────────────────────────────────────────────────── */
- const PALETTES = {
-    pb: {
-      baseHue: 318, bgSat: 68, bgLit: 14,
-      accent: '#ff5ac8', accent2: '#ffe16a', glow: 'rgba(255,90,200,0.72)',
-      optionBg: 'rgba(255,90,200,0.16)', optionBorder: '#ff5ac8',
-      optionHover: 'rgba(255,90,200,0.34)', timerColor: '#ffe16a', hiraColor: '#ffc0ec',
-      particleShape: 'round', particleEasing: 'cubic-bezier(.16,1.5,.3,1)',
-      nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, feel: 'playful',
-      rewardColors: ['#fff8ce', '#ffe166', '#ff72d2', '#ffffff'], rewardGlow: 'rgba(255,165,48,.78)',
-    },
-    br: {
-      baseHue: 220, bgSat: 85, bgLit: 10,
-      accent: '#3d8eff',
-      accent2: '#aaccff',
-      glow: 'rgba(61,142,255,0.7)',
-      optionBg: 'rgba(61,142,255,0.10)',
-      optionBorder: '#3d8eff',
-      optionHover: 'rgba(61,142,255,0.26)',
-      timerColor: '#aaccff',
-      hiraColor: '#88aaff',
-      particleShape: 'arcade', particleEasing: 'ease-out',
-      nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, feel: 'arcade',
-      rewardColors: ['#f5ffcf', '#39ff14', '#00ffee', '#ffffff'], rewardGlow: 'rgba(0,255,210,.78)',
-    },
-    bc: {
-      baseHue: 222, bgSat: 42, bgLit: 8,
-      accent: '#f0c96a', accent2: '#dfeaff', glow: 'rgba(240,201,106,0.58)',
-      optionBg: 'rgba(240,201,106,0.10)', optionBorder: '#f0c96a',
-      optionHover: 'rgba(240,201,106,0.22)', timerColor: '#ffe7a0', hiraColor: '#b8d1ff',
-      particleShape: 'diamond', particleEasing: 'cubic-bezier(.2,.7,.2,1)',
-      nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, feel: 'sleek',
-      rewardColors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], rewardGlow: 'rgba(240,201,106,.72)',
-    },
-  };
+  const PALETTES = BoohaBlitzEngine.themes;
    
   /* ── Scolding bank ───────────────────────────────────────────── */
   const SCOLDS = [
