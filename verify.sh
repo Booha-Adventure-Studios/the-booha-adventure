@@ -1481,6 +1481,13 @@ else
   bad "Blitz landscape-scaling audit failed"
 fi
 
+echo "[blitz] ruby-popup audit"
+if node tests/blitz-pass32-ruby-popup-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz ruby-popup audit passed"
+else
+  bad "Blitz ruby-popup audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"
