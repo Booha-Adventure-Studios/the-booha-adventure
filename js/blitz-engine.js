@@ -809,21 +809,59 @@ window.BoohaBlitzEngine = (() => {
         pointer-events: none;
       }
       .booha-blitz-callout.show { animation: boohaBlitzCallout 1050ms cubic-bezier(.2,.8,.2,1) both; }
-      .booha-blitz-callout.fire.show {
-        animation: boohaBlitzFire 2200ms cubic-bezier(.18,.9,.2,1) both;
+      .booha-blitz-fire-wallpaper {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        overflow: hidden;
+        isolation: isolate;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(255, 213, 72, .24), transparent 34%),
+          radial-gradient(circle at 12% 88%, rgba(255, 46, 0, .52), transparent 42%),
+          radial-gradient(circle at 88% 12%, rgba(255, 116, 0, .46), transparent 42%),
+          linear-gradient(135deg, rgba(255, 55, 0, .42), rgba(90, 6, 0, .72));
+        opacity: 0;
+        pointer-events: none;
+        animation: boohaBlitzFireWallpaper 1350ms ease-out both;
       }
-      .booha-blitz-callout.fire {
+      .booha-blitz-fire-wallpaper::before {
+        content: '';
+        position: absolute;
+        inset: -20%;
+        z-index: -1;
+        background: repeating-linear-gradient(125deg, transparent 0 42px, rgba(255, 205, 61, .12) 44px 48px, transparent 50px 92px);
+        transform: rotate(-8deg);
+        animation: boohaBlitzFireSweep 1350ms ease-out both;
+      }
+      .booha-blitz-fire-name {
+        position: absolute;
+        color: rgba(255, 236, 142, .34);
         font-family: Impact, Haettenschweiler, "Arial Black", system-ui, sans-serif;
-        font-size: clamp(26px, 8vw, 72px);
-        letter-spacing: clamp(1px, .5vw, 4px);
-        background: linear-gradient(180deg, #fffbd0 0%, #ffe45b 24%, #ff9d18 58%, #ff321d 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        -webkit-text-stroke: 1px rgba(255, 242, 152, .35);
-        text-shadow: 0 -6px 0 rgba(255, 255, 220, .18),
-          0 4px 0 #ff7a00, 0 9px 0 #e52b16,
-          0 0 18px #fff29b, 0 0 42px #ff8a00, 0 0 80px #ff2d00;
+        font-size: clamp(28px, 6vw, 86px);
+        font-weight: 1000;
+        letter-spacing: clamp(1px, .5vw, 5px);
+        line-height: 1;
+        text-shadow: 0 0 18px rgba(255, 112, 0, .9), 0 0 42px rgba(255, 45, 0, .72);
+        transform: rotate(-12deg) scale(.92);
+        white-space: nowrap;
+        animation: boohaBlitzFireName 1350ms ease-out var(--fire-delay, 0ms) both;
+      }
+      @keyframes boohaBlitzFireWallpaper {
+        0% { opacity: 0; filter: saturate(.8) brightness(.9); }
+        14% { opacity: .9; filter: saturate(1.45) brightness(1.18); }
+        46% { opacity: .58; filter: saturate(1.2) brightness(1.06); }
+        100% { opacity: 0; filter: saturate(1) brightness(1); }
+      }
+      @keyframes boohaBlitzFireSweep {
+        0% { opacity: 0; transform: rotate(-8deg) translateX(-8%); }
+        24% { opacity: 1; }
+        100% { opacity: 0; transform: rotate(-8deg) translateX(8%); }
+      }
+      @keyframes boohaBlitzFireName {
+        0% { opacity: 0; transform: rotate(-12deg) scale(.82) translateY(18px); }
+        18% { opacity: 1; transform: rotate(-12deg) scale(1.02) translateY(0); }
+        68% { opacity: .72; transform: rotate(-12deg) scale(1) translateY(-4px); }
+        100% { opacity: 0; transform: rotate(-12deg) scale(1.08) translateY(-18px); }
       }
       .booha-blitz-callout.combo {
         font-family: Impact, Haettenschweiler, "Arial Black", system-ui, sans-serif;
@@ -890,13 +928,6 @@ window.BoohaBlitzEngine = (() => {
         0% { opacity: 0; transform: translate(-50%, calc(-50% + 12px)) scale(.82); filter: blur(4px); }
         24%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
         100% { opacity: 0; transform: translate(-50%, calc(-50% - 14px)) scale(1.04); }
-      }
-      @keyframes boohaBlitzFire {
-        0% { opacity: 0; transform: translate(-50%, calc(-50% + 22px)) scale(.7) skewX(-5deg); filter: brightness(.8); }
-        14% { opacity: 1; transform: translate(-50%, calc(-50% - 5px)) scale(1.08) skewX(2deg); filter: brightness(1.25); }
-        28%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1) skewX(-1deg); filter: brightness(1); }
-        48% { transform: translate(-50%, calc(-50% - 3px)) scale(1.04) skewX(1deg); filter: brightness(1.35); }
-        100% { opacity: 0; transform: translate(-50%, calc(-50% - 28px)) scale(1.12) skewX(3deg); filter: brightness(1.15); }
       }
       .booha-blitz-callout.final {
         top: 50%;
@@ -1279,7 +1310,9 @@ window.BoohaBlitzEngine = (() => {
       }
       @media (prefers-reduced-motion: reduce) {
         .booha-blitz-callout.show { animation: none; opacity: 1; transform: translate(-50%, -50%); }
-        .booha-blitz-callout.fire.show { animation: none; }
+        .booha-blitz-fire-wallpaper { animation: none; opacity: .52; }
+        .booha-blitz-fire-wallpaper::before,
+        .booha-blitz-fire-name { animation: none; }
         .booha-blitz-callout.combo.show,
         .booha-blitz-callout.chain.show { animation: none; }
         .booha-blitz-nameplate { transition: none; }
@@ -1315,7 +1348,6 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-feedback { flex-basis: clamp(52px, 8vh, 72px); min-height: 52px; }
         .booha-blitz-nameplate { width: min(92vw, 360px); }
         .booha-blitz-callout { max-width: 94vw; font-size: clamp(18px, 6vw, 34px); }
-        .booha-blitz-callout.fire { font-size: clamp(22px, 7vw, 46px); }
         #vb-wrong-popup.blitz-wrong-feedback,
         #sb-wrong-popup.blitz-wrong-feedback,
         #qb-wrong-popup.blitz-wrong-feedback {
@@ -1342,7 +1374,6 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-feedback { flex-basis: 48px; min-height: 48px; }
         .booha-blitz-nameplate { min-height: 32px; padding: 5px 12px; }
         .booha-blitz-callout { font-size: clamp(18px, 4vw, 32px); }
-        .booha-blitz-callout.fire { font-size: clamp(22px, 5vw, 42px); }
       }
     `;
     document.head.appendChild(style);
@@ -1575,7 +1606,7 @@ window.BoohaBlitzEngine = (() => {
         announceToken++;
         callout.classList.remove('show');
         callout.classList.toggle('final', final);
-        callout.classList.toggle('fire', variant === 'fire');
+        callout.classList.remove('fire');
         callout.classList.toggle('combo', variant === 'combo');
         callout.classList.toggle('chain', variant === 'chain');
         callout.textContent = message;
@@ -1673,6 +1704,26 @@ window.BoohaBlitzEngine = (() => {
 
     function emitPerfectFlash(overlay, palette, playerName) {
       emitFinishFlash(overlay, palette, playerName, 'perfect');
+    }
+
+    function emitFireWallpaper(overlay, playerName, threshold = 0) {
+      overlay.querySelector('.booha-blitz-fire-wallpaper')?.remove();
+      const wallpaper = document.createElement('div');
+      wallpaper.className = 'booha-blitz-fire-wallpaper';
+      wallpaper.setAttribute('aria-hidden', 'true');
+      const count = LOW_POWER ? 6 : 12;
+      for (let i = 0; i < count; i++) {
+        const name = document.createElement('span');
+        name.className = 'booha-blitz-fire-name';
+        name.textContent = playerName;
+        name.style.left = `${-8 + (i % 4) * 28 + Math.random() * 10}%`;
+        name.style.top = `${-4 + Math.floor(i / 4) * 28 + Math.random() * 8}%`;
+        name.style.setProperty('--fire-delay', `${Math.random() * 90}ms`);
+        name.style.opacity = String(Math.min(1, .72 + threshold * .01));
+        wallpaper.appendChild(name);
+      }
+      overlay.insertBefore(wallpaper, overlay.firstChild);
+      setTimeout(() => wallpaper.remove(), REDUCED_MOTION ? 520 : 1450);
     }
 
     function ensureFinalCard(winScreen, palette) {
@@ -2077,7 +2128,10 @@ window.BoohaBlitzEngine = (() => {
         spotlight.clearAnnouncement();
         spotlight.setStreak(streak, eventThreshold);
         overlay.style.background = backgroundFor(palette, bgIndex, streak);
-        if (eventThreshold) playStreakBeat(eventThreshold);
+        if (eventThreshold) {
+          playStreakBeat(eventThreshold);
+          if (palette.feel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
+        }
       }
 
       function stopFinalHold() {
