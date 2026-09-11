@@ -1313,6 +1313,13 @@ else
   bad "Blitz Pass 7 shared theme-source audit failed"
 fi
 
+echo "[blitz] Pass 2 personality audit"
+if node tests/blitz-pass8-personality-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz Pass 2 personality audit passed"
+else
+  bad "Blitz Pass 2 personality audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"
