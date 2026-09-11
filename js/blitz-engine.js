@@ -380,13 +380,13 @@ window.BoohaBlitzEngine = (() => {
       }
       .booha-blitz-wrong-spark {
         position: absolute;
-        width: clamp(4px, .9vw, 7px);
-        height: clamp(4px, .9vw, 7px);
+        width: clamp(5px, 1vw, 8px);
+        height: clamp(5px, 1vw, 8px);
         background: var(--blitz-wrong, #ff536d);
         box-shadow: 0 0 10px var(--blitz-wrong, #ff536d);
         pointer-events: none;
         z-index: 12;
-        animation: boohaBlitzWrongSpark 420ms ease-out var(--spark-delay, 0ms) both;
+        animation: boohaBlitzWrongSpark 400ms ease-out var(--spark-delay, 0ms) both;
       }
       .blitz-feel-playful .booha-blitz-wrong-spark { border-radius: 50%; }
       .blitz-feel-arcade .booha-blitz-wrong-spark { border-radius: 2px; }
@@ -618,12 +618,17 @@ window.BoohaBlitzEngine = (() => {
         position: absolute;
         left: 50%;
         top: 50%;
-        width: clamp(4px, 1vw, 8px);
-        height: clamp(4px, 1vw, 8px);
+        width: clamp(5px, 1.1vw, 9px);
+        height: clamp(5px, 1.1vw, 9px);
         background: var(--streak-event-color, var(--streak-color, var(--blitz-accent)));
         box-shadow: 0 0 10px var(--streak-event-color, var(--streak-color, var(--blitz-accent)));
         pointer-events: none;
-        animation: boohaBlitzStreakSpark 720ms ease-out var(--spark-delay, 0ms) both;
+        animation: boohaBlitzStreakSpark 680ms ease-out var(--spark-delay, 0ms) both;
+      }
+      .booha-blitz-streak-spark-large {
+        width: clamp(11px, 1.8vw, 16px);
+        height: clamp(11px, 1.8vw, 16px);
+        box-shadow: 0 0 14px currentColor, 0 0 28px var(--streak-event-color, var(--blitz-accent));
       }
       .blitz-feel-playful .booha-blitz-streak-spark { border-radius: 50%; }
       .blitz-feel-arcade .booha-blitz-streak-spark {
@@ -637,8 +642,8 @@ window.BoohaBlitzEngine = (() => {
       }
       .booha-blitz-correct-spark {
         position: absolute;
-        width: clamp(4px, .9vw, 7px);
-        height: clamp(4px, .9vw, 7px);
+        width: clamp(5px, 1vw, 8px);
+        height: clamp(5px, 1vw, 8px);
         background: var(--blitz-correct, #00ff64);
         box-shadow: 0 0 9px var(--blitz-correct, #00ff64);
         pointer-events: none;
@@ -1478,13 +1483,14 @@ window.BoohaBlitzEngine = (() => {
         nameplate.classList.remove(...eventClasses);
       }
       function emitStreakSparks() {
-        const count = LOW_POWER ? 3 : palette.feel === 'arcade' ? 8 : 6;
+        const threshold = arguments.length ? arguments[0] : 0;
+        const count = LOW_POWER ? 3 : threshold >= 5 ? (palette.feel === 'arcade' ? 14 : 12) : palette.feel === 'arcade' ? 8 : 6;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
           const angle = (i / count) * Math.PI * 2 + Math.random() * 0.35;
           const distance = 24 + Math.random() * 32;
-          spark.className = 'booha-blitz-streak-spark';
+          spark.className = `booha-blitz-streak-spark${threshold >= 5 && i === 0 ? ' booha-blitz-streak-spark-large' : ''}`;
           spark.style.cssText = `--sx:${Math.cos(angle) * distance}px;--sy:${Math.sin(angle) * distance}px;--spark-delay:${Math.random() * 50}ms;`;
           spark.addEventListener('animationend', () => spark.remove(), { once: true });
           fragment.appendChild(spark);
@@ -1500,7 +1506,7 @@ window.BoohaBlitzEngine = (() => {
         const className = `streak-event-${threshold}`;
         overlay.classList.add('streak-event-live');
         nameplate.classList.add('streak-event-live', className, 'streak-hold');
-        emitStreakSparks();
+        emitStreakSparks(threshold);
         streakHoldTimer = setTimeout(() => nameplate.classList.remove('streak-hold'), 1250);
         streakEventTimer = setTimeout(clearStreakEventClasses, 780);
       }
@@ -1700,7 +1706,7 @@ window.BoohaBlitzEngine = (() => {
           const p = document.createElement('div');
           const angle = Math.random() * Math.PI * 2;
           const dist = 70 + Math.random() * (isRecord ? 360 : 240);
-          const size = 3 + Math.random() * 6;
+          const size = 5 + Math.random() * 6;
           const color = crumbs[Math.floor(Math.random() * crumbs.length)];
           p.className = 'vb-particle';
           p.style.cssText = `position:absolute;left:${W / 2}px;top:${H / 2}px;width:${size}px;height:${size}px;border-radius:${particleRadius};background:${color};pointer-events:none;z-index:30;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist + 40}px;--pdur:${520 + Math.random() * 520}ms;--pdelay:${Math.random() * 100}ms;animation:vbParticle var(--pdur) ${particleEasing} var(--pdelay) both;`;
@@ -2085,7 +2091,7 @@ window.BoohaBlitzEngine = (() => {
         const ovr = overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
         const cy = r.top - ovr.top + r.height / 2;
-        const count = LOW_POWER ? 3 : 6;
+        const count = LOW_POWER ? 3 : streak >= 5 ? 10 : 6;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
