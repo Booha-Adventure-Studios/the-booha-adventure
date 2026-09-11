@@ -560,6 +560,7 @@ window.BoohaBlitzEngine = (() => {
         border-radius: 999px;
         background: rgba(255,255,255,.2);
         box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+        transition: height 180ms ease, box-shadow 180ms ease, background 180ms ease;
       }
       .booha-blitz-streak-meter-fill {
         display: block;
@@ -568,8 +569,17 @@ window.BoohaBlitzEngine = (() => {
         border-radius: inherit;
         background: var(--streak-color, var(--blitz-accent));
         box-shadow: 0 0 10px var(--streak-color, var(--blitz-accent));
-        transition: width 220ms cubic-bezier(.2,1.2,.3,1), background 180ms ease;
+        transition: width 220ms cubic-bezier(.2,1.2,.3,1), background 180ms ease, box-shadow 180ms ease;
       }
+      .booha-blitz-nameplate.streak-tier-1 .booha-blitz-streak-meter { height: 4px; }
+      .booha-blitz-nameplate.streak-tier-2 .booha-blitz-streak-meter { height: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 0 7px rgba(255,230,107,.22); }
+      .booha-blitz-nameplate.streak-tier-3 .booha-blitz-streak-meter { height: 5px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 10px rgba(255,157,46,.3); }
+      .booha-blitz-nameplate.streak-tier-4 .booha-blitz-streak-meter { height: 6px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.24), 0 0 14px rgba(255,75,62,.38); }
+      .booha-blitz-nameplate.streak-tier-5 .booha-blitz-streak-meter { height: 7px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3), 0 0 18px rgba(255,59,189,.5); }
+      .booha-blitz-nameplate.streak-tier-2 .booha-blitz-streak-meter-fill { box-shadow: 0 0 12px var(--streak-color), 0 0 18px rgba(255,230,107,.35); }
+      .booha-blitz-nameplate.streak-tier-3 .booha-blitz-streak-meter-fill { box-shadow: 0 0 14px var(--streak-color), 0 0 22px rgba(255,157,46,.42); }
+      .booha-blitz-nameplate.streak-tier-4 .booha-blitz-streak-meter-fill { box-shadow: 0 0 16px var(--streak-color), 0 0 26px rgba(255,75,62,.48); }
+      .booha-blitz-nameplate.streak-tier-5 .booha-blitz-streak-meter-fill { box-shadow: 0 0 18px var(--streak-color), 0 0 32px rgba(255,59,189,.58); }
       .booha-blitz-nameplate.streak-pop {
         animation: boohaBlitzStreakPop 320ms cubic-bezier(.2, 1.35, .3, 1) both;
       }
@@ -1221,6 +1231,8 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-nameplate.streak-hold { animation: none; filter: none; }
         .booha-blitz-nameplate.streak-event-live .booha-blitz-streak-marker,
         .booha-blitz-nameplate.streak-event-live .booha-blitz-streak-meter-fill { animation: none; }
+        .booha-blitz-streak-meter,
+        .booha-blitz-streak-meter-fill { transition: none; }
         .booha-blitz-streak-spark { display: none; }
         .booha-blitz-correct-spark { display: none; }
         .booha-blitz-wrong-spark { display: none; }
