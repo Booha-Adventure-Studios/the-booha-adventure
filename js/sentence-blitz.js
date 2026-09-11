@@ -124,7 +124,7 @@ window.SentenceBlitz = (() => {
         position: relative; z-index: 2;
       }
       #sb-timer {
-        font-size: clamp(32px, 8vw, 64px);
+        font-size: clamp(32px, min(8vw, 8vh), 64px);
         font-weight: 900;
         letter-spacing: 2px;
         font-variant-numeric: tabular-nums;
@@ -174,7 +174,7 @@ window.SentenceBlitz = (() => {
 
       /* ── JP sentence ── */
       #sb-jp-word {
-        font-size: clamp(22px, 5vw, 44px);
+        font-size: clamp(22px, min(5vw, 5.5vh), 44px);
         font-weight: 900;
         line-height: 1.3;
         text-align: center;
@@ -189,7 +189,7 @@ window.SentenceBlitz = (() => {
       }
 
       #sb-hira {
-        font-size: clamp(12px,2.5vw,18px);
+        font-size: clamp(12px,min(2.5vw,2.5vh),18px);
         color: var(--sb-hira-color);
         text-align: center;
         letter-spacing: 1.5px;
@@ -210,8 +210,8 @@ window.SentenceBlitz = (() => {
       .sb-opt {
         appearance: none; border: 0;
         border-radius: clamp(12px,2vw,18px);
-        padding: clamp(12px,2.5vw,18px) clamp(14px,2.5vw,20px);
-        font-size: clamp(13px,2.5vw,17px);
+        padding: clamp(12px,min(2.5vw,2.2vh),18px) clamp(14px,2.5vw,20px);
+        font-size: clamp(13px,min(2.5vw,2.5vh),17px);
         font-weight: 700;
         color: #fff;
         cursor: pointer;

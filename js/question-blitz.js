@@ -124,7 +124,7 @@ window.QuestionBlitz = (() => {
         gap: 16px; position: relative; z-index: 2;
       }
       #qb-timer {
-        font-size: clamp(32px, 8vw, 64px);
+        font-size: clamp(32px, min(8vw, 8vh), 64px);
         font-weight: 900; letter-spacing: 2px;
         font-variant-numeric: tabular-nums;
         text-shadow: 0 0 24px currentColor, 0 0 48px currentColor;
@@ -172,7 +172,7 @@ window.QuestionBlitz = (() => {
 
       /* ── JP question ── */
       #qb-jp-word {
-        font-size: clamp(20px, 4.5vw, 40px);
+        font-size: clamp(20px, min(4.5vw, 5vh), 40px);
         font-weight: 900; line-height: 1.35;
         text-align: center; color: #fff;
         text-shadow: 0 0 20px var(--qb-glow), 0 0 40px var(--qb-glow);
@@ -185,7 +185,7 @@ window.QuestionBlitz = (() => {
       }
 
       #qb-hira {
-        font-size: clamp(11px,2.2vw,16px);
+        font-size: clamp(11px,min(2.2vw,2.4vh),16px);
         color: var(--qb-hira-color);
         text-align: center; letter-spacing: 1.5px;
         line-height: 1.6;
@@ -204,8 +204,8 @@ window.QuestionBlitz = (() => {
       .qb-opt {
         appearance: none; border: 0;
         border-radius: clamp(12px,2vw,18px);
-        padding: clamp(12px,2.5vw,18px) clamp(14px,2.5vw,20px);
-        font-size: clamp(13px,2.5vw,17px);
+        padding: clamp(12px,min(2.5vw,2.2vh),18px) clamp(14px,2.5vw,20px);
+        font-size: clamp(13px,min(2.5vw,2.5vh),17px);
         font-weight: 700; color: #fff;
         cursor: pointer; text-align: left;
         line-height: 1.4;

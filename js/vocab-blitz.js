@@ -127,7 +127,7 @@ const SCOLDS = [
         position: relative; z-index: 2;
       }
       #vb-timer {
-        font-size: clamp(36px, 9vw, 72px);
+        font-size: clamp(36px, min(9vw, 8vh), 72px);
         font-weight: 900;
         letter-spacing: 2px;
         font-variant-numeric: tabular-nums;
@@ -168,7 +168,7 @@ const SCOLDS = [
       }
 
       #vb-jp-word {
-        font-size: clamp(52px, 14vw, 110px);
+        font-size: clamp(52px, min(14vw, 13vh), 110px);
         font-weight: 900;
         line-height: 1;
         text-align: center;
@@ -182,7 +182,7 @@ const SCOLDS = [
       }
 
       #vb-hira {
-        font-size: clamp(16px,4vw,28px);
+        font-size: clamp(16px,min(4vw,4vh),28px);
         color: var(--vb-hira-color);
         text-align: center;
         letter-spacing: 2px;
@@ -203,8 +203,8 @@ const SCOLDS = [
       .vb-opt {
         appearance: none; border: 0;
         border-radius: clamp(14px,3vw,22px);
-        padding: clamp(14px,3.5vw,24px) clamp(10px,2vw,16px);
-        font-size: clamp(14px,3.5vw,22px);
+        padding: clamp(14px,min(3.5vw,2.8vh),24px) clamp(10px,2vw,16px);
+        font-size: clamp(14px,min(3.5vw,3vh),22px);
         font-weight: 900;
         color: #fff;
         cursor: pointer;
