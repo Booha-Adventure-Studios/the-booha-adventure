@@ -398,6 +398,101 @@ window.BoohaBlitzEngine = (() => {
         65% { opacity: 1; transform: translateY(-2px) scale(1.02); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
       }
+      #vb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card),
+      #sb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card),
+      #qb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card) {
+        visibility: hidden;
+      }
+      .booha-blitz-start-card {
+        position: absolute;
+        inset: 0;
+        z-index: 40;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 10px;
+        padding: 24px;
+        background:
+          radial-gradient(circle at 50% 46%, var(--blitz-start-glow, var(--blitz-glow)), transparent 28%),
+          radial-gradient(circle at 50% 50%, rgba(255,255,255,.07), transparent 58%);
+        text-align: center;
+        transition: opacity 160ms ease, transform 160ms ease;
+      }
+      .booha-blitz-start-card::before,
+      .booha-blitz-start-card::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: min(72vw, 420px);
+        height: min(72vw, 420px);
+        border: 1px solid var(--blitz-start-accent, var(--blitz-accent));
+        border-radius: 50%;
+        opacity: .2;
+        pointer-events: none;
+        transform: translate(-50%, -50%) scale(.72);
+        animation: boohaBlitzStartPulse 2200ms ease-out infinite;
+      }
+      .booha-blitz-start-card::after { animation-delay: 820ms; }
+      .booha-blitz-start-card.launching {
+        opacity: 0;
+        transform: scale(1.04);
+        pointer-events: none;
+      }
+      .booha-blitz-start-kicker,
+      .booha-blitz-start-title,
+      .booha-blitz-start-copy,
+      .booha-blitz-start-button { position: relative; z-index: 1; }
+      .booha-blitz-start-kicker {
+        color: var(--blitz-start-accent, var(--blitz-accent));
+        font-size: clamp(10px, 2vw, 14px);
+        font-weight: 950;
+        letter-spacing: 2.6px;
+        text-transform: uppercase;
+        text-shadow: 0 0 16px var(--blitz-start-accent, var(--blitz-accent));
+      }
+      .booha-blitz-start-title {
+        max-width: min(90vw, 620px);
+        color: #fff;
+        font-size: clamp(30px, 8vw, 72px);
+        font-weight: 1000;
+        letter-spacing: clamp(.5px, .35vw, 3px);
+        line-height: .98;
+        text-shadow: 0 0 18px #fff, 0 0 42px var(--blitz-start-glow, var(--blitz-glow));
+      }
+      .booha-blitz-start-copy {
+        color: rgba(255,255,255,.76);
+        font-size: clamp(12px, 2.6vw, 18px);
+        letter-spacing: 1.2px;
+      }
+      .booha-blitz-start-button {
+        appearance: none;
+        margin-top: 12px;
+        min-width: min(78vw, 300px);
+        padding: 14px 24px;
+        border: 2px solid var(--blitz-start-accent, var(--blitz-accent));
+        border-radius: 999px;
+        color: #101018;
+        background: var(--blitz-start-accent, var(--blitz-accent));
+        box-shadow: 0 10px 30px var(--blitz-start-glow, var(--blitz-glow)), 0 0 22px var(--blitz-start-accent, var(--blitz-accent));
+        font-size: clamp(15px, 3.6vw, 22px);
+        font-weight: 1000;
+        letter-spacing: 1.3px;
+        cursor: pointer;
+        transition: transform 100ms ease, box-shadow 100ms ease;
+      }
+      .booha-blitz-start-button:hover { transform: translateY(-2px); }
+      .booha-blitz-start-button:active {
+        transform: translateY(1px) scale(.96);
+        box-shadow: 0 5px 14px var(--blitz-start-glow, var(--blitz-glow));
+      }
+      .blitz-feel-playful .booha-blitz-start-card { border-radius: 32px; }
+      .blitz-feel-arcade .booha-blitz-start-button { border-radius: 12px; text-transform: uppercase; }
+      .blitz-feel-sleek .booha-blitz-start-button { border-radius: 14px; letter-spacing: 2px; }
+      @keyframes boohaBlitzStartPulse {
+        0% { opacity: .24; transform: translate(-50%, -50%) scale(.72); }
+        70%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.08); }
+      }
       .booha-blitz-nameplate {
         position: absolute;
         top: 50%;
@@ -1058,6 +1153,10 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-streak-spark { display: none; }
         .booha-blitz-correct-spark { display: none; }
         .booha-blitz-wrong-spark { display: none; }
+        .booha-blitz-start-card::before,
+        .booha-blitz-start-card::after { animation: none; }
+        .booha-blitz-start-card,
+        .booha-blitz-start-card.launching { transition: none; }
         .blitz-feel-arcade.streak-event-live,
         .blitz-feel-sleek.streak-event-live { box-shadow: none; transform: none; }
         .booha-blitz-final-headline,
@@ -1106,6 +1205,33 @@ window.BoohaBlitzEngine = (() => {
       }
     `;
     document.head.appendChild(style);
+  }
+
+  function createStartCard(overlay, palette) {
+    const card = document.createElement('section');
+    card.className = 'booha-blitz-start-card';
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-label', `${palette.name || 'Blitz'} start`);
+    card.style.setProperty('--blitz-start-accent', palette.accent);
+    card.style.setProperty('--blitz-start-glow', palette.glow);
+
+    const kicker = document.createElement('div');
+    kicker.className = 'booha-blitz-start-kicker';
+    kicker.textContent = `${palette.name || 'BOOHA BLITZ'} · ${palette.nameJp || ''}`.trim();
+    const title = document.createElement('div');
+    title.className = 'booha-blitz-start-title';
+    title.textContent = `${getPlayerName()}, READY?`;
+    const copy = document.createElement('div');
+    copy.className = 'booha-blitz-start-copy';
+    copy.textContent = 'Tap to start the run · タップしてスタート';
+    const button = document.createElement('button');
+    button.className = 'booha-blitz-start-button';
+    button.type = 'button';
+    button.textContent = 'START BLITZ →';
+    card.append(kicker, title, copy, button);
+    overlay.classList.add('blitz-awaiting-start');
+    overlay.appendChild(card);
+    return { card, button };
   }
 
   function create(config) {
@@ -1641,6 +1767,32 @@ window.BoohaBlitzEngine = (() => {
           // Audio is optional celebration feedback.
         }
       }
+      function playStartSting() {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor) return;
+        try {
+          if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
+          if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
+          const notes = palette.feel === 'arcade' ? [392, 587] : palette.feel === 'sleek' ? [440, 659] : [523, 784];
+          const now = streakAudioCtx.currentTime + 0.01;
+          notes.forEach((frequency, index) => {
+            const startAt = now + index * 0.075;
+            const oscillator = streakAudioCtx.createOscillator();
+            const gain = streakAudioCtx.createGain();
+            oscillator.type = palette.feel === 'sleek' ? 'sine' : 'triangle';
+            oscillator.frequency.setValueAtTime(frequency, startAt);
+            gain.gain.setValueAtTime(0.0001, startAt);
+            gain.gain.exponentialRampToValueAtTime(0.028, startAt + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.18);
+            oscillator.connect(gain);
+            gain.connect(streakAudioCtx.destination);
+            oscillator.start(startAt);
+            oscillator.stop(startAt + 0.2);
+          });
+        } catch (_) {
+          // Audio is optional first-impression feedback.
+        }
+      }
 
       const timerEl = overlay.querySelector(selector('timer'));
       const progressEl = overlay.querySelector(selector('progress'));
@@ -1653,6 +1805,7 @@ window.BoohaBlitzEngine = (() => {
       const winScreen = overlay.querySelector(selector('win'));
       const spotlight = createPlayerSpotlight(overlay, palette);
       const finalCard = ensureFinalCard(winScreen, palette);
+      const startCard = createStartCard(overlay, palette);
       const queue = shuffle(weekCards);
       let current = 0;
       let startTime = null;
@@ -1662,6 +1815,7 @@ window.BoohaBlitzEngine = (() => {
       let locked = false;
       let bgIndex = 0;
       let lastTimerPaint = -Infinity;
+      let gameStarted = false;
       let streak = 0;
       let bestStreak = 0;
       let finalHoldTimer = null;
@@ -1984,7 +2138,21 @@ window.BoohaBlitzEngine = (() => {
           btn.addEventListener('click', () => handleAnswer(btn, opt, card));
           optionsEl.appendChild(btn);
         });
-        if (current === 0 && startTime === null) startTime = performance.now();
+        if (current === 0 && startTime === null && gameStarted) startTime = performance.now();
+      }
+
+      function beginGame() {
+        if (gameStarted) return;
+        gameStarted = true;
+        startBGM();
+        playStartSting();
+        startCard.card.classList.add('launching');
+        setTimeout(() => {
+          overlay.classList.remove('blitz-awaiting-start');
+          startCard.card.remove();
+          startTime = performance.now();
+          spotlight.announce(`${spotlight.playerName}, GO!`);
+        }, 140);
       }
 
       function showWin(ms) {
@@ -2071,6 +2239,8 @@ window.BoohaBlitzEngine = (() => {
       rafId = requestAnimationFrame(tick);
       renderQuestion();
       spotlight.announce(`${spotlight.playerName}, READY?`);
+      startCard.button.addEventListener('click', beginGame);
+      requestAnimationFrame(() => startCard.button.focus());
     }
 
     function launch({ curr, monthSlug, weekNumber }) {
