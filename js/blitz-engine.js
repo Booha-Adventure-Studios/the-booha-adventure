@@ -517,7 +517,7 @@ window.BoohaBlitzEngine = (() => {
         padding: 7px 14px 8px;
         border: 2px solid var(--streak-color, var(--blitz-accent));
         border-radius: 999px;
-        background: linear-gradient(180deg, rgba(0, 0, 0, .56), rgba(0, 0, 0, .32));
+        background: linear-gradient(180deg, rgba(0, 0, 0, .76), rgba(0, 0, 0, .64));
         color: #fff;
         text-align: center;
         font-size: clamp(10px, 2.8vw, 16px);
@@ -525,7 +525,7 @@ window.BoohaBlitzEngine = (() => {
         letter-spacing: clamp(.6px, .25vw, 1.8px);
         text-shadow: 0 0 14px var(--streak-color, var(--blitz-accent));
         opacity: 0;
-        box-shadow: 0 0 18px var(--blitz-accent);
+        box-shadow: 0 0 20px var(--streak-color, var(--blitz-accent)), 0 0 34px var(--blitz-streak-glow);
         pointer-events: none;
         transition: opacity 180ms ease, transform 180ms ease, border-color 180ms ease,
           background 180ms ease, box-shadow 180ms ease;
@@ -1152,6 +1152,39 @@ window.BoohaBlitzEngine = (() => {
       #sb-overlay.blitz-feel-sleek .sb-opt:hover,
       #qb-overlay.blitz-feel-sleek .qb-opt:hover {
         transform: translateY(-1px);
+      }
+      #vb-overlay.blitz-compositor .vb-opt,
+      #sb-overlay.blitz-compositor .sb-opt,
+      #qb-overlay.blitz-compositor .qb-opt {
+        border-width: 2px;
+        border-color: var(--blitz-accent);
+        background-image: linear-gradient(160deg, rgba(255,255,255,.10), rgba(0,0,0,.16));
+      }
+      #vb-overlay.blitz-compositor .vb-opt.correct,
+      #vb-overlay.blitz-compositor .vb-opt.wrong,
+      #vb-overlay.blitz-compositor .vb-opt.micro-win,
+      #sb-overlay.blitz-compositor .sb-opt.correct,
+      #sb-overlay.blitz-compositor .sb-opt.wrong,
+      #sb-overlay.blitz-compositor .sb-opt.micro-win,
+      #qb-overlay.blitz-compositor .qb-opt.correct,
+      #qb-overlay.blitz-compositor .qb-opt.wrong,
+      #qb-overlay.blitz-compositor .qb-opt.micro-win {
+        background-image: none;
+      }
+      #vb-overlay.blitz-feel-playful .vb-opt,
+      #sb-overlay.blitz-feel-playful .sb-opt,
+      #qb-overlay.blitz-feel-playful .qb-opt {
+        box-shadow: 0 0 0 1px rgba(255,255,255,.20), 0 8px 22px rgba(74,14,55,.24), inset 0 1px 0 rgba(255,255,255,.22);
+      }
+      #vb-overlay.blitz-feel-arcade .vb-opt,
+      #sb-overlay.blitz-feel-arcade .sb-opt,
+      #qb-overlay.blitz-feel-arcade .qb-opt {
+        box-shadow: 0 0 0 1px rgba(255,255,255,.20), 0 6px 18px rgba(0,10,24,.42), inset 0 1px 0 rgba(255,255,255,.16);
+      }
+      #vb-overlay.blitz-feel-sleek .vb-opt,
+      #sb-overlay.blitz-feel-sleek .sb-opt,
+      #qb-overlay.blitz-feel-sleek .qb-opt {
+        box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 8px 24px rgba(0,8,24,.38), inset 0 1px 0 rgba(255,255,255,.14);
       }
       .blitz-feel-sleek .booha-blitz-nameplate {
         border-radius: 14px;
