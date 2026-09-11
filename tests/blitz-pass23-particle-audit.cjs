@@ -16,7 +16,7 @@ assert.match(engine, /\.booha-blitz-streak-spark-large \{[\s\S]*?width: clamp\(1
   'high streak events must include one larger readable spark');
 assert.match(engine, /threshold >= 5 \? \(palette\.feel === 'arcade' \? 14 : 12\)/,
   'high streak events must increase the particle burst while retaining low-power limits');
-assert.match(engine, /const count = LOW_POWER \? 3 : streak >= 5 \? 10 : 6/,
+assert.match(engine, /const count = isLowPower\(\) \? 3 : streak >= 5 \? 10 : 6/,
   'correct feedback must add a modest streak-scaled burst');
 assert.match(engine, /const size = 5 \+ Math\.random\(\) \* 6/,
   'celebration particles must avoid sub-five-pixel sizing');
