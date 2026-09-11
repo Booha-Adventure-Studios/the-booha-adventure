@@ -1375,6 +1375,47 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-nameplate { min-height: 32px; padding: 5px 12px; }
         .booha-blitz-callout { font-size: clamp(18px, 4vw, 32px); }
       }
+      @media (orientation: landscape) and (max-height: 700px) {
+        #vb-timer-bar, #sb-timer-bar, #qb-timer-bar {
+          min-height: 56px;
+          padding-top: max(env(safe-area-inset-top, 0px) + 8px, 10px);
+          padding-bottom: 6px;
+          gap: 10px;
+        }
+        #vb-timer, #sb-timer, #qb-timer { font-size: clamp(32px, 8vh, 58px); }
+        #vb-progress, #sb-progress, #qb-progress { font-size: clamp(10px, 2.2vh, 13px); }
+        .booha-blitz-feedback { flex-basis: 44px; min-height: 44px; }
+        .booha-blitz-nameplate {
+          width: min(520px, calc(100vw - 64px));
+          min-height: 36px;
+          padding: 5px 12px 6px;
+          font-size: clamp(10px, 2.3vh, 15px);
+        }
+        .booha-blitz-nameplate-streak { margin-left: 5px; }
+        .booha-blitz-streak-marker { margin-left: 5px; }
+        .booha-blitz-streak-meter { width: clamp(30px, 7vw, 52px); margin-left: 6px; }
+        #vb-stage { gap: 4px; padding-inline: 16px; }
+        #vb-jp-word { font-size: clamp(38px, 11vh, 74px); line-height: .95; }
+        #vb-hira { font-size: clamp(14px, 3vh, 22px); }
+        #vb-options {
+          gap: 6px;
+          padding-bottom: max(env(safe-area-inset-bottom, 0px) + 8px, 10px);
+        }
+        .vb-opt {
+          padding: clamp(8px, 1.8vh, 14px) 10px;
+          font-size: clamp(13px, 2.7vh, 18px);
+        }
+        #sb-scroll, #qb-scroll { padding-top: 4px; gap: 8px; }
+        #sb-prompt, #qb-prompt { gap: 4px; padding-top: 2px; }
+        #sb-jp-word { font-size: clamp(20px, 5.2vh, 34px); line-height: 1.2; }
+        #qb-jp-word { font-size: clamp(19px, 4.8vh, 32px); line-height: 1.25; }
+        #sb-hira, #qb-hira { font-size: clamp(11px, 2.2vh, 15px); }
+        #sb-options, #qb-options { gap: 5px; }
+        .sb-opt, .qb-opt {
+          padding: clamp(8px, 1.8vh, 13px) 14px;
+          font-size: clamp(12px, 2.3vh, 16px);
+        }
+      }
     `;
     document.head.appendChild(style);
   }
