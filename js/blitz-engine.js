@@ -6,6 +6,59 @@
  * win flow live here so those behaviours cannot drift between modes.
  */
 window.BoohaBlitzEngine = (() => {
+  const THEMES = Object.freeze({
+    pb: Object.freeze({
+      id: 'pb', name: 'Pre-Boo', nameJp: 'プレブー',
+      baseHue: 318, bgSat: 68, bgLit: 14,
+      background: Object.freeze({ main: 'hsl(318, 68%, 14%)', secondary: 'hsl(318, 52%, 19%)' }),
+      accent: '#ff5ac8', accent2: '#ffe16a', glow: 'rgba(255,90,200,0.72)',
+      optionBg: 'rgba(255,90,200,0.16)', optionBorder: '#ff5ac8', optionHover: 'rgba(255,90,200,0.34)',
+      timerColor: '#ffe16a', wordColor: '#ffffff', hiraColor: '#ffc0ec',
+      correct: Object.freeze({ color: '#00ff86', glow: 'rgba(0,255,134,.58)' }),
+      wrong: Object.freeze({ color: '#ff536d', glow: 'rgba(255,83,109,.58)' }),
+      popup: Object.freeze({ background: 'rgba(47,12,38,.92)', accent: '#ff8edb' }),
+      streak: Object.freeze({ colors: ['#ffffff', '#ffe66b', '#ff9d2e', '#ff4b3e', '#ff3bbd'], glow: 'rgba(255,102,208,.68)' }),
+      reward: Object.freeze({ colors: ['#fff8ce', '#ffe166', '#ff72d2', '#ffffff'], glow: 'rgba(255,165,48,.78)' }),
+      shape: Object.freeze({ optionRadius: 'round', popupRadius: '28px', particle: 'round' }),
+      motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72 }),
+      particleShape: 'round', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, feel: 'playful',
+      rewardColors: ['#fff8ce', '#ffe166', '#ff72d2', '#ffffff'], rewardGlow: 'rgba(255,165,48,.78)',
+    }),
+    br: Object.freeze({
+      id: 'br', name: 'Boo-riculum', nameJp: 'ブーリキュラム',
+      baseHue: 185, bgSat: 85, bgLit: 10,
+      background: Object.freeze({ main: 'hsl(185, 85%, 10%)', secondary: 'hsl(180, 78%, 13%)' }),
+      accent: '#00ffee', accent2: '#39ff14', glow: 'rgba(0,255,238,0.7)',
+      optionBg: 'rgba(0,255,238,0.14)', optionBorder: '#00ffee', optionHover: 'rgba(0,255,238,0.32)',
+      timerColor: '#39ff14', wordColor: '#ffffff', hiraColor: '#80ffee',
+      correct: Object.freeze({ color: '#39ff14', glow: 'rgba(57,255,20,.62)' }),
+      wrong: Object.freeze({ color: '#ff3b5c', glow: 'rgba(255,59,92,.62)' }),
+      popup: Object.freeze({ background: 'rgba(3,18,24,.94)', accent: '#00ffee' }),
+      streak: Object.freeze({ colors: ['#f5ffcf', '#39ff14', '#00ffee', '#8affff', '#ffffff'], glow: 'rgba(0,255,210,.72)' }),
+      reward: Object.freeze({ colors: ['#f5ffcf', '#39ff14', '#00ffee', '#ffffff'], glow: 'rgba(0,255,210,.78)' }),
+      shape: Object.freeze({ optionRadius: 'arcade', popupRadius: '18px', particle: 'arcade' }),
+      motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51 }),
+      particleShape: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, feel: 'arcade',
+      rewardColors: ['#f5ffcf', '#39ff14', '#00ffee', '#ffffff'], rewardGlow: 'rgba(0,255,210,.78)',
+    }),
+    bc: Object.freeze({
+      id: 'bc', name: 'Boo-continuum', nameJp: 'ブーコンティニューム',
+      baseHue: 222, bgSat: 42, bgLit: 8,
+      background: Object.freeze({ main: 'hsl(222, 42%, 8%)', secondary: 'hsl(225, 45%, 12%)' }),
+      accent: '#f0c96a', accent2: '#dfeaff', glow: 'rgba(240,201,106,0.58)',
+      optionBg: 'rgba(240,201,106,0.10)', optionBorder: '#f0c96a', optionHover: 'rgba(240,201,106,0.22)',
+      timerColor: '#ffe7a0', wordColor: '#ffffff', hiraColor: '#b8d1ff',
+      correct: Object.freeze({ color: '#9fffc4', glow: 'rgba(159,255,196,.5)' }),
+      wrong: Object.freeze({ color: '#e8758d', glow: 'rgba(232,117,141,.5)' }),
+      popup: Object.freeze({ background: 'rgba(8,14,31,.95)', accent: '#f0c96a' }),
+      streak: Object.freeze({ colors: ['#fff6cf', '#f0c96a', '#dfeaff', '#b8d1ff', '#ffffff'], glow: 'rgba(240,201,106,.58)' }),
+      reward: Object.freeze({ colors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], glow: 'rgba(240,201,106,.72)' }),
+      shape: Object.freeze({ optionRadius: 'diamond', popupRadius: '14px', particle: 'diamond' }),
+      motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24 }),
+      particleShape: 'diamond', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, feel: 'sleek',
+      rewardColors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], rewardGlow: 'rgba(240,201,106,.72)',
+    }),
+  });
   const TIMER_PAINT_INTERVAL_MS = 100;
   const LOW_POWER =
     (typeof window.matchMedia === 'function' &&
@@ -501,6 +554,12 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-glow', palette.glow);
       overlay.style.setProperty('--blitz-reward-glow', palette.rewardGlow || palette.glow);
       overlay.style.setProperty('--blitz-name-ease', palette.nameEasing || 'ease-out');
+      overlay.style.setProperty('--blitz-bg-main', palette.background?.main || `hsl(${palette.baseHue}, ${palette.bgSat}%, ${palette.bgLit}%)`);
+      overlay.style.setProperty('--blitz-bg-secondary', palette.background?.secondary || 'rgba(255,255,255,.08)');
+      overlay.style.setProperty('--blitz-correct', palette.correct?.color || '#00ff64');
+      overlay.style.setProperty('--blitz-wrong', palette.wrong?.color || '#ff1e1e');
+      overlay.style.setProperty('--blitz-popup-bg', palette.popup?.background || 'rgba(0,0,0,.92)');
+      overlay.style.setProperty('--blitz-streak-glow', palette.streak?.glow || palette.glow);
       overlay.classList.add(`blitz-feel-${palette.feel || 'arcade'}`);
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
         overlay.style.setProperty(name, typeof value === 'function' ? value(palette) : value);
@@ -1106,6 +1165,7 @@ window.BoohaBlitzEngine = (() => {
   }
 
   return {
+    themes: THEMES,
     LOW_POWER,
     effectCount,
     fmtTime,
