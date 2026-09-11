@@ -53,6 +53,18 @@ window.VocabBlitz = (() => {
     },
   };
 
+  const BLITZ_TIMER_PAINT_INTERVAL_MS = 100;
+  const BLITZ_LOW_POWER =
+    (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+    (typeof navigator !== 'undefined' && (
+      (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
+      (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
+    ));
+
+  function effectCount(fullCount) {
+    return BLITZ_LOW_POWER ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
+  }
+
 /* ── Scolding bank ───────────────────────────────────────────── */
 const SCOLDS = [
   {
@@ -611,6 +623,12 @@ const SCOLDS = [
         text-align: center;
         gap: 8px;
       }
+      #vb-overlay.low-power #vb-wrong-popup,
+      #vb-overlay.low-power #vb-win {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(0,0,0,0.96);
+      }
       #vb-win.show { display: flex; }
 
       .vb-win-label {
@@ -771,6 +789,7 @@ const SCOLDS = [
   function buildOverlay() {
     const el = document.createElement('div');
     el.id = 'vb-overlay';
+    if (BLITZ_LOW_POWER) el.classList.add('low-power');
     el.innerHTML = `
       <div id="vb-flash"></div>
 
@@ -833,7 +852,8 @@ const SCOLDS = [
     const cy = window.innerHeight / 2;
 
     /* 1 ── The bite: word-crumbs spray from center ─────────────── */
-    for (let i = 0; i < (isRecord ? 70 : 46); i++) {
+    const crumbNodes = document.createDocumentFragment();
+    for (let i = 0; i < effectCount(isRecord ? 70 : 46); i++) {
       const p     = document.createElement('div');
       const angle = Math.random() * Math.PI * 2;
       const dist  = 70 + Math.random() * (isRecord ? 360 : 240);
@@ -854,12 +874,14 @@ const SCOLDS = [
         --pdelay:${Math.random() * 100}ms;
         animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
       `;
-      overlay.appendChild(p);
       p.addEventListener('animationend', () => p.remove());
+      crumbNodes.appendChild(p);
     }
+    overlay.appendChild(crumbNodes);
 
     /* 2 ── Name rain: the sky fills with the student ───────────── */
-    for (let i = 0; i < (isRecord ? 44 : 28); i++) {
+    const nameNodes = document.createDocumentFragment();
+    for (let i = 0; i < effectCount(isRecord ? 44 : 28); i++) {
       const d     = document.createElement('div');
       const color = colors[Math.floor(Math.random() * colors.length)];
       const size  = 12 + Math.random() * (isRecord ? 26 : 20);
@@ -878,9 +900,10 @@ const SCOLDS = [
         --cdur:${2800 + Math.random() * 1800}ms;
         --cdelay:${Math.random() * 1000}ms;
       `;
-      overlay.appendChild(d);
       d.addEventListener('animationend', () => d.remove());
+      nameNodes.appendChild(d);
     }
+    overlay.appendChild(nameNodes);
   }
 
   /* ── Main launch function ────────────────────────────────────── */
@@ -961,6 +984,7 @@ function stopBGM() {
     let elapsed = 0;
     let clearElapsed = null;
     let rafId = null;
+    let lastTimerPaint = -Infinity;
     let locked = false;
     let bgIndex = 0;
 
@@ -968,7 +992,10 @@ function stopBGM() {
     function tick() {
       if (startTime === null) { rafId = requestAnimationFrame(tick); return; }
       elapsed = performance.now() - startTime;
-      timerEl.textContent = fmtTime(elapsed);
+      if (elapsed - lastTimerPaint >= BLITZ_TIMER_PAINT_INTERVAL_MS) {
+        timerEl.textContent = fmtTime(elapsed);
+        lastTimerPaint = elapsed;
+      }
       rafId = requestAnimationFrame(tick);
     }
 
@@ -1064,7 +1091,8 @@ function stopBGM() {
     correctBtn.style.opacity    = '0';
 
     const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
-    for (let i = 0; i < 22; i++) {
+    const particleNodes = document.createDocumentFragment();
+    for (let i = 0; i < effectCount(22); i++) {
       const p     = document.createElement('div');
       const angle = (i / 22) * Math.PI * 2;
       const dist  = 60 + Math.random() * 120;
@@ -1083,9 +1111,10 @@ function stopBGM() {
         --pdelay:${Math.random() * 40}ms;
         animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
       `;
-      overlay.appendChild(p);
       p.addEventListener('animationend', () => p.remove());
+      particleNodes.appendChild(p);
     }
+    overlay.appendChild(particleNodes);
   }, 100);
 
   // ── 5. Full screen white/neon flash ──────────────────────

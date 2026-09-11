@@ -321,6 +321,18 @@ window.QuestionBlitz = (() => {
     return a;
   }
 
+  const BLITZ_TIMER_PAINT_INTERVAL_MS = 100;
+  const BLITZ_LOW_POWER =
+    (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+    (typeof navigator !== 'undefined' && (
+      (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
+      (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
+    ));
+
+  function effectCount(fullCount) {
+    return BLITZ_LOW_POWER ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
+  }
+
   /* ── Format time ─────────────────────────────────────────────── */
   function fmtTime(ms) {
     if (ms === null || ms === undefined) return '--';
@@ -554,6 +566,12 @@ window.QuestionBlitz = (() => {
         -webkit-backdrop-filter: blur(16px);
         padding: 28px 24px; text-align: center; gap: 8px;
       }
+      #qb-overlay.low-power #qb-wrong-popup,
+      #qb-overlay.low-power #qb-win {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(0,0,0,0.96);
+      }
       #qb-win.show { display: flex; }
 
       .qb-win-label {
@@ -709,6 +727,7 @@ window.QuestionBlitz = (() => {
   function buildOverlay() {
     const el = document.createElement('div');
     el.id = 'qb-overlay';
+    if (BLITZ_LOW_POWER) el.classList.add('low-power');
     el.innerHTML = `
       <div id="qb-flash"></div>
       <div id="qb-timer-bar">
@@ -765,7 +784,8 @@ window.QuestionBlitz = (() => {
     const W = window.innerWidth, H = window.innerHeight;
 
     /* 1 ── Names STREAK across at speed, alternating direction ─── */
-    for (let i = 0; i < (isRecord ? 42 : 26); i++) {
+    const nameNodes = document.createDocumentFragment();
+    for (let i = 0; i < effectCount(isRecord ? 42 : 26); i++) {
       const d      = document.createElement('div');
       const color  = colors[Math.floor(Math.random() * colors.length)];
       const size   = 12 + Math.random() * (isRecord ? 26 : 20);
@@ -783,12 +803,14 @@ window.QuestionBlitz = (() => {
         --cdur:${1800 + Math.random() * 1200}ms;
         --cdelay:${Math.random() * 900}ms;
       `;
-      overlay.appendChild(d);
       d.addEventListener('animationend', () => d.remove());
+      nameNodes.appendChild(d);
     }
+    overlay.appendChild(nameNodes);
 
     /* 2 ── Speed lines tear through with them ──────────────────── */
-    for (let i = 0; i < (isRecord ? 34 : 22); i++) {
+    const speedLineNodes = document.createDocumentFragment();
+    for (let i = 0; i < effectCount(isRecord ? 34 : 22); i++) {
       const l      = document.createElement('div');
       const color  = colors[Math.floor(Math.random() * colors.length)];
       const toLeft = i % 2 === 0;
@@ -805,9 +827,10 @@ window.QuestionBlitz = (() => {
         --cdur:${600 + Math.random() * 300}ms;
         --cdelay:${Math.random() * 460}ms;
       `;
-      overlay.appendChild(l);
       l.addEventListener('animationend', () => l.remove());
+      speedLineNodes.appendChild(l);
     }
+    overlay.appendChild(speedLineNodes);
   }
 
   /* ── Launch ──────────────────────────────────────────────────── */
@@ -870,11 +893,15 @@ window.QuestionBlitz = (() => {
     let current = 0, startTime = null, elapsed = 0;
     let clearElapsed = null;
     let rafId = null, locked = false, bgIndex = 0;
+    let lastTimerPaint = -Infinity;
 
     function tick() {
       if (startTime === null) { rafId = requestAnimationFrame(tick); return; }
       elapsed = performance.now() - startTime;
-      timerEl.textContent = fmtTime(elapsed);
+      if (elapsed - lastTimerPaint >= BLITZ_TIMER_PAINT_INTERVAL_MS) {
+        timerEl.textContent = fmtTime(elapsed);
+        lastTimerPaint = elapsed;
+      }
       rafId = requestAnimationFrame(tick);
     }
     function stopTimer() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
@@ -915,7 +942,8 @@ window.QuestionBlitz = (() => {
         const cy  = r.top  - ovr.top  + r.height / 2;
         const colors = [palette.accent, palette.accent2, '#ffffff', '#00cfff'];
 
-        for (let i = 0; i < 18; i++) {
+        const particleNodes = document.createDocumentFragment();
+        for (let i = 0; i < effectCount(18); i++) {
           const p = document.createElement('div');
           const angle = (i / 18) * Math.PI * 2;
           const dist  = 50 + Math.random() * 100;
@@ -932,9 +960,10 @@ window.QuestionBlitz = (() => {
             
             animation: qbParticle var(--pdur) ease-out var(--pdelay) both;
           `;
-          overlay.appendChild(p);
           p.addEventListener('animationend', () => p.remove());
+          particleNodes.appendChild(p);
         }
+        overlay.appendChild(particleNodes);
       }, 90);
 
       setTimeout(() => {
