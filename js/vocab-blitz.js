@@ -53,18 +53,6 @@ window.VocabBlitz = (() => {
     },
   };
 
-  const BLITZ_TIMER_PAINT_INTERVAL_MS = 100;
-  const BLITZ_LOW_POWER =
-    (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
-    (typeof navigator !== 'undefined' && (
-      (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
-      (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
-    ));
-
-  function effectCount(fullCount) {
-    return BLITZ_LOW_POWER ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
-  }
-
 /* ── Scolding bank ───────────────────────────────────────────── */
 const SCOLDS = [
   {
@@ -149,209 +137,12 @@ const SCOLDS = [
   }
 ];
    
-  /* ── Blitz score helpers ──────────────────────────────────────── */
-  const BLITZ_GAME_TYPE = 'vocab';
-  const LEGACY_SCORE_KEY = 'vocabBlitz';
+  /* ── Mode-specific win copy ─────────────────────────────────── */
   const WIN_COPY = {
     clear: 'ATE THE WORDS',
     record: 'BROKE THE MACHINE',
     jp: 'ブーハが覚えた。'
   };
-
-  function getPlayerName() {
-    try {
-      if (typeof getBoohaFirstName === 'function') {
-        const n = getBoohaFirstName();
-        if (n) return String(n).trim().split(/\s+/)[0].toUpperCase();
-      }
-      const raw =
-        localStorage.getItem('booha_first_name') ||
-        localStorage.getItem('booha_user_name') ||
-        localStorage.getItem('booha_display_name') ||
-        localStorage.getItem('booha_name') ||
-        'PLAYER 1';
-      const first = String(raw).trim().split(/\s+/)[0] || 'PLAYER';
-      return first.toUpperCase();
-    } catch {
-      return 'PLAYER';
-    }
-  }
-
-  // Weekly bucket is keyed off the exact curriculum-week occurrence. A fifth
-  // Sunday occurrence keeps Week 4's content, but must get a fresh bucket.
-  function makeWeekId(monthSlug, weekNumber) {
-    try {
-      const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
-      if (cw && cw.monthSlug === monthSlug && cw.weekNumber === weekNumber) {
-        const key = window.CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey;
-        if (key) return key;
-      }
-    } catch (_) {}
-    return `${monthSlug}:w${weekNumber}`;
-  }
-
-  function normalizeScore(score) {
-    if (score === null || score === undefined) return null;
-    if (typeof score === 'number') {
-      return { ms: score, name: 'UNKNOWN', date: null };
-    }
-    if (typeof score === 'object' && typeof score.ms === 'number') {
-      return score;
-    }
-    return null;
-  }
-
-  function ensureBlitzStore(data, weekId) {
-    if (!data.meta) data.meta = {};
-    if (!data.meta.blitz) data.meta.blitz = {};
-
-    const blitz = data.meta.blitz;
-    if (!blitz.weekly) blitz.weekly = {};
-    if (!blitz.records) blitz.records = {};
-
-    // This only rolls the weekly bucket when we have an authoritative week id.
-    if (weekId && blitz.weeklyKey !== weekId) {
-      blitz.weeklyKey = weekId;
-      blitz.weekly = {};
-    }
-
-    if (!blitz.weekly[BLITZ_GAME_TYPE]) blitz.weekly[BLITZ_GAME_TYPE] = {};
-    if (!blitz.records[BLITZ_GAME_TYPE]) blitz.records[BLITZ_GAME_TYPE] = {};
-
-    return blitz;
-  }
-
-  // Routed through BoohaSaveFile, never localStorage directly. The bare
-  // 'booha_save' key is unscoped: writing to it put blitz records outside the
-  // student's save file, outside the weekly reset, and shared across everyone
-  // using the device. Reads here also get schema migration for free.
-  function readSave() {
-    try {
-      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.load();
-      console.error('[Blitz] Save system unavailable — reading empty.');
-      return {};
-    } catch (e) {
-      console.error('[Blitz] Save read failed:', e);
-      return {};
-    }
-  }
-
-  // Returns true only if the write actually landed. BoohaSaveFile refuses to
-  // write when no student is identified, and that must not be silent.
-  function writeSave(data) {
-    try {
-      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.save(data);
-      console.error('[Blitz] Save system unavailable — record NOT written.');
-      return false;
-    } catch (e) {
-      console.error('[Blitz] Save write failed:', e);
-      return false;
-    }
-  }
-
-  function getLegacyBestTime(curr) {
-    try {
-      const data = readSave();
-      return data?.meta?.[LEGACY_SCORE_KEY]?.[curr] ?? null;
-    } catch {
-      return null;
-    }
-  }
-
-  function getBestScore(curr) {
-    try {
-      const data = readSave();
-      const blitz = ensureBlitzStore(data);
-      const modern = normalizeScore(blitz.records?.[BLITZ_GAME_TYPE]?.[curr]);
-      if (modern) return modern;
-      return normalizeScore(getLegacyBestTime(curr));
-    } catch {
-      return null;
-    }
-  }
-
-  function getWeeklyScore(curr, weekId) {
-    try {
-      const data = readSave();
-      const blitz = ensureBlitzStore(data, weekId);
-      return normalizeScore(blitz.weekly?.[BLITZ_GAME_TYPE]?.[curr]);
-    } catch {
-      return null;
-    }
-  }
-
-  function getBestTime(curr) {
-    const best = getBestScore(curr);
-    return best ? best.ms : null;
-  }
-
-  function saveBestTime(curr, ms, weekId) {
-    try {
-      const data = readSave();
-      const blitz = ensureBlitzStore(data, weekId);
-      const playerName = getPlayerName();
-
-      const oldWeekly = normalizeScore(blitz.weekly[BLITZ_GAME_TYPE][curr]);
-      const oldRecord = normalizeScore(blitz.records[BLITZ_GAME_TYPE][curr]);
-      const legacy = normalizeScore(getLegacyBestTime(curr));
-
-      const bestBefore = [oldRecord, legacy]
-        .filter(Boolean)
-        .sort((a, b) => a.ms - b.ms)[0] || null;
-
-      const newScore = { ms, name: playerName, date: new Date().toISOString() };
-
-      const isWeeklyRecord  = !oldWeekly || ms < oldWeekly.ms;
-      const isAllTimeRecord = !bestBefore || ms < bestBefore.ms;
-
-      if (isWeeklyRecord) {
-        blitz.weekly[BLITZ_GAME_TYPE][curr] = newScore;
-      }
-      if (isAllTimeRecord) {
-        blitz.records[BLITZ_GAME_TYPE][curr] = newScore;
-        if (!data.meta[LEGACY_SCORE_KEY]) data.meta[LEGACY_SCORE_KEY] = {};
-        data.meta[LEGACY_SCORE_KEY][curr] = ms;
-      }
-
-      if (!writeSave(data)) {
-        // Don't claim a record that wasn't stored — the student would see
-        // "NEW BOOHA RECORD" and find it gone on the next load.
-        return {
-          isWeeklyRecord: false, isAllTimeRecord: false,
-          oldRecord: bestBefore, newScore, saveFailed: true
-        };
-      }
-      return { isWeeklyRecord, isAllTimeRecord, oldRecord: bestBefore, newScore };
-       
-    } catch {
-       
-      return {
-        isWeeklyRecord: false,
-        isAllTimeRecord: false,
-        oldRecord: null,
-        newScore: { ms, name: getPlayerName(), date: new Date().toISOString() }
-      };
-    }
-  }
-
-   
-  /* ── Shuffle ─────────────────────────────────────────────────── */
-  function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  /* ── Format time ─────────────────────────────────────────────── */
-  function fmtTime(ms) {
-    if (ms === null || ms === undefined) return '--';
-    const s = Math.floor(ms / 1000);
-    const cents = Math.floor((ms % 1000) / 10);
-    return `${s}.${String(cents).padStart(2, '0')}s`;
-  }
 
   /* ── Inject styles once ──────────────────────────────────────── */
   let stylesInjected = false;
@@ -789,7 +580,7 @@ const SCOLDS = [
   function buildOverlay() {
     const el = document.createElement('div');
     el.id = 'vb-overlay';
-    if (BLITZ_LOW_POWER) el.classList.add('low-power');
+    if (BoohaBlitzEngine.LOW_POWER) el.classList.add('low-power');
     el.innerHTML = `
       <div id="vb-flash"></div>
 
@@ -837,447 +628,54 @@ const SCOLDS = [
     return el;
   }
 
+  // The game lifecycle is shared with Sentence Blitz and Question Blitz.
+  const blitzEngine = BoohaBlitzEngine.create({
+    apiName: 'VocabBlitz',
+    gameType: 'vocab',
+    legacyKey: 'vocabBlitz',
+    saveId: 'vocab',
+    dataFile: 'vocab.json',
+    dataLabel: 'vocab',
+    overlayId: 'vb-overlay',
+    notEnoughMessage: 'Not enough vocab cards for this week.',
+    palettes: PALETTES,
+    scolds: SCOLDS,
+    buildOverlay,
+    injectStyles,
+    optionClass: 'vb-opt',
+    particleClass: 'vb-particle',
+    particleAnimation: 'vbParticle',
+    celebrationMode: 'vocab',
+    correctParticles: 22,
+    nextDelay: 220,
+    cssVars: {
+      '--vb-glow': p => p.glow,
+      '--vb-hira-color': p => p.hiraColor,
+      '--vb-opt-bg': p => p.optionBg,
+      '--vb-opt-border': p => p.optionBorder,
+      '--vb-opt-hover': p => p.optionHover,
+    },
+    ids: {
+      timer: '#vb-timer', progress: '#vb-progress', jpWord: '#vb-jp-word', hira: '#vb-hira',
+      options: '#vb-options', flash: '#vb-flash', scroll: null, wrongPopup: '#vb-wrong-popup',
+      win: '#vb-win', quit: '#vb-quit', wrongClose: '#vb-wrong-close',
+      playAgain: '#vb-play-again', winClose: '#vb-win-close',
+      wrongJp: '#vwk', wrongHira: '#vwh', wrongEn: '#vwe',
+      scoldJp: '#vsj', scoldHira: '#vsh', scoldEn: '#vse',
+      winName: '#vb-win-name', winScream: '#vb-win-scream', winJp: '#vb-win-jp',
+      winTime: '#vb-win-time-val', winRecord: '#vb-win-record-msg',
+      winBest: '#vb-win-best-val', winDelta: '#vb-win-delta',
+    },
+    winCopy: WIN_COPY,
+  });
+
   /* ── Particles ───────────────────────────────────────────────── */
-  function megaCelebrate(overlay, palette, isRecord) {
-    const name   = getPlayerName();
-    const colors = isRecord
-      ? ['#ffd700', '#ffea00', '#fff3b0', '#ffffff']
-      : [palette.accent, palette.accent2, '#ffffff', '#ffea00'];
-    const crumbs = ['#ffdca8', '#ffc46b', '#fff1d6', palette.accent, '#ffffff'];
-
-    overlay.classList.add('shake');
-    setTimeout(() => overlay.classList.remove('shake'), 420);
-
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
-
-    /* 1 ── The bite: word-crumbs spray from center ─────────────── */
-    const crumbNodes = document.createDocumentFragment();
-    for (let i = 0; i < effectCount(isRecord ? 70 : 46); i++) {
-      const p     = document.createElement('div');
-      const angle = Math.random() * Math.PI * 2;
-      const dist  = 70 + Math.random() * (isRecord ? 360 : 240);
-      const size  = 3 + Math.random() * 6;
-      const color = crumbs[Math.floor(Math.random() * crumbs.length)];
-      p.className = 'vb-particle';
-      p.style.cssText = `
-        position:absolute;
-        left:${cx}px; top:${cy}px;
-        width:${size}px; height:${size}px;
-        border-radius:${Math.random() > 0.4 ? '50%' : '2px'};
-        background:${color};
-        pointer-events:none; z-index:30;
-        box-shadow:0 0 8px 2px ${color};
-        --px:${Math.cos(angle) * dist}px;
-        --py:${Math.sin(angle) * dist + 40}px;
-        --pdur:${520 + Math.random() * 520}ms;
-        --pdelay:${Math.random() * 100}ms;
-        animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
-      `;
-      p.addEventListener('animationend', () => p.remove());
-      crumbNodes.appendChild(p);
-    }
-    overlay.appendChild(crumbNodes);
-
-    /* 2 ── Name rain: the sky fills with the student ───────────── */
-    const nameNodes = document.createDocumentFragment();
-    for (let i = 0; i < effectCount(isRecord ? 44 : 28); i++) {
-      const d     = document.createElement('div');
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const size  = 12 + Math.random() * (isRecord ? 26 : 20);
-      d.className   = 'vb-name-drop';
-      d.textContent = name;
-      d.style.cssText = `
-        left:${Math.random() * window.innerWidth}px;
-        top:${-40 - Math.random() * 220}px;
-        font-size:${size}px;
-        color:${color};
-        text-shadow:0 0 10px ${color}, 0 0 22px ${color};
-        --cx:${(Math.random() - 0.5) * 340}px;
-        --cy:${window.innerHeight * 0.8 + Math.random() * 380}px;
-        --r0:${(Math.random() - 0.5) * 40}deg;
-        --r1:${(Math.random() - 0.5) * 220}deg;
-        --cdur:${2800 + Math.random() * 1800}ms;
-        --cdelay:${Math.random() * 1000}ms;
-      `;
-      d.addEventListener('animationend', () => d.remove());
-      nameNodes.appendChild(d);
-    }
-    overlay.appendChild(nameNodes);
-  }
-
   /* ── Main launch function ────────────────────────────────────── */
    
   function launch({ curr, monthSlug, weekNumber }) {
-    const palette = PALETTES[curr];
-    if (!palette) { console.error('VocabBlitz: unknown curr', curr); return; }
-
-    injectStyles();
-
-    // Fetch vocab data
-    const path = `content/${curr}/${monthSlug}/vocab.json`;
-    fetch(path)
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(data => startGame(data.cards, curr, weekNumber, palette, monthSlug))
-      .catch(err => {
-        alert(`データが読み込めませんでした。\nCould not load vocab data.\n(${path})`);
-        console.error('VocabBlitz fetch error:', err);
-      });
+    return blitzEngine.launch({ curr, monthSlug, weekNumber });
   }
 
-
-  function startGame(allCards, curr, weekNumber, palette, monthSlug) {
-    // Slice this week's 15
-    const offset = (weekNumber - 1) * 15;
-    const weekCards = allCards.slice(offset, offset + 15);
-    if (weekCards.length < 6) {
-      alert('Not enough vocab cards for this week.');
-      return;
-    }
-
-    // Remove any existing overlay
-    const existing = document.getElementById('vb-overlay');
-    if (existing) existing.remove();
-
-    const overlay = buildOverlay();
-     
-    // ── BGM ──────────────────────────────────────────────────
-const bgm = new Audio('assets/audio/blitz.mp3');
-bgm.loop = true;
-bgm.volume = 0.55;
-let bgmStarted = false;
-function startBGM() {
-  if (bgmStarted) return;
-  bgmStarted = true;
-  bgm.play().catch(() => {});
-}
-function stopBGM() {
-  bgm.pause();
-  bgm.currentTime = 0;
-}
-// ───────────────────────────────────────────────────────── 
-
-    // Apply CSS vars for palette
-    overlay.style.setProperty('--vb-glow', palette.glow);
-    overlay.style.setProperty('--vb-hira-color', palette.hiraColor);
-    overlay.style.setProperty('--vb-opt-bg', palette.optionBg);
-    overlay.style.setProperty('--vb-opt-border', palette.optionBorder);
-    overlay.style.setProperty('--vb-opt-hover', palette.optionHover);
-    overlay.style.background = `hsl(${palette.baseHue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
-
-    // DOM refs
-    const timerEl   = overlay.querySelector('#vb-timer');
-    const progressEl = overlay.querySelector('#vb-progress');
-    const jpWordEl  = overlay.querySelector('#vb-jp-word');
-    const hiraEl    = overlay.querySelector('#vb-hira');
-    const optionsEl = overlay.querySelector('#vb-options');
-    const flashEl   = overlay.querySelector('#vb-flash');
-    const wrongPopup = overlay.querySelector('#vb-wrong-popup');
-    const winScreen = overlay.querySelector('#vb-win');
-
-    timerEl.style.color = palette.timerColor;
-
-    // State
-    const queue = shuffle(weekCards);
-    let current = 0;
-    let startTime = null;
-    let elapsed = 0;
-    let clearElapsed = null;
-    let rafId = null;
-    let lastTimerPaint = -Infinity;
-    let locked = false;
-    let bgIndex = 0;
-
-    // Timer
-    function tick() {
-      if (startTime === null) { rafId = requestAnimationFrame(tick); return; }
-      elapsed = performance.now() - startTime;
-      if (elapsed - lastTimerPaint >= BLITZ_TIMER_PAINT_INTERVAL_MS) {
-        timerEl.textContent = fmtTime(elapsed);
-        lastTimerPaint = elapsed;
-      }
-      rafId = requestAnimationFrame(tick);
-    }
-
-    function stopTimer() {
-      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-    }
-
-    // Render question
-    function renderQuestion() {
-      locked = false;
-      const card = queue[current];
-
-     // Hue-rotate background each question
-    bgIndex++;
-    const hue = (palette.baseHue + bgIndex * 51) % 360;
-    overlay.style.background =
-      `hsl(${hue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
-
-      // Word display
-      // Force re-animation by replacing element
-      jpWordEl.style.animation = 'none';
-      hiraEl.style.animation   = 'none';
-      requestAnimationFrame(() => {
-        jpWordEl.style.animation = '';
-        hiraEl.style.animation   = '';
-        jpWordEl.textContent = card.jp;
-        hiraEl.textContent   = card.hira;
-      });
-
-      // Progress
-      progressEl.textContent = `${current + 1} / ${queue.length}`;
-
-      // Build 6 options: 1 correct + 5 wrong from rest of week
-      const wrong = shuffle(weekCards.filter(c => c.n !== card.n)).slice(0, 5);
-      const options = shuffle([card, ...wrong]);
-
-      optionsEl.innerHTML = '';
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className  = 'vb-opt';
-        btn.type       = 'button';
-        btn.textContent = opt.en;
-        btn.addEventListener('click', () => handleAnswer(btn, opt, card, options));
-        optionsEl.appendChild(btn);
-      });
-
-      // Start timer on first question
-      if (current === 0 && startTime === null) {
-        startTime = performance.now();
-      }
-    }
-
-   function correctDetonate(overlay, correctBtn, optionsEl, jpWordEl, hiraEl, palette) {
-  // ── 1. Button green flash ────────────────────────────────
-  correctBtn.style.transition = 'none';
-  correctBtn.style.background = 'rgba(0,255,100,0.7)';
-  correctBtn.style.boxShadow  = '0 0 32px 8px rgba(0,255,100,0.8)';
-
-  // ── 2. Impact zoom shake ─────────────────────────────────
-  overlay.style.animation = 'none';
-  overlay.style.transform = 'scale(1.03)';
-  setTimeout(() => {
-    overlay.style.transform = '';
-    overlay.style.transition = 'transform 80ms ease';
-    setTimeout(() => { overlay.style.transition = ''; }, 80);
-  }, 60);
-
-  // ── 3. Wrong buttons shoot away ──────────────────────────
-  const allBtns = Array.from(optionsEl.querySelectorAll('.vb-opt'));
-  setTimeout(() => {
-    allBtns.forEach(btn => {
-      if (btn === correctBtn) return;
-      const angle  = Math.random() * Math.PI * 2;
-      const dist   = 220 + Math.random() * 180;
-      const tx     = Math.cos(angle) * dist;
-      const ty     = Math.sin(angle) * dist;
-      const rot    = (Math.random() - 0.5) * 540;
-      btn.style.transition = 'transform 280ms cubic-bezier(.4,0,1,1), opacity 220ms ease';
-      btn.style.transform  = `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(0.2)`;
-      btn.style.opacity    = '0';
-    });
-  }, 80);
-
-  // ── 4. Correct button particle explosion ─────────────────
-  setTimeout(() => {
-    const r   = correctBtn.getBoundingClientRect();
-    const ovr = overlay.getBoundingClientRect();
-    const cx  = r.left - ovr.left + r.width  / 2;
-    const cy  = r.top  - ovr.top  + r.height / 2;
-
-    correctBtn.style.transition = 'transform 120ms ease, opacity 100ms ease';
-    correctBtn.style.transform  = 'scale(1.3)';
-    correctBtn.style.opacity    = '0';
-
-    const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
-    const particleNodes = document.createDocumentFragment();
-    for (let i = 0; i < effectCount(22); i++) {
-      const p     = document.createElement('div');
-      const angle = (i / 22) * Math.PI * 2;
-      const dist  = 60 + Math.random() * 120;
-      const size  = 5 + Math.random() * 8;
-      p.style.cssText = `
-        position:absolute;
-        left:${cx}px; top:${cy}px;
-        width:${size}px; height:${size}px;
-        border-radius:${Math.random() > 0.5 ? '50%' : '3px'};
-        background:${colors[Math.floor(Math.random() * colors.length)]};
-        pointer-events:none; z-index:10;
-        box-shadow:0 0 8px 2px ${palette.accent};
-        --px:${Math.cos(angle) * dist}px;
-        --py:${Math.sin(angle) * dist}px;
-        --pdur:${260 + Math.random() * 160}ms;
-        --pdelay:${Math.random() * 40}ms;
-        animation: vbParticle var(--pdur) ease-out var(--pdelay) both;
-      `;
-      p.addEventListener('animationend', () => p.remove());
-      particleNodes.appendChild(p);
-    }
-    overlay.appendChild(particleNodes);
-  }, 100);
-
-  // ── 5. Full screen white/neon flash ──────────────────────
-  setTimeout(() => {
-    flashEl.style.background = palette.accent;
-    flashEl.style.opacity    = '0.55';
-    setTimeout(() => {
-      flashEl.style.background = '#ffffff';
-      flashEl.style.opacity    = '0.85';
-      setTimeout(() => {
-        flashEl.style.opacity    = '0';
-        flashEl.style.background = 'rgba(255,255,255,0.18)';
-      }, 60);
-    }, 40);
-  }, 120);
-
- // ── 6. Hard cut to next question ─────────────────────────
-  setTimeout(() => {
-    if (current >= queue.length) {
-      stopTimer();
-      stopBGM();
-      showWin(clearElapsed ?? elapsed, curr, palette, overlay, winScreen,
-        monthSlug, weekNumber, queue);
-    } else {
-      optionsEl.style.visibility = 'hidden';
-      renderQuestion();
-      requestAnimationFrame(() => {
-        optionsEl.style.visibility = '';
-      });
-    }
-  }, 220);
-}  
-
-    function handleAnswer(btn, chosen, correct, allOpts) {
-  if (locked) return;
-  locked = true;
-  startBGM();
-
-  if (chosen.n === correct.n) {
-    // ── CORRECT ──
-  btn.classList.add('correct');
-    current++;
-    if (current >= queue.length) clearElapsed = performance.now() - startTime;
-    correctDetonate(overlay, btn, optionsEl, jpWordEl, hiraEl, palette);
-
-  } else {
-    // ── WRONG ──
-    btn.classList.add('wrong');
-     
-    const allBtns = optionsEl.querySelectorAll('.vb-opt');
-    allBtns.forEach(b => {
-      if (b.textContent === correct.en) b.classList.add('correct');
-    });
-    overlay.classList.add('shake');
-    overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
-    stopTimer();
-    stopBGM();
-    setTimeout(() => showWrongPopup(correct, overlay, wrongPopup), 500);
-  }
-}
-
-     
-    // Wrong popup
-    function showWrongPopup(correct, overlay, popup) {
-      const scold = SCOLDS[Math.floor(Math.random() * SCOLDS.length)];
-      overlay.querySelector('#vwk').textContent = correct.jp;
-      overlay.querySelector('#vwh').textContent = correct.hira;
-      overlay.querySelector('#vwe').textContent = correct.en;
-      overlay.querySelector('#vsj').textContent = scold.jp;
-      overlay.querySelector('#vsh').textContent = scold.hira;
-      overlay.querySelector('#vse').textContent = scold.en;
-      popup.classList.add('show');
-    }
-
-   overlay.querySelector('#vb-wrong-close').addEventListener('click', () => {
-  stopTimer();
-  stopBGM();
-  overlay.remove();
-       
-      if (typeof window.VocabBlitz._onClose === 'function') window.VocabBlitz._onClose();
-    });
-
-     
-   // Fucking epic Win screen
-    function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
-      const weekId     = makeWeekId(monthSlug, weekNumber);
-      const result     = saveBestTime(curr, ms, weekId);
-      if (result.saveFailed) {
-        console.error('[Blitz] Time not saved:', ms, 'ms');
-      }
-
-      // Report clear to Booha day-recorder (fires only on 100% clear)
-      document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-        detail: { saveId: `blitz:${curr}:vocab`, score: 100, completed: true, time: ms }
-      }));
-      const best       = getBestScore(curr);
-      const weekly     = getWeeklyScore(curr, weekId);
-      const playerName = getPlayerName();
-
-      const isRecord  = result.isAllTimeRecord;
-      const oldRecord = result.oldRecord;
-
-      winScreen.classList.toggle('record-mode', isRecord);
-
-      winScreen.querySelector('#vb-win-name').textContent = playerName;
-      winScreen.querySelector('#vb-win-scream').textContent =
-        isRecord ? WIN_COPY.record : WIN_COPY.clear;
-      winScreen.querySelector('#vb-win-jp').textContent =
-        isRecord ? WIN_COPY.jp : 'クリア。';
-
-      winScreen.querySelector('#vb-win-time-val').textContent = fmtTime(ms);
-      winScreen.querySelector('#vb-win-time-val').style.color =
-        isRecord ? '#ffd700' : palette.timerColor;
-      winScreen.querySelector('#vb-win-time-val').style.textShadow =
-        isRecord
-          ? '0 0 28px rgba(255,215,0,1), 0 0 70px rgba(255,90,0,0.75)'
-          : `0 0 32px ${palette.glow}, 0 0 64px ${palette.glow}`;
-
-      const recordEl = winScreen.querySelector('#vb-win-record-msg');
-      const bestEl   = winScreen.querySelector('#vb-win-best-val');
-      const deltaEl  = winScreen.querySelector('#vb-win-delta');
-
-      recordEl.classList.toggle('big', isRecord);
-
-      if (isRecord) {
-        recordEl.textContent = '🏆 NEW BOOHA RECORD';
-        bestEl.textContent   = oldRecord ? `OLD: ${fmtTime(oldRecord.ms)}` : 'FIRST RECORD';
-        deltaEl.textContent  = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster` : '';
-      } else {
-        recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST' : '';
-        bestEl.textContent   = best ? `ALL-TIME BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : '';
-        deltaEl.textContent  = weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}${weekly.name ? ` — ${weekly.name}` : ''}` : '';
-      }
-
-      winScreen.classList.add('show');
-      megaCelebrate(overlay, palette, isRecord);
-    }
-
-     
-    overlay.querySelector('#vb-play-again').addEventListener('click', () => {
-      overlay.remove();
-      // Relaunch with same params
-      launch({ curr, monthSlug, weekNumber });
-    });
-
-    overlay.querySelector('#vb-win-close').addEventListener('click', () => {
-      overlay.remove();
-      if (typeof window.VocabBlitz._onClose === 'function') window.VocabBlitz._onClose();
-    });
-
-    // Quit
-  overlay.querySelector('#vb-quit').addEventListener('click', () => {
-  stopTimer();
-  stopBGM();
-  overlay.remove();
-       
-      if (typeof window.VocabBlitz._onClose === 'function') window.VocabBlitz._onClose();
-    });
-
-    // Kick off
-    rafId = requestAnimationFrame(tick);
-    renderQuestion();
-  }
 
   /* ── "Who is Fastest?" panel ─────────────────────────────────── */
   function buildFastestPanel() {
@@ -1506,24 +904,14 @@ function stopBGM() {
   };
 
   function getRecordScoreFor(gameType, curr) {
-    try {
-      const data = readSave();
-      const modern = normalizeScore(data?.meta?.blitz?.records?.[gameType]?.[curr]);
-      if (modern) return modern;
-      const legacyKey = LEGACY_KEY_FOR[gameType];
-      return legacyKey ? normalizeScore(data?.meta?.[legacyKey]?.[curr]) : null;
-    } catch { return null; }
+    const legacyKey = LEGACY_KEY_FOR[gameType];
+    return legacyKey
+      ? BoohaBlitzEngine.getRecordScoreFor(gameType, legacyKey, curr)
+      : null;
   }
 
   function getWeeklyScoreFor(gameType, curr, currentWeekId) {
-    try {
-      const blitz = readSave()?.meta?.blitz;
-      if (!blitz) return null;
-      // If we know the live week and the stored bucket is from another week,
-      // the weekly data is stale — treat as not played this week.
-      if (currentWeekId && blitz.weeklyKey !== currentWeekId) return null;
-      return normalizeScore(blitz.weekly?.[gameType]?.[curr]);
-    } catch { return null; }
+    return BoohaBlitzEngine.getWeeklyScoreFor(gameType, curr, currentWeekId);
   }
 
   function buildBlitzPane(gameType, currentWeekId) {
@@ -1577,7 +965,7 @@ function openFastestPanel(gameType = 'vocab', ctx = {}) {
     // "not played." Without it, a new week shows last week's scores.
     const currentWeekId =
       (ctx && ctx.monthSlug && ctx.weekNumber)
-        ? makeWeekId(ctx.monthSlug, ctx.weekNumber)
+        ? BoohaBlitzEngine.makeWeekId(ctx.monthSlug, ctx.weekNumber)
         : null;
 
     ['vocab', 'sentences', 'questions'].forEach(type => {
@@ -1597,9 +985,9 @@ function openFastestPanel(gameType = 'vocab', ctx = {}) {
 return {
     launch,
     openFastestPanel,
-    fmtTime,
-    getBestTime,
-    getWeeklyScore,   // weekly read w/ stale-week guard — used by index pills
+    fmtTime: blitzEngine.fmtTime,
+    getBestTime: blitzEngine.getBestTime,
+    getWeeklyScore: blitzEngine.getWeeklyScore, // weekly read w/ stale-week guard — used by index pills
     _onClose: null,   // set by index.html if needed
   };
 

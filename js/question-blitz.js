@@ -128,218 +128,12 @@ window.QuestionBlitz = (() => {
     }
   ];
 
- /* ── Blitz score helpers ──────────────────────────────────────── */
-  const BLITZ_GAME_TYPE = 'questions';
-  const LEGACY_SCORE_KEY = 'questionBlitz';
+  /* ── Mode-specific win copy ─────────────────────────────────── */
   const WIN_COPY = {
     clear: 'ANSWERED TOO FAST',
     record: 'BROKE THE MACHINE',
     jp: 'ブーハが覚えた。'
   };
-
-  function getPlayerName() {
-    try {
-      if (typeof getBoohaFirstName === 'function') {
-        const n = getBoohaFirstName();
-        if (n) return String(n).trim().split(/\s+/)[0].toUpperCase();
-      }
-      const raw =
-        localStorage.getItem('booha_first_name') ||
-        localStorage.getItem('booha_user_name') ||
-        localStorage.getItem('booha_display_name') ||
-        localStorage.getItem('booha_name') ||
-        'PLAYER 1';
-      const first = String(raw).trim().split(/\s+/)[0] || 'PLAYER';
-      return first.toUpperCase();
-    } catch {
-      return 'PLAYER';
-    }
-  }
-
-  // Weekly bucket is keyed off the exact curriculum-week occurrence. A fifth
-  // Sunday occurrence keeps Week 4's content, but must get a fresh bucket.
-  function makeWeekId(monthSlug, weekNumber) {
-    try {
-      const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
-      if (cw && cw.monthSlug === monthSlug && cw.weekNumber === weekNumber) {
-        const key = window.CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey;
-        if (key) return key;
-      }
-    } catch (_) {}
-    return `${monthSlug}:w${weekNumber}`;
-  }
-
-  function normalizeScore(score) {
-    if (score === null || score === undefined) return null;
-    if (typeof score === 'number') {
-      return { ms: score, name: 'UNKNOWN', date: null };
-    }
-    if (typeof score === 'object' && typeof score.ms === 'number') {
-      return score;
-    }
-    return null;
-  }
-
-  function ensureBlitzStore(data, weekId) {
-    if (!data.meta) data.meta = {};
-    if (!data.meta.blitz) data.meta.blitz = {};
-
-    const blitz = data.meta.blitz;
-    if (!blitz.weekly) blitz.weekly = {};
-    if (!blitz.records) blitz.records = {};
-
-    if (weekId && blitz.weeklyKey !== weekId) {
-      blitz.weeklyKey = weekId;
-      blitz.weekly = {};
-    }
-
-    if (!blitz.weekly[BLITZ_GAME_TYPE]) blitz.weekly[BLITZ_GAME_TYPE] = {};
-    if (!blitz.records[BLITZ_GAME_TYPE]) blitz.records[BLITZ_GAME_TYPE] = {};
-
-    return blitz;
-  }
-
- // Routed through BoohaSaveFile, never localStorage directly. The bare
-  // 'booha_save' key is unscoped: writing to it put blitz records outside the
-  // student's save file, outside the weekly reset, and shared across everyone
-  // using the device. Reads here also get schema migration for free.
-  function readSave() {
-    try {
-      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.load();
-      console.error('[Blitz] Save system unavailable — reading empty.');
-      return {};
-    } catch (e) {
-      console.error('[Blitz] Save read failed:', e);
-      return {};
-    }
-  }
-
-  // Returns true only if the write actually landed. BoohaSaveFile refuses to
-  // write when no student is identified, and that must not be silent.
-  function writeSave(data) {
-    try {
-      if (window.BoohaAdventure && BoohaAdventure.save) return BoohaAdventure.save.save(data);
-      console.error('[Blitz] Save system unavailable — record NOT written.');
-      return false;
-    } catch (e) {
-      console.error('[Blitz] Save write failed:', e);
-      return false;
-    }
-  }
-
-  function getLegacyBestTime(curr) {
-    try {
-      const data = readSave();
-      return data?.meta?.[LEGACY_SCORE_KEY]?.[curr] ?? null;
-    } catch {
-      return null;
-    }
-  }
-
-  function getBestScore(curr) {
-    try {
-      const data = readSave();
-      const blitz = ensureBlitzStore(data);
-      const modern = normalizeScore(blitz.records?.[BLITZ_GAME_TYPE]?.[curr]);
-      if (modern) return modern;
-      return normalizeScore(getLegacyBestTime(curr));
-    } catch {
-      return null;
-    }
-  }
-
-  function getWeeklyScore(curr, weekId) {
-    try {
-      const data = readSave();
-      const blitz = ensureBlitzStore(data, weekId);
-      return normalizeScore(blitz.weekly?.[BLITZ_GAME_TYPE]?.[curr]);
-    } catch {
-      return null;
-    }
-  }
-
-  function getBestTime(curr) {
-    const best = getBestScore(curr);
-    return best ? best.ms : null;
-  }
-
-  function saveBestTime(curr, ms, weekId) {
-    try {
-      const data = readSave();
-      const blitz = ensureBlitzStore(data, weekId);
-      const playerName = getPlayerName();
-
-      const oldWeekly = normalizeScore(blitz.weekly[BLITZ_GAME_TYPE][curr]);
-      const oldRecord = normalizeScore(blitz.records[BLITZ_GAME_TYPE][curr]);
-      const legacy = normalizeScore(getLegacyBestTime(curr));
-
-      const bestBefore = [oldRecord, legacy]
-        .filter(Boolean)
-        .sort((a, b) => a.ms - b.ms)[0] || null;
-
-      const newScore = { ms, name: playerName, date: new Date().toISOString() };
-
-      const isWeeklyRecord  = !oldWeekly || ms < oldWeekly.ms;
-      const isAllTimeRecord = !bestBefore || ms < bestBefore.ms;
-
-      if (isWeeklyRecord) {
-        blitz.weekly[BLITZ_GAME_TYPE][curr] = newScore;
-      }
-      if (isAllTimeRecord) {
-        blitz.records[BLITZ_GAME_TYPE][curr] = newScore;
-        if (!data.meta[LEGACY_SCORE_KEY]) data.meta[LEGACY_SCORE_KEY] = {};
-        data.meta[LEGACY_SCORE_KEY][curr] = ms;
-      }
-
-      if (!writeSave(data)) {
-        // Don't claim a record that wasn't stored — the student would see
-        // "NEW BOOHA RECORD" and find it gone on the next load.
-        return {
-          isWeeklyRecord: false, isAllTimeRecord: false,
-          oldRecord: bestBefore, newScore, saveFailed: true
-        };
-      }
-      return { isWeeklyRecord, isAllTimeRecord, oldRecord: bestBefore, newScore };
-    } catch {
-      return {
-        isWeeklyRecord: false,
-        isAllTimeRecord: false,
-        oldRecord: null,
-        newScore: { ms, name: getPlayerName(), date: new Date().toISOString() }
-      };
-    }
-  }
-
-   
-  /* ── Shuffle ─────────────────────────────────────────────────── */
-  function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  const BLITZ_TIMER_PAINT_INTERVAL_MS = 100;
-  const BLITZ_LOW_POWER =
-    (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
-    (typeof navigator !== 'undefined' && (
-      (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
-      (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
-    ));
-
-  function effectCount(fullCount) {
-    return BLITZ_LOW_POWER ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
-  }
-
-  /* ── Format time ─────────────────────────────────────────────── */
-  function fmtTime(ms) {
-    if (ms === null || ms === undefined) return '--';
-    const s = Math.floor(ms / 1000);
-    const cents = Math.floor((ms % 1000) / 10);
-    return `${s}.${String(cents).padStart(2, '0')}s`;
-  }
 
   /* ── Inject styles once ──────────────────────────────────────── */
   let stylesInjected = false;
@@ -727,7 +521,7 @@ window.QuestionBlitz = (() => {
   function buildOverlay() {
     const el = document.createElement('div');
     el.id = 'qb-overlay';
-    if (BLITZ_LOW_POWER) el.classList.add('low-power');
+    if (BoohaBlitzEngine.LOW_POWER) el.classList.add('low-power');
     el.innerHTML = `
       <div id="qb-flash"></div>
       <div id="qb-timer-bar">
@@ -772,381 +566,59 @@ window.QuestionBlitz = (() => {
     return el;
   }
 
-  function megaCelebrate(overlay, palette, isRecord) {
-    const name   = getPlayerName();
-    const colors = isRecord
-      ? ['#ffd700', '#ffea00', '#fff3b0', '#ffffff']
-      : [palette.accent, palette.accent2, '#ffffff', '#ffea00'];
-
-    overlay.classList.add('shake');
-    setTimeout(() => overlay.classList.remove('shake'), 420);
-
-    const W = window.innerWidth, H = window.innerHeight;
-
-    /* 1 ── Names STREAK across at speed, alternating direction ─── */
-    const nameNodes = document.createDocumentFragment();
-    for (let i = 0; i < effectCount(isRecord ? 42 : 26); i++) {
-      const d      = document.createElement('div');
-      const color  = colors[Math.floor(Math.random() * colors.length)];
-      const size   = 12 + Math.random() * (isRecord ? 26 : 20);
-      const toLeft = i % 2 === 1;
-      d.className   = 'qb-name-streak';
-      d.textContent = name;
-      d.style.cssText = `
-        left:${toLeft ? W + 60 : -300}px;
-        top:${Math.random() * H}px;
-        font-size:${size}px;
-        color:${color};
-        text-shadow:0 0 10px ${color}, 0 0 24px ${color};
-        --sk:${toLeft ? 14 : -14}deg;
-        --dx:${toLeft ? -(W + 620) : (W + 620)}px;
-        --cdur:${1800 + Math.random() * 1200}ms;
-        --cdelay:${Math.random() * 900}ms;
-      `;
-      d.addEventListener('animationend', () => d.remove());
-      nameNodes.appendChild(d);
-    }
-    overlay.appendChild(nameNodes);
-
-    /* 2 ── Speed lines tear through with them ──────────────────── */
-    const speedLineNodes = document.createDocumentFragment();
-    for (let i = 0; i < effectCount(isRecord ? 34 : 22); i++) {
-      const l      = document.createElement('div');
-      const color  = colors[Math.floor(Math.random() * colors.length)];
-      const toLeft = i % 2 === 0;
-      const len    = 60 + Math.random() * 180;
-      l.className = 'qb-speed-line';
-      l.style.cssText = `
-        left:${toLeft ? W + 40 : -240}px;
-        top:${Math.random() * H}px;
-        width:${len}px;
-        background:linear-gradient(${toLeft ? '270deg' : '90deg'}, transparent, ${color});
-        box-shadow:0 0 6px ${color};
-        --sk:0deg;
-        --dx:${toLeft ? -(W + 480) : (W + 480)}px;
-        --cdur:${600 + Math.random() * 300}ms;
-        --cdelay:${Math.random() * 460}ms;
-      `;
-      l.addEventListener('animationend', () => l.remove());
-      speedLineNodes.appendChild(l);
-    }
-    overlay.appendChild(speedLineNodes);
-  }
+  // The game lifecycle is shared with Vocab Blitz and Sentence Blitz.
+  const blitzEngine = BoohaBlitzEngine.create({
+    apiName: 'QuestionBlitz',
+    gameType: 'questions',
+    legacyKey: 'questionBlitz',
+    saveId: 'question',
+    dataFile: 'questions.json',
+    dataLabel: 'question',
+    overlayId: 'qb-overlay',
+    notEnoughMessage: 'Not enough question cards for this week.',
+    palettes: PALETTES,
+    scolds: SCOLDS,
+    buildOverlay,
+    injectStyles,
+    optionClass: 'qb-opt',
+    particleClass: 'qb-particle',
+    particleAnimation: 'qbParticle',
+    celebrationMode: 'question',
+    correctParticles: 18,
+    nextDelay: 200,
+    cssVars: {
+      '--qb-glow': p => p.glow,
+      '--qb-hira-color': p => p.hiraColor,
+      '--qb-opt-bg': p => p.optionBg,
+      '--qb-opt-border': p => p.optionBorder,
+      '--qb-opt-hover': p => p.optionHover,
+    },
+    ids: {
+      timer: '#qb-timer', progress: '#qb-progress', jpWord: '#qb-jp-word', hira: '#qb-hira',
+      options: '#qb-options', flash: '#qb-flash', scroll: '#qb-scroll', wrongPopup: '#qb-wrong-popup',
+      win: '#qb-win', quit: '#qb-quit', wrongClose: '#qb-wrong-close',
+      playAgain: '#qb-play-again', winClose: '#qb-win-close',
+      wrongJp: '#qbwj', wrongHira: '#qbwh', wrongEn: '#qbwe',
+      scoldJp: '#qbsj', scoldHira: '#qbsh', scoldEn: '#qbse',
+      winName: '#qb-win-name', winScream: '#qb-win-scream', winJp: '#qb-win-jp',
+      winTime: '#qb-win-time-val', winRecord: '#qb-win-record-msg',
+      winBest: '#qb-win-best-val', winDelta: '#qb-win-delta',
+    },
+    winCopy: WIN_COPY,
+  });
 
   /* ── Launch ──────────────────────────────────────────────────── */
   function launch({ curr, monthSlug, weekNumber }) {
-     
-    const palette = PALETTES[curr];
-    if (!palette) { console.error('QuestionBlitz: unknown curr', curr); return; }
-    injectStyles();
-    const path = `content/${curr}/${monthSlug}/questions.json`;
-    fetch(path)
-      .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(data => startGame(data.cards, curr, weekNumber, palette, monthSlug))
-      .catch(err => {
-        alert(`データが読み込めませんでした。\nCould not load question data.\n(${path})`);
-        console.error('QuestionBlitz fetch error:', err);
-      });
+    return blitzEngine.launch({ curr, monthSlug, weekNumber });
   }
 
   /* ── Start game ──────────────────────────────────────────────── */
-  function startGame(allCards, curr, weekNumber, palette, monthSlug) {
-    const offset = (weekNumber - 1) * 15;
-    const weekCards = allCards.slice(offset, offset + 15);
-    if (weekCards.length < 6) { alert('Not enough question cards for this week.'); return; }
-
-    const existing = document.getElementById('qb-overlay');
-    if (existing) existing.remove();
-
-    const overlay = buildOverlay();
-
-    // BGM
-    const bgm = new Audio('assets/audio/blitz.mp3');
-    bgm.loop = true; bgm.volume = 0.55;
-    let bgmStarted = false;
-    function startBGM() { if (bgmStarted) return; bgmStarted = true; bgm.play().catch(() => {}); }
-    function stopBGM()  { bgm.pause(); bgm.currentTime = 0; }
-
-    // CSS vars
-    overlay.style.setProperty('--qb-glow', palette.glow);
-    overlay.style.setProperty('--qb-hira-color', palette.hiraColor);
-    overlay.style.setProperty('--qb-opt-bg', palette.optionBg);
-    overlay.style.setProperty('--qb-opt-border', palette.optionBorder);
-    overlay.style.setProperty('--qb-opt-hover', palette.optionHover);
-    overlay.style.background = `hsl(${palette.baseHue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
-
-    // DOM refs
-    const timerEl    = overlay.querySelector('#qb-timer');
-    const progressEl = overlay.querySelector('#qb-progress');
-    const jpWordEl   = overlay.querySelector('#qb-jp-word');
-    const hiraEl     = overlay.querySelector('#qb-hira');
-    const optionsEl  = overlay.querySelector('#qb-options');
-    const flashEl    = overlay.querySelector('#qb-flash');
-    const scrollEl   = overlay.querySelector('#qb-scroll');
-    const wrongPopup = overlay.querySelector('#qb-wrong-popup');
-    const winScreen  = overlay.querySelector('#qb-win');
-
-    timerEl.style.color = palette.timerColor;
-
-    // State
-    const queue = shuffle(weekCards);
-    let current = 0, startTime = null, elapsed = 0;
-    let clearElapsed = null;
-    let rafId = null, locked = false, bgIndex = 0;
-    let lastTimerPaint = -Infinity;
-
-    function tick() {
-      if (startTime === null) { rafId = requestAnimationFrame(tick); return; }
-      elapsed = performance.now() - startTime;
-      if (elapsed - lastTimerPaint >= BLITZ_TIMER_PAINT_INTERVAL_MS) {
-        timerEl.textContent = fmtTime(elapsed);
-        lastTimerPaint = elapsed;
-      }
-      rafId = requestAnimationFrame(tick);
-    }
-    function stopTimer() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
-
-    /* ── correctDetonate ── */
-    function correctDetonate(correctBtn) {
-      correctBtn.style.transition = 'none';
-      correctBtn.style.background = 'rgba(0,255,100,0.6)';
-      correctBtn.style.boxShadow  = '0 0 28px 6px rgba(0,255,100,0.75)';
-
-      overlay.style.transform = 'scale(1.02)';
-      setTimeout(() => {
-        overlay.style.transition = 'transform 70ms ease';
-        overlay.style.transform = '';
-        setTimeout(() => { overlay.style.transition = ''; }, 70);
-      }, 55);
-
-      const allBtns = Array.from(optionsEl.querySelectorAll('.qb-opt'));
-      setTimeout(() => {
-        allBtns.forEach(btn => {
-          if (btn === correctBtn) return;
-          const angle = Math.random() * Math.PI * 2;
-          const dist  = 200 + Math.random() * 160;
-          btn.style.transition = 'transform 260ms cubic-bezier(.4,0,1,1), opacity 200ms ease';
-          btn.style.transform  = `translate(${Math.cos(angle)*dist}px,${Math.sin(angle)*dist}px) rotate(${(Math.random()-.5)*480}deg) scale(0.15)`;
-          btn.style.opacity    = '0';
-        });
-      }, 70);
-
-      setTimeout(() => {
-        correctBtn.style.transition = 'transform 110ms ease, opacity 90ms ease';
-        correctBtn.style.transform  = 'scale(1.25)';
-        correctBtn.style.opacity    = '0';
-
-        const r   = correctBtn.getBoundingClientRect();
-        const ovr = overlay.getBoundingClientRect();
-        const cx  = r.left - ovr.left + r.width / 2;
-        const cy  = r.top  - ovr.top  + r.height / 2;
-        const colors = [palette.accent, palette.accent2, '#ffffff', '#00cfff'];
-
-        const particleNodes = document.createDocumentFragment();
-        for (let i = 0; i < effectCount(18); i++) {
-          const p = document.createElement('div');
-          const angle = (i / 18) * Math.PI * 2;
-          const dist  = 50 + Math.random() * 100;
-          const size  = 5 + Math.random() * 7;
-          p.style.cssText = `
-            position:absolute; left:${cx}px; top:${cy}px;
-            width:${size}px; height:${size}px;
-            border-radius:${Math.random()>.5?'50%':'3px'};
-            background:${colors[Math.floor(Math.random()*colors.length)]};
-            pointer-events:none; z-index:10;
-            box-shadow:0 0 6px 2px ${palette.accent};
-            --px:${Math.cos(angle)*dist}px; --py:${Math.sin(angle)*dist}px;
-            --pdur:${240+Math.random()*140}ms; --pdelay:${Math.random()*30}ms;
-            
-            animation: qbParticle var(--pdur) ease-out var(--pdelay) both;
-          `;
-          p.addEventListener('animationend', () => p.remove());
-          particleNodes.appendChild(p);
-        }
-        overlay.appendChild(particleNodes);
-      }, 90);
-
-      setTimeout(() => {
-        flashEl.style.background = palette.accent;
-        flashEl.style.opacity    = '0.45';
-        setTimeout(() => {
-          flashEl.style.background = '#ffffff';
-          flashEl.style.opacity    = '0.75';
-          setTimeout(() => { flashEl.style.opacity = '0'; flashEl.style.background = ''; }, 55);
-        }, 35);
-      }, 110);
-
-     setTimeout(() => {
-        if (current >= queue.length) {
-          stopTimer(); stopBGM();
-          showWin(clearElapsed ?? elapsed, curr, palette, overlay, winScreen, monthSlug, weekNumber);
-        } else {
-          optionsEl.style.visibility = 'hidden';
-          renderQuestion();
-          scrollEl.scrollTop = 0;
-          requestAnimationFrame(() => {
-            optionsEl.style.visibility = '';
-          });
-        }
-      }, 200);
-    }
-
-       
-    /* ── renderQuestion ── */
-    function renderQuestion() {
-      locked = false;
-      const card = queue[current];
-       
-      bgIndex++;
-      const hue = (palette.baseHue + bgIndex * 51) % 360;
-      overlay.style.background = `hsl(${hue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
-
-      jpWordEl.style.animation = 'none';
-      hiraEl.style.animation   = 'none';
-      requestAnimationFrame(() => {
-        jpWordEl.style.animation = '';
-        hiraEl.style.animation   = '';
-        jpWordEl.textContent = card.jp;
-        hiraEl.textContent   = card.hira;
-      });
-
-      progressEl.textContent = `${current + 1} / ${queue.length}`;
-
-      const wrong   = shuffle(weekCards.filter(c => c.n !== card.n)).slice(0, 5);
-      const options = shuffle([card, ...wrong]);
-
-      optionsEl.innerHTML = '';
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className   = 'qb-opt';
-        btn.type        = 'button';
-        btn.textContent = opt.en;
-        btn.addEventListener('click', () => handleAnswer(btn, opt, card));
-        optionsEl.appendChild(btn);
-      });
-
-      if (current === 0 && startTime === null) startTime = performance.now();
-    }
-
-    /* ── handleAnswer ── */
-    function handleAnswer(btn, chosen, correct) {
-      if (locked) return;
-      locked = true;
-      startBGM();
-
-      if (chosen.n === correct.n) {
-        btn.classList.add('correct');
-        current++;
-        if (current >= queue.length) clearElapsed = performance.now() - startTime;
-        correctDetonate(btn);
-      } else {
-        btn.classList.add('wrong');
-        optionsEl.querySelectorAll('.qb-opt').forEach(b => {
-          if (b.textContent === correct.en) b.classList.add('correct');
-        });
-        overlay.classList.add('shake');
-        overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
-        stopTimer(); stopBGM();
-        setTimeout(() => showWrongPopup(correct, wrongPopup), 480);
-      }
-    }
-
-    /* ── Wrong popup ── */
-    function showWrongPopup(correct, popup) {
-      const scold = SCOLDS[Math.floor(Math.random() * SCOLDS.length)];
-      overlay.querySelector('#qbwj').textContent = correct.jp;
-      overlay.querySelector('#qbwh').textContent = correct.hira;
-      overlay.querySelector('#qbwe').textContent = correct.en;
-      overlay.querySelector('#qbsj').textContent = scold.jp;
-      overlay.querySelector('#qbsh').textContent = scold.hira;
-      overlay.querySelector('#qbse').textContent = scold.en;
-      popup.classList.add('show');
-    }
-
-    overlay.querySelector('#qb-wrong-close').addEventListener('click', () => {
-      stopTimer(); stopBGM(); overlay.remove();
-      if (typeof window.QuestionBlitz._onClose === 'function') window.QuestionBlitz._onClose();
-    });
-
-   /* ── Win screen ── */
-    function showWin(ms, curr, palette, overlay, winScreen, monthSlug, weekNumber) {
-      const weekId     = makeWeekId(monthSlug, weekNumber);
-      const result     = saveBestTime(curr, ms, weekId);
-      if (result.saveFailed) {
-        console.error('[Blitz] Time not saved:', ms, 'ms');
-      }
-
-      // Report clear to Booha day-recorder (fires only on 100% clear)
-      document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-        detail: { saveId: `blitz:${curr}:question`, score: 100, completed: true, time: ms }
-      }));
-      const best       = getBestScore(curr);
-      const weekly     = getWeeklyScore(curr, weekId);
-      const playerName = getPlayerName();
-
-      const isRecord  = result.isAllTimeRecord;
-      const oldRecord = result.oldRecord;
-
-      winScreen.classList.toggle('record-mode', isRecord);
-
-      winScreen.querySelector('#qb-win-name').textContent = playerName;
-      winScreen.querySelector('#qb-win-scream').textContent =
-        isRecord ? WIN_COPY.record : WIN_COPY.clear;
-      winScreen.querySelector('#qb-win-jp').textContent =
-        isRecord ? WIN_COPY.jp : 'クリア。';
-
-      winScreen.querySelector('#qb-win-time-val').textContent = fmtTime(ms);
-      winScreen.querySelector('#qb-win-time-val').style.color =
-        isRecord ? '#ffd700' : palette.timerColor;
-      winScreen.querySelector('#qb-win-time-val').style.textShadow =
-        isRecord
-          ? '0 0 28px rgba(255,215,0,1), 0 0 70px rgba(255,90,0,0.75)'
-          : `0 0 32px ${palette.glow}, 0 0 64px ${palette.glow}`;
-
-      const recordEl = winScreen.querySelector('#qb-win-record-msg');
-      const bestEl   = winScreen.querySelector('#qb-win-best-val');
-      const deltaEl  = winScreen.querySelector('#qb-win-delta');
-
-      recordEl.classList.toggle('big', isRecord);
-
-      if (isRecord) {
-        recordEl.textContent = '🏆 NEW BOOHA RECORD';
-        bestEl.textContent   = oldRecord ? `OLD: ${fmtTime(oldRecord.ms)}` : 'FIRST RECORD';
-        deltaEl.textContent  = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster` : '';
-      } else {
-        recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST' : '';
-        bestEl.textContent   = best ? `ALL-TIME BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : '';
-        deltaEl.textContent  = weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}${weekly.name ? ` — ${weekly.name}` : ''}` : '';
-      }
-
-      winScreen.classList.add('show');
-      megaCelebrate(overlay, palette, isRecord);
-    }
-
-     
-    overlay.querySelector('#qb-play-again').addEventListener('click', () => {
-      overlay.remove();
-      launch({ curr, monthSlug, weekNumber });
-    });
-    overlay.querySelector('#qb-win-close').addEventListener('click', () => {
-      overlay.remove();
-      if (typeof window.QuestionBlitz._onClose === 'function') window.QuestionBlitz._onClose();
-    });
-    overlay.querySelector('#qb-quit').addEventListener('click', () => {
-      stopTimer(); stopBGM(); overlay.remove();
-      if (typeof window.QuestionBlitz._onClose === 'function') window.QuestionBlitz._onClose();
-    });
-
-    rafId = requestAnimationFrame(tick);
-    renderQuestion();
-  }
-
   /* ── Public API ──────────────────────────────────────────────── */
 return {
     launch,
-    getBestTime,
-    fmtTime,
-    getWeeklyScore,   // weekly read w/ stale-week guard — used by index pills
+    getBestTime: blitzEngine.getBestTime,
+    fmtTime: blitzEngine.fmtTime,
+    getWeeklyScore: blitzEngine.getWeeklyScore, // weekly read w/ stale-week guard — used by index pills
     _onClose: null,
   };
 
