@@ -732,6 +732,64 @@ window.BoohaBlitzEngine = (() => {
         text-transform: uppercase;
         text-shadow: 0 0 16px var(--blitz-finish-accent, #ffe66b);
       }
+      .booha-blitz-final-headline {
+        position: relative;
+        z-index: 1;
+        max-width: 100%;
+        margin: 0 0 4px;
+        color: transparent;
+        background: var(--blitz-finish-gradient, linear-gradient(90deg, #fff, #ffe66b, #ff6fb5));
+        -webkit-background-clip: text;
+        background-clip: text;
+        font-size: clamp(16px, 4vw, 30px);
+        font-weight: 1000;
+        letter-spacing: clamp(.5px, .22vw, 2px);
+        line-height: 1.05;
+        text-align: center;
+        text-wrap: balance;
+        text-shadow: 0 0 18px var(--blitz-finish-glow, var(--blitz-glow));
+        animation: boohaBlitzFinalHeadline 620ms cubic-bezier(.16,1.35,.3,1) both;
+      }
+      .booha-blitz-final-residual {
+        position: relative;
+        z-index: 1;
+        margin: 2px 0 0;
+        color: var(--blitz-finish-accent, #ffe66b);
+        font-size: clamp(9px, 1.8vw, 12px);
+        font-weight: 950;
+        letter-spacing: 1.5px;
+        line-height: 1.2;
+        text-align: center;
+        text-transform: uppercase;
+        text-shadow: 0 0 12px var(--blitz-finish-glow, var(--blitz-glow));
+        animation: boohaBlitzResidualPulse 1500ms ease-in-out infinite alternate;
+      }
+      .booha-blitz-final-residual::before,
+      .booha-blitz-final-residual::after {
+        content: '✦';
+        display: inline-block;
+        margin: 0 8px;
+        color: var(--blitz-finish-accent, #ffe66b);
+        animation: boohaBlitzResidualSpark 1100ms ease-in-out infinite alternate;
+      }
+      .booha-blitz-final-residual::after { animation-delay: 280ms; }
+      @keyframes boohaBlitzFinalHeadline {
+        0% { opacity: 0; transform: translateY(8px) scale(.92); }
+        68% { opacity: 1; transform: translateY(-1px) scale(1.03); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      @keyframes boohaBlitzResidualPulse {
+        from { opacity: .68; letter-spacing: 1.3px; }
+        to { opacity: 1; letter-spacing: 1.7px; }
+      }
+      @keyframes boohaBlitzResidualSpark {
+        from { opacity: .45; transform: scale(.8) rotate(0); }
+        to { opacity: 1; transform: scale(1.15) rotate(18deg); }
+      }
+      @keyframes boohaBlitzButtonsIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
       .booha-blitz-final-card .booha-blitz-final-summary,
       .booha-blitz-final-card .booha-blitz-final-hold,
       .booha-blitz-final-card .vb-win-buttons,
@@ -755,6 +813,13 @@ window.BoohaBlitzEngine = (() => {
       }
       .booha-blitz-final-card .booha-blitz-final-hold {
         width: 100%;
+      }
+      .booha-blitz-final-card .vb-win-buttons,
+      .booha-blitz-final-card .sb-win-buttons,
+      .booha-blitz-final-card .qb-win-buttons {
+        opacity: 0;
+        transform: translateY(8px);
+        animation: boohaBlitzButtonsIn 520ms 900ms cubic-bezier(.2,.9,.25,1) both;
       }
       #vb-win.blitz-finish,
       #sb-win.blitz-finish,
@@ -813,6 +878,11 @@ window.BoohaBlitzEngine = (() => {
         text-align: center;
       }
       .booha-blitz-final-hold.ready { color: #ffe66b; }
+      #vb-win.blitz-finish.residual-run .booha-blitz-final-card,
+      #sb-win.blitz-finish.residual-run .booha-blitz-final-card,
+      #qb-win.blitz-finish.residual-run .booha-blitz-final-card {
+        box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 42px var(--blitz-finish-glow, var(--blitz-glow)), 0 0 90px var(--blitz-finish-glow, var(--blitz-glow));
+      }
       #vb-win.blitz-finish,
       #sb-win.blitz-finish,
       #qb-win.blitz-finish {
@@ -947,6 +1017,13 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-correct-spark { display: none; }
         .blitz-feel-arcade.streak-event-live,
         .blitz-feel-sleek.streak-event-live { box-shadow: none; transform: none; }
+        .booha-blitz-final-headline,
+        .booha-blitz-final-residual,
+        .booha-blitz-final-residual::before,
+        .booha-blitz-final-residual::after,
+        .booha-blitz-final-card .vb-win-buttons,
+        .booha-blitz-final-card .sb-win-buttons,
+        .booha-blitz-final-card .qb-win-buttons { animation: none; opacity: 1; transform: none; }
         #vb-wrong-popup.blitz-wrong-feedback.show,
         #sb-wrong-popup.blitz-wrong-feedback.show,
         #qb-wrong-popup.blitz-wrong-feedback.show { animation: none; }
@@ -1226,6 +1303,8 @@ window.BoohaBlitzEngine = (() => {
           summary: existing,
           streak: existing.querySelector('.booha-blitz-final-streak'),
           perfect: existing.querySelector('.booha-blitz-final-perfect'),
+          headline: winScreen.querySelector('.booha-blitz-final-headline'),
+          residual: winScreen.querySelector('.booha-blitz-final-residual'),
           hold: winScreen.querySelector('.booha-blitz-final-hold'),
         };
       }
@@ -1240,6 +1319,18 @@ window.BoohaBlitzEngine = (() => {
       curriculum.className = 'booha-blitz-final-curriculum';
       curriculum.textContent = `${palette?.name || 'BOOHA BLITZ'} · ${palette?.nameJp || ''}`.trim();
       card.prepend(curriculum);
+
+      const headline = document.createElement('div');
+      headline.className = 'booha-blitz-final-headline';
+      headline.setAttribute('aria-live', 'polite');
+      const originalName = winScreen.querySelector(selector('winName'));
+      card.insertBefore(headline, originalName || null);
+
+      const residual = document.createElement('div');
+      residual.className = 'booha-blitz-final-residual';
+      residual.setAttribute('aria-live', 'polite');
+      residual.textContent = 'RUN ENERGY CARRIED INTO THE CLEAR';
+      card.insertBefore(residual, originalName || null);
 
       const summary = document.createElement('div');
       summary.className = 'booha-blitz-final-summary';
@@ -1270,7 +1361,7 @@ window.BoohaBlitzEngine = (() => {
       } else {
         card.append(summary, hold);
       }
-      return { summary, streak, perfect, hold };
+      return { summary, streak, perfect, headline, residual, hold };
     }
 
     function closeGame(overlay, stopTimer, stopBGM) {
@@ -1470,6 +1561,34 @@ window.BoohaBlitzEngine = (() => {
           // Audio is optional feedback and must never block an answer.
         }
       }
+      function playFinalStinger(isRecord, isPerfectRun) {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor) return;
+        try {
+          if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
+          if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
+          const notes = isRecord
+            ? [659, 831, 1047, 1319]
+            : isPerfectRun ? [523, 659, 784, 1047] : [440, 554, 659];
+          const now = streakAudioCtx.currentTime + 0.015;
+          notes.forEach((frequency, index) => {
+            const startAt = now + index * 0.075;
+            const oscillator = streakAudioCtx.createOscillator();
+            const gain = streakAudioCtx.createGain();
+            oscillator.type = isRecord ? 'triangle' : palette.feel === 'sleek' ? 'sine' : 'triangle';
+            oscillator.frequency.setValueAtTime(frequency, startAt);
+            gain.gain.setValueAtTime(0.0001, startAt);
+            gain.gain.exponentialRampToValueAtTime(isRecord ? 0.05 : 0.035, startAt + 0.014);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.22);
+            oscillator.connect(gain);
+            gain.connect(streakAudioCtx.destination);
+            oscillator.start(startAt);
+            oscillator.stop(startAt + 0.24);
+          });
+        } catch (_) {
+          // Audio is optional celebration feedback.
+        }
+      }
 
       const timerEl = overlay.querySelector(selector('timer'));
       const progressEl = overlay.querySelector(selector('progress'));
@@ -1570,7 +1689,7 @@ window.BoohaBlitzEngine = (() => {
         finalHoldInterval = null;
       }
 
-      function startFinalHold() {
+      function startFinalHold(holdMs = FINAL_CARD_HOLD_MS) {
         stopFinalHold();
         const buttons = [
           winScreen.querySelector(selector('playAgain')),
@@ -1582,7 +1701,7 @@ window.BoohaBlitzEngine = (() => {
           button.title = 'Please look at your clear first.';
         });
 
-        const releaseAt = Date.now() + FINAL_CARD_HOLD_MS;
+        const releaseAt = Date.now() + holdMs;
         const paintHold = () => {
           const seconds = Math.max(1, Math.ceil((releaseAt - Date.now()) / 1000));
           finalCard.hold.textContent = `${spotlight.playerName}, LOOK AT YOUR CLEAR — ${seconds}`;
@@ -1599,7 +1718,7 @@ window.BoohaBlitzEngine = (() => {
             button.removeAttribute('aria-disabled');
             button.title = '';
           });
-        }, FINAL_CARD_HOLD_MS);
+        }, holdMs);
       }
 
       function emitCorrectMicroBurst(correctBtn) {
@@ -1780,8 +1899,13 @@ window.BoohaBlitzEngine = (() => {
         const oldRecord = result.oldRecord;
         winScreen.classList.toggle('record-mode', isRecord);
         winScreen.classList.add('blitz-finish');
+        winScreen.classList.add('residual-run');
         winScreen.style.setProperty('--blitz-finish-accent', isRecord ? '#ffd700' : (palette.rewardColors?.[1] || palette.accent));
         winScreen.style.setProperty('--blitz-finish-glow', isRecord ? 'rgba(255, 215, 0, .34)' : (palette.rewardGlow || palette.glow));
+        const finishGradient = palette.rewardColors?.length
+          ? palette.rewardColors.join(', ')
+          : `${palette.accent}, ${palette.accent2}, #ffffff`;
+        winScreen.style.setProperty('--blitz-finish-gradient', `linear-gradient(90deg, ${finishGradient})`);
         winScreen.querySelector(selector('winName')).textContent = playerName;
         winScreen.querySelector(selector('winScream')).textContent = isRecord ? config.winCopy.record : config.winCopy.clear;
         winScreen.querySelector(selector('winJp')).textContent = isRecord ? config.winCopy.jp : 'クリア。';
@@ -1800,19 +1924,26 @@ window.BoohaBlitzEngine = (() => {
           bestEl.textContent = `PERSONAL BEST: ${fmtTime(ms)}`;
           deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than previous best` : 'FIRST PERSONAL BEST';
         } else {
-          recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST' : 'CLEAR COMPLETE';
+          recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST · #1' : 'CLEAR COMPLETE';
           bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
           deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs previous best` : (weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}` : '');
         }
-        finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
         const isPerfectRun = bestStreak === queue.length;
+        finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
+        if (finalCard.headline) {
+          finalCard.headline.textContent = `${playerName} — ${String(palette.name || 'BOOHA').toUpperCase()} BLITZ`;
+        }
+        if (finalCard.residual) {
+          finalCard.residual.textContent = `${palette.streak?.label || 'STREAK'} ENERGY ×${bestStreak} — STILL GLOWING`;
+        }
         finalCard.perfect.hidden = !isPerfectRun;
         finalCard.perfect.textContent = isPerfectRun ? `PERFECT RUN · ${queue.length}/${queue.length}` : '';
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         spotlight.nameplate.classList.add('complete');
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
         winScreen.classList.add('show');
-        startFinalHold();
+        playFinalStinger(isRecord, isPerfectRun);
+        startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
         celebrate(overlay, palette, isRecord);
       }
 
