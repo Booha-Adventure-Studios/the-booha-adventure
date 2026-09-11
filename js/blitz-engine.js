@@ -352,9 +352,51 @@ window.BoohaBlitzEngine = (() => {
         border-color: var(--blitz-accent);
         box-shadow: 0 8px 22px var(--blitz-glow);
       }
+      #vb-wrong-popup.blitz-wrong-feedback.wrong-feel-playful,
+      #sb-wrong-popup.blitz-wrong-feedback.wrong-feel-playful,
+      #qb-wrong-popup.blitz-wrong-feedback.wrong-feel-playful {
+        border-top-color: var(--blitz-wrong);
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.wrong-feel-arcade,
+      #sb-wrong-popup.blitz-wrong-feedback.wrong-feel-arcade,
+      #qb-wrong-popup.blitz-wrong-feedback.wrong-feel-arcade {
+        border-radius: 18px;
+        box-shadow: 0 18px 48px rgba(0,0,0,.42), 0 0 34px var(--blitz-wrong);
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.wrong-feel-sleek,
+      #sb-wrong-popup.blitz-wrong-feedback.wrong-feel-sleek,
+      #qb-wrong-popup.blitz-wrong-feedback.wrong-feel-sleek {
+        border-radius: 14px;
+        border-top-width: 2px;
+      }
+      .booha-blitz-wrong-spark {
+        position: absolute;
+        width: clamp(4px, .9vw, 7px);
+        height: clamp(4px, .9vw, 7px);
+        background: var(--blitz-wrong, #ff536d);
+        box-shadow: 0 0 10px var(--blitz-wrong, #ff536d);
+        pointer-events: none;
+        z-index: 12;
+        animation: boohaBlitzWrongSpark 420ms ease-out var(--spark-delay, 0ms) both;
+      }
+      .blitz-feel-playful .booha-blitz-wrong-spark { border-radius: 50%; }
+      .blitz-feel-arcade .booha-blitz-wrong-spark { border-radius: 2px; }
+      .blitz-feel-sleek .booha-blitz-wrong-spark {
+        clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      }
       @keyframes boohaBlitzWrongCard {
         from { opacity: 0; transform: translate(-50%, 22px) scale(.97); }
         to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      }
+      @keyframes boohaBlitzWrongSpark {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
+        18% { opacity: 1; }
+        100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
+      }
+      @keyframes boohaBlitzRecoveryCard {
+        0% { opacity: 0; transform: translateY(10px) scale(.96); }
+        65% { opacity: 1; transform: translateY(-2px) scale(1.02); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
       }
       .booha-blitz-nameplate {
         position: absolute;
@@ -1015,6 +1057,7 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-nameplate.streak-event-live .booha-blitz-streak-meter-fill { animation: none; }
         .booha-blitz-streak-spark { display: none; }
         .booha-blitz-correct-spark { display: none; }
+        .booha-blitz-wrong-spark { display: none; }
         .blitz-feel-arcade.streak-event-live,
         .blitz-feel-sleek.streak-event-live { box-shadow: none; transform: none; }
         .booha-blitz-final-headline,
@@ -1116,6 +1159,14 @@ window.BoohaBlitzEngine = (() => {
           box-shadow: none !important;
           outline: 2px solid #ff1e1e;
         }
+        #${config.overlayId}.blitz-compositor.wrong-active .${config.optionClass} {
+          opacity: .35;
+          filter: saturate(.55);
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-recover {
+          animation: boohaBlitzRecoveryCard 360ms cubic-bezier(.16,1.25,.3,1) both;
+          animation-delay: calc(var(--recover-index, 0) * 42ms);
+        }
         #${config.overlayId}.blitz-compositor .${config.optionClass}:focus-visible {
           outline: 3px solid var(--blitz-accent);
           outline-offset: 3px;
@@ -1123,6 +1174,7 @@ window.BoohaBlitzEngine = (() => {
         @media (prefers-reduced-motion: reduce) {
           #${config.overlayId}.blitz-compositor .${config.optionClass}::after { transition: none; }
           #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win { animation: none; }
+          #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-recover { animation: none; }
         }
       `;
       document.head.appendChild(style);
@@ -1812,12 +1864,38 @@ window.BoohaBlitzEngine = (() => {
         }, config.nextDelay || 200);
       }
 
+      function emitWrongMicroFeedback(wrongBtn) {
+        const r = wrongBtn.getBoundingClientRect();
+        const ovr = overlay.getBoundingClientRect();
+        const cx = r.left - ovr.left + r.width / 2;
+        const cy = r.top - ovr.top + r.height / 2;
+        const count = LOW_POWER ? 2 : 4;
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+          const spark = document.createElement('span');
+          const angle = (i / count) * Math.PI * 2 + Math.random() * 0.25;
+          const distance = 18 + Math.random() * 22;
+          spark.className = 'booha-blitz-wrong-spark';
+          spark.style.cssText = `left:${cx}px;top:${cy}px;--sx:${Math.cos(angle) * distance}px;--sy:${Math.sin(angle) * distance}px;--spark-delay:${Math.random() * 20}ms;`;
+          spark.addEventListener('animationend', () => spark.remove(), { once: true });
+          fragment.appendChild(spark);
+        }
+        overlay.appendChild(fragment);
+        flashEl.style.background = palette.wrong?.color || '#ff536d';
+        flashEl.style.opacity = '0.3';
+        setTimeout(() => {
+          flashEl.style.opacity = '0';
+          flashEl.style.background = '';
+        }, 120);
+      }
+
       function showWrongPopup(correct) {
         const scold = config.scolds[Math.floor(Math.random() * config.scolds.length)];
         const wrongJp = overlay.querySelector(selector('wrongJp'));
         const wrongHira = overlay.querySelector(selector('wrongHira'));
         const scoldJp = overlay.querySelector(selector('scoldJp'));
         const scoldHira = overlay.querySelector(selector('scoldHira'));
+        const status = wrongPopup.querySelector('[id$="-wrong-status"]');
         renderFurigana(wrongJp, correct.jp, correct.hira);
         renderFurigana(scoldJp, scold.jp, scold.hira);
         wrongHira.textContent = correct.hira;
@@ -1826,7 +1904,28 @@ window.BoohaBlitzEngine = (() => {
         scoldHira.hidden = true;
         overlay.querySelector(selector('wrongEn')).textContent = correct.en;
         overlay.querySelector(selector('scoldEn')).textContent = scold.en;
+        const statusByFeel = {
+          playful: `${spotlight.playerName}, BUMP! LET'S BOUNCE BACK.`,
+          arcade: `${spotlight.playerName}, CHAIN BROKEN — RELOAD!`,
+          sleek: `${spotlight.playerName}, LINK LOST — TRY AGAIN.`,
+        };
+        if (status) status.textContent = statusByFeel[palette.feel] || statusByFeel.playful;
+        wrongPopup.classList.remove('wrong-feel-playful', 'wrong-feel-arcade', 'wrong-feel-sleek');
+        wrongPopup.classList.add(`wrong-feel-${palette.feel || 'playful'}`);
+        overlay.classList.add('wrong-active');
         wrongPopup.classList.add('show');
+      }
+
+      function recoverFromWrong() {
+        if (!wrongPopup.classList.contains('show')) return;
+        wrongPopup.classList.remove('show');
+        wrongPopup.scrollTop = 0;
+        overlay.classList.remove('wrong-active');
+        renderQuestion(true);
+        startTime = performance.now() - elapsed;
+        lastTimerPaint = -Infinity;
+        rafId = requestAnimationFrame(tick);
+        requestAnimationFrame(() => optionsEl.querySelector(`.${config.optionClass}`)?.focus());
       }
 
       function handleAnswer(btn, chosen, correct) {
@@ -1848,14 +1947,15 @@ window.BoohaBlitzEngine = (() => {
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
           if (b.textContent === correct.en) b.classList.add('correct');
         });
+        emitWrongMicroFeedback(btn);
         overlay.classList.add('shake');
         overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
         stopTimer();
         stopBGM();
-        setTimeout(() => showWrongPopup(correct), config.wrongDelay || 480);
+        setTimeout(() => showWrongPopup(correct), config.wrongDelay || 320);
       }
 
-      function renderQuestion() {
+      function renderQuestion(recover = false) {
         locked = false;
         const card = queue[current];
         bgIndex++;
@@ -1872,9 +1972,13 @@ window.BoohaBlitzEngine = (() => {
         const wrong = shuffle(weekCards.filter(c => c.n !== card.n)).slice(0, 5);
         const options = shuffle([card, ...wrong]);
         optionsEl.innerHTML = '';
-        options.forEach(opt => {
+        options.forEach((opt, index) => {
           const btn = document.createElement('button');
           btn.className = config.optionClass;
+          if (recover) {
+            btn.classList.add('blitz-recover');
+            btn.style.setProperty('--recover-index', String(index));
+          }
           btn.type = 'button';
           btn.textContent = opt.en;
           btn.addEventListener('click', () => handleAnswer(btn, opt, card));
@@ -1952,7 +2056,7 @@ window.BoohaBlitzEngine = (() => {
         stopStreakBeat();
         closeGame(overlay, stopTimer, stopBGM);
       };
-      overlay.querySelector(selector('wrongClose')).addEventListener('click', cleanupAndClose);
+      overlay.querySelector(selector('wrongClose')).addEventListener('click', recoverFromWrong);
       overlay.querySelector(selector('quit')).addEventListener('click', cleanupAndClose);
       overlay.querySelector(selector('playAgain')).addEventListener('click', () => {
         stopFinalHold();
