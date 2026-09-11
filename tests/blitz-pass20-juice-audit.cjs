@@ -10,10 +10,10 @@ assert.match(engine, /const energy = Math\.min\(15, Math\.max\(0, Number\(streak
   'streak-driven background energy must be capped');
 assert.match(engine, /backgroundFor\(palette, bgIndex, streak\)/,
   'the live play field must use the current streak when rendering a question');
-assert.match(engine, /fallbackMessages = \{[\s\S]*?COMBO ×\$\{streak\}[\s\S]*?CHAIN ×\$\{streak\}/,
-  'every correct answer must have a lightweight curriculum-flavored combo fallback');
-assert.match(engine, /spotlight\.announce\(messages\[streak\] \|\| fallbackMessages/,
-  'combo feedback must be announced even between named milestones');
+assert.match(engine, /function clearAnnouncement\(\)/,
+  'ordinary streak feedback must be clearable without leaving a floating callout');
+assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold\);/,
+  'streak updates must use the nameplate instead of an ordinary floating combo callout');
 assert.match(engine, /function emitPerfectFlash\(overlay, palette, playerName\)/,
   'perfect clears must have a distinct finishing flash');
 assert.match(engine, /booha-blitz-perfect-flash-label/,
@@ -27,4 +27,4 @@ assert.match(engine, /if \(!REDUCED_MOTION\) \{\n\s+overlay\.classList\.add\('sh
 assert.match(verify, /tests\/blitz-pass20-juice-audit\.cjs/,
   'verify.sh must run the Pass 8 extra-juice audit');
 
-console.log('Blitz Pass 8 extra-juice audit passed: combo fallback copy, capped streak energy, perfect flash, and reduced-motion coverage are present.');
+console.log('Blitz Pass 8 extra-juice audit passed: capped streak energy, perfect flash, and reduced-motion coverage are present.');

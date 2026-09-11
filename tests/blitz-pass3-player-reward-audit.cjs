@@ -13,14 +13,12 @@ assert.match(engine, /getPlayerName\(\)/, 'shared engine must resolve the curren
 assert.match(engine, /booha-blitz-nameplate/, 'shared engine must render a persistent player nameplate');
 assert.match(engine, /booha-blitz-nameplate-streak/, 'shared engine must render the live streak');
 assert.match(engine, /function updateStreak\(\)/, 'shared engine must track a correct-answer streak');
-for (const message of [
-  'NICE START',
-  'IS ON FIRE',
-  'IS UNSTOPPABLE',
-  'OWNS THIS RUN',
-]) {
-  assert(engine.includes(message), `shared engine must include the ${message.toLowerCase()} name callout`);
-}
+assert.match(engine, /nameplate\.setAttribute\('role', 'status'\)/,
+  'the live nameplate must own streak feedback accessibly');
+assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold\);/,
+  'ordinary streak feedback must use the live nameplate instead of a floating callout');
+assert.doesNotMatch(engine, /NICE START|IS ON FIRE|IS UNSTOPPABLE|OWNS THIS RUN/,
+  'ordinary streak callout copy must not return over the game field');
 
 assert.match(engine, /const FINAL_CARD_HOLD_MS = 4000;/,
   'final card must remain visible for a meaningful four-second reveal');

@@ -534,19 +534,19 @@ window.BoohaBlitzEngine = (() => {
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 18;
-        width: min(420px, calc(100vw - 28px));
-        min-height: clamp(34px, 5vw, 48px);
+        width: min(520px, calc(100vw - 24px));
+        min-height: clamp(42px, 6vw, 56px);
         box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 7px 14px 8px;
+        padding: 9px 18px 10px;
         border: 2px solid var(--streak-color, var(--blitz-accent));
         border-radius: 999px;
         background: linear-gradient(180deg, rgba(0, 0, 0, .76), rgba(0, 0, 0, .64));
         color: #fff;
         text-align: center;
-        font-size: clamp(10px, 2.8vw, 16px);
+        font-size: clamp(11px, 3vw, 18px);
         font-weight: 950;
         letter-spacing: clamp(.6px, .25vw, 1.8px);
         text-shadow: 0 0 14px var(--streak-color, var(--blitz-accent));
@@ -606,6 +606,10 @@ window.BoohaBlitzEngine = (() => {
       .booha-blitz-nameplate.streak-tier-3 .booha-blitz-streak-meter-fill { box-shadow: 0 0 14px var(--streak-color), 0 0 22px rgba(255,157,46,.42); }
       .booha-blitz-nameplate.streak-tier-4 .booha-blitz-streak-meter-fill { box-shadow: 0 0 16px var(--streak-color), 0 0 26px rgba(255,75,62,.48); }
       .booha-blitz-nameplate.streak-tier-5 .booha-blitz-streak-meter-fill { box-shadow: 0 0 18px var(--streak-color), 0 0 32px rgba(255,59,189,.58); }
+      .booha-blitz-nameplate.streak-tier-2 { padding-inline: 20px; }
+      .booha-blitz-nameplate.streak-tier-3 { padding-inline: 22px; }
+      .booha-blitz-nameplate.streak-tier-4,
+      .booha-blitz-nameplate.streak-tier-5 { padding-inline: 24px; }
       .booha-blitz-nameplate.streak-pop {
         animation: boohaBlitzStreakPop 320ms cubic-bezier(.2, 1.35, .3, 1) both;
       }
@@ -1506,6 +1510,8 @@ window.BoohaBlitzEngine = (() => {
       const nameplate = document.createElement('div');
       nameplate.className = 'booha-blitz-nameplate';
       nameplate.style.setProperty('--blitz-accent', palette.accent);
+      nameplate.setAttribute('role', 'status');
+      nameplate.setAttribute('aria-live', 'polite');
       const nameEl = document.createElement('span');
       nameEl.className = 'booha-blitz-nameplate-name';
       nameEl.textContent = playerName;
@@ -1581,6 +1587,12 @@ window.BoohaBlitzEngine = (() => {
         }, final ? 1500 : 1100);
       }
 
+      function clearAnnouncement() {
+        announceToken++;
+        callout.classList.remove('show', 'final', 'fire', 'combo', 'chain');
+        callout.textContent = '';
+      }
+
       function setStreak(streak, eventThreshold = 0) {
         nameplate.classList.remove(
           'streak-tier-1', 'streak-tier-2', 'streak-tier-3', 'streak-tier-4', 'streak-tier-5',
@@ -1592,6 +1604,7 @@ window.BoohaBlitzEngine = (() => {
           streakHoldTimer = null;
           streakEventTimer = null;
           clearStreakEventClasses();
+          clearAnnouncement();
           streakEl.textContent = 'READY';
           streakMarkerEl.textContent = '';
           nameplate.style.setProperty('--streak-progress', '0%');
@@ -1625,10 +1638,11 @@ window.BoohaBlitzEngine = (() => {
 
       function resetStreak() {
         nameplate.classList.remove('streak-pop', 'streak-hold');
+        clearAnnouncement();
         setStreak(0);
       }
 
-      return { playerName, nameplate, callout, announce, setStreak, resetStreak };
+      return { playerName, nameplate, callout, announce, clearAnnouncement, setStreak, resetStreak };
     }
 
     function renderFurigana(container, jp, hira) {
@@ -2060,51 +2074,10 @@ window.BoohaBlitzEngine = (() => {
         streak++;
         bestStreak = Math.max(bestStreak, streak);
         const eventThreshold = STREAK_EVENT_THRESHOLDS.includes(streak) ? streak : 0;
+        spotlight.clearAnnouncement();
         spotlight.setStreak(streak, eventThreshold);
         overlay.style.background = backgroundFor(palette, bgIndex, streak);
         if (eventThreshold) playStreakBeat(eventThreshold);
-        const messagesByFeel = {
-          playful: {
-            1: `${spotlight.playerName}, NICE START!`,
-            2: `${spotlight.playerName} ×2 — KEEP BOUNCING!`,
-            3: `${spotlight.playerName} IS ON FIRE!`,
-            5: `${spotlight.playerName} IS UNSTOPPABLE!`,
-            7: `${spotlight.playerName} IS FLYING!`,
-            8: `${spotlight.playerName} OWNS THIS RUN!`,
-            10: `${spotlight.playerName} HAS THE RHYTHM!`,
-            15: `${spotlight.playerName} IS A BOOHA LEGEND!`,
-          },
-          arcade: {
-            1: `${spotlight.playerName}, CHAIN START!`,
-            2: `${spotlight.playerName} COMBO ×2!`,
-            3: `${spotlight.playerName} POWER CHAIN!`,
-            5: `${spotlight.playerName} COMBO OVERDRIVE!`,
-            7: `${spotlight.playerName} TURBO CHAIN!`,
-            8: `${spotlight.playerName} CHAIN MAX!`,
-            10: `${spotlight.playerName} PERFECT FLOW!`,
-            15: `${spotlight.playerName} ULTRA COMBO!`,
-          },
-          sleek: {
-            1: `${spotlight.playerName}, CHAIN STARTED.`,
-            2: `${spotlight.playerName} LINK ×2.`,
-            3: `${spotlight.playerName} HAS THE EDGE.`,
-            5: `${spotlight.playerName} IN PERFECT FORM.`,
-            7: `${spotlight.playerName} IN THE ZONE.`,
-            8: `${spotlight.playerName} OWNS THE SEQUENCE.`,
-            10: `${spotlight.playerName} HAS THE RHYTHM.`,
-            15: `${spotlight.playerName} MASTERED THE RUN.`,
-          },
-        };
-        const messages = messagesByFeel[palette.feel] || messagesByFeel.playful;
-        const fallbackMessages = {
-          playful: `${spotlight.playerName} NICE ×${streak}!`,
-          arcade: `${spotlight.playerName} COMBO ×${streak}!`,
-          sleek: `${spotlight.playerName} CHAIN ×${streak}.`,
-        };
-        const variant = eventThreshold
-          ? (palette.feel === 'playful' ? 'fire' : palette.feel === 'arcade' ? 'combo' : 'chain')
-          : '';
-        spotlight.announce(messages[streak] || fallbackMessages[palette.feel] || fallbackMessages.playful, false, variant);
       }
 
       function stopFinalHold() {

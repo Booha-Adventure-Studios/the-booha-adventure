@@ -20,15 +20,13 @@ assert.match(engine, /nameplate\.classList\.remove\([\s\S]*?streak-milestone-8/s
   'reset must remove milestone state');
 assert.match(engine, /nameplate\.removeAttribute\('data-streak'\)/,
   'reset must clear the visible streak identity');
-assert.match(engine, /messagesByFeel = \{/,
-  'streak callouts must vary by curriculum personality');
-assert.match(engine, /variant === 'combo'/,
-  'arcade streaks must use a combo-specific callout');
-assert.match(engine, /variant === 'chain'/,
-  'premium streaks must use a chain-specific callout');
-assert.match(engine, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?booha-blitz-callout\.combo\.show/s,
-  'streak callouts must respect reduced motion');
+assert.match(engine, /function clearAnnouncement\(\)/,
+  'streak updates must clear stale floating announcements');
+assert.match(engine, /nameplate\.setAttribute\('aria-live', 'polite'\)/,
+  'the live nameplate must announce streak changes');
+assert.match(engine, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?booha-blitz-nameplate\.streak-active \{ animation: none; \}/s,
+  'the reactive streak container must respect reduced motion');
 assert.match(verify, /tests\/blitz-pass11-streak-audit\.cjs/,
   'verify.sh must run the shared streak audit');
 
-console.log('Blitz Pass 5 streak audit passed: shared milestones, meters, and curriculum-specific combo feedback are covered.');
+console.log('Blitz Pass 5 streak audit passed: shared milestones, meters, live nameplate feedback, and reduced-motion coverage are covered.');
