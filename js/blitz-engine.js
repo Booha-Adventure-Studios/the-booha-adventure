@@ -138,6 +138,7 @@ window.BoohaBlitzEngine = (() => {
   function backgroundFor(palette, index = 0) {
     const streak = arguments.length > 2 ? arguments[2] : 0;
     const energy = Math.min(15, Math.max(0, Number(streak) || 0));
+    if (isLowPower() && palette.background?.main) return palette.background.main;
     const hue = (palette.baseHue + index * (palette.hueStep || 51) + energy * (palette.feel === 'sleek' ? 1 : 2)) % 360;
     const saturation = Math.min(100, palette.bgSat + energy * (palette.feel === 'arcade' ? 0.7 : 0.45));
     const lightness = Math.min(42, palette.bgLit + energy * (palette.feel === 'playful' ? 0.4 : 0.25));
@@ -363,6 +364,7 @@ window.BoohaBlitzEngine = (() => {
       }
       #vb-overlay.low-power, #sb-overlay.low-power, #qb-overlay.low-power {
         transition: none !important;
+        background: var(--blitz-bg-main) !important;
       }
       #vb-overlay.low-power .booha-blitz-fire-wallpaper,
       #sb-overlay.low-power .booha-blitz-fire-wallpaper,
@@ -2313,9 +2315,10 @@ window.BoohaBlitzEngine = (() => {
       let startTime = null;
       let elapsed = 0;
       let clearElapsed = null;
-      let rafId = null;
+      let timerId = null;
       let locked = false;
       let bgIndex = 0;
+      let backgroundValue = '';
       let lastTimerPaint = -Infinity;
       let gameStarted = false;
       let streak = 0;
@@ -2323,9 +2326,22 @@ window.BoohaBlitzEngine = (() => {
       let finalHoldTimer = null;
       let finalHoldInterval = null;
 
+      function setBackground(streakValue = streak) {
+        const next = backgroundFor(palette, bgIndex, streakValue);
+        if (next === backgroundValue) return;
+        backgroundValue = next;
+        overlay.style.background = next;
+      }
+
+      function scheduleTimerTick(delay = 0) {
+        if (timerId !== null) clearTimeout(timerId);
+        timerId = setTimeout(tick, delay);
+      }
+
       function tick() {
+        timerId = null;
         if (startTime === null) {
-          rafId = requestAnimationFrame(tick);
+          scheduleTimerTick(TIMER_PAINT_INTERVAL_MS);
           return;
         }
         elapsed = performance.now() - startTime;
@@ -2333,13 +2349,13 @@ window.BoohaBlitzEngine = (() => {
           timerEl.textContent = fmtTime(elapsed);
           lastTimerPaint = elapsed;
         }
-        rafId = requestAnimationFrame(tick);
+        scheduleTimerTick(TIMER_PAINT_INTERVAL_MS);
       }
 
       function stopTimer() {
-        if (rafId) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
+        if (timerId !== null) {
+          clearTimeout(timerId);
+          timerId = null;
         }
       }
 
@@ -2349,7 +2365,7 @@ window.BoohaBlitzEngine = (() => {
         const eventThreshold = STREAK_EVENT_THRESHOLDS.includes(streak) ? streak : 0;
         spotlight.clearAnnouncement();
         spotlight.setStreak(streak, eventThreshold);
-        overlay.style.background = backgroundFor(palette, bgIndex, streak);
+        setBackground(streak);
         if (eventThreshold) {
           playStreakBeat(eventThreshold);
           if (palette.feel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
@@ -2561,7 +2577,7 @@ window.BoohaBlitzEngine = (() => {
         timerEl.textContent = '0.00s';
         renderQuestion(true);
         startBGM();
-        rafId = requestAnimationFrame(tick);
+        scheduleTimerTick(0);
         requestAnimationFrame(() => optionsEl.querySelector(`.${config.optionClass}`)?.focus());
       }
 
@@ -2581,7 +2597,7 @@ window.BoohaBlitzEngine = (() => {
 
         btn.classList.add('wrong');
         spotlight.resetStreak();
-        overlay.style.background = backgroundFor(palette, bgIndex, 0);
+        setBackground(0);
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
           if (b.textContent === correct.en) b.classList.add('correct');
         });
@@ -2598,7 +2614,7 @@ window.BoohaBlitzEngine = (() => {
         locked = false;
         const card = queue[current];
         bgIndex++;
-        overlay.style.background = backgroundFor(palette, bgIndex, streak);
+        setBackground(streak);
         jpWordEl.style.animation = 'none';
         hiraEl.style.animation = 'none';
         requestAnimationFrame(() => {
@@ -2639,6 +2655,7 @@ window.BoohaBlitzEngine = (() => {
           overlay.classList.remove('blitz-awaiting-start');
           startCard.card.remove();
           startTime = performance.now();
+          scheduleTimerTick(0);
           overlay._boohaBlitzPerformanceCleanup = monitorFramePerformance(
             overlay,
             () => enableRuntimeLowPower(overlay),
@@ -2732,7 +2749,7 @@ window.BoohaBlitzEngine = (() => {
       });
       overlay.querySelector(selector('winClose')).addEventListener('click', cleanupAndClose);
 
-      rafId = requestAnimationFrame(tick);
+      scheduleTimerTick(0);
       renderQuestion();
       spotlight.announce(`${spotlight.playerName}, READY?`);
       startCard.button.addEventListener('click', beginGame);

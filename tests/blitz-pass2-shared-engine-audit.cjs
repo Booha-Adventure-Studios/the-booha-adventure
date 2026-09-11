@@ -43,7 +43,7 @@ for (const token of [
   'function celebrate',
   'function saveBestTime',
   'booha:gameEnd',
-  'requestAnimationFrame(tick)',
+  'scheduleTimerTick',
 ]) {
   assert(engine.includes(token), `shared engine must own ${token}`);
 }
