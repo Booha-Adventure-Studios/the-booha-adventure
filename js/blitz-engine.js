@@ -20,7 +20,7 @@ window.BoohaBlitzEngine = (() => {
       streak: Object.freeze({ label: 'STREAK', marker: '★', colors: ['#ffffff', '#ffe66b', '#ffad55', '#ff6d78', '#ff6ccf'], glow: 'rgba(255,125,196,.62)' }),
       reward: Object.freeze({ colors: ['#fffbe1', '#ffe27a', '#ff8ec8', '#ffffff'], glow: 'rgba(255,184,72,.72)' }),
       shape: Object.freeze({ optionRadius: 'round', popupRadius: '28px', particle: 'round' }),
-      motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72 }),
+      motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
       particleShape: 'round', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, feel: 'playful',
       rewardColors: ['#fffbe1', '#ffe27a', '#ff8ec8', '#ffffff'], rewardGlow: 'rgba(255,184,72,.72)',
     }),
@@ -37,7 +37,7 @@ window.BoohaBlitzEngine = (() => {
       streak: Object.freeze({ label: 'COMBO', marker: '⚡', colors: ['#f5ffcf', '#39ff14', '#00ffee', '#8affff', '#ffffff'], glow: 'rgba(0,255,210,.72)' }),
       reward: Object.freeze({ colors: ['#f5ffcf', '#39ff14', '#00ffee', '#ffffff'], glow: 'rgba(0,255,210,.78)' }),
       shape: Object.freeze({ optionRadius: 'arcade', popupRadius: '18px', particle: 'arcade' }),
-      motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51 }),
+      motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, optionDurationMs: 260, optionStaggerMs: 30, optionX: '0px', optionY: '8px', optionScale: '.97' }),
       particleShape: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, feel: 'arcade',
       rewardColors: ['#f5ffcf', '#39ff14', '#00ffee', '#ffffff'], rewardGlow: 'rgba(0,255,210,.78)',
     }),
@@ -54,7 +54,7 @@ window.BoohaBlitzEngine = (() => {
       streak: Object.freeze({ label: 'CHAIN', marker: '✦', colors: ['#fff6cf', '#f0c96a', '#dfeaff', '#b8d1ff', '#ffffff'], glow: 'rgba(240,201,106,.58)' }),
       reward: Object.freeze({ colors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], glow: 'rgba(240,201,106,.72)' }),
       shape: Object.freeze({ optionRadius: 'diamond', popupRadius: '14px', particle: 'diamond' }),
-      motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24 }),
+      motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
       particleShape: 'diamond', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, feel: 'sleek',
       rewardColors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], rewardGlow: 'rgba(240,201,106,.72)',
     }),
@@ -75,9 +75,10 @@ window.BoohaBlitzEngine = (() => {
     }),
   });
   const TIMER_PAINT_INTERVAL_MS = 100;
+  const REDUCED_MOTION = typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LOW_POWER =
-    (typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches) ||
+    REDUCED_MOTION ||
     (typeof navigator !== 'undefined' && (
       (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
       (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
@@ -296,6 +297,7 @@ window.BoohaBlitzEngine = (() => {
         display: grid;
         place-items: center;
         isolation: isolate;
+        contain: layout style;
       }
       #vb-wrong-popup.blitz-wrong-feedback,
       #sb-wrong-popup.blitz-wrong-feedback,
@@ -1246,8 +1248,22 @@ window.BoohaBlitzEngine = (() => {
       const style = document.createElement('style');
       style.id = `booha-blitz-compositor-${config.gameType}`;
       style.textContent = `
+        @keyframes boohaBlitzOptionEnter {
+          from {
+            opacity: 0;
+            transform: translate(var(--blitz-option-x, 0px), var(--blitz-option-y, 12px)) scale(var(--blitz-option-scale, .96));
+          }
+          to {
+            opacity: 1;
+            transform: translate(0, 0) scale(1);
+          }
+        }
         #${config.overlayId}.blitz-compositor .${config.optionClass} {
           transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-enter {
+          animation: boohaBlitzOptionEnter var(--blitz-option-duration, 320ms) var(--blitz-motion-ease, ease-out) var(--blitz-enter-delay, 0ms) both;
+          will-change: transform, opacity;
         }
         #${config.overlayId}.blitz-compositor .${config.optionClass}::after {
           content: '';
@@ -1299,8 +1315,11 @@ window.BoohaBlitzEngine = (() => {
         }
         @media (prefers-reduced-motion: reduce) {
           #${config.overlayId}.blitz-compositor .${config.optionClass}::after { transition: none; }
+          #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-enter,
+          #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-recover { animation: none !important; opacity: 1; transform: none; }
           #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win { animation: none; }
-          #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-recover { animation: none; }
+          #${config.overlayId}.blitz-compositor .${config.optionClass}.wrong,
+          #${config.overlayId}.shake { animation: none !important; }
         }
       `;
       document.head.appendChild(style);
@@ -1317,6 +1336,13 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-wrong', palette.wrong?.color || '#ff1e1e');
       overlay.style.setProperty('--blitz-popup-bg', palette.popup?.background || 'rgba(0,0,0,.92)');
       overlay.style.setProperty('--blitz-streak-glow', palette.streak?.glow || palette.glow);
+      const motion = palette.motion || {};
+      overlay.style.setProperty('--blitz-motion-ease', motion.particleEasing || palette.particleEasing || 'ease-out');
+      overlay.style.setProperty('--blitz-option-duration', `${motion.optionDurationMs || 320}ms`);
+      overlay.style.setProperty('--blitz-option-stagger', `${motion.optionStaggerMs || 36}ms`);
+      overlay.style.setProperty('--blitz-option-x', motion.optionX || '0px');
+      overlay.style.setProperty('--blitz-option-y', motion.optionY || '12px');
+      overlay.style.setProperty('--blitz-option-scale', motion.optionScale || '.96');
       overlay.classList.add(`blitz-feel-${palette.feel || 'arcade'}`);
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
         overlay.style.setProperty(name, typeof value === 'function' ? value(palette) : value);
@@ -1565,8 +1591,10 @@ window.BoohaBlitzEngine = (() => {
       const W = window.innerWidth;
       const H = window.innerHeight;
 
-      overlay.classList.add('shake');
-      setTimeout(() => overlay.classList.remove('shake'), 420);
+      if (!REDUCED_MOTION) {
+        overlay.classList.add('shake');
+        setTimeout(() => overlay.classList.remove('shake'), 420);
+      }
 
       const fragment = document.createDocumentFragment();
       const mode = config.celebrationMode;
@@ -1977,58 +2005,66 @@ window.BoohaBlitzEngine = (() => {
         correctBtn.style.transition = 'none';
         correctBtn.style.background = palette.correct?.color || '#00ff64';
         emitCorrectMicroBurst(correctBtn);
-        overlay.style.transform = 'scale(1.02)';
-        setTimeout(() => {
-          overlay.style.transition = 'transform 70ms ease';
-          overlay.style.transform = '';
-          setTimeout(() => { overlay.style.transition = ''; }, 70);
-        }, 55);
+        if (!REDUCED_MOTION) {
+          overlay.style.transform = 'scale(1.02)';
+          setTimeout(() => {
+            overlay.style.transition = 'transform 70ms ease';
+            overlay.style.transform = '';
+            setTimeout(() => { overlay.style.transition = ''; }, 70);
+          }, 55);
+        }
 
         const allBtns = Array.from(optionsEl.querySelectorAll(`.${config.optionClass}`));
-        setTimeout(() => {
-          allBtns.forEach(btn => {
-            if (btn === correctBtn) return;
-            const angle = Math.random() * Math.PI * 2;
-            const dist = 200 + Math.random() * 160;
-            btn.style.transition = 'transform 260ms cubic-bezier(.4,0,1,1), opacity 200ms ease';
-            btn.style.transform = `translate(${Math.cos(angle) * dist}px,${Math.sin(angle) * dist}px) rotate(${(Math.random() - 0.5) * 480}deg) scale(0.15)`;
-            btn.style.opacity = '0';
-          });
-        }, 70);
-
-        setTimeout(() => {
-          correctBtn.style.transition = 'transform 110ms ease, opacity 90ms ease';
-          correctBtn.style.transform = 'scale(1.25)';
-          correctBtn.style.opacity = '0';
-          const r = correctBtn.getBoundingClientRect();
-          const ovr = overlay.getBoundingClientRect();
-          const cx = r.left - ovr.left + r.width / 2;
-          const cy = r.top - ovr.top + r.height / 2;
-          const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
-          const particles = document.createDocumentFragment();
-          const count = config.correctParticles || 20;
-          for (let i = 0; i < effectCount(count); i++) {
-            const p = document.createElement('div');
-            const angle = (i / count) * Math.PI * 2;
-            const dist = 50 + Math.random() * 100;
-            const size = 5 + Math.random() * 7;
-            p.className = config.particleClass;
-            p.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.5 ? '50%' : '3px'};background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:10;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${240 + Math.random() * 140}ms;--pdelay:${Math.random() * 30}ms;animation:${config.particleAnimation} var(--pdur) ease-out var(--pdelay) both;`;
-            p.addEventListener('animationend', () => p.remove());
-            particles.appendChild(p);
-          }
-          overlay.appendChild(particles);
-        }, 90);
-
-        setTimeout(() => {
-          flashEl.style.background = palette.accent;
-          flashEl.style.opacity = '0.45';
+        if (!REDUCED_MOTION) {
           setTimeout(() => {
-            flashEl.style.background = '#ffffff';
-            flashEl.style.opacity = '0.75';
-            setTimeout(() => { flashEl.style.opacity = '0'; flashEl.style.background = ''; }, 55);
-          }, 35);
-        }, 110);
+            allBtns.forEach(btn => {
+              if (btn === correctBtn) return;
+              const angle = Math.random() * Math.PI * 2;
+              const dist = 200 + Math.random() * 160;
+              btn.style.transition = 'transform 260ms cubic-bezier(.4,0,1,1), opacity 200ms ease';
+              btn.style.transform = `translate(${Math.cos(angle) * dist}px,${Math.sin(angle) * dist}px) rotate(${(Math.random() - 0.5) * 480}deg) scale(0.15)`;
+              btn.style.opacity = '0';
+            });
+          }, 70);
+        }
+
+        if (!REDUCED_MOTION) {
+          setTimeout(() => {
+            correctBtn.style.transition = 'transform 110ms ease, opacity 90ms ease';
+            correctBtn.style.transform = 'scale(1.25)';
+            correctBtn.style.opacity = '0';
+            const r = correctBtn.getBoundingClientRect();
+            const ovr = overlay.getBoundingClientRect();
+            const cx = r.left - ovr.left + r.width / 2;
+            const cy = r.top - ovr.top + r.height / 2;
+            const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
+            const particles = document.createDocumentFragment();
+            const count = config.correctParticles || 20;
+            for (let i = 0; i < effectCount(count); i++) {
+              const p = document.createElement('div');
+              const angle = (i / count) * Math.PI * 2;
+              const dist = 50 + Math.random() * 100;
+              const size = 5 + Math.random() * 7;
+              p.className = config.particleClass;
+              p.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.5 ? '50%' : '3px'};background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:10;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${240 + Math.random() * 140}ms;--pdelay:${Math.random() * 30}ms;animation:${config.particleAnimation} var(--pdur) ease-out var(--pdelay) both;`;
+              p.addEventListener('animationend', () => p.remove());
+              particles.appendChild(p);
+            }
+            overlay.appendChild(particles);
+          }, 90);
+        }
+
+        if (!REDUCED_MOTION) {
+          setTimeout(() => {
+            flashEl.style.background = palette.accent;
+            flashEl.style.opacity = '0.45';
+            setTimeout(() => {
+              flashEl.style.background = '#ffffff';
+              flashEl.style.opacity = '0.75';
+              setTimeout(() => { flashEl.style.opacity = '0'; flashEl.style.background = ''; }, 55);
+            }, 35);
+          }, 110);
+        }
 
         setTimeout(() => {
           if (current >= queue.length) {
@@ -2129,7 +2165,7 @@ window.BoohaBlitzEngine = (() => {
         });
         emitWrongMicroFeedback(btn);
         playWrongHit();
-        overlay.classList.add('shake');
+        if (!REDUCED_MOTION) overlay.classList.add('shake');
         overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
         stopTimer();
         stopBGM();
@@ -2159,6 +2195,9 @@ window.BoohaBlitzEngine = (() => {
           if (recover) {
             btn.classList.add('blitz-recover');
             btn.style.setProperty('--recover-index', String(index));
+          } else {
+            btn.classList.add('blitz-enter');
+            btn.style.setProperty('--blitz-enter-delay', `${index * (palette.motion?.optionStaggerMs || 36)}ms`);
           }
           btn.type = 'button';
           btn.textContent = opt.en;
