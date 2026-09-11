@@ -117,7 +117,7 @@ window.SentenceBlitz = (() => {
       }
 
       #sb-timer-bar {
-        width: 100%; flex-shrink: 0;
+        width: 100%; flex: 0 0 auto; min-height: 72px; box-sizing: border-box;
         display: flex; align-items: center; justify-content: center;
         padding: max(env(safe-area-inset-top,0px) + 12px, 18px) 20px 10px;
         gap: 16px;
@@ -153,14 +153,23 @@ window.SentenceBlitz = (() => {
 
       /* ── Scrollable main area ── */
       #sb-scroll {
-        flex: 1; width: 100%;
+        flex: 1 1 auto; min-height: 0; width: 100%;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         display: flex; flex-direction: column;
         align-items: center;
         padding: 10px 16px max(env(safe-area-inset-bottom,0px) + 16px, 20px);
-        gap: clamp(10px,2vw,18px);
+        gap: clamp(12px,2vw,22px);
         z-index: 2;
+      }
+
+      #sb-prompt {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(8px, 1.5vw, 14px);
+        padding: clamp(8px, 1.5vw, 16px) 0 2px;
       }
 
       /* ── JP sentence ── */
@@ -192,7 +201,7 @@ window.SentenceBlitz = (() => {
 
       /* ── Options — single column ── */
       #sb-options {
-        width: 100%; max-width: 680px;
+        flex: 0 0 auto; width: 100%; max-width: 680px;
         display: flex;
         flex-direction: column;
         gap: clamp(7px,1.5vw,11px);
@@ -504,15 +513,17 @@ window.SentenceBlitz = (() => {
     if (BoohaBlitzEngine.LOW_POWER) el.classList.add('low-power');
     el.innerHTML = `
       <div id="sb-flash"></div>
-      <div id="sb-timer-bar">
+      <div id="sb-timer-bar" class="booha-blitz-hud">
         <div id="sb-progress"></div>
         <div id="sb-timer">0.00s</div>
         <button id="sb-quit" type="button">やめる</button>
       </div>
       <div id="sb-scroll">
-        <div id="sb-jp-word"></div>
-        <div id="sb-hira"></div>
-        <div id="sb-options"></div>
+        <div id="sb-prompt" class="booha-blitz-prompt">
+          <div id="sb-jp-word"></div>
+          <div id="sb-hira"></div>
+        </div>
+        <div id="sb-options" class="booha-blitz-answer"></div>
       </div>
       <div id="sb-wrong-popup">
         <div class="sb-wrong-jp"   id="sbwj"></div>
