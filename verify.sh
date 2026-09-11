@@ -1474,6 +1474,13 @@ else
   bad "Blitz mastery-retry audit failed"
 fi
 
+echo "[blitz] landscape-scaling audit"
+if node tests/blitz-pass31-landscape-scaling-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz landscape-scaling audit passed"
+else
+  bad "Blitz landscape-scaling audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"
