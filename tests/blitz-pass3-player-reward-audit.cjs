@@ -24,7 +24,7 @@ for (const message of [
 
 assert.match(engine, /const FINAL_CARD_HOLD_MS = 4000;/,
   'final card must remain visible for a meaningful four-second reveal');
-assert.match(engine, /function ensureFinalCard\(winScreen\)/,
+assert.match(engine, /function ensureFinalCard\(winScreen(?:, palette)?\)/,
   'shared engine must build the final player summary card');
 assert.match(engine, /button\.disabled = true;/,
   'final-card actions must be locked during the reveal');

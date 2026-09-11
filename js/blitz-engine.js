@@ -573,6 +573,90 @@ window.BoohaBlitzEngine = (() => {
         border-radius: 18px;
         background: rgba(0, 0, 0, .25);
       }
+      .booha-blitz-final-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: min(100%, 560px);
+        max-height: min(92vh, 860px);
+        box-sizing: border-box;
+        overflow-y: auto;
+        padding: clamp(22px, 4vw, 38px) clamp(18px, 4vw, 42px) clamp(18px, 3vw, 28px);
+        border: 1px solid var(--blitz-finish-accent, var(--blitz-accent));
+        border-radius: clamp(24px, 4vw, 38px);
+        background:
+          linear-gradient(145deg, rgba(255,255,255,.12), transparent 30%),
+          radial-gradient(circle at 50% 0%, var(--blitz-finish-glow, var(--blitz-glow)), transparent 58%),
+          rgba(7, 3, 18, .82);
+        box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 42px var(--blitz-finish-glow, var(--blitz-glow));
+        scrollbar-width: thin;
+        scrollbar-color: var(--blitz-finish-accent, var(--blitz-accent)) transparent;
+      }
+      .booha-blitz-final-card::before {
+        content: '';
+        position: absolute;
+        inset: 8px;
+        border: 1px solid rgba(255,255,255,.11);
+        border-radius: inherit;
+        pointer-events: none;
+      }
+      .booha-blitz-final-curriculum {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 10px;
+        color: var(--blitz-finish-accent, #ffe66b);
+        font-size: clamp(10px, 2vw, 13px);
+        font-weight: 950;
+        letter-spacing: 2.2px;
+        text-transform: uppercase;
+        text-shadow: 0 0 16px var(--blitz-finish-accent, #ffe66b);
+      }
+      .booha-blitz-final-card .booha-blitz-final-summary,
+      .booha-blitz-final-card .booha-blitz-final-hold,
+      .booha-blitz-final-card .vb-win-buttons,
+      .booha-blitz-final-card .sb-win-buttons,
+      .booha-blitz-final-card .qb-win-buttons {
+        position: relative;
+        z-index: 1;
+      }
+      .booha-blitz-final-card .booha-blitz-final-summary {
+        width: 100%;
+        margin-top: 16px;
+        background: rgba(0,0,0,.24);
+      }
+      .booha-blitz-final-perfect {
+        flex: 1 1 100%;
+        color: #fff7b0;
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: 1.5px;
+        text-shadow: 0 0 14px #ffd43b;
+      }
+      .booha-blitz-final-card .booha-blitz-final-hold {
+        width: 100%;
+      }
+      #vb-win.blitz-finish,
+      #sb-win.blitz-finish,
+      #qb-win.blitz-finish {
+        padding: 16px;
+      }
+      #vb-win.blitz-finish.perfect-mode .booha-blitz-final-card,
+      #sb-win.blitz-finish.perfect-mode .booha-blitz-final-card,
+      #qb-win.blitz-finish.perfect-mode .booha-blitz-final-card {
+        border-color: #fff0a8;
+        box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 52px rgba(255,214,73,.62);
+      }
+      #vb-win.blitz-finish.perfect-mode .booha-blitz-final-curriculum::before,
+      #sb-win.blitz-finish.perfect-mode .booha-blitz-final-curriculum::before,
+      #qb-win.blitz-finish.perfect-mode .booha-blitz-final-curriculum::before {
+        content: '✦  PERFECT RUN  ✦';
+        display: block;
+        margin-bottom: 8px;
+        color: #fff7b0;
+        font-size: 10px;
+        letter-spacing: 2px;
+      }
       .booha-blitz-final-flourish {
         flex: 1 1 100%;
         color: var(--blitz-finish-accent, #ffe66b);
@@ -950,15 +1034,27 @@ window.BoohaBlitzEngine = (() => {
       container.setAttribute('aria-label', `${jp} ${hira}`);
     }
 
-    function ensureFinalCard(winScreen) {
+    function ensureFinalCard(winScreen, palette) {
       const existing = winScreen.querySelector('.booha-blitz-final-summary');
       if (existing) {
         return {
           summary: existing,
           streak: existing.querySelector('.booha-blitz-final-streak'),
+          perfect: existing.querySelector('.booha-blitz-final-perfect'),
           hold: winScreen.querySelector('.booha-blitz-final-hold'),
         };
       }
+
+      const card = document.createElement('section');
+      card.className = 'booha-blitz-final-card';
+      card.setAttribute('aria-label', 'Blitz clear results');
+      while (winScreen.firstChild) card.appendChild(winScreen.firstChild);
+      winScreen.appendChild(card);
+
+      const curriculum = document.createElement('div');
+      curriculum.className = 'booha-blitz-final-curriculum';
+      curriculum.textContent = `${palette?.name || 'BOOHA BLITZ'} · ${palette?.nameJp || ''}`.trim();
+      card.prepend(curriculum);
 
       const summary = document.createElement('div');
       summary.className = 'booha-blitz-final-summary';
@@ -971,7 +1067,10 @@ window.BoohaBlitzEngine = (() => {
       const streak = document.createElement('div');
       streak.className = 'booha-blitz-final-streak';
       streak.textContent = 'BEST STREAK ×0';
-      summary.append(badge, flourish, streak);
+      const perfect = document.createElement('div');
+      perfect.className = 'booha-blitz-final-perfect';
+      perfect.hidden = true;
+      summary.append(badge, flourish, streak, perfect);
 
       const hold = document.createElement('div');
       hold.className = 'booha-blitz-final-hold';
@@ -981,12 +1080,12 @@ window.BoohaBlitzEngine = (() => {
       const playAgain = winScreen.querySelector(selector('playAgain'));
       const buttonGroup = playAgain && playAgain.parentElement;
       if (buttonGroup) {
-        winScreen.insertBefore(summary, buttonGroup);
-        winScreen.insertBefore(hold, buttonGroup);
+        card.insertBefore(summary, buttonGroup);
+        card.insertBefore(hold, buttonGroup);
       } else {
-        winScreen.append(summary, hold);
+        card.append(summary, hold);
       }
-      return { summary, streak, hold };
+      return { summary, streak, perfect, hold };
     }
 
     function closeGame(overlay, stopTimer, stopBGM) {
@@ -1137,7 +1236,7 @@ window.BoohaBlitzEngine = (() => {
       const wrongPopup = overlay.querySelector(selector('wrongPopup'));
       const winScreen = overlay.querySelector(selector('win'));
       const spotlight = createPlayerSpotlight(overlay, palette);
-      const finalCard = ensureFinalCard(winScreen);
+      const finalCard = ensureFinalCard(winScreen, palette);
       const queue = shuffle(weekCards);
       let current = 0;
       let startTime = null;
@@ -1423,14 +1522,18 @@ window.BoohaBlitzEngine = (() => {
         recordEl.classList.toggle('big', isRecord);
         if (isRecord) {
           recordEl.textContent = '🏆 NEW BOOHA RECORD';
-          bestEl.textContent = oldRecord ? `OLD: ${fmtTime(oldRecord.ms)}` : 'FIRST RECORD';
-          deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster` : '';
+          bestEl.textContent = `PERSONAL BEST: ${fmtTime(ms)}`;
+          deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than previous best` : 'FIRST PERSONAL BEST';
         } else {
-          recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST' : '';
-          bestEl.textContent = best ? `ALL-TIME BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : '';
-          deltaEl.textContent = weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}${weekly.name ? ` — ${weekly.name}` : ''}` : '';
+          recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST' : 'CLEAR COMPLETE';
+          bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
+          deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs previous best` : (weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}` : '');
         }
         finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
+        const isPerfectRun = bestStreak === queue.length;
+        finalCard.perfect.hidden = !isPerfectRun;
+        finalCard.perfect.textContent = isPerfectRun ? `PERFECT RUN · ${queue.length}/${queue.length}` : '';
+        winScreen.classList.toggle('perfect-mode', isPerfectRun);
         spotlight.nameplate.classList.add('complete');
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
         winScreen.classList.add('show');
