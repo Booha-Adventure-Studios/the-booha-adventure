@@ -83,9 +83,56 @@ window.BoohaBlitzEngine = (() => {
       (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
       (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
     ));
+  let RUNTIME_LOW_POWER = false;
+
+  function isLowPower() {
+    return LOW_POWER || RUNTIME_LOW_POWER;
+  }
 
   function effectCount(fullCount) {
-    return LOW_POWER ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
+    return isLowPower() ? Math.max(6, Math.round(fullCount * 0.5)) : fullCount;
+  }
+
+  function enableRuntimeLowPower(overlay) {
+    RUNTIME_LOW_POWER = true;
+    overlay.classList.add('low-power', 'runtime-low-power');
+  }
+
+  function monitorFramePerformance(overlay, onPoorPerformance) {
+    if (LOW_POWER) return () => {};
+    const startedAt = performance.now();
+    let previous = startedAt;
+    let frameCount = 0;
+    let slowFrames = 0;
+    let totalFrameTime = 0;
+    let rafId = null;
+    let active = true;
+
+    const stop = () => {
+      if (!active) return;
+      active = false;
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      rafId = null;
+    };
+    const sample = now => {
+      if (!active) return;
+      const frameTime = now - previous;
+      previous = now;
+      if (frameCount > 0) {
+        totalFrameTime += frameTime;
+        if (frameTime >= 34) slowFrames++;
+      }
+      frameCount++;
+      if (now - startedAt >= 1800) {
+        const averageFrameTime = totalFrameTime / Math.max(1, frameCount - 1);
+        if (averageFrameTime >= 26 || slowFrames >= 6) onPoorPerformance({ averageFrameTime, slowFrames });
+        stop();
+        return;
+      }
+      rafId = requestAnimationFrame(sample);
+    };
+    rafId = requestAnimationFrame(sample);
+    return stop;
   }
 
   function backgroundFor(palette, index = 0) {
@@ -313,6 +360,42 @@ window.BoohaBlitzEngine = (() => {
       }
       #vb-overlay #vb-quit, #sb-overlay #sb-quit, #qb-overlay #qb-quit {
         right: max(env(safe-area-inset-right, 0px) + 16px, 16px);
+      }
+      #vb-overlay.low-power, #sb-overlay.low-power, #qb-overlay.low-power {
+        transition: none !important;
+      }
+      #vb-overlay.low-power .booha-blitz-fire-wallpaper,
+      #sb-overlay.low-power .booha-blitz-fire-wallpaper,
+      #qb-overlay.low-power .booha-blitz-fire-wallpaper,
+      #vb-overlay.low-power .booha-blitz-streak-spark,
+      #sb-overlay.low-power .booha-blitz-streak-spark,
+      #qb-overlay.low-power .booha-blitz-streak-spark,
+      #vb-overlay.low-power .booha-blitz-correct-spark,
+      #sb-overlay.low-power .booha-blitz-correct-spark,
+      #qb-overlay.low-power .booha-blitz-correct-spark,
+      #vb-overlay.low-power .booha-blitz-wrong-spark,
+      #sb-overlay.low-power .booha-blitz-wrong-spark,
+      #qb-overlay.low-power .booha-blitz-wrong-spark { display: none !important; }
+      #vb-overlay.low-power .booha-blitz-wrong-feedback,
+      #sb-overlay.low-power .booha-blitz-wrong-feedback,
+      #qb-overlay.low-power .booha-blitz-wrong-feedback,
+      #vb-overlay.low-power #vb-win,
+      #sb-overlay.low-power #sb-win,
+      #qb-overlay.low-power #qb-win {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+      #vb-overlay.low-power .booha-blitz-final-card,
+      #sb-overlay.low-power .booha-blitz-final-card {
+        box-shadow: 0 12px 32px rgba(0,0,0,.46), 0 0 20px var(--blitz-finish-glow, var(--blitz-glow));
+      }
+      #qb-overlay.low-power .booha-blitz-final-card {
+        box-shadow: 0 12px 32px rgba(0,0,0,.46), 0 0 20px var(--blitz-finish-glow, var(--blitz-glow));
+      }
+      #vb-overlay.low-power .vb-opt,
+      #sb-overlay.low-power .sb-opt,
+      #qb-overlay.low-power .qb-opt {
+        transition: none !important;
       }
       #vb-win, #sb-win, #qb-win {
         padding-top: max(env(safe-area-inset-top, 0px) + 16px, 16px);
@@ -1706,7 +1789,7 @@ window.BoohaBlitzEngine = (() => {
       }
       function emitStreakSparks() {
         const threshold = arguments.length ? arguments[0] : 0;
-        const count = LOW_POWER ? 3 : threshold >= 5 ? (palette.feel === 'arcade' ? 14 : 12) : palette.feel === 'arcade' ? 8 : 6;
+        const count = isLowPower() ? 3 : threshold >= 5 ? (palette.feel === 'arcade' ? 14 : 12) : palette.feel === 'arcade' ? 8 : 6;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
@@ -1841,7 +1924,7 @@ window.BoohaBlitzEngine = (() => {
       const wallpaper = document.createElement('div');
       wallpaper.className = 'booha-blitz-fire-wallpaper';
       wallpaper.setAttribute('aria-hidden', 'true');
-      const count = LOW_POWER ? 6 : 12;
+      const count = isLowPower() ? 6 : 12;
       for (let i = 0; i < count; i++) {
         const name = document.createElement('span');
         name.className = 'booha-blitz-fire-name';
@@ -1927,6 +2010,7 @@ window.BoohaBlitzEngine = (() => {
     function closeGame(overlay, stopTimer, stopBGM) {
       stopTimer();
       stopBGM();
+      overlay._boohaBlitzPerformanceCleanup?.();
       overlay._boohaBlitzViewportCleanup?.();
       overlay.remove();
       const api = window[config.apiName];
@@ -2047,11 +2131,13 @@ window.BoohaBlitzEngine = (() => {
 
       const existing = document.getElementById(config.overlayId);
       if (existing) {
+        existing._boohaBlitzPerformanceCleanup?.();
         existing._boohaBlitzViewportCleanup?.();
         existing.remove();
       }
       const overlay = config.buildOverlay();
       overlay._boohaBlitzViewportCleanup = bindViewportMetrics(overlay);
+      if (isLowPower()) overlay.classList.add('low-power');
       overlay.classList.add('blitz-compositor');
       applyPalette(overlay, palette);
 
@@ -2314,7 +2400,7 @@ window.BoohaBlitzEngine = (() => {
         const ovr = overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
         const cy = r.top - ovr.top + r.height / 2;
-        const count = LOW_POWER ? 3 : streak >= 5 ? 10 : 6;
+        const count = isLowPower() ? 3 : streak >= 5 ? 10 : 6;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
@@ -2413,7 +2499,7 @@ window.BoohaBlitzEngine = (() => {
         const ovr = overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
         const cy = r.top - ovr.top + r.height / 2;
-        const count = LOW_POWER ? 2 : 4;
+        const count = isLowPower() ? 2 : 4;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
@@ -2553,6 +2639,10 @@ window.BoohaBlitzEngine = (() => {
           overlay.classList.remove('blitz-awaiting-start');
           startCard.card.remove();
           startTime = performance.now();
+          overlay._boohaBlitzPerformanceCleanup = monitorFramePerformance(
+            overlay,
+            () => enableRuntimeLowPower(overlay),
+          );
           spotlight.announce(`${spotlight.playerName}, GO!`);
         }, 140);
       }
@@ -2635,6 +2725,7 @@ window.BoohaBlitzEngine = (() => {
         stopStreakBeat();
         stopTimer();
         stopBGM();
+        overlay._boohaBlitzPerformanceCleanup?.();
         overlay._boohaBlitzViewportCleanup?.();
         overlay.remove();
         launch({ curr, monthSlug, weekNumber });
