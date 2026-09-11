@@ -1453,6 +1453,13 @@ else
   bad "Blitz Pass 2 streak-container audit failed"
 fi
 
+echo "[blitz] Pass 3 fire-wallpaper audit"
+if node tests/blitz-pass28-fire-wallpaper-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz Pass 3 fire-wallpaper audit passed"
+else
+  bad "Blitz Pass 3 fire-wallpaper audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"
