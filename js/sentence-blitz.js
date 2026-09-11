@@ -356,7 +356,6 @@ window.SentenceBlitz = (() => {
         -webkit-backdrop-filter: blur(16px);
         padding: 28px 24px; text-align: center; gap: 8px;
       }
-      #sb-overlay.low-power #sb-wrong-popup,
       #sb-overlay.low-power #sb-win {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
@@ -525,7 +524,7 @@ window.SentenceBlitz = (() => {
         </div>
         <div id="sb-options" class="booha-blitz-answer"></div>
       </div>
-      <div id="sb-wrong-popup">
+      <div id="sb-wrong-popup" class="blitz-wrong-feedback">
         <div class="sb-wrong-jp"   id="sbwj"></div>
         <div class="sb-wrong-hira" id="sbwh"></div>
         <div class="sb-wrong-en"   id="sbwe"></div>

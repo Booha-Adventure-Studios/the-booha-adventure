@@ -347,7 +347,6 @@ window.QuestionBlitz = (() => {
         -webkit-backdrop-filter: blur(16px);
         padding: 28px 24px; text-align: center; gap: 8px;
       }
-      #qb-overlay.low-power #qb-wrong-popup,
       #qb-overlay.low-power #qb-win {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
@@ -523,7 +522,7 @@ window.QuestionBlitz = (() => {
         </div>
         <div id="qb-options" class="booha-blitz-answer"></div>
       </div>
-      <div id="qb-wrong-popup">
+      <div id="qb-wrong-popup" class="blitz-wrong-feedback">
         <div class="qb-wrong-jp"   id="qbwj"></div>
         <div class="qb-wrong-hira" id="qbwh"></div>
         <div class="qb-wrong-en"   id="qbwe"></div>
