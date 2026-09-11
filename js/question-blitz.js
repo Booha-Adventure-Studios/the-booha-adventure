@@ -530,7 +530,7 @@ window.QuestionBlitz = (() => {
         <div class="qb-wrong-scold-hira" id="qbsh"></div>
         <div class="qb-wrong-scold-en"   id="qbse"></div>
         <div id="qb-wrong-status">READY FOR THE NEXT TRY</div>
-        <button id="qb-wrong-close" type="button">つづける</button>
+        <button id="qb-wrong-close" type="button">もう一度 / RETRY</button>
       </div>
       
      <div id="qb-win">
