@@ -200,6 +200,125 @@ window.BoohaBlitzEngine = (() => {
     return getWeeklyScore(gameType, curr, currentWeekId);
   }
 
+  const FINAL_CARD_HOLD_MS = 4000;
+  let sharedStylesInjected = false;
+
+  function injectSharedStyles() {
+    if (sharedStylesInjected) return;
+    sharedStylesInjected = true;
+    const style = document.createElement('style');
+    style.id = 'booha-blitz-shared-styles';
+    style.textContent = `
+      .booha-blitz-nameplate {
+        position: fixed;
+        top: max(env(safe-area-inset-top, 0px) + 58px, 58px);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 18;
+        min-width: min(280px, calc(100vw - 32px));
+        padding: 8px 18px 9px;
+        border: 1px solid var(--blitz-accent);
+        border-radius: 999px;
+        background: rgba(0, 0, 0, .34);
+        color: #fff;
+        text-align: center;
+        font-size: clamp(11px, 2.8vw, 14px);
+        font-weight: 950;
+        letter-spacing: 1.2px;
+        text-shadow: 0 0 14px var(--blitz-accent);
+        box-shadow: 0 0 18px var(--blitz-accent);
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+      .booha-blitz-nameplate-name { color: var(--blitz-accent); }
+      .booha-blitz-nameplate-streak { margin-left: 8px; color: #fff; }
+      .booha-blitz-nameplate.complete {
+        opacity: 0;
+        transform: translate(-50%, -8px) scale(.96);
+      }
+      .booha-blitz-callout {
+        position: fixed;
+        left: 50%;
+        top: 24%;
+        z-index: 19;
+        max-width: min(92vw, 620px);
+        transform: translate(-50%, 8px) scale(.94);
+        color: #fff;
+        font-size: clamp(20px, 6vw, 46px);
+        font-weight: 1000;
+        letter-spacing: .8px;
+        line-height: 1.05;
+        text-align: center;
+        text-shadow: 0 0 12px var(--blitz-accent), 0 0 34px var(--blitz-accent);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .booha-blitz-callout.show { animation: boohaBlitzCallout 1050ms cubic-bezier(.2,.8,.2,1) both; }
+      .booha-blitz-callout.final {
+        top: 20%;
+        color: #ffe66b;
+        text-shadow: 0 0 14px #ffb300, 0 0 42px #ff5a00;
+      }
+      @keyframes boohaBlitzCallout {
+        0% { opacity: 0; transform: translate(-50%, 12px) scale(.88) rotate(-2deg); }
+        18%, 72% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(0); }
+        100% { opacity: 0; transform: translate(-50%, -18px) scale(1.04) rotate(1deg); }
+      }
+      .booha-blitz-final-summary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        width: min(100%, 360px);
+        margin: 12px auto 2px;
+      }
+      .booha-blitz-final-badge,
+      .booha-blitz-final-streak {
+        border: 1px solid rgba(255, 255, 255, .28);
+        border-radius: 999px;
+        padding: 6px 11px;
+        color: #fff;
+        background: rgba(255, 255, 255, .1);
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+      }
+      .booha-blitz-final-badge {
+        color: #ffe66b;
+        border-color: rgba(255, 230, 107, .6);
+        box-shadow: 0 0 16px rgba(255, 175, 0, .25);
+      }
+      .booha-blitz-final-hold {
+        min-height: 18px;
+        margin: 7px auto 2px;
+        color: rgba(255, 255, 255, .7);
+        font-size: 10px;
+        font-weight: 850;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+      .booha-blitz-final-hold.ready { color: #ffe66b; }
+      .booha-blitz-final-summary + .booha-blitz-final-hold + .vb-win-buttons,
+      .booha-blitz-final-summary + .booha-blitz-final-hold + .sb-win-buttons,
+      .booha-blitz-final-summary + .booha-blitz-final-hold + .qb-win-buttons { margin-top: 4px; }
+      .booha-blitz-final-hold ~ button:disabled,
+      .booha-blitz-final-hold ~ .vb-win-buttons button:disabled,
+      .booha-blitz-final-hold ~ .sb-win-buttons button:disabled,
+      .booha-blitz-final-hold ~ .qb-win-buttons button:disabled {
+        cursor: wait;
+        opacity: .42;
+        filter: grayscale(.35);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .booha-blitz-callout.show { animation: none; opacity: 1; transform: translate(-50%, 0); }
+        .booha-blitz-nameplate { transition: none; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   function create(config) {
     const ids = config.ids;
     const selector = (key) => ids[key];
@@ -212,6 +331,84 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.background = `hsl(${palette.baseHue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
       const timer = overlay.querySelector(selector('timer'));
       if (timer) timer.style.color = palette.timerColor;
+    }
+
+    function createPlayerSpotlight(overlay, palette) {
+      injectSharedStyles();
+      const playerName = getPlayerName();
+      const nameplate = document.createElement('div');
+      nameplate.className = 'booha-blitz-nameplate';
+      nameplate.style.setProperty('--blitz-accent', palette.accent);
+      const nameEl = document.createElement('span');
+      nameEl.className = 'booha-blitz-nameplate-name';
+      nameEl.textContent = playerName;
+      const streakEl = document.createElement('span');
+      streakEl.className = 'booha-blitz-nameplate-streak';
+      streakEl.textContent = 'READY';
+      nameplate.append(nameEl, streakEl);
+      overlay.appendChild(nameplate);
+
+      const callout = document.createElement('div');
+      callout.className = 'booha-blitz-callout';
+      callout.style.setProperty('--blitz-accent', palette.accent);
+      callout.setAttribute('aria-live', 'polite');
+      overlay.appendChild(callout);
+
+      let announceToken = 0;
+      function announce(message, final = false) {
+        announceToken++;
+        callout.classList.remove('show');
+        callout.classList.toggle('final', final);
+        callout.textContent = message;
+        void callout.offsetWidth;
+        callout.classList.add('show');
+        const token = announceToken;
+        setTimeout(() => {
+          if (token === announceToken) callout.classList.remove('show');
+        }, final ? 1500 : 1100);
+      }
+
+      function setStreak(streak) {
+        streakEl.textContent = streak ? `STREAK ×${streak}` : 'READY';
+      }
+
+      return { playerName, nameplate, callout, announce, setStreak };
+    }
+
+    function ensureFinalCard(winScreen) {
+      const existing = winScreen.querySelector('.booha-blitz-final-summary');
+      if (existing) {
+        return {
+          summary: existing,
+          streak: existing.querySelector('.booha-blitz-final-streak'),
+          hold: winScreen.querySelector('.booha-blitz-final-hold'),
+        };
+      }
+
+      const summary = document.createElement('div');
+      summary.className = 'booha-blitz-final-summary';
+      const badge = document.createElement('div');
+      badge.className = 'booha-blitz-final-badge';
+      badge.textContent = 'FULL CLEAR';
+      const streak = document.createElement('div');
+      streak.className = 'booha-blitz-final-streak';
+      streak.textContent = 'BEST STREAK ×0';
+      summary.append(badge, streak);
+
+      const hold = document.createElement('div');
+      hold.className = 'booha-blitz-final-hold';
+      hold.setAttribute('aria-live', 'polite');
+      hold.textContent = 'LOOK AT YOUR CLEAR';
+
+      const playAgain = winScreen.querySelector(selector('playAgain'));
+      const buttonGroup = playAgain && playAgain.parentElement;
+      if (buttonGroup) {
+        winScreen.insertBefore(summary, buttonGroup);
+        winScreen.insertBefore(hold, buttonGroup);
+      } else {
+        winScreen.append(summary, hold);
+      }
+      return { summary, streak, hold };
     }
 
     function closeGame(overlay, stopTimer, stopBGM) {
@@ -339,6 +536,8 @@ window.BoohaBlitzEngine = (() => {
       const scrollEl = selector('scroll') ? overlay.querySelector(selector('scroll')) : null;
       const wrongPopup = overlay.querySelector(selector('wrongPopup'));
       const winScreen = overlay.querySelector(selector('win'));
+      const spotlight = createPlayerSpotlight(overlay, palette);
+      const finalCard = ensureFinalCard(winScreen);
       const queue = shuffle(weekCards);
       let current = 0;
       let startTime = null;
@@ -348,6 +547,10 @@ window.BoohaBlitzEngine = (() => {
       let locked = false;
       let bgIndex = 0;
       let lastTimerPaint = -Infinity;
+      let streak = 0;
+      let bestStreak = 0;
+      let finalHoldTimer = null;
+      let finalHoldInterval = null;
 
       function tick() {
         if (startTime === null) {
@@ -367,6 +570,60 @@ window.BoohaBlitzEngine = (() => {
           cancelAnimationFrame(rafId);
           rafId = null;
         }
+      }
+
+      function updateStreak() {
+        streak++;
+        bestStreak = Math.max(bestStreak, streak);
+        spotlight.setStreak(streak);
+        const messages = {
+          1: `${spotlight.playerName}, NICE START!`,
+          2: `${spotlight.playerName} ×2 — KEEP GOING!`,
+          3: `${spotlight.playerName} IS ON FIRE!`,
+          5: `${spotlight.playerName} IS UNSTOPPABLE!`,
+          8: `${spotlight.playerName} OWNS THIS RUN!`,
+          10: `${spotlight.playerName} HAS THE RHYTHM!`,
+        };
+        if (messages[streak]) spotlight.announce(messages[streak]);
+      }
+
+      function stopFinalHold() {
+        if (finalHoldTimer) clearTimeout(finalHoldTimer);
+        if (finalHoldInterval) clearInterval(finalHoldInterval);
+        finalHoldTimer = null;
+        finalHoldInterval = null;
+      }
+
+      function startFinalHold() {
+        stopFinalHold();
+        const buttons = [
+          winScreen.querySelector(selector('playAgain')),
+          winScreen.querySelector(selector('winClose')),
+        ].filter(Boolean);
+        buttons.forEach(button => {
+          button.disabled = true;
+          button.setAttribute('aria-disabled', 'true');
+          button.title = 'Please look at your clear first.';
+        });
+
+        const releaseAt = Date.now() + FINAL_CARD_HOLD_MS;
+        const paintHold = () => {
+          const seconds = Math.max(1, Math.ceil((releaseAt - Date.now()) / 1000));
+          finalCard.hold.textContent = `${spotlight.playerName}, LOOK AT YOUR CLEAR — ${seconds}`;
+        };
+        finalCard.hold.classList.remove('ready');
+        paintHold();
+        finalHoldInterval = setInterval(paintHold, 250);
+        finalHoldTimer = setTimeout(() => {
+          stopFinalHold();
+          finalCard.hold.classList.add('ready');
+          finalCard.hold.textContent = `${spotlight.playerName}, YOUR MOMENT — READY`;
+          buttons.forEach(button => {
+            button.disabled = false;
+            button.removeAttribute('aria-disabled');
+            button.title = '';
+          });
+        }, FINAL_CARD_HOLD_MS);
       }
 
       function correctDetonate(correctBtn) {
@@ -458,6 +715,7 @@ window.BoohaBlitzEngine = (() => {
         if (chosen.n === correct.n) {
           btn.classList.add('correct');
           current++;
+          updateStreak();
           if (current >= queue.length) clearElapsed = performance.now() - startTime;
           correctDetonate(btn);
           return;
@@ -540,14 +798,22 @@ window.BoohaBlitzEngine = (() => {
           bestEl.textContent = best ? `ALL-TIME BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : '';
           deltaEl.textContent = weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}${weekly.name ? ` — ${weekly.name}` : ''}` : '';
         }
+        finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
+        spotlight.nameplate.classList.add('complete');
+        spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
         winScreen.classList.add('show');
+        startFinalHold();
         celebrate(overlay, palette, isRecord);
       }
 
-      const cleanupAndClose = () => closeGame(overlay, stopTimer, stopBGM);
+      const cleanupAndClose = () => {
+        stopFinalHold();
+        closeGame(overlay, stopTimer, stopBGM);
+      };
       overlay.querySelector(selector('wrongClose')).addEventListener('click', cleanupAndClose);
       overlay.querySelector(selector('quit')).addEventListener('click', cleanupAndClose);
       overlay.querySelector(selector('playAgain')).addEventListener('click', () => {
+        stopFinalHold();
         stopTimer();
         stopBGM();
         overlay.remove();
@@ -557,6 +823,7 @@ window.BoohaBlitzEngine = (() => {
 
       rafId = requestAnimationFrame(tick);
       renderQuestion();
+      spotlight.announce(`${spotlight.playerName}, READY?`);
     }
 
     function launch({ curr, monthSlug, weekNumber }) {

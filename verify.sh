@@ -1278,6 +1278,13 @@ else
   bad "Blitz Pass 2 shared-engine audit failed"
 fi
 
+echo "[blitz] Pass 3 player-reward audit"
+if node tests/blitz-pass3-player-reward-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz player-name, streak, sprite-free, and final-card contracts pass"
+else
+  bad "Blitz Pass 3 player-reward audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"
