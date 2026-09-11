@@ -19,6 +19,8 @@ U.unlockAudio();
 
 /* ═══ PRE-LOAD SFX — clone pattern ═══ */
 const SFX = {};
+const voiceGate = U.createAudioGate({ cooldownMs: 650, timeoutMs: 8000 });
+const lastSfxAt = Object.create(null);
 function loadSfx(name, url) {
   return new Promise(resolve => {
     const a = new Audio(url);
@@ -31,6 +33,9 @@ function loadSfx(name, url) {
 }
 function playSfx(name) {
   const src = SFX[name]; if (!src) return;
+  const now = Date.now();
+  if (now - (lastSfxAt[name] || 0) < 140) return;
+  lastSfxAt[name] = now;
   try { const c = src.cloneNode(); c.setAttribute('playsinline',''); c.setAttribute('webkit-playsinline',''); c.play().catch(()=>{}); } catch(e) {}
 }
 
@@ -401,9 +406,8 @@ playBtn.addEventListener('click', () => {
     const a = new Audio(CFG.audioBase + card.mp3);
     a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
     const done = () => { playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶'; };
-    a.onended = done; a.onerror = done;
-    setTimeout(done, 8000);
-    a.play().catch(done);
+    const started = voiceGate.play(a, { button: playBtn, onEnd: done });
+    if (!started) done();
   } catch(e) { playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶'; }
 });
 playBtn.addEventListener('touchstart', e => { e.preventDefault(); playBtn.click(); }, { passive:false });

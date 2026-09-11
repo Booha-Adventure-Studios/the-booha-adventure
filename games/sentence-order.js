@@ -94,18 +94,20 @@ function playAudio(mp3, onEnd) {
 let speakerDebounce = false;
 function playListen(mp3) {
   if (speakerDebounce) return;
+  if (activeAudio) return;
   speakerDebounce = true;
   setTimeout(() => { speakerDebounce = false; }, 1300);
   if (!mp3) return;
   const a = sentCache[mp3];
   if (!a) return;
-  stopActive();
   activeAudio = a;
-  a.onended = () => { activeAudio = null; };
-  a.onerror = () => { activeAudio = null; };
+  const finish = () => { if (activeAudio === a) activeAudio = null; };
+  a.onended = finish;
+  a.onerror = finish;
+  setTimeout(finish, 8000);
   try { a.currentTime = 0; } catch {}
   const p = a.play();
-  if (p && p.catch) p.catch(() => {});
+  if (p && p.catch) p.catch(finish);
 }
 
 /* ── U.playSFX callback shim ── */
