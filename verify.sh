@@ -1467,6 +1467,13 @@ else
   bad "Blitz wrong-retry BGM audit failed"
 fi
 
+echo "[blitz] mastery-retry audit"
+if node tests/blitz-pass30-mastery-retry-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz mastery-retry audit passed"
+else
+  bad "Blitz mastery-retry audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"

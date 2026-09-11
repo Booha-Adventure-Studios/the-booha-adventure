@@ -26,8 +26,8 @@ assert.match(engine, /function recoverFromWrong\(\)/,
   'dismissing wrong feedback must have a dedicated recovery path');
 assert.match(engine, /renderQuestion\(true\)/,
   'recovery must rebuild the current prompt and options');
-assert.match(engine, /startTime = performance\.now\(\) - elapsed/,
-  'recovery must resume the elapsed timer rather than restarting the run');
+assert.match(engine, /elapsed = 0;[\s\S]*?clearElapsed = null;[\s\S]*?startTime = performance\.now\(\);[\s\S]*?timerEl\.textContent = '0\.00s'/,
+  'recovery must restart the timed run at zero after a wrong answer');
 assert.match(engine, /blitz-recover/,
   'recovered options must animate back with a staggered entrance');
 assert.match(engine, /config\.wrongDelay \|\| 320/,
@@ -41,11 +41,11 @@ for (const [source, prefix] of [['js/vocab-blitz.js', 'vb'], ['js/sentence-blitz
   .map(([file, prefix]) => [fs.readFileSync(file, 'utf8'), prefix])) {
   assert.match(source, new RegExp(`id="${prefix}-wrong-status">READY FOR THE NEXT TRY`),
     `${prefix} must start with a recovery-oriented wrong status`);
-  assert.match(source, new RegExp(`id="${prefix}-wrong-close" type="button">つづける`),
-    `${prefix} wrong feedback must offer continue, not a dead-end back button`);
+  assert.match(source, new RegExp(`id="${prefix}-wrong-close" type="button">もう一度 / RETRY`),
+    `${prefix} wrong feedback must clearly offer a retry`);
 }
 
 assert.match(verify, /tests\/blitz-pass16-wrong-recovery-audit\.cjs/,
   'verify.sh must run the Pass 4 wrong-recovery audit');
 
-console.log('Blitz Pass 4 wrong-recovery audit passed: personality copy, wrong-color beat, snappy sheet, timer resume, staggered return, and reduced-motion coverage are present.');
+console.log('Blitz Pass 4 wrong-recovery audit passed: personality copy, wrong-color beat, retry reset, staggered return, and reduced-motion coverage are present.');
