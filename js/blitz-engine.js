@@ -1925,9 +1925,10 @@ window.BoohaBlitzEngine = (() => {
       bgm.volume = 0.55;
       let bgmStarted = false;
       const startBGM = () => {
-        if (bgmStarted) return;
         bgmStarted = true;
-        bgm.play().catch(() => {});
+        if (!bgm.paused) return;
+        const playback = bgm.play();
+        if (playback?.catch) playback.catch(() => {});
       };
       const stopBGM = () => {
         bgm.pause();
@@ -2326,6 +2327,7 @@ window.BoohaBlitzEngine = (() => {
 
       function recoverFromWrong() {
         if (!wrongPopup.classList.contains('show')) return;
+        startBGM();
         wrongPopup.classList.remove('show');
         wrongPopup.scrollTop = 0;
         overlay.classList.remove('wrong-active');
