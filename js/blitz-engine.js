@@ -323,6 +323,15 @@ window.BoohaBlitzEngine = (() => {
         border-radius: 18px;
         background: rgba(0, 0, 0, .25);
       }
+      .booha-blitz-final-flourish {
+        flex: 1 1 100%;
+        color: var(--blitz-finish-accent, #ffe66b);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        opacity: .78;
+      }
       .booha-blitz-final-badge,
       .booha-blitz-final-streak {
         border: 1px solid rgba(255, 255, 255, .28);
@@ -387,6 +396,33 @@ window.BoohaBlitzEngine = (() => {
         overflow: hidden;
         pointer-events: none;
       }
+      .booha-blitz-structure-line {
+        position: absolute;
+        height: 3px;
+        border-radius: 999px;
+        opacity: 0;
+        transform: translateX(0) scaleX(.2);
+        transform-origin: center;
+        animation: boohaBlitzStructureLine var(--line-dur) cubic-bezier(.2,.75,.3,1) var(--line-delay) both;
+      }
+      @keyframes boohaBlitzStructureLine {
+        0% { opacity: 0; transform: translateX(0) scaleX(.2); }
+        18% { opacity: .9; transform: translateX(0) scaleX(1); }
+        76% { opacity: .72; transform: translateX(var(--line-x)) scaleX(1); }
+        100% { opacity: 0; transform: translateX(calc(var(--line-x) * 1.3)) scaleX(.8); }
+      }
+      #vb-overlay .vb-name-drop,
+      #sb-overlay .sb-name-drop,
+      #qb-overlay .qb-name-streak {
+        animation-timing-function: var(--blitz-name-ease, ease-out);
+      }
+      .blitz-feel-playful .booha-blitz-callout,
+      .blitz-feel-playful .booha-blitz-final-flourish { letter-spacing: .5px; }
+      .blitz-feel-sleek .booha-blitz-nameplate {
+        border-radius: 14px;
+        letter-spacing: 2px;
+      }
+      .blitz-feel-sleek .booha-blitz-callout { letter-spacing: 2px; }
       .booha-blitz-final-summary + .booha-blitz-final-hold + .vb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .sb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .qb-win-buttons { margin-top: 4px; }
@@ -463,6 +499,9 @@ window.BoohaBlitzEngine = (() => {
     function applyPalette(overlay, palette) {
       overlay.style.setProperty('--blitz-accent', palette.accent);
       overlay.style.setProperty('--blitz-glow', palette.glow);
+      overlay.style.setProperty('--blitz-reward-glow', palette.rewardGlow || palette.glow);
+      overlay.style.setProperty('--blitz-name-ease', palette.nameEasing || 'ease-out');
+      overlay.classList.add(`blitz-feel-${palette.feel || 'arcade'}`);
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
         overlay.style.setProperty(name, typeof value === 'function' ? value(palette) : value);
       });
@@ -557,11 +596,14 @@ window.BoohaBlitzEngine = (() => {
       summary.className = 'booha-blitz-final-summary';
       const badge = document.createElement('div');
       badge.className = 'booha-blitz-final-badge';
-      badge.textContent = 'FULL CLEAR';
+      badge.textContent = config.finalCard?.badge || 'FULL CLEAR';
+      const flourish = document.createElement('div');
+      flourish.className = 'booha-blitz-final-flourish';
+      flourish.textContent = config.finalCard?.detail || 'EVERY ANSWER LANDED';
       const streak = document.createElement('div');
       streak.className = 'booha-blitz-final-streak';
       streak.textContent = 'BEST STREAK ×0';
-      summary.append(badge, streak);
+      summary.append(badge, flourish, streak);
 
       const hold = document.createElement('div');
       hold.className = 'booha-blitz-final-hold';
@@ -589,9 +631,16 @@ window.BoohaBlitzEngine = (() => {
 
     function celebrate(overlay, palette, isRecord) {
       const name = getPlayerName();
+      const rewardColors = palette.rewardColors || [palette.accent, palette.accent2, '#ffffff', '#ffea00'];
       const colors = isRecord
-        ? ['#ffd700', '#ffea00', '#fff3b0', '#ffffff']
-        : [palette.accent, palette.accent2, '#ffffff', '#ffea00'];
+        ? (palette.rewardRecordColors || ['#fff4b0', '#ffd700', '#ff8a00', '#ffffff'])
+        : rewardColors;
+      const finalCard = config.finalCard || {};
+      const nameDelay = finalCard.nameDelay ?? 760;
+      const nameCount = finalCard.nameCount ?? 34;
+      const nameDuration = finalCard.nameDuration ?? 3800;
+      const particleEasing = palette.particleEasing || 'ease-out';
+      const particleRadius = palette.particleShape === 'diamond' ? '2px' : palette.particleShape === 'round' ? '50%' : '3px';
       const W = window.innerWidth;
       const H = window.innerHeight;
 
@@ -610,16 +659,16 @@ window.BoohaBlitzEngine = (() => {
           const size = 3 + Math.random() * 6;
           const color = crumbs[Math.floor(Math.random() * crumbs.length)];
           p.className = 'vb-particle';
-          p.style.cssText = `position:absolute;left:${W / 2}px;top:${H / 2}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.4 ? '50%' : '2px'};background:${color};pointer-events:none;z-index:30;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist + 40}px;--pdur:${520 + Math.random() * 520}ms;--pdelay:${Math.random() * 100}ms;animation:vbParticle var(--pdur) ease-out var(--pdelay) both;`;
+          p.style.cssText = `position:absolute;left:${W / 2}px;top:${H / 2}px;width:${size}px;height:${size}px;border-radius:${particleRadius};background:${color};pointer-events:none;z-index:30;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist + 40}px;--pdur:${520 + Math.random() * 520}ms;--pdelay:${Math.random() * 100}ms;animation:vbParticle var(--pdur) ${particleEasing} var(--pdelay) both;`;
           p.addEventListener('animationend', () => p.remove());
           fragment.appendChild(p);
         }
-        for (let i = 0; i < effectCount(isRecord ? 44 : 28); i++) {
+        for (let i = 0; i < effectCount(isRecord ? nameCount + 14 : nameCount); i++) {
           const d = document.createElement('div');
           const color = colors[Math.floor(Math.random() * colors.length)];
           d.className = 'vb-name-drop';
           d.textContent = name;
-          d.style.cssText = `left:${Math.random() * W}px;top:${-40 - Math.random() * 220}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};--cx:${(Math.random() - 0.5) * 340}px;--cy:${H * 0.8 + Math.random() * 380}px;--r0:${(Math.random() - 0.5) * 40}deg;--r1:${(Math.random() - 0.5) * 220}deg;--cdur:${2800 + Math.random() * 1800}ms;--cdelay:${Math.random() * 1000}ms;`;
+          d.style.cssText = `left:${Math.random() * W}px;top:${-40 - Math.random() * 220}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};--cx:${(Math.random() - 0.5) * 340}px;--cy:${H * 0.8 + Math.random() * 380}px;--r0:${(Math.random() - 0.5) * 40}deg;--r1:${(Math.random() - 0.5) * 220}deg;--cdur:${nameDuration + Math.random() * 1200}ms;--cdelay:${nameDelay + Math.random() * 500}ms;`;
           d.addEventListener('animationend', () => d.remove());
           fragment.appendChild(d);
         }
@@ -640,18 +689,28 @@ window.BoohaBlitzEngine = (() => {
           const dist = 80 + Math.random() * (isRecord ? 340 : 240);
           const color = rubble[Math.floor(Math.random() * rubble.length)];
           p.className = 'sb-particle';
-          p.style.cssText = `position:absolute;left:${Math.random() * W}px;top:${H - 8}px;width:${4 + Math.random() * 8}px;height:${4 + Math.random() * 8}px;border-radius:${Math.random() > 0.6 ? '50%' : '2px'};background:${color};pointer-events:none;z-index:30;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${520 + Math.random() * 560}ms;--pdelay:${Math.random() * 260}ms;animation:sbParticle var(--pdur) ease-out var(--pdelay) both;`;
+          p.style.cssText = `position:absolute;left:${Math.random() * W}px;top:${H - 8}px;width:${4 + Math.random() * 8}px;height:${4 + Math.random() * 8}px;border-radius:${particleRadius};background:${color};pointer-events:none;z-index:30;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${520 + Math.random() * 560}ms;--pdelay:${Math.random() * 260}ms;animation:sbParticle var(--pdur) ${particleEasing} var(--pdelay) both;`;
           p.addEventListener('animationend', () => p.remove());
           fragment.appendChild(p);
         }
+        if (finalCard.celebrationKind === 'lines') {
+          for (let i = 0; i < effectCount(isRecord ? 18 : 12); i++) {
+            const line = document.createElement('div');
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            line.className = 'booha-blitz-structure-line';
+            line.style.cssText = `left:${10 + Math.random() * 70}%;top:${18 + Math.random() * 64}%;width:${90 + Math.random() * 220}px;background:${color};--line-x:${(Math.random() - .5) * 80}px;--line-dur:${1900 + Math.random() * 800}ms;--line-delay:${nameDelay + Math.random() * 350}ms;`;
+            line.addEventListener('animationend', () => line.remove());
+            fragment.appendChild(line);
+          }
+        }
       } else {
-        for (let i = 0; i < effectCount(isRecord ? 42 : 26); i++) {
+        for (let i = 0; i < effectCount(isRecord ? nameCount + 12 : nameCount); i++) {
           const d = document.createElement('div');
           const color = colors[Math.floor(Math.random() * colors.length)];
           const toLeft = i % 2 === 1;
           d.className = 'qb-name-streak';
           d.textContent = name;
-          d.style.cssText = `left:${toLeft ? W + 60 : -300}px;top:${Math.random() * H}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};--sk:${toLeft ? 14 : -14}deg;--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${1800 + Math.random() * 1200}ms;--cdelay:${Math.random() * 900}ms;`;
+          d.style.cssText = `left:${toLeft ? W + 60 : -300}px;top:${Math.random() * H}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};--sk:${toLeft ? 14 : -14}deg;--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${nameDuration + Math.random() * 900}ms;--cdelay:${nameDelay + Math.random() * 500}ms;`;
           d.addEventListener('animationend', () => d.remove());
           fragment.appendChild(d);
         }
@@ -660,7 +719,7 @@ window.BoohaBlitzEngine = (() => {
           const color = colors[Math.floor(Math.random() * colors.length)];
           const toLeft = i % 2 === 0;
           line.className = 'qb-speed-line';
-          line.style.cssText = `left:${toLeft ? W + 40 : -240}px;top:${Math.random() * H}px;width:${60 + Math.random() * 180}px;background:${color};--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${900 + Math.random() * 700}ms;--cdelay:${Math.random() * 700}ms;`;
+          line.style.cssText = `left:${toLeft ? W + 40 : -240}px;top:${Math.random() * H}px;width:${60 + Math.random() * 180}px;background:${color};--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${900 + Math.random() * 700}ms;--cdelay:${nameDelay * .7 + Math.random() * 400}ms;`;
           line.addEventListener('animationend', () => line.remove());
           fragment.appendChild(line);
         }
@@ -917,7 +976,7 @@ window.BoohaBlitzEngine = (() => {
         locked = false;
         const card = queue[current];
         bgIndex++;
-        const hue = (palette.baseHue + bgIndex * 51) % 360;
+        const hue = (palette.baseHue + bgIndex * (palette.hueStep || 51)) % 360;
         overlay.style.background = `hsl(${hue}, ${palette.bgSat}%, ${palette.bgLit}%)`;
         jpWordEl.style.animation = 'none';
         hiraEl.style.animation = 'none';
@@ -958,8 +1017,8 @@ window.BoohaBlitzEngine = (() => {
         const oldRecord = result.oldRecord;
         winScreen.classList.toggle('record-mode', isRecord);
         winScreen.classList.add('blitz-finish');
-        winScreen.style.setProperty('--blitz-finish-accent', isRecord ? '#ffd700' : palette.accent);
-        winScreen.style.setProperty('--blitz-finish-glow', isRecord ? 'rgba(255, 215, 0, .34)' : palette.glow);
+        winScreen.style.setProperty('--blitz-finish-accent', isRecord ? '#ffd700' : (palette.rewardColors?.[1] || palette.accent));
+        winScreen.style.setProperty('--blitz-finish-glow', isRecord ? 'rgba(255, 215, 0, .34)' : (palette.rewardGlow || palette.glow));
         winScreen.querySelector(selector('winName')).textContent = playerName;
         winScreen.querySelector(selector('winScream')).textContent = isRecord ? config.winCopy.record : config.winCopy.clear;
         winScreen.querySelector(selector('winJp')).textContent = isRecord ? config.winCopy.jp : 'クリア。';
