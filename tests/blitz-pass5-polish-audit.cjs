@@ -15,10 +15,12 @@ assert.match(engine, /nameplate\.classList\.remove\('streak-active'\)/,
   'the streak HUD must disappear when the streak stops');
 assert.match(engine, /streak-tier-5/,
   'the streak HUD must promote through color tiers');
-assert.match(engine, /boohaBlitzFire 2200ms/,
-  'the fire callout must remain visible long enough to be noticed');
-assert.match(engine, /variant === 'fire'/,
-  'the on-fire milestone must use a dedicated visual variant');
+assert.match(engine, /function emitFireWallpaper\(overlay, playerName, threshold = 0\)/,
+  'the on-fire milestone must use a non-blocking background wallpaper effect');
+assert.match(engine, /booha-blitz-fire-wallpaper/,
+  'the fire milestone must use a contained wallpaper layer');
+assert.doesNotMatch(engine, /booha-blitz-callout\.fire/,
+  'the fire milestone must not return to a disruptive center callout');
 assert.match(engine, /booha-blitz-celebration-layer/,
   'celebration particles must be contained behind the finish card');
 assert.match(engine, /winScreen\.classList\.add\('blitz-finish'\)/,
@@ -42,4 +44,4 @@ for (const [source, prefix, jpClass] of [[vocab, 'vb', 'vb-wrong-kanji'], [sente
 assert.match(verify, /tests\/blitz-pass5-polish-audit\.cjs/,
   'verify.sh must run the Blitz Pass 5 polish audit');
 
-console.log('Blitz Pass 5 polish audit passed: responsive streak HUD, fire milestone, finish layering, fastest-player wiring, and ruby fail screens are covered.');
+console.log('Blitz Pass 5 polish audit passed: responsive streak HUD, background fire milestone, finish layering, fastest-player wiring, and ruby fail screens are covered.');
