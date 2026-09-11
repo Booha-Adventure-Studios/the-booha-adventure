@@ -384,7 +384,6 @@ const SCOLDS = [
         text-align: center;
         gap: 8px;
       }
-      #vb-overlay.low-power #vb-wrong-popup,
       #vb-overlay.low-power #vb-win {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
@@ -567,7 +566,7 @@ const SCOLDS = [
 
       <div id="vb-options" class="booha-blitz-answer"></div>
 
-      <div id="vb-wrong-popup">
+      <div id="vb-wrong-popup" class="blitz-wrong-feedback">
         <div class="vb-wrong-kanji" id="vwk"></div>
         <div class="vb-wrong-hira"  id="vwh"></div>
         <div class="vb-wrong-en"    id="vwe"></div>

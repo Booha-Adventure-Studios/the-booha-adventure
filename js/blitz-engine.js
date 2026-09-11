@@ -282,6 +282,65 @@ window.BoohaBlitzEngine = (() => {
         place-items: center;
         isolation: isolate;
       }
+      #vb-wrong-popup.blitz-wrong-feedback,
+      #sb-wrong-popup.blitz-wrong-feedback,
+      #qb-wrong-popup.blitz-wrong-feedback {
+        position: absolute;
+        top: auto;
+        right: auto;
+        bottom: max(env(safe-area-inset-bottom, 0px) + 16px, 16px);
+        left: 50%;
+        width: min(680px, calc(100% - 32px));
+        max-height: min(76vh, 560px);
+        box-sizing: border-box;
+        display: none;
+        padding: clamp(18px, 3vw, 28px) clamp(16px, 4vw, 34px) clamp(16px, 3vw, 24px);
+        gap: 8px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        border: 1px solid var(--blitz-accent);
+        border-top-width: 3px;
+        border-radius: 28px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.08), transparent 24%),
+          var(--blitz-popup-bg, rgba(0,0,0,.92));
+        box-shadow: 0 18px 48px rgba(0,0,0,.38), 0 0 28px var(--blitz-glow);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transform: translateX(-50%);
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.show,
+      #sb-wrong-popup.blitz-wrong-feedback.show,
+      #qb-wrong-popup.blitz-wrong-feedback.show {
+        display: flex;
+        animation: boohaBlitzWrongCard 240ms cubic-bezier(.2, .9, .25, 1) both;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp {
+        color: var(--blitz-wrong, #ff536d);
+        text-shadow: 0 0 24px var(--blitz-wrong, #ff536d);
+      }
+      #vb-wrong-popup.blitz-wrong-feedback #vb-wrong-status,
+      #sb-wrong-popup.blitz-wrong-feedback #sb-wrong-status,
+      #qb-wrong-popup.blitz-wrong-feedback #qb-wrong-status {
+        color: var(--blitz-accent);
+        font-size: clamp(11px, 2vw, 14px);
+        letter-spacing: 1.6px;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback #vb-wrong-close,
+      #sb-wrong-popup.blitz-wrong-feedback #sb-wrong-close,
+      #qb-wrong-popup.blitz-wrong-feedback #qb-wrong-close {
+        margin-top: 12px;
+        color: #101018;
+        background: var(--blitz-accent);
+        border-color: var(--blitz-accent);
+        box-shadow: 0 8px 22px var(--blitz-glow);
+      }
+      @keyframes boohaBlitzWrongCard {
+        from { opacity: 0; transform: translate(-50%, 22px) scale(.97); }
+        to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      }
       .booha-blitz-nameplate {
         position: absolute;
         top: 50%;
@@ -556,12 +615,36 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-callout.fire.show { animation: none; }
         .booha-blitz-nameplate { transition: none; }
         .booha-blitz-nameplate.streak-active { animation: none; }
+        #vb-wrong-popup.blitz-wrong-feedback.show,
+        #sb-wrong-popup.blitz-wrong-feedback.show,
+        #qb-wrong-popup.blitz-wrong-feedback.show { animation: none; }
       }
       @media (max-width: 600px) {
         .booha-blitz-feedback { flex-basis: clamp(52px, 8vh, 72px); min-height: 52px; }
         .booha-blitz-nameplate { width: min(92vw, 360px); }
         .booha-blitz-callout { max-width: 94vw; font-size: clamp(18px, 6vw, 34px); }
         .booha-blitz-callout.fire { font-size: clamp(22px, 7vw, 46px); }
+        #vb-wrong-popup.blitz-wrong-feedback,
+        #sb-wrong-popup.blitz-wrong-feedback,
+        #qb-wrong-popup.blitz-wrong-feedback {
+          right: 10px;
+          bottom: max(env(safe-area-inset-bottom, 0px) + 10px, 10px);
+          left: 10px;
+          width: auto;
+          max-height: 70vh;
+          border-radius: 24px;
+          transform: none;
+          animation: none;
+        }
+        #vb-wrong-popup.blitz-wrong-feedback.show,
+        #sb-wrong-popup.blitz-wrong-feedback.show,
+        #qb-wrong-popup.blitz-wrong-feedback.show {
+          animation: boohaBlitzWrongSheet 240ms cubic-bezier(.2, .9, .25, 1) both;
+        }
+        @keyframes boohaBlitzWrongSheet {
+          from { opacity: 0; transform: translateY(22px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
       }
       @media (orientation: landscape) and (max-height: 620px) {
         .booha-blitz-feedback { flex-basis: 48px; min-height: 48px; }
