@@ -66,13 +66,11 @@ function playWord(mp3) {
   if (!mp3) return;
   const a = wordCache[mp3];
   if (!a) return;
+  if (wordLocked) return;
 
   const now = Date.now();
   if (lastPlayedAt[mp3] && now - lastPlayedAt[mp3] < AUDIO_DEBOUNCE) return;
   lastPlayedAt[mp3] = now;
-
-  /* Stop whatever is currently playing */
-  stopWord();
 
   activeWord  = a;
   wordLocked  = true;
@@ -80,12 +78,13 @@ function playWord(mp3) {
   try { a.currentTime = 0; } catch (_) {}
 
   const p = a.play();
-  if (p && p.catch) {
-    p.catch(() => { wordLocked = false; });
-  }
+  if (p && p.catch) p.catch(() => { wordLocked = false; activeWord = null; });
 
   /* Re-enable tapping once the clip ends */
-  a.onended = () => { wordLocked = false; };
+  const finish = () => { if (activeWord === a) activeWord = null; wordLocked = false; };
+  a.onended = finish;
+  a.onerror = finish;
+  setTimeout(finish, 5000);
 }
 
 /* ══════════════════════════════════════════════════════════════

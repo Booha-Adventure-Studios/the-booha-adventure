@@ -50,14 +50,18 @@ function playSent(mp3) {
   if (!mp3) return;
   const a = sentCache[mp3];
   if (!a) return;
+  if (activeSent) return;
   const now = Date.now();
   if (lastPlayedAt[mp3] && now - lastPlayedAt[mp3] < AUDIO_DEBOUNCE) return;
   lastPlayedAt[mp3] = now;
-  stopSent();
   activeSent = a;
   try { a.currentTime = 0; } catch (_) {}
   const p = a.play();
-  if (p && p.catch) p.catch(() => {});
+  const finish = () => { if (activeSent === a) activeSent = null; };
+  a.onended = finish;
+  a.onerror = finish;
+  setTimeout(finish, 8000);
+  if (p && p.catch) p.catch(finish);
 }
 
 /* ══════════════════════════════════════════════════════════════
