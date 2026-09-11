@@ -1495,6 +1495,13 @@ else
   bad "Blitz viewport-safe-area audit failed"
 fi
 
+echo "[blitz] runtime-performance audit"
+if node tests/blitz-pass34-runtime-performance-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz runtime-performance audit passed"
+else
+  bad "Blitz runtime-performance audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"
