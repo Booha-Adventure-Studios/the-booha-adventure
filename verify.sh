@@ -1271,6 +1271,13 @@ else
   bad "Blitz Pass 1 performance audit failed"
 fi
 
+echo "[blitz] Pass 2 shared-engine audit"
+if node tests/blitz-pass2-shared-engine-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz shared-engine lifecycle, score, and public-API contracts pass"
+else
+  bad "Blitz Pass 2 shared-engine audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

@@ -11,23 +11,26 @@ const sources = files.map(file => ({
   file,
   source: fs.readFileSync(path.join(root, 'js', file), 'utf8')
 }));
+const engine = fs.readFileSync(path.join(root, 'js', 'blitz-engine.js'), 'utf8');
 
+assert.match(engine, /const TIMER_PAINT_INTERVAL_MS = 100;/,
+  'shared engine must throttle timer DOM paints to 10Hz');
+assert.match(engine, /lastTimerPaint/,
+  'shared engine must track the last timer paint');
+assert.match(engine, /elapsed - lastTimerPaint >= TIMER_PAINT_INTERVAL_MS/,
+  'shared engine must avoid per-frame timer DOM writes');
+assert.match(engine, /const LOW_POWER =/, 'shared engine must detect low-power/reduced-motion devices');
+assert.match(engine, /function effectCount\(fullCount\)/,
+  'shared engine must scale celebration effects on constrained devices');
+assert.match(engine, /document\.createDocumentFragment\(\)/,
+  'shared engine must batch celebration DOM insertion');
 for (const { file, source } of sources) {
-  assert.match(source, /const BLITZ_TIMER_PAINT_INTERVAL_MS = 100;/,
-    `${file} must throttle timer DOM paints to 10Hz`);
-  assert.match(source, /lastTimerPaint/,
-    `${file} must track the last timer paint`);
-  assert.match(source, /elapsed - lastTimerPaint >= BLITZ_TIMER_PAINT_INTERVAL_MS/,
-    `${file} must avoid per-frame timer DOM writes`);
-  assert.match(source, /const BLITZ_LOW_POWER =/, `${file} must detect low-power/reduced-motion devices`);
-  assert.match(source, /function effectCount\(fullCount\)/,
-    `${file} must scale celebration effects on constrained devices`);
-  assert.match(source, /document\.createDocumentFragment\(\)/,
-    `${file} must batch celebration DOM insertion`);
+  assert.match(source, /BoohaBlitzEngine\.LOW_POWER/,
+    `${file} must use the shared low-power signal for its skin`);
   assert.match(source, /backdrop-filter: none;/,
     `${file} must provide a low-power blur fallback`);
-  assert(!source.includes('overlay.appendChild(p);'),
-    `${file} must not append particle nodes one at a time`);
 }
+assert(!engine.includes('overlay.appendChild(p);'),
+  'shared engine must not append particle nodes one at a time');
 
-console.log('Blitz Pass 1 performance audit passed: timer paints, low-power effects, batched particles, and blur fallbacks are aligned across all three games.');
+console.log('Blitz Pass 1 performance audit passed: shared timer paints, low-power effects, batched particles, and blur fallbacks are aligned across all three games.');
