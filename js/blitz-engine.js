@@ -271,11 +271,22 @@ window.BoohaBlitzEngine = (() => {
     const style = document.createElement('style');
     style.id = 'booha-blitz-shared-styles';
     style.textContent = `
+      .booha-blitz-feedback {
+        position: relative;
+        z-index: 4;
+        flex: 0 0 clamp(58px, 8vh, 86px);
+        width: min(100%, 680px);
+        min-height: 58px;
+        pointer-events: none;
+        display: grid;
+        place-items: center;
+        isolation: isolate;
+      }
       .booha-blitz-nameplate {
-        position: fixed;
-        top: clamp(96px, 13vh, 148px);
+        position: absolute;
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
         z-index: 18;
         width: min(420px, calc(100vw - 28px));
         min-height: clamp(34px, 5vw, 48px);
@@ -302,7 +313,7 @@ window.BoohaBlitzEngine = (() => {
       }
       .booha-blitz-nameplate.streak-active {
         opacity: 1;
-        transform: translateX(-50%) translateY(0) scale(1);
+        transform: translate(-50%, -50%) scale(1);
         animation: boohaBlitzStreakIn 260ms cubic-bezier(.2, 1.4, .3, 1) both;
       }
       .booha-blitz-nameplate-name { color: var(--streak-color, var(--blitz-accent)); }
@@ -314,17 +325,17 @@ window.BoohaBlitzEngine = (() => {
       .booha-blitz-nameplate.streak-tier-5 { --streak-color: #ff3bbd; }
       .booha-blitz-nameplate.complete {
         opacity: 0;
-        transform: translate(-50%, -8px) scale(.96);
+        transform: translate(-50%, calc(-50% - 8px)) scale(.96);
       }
       @keyframes boohaBlitzStreakIn {
-        0% { transform: translateX(-50%) translateY(6px) scale(.82); }
-        65% { transform: translateX(-50%) translateY(-1px) scale(1.04); }
-        100% { transform: translateX(-50%) translateY(0) scale(1); }
+        0% { transform: translate(-50%, calc(-50% + 6px)) scale(.82); }
+        65% { transform: translate(-50%, calc(-50% - 1px)) scale(1.04); }
+        100% { transform: translate(-50%, -50%) scale(1); }
       }
       .booha-blitz-callout {
-        position: fixed;
+        position: absolute;
         left: 50%;
-        top: 24%;
+        top: 50%;
         z-index: 19;
         max-width: min(92vw, 620px);
         transform: translate(-50%, 8px) scale(.94);
@@ -356,21 +367,21 @@ window.BoohaBlitzEngine = (() => {
           0 0 18px #fff29b, 0 0 42px #ff8a00, 0 0 80px #ff2d00;
       }
       @keyframes boohaBlitzFire {
-        0% { opacity: 0; transform: translate(-50%, 22px) scale(.7) skewX(-5deg); filter: brightness(.8); }
-        14% { opacity: 1; transform: translate(-50%, -5px) scale(1.08) skewX(2deg); filter: brightness(1.25); }
-        28%, 72% { opacity: 1; transform: translate(-50%, 0) scale(1) skewX(-1deg); filter: brightness(1); }
-        48% { transform: translate(-50%, -3px) scale(1.04) skewX(1deg); filter: brightness(1.35); }
-        100% { opacity: 0; transform: translate(-50%, -28px) scale(1.12) skewX(3deg); filter: brightness(1.15); }
+        0% { opacity: 0; transform: translate(-50%, calc(-50% + 22px)) scale(.7) skewX(-5deg); filter: brightness(.8); }
+        14% { opacity: 1; transform: translate(-50%, calc(-50% - 5px)) scale(1.08) skewX(2deg); filter: brightness(1.25); }
+        28%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1) skewX(-1deg); filter: brightness(1); }
+        48% { transform: translate(-50%, calc(-50% - 3px)) scale(1.04) skewX(1deg); filter: brightness(1.35); }
+        100% { opacity: 0; transform: translate(-50%, calc(-50% - 28px)) scale(1.12) skewX(3deg); filter: brightness(1.15); }
       }
       .booha-blitz-callout.final {
-        top: 20%;
+        top: 50%;
         color: #ffe66b;
         text-shadow: 0 0 14px #ffb300, 0 0 42px #ff5a00;
       }
       @keyframes boohaBlitzCallout {
         0% { opacity: 0; transform: translate(-50%, 12px) scale(.88) rotate(-2deg); }
-        18%, 72% { opacity: 1; transform: translate(-50%, 0) scale(1) rotate(0); }
-        100% { opacity: 0; transform: translate(-50%, -18px) scale(1.04) rotate(1deg); }
+        18%, 72% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+        100% { opacity: 0; transform: translate(-50%, calc(-50% - 18px)) scale(1.04) rotate(1deg); }
       }
       .booha-blitz-final-summary {
         display: flex;
@@ -521,6 +532,14 @@ window.BoohaBlitzEngine = (() => {
         letter-spacing: 2px;
       }
       .blitz-feel-sleek .booha-blitz-callout { letter-spacing: 2px; }
+      .booha-blitz-prompt {
+        width: 100%;
+        min-width: 0;
+      }
+      .booha-blitz-answer {
+        width: 100%;
+        min-width: 0;
+      }
       .booha-blitz-final-summary + .booha-blitz-final-hold + .vb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .sb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .qb-win-buttons { margin-top: 4px; }
@@ -533,10 +552,22 @@ window.BoohaBlitzEngine = (() => {
         filter: grayscale(.35);
       }
       @media (prefers-reduced-motion: reduce) {
-        .booha-blitz-callout.show { animation: none; opacity: 1; transform: translate(-50%, 0); }
+        .booha-blitz-callout.show { animation: none; opacity: 1; transform: translate(-50%, -50%); }
         .booha-blitz-callout.fire.show { animation: none; }
         .booha-blitz-nameplate { transition: none; }
         .booha-blitz-nameplate.streak-active { animation: none; }
+      }
+      @media (max-width: 600px) {
+        .booha-blitz-feedback { flex-basis: clamp(52px, 8vh, 72px); min-height: 52px; }
+        .booha-blitz-nameplate { width: min(92vw, 360px); }
+        .booha-blitz-callout { max-width: 94vw; font-size: clamp(18px, 6vw, 34px); }
+        .booha-blitz-callout.fire { font-size: clamp(22px, 7vw, 46px); }
+      }
+      @media (orientation: landscape) and (max-height: 620px) {
+        .booha-blitz-feedback { flex-basis: 48px; min-height: 48px; }
+        .booha-blitz-nameplate { min-height: 32px; padding: 5px 12px; }
+        .booha-blitz-callout { font-size: clamp(18px, 4vw, 32px); }
+        .booha-blitz-callout.fire { font-size: clamp(22px, 5vw, 42px); }
       }
     `;
     document.head.appendChild(style);
@@ -617,6 +648,12 @@ window.BoohaBlitzEngine = (() => {
     function createPlayerSpotlight(overlay, palette) {
       injectSharedStyles();
       const playerName = getPlayerName();
+      const feedback = document.createElement('div');
+      feedback.className = 'booha-blitz-feedback';
+      const contentStart = Array.from(overlay.children).find(child =>
+        child.id.endsWith('-stage') || child.id.endsWith('-scroll'));
+      overlay.insertBefore(feedback, contentStart || null);
+
       const nameplate = document.createElement('div');
       nameplate.className = 'booha-blitz-nameplate';
       nameplate.style.setProperty('--blitz-accent', palette.accent);
@@ -627,13 +664,13 @@ window.BoohaBlitzEngine = (() => {
       streakEl.className = 'booha-blitz-nameplate-streak';
       streakEl.textContent = 'READY';
       nameplate.append(nameEl, streakEl);
-      overlay.appendChild(nameplate);
+      feedback.appendChild(nameplate);
 
       const callout = document.createElement('div');
       callout.className = 'booha-blitz-callout';
       callout.style.setProperty('--blitz-accent', palette.accent);
       callout.setAttribute('aria-live', 'polite');
-      overlay.appendChild(callout);
+      feedback.appendChild(callout);
 
       let announceToken = 0;
       function announce(message, final = false, variant = '') {
