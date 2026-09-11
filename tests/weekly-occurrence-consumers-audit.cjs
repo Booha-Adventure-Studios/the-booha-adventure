@@ -17,13 +17,11 @@ const repeat = calendar.getCurrentCurriculumWeek(new Date('2026-08-31T12:00:00+0
 assert.strictEqual(repeat.weekId, 'august-w4');
 assert.strictEqual(repeat.occurrenceKey, '2026-08-30|august-w4');
 
-for (const file of [
-  'js/vocab-blitz.js', 'js/sentence-blitz.js', 'js/question-blitz.js',
-]) {
-  const source = read(file);
-  assert.ok(source.includes('getCurriculumWeekOccurrenceKey'), `${file} must use occurrence keys`);
-  assert.ok(source.includes('cw.occurrenceKey'), `${file} must retain the calendar fallback`);
-}
+const blitzEngine = read('js/blitz-engine.js');
+assert.ok(blitzEngine.includes('getCurriculumWeekOccurrenceKey'),
+  'shared Blitz engine must use occurrence keys');
+assert.ok(blitzEngine.includes('cw.occurrenceKey'),
+  'shared Blitz engine must retain the calendar fallback');
 
 for (const file of ['js/utsuroba.js', 'js/muenba.js', 'js/karasuki.js', 'js/core/day-record.js']) {
   const source = read(file);
