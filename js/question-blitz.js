@@ -529,8 +529,8 @@ window.QuestionBlitz = (() => {
         <div class="qb-wrong-scold-jp"   id="qbsj"></div>
         <div class="qb-wrong-scold-hira" id="qbsh"></div>
         <div class="qb-wrong-scold-en"   id="qbse"></div>
-        <div id="qb-wrong-status">RUN ENDED — NO SCORE</div>
-        <button id="qb-wrong-close" type="button">もどる</button>
+        <div id="qb-wrong-status">READY FOR THE NEXT TRY</div>
+        <button id="qb-wrong-close" type="button">つづける</button>
       </div>
       
      <div id="qb-win">
