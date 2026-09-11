@@ -2014,6 +2014,7 @@ window.BoohaBlitzEngine = (() => {
       stopBGM();
       overlay._boohaBlitzPerformanceCleanup?.();
       overlay._boohaBlitzViewportCleanup?.();
+      overlay._boohaBlitzVisibilityCleanup?.();
       overlay.remove();
       const api = window[config.apiName];
       if (api && typeof api._onClose === 'function') api._onClose();
@@ -2135,6 +2136,7 @@ window.BoohaBlitzEngine = (() => {
       if (existing) {
         existing._boohaBlitzPerformanceCleanup?.();
         existing._boohaBlitzViewportCleanup?.();
+        existing._boohaBlitzVisibilityCleanup?.();
         existing.remove();
       }
       const overlay = config.buildOverlay();
@@ -2325,6 +2327,8 @@ window.BoohaBlitzEngine = (() => {
       let bestStreak = 0;
       let finalHoldTimer = null;
       let finalHoldInterval = null;
+      let runIsActive = false;
+      let visibilityPaused = false;
 
       function setBackground(streakValue = streak) {
         const next = backgroundFor(palette, bgIndex, streakValue);
@@ -2358,6 +2362,39 @@ window.BoohaBlitzEngine = (() => {
           timerId = null;
         }
       }
+
+      function pauseForVisibility() {
+        if (!runIsActive || visibilityPaused || startTime === null) return;
+        elapsed = performance.now() - startTime;
+        stopTimer();
+        stopBGM();
+        visibilityPaused = true;
+      }
+
+      function resumeFromVisibility() {
+        if (document.visibilityState === 'hidden' || document.hidden || !visibilityPaused || !runIsActive || startTime === null) return;
+        startTime = performance.now() - elapsed;
+        lastTimerPaint = -Infinity;
+        timerEl.textContent = fmtTime(elapsed);
+        visibilityPaused = false;
+        startBGM();
+        scheduleTimerTick(0);
+      }
+
+      function handleVisibilityChange() {
+        const hidden = document.visibilityState === 'hidden' || document.hidden;
+        if (hidden) pauseForVisibility();
+        else resumeFromVisibility();
+      }
+
+      document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
+      window.addEventListener('pagehide', pauseForVisibility, { passive: true });
+      window.addEventListener('pageshow', resumeFromVisibility, { passive: true });
+      overlay._boohaBlitzVisibilityCleanup = () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('pagehide', pauseForVisibility);
+        window.removeEventListener('pageshow', resumeFromVisibility);
+      };
 
       function updateStreak() {
         streak++;
@@ -2573,6 +2610,8 @@ window.BoohaBlitzEngine = (() => {
         elapsed = 0;
         clearElapsed = null;
         startTime = performance.now();
+        runIsActive = true;
+        visibilityPaused = false;
         lastTimerPaint = -Infinity;
         timerEl.textContent = '0.00s';
         renderQuestion(true);
@@ -2596,6 +2635,8 @@ window.BoohaBlitzEngine = (() => {
         }
 
         btn.classList.add('wrong');
+        runIsActive = false;
+        visibilityPaused = false;
         spotlight.resetStreak();
         setBackground(0);
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
@@ -2655,6 +2696,8 @@ window.BoohaBlitzEngine = (() => {
           overlay.classList.remove('blitz-awaiting-start');
           startCard.card.remove();
           startTime = performance.now();
+          runIsActive = true;
+          visibilityPaused = false;
           scheduleTimerTick(0);
           overlay._boohaBlitzPerformanceCleanup = monitorFramePerformance(
             overlay,
@@ -2665,6 +2708,8 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function showWin(ms) {
+        runIsActive = false;
+        visibilityPaused = false;
         const weekId = makeWeekId(monthSlug, weekNumber);
         const result = saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId);
         if (result.saveFailed) console.error(`[${config.apiName}] Time not saved:`, ms, 'ms');
@@ -2744,6 +2789,7 @@ window.BoohaBlitzEngine = (() => {
         stopBGM();
         overlay._boohaBlitzPerformanceCleanup?.();
         overlay._boohaBlitzViewportCleanup?.();
+        overlay._boohaBlitzVisibilityCleanup?.();
         overlay.remove();
         launch({ curr, monthSlug, weekNumber });
       });
