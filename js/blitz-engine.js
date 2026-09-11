@@ -479,6 +479,25 @@ window.BoohaBlitzEngine = (() => {
         clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
         box-shadow: 0 0 8px #f0c96a, 0 0 14px #dfeaff;
       }
+      .booha-blitz-correct-spark {
+        position: absolute;
+        width: clamp(4px, .9vw, 7px);
+        height: clamp(4px, .9vw, 7px);
+        background: var(--blitz-correct, #00ff64);
+        box-shadow: 0 0 9px var(--blitz-correct, #00ff64);
+        pointer-events: none;
+        z-index: 12;
+        animation: boohaBlitzCorrectSpark 360ms ease-out var(--spark-delay, 0ms) both;
+      }
+      .blitz-feel-playful .booha-blitz-correct-spark { border-radius: 50%; }
+      .blitz-feel-arcade .booha-blitz-correct-spark {
+        border-radius: 2px;
+        box-shadow: 0 0 8px #00ffee, 0 0 14px #39ff14;
+      }
+      .blitz-feel-sleek .booha-blitz-correct-spark {
+        clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+        box-shadow: 0 0 8px #f0c96a, 0 0 14px #dfeaff;
+      }
       .blitz-feel-arcade.streak-event-live {
         box-shadow: inset 0 0 48px rgba(0,255,238,.24);
       }
@@ -555,6 +574,16 @@ window.BoohaBlitzEngine = (() => {
       @keyframes boohaBlitzStreakSpark {
         0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); }
         20% { opacity: 1; }
+        100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
+      }
+      @keyframes boohaBlitzCorrectPop {
+        0% { transform: scale(1); }
+        45% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+      }
+      @keyframes boohaBlitzCorrectSpark {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+        18% { opacity: 1; }
         100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
       }
       .booha-blitz-nameplate.streak-tier-1 { --streak-color: #ffffff; }
@@ -915,6 +944,7 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-nameplate.streak-event-live .booha-blitz-streak-marker,
         .booha-blitz-nameplate.streak-event-live .booha-blitz-streak-meter-fill { animation: none; }
         .booha-blitz-streak-spark { display: none; }
+        .booha-blitz-correct-spark { display: none; }
         .blitz-feel-arcade.streak-event-live,
         .blitz-feel-sleek.streak-event-live { box-shadow: none; transform: none; }
         #vb-wrong-popup.blitz-wrong-feedback.show,
@@ -995,6 +1025,16 @@ window.BoohaBlitzEngine = (() => {
           box-shadow: none !important;
           outline: 2px solid #00ff64;
         }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win {
+          background: var(--blitz-correct) !important;
+          outline-color: var(--blitz-correct) !important;
+          box-shadow: 0 0 22px var(--blitz-correct), 0 0 42px var(--blitz-glow) !important;
+          animation: boohaBlitzCorrectPop 220ms cubic-bezier(.16,1.45,.3,1) both;
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win::after {
+          opacity: .78;
+          transform: scale(1.04);
+        }
         #${config.overlayId}.blitz-compositor .${config.optionClass}.wrong {
           box-shadow: none !important;
           outline: 2px solid #ff1e1e;
@@ -1005,6 +1045,7 @@ window.BoohaBlitzEngine = (() => {
         }
         @media (prefers-reduced-motion: reduce) {
           #${config.overlayId}.blitz-compositor .${config.optionClass}::after { transition: none; }
+          #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win { animation: none; }
         }
       `;
       document.head.appendChild(style);
@@ -1402,6 +1443,33 @@ window.BoohaBlitzEngine = (() => {
         streakAudioCtx = null;
         try { ctx.close().catch(() => {}); } catch (_) {}
       }
+      function playCorrectHit() {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtor) return;
+        try {
+          if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
+          if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
+          const base = palette.feel === 'arcade' ? 440 : palette.feel === 'sleek' ? 523 : 587;
+          const pitch = base * (1 + Math.min(streak, 12) * 0.018);
+          const now = streakAudioCtx.currentTime + 0.005;
+          [pitch, pitch * 1.5].forEach((frequency, index) => {
+            const startAt = now + index * 0.018;
+            const oscillator = streakAudioCtx.createOscillator();
+            const gain = streakAudioCtx.createGain();
+            oscillator.type = palette.feel === 'sleek' ? 'sine' : 'triangle';
+            oscillator.frequency.setValueAtTime(frequency, startAt);
+            gain.gain.setValueAtTime(0.0001, startAt);
+            gain.gain.exponentialRampToValueAtTime(index ? 0.018 : 0.032, startAt + 0.008);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.1);
+            oscillator.connect(gain);
+            gain.connect(streakAudioCtx.destination);
+            oscillator.start(startAt);
+            oscillator.stop(startAt + 0.12);
+          });
+        } catch (_) {
+          // Audio is optional feedback and must never block an answer.
+        }
+      }
 
       const timerEl = overlay.querySelector(selector('timer'));
       const progressEl = overlay.querySelector(selector('progress'));
@@ -1534,9 +1602,30 @@ window.BoohaBlitzEngine = (() => {
         }, FINAL_CARD_HOLD_MS);
       }
 
+      function emitCorrectMicroBurst(correctBtn) {
+        const r = correctBtn.getBoundingClientRect();
+        const ovr = overlay.getBoundingClientRect();
+        const cx = r.left - ovr.left + r.width / 2;
+        const cy = r.top - ovr.top + r.height / 2;
+        const count = LOW_POWER ? 3 : 6;
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+          const spark = document.createElement('span');
+          const angle = (i / count) * Math.PI * 2 + Math.random() * 0.3;
+          const distance = 20 + Math.random() * 28;
+          spark.className = 'booha-blitz-correct-spark';
+          spark.style.cssText = `left:${cx}px;top:${cy}px;--sx:${Math.cos(angle) * distance}px;--sy:${Math.sin(angle) * distance}px;--spark-delay:${Math.random() * 24}ms;`;
+          spark.addEventListener('animationend', () => spark.remove(), { once: true });
+          fragment.appendChild(spark);
+        }
+        overlay.appendChild(fragment);
+      }
+
       function correctDetonate(correctBtn) {
+        correctBtn.classList.add('micro-win');
         correctBtn.style.transition = 'none';
-        correctBtn.style.background = 'rgba(0,255,100,0.65)';
+        correctBtn.style.background = palette.correct?.color || '#00ff64';
+        emitCorrectMicroBurst(correctBtn);
         overlay.style.transform = 'scale(1.02)';
         setTimeout(() => {
           overlay.style.transition = 'transform 70ms ease';
@@ -1629,6 +1718,7 @@ window.BoohaBlitzEngine = (() => {
           btn.classList.add('correct');
           current++;
           updateStreak();
+          playCorrectHit();
           if (current >= queue.length) clearElapsed = performance.now() - startTime;
           correctDetonate(btn);
           return;
