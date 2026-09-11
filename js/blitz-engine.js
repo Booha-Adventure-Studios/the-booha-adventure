@@ -345,6 +345,32 @@ window.BoohaBlitzEngine = (() => {
         color: var(--blitz-wrong, #ff536d);
         text-shadow: 0 0 24px var(--blitz-wrong, #ff536d);
       }
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp {
+        box-sizing: border-box;
+        max-width: 100%;
+        padding-inline: 8px;
+        font-size: clamp(28px, 8vw, 72px);
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+        text-wrap: balance;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji ruby,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp ruby,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp ruby {
+        display: inline;
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji rt,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp rt,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp rt {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
       #vb-wrong-popup.blitz-wrong-feedback #vb-wrong-status,
       #sb-wrong-popup.blitz-wrong-feedback #sb-wrong-status,
       #qb-wrong-popup.blitz-wrong-feedback #qb-wrong-status {

@@ -1439,6 +1439,13 @@ else
   bad "Blitz Pass 5 correct-contrast audit failed"
 fi
 
+echo "[blitz] Pass 1 furigana-layout audit"
+if node tests/blitz-pass26-furigana-layout-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz Pass 1 furigana-layout audit passed"
+else
+  bad "Blitz Pass 1 furigana-layout audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"
