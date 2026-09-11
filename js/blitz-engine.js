@@ -323,8 +323,57 @@ window.BoohaBlitzEngine = (() => {
     const ids = config.ids;
     const selector = (key) => ids[key];
     let stylesInjected = false;
+    let compositorStylesInjected = false;
+
+    function injectCompositorStyles() {
+      if (compositorStylesInjected) return;
+      compositorStylesInjected = true;
+      const style = document.createElement('style');
+      style.id = `booha-blitz-compositor-${config.gameType}`;
+      style.textContent = `
+        #${config.overlayId}.blitz-compositor .${config.optionClass} {
+          transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border: 2px solid var(--blitz-accent);
+          border-radius: inherit;
+          background: radial-gradient(circle at 50% 35%, var(--blitz-glow), transparent 68%);
+          opacity: 0;
+          transform: scale(.96);
+          transition: opacity 120ms ease, transform 120ms ease;
+          pointer-events: none;
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}:hover::after,
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.correct::after,
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.wrong::after {
+          opacity: .62;
+          transform: scale(1);
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.correct {
+          box-shadow: none !important;
+          outline: 2px solid #00ff64;
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.wrong {
+          box-shadow: none !important;
+          outline: 2px solid #ff1e1e;
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}:focus-visible {
+          outline: 3px solid var(--blitz-accent);
+          outline-offset: 3px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          #${config.overlayId}.blitz-compositor .${config.optionClass}::after { transition: none; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
     function applyPalette(overlay, palette) {
+      overlay.style.setProperty('--blitz-accent', palette.accent);
+      overlay.style.setProperty('--blitz-glow', palette.glow);
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
         overlay.style.setProperty(name, typeof value === 'function' ? value(palette) : value);
       });
@@ -442,7 +491,7 @@ window.BoohaBlitzEngine = (() => {
           const size = 3 + Math.random() * 6;
           const color = crumbs[Math.floor(Math.random() * crumbs.length)];
           p.className = 'vb-particle';
-          p.style.cssText = `position:absolute;left:${W / 2}px;top:${H / 2}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.4 ? '50%' : '2px'};background:${color};pointer-events:none;z-index:30;box-shadow:0 0 8px 2px ${color};--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist + 40}px;--pdur:${520 + Math.random() * 520}ms;--pdelay:${Math.random() * 100}ms;animation:vbParticle var(--pdur) ease-out var(--pdelay) both;`;
+          p.style.cssText = `position:absolute;left:${W / 2}px;top:${H / 2}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.4 ? '50%' : '2px'};background:${color};pointer-events:none;z-index:30;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist + 40}px;--pdur:${520 + Math.random() * 520}ms;--pdelay:${Math.random() * 100}ms;animation:vbParticle var(--pdur) ease-out var(--pdelay) both;`;
           p.addEventListener('animationend', () => p.remove());
           fragment.appendChild(p);
         }
@@ -451,7 +500,7 @@ window.BoohaBlitzEngine = (() => {
           const color = colors[Math.floor(Math.random() * colors.length)];
           d.className = 'vb-name-drop';
           d.textContent = name;
-          d.style.cssText = `left:${Math.random() * W}px;top:${-40 - Math.random() * 220}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};text-shadow:0 0 10px ${color},0 0 22px ${color};--cx:${(Math.random() - 0.5) * 340}px;--cy:${H * 0.8 + Math.random() * 380}px;--r0:${(Math.random() - 0.5) * 40}deg;--r1:${(Math.random() - 0.5) * 220}deg;--cdur:${2800 + Math.random() * 1800}ms;--cdelay:${Math.random() * 1000}ms;`;
+          d.style.cssText = `left:${Math.random() * W}px;top:${-40 - Math.random() * 220}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};--cx:${(Math.random() - 0.5) * 340}px;--cy:${H * 0.8 + Math.random() * 380}px;--r0:${(Math.random() - 0.5) * 40}deg;--r1:${(Math.random() - 0.5) * 220}deg;--cdur:${2800 + Math.random() * 1800}ms;--cdelay:${Math.random() * 1000}ms;`;
           d.addEventListener('animationend', () => d.remove());
           fragment.appendChild(d);
         }
@@ -462,7 +511,7 @@ window.BoohaBlitzEngine = (() => {
           const color = colors[Math.floor(Math.random() * colors.length)];
           d.className = 'sb-name-drop';
           d.textContent = name;
-          d.style.cssText = `left:${Math.random() * W}px;top:${-50 - Math.random() * 160}px;font-size:${14 + Math.random() * (isRecord ? 28 : 22)}px;color:${color};text-shadow:0 0 10px ${color},0 2px 0 rgba(0,0,0,.45);--cx:${(Math.random() - 0.5) * 90}px;--cy:${H * (0.5 + Math.random() * 0.42)}px;--r0:${(Math.random() - 0.5) * 24}deg;--cdur:${1400 + Math.random() * 1000}ms;--cdelay:${Math.random() * 1100}ms;`;
+          d.style.cssText = `left:${Math.random() * W}px;top:${-50 - Math.random() * 160}px;font-size:${14 + Math.random() * (isRecord ? 28 : 22)}px;color:${color};--cx:${(Math.random() - 0.5) * 90}px;--cy:${H * (0.5 + Math.random() * 0.42)}px;--r0:${(Math.random() - 0.5) * 24}deg;--cdur:${1400 + Math.random() * 1000}ms;--cdelay:${Math.random() * 1100}ms;`;
           d.addEventListener('animationend', () => d.remove());
           fragment.appendChild(d);
         }
@@ -472,7 +521,7 @@ window.BoohaBlitzEngine = (() => {
           const dist = 80 + Math.random() * (isRecord ? 340 : 240);
           const color = rubble[Math.floor(Math.random() * rubble.length)];
           p.className = 'sb-particle';
-          p.style.cssText = `position:absolute;left:${Math.random() * W}px;top:${H - 8}px;width:${4 + Math.random() * 8}px;height:${4 + Math.random() * 8}px;border-radius:${Math.random() > 0.6 ? '50%' : '2px'};background:${color};pointer-events:none;z-index:30;box-shadow:0 0 8px 2px ${color};--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${520 + Math.random() * 560}ms;--pdelay:${Math.random() * 260}ms;animation:sbParticle var(--pdur) ease-out var(--pdelay) both;`;
+          p.style.cssText = `position:absolute;left:${Math.random() * W}px;top:${H - 8}px;width:${4 + Math.random() * 8}px;height:${4 + Math.random() * 8}px;border-radius:${Math.random() > 0.6 ? '50%' : '2px'};background:${color};pointer-events:none;z-index:30;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${520 + Math.random() * 560}ms;--pdelay:${Math.random() * 260}ms;animation:sbParticle var(--pdur) ease-out var(--pdelay) both;`;
           p.addEventListener('animationend', () => p.remove());
           fragment.appendChild(p);
         }
@@ -483,7 +532,7 @@ window.BoohaBlitzEngine = (() => {
           const toLeft = i % 2 === 1;
           d.className = 'qb-name-streak';
           d.textContent = name;
-          d.style.cssText = `left:${toLeft ? W + 60 : -300}px;top:${Math.random() * H}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};text-shadow:0 0 10px ${color},0 0 24px ${color};--sk:${toLeft ? 14 : -14}deg;--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${1800 + Math.random() * 1200}ms;--cdelay:${Math.random() * 900}ms;`;
+          d.style.cssText = `left:${toLeft ? W + 60 : -300}px;top:${Math.random() * H}px;font-size:${12 + Math.random() * (isRecord ? 26 : 20)}px;color:${color};--sk:${toLeft ? 14 : -14}deg;--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${1800 + Math.random() * 1200}ms;--cdelay:${Math.random() * 900}ms;`;
           d.addEventListener('animationend', () => d.remove());
           fragment.appendChild(d);
         }
@@ -492,7 +541,7 @@ window.BoohaBlitzEngine = (() => {
           const color = colors[Math.floor(Math.random() * colors.length)];
           const toLeft = i % 2 === 0;
           line.className = 'qb-speed-line';
-          line.style.cssText = `left:${toLeft ? W + 40 : -240}px;top:${Math.random() * H}px;width:${60 + Math.random() * 180}px;background:${color};box-shadow:0 0 10px 2px ${color};--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${900 + Math.random() * 700}ms;--cdelay:${Math.random() * 700}ms;`;
+          line.style.cssText = `left:${toLeft ? W + 40 : -240}px;top:${Math.random() * H}px;width:${60 + Math.random() * 180}px;background:${color};--dx:${toLeft ? -(W + 620) : (W + 620)}px;--cdur:${900 + Math.random() * 700}ms;--cdelay:${Math.random() * 700}ms;`;
           line.addEventListener('animationend', () => line.remove());
           fragment.appendChild(line);
         }
@@ -511,6 +560,7 @@ window.BoohaBlitzEngine = (() => {
       const existing = document.getElementById(config.overlayId);
       if (existing) existing.remove();
       const overlay = config.buildOverlay();
+      overlay.classList.add('blitz-compositor');
       applyPalette(overlay, palette);
 
       const bgm = new Audio('assets/audio/blitz.mp3');
@@ -629,7 +679,6 @@ window.BoohaBlitzEngine = (() => {
       function correctDetonate(correctBtn) {
         correctBtn.style.transition = 'none';
         correctBtn.style.background = 'rgba(0,255,100,0.65)';
-        correctBtn.style.boxShadow = '0 0 30px 7px rgba(0,255,100,0.78)';
         overlay.style.transform = 'scale(1.02)';
         setTimeout(() => {
           overlay.style.transition = 'transform 70ms ease';
@@ -666,7 +715,7 @@ window.BoohaBlitzEngine = (() => {
             const dist = 50 + Math.random() * 100;
             const size = 5 + Math.random() * 7;
             p.className = config.particleClass;
-            p.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.5 ? '50%' : '3px'};background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:10;box-shadow:0 0 6px 2px ${palette.accent};--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${240 + Math.random() * 140}ms;--pdelay:${Math.random() * 30}ms;animation:${config.particleAnimation} var(--pdur) ease-out var(--pdelay) both;`;
+            p.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.5 ? '50%' : '3px'};background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:10;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${240 + Math.random() * 140}ms;--pdelay:${Math.random() * 30}ms;animation:${config.particleAnimation} var(--pdur) ease-out var(--pdelay) both;`;
             p.addEventListener('animationend', () => p.remove());
             particles.appendChild(p);
           }
@@ -836,6 +885,7 @@ window.BoohaBlitzEngine = (() => {
         stylesInjected = true;
         config.injectStyles();
       }
+      injectCompositorStyles();
       const path = `content/${curr}/${monthSlug}/${config.dataFile}`;
       fetch(path)
         .then(r => {

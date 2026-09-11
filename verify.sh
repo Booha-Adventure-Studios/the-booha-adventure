@@ -1285,6 +1285,13 @@ else
   bad "Blitz Pass 3 player-reward audit failed"
 fi
 
+echo "[blitz] Pass 4 compositor audit"
+if node tests/blitz-pass4-compositor-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz compositor-friendly glow and celebration contracts pass"
+else
+  bad "Blitz Pass 4 compositor audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"
