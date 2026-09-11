@@ -1399,7 +1399,14 @@ window.BoohaBlitzEngine = (() => {
         #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win {
           background: var(--blitz-correct) !important;
           outline-color: var(--blitz-correct) !important;
-          box-shadow: 0 0 22px var(--blitz-correct), 0 0 42px var(--blitz-glow) !important;
+          outline: 2px solid #ffffff;
+          outline-offset: 0;
+          box-shadow:
+            0 0 0 2px #ffffff,
+            0 0 22px var(--blitz-correct),
+            0 0 42px var(--blitz-glow),
+            inset 0 0 18px rgba(255,255,255,.35) !important;
+          filter: brightness(1.12) saturate(1.14);
           animation: boohaBlitzCorrectPop 220ms cubic-bezier(.16,1.45,.3,1) both;
         }
         #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win::after {
@@ -1426,7 +1433,7 @@ window.BoohaBlitzEngine = (() => {
           #${config.overlayId}.blitz-compositor .${config.optionClass}::after { transition: none; }
           #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-enter,
           #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-recover { animation: none !important; opacity: 1; transform: none; }
-          #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win { animation: none; }
+          #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win { animation: none; filter: none; }
           #${config.overlayId}.blitz-compositor .${config.optionClass}.wrong,
           #${config.overlayId}.shake { animation: none !important; }
         }
