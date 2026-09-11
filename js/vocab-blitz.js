@@ -120,7 +120,7 @@ const SCOLDS = [
 
       /* ── timer bar ── */
       #vb-timer-bar {
-        width: 100%; flex-shrink: 0;
+        width: 100%; flex: 0 0 auto; min-height: 78px; box-sizing: border-box;
         display: flex; align-items: center; justify-content: center;
         padding: max(env(safe-area-inset-top,0px) + 12px, 18px) 20px 14px;
         gap: 16px;
@@ -159,7 +159,7 @@ const SCOLDS = [
 
       /* ── word stage ── */
       #vb-stage {
-        flex: 1; width: 100%;
+        flex: 1 1 auto; min-height: 0; width: 100%;
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
         padding: 0 20px;
@@ -192,7 +192,7 @@ const SCOLDS = [
 
       /* ── options grid ── */
       #vb-options {
-        width: 100%; max-width: 600px;
+        flex: 0 0 auto; width: min(100%, 600px); max-width: 600px;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: clamp(8px,2vw,14px);
@@ -554,18 +554,18 @@ const SCOLDS = [
     el.innerHTML = `
       <div id="vb-flash"></div>
 
-      <div id="vb-timer-bar">
+      <div id="vb-timer-bar" class="booha-blitz-hud">
         <div id="vb-progress"></div>
         <div id="vb-timer">0.00s</div>
         <button id="vb-quit" type="button">やめる</button>
       </div>
 
-      <div id="vb-stage">
+      <div id="vb-stage" class="booha-blitz-prompt">
         <div id="vb-jp-word"></div>
         <div id="vb-hira"></div>
       </div>
 
-      <div id="vb-options"></div>
+      <div id="vb-options" class="booha-blitz-answer"></div>
 
       <div id="vb-wrong-popup">
         <div class="vb-wrong-kanji" id="vwk"></div>

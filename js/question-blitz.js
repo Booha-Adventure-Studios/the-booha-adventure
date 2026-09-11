@@ -118,7 +118,7 @@ window.QuestionBlitz = (() => {
       }
 
       #qb-timer-bar {
-        width: 100%; flex-shrink: 0;
+        width: 100%; flex: 0 0 auto; min-height: 72px; box-sizing: border-box;
         display: flex; align-items: center; justify-content: center;
         padding: max(env(safe-area-inset-top,0px) + 12px, 18px) 20px 10px;
         gap: 16px; position: relative; z-index: 2;
@@ -151,14 +151,23 @@ window.QuestionBlitz = (() => {
 
       /* ── Scrollable area ── */
       #qb-scroll {
-        flex: 1; width: 100%;
+        flex: 1 1 auto; min-height: 0; width: 100%;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         display: flex; flex-direction: column;
         align-items: center;
         padding: 10px 16px max(env(safe-area-inset-bottom,0px) + 16px, 20px);
-        gap: clamp(10px,2vw,18px);
+        gap: clamp(12px,2vw,22px);
         z-index: 2;
+      }
+
+      #qb-prompt {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: clamp(8px, 1.5vw, 14px);
+        padding: clamp(8px, 1.5vw, 16px) 0 2px;
       }
 
       /* ── JP question ── */
@@ -187,7 +196,7 @@ window.QuestionBlitz = (() => {
 
       /* ── Options — single column ── */
       #qb-options {
-        width: 100%; max-width: 680px;
+        flex: 0 0 auto; width: 100%; max-width: 680px;
         display: flex; flex-direction: column;
         gap: clamp(7px,1.5vw,11px);
       }
@@ -502,15 +511,17 @@ window.QuestionBlitz = (() => {
     if (BoohaBlitzEngine.LOW_POWER) el.classList.add('low-power');
     el.innerHTML = `
       <div id="qb-flash"></div>
-      <div id="qb-timer-bar">
+      <div id="qb-timer-bar" class="booha-blitz-hud">
         <div id="qb-progress"></div>
         <div id="qb-timer">0.00s</div>
         <button id="qb-quit" type="button">やめる</button>
       </div>
       <div id="qb-scroll">
-        <div id="qb-jp-word"></div>
-        <div id="qb-hira"></div>
-        <div id="qb-options"></div>
+        <div id="qb-prompt" class="booha-blitz-prompt">
+          <div id="qb-jp-word"></div>
+          <div id="qb-hira"></div>
+        </div>
+        <div id="qb-options" class="booha-blitz-answer"></div>
       </div>
       <div id="qb-wrong-popup">
         <div class="qb-wrong-jp"   id="qbwj"></div>

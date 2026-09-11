@@ -7,8 +7,8 @@ const sentence = fs.readFileSync('js/sentence-blitz.js', 'utf8');
 const questions = fs.readFileSync('js/question-blitz.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /top: clamp\(96px, 13vh, 148px\)/,
-  'the player streak HUD must reserve space below the timer on different viewport heights');
+assert.match(engine, /\.booha-blitz-feedback\s*\{[\s\S]*?flex: 0 0 clamp\(58px, 8vh, 86px\)/,
+  'the player streak HUD must reserve a dedicated feedback rail below the timer');
 assert.match(engine, /streak-active/,
   'the streak HUD must have an explicit active state');
 assert.match(engine, /nameplate\.classList\.remove\('streak-active'\)/,
