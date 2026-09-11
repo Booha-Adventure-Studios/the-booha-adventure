@@ -532,7 +532,7 @@ window.SentenceBlitz = (() => {
         <div class="sb-wrong-scold-hira" id="sbsh"></div>
         <div class="sb-wrong-scold-en"   id="sbse"></div>
         <div id="sb-wrong-status">READY FOR THE NEXT TRY</div>
-        <button id="sb-wrong-close" type="button">つづける</button>
+        <button id="sb-wrong-close" type="button">もう一度 / RETRY</button>
       </div>
       
      <div id="sb-win">

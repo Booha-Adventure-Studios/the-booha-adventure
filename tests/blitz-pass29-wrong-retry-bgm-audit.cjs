@@ -8,7 +8,7 @@ assert.match(engine, /if \(!bgm\.paused\) return;/,
   'BGM start should be idempotent while still resuming a paused track');
 assert.match(engine, /const playback = bgm\.play\(\);[\s\S]*?playback\?\.catch/,
   'BGM resume should safely handle browsers that return a play promise');
-assert.match(engine, /function recoverFromWrong\(\) \{[\s\S]*?startBGM\(\);[\s\S]*?wrongPopup\.classList\.remove\('show'\)/,
+assert.match(engine, /function recoverFromWrong\(\) \{[\s\S]*?wrongPopup\.classList\.remove\('show'\)[\s\S]*?startBGM\(\);/,
   'retrying from the wrong-answer popup must resume BGM from the trusted click');
 assert.match(engine, /stopTimer\(\);\s*stopBGM\(\);\s*setTimeout\(\(\) => showWrongPopup\(correct\)/,
   'wrong answers should still pause BGM while the feedback popup is open');

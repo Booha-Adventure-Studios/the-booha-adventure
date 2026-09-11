@@ -2327,13 +2327,18 @@ window.BoohaBlitzEngine = (() => {
 
       function recoverFromWrong() {
         if (!wrongPopup.classList.contains('show')) return;
-        startBGM();
         wrongPopup.classList.remove('show');
         wrongPopup.scrollTop = 0;
         overlay.classList.remove('wrong-active');
-        renderQuestion(true);
-        startTime = performance.now() - elapsed;
+        streak = 0;
+        bestStreak = 0;
+        elapsed = 0;
+        clearElapsed = null;
+        startTime = performance.now();
         lastTimerPaint = -Infinity;
+        timerEl.textContent = '0.00s';
+        renderQuestion(true);
+        startBGM();
         rafId = requestAnimationFrame(tick);
         requestAnimationFrame(() => optionsEl.querySelector(`.${config.optionClass}`)?.focus());
       }
