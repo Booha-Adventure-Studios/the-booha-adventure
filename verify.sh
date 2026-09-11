@@ -1502,6 +1502,13 @@ else
   bad "Blitz runtime-performance audit failed"
 fi
 
+echo "[blitz] timer-repaint audit"
+if node tests/blitz-pass35-timer-repaint-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz timer-repaint audit passed"
+else
+  bad "Blitz timer-repaint audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"

@@ -8,8 +8,10 @@ assert.match(engine, /function backgroundFor\(palette, index = 0\)/,
   'background energy must be derived from the active streak');
 assert.match(engine, /const energy = Math\.min\(15, Math\.max\(0, Number\(streak\) \|\| 0\)\)/,
   'streak-driven background energy must be capped');
-assert.match(engine, /backgroundFor\(palette, bgIndex, streak\)/,
-  'the live play field must use the current streak when rendering a question');
+assert.match(engine, /function setBackground\(streakValue = streak\)[\s\S]*?backgroundFor\(palette, bgIndex, streakValue\)/,
+  'the live play field must derive its background from the current streak');
+assert.match(engine, /setBackground\(streak\)/,
+  'question rendering must apply the current streak background energy');
 assert.match(engine, /function clearAnnouncement\(\)/,
   'ordinary streak feedback must be clearable without leaving a floating callout');
 assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold\);/,

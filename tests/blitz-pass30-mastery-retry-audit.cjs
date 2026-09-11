@@ -12,7 +12,7 @@ assert.doesNotMatch(engine, /function recoverFromWrong\(\) \{[\s\S]*?startTime =
   'retry must not resume the pre-mistake elapsed time');
 assert.match(engine, /function handleAnswer\(btn, chosen, correct\) \{[\s\S]*?if \(chosen\.n === correct\.n\) \{[\s\S]*?current\+\+/,
   'a wrong answer must leave current unchanged so retry stays on the missed card');
-assert.match(engine, /function recoverFromWrong\(\) \{[\s\S]*?startBGM\(\);[\s\S]*?rafId = requestAnimationFrame\(tick\)/,
+assert.match(engine, /function recoverFromWrong\(\) \{[\s\S]*?startBGM\(\);[\s\S]*?scheduleTimerTick\(0\)/,
   'retry must restart the timer and BGM from the trusted button click');
 
 for (const [source, prefix] of modes.map((source, index) => [source, ['vb', 'sb', 'qb'][index]])) {
