@@ -7918,7 +7918,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
-      serviceWorkerCacheVersion: 'booha-assets-2026-533',
+      serviceWorkerCacheVersion: 'booha-assets-2026-534',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleMuenbaFrame();
