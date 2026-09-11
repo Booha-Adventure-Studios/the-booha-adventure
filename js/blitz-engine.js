@@ -316,6 +316,7 @@ window.BoohaBlitzEngine = (() => {
         left: 50%;
         width: min(680px, calc(100% - 32px));
         max-height: min(76vh, 560px);
+        max-height: min(76dvh, 560px);
         box-sizing: border-box;
         display: none;
         padding: clamp(18px, 3vw, 28px) clamp(16px, 4vw, 34px) clamp(16px, 3vw, 24px);
@@ -341,35 +342,62 @@ window.BoohaBlitzEngine = (() => {
       }
       #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji,
       #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp {
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp,
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-jp,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-jp,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp {
         color: var(--blitz-wrong, #ff536d);
         text-shadow: 0 0 24px var(--blitz-wrong, #ff536d);
       }
       #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji,
       #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp {
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp,
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-jp,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-jp,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp {
         box-sizing: border-box;
         max-width: 100%;
         padding-inline: 8px;
+        padding-top: .45em;
         font-size: clamp(28px, 8vw, 72px);
-        line-height: 1.3;
+        line-height: 1.55;
         overflow-wrap: anywhere;
         text-wrap: balance;
+        overflow: visible;
       }
       #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji ruby,
       #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp ruby,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp ruby {
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp ruby,
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-jp ruby,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-jp ruby,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp ruby {
         display: inline;
         max-width: 100%;
         white-space: normal;
         overflow-wrap: anywhere;
+        ruby-position: over;
+        overflow: visible;
       }
       #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji rt,
       #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp rt,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp rt {
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp rt,
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-jp rt,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-jp rt,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp rt {
         max-width: 100%;
         white-space: normal;
         overflow-wrap: anywhere;
+        line-height: 1;
+        overflow: visible;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback > *,
+      #sb-wrong-popup.blitz-wrong-feedback > *,
+      #qb-wrong-popup.blitz-wrong-feedback > * { flex: 0 0 auto; }
+      #vb-wrong-popup.blitz-wrong-feedback #vb-wrong-close,
+      #sb-wrong-popup.blitz-wrong-feedback #sb-wrong-close,
+      #qb-wrong-popup.blitz-wrong-feedback #qb-wrong-close {
+        margin-bottom: max(env(safe-area-inset-bottom, 0px), 4px);
+        flex: 0 0 auto;
       }
       #vb-wrong-popup.blitz-wrong-feedback #vb-wrong-status,
       #sb-wrong-popup.blitz-wrong-feedback #sb-wrong-status,
@@ -1415,6 +1443,24 @@ window.BoohaBlitzEngine = (() => {
           padding: clamp(8px, 1.8vh, 13px) 14px;
           font-size: clamp(12px, 2.3vh, 16px);
         }
+        #vb-wrong-popup.blitz-wrong-feedback,
+        #sb-wrong-popup.blitz-wrong-feedback,
+        #qb-wrong-popup.blitz-wrong-feedback {
+          max-height: calc(100dvh - 24px);
+          padding-top: max(24px, 3vh);
+          padding-bottom: max(env(safe-area-inset-bottom, 0px) + 18px, 22px);
+          gap: 6px;
+        }
+        #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji,
+        #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp,
+        #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp,
+        #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-jp,
+        #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-jp,
+        #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp {
+          font-size: clamp(24px, 7vh, 48px);
+          line-height: 1.55;
+          padding-top: .45em;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -2363,6 +2409,7 @@ window.BoohaBlitzEngine = (() => {
         wrongPopup.classList.remove('wrong-feel-playful', 'wrong-feel-arcade', 'wrong-feel-sleek');
         wrongPopup.classList.add(`wrong-feel-${palette.feel || 'playful'}`);
         overlay.classList.add('wrong-active');
+        wrongPopup.scrollTop = 0;
         wrongPopup.classList.add('show');
       }
 
