@@ -1334,6 +1334,13 @@ else
   bad "Blitz Pass 4 feedback audit failed"
 fi
 
+echo "[blitz] Pass 5 streak audit"
+if node tests/blitz-pass11-streak-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz Pass 5 streak audit passed"
+else
+  bad "Blitz Pass 5 streak audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"
