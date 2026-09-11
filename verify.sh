@@ -1299,6 +1299,13 @@ else
   bad "Blitz Pass 5 polish audit failed"
 fi
 
+echo "[blitz] Pass 6 color/feel audit"
+if node tests/blitz-pass6-color-feel-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz curriculum personalities and reward finish contracts pass"
+else
+  bad "Blitz Pass 6 color/feel audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"
