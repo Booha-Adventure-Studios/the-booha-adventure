@@ -836,6 +836,14 @@ window.BoohaBlitzEngine = (() => {
         line-height: .95;
         text-shadow: 0 0 12px #fff, 0 0 34px var(--blitz-accent), 0 0 72px var(--blitz-glow);
       }
+      .booha-blitz-perfect-flash.record {
+        background: radial-gradient(circle at 50% 48%, rgba(255,255,255,.9), rgba(255,196,36,.72) 16%, rgba(255,90,0,.22) 38%, transparent 68%);
+      }
+      .booha-blitz-perfect-flash.record .booha-blitz-perfect-flash-label {
+        color: #fff7b0;
+        text-shadow: 0 0 12px #fff, 0 0 34px #ffd700, 0 0 78px #ff5a00;
+      }
+      .booha-blitz-perfect-flash.record { animation-duration: 1050ms; }
       @keyframes boohaBlitzPerfectFlash {
         0% { opacity: 0; transform: scale(.74); }
         16% { opacity: 1; transform: scale(1.08); }
@@ -1020,6 +1028,10 @@ window.BoohaBlitzEngine = (() => {
       #sb-win.blitz-finish.perfect-mode .booha-blitz-final-card,
       #qb-win.blitz-finish.perfect-mode .booha-blitz-final-card {
         border-color: #fff0a8;
+        background:
+          linear-gradient(145deg, rgba(255,255,255,.16), transparent 30%),
+          radial-gradient(circle at 50% 0%, rgba(255,214,73,.32), transparent 60%),
+          rgba(22, 10, 18, .86);
         box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 52px rgba(255,214,73,.62);
       }
       #vb-win.blitz-finish.perfect-mode .booha-blitz-final-curriculum::before,
@@ -1088,6 +1100,16 @@ window.BoohaBlitzEngine = (() => {
           radial-gradient(circle at 50% 18%, rgba(255, 213, 72, .34), transparent 34%),
           radial-gradient(circle at 15% 35%, var(--blitz-glow), transparent 28%),
           linear-gradient(180deg, rgba(30, 10, 10, .92), rgba(0, 0, 0, .97));
+      }
+      #vb-win.blitz-finish.record-mode .booha-blitz-final-card,
+      #sb-win.blitz-finish.record-mode .booha-blitz-final-card,
+      #qb-win.blitz-finish.record-mode .booha-blitz-final-card {
+        border-color: #ffd700;
+        background:
+          linear-gradient(145deg, rgba(255,255,255,.18), transparent 28%),
+          radial-gradient(circle at 50% 0%, rgba(255,199,49,.38), transparent 62%),
+          rgba(28, 8, 8, .86);
+        box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 64px rgba(255,188,35,.72), 0 0 110px rgba(255,90,0,.26);
       }
       #vb-win.blitz-finish .booha-blitz-final-badge,
       #sb-win.blitz-finish .booha-blitz-final-badge,
@@ -1588,17 +1610,22 @@ window.BoohaBlitzEngine = (() => {
       container.setAttribute('aria-label', `${jp} ${hira}`);
     }
 
-    function emitPerfectFlash(overlay, palette, playerName) {
+    function emitFinishFlash(overlay, palette, playerName, kind = 'perfect') {
       const flash = document.createElement('div');
-      flash.className = 'booha-blitz-perfect-flash';
-      flash.style.setProperty('--blitz-accent', palette.accent);
-      flash.style.setProperty('--blitz-glow', palette.glow);
+      const isRecordFlash = kind === 'record';
+      flash.className = `booha-blitz-perfect-flash${isRecordFlash ? ' record' : ''}`;
+      flash.style.setProperty('--blitz-accent', isRecordFlash ? '#ffd700' : palette.accent);
+      flash.style.setProperty('--blitz-glow', isRecordFlash ? 'rgba(255,188,35,.72)' : palette.glow);
       const label = document.createElement('div');
       label.className = 'booha-blitz-perfect-flash-label';
-      label.textContent = `${playerName} · PERFECT!`;
+      label.textContent = isRecordFlash ? `${playerName} · NEW RECORD!` : `${playerName} · PERFECT!`;
       flash.appendChild(label);
       overlay.appendChild(flash);
-      setTimeout(() => flash.remove(), REDUCED_MOTION ? 320 : 900);
+      setTimeout(() => flash.remove(), REDUCED_MOTION ? 320 : isRecordFlash ? 1050 : 900);
+    }
+
+    function emitPerfectFlash(overlay, palette, playerName) {
+      emitFinishFlash(overlay, palette, playerName, 'perfect');
     }
 
     function ensureFinalCard(winScreen, palette) {
@@ -2386,6 +2413,7 @@ window.BoohaBlitzEngine = (() => {
         spotlight.nameplate.classList.add('complete');
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
         if (isPerfectRun) emitPerfectFlash(overlay, palette, playerName);
+        else if (isRecord) emitFinishFlash(overlay, palette, playerName, 'record');
         winScreen.classList.add('show');
         playFinalStinger(isRecord, isPerfectRun);
         startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
