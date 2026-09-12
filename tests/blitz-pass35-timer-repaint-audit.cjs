@@ -20,8 +20,8 @@ assert.match(engine, /function setBackground\(streakValue = streak\)/,
   'background updates must pass through a de-duplicating setter');
 assert.match(engine, /if \(next === backgroundValue\) return;/,
   'identical full-screen background values must not be reassigned');
-assert.match(engine, /if \(isLowPower\(\) && palette\.background\?\.main\) return palette\.background\.main;/,
-  'low-power mode must use the cheaper solid curriculum background');
+assert.match(engine, /if \(isMinimalPower\(\) && palette\.background\?\.main\) return palette\.background\.main;/,
+  'minimal-power mode must use the cheaper solid curriculum background');
 assert.match(engine, /background: var\(--blitz-bg-main\) !important;/,
   'low-power mode must avoid animated full-screen gradient repainting');
 
