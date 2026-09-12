@@ -296,14 +296,6 @@ window.SentenceBlitz = (() => {
         width: 100%;
         overflow-wrap: anywhere;
       }
-      .sb-wrong-jp ruby { ruby-position: over; }
-      .sb-wrong-jp rt {
-        display: ruby-text;
-        font-size: .34em;
-        color: rgba(255, 190, 190, .9);
-        letter-spacing: .08em;
-        line-height: 1;
-      }
       .sb-wrong-hira[hidden], .sb-wrong-scold-hira[hidden] { display: none; }
       .sb-wrong-hira {
         font-size: clamp(14px,3.5vw,22px);

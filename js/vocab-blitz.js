@@ -309,14 +309,6 @@ const SCOLDS = [
         overflow-wrap: anywhere;
         animation: vbWordPop 350ms cubic-bezier(.34,1.56,.64,1) both;
       }
-      .vb-wrong-kanji ruby { ruby-position: over; }
-      .vb-wrong-kanji rt {
-        display: ruby-text;
-        font-size: .34em;
-        color: rgba(255, 190, 190, .9);
-        letter-spacing: .08em;
-        line-height: 1;
-      }
       .vb-wrong-hira[hidden], .vb-wrong-scold-hira[hidden] { display: none; }
       .vb-wrong-hira {
         font-size: clamp(14px,3.5vw,22px);

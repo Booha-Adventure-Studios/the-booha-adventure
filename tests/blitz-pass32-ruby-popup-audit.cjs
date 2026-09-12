@@ -8,16 +8,14 @@ const verify = fs.readFileSync('verify.sh', 'utf8');
 
 assert.match(engine, /max-height: min\(76dvh, 560px\)/,
   'wrong feedback must use the dynamic viewport height when available');
-assert.match(engine, /padding-top: \.45em;/,
-  'wrong Japanese content must reserve space above ruby annotations');
 assert.match(engine, /line-height: 1\.55;/,
-  'wrong Japanese content must use generous ruby-safe line height');
+  'wrong Japanese content must use a generous line height');
 assert.match(engine, /overflow: visible;/,
-  'wrong Japanese and ruby content must not clip annotation boxes');
-assert.match(engine, /ruby-position: over;/,
-  'wrong Japanese content must place furigana above the source text');
-assert.match(engine, /rt \{[\s\S]*?line-height: 1;/,
-  'furigana annotations must keep a compact predictable line box');
+  'wrong Japanese content must not clip long feedback text');
+assert.match(engine, /function renderSeparateReading\(jpContainer, hiraContainer, jp, hira\)/,
+  'wrong feedback must use separate Japanese and furigana blocks');
+assert.doesNotMatch(engine, /renderFurigana\(/,
+  'wrong feedback must not rely on the old ruby renderer');
 assert.match(engine, /wrongPopup\.scrollTop = 0;[\s\S]*?wrongPopup\.classList\.add\('show'\)/,
   'opening wrong feedback must always begin at the top of the card');
 assert.match(engine, /max-height: calc\(100dvh - 24px\)/,
@@ -33,4 +31,4 @@ for (const source of modes) {
 assert.match(verify, /tests\/blitz-pass32-ruby-popup-audit\.cjs/,
   'verify.sh must run the ruby popup audit');
 
-console.log('Blitz ruby-popup audit passed: long Japanese feedback has ruby-safe spacing, scrolling, and retry reachability.');
+console.log('Blitz separate-reading popup audit passed: long Japanese feedback has safe spacing, scrolling, and retry reachability.');
