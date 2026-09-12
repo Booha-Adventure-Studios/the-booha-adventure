@@ -2329,6 +2329,7 @@ window.BoohaBlitzEngine = (() => {
       let finalHoldInterval = null;
       let runIsActive = false;
       let visibilityPaused = false;
+      let runEligibleForRecord = true;
 
       function setBackground(streakValue = streak) {
         const next = backgroundFor(palette, bgIndex, streakValue);
@@ -2606,7 +2607,6 @@ window.BoohaBlitzEngine = (() => {
         wrongPopup.scrollTop = 0;
         overlay.classList.remove('wrong-active');
         streak = 0;
-        bestStreak = 0;
         elapsed = 0;
         clearElapsed = null;
         startTime = performance.now();
@@ -2637,6 +2637,7 @@ window.BoohaBlitzEngine = (() => {
         btn.classList.add('wrong');
         runIsActive = false;
         visibilityPaused = false;
+        runEligibleForRecord = false;
         spotlight.resetStreak();
         setBackground(0);
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
@@ -2689,6 +2690,7 @@ window.BoohaBlitzEngine = (() => {
       function beginGame() {
         if (gameStarted) return;
         gameStarted = true;
+        runEligibleForRecord = true;
         startBGM();
         playStartSting();
         startCard.card.classList.add('launching');
@@ -2711,11 +2713,26 @@ window.BoohaBlitzEngine = (() => {
         runIsActive = false;
         visibilityPaused = false;
         const weekId = makeWeekId(monthSlug, weekNumber);
-        const result = saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId);
+        const recordEligible = runEligibleForRecord;
+        const result = recordEligible
+          ? saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId)
+          : {
+            isWeeklyRecord: false,
+            isAllTimeRecord: false,
+            oldRecord: getBestScore(config.gameType, config.legacyKey, curr),
+            newScore: null,
+            saveFailed: false,
+          };
         if (result.saveFailed) console.error(`[${config.apiName}] Time not saved:`, ms, 'ms');
 
         document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-          detail: { saveId: `blitz:${curr}:${config.saveId}`, score: 100, completed: true, time: ms },
+          detail: {
+            saveId: `blitz:${curr}:${config.saveId}`,
+            score: 100,
+            completed: true,
+            recordEligible,
+            ...(recordEligible ? { time: ms } : {}),
+          },
         }));
 
         const best = getBestScore(config.gameType, config.legacyKey, curr);
@@ -2749,12 +2766,17 @@ window.BoohaBlitzEngine = (() => {
           recordEl.textContent = '🏆 NEW BOOHA RECORD';
           bestEl.textContent = `PERSONAL BEST: ${fmtTime(ms)}`;
           deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than previous best` : 'FIRST PERSONAL BEST';
+        } else if (isMasteryClear) {
+          recordEl.textContent = 'MASTERY CLEAR · NO RECORD';
+          bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
+          deltaEl.textContent = 'RETRY RUN — RECORDS REQUIRE A CLEAN START';
         } else {
           recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST · #1' : 'CLEAR COMPLETE';
           bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
           deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs previous best` : (weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}` : '');
         }
-        const isPerfectRun = bestStreak === queue.length;
+        const isPerfectRun = recordEligible && bestStreak === queue.length;
+        const isMasteryClear = !recordEligible;
         finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
         if (finalCard.headline) {
           finalCard.headline.textContent = `${playerName} — ${String(palette.name || 'BOOHA').toUpperCase()} BLITZ`;
@@ -2762,8 +2784,10 @@ window.BoohaBlitzEngine = (() => {
         if (finalCard.residual) {
           finalCard.residual.textContent = `${palette.streak?.label || 'STREAK'} ENERGY ×${bestStreak} — STILL GLOWING`;
         }
-        finalCard.perfect.hidden = !isPerfectRun;
-        finalCard.perfect.textContent = isPerfectRun ? `PERFECT RUN · ${queue.length}/${queue.length}` : '';
+        finalCard.perfect.hidden = !(isPerfectRun || isMasteryClear);
+        finalCard.perfect.textContent = isMasteryClear
+          ? 'MASTERY CLEAR · NO RECORD'
+          : isPerfectRun ? `PERFECT RUN · ${queue.length}/${queue.length}` : '';
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         spotlight.nameplate.classList.add('complete');
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
