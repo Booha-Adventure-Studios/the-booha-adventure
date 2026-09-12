@@ -19,8 +19,8 @@ assert.match(engine, /@keyframes boohaBlitzWrongSheet/,
   'wrong feedback must have a mobile sheet treatment');
 assert.match(engine, /showWrongPopup\(correct\)/,
   'the existing wrong-answer flow must remain wired');
-assert.match(engine, /renderFurigana\(scoldJp, scold\.jp, scold\.hira\)/,
-  'the contained feedback must preserve the Booha scold content');
+assert.match(engine, /renderSeparateReading\(scoldJp, scoldHira, scold\.jp, scold\.hira\)/,
+  'the contained feedback must preserve the Booha scold content and reading');
 
 for (const [source, prefix] of [[vocab, 'vb'], [sentence, 'sb'], [question, 'qb']]) {
   assert.match(source, new RegExp(`id="${prefix}-wrong-popup" class="blitz-wrong-feedback"`),

@@ -287,14 +287,6 @@ window.QuestionBlitz = (() => {
         width: 100%;
         overflow-wrap: anywhere;
       }
-      .qb-wrong-jp ruby { ruby-position: over; }
-      .qb-wrong-jp rt {
-        display: ruby-text;
-        font-size: .34em;
-        color: rgba(255, 190, 190, .9);
-        letter-spacing: .08em;
-        line-height: 1;
-      }
       .qb-wrong-hira[hidden], .qb-wrong-scold-hira[hidden] { display: none; }
       .qb-wrong-hira {
         font-size: clamp(14px,3.5vw,22px);
