@@ -25,23 +25,23 @@ assert.match(engine, /booha-blitz-celebration-layer/,
   'celebration particles must be contained behind the finish card');
 assert.match(engine, /winScreen\.classList\.add\('blitz-finish'\)/,
   'the finish screen must receive the shared visual treatment');
-assert.match(engine, /function renderFurigana\(container, jp, hira\)/,
-  'the fail screen must render ruby furigana from the shared engine');
-assert.match(engine, /wrongHira\.hidden = true/,
-  'the duplicate fail-screen reading line must not compete with ruby text');
+assert.match(engine, /function renderSeparateReading\(jpContainer, hiraContainer, jp, hira\)/,
+  'the fail screen must render Japanese and furigana in separate blocks');
+assert.match(engine, /hiraContainer\.hidden = false/,
+  'the fail-screen furigana block must be visible when feedback opens');
 assert.match(vocab, /const formatBlitzTime = BoohaBlitzEngine\.fmtTime/,
   'the fastest-player panel must use the shared time formatter');
 assert.ok(!/\$\{fmtTime\(/.test(vocab),
   'the fastest-player panel must not call an undefined local fmtTime');
 assert.match(vocab, /window\.CALENDAR\?\.getCurrentCurriculumWeek/, 
   'the fastest-player panel must resolve a week when opened without explicit context');
-for (const [source, prefix, jpClass] of [[vocab, 'vb', 'vb-wrong-kanji'], [sentence, 'sb', 'sb-wrong-jp'], [questions, 'qb', 'qb-wrong-jp']]) {
-  assert.match(source, new RegExp(`\\.${jpClass} ruby`),
-    `${prefix} fail screen must style ruby furigana`);
-  assert.match(source, new RegExp(`\\.${prefix}-wrong-hira\\[hidden\\]`),
-    `${prefix} duplicate reading line must support the shared hidden state`);
+for (const [source, prefix] of [[vocab, 'vb'], [sentence, 'sb'], [questions, 'qb']]) {
+  assert.match(source, new RegExp('\\.' + prefix + '-wrong-hira\\[hidden\\]'),
+    prefix + ' furigana block must support the shared hidden state');
+  assert.match(source, new RegExp('\\.' + prefix + '-wrong-scold-hira'),
+    prefix + ' scold furigana must have its own block');
 }
 assert.match(verify, /tests\/blitz-pass5-polish-audit\.cjs/,
   'verify.sh must run the Blitz Pass 5 polish audit');
 
-console.log('Blitz Pass 5 polish audit passed: responsive streak HUD, background fire milestone, finish layering, fastest-player wiring, and ruby fail screens are covered.');
+console.log('Blitz Pass 5 polish audit passed: responsive streak HUD, background fire milestone, finish layering, fastest-player wiring, and separate-reading fail screens are covered.');

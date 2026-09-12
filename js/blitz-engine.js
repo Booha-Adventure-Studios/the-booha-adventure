@@ -531,37 +531,27 @@ window.BoohaBlitzEngine = (() => {
         box-sizing: border-box;
         max-width: 100%;
         padding-inline: 8px;
-        padding-top: .45em;
         font-size: clamp(28px, 8vw, 72px);
         line-height: 1.55;
         overflow-wrap: anywhere;
         text-wrap: balance;
         overflow: visible;
       }
-      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji ruby,
-      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp ruby,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp ruby,
-      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-jp ruby,
-      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-jp ruby,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp ruby {
-        display: inline;
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-hira,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-hira,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-hira,
+      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-hira,
+      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-hira,
+      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-hira {
+        display: block;
+        box-sizing: border-box;
+        width: min(100%, 760px);
         max-width: 100%;
+        padding-inline: 8px;
+        line-height: 1.5;
         white-space: normal;
         overflow-wrap: anywhere;
-        ruby-position: over;
-        overflow: visible;
-      }
-      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji rt,
-      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp rt,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp rt,
-      #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-jp rt,
-      #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-jp rt,
-      #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp rt {
-        max-width: 100%;
-        white-space: normal;
-        overflow-wrap: anywhere;
-        line-height: 1;
-        overflow: visible;
+        text-wrap: balance;
       }
       #vb-wrong-popup.blitz-wrong-feedback > *,
       #sb-wrong-popup.blitz-wrong-feedback > *,
@@ -1632,7 +1622,15 @@ window.BoohaBlitzEngine = (() => {
         #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-jp {
           font-size: clamp(24px, 7vh, 48px);
           line-height: 1.55;
-          padding-top: .45em;
+        }
+        #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-hira,
+        #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-hira,
+        #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-hira,
+        #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-scold-hira,
+        #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-scold-hira,
+        #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-scold-hira {
+          font-size: clamp(12px, 3.2vh, 20px);
+          line-height: 1.45;
         }
       }
     `;
@@ -1965,16 +1963,12 @@ window.BoohaBlitzEngine = (() => {
       return { playerName, nameplate, callout, announce, clearAnnouncement, setStreak, resetStreak };
     }
 
-    function renderFurigana(container, jp, hira) {
-      while (container.firstChild) container.removeChild(container.firstChild);
-      const ruby = document.createElement('ruby');
-      ruby.appendChild(document.createTextNode(jp));
-      const rt = document.createElement('rt');
-      rt.textContent = hira;
-      ruby.appendChild(rt);
-      container.appendChild(ruby);
-      container.classList.add('booha-blitz-ruby-text');
-      container.setAttribute('aria-label', `${jp} ${hira}`);
+    function renderSeparateReading(jpContainer, hiraContainer, jp, hira) {
+      jpContainer.textContent = jp;
+      jpContainer.classList.remove('booha-blitz-ruby-text');
+      jpContainer.setAttribute('aria-label', `${jp} ${hira}`);
+      hiraContainer.textContent = hira;
+      hiraContainer.hidden = false;
     }
 
     function emitFinishFlash(overlay, palette, playerName, kind = 'perfect') {
@@ -2657,12 +2651,8 @@ window.BoohaBlitzEngine = (() => {
         const scoldJp = overlay.querySelector(selector('scoldJp'));
         const scoldHira = overlay.querySelector(selector('scoldHira'));
         const status = wrongPopup.querySelector('[id$="-wrong-status"]');
-        renderFurigana(wrongJp, correct.jp, correct.hira);
-        renderFurigana(scoldJp, scold.jp, scold.hira);
-        wrongHira.textContent = correct.hira;
-        scoldHira.textContent = scold.hira;
-        wrongHira.hidden = true;
-        scoldHira.hidden = true;
+        renderSeparateReading(wrongJp, wrongHira, correct.jp, correct.hira);
+        renderSeparateReading(scoldJp, scoldHira, scold.jp, scold.hira);
         overlay.querySelector(selector('wrongEn')).textContent = correct.en;
         overlay.querySelector(selector('scoldEn')).textContent = scold.en;
         const statusByFeel = {

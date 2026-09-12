@@ -1530,6 +1530,13 @@ else
   bad "Blitz performance-tier audit failed"
 fi
 
+echo "[blitz] separate-furigana popup audit"
+if node tests/blitz-pass39-separate-furigana-popup-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz separate-furigana popup audit passed"
+else
+  bad "Blitz separate-furigana popup audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"
