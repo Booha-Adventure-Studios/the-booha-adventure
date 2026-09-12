@@ -6,8 +6,10 @@ const modes = ['js/vocab-blitz.js', 'js/sentence-blitz.js', 'js/question-blitz.j
   .map(file => fs.readFileSync(file, 'utf8'));
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /function recoverFromWrong\(\) \{[\s\S]*?streak = 0;[\s\S]*?bestStreak = 0;[\s\S]*?elapsed = 0;[\s\S]*?clearElapsed = null;[\s\S]*?startTime = performance\.now\(\);[\s\S]*?lastTimerPaint = -Infinity;[\s\S]*?timerEl\.textContent = '0\.00s';[\s\S]*?renderQuestion\(true\)/,
-  'retry must reset streak, run-best streak, and elapsed time while rebuilding the same question');
+assert.match(engine, /function recoverFromWrong\(\) \{[\s\S]*?streak = 0;[\s\S]*?elapsed = 0;[\s\S]*?clearElapsed = null;[\s\S]*?startTime = performance\.now\(\);[\s\S]*?lastTimerPaint = -Infinity;[\s\S]*?timerEl\.textContent = '0\.00s';[\s\S]*?renderQuestion\(true\)/,
+  'retry must reset the active streak and elapsed time while rebuilding the same question');
+assert.doesNotMatch(engine, /function recoverFromWrong\(\) \{[\s\S]*?bestStreak = 0;/,
+  'retry must preserve the session best streak for the final performance summary');
 assert.doesNotMatch(engine, /function recoverFromWrong\(\) \{[\s\S]*?startTime = performance\.now\(\) - elapsed/,
   'retry must not resume the pre-mistake elapsed time');
 assert.match(engine, /function handleAnswer\(btn, chosen, correct\) \{[\s\S]*?if \(chosen\.n === correct\.n\) \{[\s\S]*?current\+\+/,

@@ -63,7 +63,7 @@ const BoohaDayRecord = (() => {
     const keys = _keys();
     if (!keys) return;
 
-    const { saveId, score, completed, time } = detail || {};
+    const { saveId, score, completed, time, recordEligible = true } = detail || {};
     if (!saveId) return;
 
     const meta = _meta();
@@ -82,7 +82,7 @@ const BoohaDayRecord = (() => {
     if (saveId.startsWith('blitz:')) {
       // Blitz reports best clear TIME; only 100% clears fire completed=true
       const id = saveId.slice(6);
-      if (completed && typeof time === 'number') {
+      if (completed && recordEligible !== false && typeof time === 'number') {
         const best = wk.blitz[id];
         if (best == null || time < best) wk.blitz[id] = time;
       }
