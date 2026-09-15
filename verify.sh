@@ -1264,6 +1264,13 @@ else
   bad "Tokyo daily-stats audit failed"
 fi
 
+echo "[blitz] Pass 1 finish execution test"
+if node tests/blitz-finish-execution.test.cjs >/dev/null 2>&1; then
+  ok "Blitz record, ordinary, mastery, and fallback finishes render safely"
+else
+  bad "Blitz finish execution test failed"
+fi
+
 echo "[blitz] Pass 1 performance audit"
 if node tests/blitz-pass1-performance-audit.cjs >/dev/null 2>&1; then
   ok "Blitz timer, low-power effects, batched particles, and blur fallback contracts pass"

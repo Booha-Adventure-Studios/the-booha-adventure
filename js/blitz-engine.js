@@ -2784,6 +2784,29 @@ window.BoohaBlitzEngine = (() => {
         visibilityPaused = false;
         const weekId = makeWeekId(monthSlug, weekNumber);
         const recordEligible = runEligibleForRecord;
+        const isPerfectRun = recordEligible && bestStreak === queue.length;
+        const isMasteryClear = !recordEligible;
+        const revealFinishFallback = () => {
+          try {
+            winScreen.classList.add('show');
+            const fallbackRecord = winScreen.querySelector(selector('winRecord'));
+            const fallbackTime = winScreen.querySelector(selector('winTime'));
+            if (fallbackRecord && !fallbackRecord.textContent) fallbackRecord.textContent = 'CLEAR COMPLETE';
+            if (fallbackTime && !fallbackTime.textContent) fallbackTime.textContent = fmtTime(ms);
+            [
+              winScreen.querySelector(selector('playAgain')),
+              winScreen.querySelector(selector('winClose')),
+            ].filter(Boolean).forEach(button => {
+              button.disabled = false;
+              button.removeAttribute('aria-disabled');
+              button.title = '';
+            });
+          } catch (fallbackError) {
+            console.error(`[${config.apiName}] Finish fallback failed:`, fallbackError);
+          }
+        };
+
+        try {
         const result = recordEligible
           ? saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId)
           : {
@@ -2845,8 +2868,6 @@ window.BoohaBlitzEngine = (() => {
           bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
           deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs previous best` : (weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}` : '');
         }
-        const isPerfectRun = recordEligible && bestStreak === queue.length;
-        const isMasteryClear = !recordEligible;
         finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
         if (finalCard.headline) {
           finalCard.headline.textContent = `${playerName} — ${String(palette.name || 'BOOHA').toUpperCase()} BLITZ`;
@@ -2867,6 +2888,10 @@ window.BoohaBlitzEngine = (() => {
         playFinalStinger(isRecord, isPerfectRun);
         startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
         celebrate(overlay, palette, isRecord);
+        } catch (error) {
+          console.error(`[${config.apiName}] Finish rendering failed:`, error);
+          revealFinishFallback();
+        }
       }
 
       const cleanupAndClose = () => {
