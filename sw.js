@@ -66,6 +66,8 @@ const CURRENT_CACHES = {
   // replenish lantern light when the meter is below its maximum.
   // Family Room Pass 2: tier gates use the fastest current-week Blitz stamp
   // across each curriculum, still carried by the network-first JS path.
+  // Family Room Pass 3: Booha movement, lantern reveal, hold-to-mark, and the
+  // single leave report remain network-first so offline fallback stays safe.
   // Muenba 28A adds the shared decoded sample-loader and pitch variation API.
   // Muenba 28B adds staggered authored scream playback, decay, and danger-state cleanup.
   // Muenba 28C primes all authored clips after the first gesture and avoids immediate repeats.

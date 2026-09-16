@@ -3,6 +3,7 @@
 
   const SAVE_ID = 'bonus:family_room';
   const CASE_ROUNDS = 7;
+  const MARK_HOLD_MS = 600;
   const MAX_FLAMES = 3;
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
@@ -35,8 +36,6 @@
   const messageButton = document.getElementById('message-button');
   const curtain = document.getElementById('transition-curtain');
   const observationNote = document.getElementById('observation-note');
-  const markPrompt = document.getElementById('mark-prompt');
-  const markSkip = document.getElementById('mark-skip');
   const clueCard = document.getElementById('clue-card');
   const clueEn = document.getElementById('clue-en');
   const clueJp = document.getElementById('clue-jp');
@@ -70,7 +69,6 @@
   let currentIsAnomaly = false;
   let roundStarted = 0;
   let transitionStarted = 0;
-  let transitionDirection = 'straight';
   let entryStarted = 0;
   let caseStarted = 0;
   let audioEnabled = true;
@@ -79,6 +77,11 @@
   let ambientOscillator = null;
   let droneTellTimer = 0;
   let clueTimer = 0;
+  let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
+  let pointerActive = false;
+  let markHoldTimer = 0;
+  let markLocked = false;
+  let markedPoint = null;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const easeOut = value => 1 - Math.pow(1 - clamp(value, 0, 1), 3);
@@ -92,7 +95,12 @@
     canvas.height = Math.floor(height * dpr);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+    if (!booha.x) resetBooha();
     rebuildOverlays();
+  }
+
+  function resetBooha() {
+    booha = { x: width / 2, y: height * .74, targetX: width / 2, targetY: height * .74 };
   }
 
   function rebuildOverlays() {
@@ -226,44 +234,64 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#020202'; ctx.fillRect(0, 0, width, height);
+    moveBooha();
     if (baseImage.complete) {
+      // Keep the room plate readable, then let Booha's lantern reveal only a
+      // small moving circle at full brightness.
       ctx.save();
-      ctx.globalAlpha = state === 'caught' ? .46 : 1;
+      ctx.globalAlpha = state === 'caught' ? .07 : .16;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
       ctx.restore();
-      if (vignetteCanvas) ctx.drawImage(vignetteCanvas, 0, 0, width, height);
-      const darkness = (MAX_FLAMES - flames) * .105;
-      if (darkness) { ctx.fillStyle = `rgba(0,0,0,${darkness})`; ctx.fillRect(0, 0, width, height); }
+      const radius = lightRadius();
+      ctx.save();
+      ctx.beginPath(); ctx.arc(booha.x, booha.y, radius, 0, Math.PI * 2); ctx.clip();
+      ctx.globalAlpha = state === 'caught' ? .24 : 1;
+      ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
       drawAnomaly(currentAnomaly);
+      const light = ctx.createRadialGradient(booha.x, booha.y, radius * .48, booha.x, booha.y, radius);
+      light.addColorStop(0, 'rgba(0,0,0,0)');
+      light.addColorStop(1, 'rgba(0,0,0,.72)');
+      ctx.fillStyle = light; ctx.fillRect(booha.x - radius, booha.y - radius, radius * 2, radius * 2);
+      ctx.restore();
+      if (vignetteCanvas) ctx.drawImage(vignetteCanvas, 0, 0, width, height);
+      const darkness = (MAX_FLAMES - flames) * .06;
+      if (darkness) { ctx.fillStyle = `rgba(0,0,0,${darkness})`; ctx.fillRect(0, 0, width, height); }
     }
     if (scanlineCanvas) ctx.drawImage(scanlineCanvas, 0, 0, width, height);
     if (!REDUCED_MOTION && state !== 'title') {
       ctx.save(); ctx.globalAlpha = .035 + Math.sin(time / 260) * .012; ctx.fillStyle = '#fff'; ctx.fillRect(0, (time / 8) % height, width, 1); ctx.restore();
     }
     if (state !== 'caught') drawBooha(time);
-    if (state === 'transition') drawTransition(time);
+  }
+
+  function lightRadius() {
+    const radii = [0, .12, .18, .22, .26];
+    return Math.min(width, height) * (radii[clamp(flames, 0, MAX_FLAMES)] || .12);
+  }
+
+  function moveBooha() {
+    const ease = REDUCED_MOTION ? .28 : .12;
+    booha.x += (booha.targetX - booha.x) * ease;
+    booha.y += (booha.targetY - booha.y) * ease;
   }
 
   function drawBooha(time) {
-    const image = currentIsAnomaly && time - roundStarted > 2100 ? alertBooha : idleBooha;
+    const image = idleBooha;
     if (!image.complete) return;
-    const progress = easeOut((time - entryStarted) / 900);
     const size = clamp(Math.min(width, height) * .13, 66, 116);
-    const x = width / 2 - size / 2;
-    const y = height + size * .18 - progress * size * .82 + (REDUCED_MOTION ? 0 : Math.sin(time / 410) * 3);
+    const bob = REDUCED_MOTION ? 0 : Math.sin(time / 410) * 3;
     ctx.save();
     ctx.globalAlpha = .76;
     ctx.shadowColor = `rgba(229,176,89,${.24 + flames * .12})`;
     ctx.shadowBlur = 13 + flames * 3;
-    ctx.drawImage(image, x, y, size, size);
+    ctx.drawImage(image, booha.x - size / 2, booha.y - size / 2 + bob, size, size);
+    if (markLocked) {
+      ctx.globalAlpha = .9;
+      ctx.strokeStyle = '#e8b76c';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(booha.x, booha.y, size * .68, 0, Math.PI * 2); ctx.stroke();
+    }
     ctx.restore();
-  }
-
-  function drawTransition(time) {
-    const progress = clamp((time - transitionStarted) / (REDUCED_MOTION ? 1 : 420), 0, 1);
-    ctx.save(); ctx.globalAlpha = Math.sin(progress * Math.PI) * .12;
-    ctx.translate(transitionDirection === 'back' ? -progress * width * .025 : progress * width * .025, 0);
-    ctx.fillStyle = '#f0c783'; ctx.fillRect(0, 0, width, height); ctx.restore();
   }
 
   function frame(time) { drawRoom(time); animationFrame = requestAnimationFrame(frame); }
@@ -275,11 +303,11 @@
   }
 
   function hidePanels() { startPanel.classList.remove('visible'); messagePanel.classList.remove('visible'); }
-  function clearMarkingUi() { markPrompt.hidden = true; markSkip.hidden = true; clueCard.hidden = true; }
-  function updateHud() { observationNote.textContent = state === 'marking' ? 'THE ROOM REMEMBERS' : state === 'playing' ? currentTier().label : 'LOOK / LISTEN / REMEMBER'; updateFlames(); }
+  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; window.clearTimeout(markHoldTimer); markHoldTimer = 0; }
+  function updateHud() { observationNote.textContent = state === 'playing' ? (markLocked ? 'MARK LOCKED / LEAVE WHEN READY' : 'DRAG BOOHA / HOLD TO MARK') : 'LOOK / LISTEN / REMEMBER'; updateFlames(); }
 
   function startRound() {
-    state = 'playing'; roundStarted = performance.now(); entryStarted = roundStarted; transitionStarted = 0; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); chooseRound(); updateHud(); scheduleTell(); ping(176 + round * 13, .028);
+    state = 'playing'; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); scheduleTell(); ping(176 + round * 13, .028);
   }
 
   function enterRoom() {
@@ -306,18 +334,22 @@
     ambientOscillator.frequency.setTargetAtTime(42, audioContext.currentTime + .5, .1);
   }
 
-  function handleChoice(choice) {
+  function handleLeave() {
     if (state !== 'playing') return;
-    state = 'transition'; transitionDirection = choice; transitionStarted = performance.now(); controls.classList.add('hidden');
-    const choseStraight = choice === 'straight';
-    const correct = currentIsAnomaly ? !choseStraight : choseStraight;
+    state = 'transition'; controls.classList.add('hidden');
+    const [mx, my] = markedPoint || [0, 0];
+    const [tx, ty] = currentAnomaly ? currentPoint(currentAnomaly.target) : [0, 0];
+    const radius = currentAnomaly ? Math.max(30, Math.min(width, height) * currentAnomaly.target[2] * .72) : 0;
+    const markedAnomaly = Boolean(markedPoint && currentAnomaly && Math.hypot(mx - tx, my - ty) <= radius);
+    const correct = currentIsAnomaly ? markedAnomaly : !markedPoint;
     if (!correct) { wrongTone(); curtain.className = 'active catch'; window.setTimeout(handleWrong, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
-    window.setTimeout(() => { if (currentIsAnomaly) beginMarking(); else advanceCase(); }, REDUCED_MOTION ? 80 : 420);
+    if (currentIsAnomaly) { marks += 1; if (flames < MAX_FLAMES) flames += 1; showClue(); updateFlames(); }
+    window.setTimeout(advanceCase, currentIsAnomaly ? (REDUCED_MOTION ? 500 : 1450) : (REDUCED_MOTION ? 80 : 420));
   }
 
   function handleWrong() {
-    curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - 1); updateFlames();
+    curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - 1); clearMarkingUi(); updateFlames();
     if (flames > 0) { showMessage('THE ROOM GOT DARKER', 'TRY AGAIN.', 'The light is still here. Look once more, then choose.', 'LOOK AGAIN', () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
     state = 'caught'; observationNote.textContent = 'THE LANTERN WENT OUT';
     showMessage('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The case is not closed. Bring the light back and try the room again.', 'RESTART THE CASE', () => { messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); startRound(); });
@@ -327,27 +359,38 @@
     state = 'playing';
     roundStarted = performance.now();
     entryStarted = roundStarted;
-    transitionStarted = 0;
     curtain.className = '';
     controls.classList.remove('hidden');
     clearMarkingUi();
+    resetBooha();
     chooseRound();
     updateHud();
     scheduleTell();
   }
 
-  function beginMarking() { state = 'marking'; controls.classList.add('hidden'); markPrompt.hidden = false; markSkip.hidden = false; observationNote.textContent = 'THE ROOM REMEMBERS'; }
-
-  function handleMark(event) {
-    if (state !== 'marking' || !currentAnomaly) return;
+  function setBoohaTarget(event) {
+    if (state !== 'playing') return;
     const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left; const y = event.clientY - rect.top;
-    const [tx, ty] = currentPoint(currentAnomaly.target);
-    const radius = Math.max(30, Math.min(width, height) * currentAnomaly.target[2] * .72);
-    if (Math.hypot(x - tx, y - ty) > radius) { ping(84, .018); observationNote.textContent = 'NOT THERE / LOOK AGAIN'; return; }
-    marks += 1;
-    if (flames < MAX_FLAMES) flames += 1;
-    rightTone(); clearMarkingUi(); showClue(); updateFlames(); window.setTimeout(advanceCase, REDUCED_MOTION ? 500 : 1450);
+    booha.targetX = clamp(event.clientX - rect.left, 0, width);
+    booha.targetY = clamp(event.clientY - rect.top, 0, height);
+    pointerActive = true;
+    markLocked = false;
+    markedPoint = null;
+    window.clearTimeout(markHoldTimer);
+    markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
+    observationNote.textContent = 'HOLD BOOHA STILL';
+  }
+
+  function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event); }
+  function releaseBooha() { pointerActive = false; if (!markLocked) window.clearTimeout(markHoldTimer); }
+
+  function lockMark() {
+    markHoldTimer = 0;
+    if (state !== 'playing' || !pointerActive) return;
+    markLocked = true;
+    markedPoint = [booha.targetX, booha.targetY];
+    rightTone();
+    observationNote.textContent = 'MARK LOCKED / LEAVE WHEN READY';
   }
 
   function showClue() { clueEn.textContent = currentAnomaly.en; clueJp.textContent = currentAnomaly.jp; clueCard.hidden = false; observationNote.textContent = 'MARK RETURNED TO THE LANTERN'; window.clearTimeout(clueTimer); clueTimer = window.setTimeout(() => { clueCard.hidden = true; }, 1300); }
@@ -388,15 +431,16 @@
   function completeTone() { [330, 440, 660].forEach((frequency, index) => window.setTimeout(() => tone(frequency, .26, .035), index * 100)); }
 
   document.getElementById('start-button').addEventListener('click', enterRoom);
-  document.getElementById('straight-button').addEventListener('click', () => handleChoice('straight'));
-  document.getElementById('back-button').addEventListener('click', () => handleChoice('back'));
-  markSkip.addEventListener('click', advanceCase);
-  canvas.addEventListener('pointerdown', handleMark);
+  document.getElementById('leave-button').addEventListener('click', handleLeave);
+  canvas.addEventListener('pointerdown', setBoohaTarget);
+  canvas.addEventListener('pointermove', moveBoohaTarget);
+  canvas.addEventListener('pointerup', releaseBooha);
+  canvas.addEventListener('pointercancel', releaseBooha);
   soundToggle.addEventListener('click', toggleSound);
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; updateTierButtons(); }));
   window.addEventListener('resize', resize);
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); else { startLoop(); if (audioContext?.state === 'suspended' && audioEnabled) audioContext.resume(); } });
-  window.addEventListener('keydown', event => { if (event.key === 'Enter' && state === 'title') enterRoom(); if (event.key === 'ArrowUp' || event.key.toLowerCase() === 'w') handleChoice('straight'); if (event.key === 'ArrowDown' || event.key.toLowerCase() === 's') handleChoice('back'); });
+  window.addEventListener('keydown', event => { if (event.key === 'Enter' && state === 'title') enterRoom(); if ((event.key === 'Enter' || event.key === ' ') && state === 'playing') handleLeave(); });
 
   resize(); updateFlames(); updateTierButtons(); startLoop();
 })();
