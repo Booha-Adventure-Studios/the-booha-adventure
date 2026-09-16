@@ -18,6 +18,7 @@ const BoohaAdventureLog = (() => {
 
   const BLITZ_TYPES = ['vocab', 'sentence', 'question'];
   const JP_DAYS     = ['日', '月', '火', '水', '木', '金', '土'];
+  const BLITZ_TIER_LABELS = { perfect: 'PERFECT', clean: 'CLEAN', mastery: 'MASTERY' };
 
   /* ── Pure helpers (exposed for testing) ─────────────────────── */
 
@@ -58,7 +59,18 @@ const BoohaAdventureLog = (() => {
     });
     const blitzStamps = BLITZ_TYPES.map(t => {
       const key = `${curr}:${t}`;
-      return { id: t, ms: blitz[key] != null ? blitz[key] : null };
+      const raw = blitz[key];
+      const result = typeof raw === 'number'
+        ? { ms: raw, tier: 'perfect', mistakes: 0 }
+        : raw && typeof raw === 'object' && typeof raw.ms === 'number'
+          ? raw
+          : null;
+      return {
+        id: t,
+        ms: result?.ms ?? null,
+        tier: result?.tier || null,
+        mistakes: Number.isFinite(result?.mistakes) ? result.mistakes : null,
+      };
     });
 
     const advDone   = gameStamps.filter(s => s.pct != null).length;
@@ -212,10 +224,14 @@ const BoohaAdventureLog = (() => {
     });
     // 3 blitz stamps
     status.blitzStamps.forEach(s => {
-      const stamp = el('div', 'alog-stamp blitz' + (s.ms != null ? ' done' : ''));
+      const tierClass = s.tier ? ` blitz-tier-${s.tier}` : '';
+      const stamp = el('div', 'alog-stamp blitz' + (s.ms != null ? ' done' : '') + tierClass);
       stamp.appendChild(el('div', 'alog-stamp-glyph', s.ms != null ? '★' : ''));
       stamp.appendChild(el('div', 'alog-stamp-label', s.id.toUpperCase() + ' BLITZ'));
-      if (s.ms != null) stamp.appendChild(el('div', 'alog-stamp-pct', fmtMs(s.ms)));
+      if (s.ms != null) {
+        stamp.appendChild(el('div', 'alog-stamp-tier', BLITZ_TIER_LABELS[s.tier] || 'CLEAR'));
+        stamp.appendChild(el('div', 'alog-stamp-pct', fmtMs(s.ms)));
+      }
       grid.appendChild(stamp);
     });
     mount.appendChild(grid);

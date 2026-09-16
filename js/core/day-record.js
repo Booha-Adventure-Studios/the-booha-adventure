@@ -12,7 +12,8 @@
  *
  *   meta.weekLog["2026-08-30|august-w4"] = {
  *       adv:   { "br:vocab_tap": 92, ... }   // best pct per game this week
- *       blitz: { "vocab": 41.2, ... }        // best clear time (s), 100% only
+ *       blitz: { "vocab": { ms: 41200, tier: "clean", mistakes: 1 }, ... }
+ *                                                // best weekly clear result
  *       duel:  { "liar": { w: 2, p: 3 } }    // wins / plays
  *   }
  *
@@ -58,6 +59,26 @@ const BoohaDayRecord = (() => {
     return meta;
   }
 
+  const BLITZ_TIER_RANK = { mastery: 1, clean: 2, perfect: 3 };
+
+  function normalizeBlitzResult(value) {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      // Legacy numeric stamps were only written by record-eligible clears.
+      return { ms: value, tier: 'perfect', mistakes: 0 };
+    }
+    if (!value || typeof value !== 'object' || !Number.isFinite(value.ms)) return null;
+    const tier = BLITZ_TIER_RANK[value.tier] ? value.tier : 'perfect';
+    const mistakes = Number.isFinite(value.mistakes) ? Math.max(0, value.mistakes) : 0;
+    return { ms: value.ms, tier, mistakes };
+  }
+
+  function shouldReplaceBlitzResult(previous, next) {
+    if (!previous) return true;
+    const previousRank = BLITZ_TIER_RANK[previous.tier] || 0;
+    const nextRank = BLITZ_TIER_RANK[next.tier] || 0;
+    return nextRank > previousRank || (nextRank === previousRank && next.ms < previous.ms);
+  }
+
   /** Record one gameEnd event into dayLog + weekLog. */
   function record(detail) {
     const keys = _keys();
@@ -80,11 +101,18 @@ const BoohaDayRecord = (() => {
     const wk = meta.weekLog[keys.week] || { adv: {}, blitz: {}, duel: {} };
 
     if (saveId.startsWith('blitz:')) {
-      // Blitz reports best clear TIME; only 100% clears fire completed=true
+      // Blitz keeps the strongest clear tier as the weekly stamp. Legacy
+      // numeric values remain readable, while new clears retain mistakes and
+      // adjusted time for the profile.
       const id = saveId.slice(6);
-      if (completed && recordEligible !== false && typeof time === 'number') {
-        const best = wk.blitz[id];
-        if (best == null || time < best) wk.blitz[id] = time;
+      if (completed && typeof time === 'number' && Number.isFinite(time)) {
+        const next = normalizeBlitzResult({
+          ms: time,
+          tier: detail.clearTier,
+          mistakes: detail.mistakes,
+        });
+        const previous = normalizeBlitzResult(wk.blitz[id]);
+        if (next && shouldReplaceBlitzResult(previous, next)) wk.blitz[id] = next;
       }
     } else if (saveId.startsWith('duel:')) {
       const id = saveId.slice(5);
