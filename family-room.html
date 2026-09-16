@@ -46,7 +46,7 @@
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
       <p class="panel-kicker"><span>CASE FILE 02 / CHANOMA</span><span class="jp" lang="ja">じけんファイル 02 / ちゃのま</span></p>
       <h1 id="start-title"><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
-      <p class="panel-copy"><span>The room repeats. Drag Booha through the darkness. Hold him still where something changed, then report the room. If the room is clean, report it without marking anything.</span><span class="jp" lang="ja">へやは くりかえす。くらやみの なかで ブーハを ひっぱる。なにかが かわった ばしょで ブーハを じっと させて、しるしを つける。それから へやを ほうこくする。へやが きれいなら、しるしを つけずに ほうこくする。</span></p>
+      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha through the darkness, mark what changed, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。くらやみの なかで ブーハを ひっぱり、かわった ところに しるしを つけて、へやを ほうこくする。</span></p>
       <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves / へやの うごきを えらぶ">
         <button class="tier-button selected" type="button" data-tier="patient"><b><span>THE ROOM IS PATIENT</span><span class="jp" lang="ja">へやは おだやか</span></b><small><span>the first case</span><span class="jp" lang="ja">はじめの じけん</span></small></button>
         <button class="tier-button" type="button" data-tier="quicker"><b><span>THE ROOM IS QUICKER</span><span class="jp" lang="ja">へやは はやい</span></b><small><span>three fast Blitz stamps</span><span class="jp" lang="ja">ブリッツの はやい しるし みっつ</span></small></button>
@@ -54,7 +54,16 @@
       </div>
       <button id="start-button" class="primary-button" type="button"><span>ENTER THE ROOM</span><span class="jp" lang="ja">へやに はいる</span><span class="button-arrow" aria-hidden="true">→</span></button>
       <button id="back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
-      <p class="panel-foot"><span>Drag or use arrows · hold still / Space to mark · Enter to enter/report</span><span class="jp" lang="ja">ひっぱるか やじるしで うごかす · じっと させるか スペースで しるし · Enterで はいる/ほうこく</span></p>
+      <p class="panel-foot"><span>Enter opens the study · Drag or arrows move · Space to mark · Enter reports</span><span class="jp" lang="ja">Enterで へやを おぼえる · ひっぱるか やじるしで うごかす · スペースで しるし · Enterで ほうこく</span></p>
+    </section>
+
+    <section id="study-panel" class="panel study-panel" aria-labelledby="study-title" hidden>
+      <p class="panel-kicker"><span>CASE FILE 02 / CHANOMA</span><span class="jp" lang="ja">じけんファイル 02 / ちゃのま</span></p>
+      <h2 id="study-title"><span>STUDY THE ROOM.</span><span class="jp" lang="ja">へやを おぼえる。</span></h2>
+      <p class="panel-copy"><span>Take as long as you need. Remember what belongs here, and notice the way out. Start the case when you are ready.</span><span class="jp" lang="ja">じぶんの ペースで みる。ここに あるものと、でぐちを おぼえる。じゅんびが できたら、じけんを はじめる。</span></p>
+      <button id="study-start-button" class="primary-button" type="button"><span>START THE CASE</span><span class="jp" lang="ja">じけんを はじめる</span><span class="button-arrow" aria-hidden="true">→</span></button>
+      <button id="study-back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
+      <p class="panel-foot"><span>No timer. Start when ready.</span><span class="jp" lang="ja">じかんせいげんなし。じゅんびが できたら はじめる。</span></p>
     </section>
 
     <section id="message-panel" class="panel" aria-live="polite">
