@@ -16,10 +16,10 @@ assert.match(engine, /\.booha-blitz-streak-spark-large \{[\s\S]*?width: clamp\(1
   'high streak events must include one larger readable spark');
 assert.match(engine, /const fullCount = \(\{ 3: 6, 5: 12, 8: 20, 12: 32, 15: 48 \}\)\[threshold\] \|\| 6/,
   'high streak events must increase the particle burst across the unified ladder');
-assert.match(engine, /const count = isMinimalPower\(\) \? 3 : effectCount\(fullCount\)/,
-  'streak particle bursts must retain low-power limits');
-assert.match(engine, /const count = isMinimalPower\(\) \? 2 : isLowPower\(\) \? 4 : streak >= 5 \? 10 : 6/,
-  'correct feedback must keep modest bursts across reduced and minimal tiers');
+assert.match(engine, /function emitStreakSparks\(\)[\s\S]*?if \(isMinimalPower\(\)\) return;[\s\S]*?const count = effectCount\(fullCount\)/,
+  'streak particle bursts must retain low-power limits without hidden nodes');
+assert.match(engine, /const count = isLowPower\(\) \? 4 : streak >= 5 \? 10 : 6/,
+  'correct feedback must keep modest bursts across reduced tiers');
 assert.match(engine, /const size = 5 \+ Math\.random\(\) \* 6/,
   'celebration particles must avoid sub-five-pixel sizing');
 assert.match(engine, /\.booha-blitz-streak-spark \{ display: none; \}/,

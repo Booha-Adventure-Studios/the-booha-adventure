@@ -1972,8 +1972,9 @@ window.BoohaBlitzEngine = (() => {
       }
       function emitStreakSparks() {
         const threshold = arguments.length ? arguments[0] : 0;
+        if (isMinimalPower()) return;
         const fullCount = ({ 3: 6, 5: 12, 8: 20, 12: 32, 15: 48 })[threshold] || 6;
-        const count = isMinimalPower() ? 3 : effectCount(fullCount);
+        const count = effectCount(fullCount);
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
@@ -2515,6 +2516,7 @@ window.BoohaBlitzEngine = (() => {
       let visibilityPaused = false;
       let runEligibleForRecord = true;
       let mistakeCount = 0;
+      let questionOverlayRect = null;
       const initialQueueLength = queue.length;
 
       function setBackground(streakValue = streak) {
@@ -2651,12 +2653,13 @@ window.BoohaBlitzEngine = (() => {
         }, holdMs);
       }
 
-      function emitCorrectMicroBurst(correctBtn) {
-        const r = correctBtn.getBoundingClientRect();
-        const ovr = overlay.getBoundingClientRect();
+      function emitCorrectMicroBurst(correctBtn, answerRect, overlayRect) {
+        if (isMinimalPower()) return;
+        const r = answerRect || correctBtn.getBoundingClientRect();
+        const ovr = overlayRect || overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
         const cy = r.top - ovr.top + r.height / 2;
-        const count = isMinimalPower() ? 2 : isLowPower() ? 4 : streak >= 5 ? 10 : 6;
+        const count = isLowPower() ? 4 : streak >= 5 ? 10 : 6;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
@@ -2670,11 +2673,11 @@ window.BoohaBlitzEngine = (() => {
         overlay.appendChild(fragment);
       }
 
-      function correctDetonate(correctBtn) {
+      function correctDetonate(correctBtn, answerRect, overlayRect) {
         correctBtn.classList.add('micro-win');
         correctBtn.style.transition = 'none';
         correctBtn.style.background = palette.correct?.color || '#00ff64';
-        emitCorrectMicroBurst(correctBtn);
+        emitCorrectMicroBurst(correctBtn, answerRect, overlayRect);
         if (!REDUCED_MOTION) {
           overlay.style.transform = 'scale(1.02)';
           setTimeout(() => {
@@ -2703,8 +2706,8 @@ window.BoohaBlitzEngine = (() => {
             correctBtn.style.transition = 'transform 110ms ease, opacity 90ms ease';
             correctBtn.style.transform = 'scale(1.25)';
             correctBtn.style.opacity = '0';
-            const r = correctBtn.getBoundingClientRect();
-            const ovr = overlay.getBoundingClientRect();
+            const r = answerRect || correctBtn.getBoundingClientRect();
+            const ovr = overlayRect || overlay.getBoundingClientRect();
             const cx = r.left - ovr.left + r.width / 2;
             const cy = r.top - ovr.top + r.height / 2;
             const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
@@ -2750,12 +2753,13 @@ window.BoohaBlitzEngine = (() => {
         }, config.nextDelay || 200);
       }
 
-      function emitWrongMicroFeedback(wrongBtn) {
-        const r = wrongBtn.getBoundingClientRect();
-        const ovr = overlay.getBoundingClientRect();
+      function emitWrongMicroFeedback(wrongBtn, answerRect, overlayRect) {
+        if (isMinimalPower()) return;
+        const r = answerRect || wrongBtn.getBoundingClientRect();
+        const ovr = overlayRect || overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
         const cy = r.top - ovr.top + r.height / 2;
-        const count = isMinimalPower() ? 0 : isLowPower() ? 3 : 4;
+        const count = isLowPower() ? 3 : 4;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
@@ -2825,6 +2829,8 @@ window.BoohaBlitzEngine = (() => {
       function handleAnswer(btn, chosen, correct) {
         if (locked) return;
         locked = true;
+        const answerRect = isMinimalPower() ? null : btn.getBoundingClientRect();
+        const overlayRect = isMinimalPower() ? null : questionOverlayRect;
         startBGM();
         if (chosen.n === correct.n) {
           btn.classList.add('correct');
@@ -2832,7 +2838,7 @@ window.BoohaBlitzEngine = (() => {
           updateStreak();
           playCorrectHit();
           if (current >= queue.length) clearElapsed = performance.now() - startTime;
-          correctDetonate(btn);
+          correctDetonate(btn, answerRect, overlayRect);
           return;
         }
 
@@ -2847,7 +2853,7 @@ window.BoohaBlitzEngine = (() => {
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
           if (b.textContent === correct.en) b.classList.add('correct');
         });
-        emitWrongMicroFeedback(btn);
+        emitWrongMicroFeedback(btn, answerRect, overlayRect);
         playWrongHit();
         if (!REDUCED_MOTION) overlay.classList.add('shake');
         overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
@@ -2889,6 +2895,7 @@ window.BoohaBlitzEngine = (() => {
           btn.addEventListener('click', () => handleAnswer(btn, opt, card));
           optionsEl.appendChild(btn);
         });
+        questionOverlayRect = overlay.getBoundingClientRect();
         if (current === 0 && startTime === null && gameStarted) startTime = performance.now();
       }
 
