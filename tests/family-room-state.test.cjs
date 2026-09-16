@@ -56,7 +56,12 @@ assert(source.includes("playSfx('move', AUDIO_LEVELS.move)") && source.includes(
 assert(source.includes("playSfx(Math.random() < .5 ? 'jump1' : 'jump2', AUDIO_LEVELS.jump)"), 'failure must choose one of the two jump-scare screams');
 assert(serviceWorker.includes("`${BASE}/assets/`"), 'Family Room audio must use the runtime asset cache path');
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
-assert(markup.includes('id="leave-button"') && markup.includes('LEAVE THE ROOM'), 'the room must use one leave/report button');
+assert(markup.includes('id="leave-button"') && markup.includes('REPORT THE ROOM') && source.includes('REPORT & CONTINUE'), 'the room must use one explicit report/continue button');
+assert(markup.includes('id="start-button"') && markup.includes('ENTER THE ROOM') && markup.includes('へやに はいる'), 'the start action must clearly say enter the room in both languages');
+assert(markup.includes('id="back-button"') && markup.includes('BACK TO PROFILE'), 'back must be reserved for leaving the game');
+assert(markup.includes('id="observation-en"') && markup.includes('id="observation-jp"') && source.includes('HOLD BOOHA STILL'), 'marking guidance must have paired English and Japanese lines');
+assert(markup.includes('message-title-en') && markup.includes('message-title-jp') && markup.includes('message-button-en') && markup.includes('message-button-jp'), 'message panels must render bilingual pairs');
+assert(source.includes('function setBilingual') && source.includes('function setObservation') && source.includes('function setReportLabel'), 'dynamic room states must update both language lines together');
 
 function classList() {
   const values = new Set();
@@ -77,7 +82,7 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'transition-curtain', 'observation-note', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'flame-meter', 'start-button', 'leave-button'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'flame-meter', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
 nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
 const flames = [0, 1, 2].map(index => Object.assign(element(`flame-${index}`), { dataset: { flame: String(index) } }));

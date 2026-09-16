@@ -8,15 +8,15 @@
   <link rel="stylesheet" href="family-room.css" />
 </head>
 <body>
-  <main id="game-shell" aria-label="Family Room observation game">
-    <canvas id="room-canvas" aria-label="A dark family room. Drag Booha through the room and hold him still to mark a change."></canvas>
+  <main id="game-shell" aria-label="Family Room observation game / かぞくの へやの かんさつゲーム">
+    <canvas id="room-canvas" aria-label="A dark family room. Drag Booha through the room and hold him still to mark a change. くらい かぞくの へやで、ブーハを うごかして へんかに しるしを つけます。"></canvas>
 
     <header class="hud">
       <div class="hud-brand">
-        <span class="eyebrow">UTSUROBA / CASEWORK</span>
-        <span class="title">FAMILY ROOM</span>
-        <div id="andon" class="andon" role="status" aria-label="Lantern light is burning">
-          <span class="andon-light" aria-hidden="true"></span><span>ROOM LIGHT</span>
+        <span class="eyebrow"><span>UTSUROBA / CASEWORK</span><span class="jp" lang="ja">うつろば / じけん</span></span>
+        <span class="title"><span>FAMILY ROOM</span><span class="jp" lang="ja">かぞくの へや</span></span>
+        <div id="andon" class="andon" role="status" aria-label="Lantern light is burning / あんどんが もえている">
+          <span class="andon-light" aria-hidden="true"></span><span><span>ROOM LIGHT</span><span class="jp" lang="ja">へやの あかり</span></span>
         </div>
       </div>
       <div class="hud-right">
@@ -25,42 +25,43 @@
           <span class="flame" data-flame="1" aria-hidden="true">◆</span>
           <span class="flame" data-flame="2" aria-hidden="true">◆</span>
         </div>
-        <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="true">SOUND <span id="sound-state">ON</span></button>
+        <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="true"><span>SOUND</span><span class="jp" lang="ja">おと</span> <span id="sound-state">ON</span><span id="sound-state-jp" class="jp" lang="ja">オン</span></button>
       </div>
     </header>
 
-    <div id="observation-note" class="observation-note">LOOK / LISTEN / REMEMBER</div>
+    <div id="observation-note" class="observation-note"><span id="observation-en">LOOK / LISTEN / REMEMBER</span><span id="observation-jp" class="jp" lang="ja">みて / きいて / おぼえる</span></div>
     <div id="clue-card" class="clue-card" aria-live="polite" hidden>
-      <span class="clue-kicker">CASE NOTE</span>
+      <span class="clue-kicker"><span>CASE NOTE</span><span class="jp" lang="ja">じけんメモ</span></span>
       <strong id="clue-en"></strong>
       <span id="clue-jp" class="clue-jp"></span>
     </div>
 
-    <section id="controls" class="controls hidden" aria-label="Report the room">
+    <section id="controls" class="controls hidden" aria-label="Report the room / へやを ほうこくする">
       <button id="leave-button" class="choice-button leave-button" type="button">
         <span class="choice-arrow">↗</span>
-        <span><b>LEAVE THE ROOM</b><small>marked = changed · unmarked = clean</small></span>
+        <span class="choice-copy"><b><span id="leave-en">REPORT THE ROOM</span><span id="leave-jp" class="jp" lang="ja">へやを ほうこくする</span></b><small><span>marked = changed · unmarked = clean</span><span class="jp" lang="ja">しるし = へんか · しるしなし = きれい</span></small></span>
       </button>
     </section>
 
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
-      <p class="panel-kicker">CASE FILE 07 / FAMILY ROOM</p>
-      <h1 id="start-title">DON'T BLINK.</h1>
-      <p class="panel-copy">The room repeats. Drag Booha through the darkness. Hold him still where something changed, then leave. If the room is clean, leave without marking anything.</p>
-      <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves">
-        <button class="tier-button selected" type="button" data-tier="patient"><b>THE ROOM IS PATIENT</b><small>the first case</small></button>
-        <button class="tier-button" type="button" data-tier="quicker"><b>THE ROOM IS QUICKER</b><small>three fast Blitz stamps</small></button>
-        <button class="tier-button" type="button" data-tier="lies"><b>THE ROOM LIES TO YOU</b><small>three very fast stamps</small></button>
+      <p class="panel-kicker"><span>CASE FILE 07 / FAMILY ROOM</span><span class="jp" lang="ja">じけんファイル 07 / かぞくの へや</span></p>
+      <h1 id="start-title"><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
+      <p class="panel-copy"><span>The room repeats. Drag Booha through the darkness. Hold him still where something changed, then report the room. If the room is clean, report it without marking anything.</span><span class="jp" lang="ja">へやは くりかえす。くらやみの なかで ブーハを ひっぱる。なにかが かわった ばしょで ブーハを じっと させて、しるしを つける。それから へやを ほうこくする。へやが きれいなら、しるしを つけずに ほうこくする。</span></p>
+      <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves / へやの うごきを えらぶ">
+        <button class="tier-button selected" type="button" data-tier="patient"><b><span>THE ROOM IS PATIENT</span><span class="jp" lang="ja">へやは おだやか</span></b><small><span>the first case</span><span class="jp" lang="ja">はじめの じけん</span></small></button>
+        <button class="tier-button" type="button" data-tier="quicker"><b><span>THE ROOM IS QUICKER</span><span class="jp" lang="ja">へやは はやい</span></b><small><span>three fast Blitz stamps</span><span class="jp" lang="ja">ブリッツの はやい しるし みっつ</span></small></button>
+        <button class="tier-button" type="button" data-tier="lies"><b><span>THE ROOM LIES TO YOU</span><span class="jp" lang="ja">へやは うそを つく</span></b><small><span>three very fast stamps</span><span class="jp" lang="ja">ブリッツの とても はやい しるし みっつ</span></small></button>
       </div>
-      <button id="start-button" class="primary-button" type="button">ENTER THE ROOM <span>→</span></button>
-      <p class="panel-foot">Drag Booha to look &nbsp;·&nbsp; hold to mark &nbsp;·&nbsp; <kbd>Enter</kbd> leave</p>
+      <button id="start-button" class="primary-button" type="button"><span>ENTER THE ROOM</span><span class="jp" lang="ja">へやに はいる</span><span class="button-arrow" aria-hidden="true">→</span></button>
+      <button id="back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
+      <p class="panel-foot"><span>Drag Booha to look · hold to mark · Enter to enter/report</span><span class="jp" lang="ja">ブーハを ひっぱって みる · じっと させて しるし · Enterで はいる/ほうこく</span></p>
     </section>
 
     <section id="message-panel" class="panel" aria-live="polite">
-      <p id="message-kicker" class="panel-kicker"></p>
-      <h2 id="message-title"></h2>
-      <p id="message-copy" class="panel-copy"></p>
-      <button id="message-button" class="primary-button" type="button"></button>
+      <p id="message-kicker" class="panel-kicker"><span id="message-kicker-en"></span><span id="message-kicker-jp" class="jp" lang="ja"></span></p>
+      <h2 id="message-title"><span id="message-title-en"></span><span id="message-title-jp" class="jp" lang="ja"></span></h2>
+      <p id="message-copy" class="panel-copy"><span id="message-copy-en"></span><span id="message-copy-jp" class="jp" lang="ja"></span></p>
+      <button id="message-button" class="primary-button" type="button"><span id="message-button-en"></span><span id="message-button-jp" class="jp" lang="ja"></span></button>
     </section>
 
   <div id="transition-curtain" aria-hidden="true"></div>
