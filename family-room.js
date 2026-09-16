@@ -7,9 +7,9 @@
   const MAX_FLAMES = 3;
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', tellRounds: 3, falseTell: false },
-    quicker: { label: 'THE ROOM IS QUICKER', tellRounds: 2, falseTell: false },
-    lies: { label: 'THE ROOM LIES TO YOU', tellRounds: 0, falseTell: true },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, falseAlertChance: 0 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, falseAlertChance: 0 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, falseAlertChance: .15 },
   });
 
   const anomalies = [
@@ -67,6 +67,7 @@
   let correctCalls = 0;
   let currentAnomaly = null;
   let currentIsAnomaly = false;
+  let falseAlertPoint = null;
   let roundStarted = 0;
   let transitionStarted = 0;
   let entryStarted = 0;
@@ -184,6 +185,10 @@
   function chooseRound() {
     currentIsAnomaly = Math.random() >= .5;
     currentAnomaly = currentIsAnomaly ? random(anomalies) : null;
+    const tier = currentTier();
+    falseAlertPoint = !currentIsAnomaly && Math.random() < tier.falseAlertChance
+      ? { u: .12 + Math.random() * .76, v: .2 + Math.random() * .56, radius: .1 }
+      : null;
   }
 
   function currentPoint([u, v]) { return [plate.x + u * plate.w, plate.y + v * plate.h]; }
@@ -276,7 +281,7 @@
   }
 
   function drawBooha(time) {
-    const image = idleBooha;
+    const image = isBoohaAlerting() ? alertBooha : idleBooha;
     if (!image.complete) return;
     const size = clamp(Math.min(width, height) * .13, 66, 116);
     const bob = REDUCED_MOTION ? 0 : Math.sin(time / 410) * 3;
@@ -292,6 +297,20 @@
       ctx.beginPath(); ctx.arc(booha.x, booha.y, size * .68, 0, Math.PI * 2); ctx.stroke();
     }
     ctx.restore();
+  }
+
+  function alertTarget() {
+    if (currentIsAnomaly && currentAnomaly) return currentAnomaly.target;
+    if (falseAlertPoint) return [falseAlertPoint.u, falseAlertPoint.v, falseAlertPoint.radius];
+    return null;
+  }
+
+  function isBoohaAlerting() {
+    const target = alertTarget();
+    if (!target) return false;
+    const [tx, ty] = currentPoint(target);
+    const radius = Math.max(30, Math.min(width, height) * target[2] * .72) * currentTier().alertMultiplier;
+    return Math.hypot(booha.x - tx, booha.y - ty) <= radius;
   }
 
   function frame(time) { drawRoom(time); animationFrame = requestAnimationFrame(frame); }
@@ -319,8 +338,7 @@
 
   function scheduleTell() {
     window.clearTimeout(droneTellTimer);
-    const tier = currentTier();
-    const shouldTell = tier.falseTell ? Math.random() < .42 : currentIsAnomaly && round < tier.tellRounds;
+    const shouldTell = currentIsAnomaly || Boolean(falseAlertPoint);
     if (!shouldTell) return;
     droneTellTimer = window.setTimeout(() => { if (state === 'playing') tellPresence(); }, 900 + Math.random() * 500);
   }

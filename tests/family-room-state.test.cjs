@@ -22,6 +22,10 @@ assert(!source.includes("state = 'marking'"), 'marking must be part of observati
 assert(!source.includes('beginMarking') && !source.includes('mark-skip'), 'the old marking detour must be retired');
 assert(source.includes('MARK_HOLD_MS = 600') && source.includes('lockMark'), 'marking must require a hold before it locks');
 assert(source.includes('lightRadius') && source.includes('moveBooha'), 'Booha movement must drive the lantern reveal');
+assert(source.includes('alertMultiplier: 2') && source.includes('alertMultiplier: 1.2') && source.includes('alertMultiplier: 1'), 'alert distance must scale with the room tier');
+assert(source.includes('falseAlertChance: .15') && source.includes('falseAlertPoint'), 'the Lies tier must support false proximity alerts');
+assert(source.includes('function isBoohaAlerting()') && source.includes('currentPoint(target)'), 'Booha alerting must be proximity-based');
+assert(!source.includes('time - roundStarted > 2100'), 'the alert sprite must not be a timed giveaway');
 assert(markup.includes('id="leave-button"') && markup.includes('LEAVE THE ROOM'), 'the room must use one leave/report button');
 
 function classList() {
