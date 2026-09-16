@@ -74,6 +74,13 @@
     r      : isTouchDevice ? 58 : 44,
     href   : 'karasuki.html',
   };
+  const FAMILY_ROOM_PORTAL = {
+    roomId : 'room_05',
+    x      : 364,
+    y      : 246,
+    r      : isTouchDevice ? 64 : 50,
+    href   : 'family-room.html',
+  };
   const PAGE_ID = 'utsuroba';
   const UTSUROBA_MEMORY_MODES = ['start', 'fresh', 'deep'];
 
@@ -147,6 +154,14 @@
     return window.BoohaUnlockSystem &&
       typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
       ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
+      : false;
+  }
+
+  function familyRoomOpen() {
+    if (DEV_MODE || window.__devUtsuroba || window.__devFamilyRoom) return true;
+    return window.BoohaUnlockSystem &&
+      typeof BoohaUnlockSystem.isBonusGameUnlocked === 'function'
+      ? BoohaUnlockSystem.isBonusGameUnlocked('family_room')
       : false;
   }
 
@@ -1572,9 +1587,17 @@
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
     fadeEl.style.opacity    = '1';
     setTimeout(() => {
-      try { sessionStorage.setItem('utsuroba_return_room','room_05'); } catch(_) {}
+      try { sessionStorage.setItem('utsuroba_return_room','room_15'); } catch(_) {}
       window.location.href = KARASUKI_EXIT.href;
     }, FADE_MS+60);
+  }
+
+  function enterFamilyRoom() {
+    if (!familyRoomOpen() || state.inputLocked) return;
+    state.inputLocked = true;
+    state.clickTarget = null;
+    state.moving = false;
+    window.location.href = FAMILY_ROOM_PORTAL.href;
   }
 
   /* ═══════════════════════════════════════════
@@ -3343,6 +3366,81 @@
     return false;
   }
 
+  function clickCheckFamilyRoomPortal(wx, wy) {
+    if (state.roomId !== FAMILY_ROOM_PORTAL.roomId) return false;
+    if (Math.hypot(wx - FAMILY_ROOM_PORTAL.x, wy - FAMILY_ROOM_PORTAL.y) > FAMILY_ROOM_PORTAL.r) return false;
+    if (familyRoomOpen()) enterFamilyRoom();
+    return true;
+  }
+
+  function checkFamilyRoomPortal() {
+    if (state.roomId !== FAMILY_ROOM_PORTAL.roomId || !familyRoomOpen() || state.inputLocked) return;
+    if (Math.hypot(state.x - FAMILY_ROOM_PORTAL.x, state.y - FAMILY_ROOM_PORTAL.y) <= FAMILY_ROOM_PORTAL.r) enterFamilyRoom();
+  }
+
+  function drawFamilyRoomPortal(now) {
+    if (state.roomId !== FAMILY_ROOM_PORTAL.roomId) return;
+    const sec = now / 1000;
+    const open = familyRoomOpen();
+    const reveal = open ? 1 : Math.max(0.18, Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD));
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 1.7);
+    const wobble = Math.sin(sec * 1.1) * 4;
+    const cx = FAMILY_ROOM_PORTAL.x;
+    const cy = FAMILY_ROOM_PORTAL.y + wobble;
+    ctx.save();
+
+    // The open entrance is a sickly green breach in the room: the smoke is
+    // deliberately dark so the orb reads as an intrusion rather than a UI
+    // waypoint.
+    const haze = ctx.createRadialGradient(cx, cy, 0, cx, cy, 82 + pulse * 12);
+    haze.addColorStop(0, open ? 'rgba(190,255,35,0.30)' : 'rgba(55,65,20,0.12)');
+    haze.addColorStop(0.42, open ? 'rgba(101,160,0,0.17)' : 'rgba(18,20,12,0.15)');
+    haze.addColorStop(1, 'transparent');
+    ctx.globalAlpha = reveal * (0.7 + pulse * 0.2);
+    ctx.fillStyle = haze;
+    ctx.beginPath(); ctx.arc(cx, cy, 82 + pulse * 12, 0, Math.PI * 2); ctx.fill();
+
+    const smoke = [
+      [-31, 12, 31, 24, 0.2], [-20, -24, 27, 25, 1.1], [13, -29, 35, 22, 2.0],
+      [35, 5, 29, 26, 2.8], [18, 30, 33, 20, 3.6], [-27, 29, 28, 19, 4.4],
+    ];
+    smoke.forEach(([dx, dy, rx, ry, phase], index) => {
+      const px = cx + dx + Math.sin(sec * (0.42 + index * 0.025) + phase) * 7;
+      const py = cy + dy + Math.cos(sec * (0.36 + index * 0.02) + phase) * 5;
+      const puff = ctx.createRadialGradient(px - rx * 0.18, py - ry * 0.2, 2, px, py, Math.max(rx, ry));
+      puff.addColorStop(0, open ? 'rgba(0,0,0,0.66)' : 'rgba(0,0,0,0.38)');
+      puff.addColorStop(0.58, open ? 'rgba(3,6,1,0.34)' : 'rgba(8,8,5,0.20)');
+      puff.addColorStop(1, 'transparent');
+      ctx.save();
+      ctx.translate(px, py); ctx.scale(1, ry / rx);
+      ctx.globalAlpha = reveal * (0.52 + 0.14 * Math.sin(sec * 1.25 + phase));
+      ctx.fillStyle = puff; ctx.beginPath(); ctx.arc(0, 0, rx, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    });
+
+    if (open) {
+      ctx.globalAlpha = 0.65 + pulse * 0.2;
+      ctx.strokeStyle = '#9dff18'; ctx.lineWidth = 2; ctx.shadowBlur = 15; ctx.shadowColor = '#9dff18';
+      ctx.setLineDash([5, 8]); ctx.lineDashOffset = -sec * 10;
+      ctx.beginPath(); ctx.ellipse(cx, cy, 40 + pulse * 5, 25 + pulse * 4, sec * 0.18, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]); ctx.shadowBlur = 0;
+    }
+
+    const coreR = 10 + pulse * 3.5;
+    const core = ctx.createRadialGradient(cx - coreR * 0.32, cy - coreR * 0.34, 0, cx, cy, coreR);
+    core.addColorStop(0, open ? '#f4ffd5' : '#777957');
+    core.addColorStop(0.3, open ? '#d4ff69' : '#4e5335');
+    core.addColorStop(0.68, open ? '#9dff18' : '#292d18');
+    core.addColorStop(1, open ? '#315600' : '#080a06');
+    ctx.globalAlpha = reveal * (0.96 + pulse * 0.04);
+    ctx.shadowBlur = open ? 25 + pulse * 18 : 7;
+    ctx.shadowColor = open ? '#9dff18' : '#30351b';
+    ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+    ctx.globalAlpha = reveal * (open ? 0.72 : 0.25); ctx.fillStyle = open ? '#ffffff' : '#aaa978';
+    ctx.beginPath(); ctx.arc(cx - coreR * 0.3, cy - coreR * 0.3, coreR * 0.3, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
   /* ═══════════════════════════════════════════
      DRAW DRIFTERS
   ═══════════════════════════════════════════ */
@@ -3528,6 +3626,7 @@
     drawDrifters(now);
     drawExitArrows(now);
     drawKarasukiExitArrow(now);
+    drawFamilyRoomPortal(now);
 
     /* Ghost */
     const bobFreq  = (Math.PI*2)/(HOVER_PERIOD/1000);
@@ -3697,6 +3796,7 @@
   function handleWorldTap(wx,wy) {
     if (state.coordMode) { dropPin(wx,wy); ripples.push({x:wx,y:wy,life:1}); return; }
     if (clickCheckKarasukiExit(wx,wy)) { ripples.push({x:wx,y:wy,life:1}); return; }
+    if (clickCheckFamilyRoomPortal(wx,wy)) { ripples.push({x:wx,y:wy,life:1}); return; }
     if (clickCheckDrifter(wx,wy))      { ripples.push({x:wx,y:wy,life:1}); return; }
     state.clickTarget = { x:wx, y:wy }; ripples.push({x:wx,y:wy,life:1});
   }
@@ -3764,6 +3864,7 @@
         handleClickMovement(now);
         const unlocked = now >= state.spawnLockUntil && state.distMovedSinceSpawn >= ARROW_MOVE_THRESHOLD;
         if (unlocked) checkKarasukiExit();
+        if (unlocked) checkFamilyRoomPortal();
         if (unlocked) { const exit = getNPPExit(now); if (exit) { state.clickTarget=null; state.moving=false; transitionTo(exit); } }
       }
     }

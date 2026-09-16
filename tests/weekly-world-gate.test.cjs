@@ -113,6 +113,16 @@ assert.match(utsurobaSource, /if \(DEV_MODE\) window\.__devUtsuroba = true;/,
   'Utsuroba DEV mode must establish the test override');
 assert.match(utsurobaSource, /if \(DEV_MODE \|\| window\.__devUtsuroba\) return true;/,
   'Utsuroba DEV tools must be able to open the unfinished world');
+assert.match(utsurobaSource, /roomId : 'room_05'[\s\S]*?x      : 364[\s\S]*?y      : 246/,
+  'Family Room must be placed in Utsuroba room_05 at the requested coordinates');
+assert.match(utsurobaSource, /function drawFamilyRoomPortal\(now\)/,
+  'Utsuroba must draw the Family Room entrance portal');
+assert.match(utsurobaSource, /#9dff18/,
+  'the open Family Room portal must use an eerie lime orb');
+assert.match(utsurobaSource, /rgba\(0,0,0,0\.66\)/,
+  'the open Family Room portal must use black smoke');
+assert.match(utsurobaSource, /family-room\.html/,
+  'the Utsuroba portal must route to Family Room');
 assert.match(utsurobaSource, /showLockedWorld\(\)/,
   'Utsuroba should show a friendly locked state');
 assert.match(utsurobaSource, /href = 'profile\.html'/,
