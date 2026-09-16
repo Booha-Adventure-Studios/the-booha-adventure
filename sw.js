@@ -163,6 +163,7 @@ const CURRENT_CACHES = {
   // Family Room Pass 8: authored audio is fetched on room entry through the
   // existing runtime asset cache rather than added to the install-time core.
   // Family Room Pataskala pass: character poses use that same deferred path.
+  // Family Room Pass 1: portrait-safe anchors and plate-relative overlays.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };

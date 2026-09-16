@@ -42,6 +42,13 @@ assert(source.includes('const PATASKALA_POSES = [') && source.includes("characte
 assert(source.includes('assets/family-room/pataskala/${pose.id}.webp') && ['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => fs.existsSync(path.join(root, `assets/family-room/pataskala/${id}.webp`))), 'all Pataskala poses must load as authored transparent assets');
 assert(source.includes('function pataskalaChance') && source.includes('if (round < 2) return 0'), 'Pataskala must emerge progressively after the opening cases');
 assert(source.includes("selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2"), 'the emerging Pataskala pose must be reserved for the Lies tier');
+assert(source.includes('MARK_DEAD_ZONE_PX = 8') && source.includes('markHoldOrigin'), 'touch marking must tolerate small pointer tremor');
+assert(source.includes('plate.w * anomaly.artSize') && source.includes('plate.w * target[2]'), 'anomaly sizing and alert radii must follow the room plate');
+assert(source.includes('drawAnomaly(currentAnomaly);') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'anomalies must be faintly visible outside the lantern and the light rim must blend into the room');
+assert(source.includes('markedPoint = [booha.targetX, booha.targetY, lightRadius()]') && source.includes('markRadius'), 'marking must judge whether the anomaly is inside the lantern at lock time');
+assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 92'), 'Booha must leave more of the lantern reveal unobstructed');
+const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
+assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 assert(source.includes('const FAMILY_AUDIO = Object.freeze') && source.includes('family_BGM.mp3') && source.includes('family_jump-2.mp3'), 'the Family Room audio set must be declared');
 assert(source.includes('function loadAudioBuffers') && source.includes('function startBgm') && source.includes('function playSfx'), 'Family Room audio must use the shared WebAudio lifecycle');
 assert(source.includes('AUDIO_LEVELS = Object.freeze') && source.includes('master: .72'), 'Family Room audio must use a capped master volume');
@@ -117,7 +124,7 @@ vm.runInContext(source, context, { filename: 'family-room.js' });
 
 nodes['start-button'].onclick();
 for (let index = 0; index < 7; index += 1) {
-  nodes['room-canvas'].onpointerdown({ clientX: 174, clientY: 645 });
+  nodes['room-canvas'].onpointerdown({ clientX: 235, clientY: 476 });
   nodes['leave-button'].onclick();
 }
 
