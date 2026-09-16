@@ -9,17 +9,17 @@ const root = path.resolve(__dirname, '..');
 const engine = fs.readFileSync(path.join(root, 'js', 'blitz-engine.js'), 'utf8');
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 
-assert.match(engine, /function emitCorrectMicroBurst\(correctBtn, answerRect, overlayRect\) \{\s*if \(isMinimalPower\(\)\) return;/,
+assert.match(engine, /function emitCorrectMicroBurst\(correctBtn, answerRect, overlayRect\) \{\s*if \(isMinimalPower\(\) \|\| REDUCED_MOTION\) return;/,
   'minimal mode must skip correct-answer spark allocation entirely');
-assert.match(engine, /function emitStreakSparks\(\) \{\s*const threshold = arguments\.length \? arguments\[0\] : 0;\s*if \(isMinimalPower\(\)\) return;/,
+assert.match(engine, /function emitStreakSparks\(\) \{\s*const threshold = arguments\.length \? arguments\[0\] : 0;\s*if \(isMinimalPower\(\) \|\| REDUCED_MOTION\) return;/,
   'minimal mode must skip hidden streak spark allocation');
-assert.match(engine, /function emitWrongMicroFeedback\(wrongBtn, answerRect, overlayRect\) \{\s*if \(isMinimalPower\(\)\) return;/,
+assert.match(engine, /function emitWrongMicroFeedback\(wrongBtn, answerRect, overlayRect\) \{\s*if \(isMinimalPower\(\) \|\| REDUCED_MOTION\) return;/,
   'minimal mode must skip hidden wrong-answer spark allocation');
 assert.match(engine, /let questionOverlayRect = null;/,
   'the engine must retain one cached overlay rectangle per question');
 assert.match(engine, /questionOverlayRect = overlay\.getBoundingClientRect\(\);/,
   'the overlay rectangle must be captured after question layout');
-assert.match(engine, /const answerRect = isMinimalPower\(\) \? null : btn\.getBoundingClientRect\(\);/,
+assert.match(engine, /const answerRect = isMinimalPower\(\) \|\| REDUCED_MOTION \? null : btn\.getBoundingClientRect\(\);/,
   'the selected answer rectangle must be captured once at tap time');
 assert.match(engine, /correctDetonate\(btn, answerRect, overlayRect\);/,
   'correct feedback must consume the cached geometry');
