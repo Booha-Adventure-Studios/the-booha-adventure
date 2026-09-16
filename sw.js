@@ -175,6 +175,8 @@ const CURRENT_CACHES = {
   // are requested into the runtime cache when the room is entered.
   // Family Room Pass 5: Patient gets a forgiving burn window and keyboard play
   // restores arrow/WASD movement, Space marking, and Enter reporting.
+  // Family Room hardening: deferred audio/Pataskala assets use the same runtime
+  // cache request manifest while install-time room art remains fully precached.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };

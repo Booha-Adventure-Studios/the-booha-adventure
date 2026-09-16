@@ -18,6 +18,9 @@
   const AUDIO_LEVELS = Object.freeze({ bgm: .07, move: .16, anomaly: .34, jump: .58, master: .72 });
   const FAMILY_SFX_NAMES = Object.freeze(['move', 'anomaly', 'jump1', 'jump2']);
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const LOW_POWER = (Number.isFinite(window.navigator?.deviceMemory) && window.navigator.deviceMemory <= 2)
+    || (Number.isFinite(window.navigator?.hardwareConcurrency) && window.navigator.hardwareConcurrency <= 2);
+  if (LOW_POWER) document.documentElement.classList.add('low-power');
   const TIER_RULES = Object.freeze({
     patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 35000, progressPenalty: 0 },
     quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, jumpLevel: .4, burnMs: 18000, progressPenalty: 1 },
@@ -86,6 +89,11 @@
   const flameEls = [...document.querySelectorAll('[data-flame]')];
   const tierButtons = [...document.querySelectorAll('[data-tier]')];
 
+  const FAMILY_DEFERRED_ASSETS = Object.freeze([
+    ...Object.values(FAMILY_AUDIO),
+    ...PATASKALA_POSES.map(pose => `assets/family-room/pataskala/${pose.id}.webp`),
+  ]);
+
   const baseImage = new Image();
   baseImage.src = 'assets/family-room/living_base.webp';
   const idleBooha = new Image();
@@ -110,6 +118,7 @@
   let vignetteCanvas = null;
   let scanlineCanvas = null;
   let animationFrame = 0;
+  let resizeFrame = 0;
   let state = 'title';
   let selectedTier = 'patient';
   let round = 0;
@@ -146,21 +155,53 @@
   let markedPoint = null;
   let burnoutHandled = false;
   let failureStarted = 0;
+  let pauseStartedAt = 0;
+  let transitionTimer = 0;
+  let failureJumpTimer = 0;
+  let failurePanelTimer = 0;
+  let clueVersion = 0;
+  let roundToken = 0;
+  let completionSubmitted = false;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const easeOut = value => 1 - Math.pow(1 - clamp(value, 0, 1), 3);
   const random = list => list[Math.floor(Math.random() * list.length)];
 
   function resize() {
+    const oldWidth = width;
+    const oldHeight = height;
+    const hadViewport = oldWidth > 0 && oldHeight > 0;
+    const normalized = hadViewport ? {
+      x: booha.x / oldWidth,
+      y: booha.y / oldHeight,
+      targetX: booha.targetX / oldWidth,
+      targetY: booha.targetY / oldHeight,
+    } : null;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (LOW_POWER) dpr = Math.min(dpr, 1);
     width = window.innerWidth;
     height = window.innerHeight;
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
-    if (!booha.x) resetBooha();
+    if (normalized) {
+      booha.x = clamp(normalized.x * width, 0, width);
+      booha.y = clamp(normalized.y * height, 0, height);
+      booha.targetX = clamp(normalized.targetX * width, 0, width);
+      booha.targetY = clamp(normalized.targetY * height, 0, height);
+      if (state === 'playing' && (oldWidth !== width || oldHeight !== height)) {
+        clearMarkingUi();
+        setObservation('SCREEN CHANGED / MARK AGAIN', 'がめんが かわった / もういちど しるし');
+      }
+    } else resetBooha();
     rebuildOverlays();
+    if (!document.hidden) drawRoom(performance.now());
+  }
+
+  function scheduleResize() {
+    if (resizeFrame) return;
+    resizeFrame = window.requestAnimationFrame(() => { resizeFrame = 0; resize(); });
   }
 
   function resetBooha() {
@@ -302,7 +343,7 @@
   function drawAnomaly(anomaly) {
     if (!anomaly) return;
     const art = anomaly.character === 'pataskala' ? pataskalaArt[anomaly.id] : anomalyArt[anomaly.id];
-    if (!art?.complete) return;
+    if (!imageReady(art)) return;
     const [u, v] = anomaly.target;
     const [x, y] = currentPoint([u, v]);
     const sourceWidth = art.naturalWidth || 512;
@@ -319,6 +360,10 @@
     ctx.restore();
   }
 
+  function imageReady(image) {
+    return Boolean(image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0);
+  }
+
   function drawRoom(time) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
@@ -328,7 +373,7 @@
       return;
     }
     moveBooha();
-    if (baseImage.complete) {
+    if (imageReady(baseImage)) {
       // Keep the room plate readable, then let Booha's lantern reveal only a
       // small moving circle at full brightness.
       ctx.save();
@@ -378,7 +423,7 @@
   }
 
   function drawFailureBooha(time) {
-    if (!idleBooha.complete) return;
+    if (!imageReady(idleBooha)) return;
     const size = clamp(Math.min(width, height) * .075, 38, 62);
     const x = width / 2;
     const y = height * .7;
@@ -403,7 +448,7 @@
 
   function drawBooha(time) {
     const image = isBoohaAlerting() ? alertBooha : idleBooha;
-    if (!image.complete) return;
+    if (!imageReady(image)) return;
     const size = clamp(Math.min(width, height) * .1, 52, 92);
     const bob = REDUCED_MOTION ? 0 : Math.sin(time / 410) * 3;
     ctx.save();
@@ -434,9 +479,43 @@
     return Math.hypot(booha.x - tx, booha.y - ty) <= radius;
   }
 
-  function frame(time) { handleBurnout(time); updateAndon(time); drawRoom(time); animationFrame = requestAnimationFrame(frame); }
-  function startLoop() { if (!animationFrame) animationFrame = requestAnimationFrame(frame); }
+  function frame(time) {
+    animationFrame = 0;
+    if (document.hidden) return;
+    handleBurnout(time); updateAndon(time); drawRoom(time);
+    animationFrame = requestAnimationFrame(frame);
+  }
+  function startLoop() { if (!document.hidden && !animationFrame) animationFrame = requestAnimationFrame(frame); }
   function stopLoop() { if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = 0; } }
+
+  function shiftGameplayClocks(delta) {
+    if (!delta) return;
+    if (roundStarted) roundStarted += delta;
+    if (entryStarted) entryStarted += delta;
+    if (caseStarted) caseStarted += delta;
+    if (transitionStarted) transitionStarted += delta;
+    if (failureStarted) failureStarted += delta;
+  }
+
+  function pauseForVisibility() {
+    if (pauseStartedAt) return;
+    pauseStartedAt = performance.now();
+    releaseBooha();
+    stopLoop();
+    if (audioContext?.state === 'running' && typeof audioContext.suspend === 'function') audioContext.suspend().catch(() => {});
+  }
+
+  function resumeFromVisibility() {
+    if (!pauseStartedAt) return;
+    const resumedAt = performance.now();
+    shiftGameplayClocks(Math.max(0, resumedAt - pauseStartedAt));
+    pauseStartedAt = 0;
+    if (!document.hidden) {
+      if (audioContext?.state === 'suspended' && audioEnabled) audioContext.resume().catch(() => {});
+      updateAndon(resumedAt);
+      startLoop();
+    }
+  }
 
   function showMessage(message, handler) {
     setBilingual(messageKickerEn, messageKickerJp, message.kicker, message.kickerJp);
@@ -448,29 +527,47 @@
   }
 
   function hidePanels() { startPanel.classList.remove('visible'); messagePanel.classList.remove('visible'); }
-  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; markHoldOrigin = null; keyboardMarkActive = false; window.clearTimeout(markHoldTimer); markHoldTimer = 0; setReportLabel(false); }
+  function clearRoundTimers() {
+    window.clearTimeout(droneTellTimer); droneTellTimer = 0;
+    window.clearTimeout(transitionTimer); transitionTimer = 0;
+    window.clearTimeout(failureJumpTimer); failureJumpTimer = 0;
+    window.clearTimeout(failurePanelTimer); failurePanelTimer = 0;
+    transitionStarted = 0;
+  }
+  function clearMarkingUi() {
+    clueVersion += 1;
+    window.clearTimeout(clueTimer); clueTimer = 0;
+    clueCard.hidden = true;
+    markLocked = false; markedPoint = null; markHoldOrigin = null; keyboardMarkActive = false;
+    window.clearTimeout(markHoldTimer); markHoldTimer = 0;
+    setReportLabel(false);
+  }
   function updateHud() { if (state === 'playing') setObservation(markLocked ? 'MARK LOCKED / REPORT THE ROOM' : 'DRAG BOOHA / HOLD TO MARK', markLocked ? 'しるしを つけた / へやを ほうこくする' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markLocked); updateFlames(); }
 
   function startRound() {
-    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028);
+    clearRoundTimers();
+    roundToken += 1;
+    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
   }
 
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
-    round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); hidePanels(); requestFamilyRuntimeCache(); ensureAudio(); startRound();
+    round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); hidePanels(); requestFamilyRuntimeCache(); ensureAudio(); startRound();
   }
 
   function requestFamilyRuntimeCache() {
     const controller = window.navigator?.serviceWorker?.controller;
     if (!controller) return;
-    const urls = [
-      ...Object.values(FAMILY_AUDIO),
-      ...PATASKALA_POSES.map(pose => `assets/family-room/pataskala/${pose.id}.webp`),
-    ].map(url => new URL(url, window.location.href).pathname);
+    const urls = FAMILY_DEFERRED_ASSETS.map(url => new URL(url, window.location.href).pathname);
     controller.postMessage({ type: 'CACHE_URLS', payload: urls });
   }
 
-  function advanceCase() { progress = Math.min(CASE_ROUNDS, progress + 1); round += 1; if (progress >= CASE_ROUNDS) showComplete(); else startRound(); }
+  function advanceCase() {
+    if (state !== 'transition') return;
+    transitionTimer = 0;
+    progress = Math.min(CASE_ROUNDS, progress + 1); round += 1;
+    if (progress >= CASE_ROUNDS) showComplete(); else startRound();
+  }
 
   function scheduleTell() {
     window.clearTimeout(droneTellTimer);
@@ -490,22 +587,23 @@
 
   function handleLeave() {
     if (state !== 'playing') return;
-    state = 'transition'; controls.classList.add('hidden');
+    state = 'transition'; transitionStarted = performance.now(); controls.classList.add('hidden'); silenceDrone();
     const [mx, my] = markedPoint || [0, 0];
     const [tx, ty] = currentAnomaly ? currentPoint(currentAnomaly.target) : [0, 0];
     const markRadius = markedPoint?.[2] || 0;
     const markedAnomaly = Boolean(markedPoint && currentAnomaly && Math.hypot(mx - tx, my - ty) <= markRadius);
     const correct = currentIsAnomaly ? markedAnomaly : !markedPoint;
-    if (!correct) { wrongTone(); if (currentIsAnomaly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; window.setTimeout(handleWrong, REDUCED_MOTION ? 80 : 260); return; }
+    const token = roundToken;
+    if (!correct) { wrongTone(); if (currentIsAnomaly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
     if (currentIsAnomaly) { marks += 1; if (flames < MAX_FLAMES) flames += 1; showClue(); updateFlames(); }
-    window.setTimeout(advanceCase, currentIsAnomaly ? (REDUCED_MOTION ? 500 : 1450) : (REDUCED_MOTION ? 80 : 420));
+    transitionTimer = window.setTimeout(() => { if (token === roundToken) advanceCase(); }, currentIsAnomaly ? (REDUCED_MOTION ? 500 : 1450) : (REDUCED_MOTION ? 80 : 420));
   }
 
   function handleBurnout(time) {
     if (state !== 'playing' || burnoutHandled || time - roundStarted < currentTier().burnMs) return;
     burnoutHandled = true;
-    window.clearTimeout(droneTellTimer);
+    clearRoundTimers();
     flames = Math.max(0, flames - 1);
     wrongTone();
     updateFlames(); updateAndon(time);
@@ -519,13 +617,14 @@
   }
 
   function handleWrong() {
-    curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - currentTier().progressPenalty); clearMarkingUi(); updateFlames();
+    if (state !== 'transition') return;
+    transitionTimer = 0; transitionStarted = 0; curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - currentTier().progressPenalty); clearMarkingUi(); updateFlames();
     if (flames > 0) { showMessage(UI_COPY.roomDarker, () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
     beginFailure(UI_COPY.lightLostReport);
   }
 
   function restartCase() {
-    messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); startRound();
+    clearRoundTimers(); messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); startRound();
   }
 
   function silenceDrone() {
@@ -536,14 +635,15 @@
   }
 
   function beginFailure(message) {
-    state = 'caught'; failureStarted = performance.now(); setObservation('THE LANTERN WENT OUT', 'あかりが きえた'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
+    clearRoundTimers(); state = 'caught'; failureStarted = performance.now(); setObservation('THE LANTERN WENT OUT', 'あかりが きえた'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
     const jumpLevel = currentTier().jumpLevel ?? AUDIO_LEVELS.jump;
-    window.setTimeout(() => { if (state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
-    window.setTimeout(() => { if (state === 'caught' && failureStarted) showMessage(message, restartCase); }, FAILURE_PANEL_DELAY_MS);
+    const token = roundToken;
+    failureJumpTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
+    failurePanelTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) showMessage(message, restartCase); }, FAILURE_PANEL_DELAY_MS);
   }
 
   function retryRound() {
-    state = 'playing';
+    clearRoundTimers(); state = 'playing';
     burnoutHandled = false;
     roundStarted = performance.now();
     entryStarted = roundStarted;
@@ -561,6 +661,7 @@
     const rect = canvas.getBoundingClientRect();
     const nextX = clamp(event.clientX - rect.left, 0, width);
     const nextY = clamp(event.clientY - rect.top, 0, height);
+    canvas.setPointerCapture?.(event.pointerId);
     const startsHold = !pointerActive || !markHoldOrigin;
     const movedBeyondDeadZone = markHoldOrigin
       && Math.hypot(nextX - markHoldOrigin[0], nextY - markHoldOrigin[1]) > MARK_DEAD_ZONE_PX;
@@ -579,7 +680,12 @@
   }
 
   function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event); }
-  function releaseBooha() { pointerActive = false; markHoldOrigin = null; if (!markLocked) window.clearTimeout(markHoldTimer); }
+  function releaseBooha(event) {
+    pointerActive = false;
+    markHoldOrigin = null;
+    if (event?.pointerId != null) canvas.releasePointerCapture?.(event.pointerId);
+    if (!markLocked) { window.clearTimeout(markHoldTimer); markHoldTimer = 0; }
+  }
 
   function moveBoohaByKeyboard(dx, dy) {
     if (state !== 'playing' || markLocked) return;
@@ -623,13 +729,19 @@
     setObservation('MARK LOCKED / REPORT THE ROOM', 'しるしを つけた / へやを ほうこくする');
   }
 
-  function showClue() { clueEn.textContent = currentAnomaly.en; clueJp.textContent = currentAnomaly.jp; clueCard.hidden = false; setObservation('MARK RETURNED TO THE LANTERN', 'しるしが あかりに もどった'); window.clearTimeout(clueTimer); clueTimer = window.setTimeout(() => { clueCard.hidden = true; }, 1300); }
+  function showClue() {
+    clueEn.textContent = currentAnomaly.en; clueJp.textContent = currentAnomaly.jp; clueCard.hidden = false; setObservation('MARK RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
+    clueVersion += 1; const version = clueVersion; window.clearTimeout(clueTimer);
+    clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 1300);
+  }
 
   function submitResult() {
+    if (completionSubmitted) return;
+    completionSubmitted = true;
     document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId: SAVE_ID, score: marks, completed: true, time: performance.now() - caseStarted, recordEligible: true, recentRun: { marks, calls: correctCalls, tier: selectedTier } } }));
   }
 
-  function showComplete() { state = 'complete'; controls.classList.add('hidden'); clearMarkingUi(); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); showMessage(UI_COPY.complete, exitGame); }
+  function showComplete() { if (state === 'complete') return; clearRoundTimers(); state = 'complete'; controls.classList.add('hidden'); clearMarkingUi(); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); stopLoop(); showMessage(UI_COPY.complete, exitGame); }
 
   function exitGame() {
     try {
@@ -658,27 +770,34 @@
     }
     audioMasterGain.gain.setTargetAtTime(AUDIO_LEVELS.master, audioContext.currentTime, .04);
     loadAudioBuffers();
-    if (audioContext.state === 'suspended') audioContext.resume();
+    if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
   }
 
   function loadAudioBuffers() {
     if (!audioContext || typeof window.fetch !== 'function') return null;
     if (!sfxLoadPromise) {
-      sfxLoadPromise = Promise.all(FAMILY_SFX_NAMES.map(name => loadAudioBuffer(name, FAMILY_AUDIO[name])))
-        .catch(() => { sfxLoadPromise = null; });
+      sfxLoadPromise = Promise.allSettled(FAMILY_SFX_NAMES.map(name => loadAudioBuffer(name, FAMILY_AUDIO[name])))
+        .then(results => {
+          results.forEach((result, index) => {
+            if (result.status === 'rejected') console.warn(`[Family Room] SFX unavailable: ${FAMILY_SFX_NAMES[index]}`);
+          });
+          return results;
+        });
     }
     if (!bgmLoadPromise) {
       bgmLoadPromise = loadAudioBuffer('bgm', FAMILY_AUDIO.bgm)
         .then(() => { if (audioEnabled && state === 'playing') startBgm(); })
-        .catch(() => { bgmLoadPromise = null; });
+        .catch(() => { console.warn('[Family Room] BGM unavailable'); return false; });
     }
     return Promise.allSettled([sfxLoadPromise, bgmLoadPromise]);
   }
 
   async function loadAudioBuffer(name, url) {
-      const response = await window.fetch(url);
-      if (!response.ok) throw new Error(`Family Room audio failed: ${name}`);
-      audioBuffers[name] = await audioContext.decodeAudioData(await response.arrayBuffer());
+    if (audioBuffers[name]) return true;
+    const response = await window.fetch(url);
+    if (!response.ok) throw new Error(`Family Room audio failed: ${name}`);
+    audioBuffers[name] = await audioContext.decodeAudioData(await response.arrayBuffer());
+    return true;
   }
 
   function startBgm() {
@@ -713,8 +832,12 @@
   canvas.addEventListener('pointercancel', releaseBooha);
   soundToggle.addEventListener('click', toggleSound);
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; updateTierButtons(); }));
-  window.addEventListener('resize', resize);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); else { startLoop(); if (audioContext?.state === 'suspended' && audioEnabled) audioContext.resume(); } });
+  window.addEventListener('resize', scheduleResize);
+  window.addEventListener('orientationchange', scheduleResize);
+  window.visualViewport?.addEventListener('resize', scheduleResize);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pauseForVisibility(); else resumeFromVisibility(); });
+  window.addEventListener('pagehide', pauseForVisibility, { passive: true });
+  window.addEventListener('pageshow', resumeFromVisibility, { passive: true });
   window.addEventListener('keydown', event => {
     if (event.key === 'Enter' && state === 'title') { event.preventDefault?.(); enterRoom(); return; }
     if (state !== 'playing') return;
@@ -726,5 +849,5 @@
   });
   window.addEventListener('keyup', event => { if (event.key === ' ' || event.key === 'Spacebar') releaseKeyboardMark(); });
 
-  resize(); updateFlames(); updateAndon(); updateTierButtons(); startLoop();
+  resize(); updateFlames(); updateAndon(); updateTierButtons();
 })();
