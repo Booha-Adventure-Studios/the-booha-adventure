@@ -5,7 +5,16 @@
   const CASE_ROUNDS = 7;
   const MARK_HOLD_MS = 600;
   const FAILURE_SILENCE_MS = 1200;
+  const FAILURE_PANEL_DELAY_MS = 1800;
   const MAX_FLAMES = 3;
+  const FAMILY_AUDIO = Object.freeze({
+    bgm: 'assets/family-room/audio/family_BGM.mp3',
+    move: 'assets/family-room/audio/family_move-1.mp3',
+    anomaly: 'assets/family-room/audio/family_anomaly-1.mp3',
+    jump1: 'assets/family-room/audio/family_jump-1.mp3',
+    jump2: 'assets/family-room/audio/family_jump-2.mp3',
+  });
+  const AUDIO_LEVELS = Object.freeze({ bgm: .07, move: .16, anomaly: .34, jump: .58, master: .72 });
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
     patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, falseAlertChance: 0, burnMs: 25000 },
@@ -81,8 +90,13 @@
   let caseStarted = 0;
   let audioEnabled = true;
   let audioContext = null;
+  let audioMasterGain = null;
   let ambientGain = null;
   let ambientOscillator = null;
+  let bgmGain = null;
+  let bgmSource = null;
+  let audioBuffers = Object.create(null);
+  let audioLoadPromise = null;
   let droneTellTimer = 0;
   let clueTimer = 0;
   let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
@@ -363,7 +377,7 @@
   function updateHud() { observationNote.textContent = state === 'playing' ? (markLocked ? 'MARK LOCKED / LEAVE WHEN READY' : 'DRAG BOOHA / HOLD TO MARK') : 'LOOK / LISTEN / REMEMBER'; updateFlames(); }
 
   function startRound() {
-    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); scheduleTell(); ping(176 + round * 13, .028);
+    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028);
   }
 
   function enterRoom() {
@@ -377,7 +391,7 @@
     window.clearTimeout(droneTellTimer);
     const shouldTell = currentIsAnomaly || Boolean(falseAlertPoint);
     if (!shouldTell) return;
-    droneTellTimer = window.setTimeout(() => { if (state === 'playing') tellPresence(); }, 900 + Math.random() * 500);
+    droneTellTimer = window.setTimeout(() => { if (state === 'playing') { tellPresence(); playSfx('move', AUDIO_LEVELS.move); } }, 900 + Math.random() * 500);
   }
 
   function tellPresence() {
@@ -397,7 +411,7 @@
     const radius = currentAnomaly ? Math.max(30, Math.min(width, height) * currentAnomaly.target[2] * .72) : 0;
     const markedAnomaly = Boolean(markedPoint && currentAnomaly && Math.hypot(mx - tx, my - ty) <= radius);
     const correct = currentIsAnomaly ? markedAnomaly : !markedPoint;
-    if (!correct) { wrongTone(); curtain.className = 'active catch'; window.setTimeout(handleWrong, REDUCED_MOTION ? 80 : 260); return; }
+    if (!correct) { wrongTone(); if (currentIsAnomaly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; window.setTimeout(handleWrong, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
     if (currentIsAnomaly) { marks += 1; if (flames < MAX_FLAMES) flames += 1; showClue(); updateFlames(); }
     window.setTimeout(advanceCase, currentIsAnomaly ? (REDUCED_MOTION ? 500 : 1450) : (REDUCED_MOTION ? 80 : 420));
@@ -437,8 +451,9 @@
   }
 
   function beginFailure(kicker, title, copy) {
-    state = 'caught'; failureStarted = performance.now(); observationNote.textContent = 'THE LANTERN WENT OUT'; silenceDrone(); updateAndon();
-    window.setTimeout(() => { if (state === 'caught' && failureStarted) showMessage(kicker, title, copy, 'RESTART THE CASE', restartCase); }, FAILURE_SILENCE_MS);
+    state = 'caught'; failureStarted = performance.now(); observationNote.textContent = 'THE LANTERN WENT OUT'; silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
+    window.setTimeout(() => { if (state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', AUDIO_LEVELS.jump); }, FAILURE_SILENCE_MS + 60);
+    window.setTimeout(() => { if (state === 'caught' && failureStarted) showMessage(kicker, title, copy, 'RESTART THE CASE', restartCase); }, FAILURE_PANEL_DELAY_MS);
   }
 
   function retryRound() {
@@ -497,19 +512,48 @@
   }
 
   function toggleSound() {
-    audioEnabled = !audioEnabled; soundState.textContent = audioEnabled ? 'ON' : 'OFF'; soundToggle.setAttribute('aria-pressed', String(audioEnabled)); if (audioEnabled) ensureAudio(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12);
+    audioEnabled = !audioEnabled; soundState.textContent = audioEnabled ? 'ON' : 'OFF'; soundToggle.setAttribute('aria-pressed', String(audioEnabled)); if (audioEnabled) ensureAudio(); if (audioMasterGain && audioContext) audioMasterGain.gain.setTargetAtTime(audioEnabled ? AUDIO_LEVELS.master : 0, audioContext.currentTime, .04); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12);
   }
 
   function ensureAudio() {
     if (!audioEnabled) return;
     const AudioContextClass = window.AudioContext || window.webkitAudioContext; if (!AudioContextClass) return;
-    if (!audioContext) { audioContext = new AudioContextClass(); ambientOscillator = audioContext.createOscillator(); ambientGain = audioContext.createGain(); ambientOscillator.type = 'sine'; ambientOscillator.frequency.value = 42; ambientGain.gain.value = .014; ambientOscillator.connect(ambientGain).connect(audioContext.destination); ambientOscillator.start(); }
+    if (!audioContext) {
+      audioContext = new AudioContextClass();
+      audioMasterGain = audioContext.createGain(); audioMasterGain.gain.value = AUDIO_LEVELS.master; audioMasterGain.connect(audioContext.destination);
+      ambientOscillator = audioContext.createOscillator(); ambientGain = audioContext.createGain(); ambientOscillator.type = 'sine'; ambientOscillator.frequency.value = 42; ambientGain.gain.value = .014; ambientOscillator.connect(ambientGain).connect(audioMasterGain); ambientOscillator.start();
+    }
+    audioMasterGain.gain.setTargetAtTime(AUDIO_LEVELS.master, audioContext.currentTime, .04);
+    loadAudioBuffers();
     if (audioContext.state === 'suspended') audioContext.resume();
+  }
+
+  function loadAudioBuffers() {
+    if (!audioContext || audioLoadPromise || typeof window.fetch !== 'function') return audioLoadPromise;
+    audioLoadPromise = Promise.all(Object.entries(FAMILY_AUDIO).map(async ([name, url]) => {
+      const response = await window.fetch(url);
+      if (!response.ok) throw new Error(`Family Room audio failed: ${name}`);
+      audioBuffers[name] = await audioContext.decodeAudioData(await response.arrayBuffer());
+    })).then(() => { if (audioEnabled && state === 'playing') startBgm(); }).catch(() => { audioLoadPromise = null; });
+    return audioLoadPromise;
+  }
+
+  function startBgm() {
+    if (!audioEnabled || !audioContext || bgmSource || !audioBuffers.bgm) return;
+    bgmSource = audioContext.createBufferSource(); bgmGain = audioContext.createGain();
+    bgmSource.buffer = audioBuffers.bgm; bgmSource.loop = true; bgmGain.gain.value = AUDIO_LEVELS.bgm;
+    bgmSource.connect(bgmGain).connect(audioMasterGain); bgmSource.start();
+  }
+
+  function playSfx(name, level) {
+    if (!audioEnabled || !audioContext || !audioBuffers[name]) return;
+    const source = audioContext.createBufferSource(); const gain = audioContext.createGain();
+    source.buffer = audioBuffers[name]; gain.gain.value = level; source.connect(gain).connect(audioMasterGain); source.start();
   }
 
   function tone(frequency, duration, volume, type = 'sine') {
     if (!audioEnabled || !audioContext) return;
-    const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain(); oscillator.type = type; oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime); gain.gain.setValueAtTime(volume, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + duration); oscillator.connect(gain).connect(audioContext.destination); oscillator.start(); oscillator.stop(audioContext.currentTime + duration);
+    const oscillator = audioContext.createOscillator(); const gain = audioContext.createGain(); oscillator.type = type; oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime); gain.gain.setValueAtTime(volume, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + duration); oscillator.connect(gain).connect(audioMasterGain || audioContext.destination); oscillator.start(); oscillator.stop(audioContext.currentTime + duration);
   }
 
   function ping(frequency, volume) { tone(frequency, .12, volume); }
