@@ -1313,6 +1313,13 @@ else
   bad "Blitz Pass 5 performance audit failed"
 fi
 
+echo "[blitz] Pass 6 accessibility audit"
+if node tests/blitz-pass6-accessibility-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz reduced-motion accessibility contracts pass"
+else
+  bad "Blitz Pass 6 accessibility audit failed"
+fi
+
 echo "[blitz] Pass 4 compositor audit"
 if node tests/blitz-pass4-compositor-audit.cjs >/dev/null 2>&1; then
   ok "Blitz compositor-friendly glow and celebration contracts pass"

@@ -4,8 +4,8 @@ const assert = require('assert');
 const engine = fs.readFileSync('js/blitz-engine.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /const HARDWARE_PERFORMANCE_TIER = REDUCED_MOTION[\s\S]*?'minimal'[\s\S]*?'reduced'[\s\S]*?'full'/,
-  'Blitz must expose full, reduced, and minimal performance tiers');
+assert.match(engine, /const HARDWARE_PERFORMANCE_TIER = typeof navigator !== 'undefined'[\s\S]*?'reduced' : 'full';/,
+  'Blitz must derive performance tiers from hardware hints, not accessibility preferences');
 assert.match(engine, /function performanceTier\(\)[\s\S]*?return RUNTIME_PERFORMANCE_TIER \|\| HARDWARE_PERFORMANCE_TIER;/,
   'the active tier must combine per-launch runtime measurement with the hardware hint');
 assert.match(engine, /function effectCount\(fullCount\)[\s\S]*?isMinimalPower\(\)[\s\S]*?isLowPower\(\)/,

@@ -5,7 +5,7 @@ const engine = fs.readFileSync('js/blitz-engine.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
 assert.match(engine, /const LOW_POWER =/, 
-  'existing hardware and reduced-motion low-power detection must remain');
+  'existing hardware low-power detection must remain separate from motion preferences');
 assert.match(engine, /let RUNTIME_LOW_POWER = false;/,
   'runtime low-power state must be tracked separately from the startup hint');
 assert.match(engine, /function monitorFramePerformance\(overlay, onPoorPerformance(?:, onProgress)?\)/,

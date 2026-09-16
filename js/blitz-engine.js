@@ -81,12 +81,10 @@ window.BoohaBlitzEngine = (() => {
   const PERFORMANCE_WINDOW_MS = 2600;
   const REDUCED_MOTION = typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const HARDWARE_PERFORMANCE_TIER = REDUCED_MOTION
-    ? 'minimal'
-    : typeof navigator !== 'undefined' && (
-      (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
-      (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
-    ) ? 'reduced' : 'full';
+  const HARDWARE_PERFORMANCE_TIER = typeof navigator !== 'undefined' && (
+    (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
+    (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
+  ) ? 'reduced' : 'full';
   const BLITZ_DIAGNOSTIC_ENABLED = (() => {
     try {
       const search = typeof window !== 'undefined' && window.location ? window.location.search : '';
@@ -1972,7 +1970,7 @@ window.BoohaBlitzEngine = (() => {
       }
       function emitStreakSparks() {
         const threshold = arguments.length ? arguments[0] : 0;
-        if (isMinimalPower()) return;
+        if (isMinimalPower() || REDUCED_MOTION) return;
         const fullCount = ({ 3: 6, 5: 12, 8: 20, 12: 32, 15: 48 })[threshold] || 6;
         const count = effectCount(fullCount);
         const fragment = document.createDocumentFragment();
@@ -2654,7 +2652,7 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function emitCorrectMicroBurst(correctBtn, answerRect, overlayRect) {
-        if (isMinimalPower()) return;
+        if (isMinimalPower() || REDUCED_MOTION) return;
         const r = answerRect || correctBtn.getBoundingClientRect();
         const ovr = overlayRect || overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
@@ -2737,6 +2735,13 @@ window.BoohaBlitzEngine = (() => {
               setTimeout(() => { flashEl.style.opacity = '0'; flashEl.style.background = ''; }, 55);
             }, 35);
           }, 110);
+        } else {
+          flashEl.style.background = palette.accent;
+          flashEl.style.opacity = '0.45';
+          setTimeout(() => {
+            flashEl.style.opacity = '0';
+            flashEl.style.background = '';
+          }, 90);
         }
 
         setTimeout(() => {
@@ -2754,7 +2759,7 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function emitWrongMicroFeedback(wrongBtn, answerRect, overlayRect) {
-        if (isMinimalPower()) return;
+        if (isMinimalPower() || REDUCED_MOTION) return;
         const r = answerRect || wrongBtn.getBoundingClientRect();
         const ovr = overlayRect || overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
@@ -2829,8 +2834,8 @@ window.BoohaBlitzEngine = (() => {
       function handleAnswer(btn, chosen, correct) {
         if (locked) return;
         locked = true;
-        const answerRect = isMinimalPower() ? null : btn.getBoundingClientRect();
-        const overlayRect = isMinimalPower() ? null : questionOverlayRect;
+        const answerRect = isMinimalPower() || REDUCED_MOTION ? null : btn.getBoundingClientRect();
+        const overlayRect = isMinimalPower() || REDUCED_MOTION ? null : questionOverlayRect;
         startBGM();
         if (chosen.n === correct.n) {
           btn.classList.add('correct');
