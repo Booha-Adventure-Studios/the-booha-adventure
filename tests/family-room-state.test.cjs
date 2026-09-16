@@ -14,7 +14,7 @@ assert(!source.includes('round-number'), 'the case must not expose a round count
 assert(!source.includes('localStorage'), 'the room must use the shared save/event layer');
 assert(!source.includes('creature-1'), 'the photoreal creature beat must be retired');
 assert(source.includes('saveId: SAVE_ID'), 'the room must submit a registered save id');
-assert(source.includes('progress = Math.max(0, progress - 1)'), 'wrong calls must lower hidden case progress');
+assert(source.includes('progress = Math.max(0, progress - currentTier().progressPenalty)'), 'wrong calls must apply the selected tier progress penalty');
 assert(source.includes('if (flames < MAX_FLAMES) flames += 1'), 'a correct mark must return lantern light only below maximum');
 assert(source.includes('function retryRound()') && source.includes('chooseRound();'), 'a wrong call must reroll the room before retrying');
 assert(!source.includes("['pb:vocab', 'pb:sentence', 'pb:question']"), 'tier gates must not be hard-coded to Pre-Boo');
@@ -28,7 +28,8 @@ assert(source.includes('realTellChance: 1') && source.includes('realTellChance: 
 assert(source.includes('falseAlertChance: .25') && source.includes('falseAlertPoint') && source.includes('const shouldTell = tellAvailable'), 'the Lies tier must support uncertain and false proximity alerts');
 assert(source.includes('function isBoohaAlerting()') && source.includes('currentPoint(target)'), 'Booha alerting must be proximity-based');
 assert(!source.includes('time - roundStarted > 2100'), 'the alert sprite must not be a timed giveaway');
-assert(source.includes('burnMs: 25000') && source.includes('burnMs: 18000') && source.includes('burnMs: 12000'), 'each room tier must have its own lantern burn window');
+assert(source.includes('burnMs: 35000') && source.includes('burnMs: 18000') && source.includes('burnMs: 12000'), 'each room tier must have its own lantern burn window');
+assert(source.includes('progressPenalty: 0') && source.includes('progressPenalty: 1') && source.includes('currentTier().progressPenalty'), 'Patient must recover from a wrong report without losing case progress');
 assert(source.includes('function handleBurnout(time)') && source.includes('flames = Math.max(0, flames - 1)'), 'burnout must cost one flame');
 assert(source.includes('function updateAndon') && source.includes('THE ANDON WENT DARK'), 'the lantern clock must use a dimming andon, not a number');
 assert(markup.includes('id="andon"') && markup.includes('ROOM LIGHT'), 'the lantern burn indicator must have a corner status element');
@@ -66,6 +67,8 @@ assert(markup.includes('id="back-button"') && markup.includes('BACK TO PROFILE')
 assert(markup.includes('id="observation-en"') && markup.includes('id="observation-jp"') && source.includes('HOLD BOOHA STILL'), 'marking guidance must have paired English and Japanese lines');
 assert(markup.includes('message-title-en') && markup.includes('message-title-jp') && markup.includes('message-button-en') && markup.includes('message-button-jp'), 'message panels must render bilingual pairs');
 assert(source.includes('function setBilingual') && source.includes('function setObservation') && source.includes('function setReportLabel'), 'dynamic room states must update both language lines together');
+assert(source.includes('function moveBoohaByKeyboard') && source.includes('arrowup') && source.includes('function startKeyboardMark') && source.includes('function releaseKeyboardMark'), 'keyboard play must support movement and hold-to-mark');
+assert(markup.includes('Space to mark') && markup.includes('スペースで しるし'), 'keyboard instructions must be bilingual');
 
 function classList() {
   const values = new Set();

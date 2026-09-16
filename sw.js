@@ -168,6 +168,8 @@ const CURRENT_CACHES = {
   // Family Room Pass 3: tiered presence tells and failure sting levels.
   // Family Room Pass 4: Pataskala is install-safe; audio and remaining art
   // are requested into the runtime cache when the room is entered.
+  // Family Room Pass 5: Patient gets a forgiving burn window and keyboard play
+  // restores arrow/WASD movement, Space marking, and Enter reporting.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };

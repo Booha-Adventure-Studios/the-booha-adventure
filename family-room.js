@@ -19,9 +19,9 @@
   const FAMILY_SFX_NAMES = Object.freeze(['move', 'anomaly', 'jump1', 'jump2']);
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 25000 },
-    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, jumpLevel: .4, burnMs: 18000 },
-    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, jumpLevel: .58, burnMs: 12000 },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 35000, progressPenalty: 0 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, jumpLevel: .4, burnMs: 18000, progressPenalty: 1 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, jumpLevel: .58, burnMs: 12000, progressPenalty: 1 },
   });
 
   const UI_COPY = Object.freeze({
@@ -139,6 +139,7 @@
   let clueTimer = 0;
   let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let pointerActive = false;
+  let keyboardMarkActive = false;
   let markHoldOrigin = null;
   let markHoldTimer = 0;
   let markLocked = false;
@@ -447,7 +448,7 @@
   }
 
   function hidePanels() { startPanel.classList.remove('visible'); messagePanel.classList.remove('visible'); }
-  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; markHoldOrigin = null; window.clearTimeout(markHoldTimer); markHoldTimer = 0; setReportLabel(false); }
+  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; markHoldOrigin = null; keyboardMarkActive = false; window.clearTimeout(markHoldTimer); markHoldTimer = 0; setReportLabel(false); }
   function updateHud() { if (state === 'playing') setObservation(markLocked ? 'MARK LOCKED / REPORT THE ROOM' : 'DRAG BOOHA / HOLD TO MARK', markLocked ? 'しるしを つけた / へやを ほうこくする' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markLocked); updateFlames(); }
 
   function startRound() {
@@ -518,7 +519,7 @@
   }
 
   function handleWrong() {
-    curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - 1); clearMarkingUi(); updateFlames();
+    curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - currentTier().progressPenalty); clearMarkingUi(); updateFlames();
     if (flames > 0) { showMessage(UI_COPY.roomDarker, () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
     beginFailure(UI_COPY.lightLostReport);
   }
@@ -565,6 +566,7 @@
       && Math.hypot(nextX - markHoldOrigin[0], nextY - markHoldOrigin[1]) > MARK_DEAD_ZONE_PX;
     booha.targetX = nextX;
     booha.targetY = nextY;
+    keyboardMarkActive = false;
     pointerActive = true;
     if (startsHold || (!markLocked && movedBeyondDeadZone)) {
       markHoldOrigin = [nextX, nextY];
@@ -579,9 +581,41 @@
   function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event); }
   function releaseBooha() { pointerActive = false; markHoldOrigin = null; if (!markLocked) window.clearTimeout(markHoldTimer); }
 
+  function moveBoohaByKeyboard(dx, dy) {
+    if (state !== 'playing' || markLocked) return;
+    const step = Math.max(28, Math.min(width, height) * .06);
+    booha.targetX = clamp(booha.targetX + dx * step, 0, width);
+    booha.targetY = clamp(booha.targetY + dy * step, 0, height);
+    if (keyboardMarkActive) {
+      markHoldOrigin = [booha.targetX, booha.targetY];
+      window.clearTimeout(markHoldTimer);
+      markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
+    } else {
+      setObservation('ARROWS MOVE BOOHA / SPACE MARKS', 'やじるしで ブーハを うごかす / スペースで しるし');
+    }
+  }
+
+  function startKeyboardMark() {
+    if (state !== 'playing' || markLocked) return;
+    keyboardMarkActive = true;
+    pointerActive = false;
+    markHoldOrigin = [booha.targetX, booha.targetY];
+    window.clearTimeout(markHoldTimer);
+    markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
+    setObservation('HOLD SPACE STILL', 'スペースを じっと おす');
+  }
+
+  function releaseKeyboardMark() {
+    keyboardMarkActive = false;
+    if (!markLocked) {
+      markHoldOrigin = null;
+      window.clearTimeout(markHoldTimer);
+    }
+  }
+
   function lockMark() {
     markHoldTimer = 0;
-    if (state !== 'playing' || !pointerActive) return;
+    if (state !== 'playing' || (!pointerActive && !keyboardMarkActive)) return;
     markLocked = true;
     markedPoint = [booha.targetX, booha.targetY, lightRadius()];
     rightTone();
@@ -681,7 +715,16 @@
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; updateTierButtons(); }));
   window.addEventListener('resize', resize);
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); else { startLoop(); if (audioContext?.state === 'suspended' && audioEnabled) audioContext.resume(); } });
-  window.addEventListener('keydown', event => { if (event.key === 'Enter' && state === 'title') enterRoom(); if ((event.key === 'Enter' || event.key === ' ') && state === 'playing') handleLeave(); });
+  window.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && state === 'title') { event.preventDefault?.(); enterRoom(); return; }
+    if (state !== 'playing') return;
+    const key = event.key.toLowerCase();
+    const movement = { arrowup: [0, -1], w: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], arrowright: [1, 0], d: [1, 0] }[key];
+    if (movement) { event.preventDefault?.(); moveBoohaByKeyboard(...movement); return; }
+    if ((event.key === ' ' || event.key === 'Spacebar') && !event.repeat) { event.preventDefault?.(); startKeyboardMark(); return; }
+    if (event.key === 'Enter' && !event.repeat) { event.preventDefault?.(); handleLeave(); }
+  });
+  window.addEventListener('keyup', event => { if (event.key === ' ' || event.key === 'Spacebar') releaseKeyboardMark(); });
 
   resize(); updateFlames(); updateAndon(); updateTierButtons(); startLoop();
 })();
