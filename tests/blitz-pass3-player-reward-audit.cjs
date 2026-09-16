@@ -15,7 +15,7 @@ assert.match(engine, /booha-blitz-nameplate-streak/, 'shared engine must render 
 assert.match(engine, /function updateStreak\(\)/, 'shared engine must track a correct-answer streak');
 assert.match(engine, /nameplate\.setAttribute\('role', 'status'\)/,
   'the live nameplate must own streak feedback accessibly');
-assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold\);/,
+assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold, initialQueueLength\);/,
   'ordinary streak feedback must use the live nameplate instead of a floating callout');
 assert.doesNotMatch(engine, /NICE START|IS ON FIRE|IS UNSTOPPABLE|OWNS THIS RUN/,
   'ordinary streak callout copy must not return over the game field');

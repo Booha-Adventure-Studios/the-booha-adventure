@@ -14,7 +14,7 @@ assert.match(engine, /setBackground\(streak\)/,
   'question rendering must apply the current streak background energy');
 assert.match(engine, /function clearAnnouncement\(\)/,
   'ordinary streak feedback must be clearable without leaving a floating callout');
-assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold\);/,
+assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold, initialQueueLength\);/,
   'streak updates must use the nameplate instead of an ordinary floating combo callout');
 assert.match(engine, /function emitPerfectFlash\(overlay, palette, playerName\)/,
   'perfect clears must have a distinct finishing flash');

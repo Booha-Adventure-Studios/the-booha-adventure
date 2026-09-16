@@ -12,10 +12,10 @@ assert.match(engine, /nameplate\.setAttribute\('role', 'status'\)/,
   'streak changes should remain accessible without a floating callout');
 assert.match(engine, /nameplate\.setAttribute\('aria-live', 'polite'\)/,
   'streak changes should be announced from the live container');
-assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold\);/,
-  'ordinary streak updates should clear the old floating announcement');
-assert.doesNotMatch(engine, /fallbackMessages = \{/,
-  'ordinary streaks should not recreate the removed floating combo copy');
+assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold, initialQueueLength\);/,
+  'streak updates should clear stale announcements and use the full run length');
+assert.match(engine, /spotlight\.announce\(copy\[palette\.feel\]/,
+  'milestone streaks should announce their curriculum-specific copy');
 assert.match(engine, /streak-tier-5 \{ padding-inline: 24px; \}/,
   'higher streak tiers should give the reactive container extra breathing room');
 assert.match(verify, /tests\/blitz-pass27-streak-container-audit\.cjs/,
