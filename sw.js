@@ -10,6 +10,9 @@ const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
+  // Family Room Pass 1 locks the house registry and Case 02 label. The room
+  // scripts are network-first; keep the established page cache version so
+  // historical cache-contract audits remain compatible.
   pages:  'booha-pages-2026-411',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
