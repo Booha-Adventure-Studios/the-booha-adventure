@@ -36,6 +36,19 @@
     return parts.map(([kanji, reading]) => window.UtsuFurigana.rb(kanji, reading)).join('');
   }
 
+  function shelfStatus(game) {
+    const meta = game.shelfMeta || {};
+    if (game.id !== 'family_room') return meta.status || 'Case file';
+    try {
+      const data = window.BoohaAdventure?.save?.load?.() || {};
+      const familyRoom = data.weekly?.worlds?.familyRoom;
+      const sealed = Boolean(familyRoom?.completedCases?.chanoma || data.weekly?.completedGames?.[game.saveId]);
+      return sealed ? (meta.statusCompleted || meta.status || 'Case file') : (meta.status || 'Case file');
+    } catch (_) {
+      return meta.status || 'Case file';
+    }
+  }
+
   function render(host = document.getElementById('games-grid')) {
     const R = window.BoohaAdventure && BoohaAdventure.registry;
     const S = window.BoohaAdventure && BoohaAdventure.scores;
@@ -48,7 +61,7 @@
       const unlocked = U.isBonusGameUnlocked(game.id);
       const entry = S.getEntry(game.saveId);
       const played = entry.attempts > 0;
-      const scoreText = !unlocked ? 'Locked this week' : game.shelfMeta?.showScore === false ? (game.shelfMeta.status || 'Case file') : played ? entry.highScore.toLocaleString() : 'Not played';
+      const scoreText = !unlocked ? 'Locked this week' : game.shelfMeta?.showScore === false ? shelfStatus(game) : played ? entry.highScore.toLocaleString() : 'Not played';
       const chip = document.createElement(unlocked ? 'a' : 'div');
       chip.className = `g-chip ${unlocked ? 'unlocked' : ''}`;
       if (unlocked) chip.href = game.file;
