@@ -8,7 +8,7 @@ assert.match(engine, /const LOW_POWER =/,
   'existing hardware and reduced-motion low-power detection must remain');
 assert.match(engine, /let RUNTIME_LOW_POWER = false;/,
   'runtime low-power state must be tracked separately from the startup hint');
-assert.match(engine, /function monitorFramePerformance\(overlay, onPoorPerformance\)/,
+assert.match(engine, /function monitorFramePerformance\(overlay, onPoorPerformance(?:, onProgress)?\)/,
   'the engine must expose a startup frame-performance monitor');
 assert.match(engine, /const PERFORMANCE_SETTLE_MS = 900;/,
   'runtime performance monitoring must allow the first playable question to settle');
