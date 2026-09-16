@@ -27,12 +27,38 @@
     lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, jumpLevel: .58, burnMs: 12000, progressPenalty: 1 },
   });
 
+  // Pass 1 design lock: the house order and content vocabulary live in one
+  // registry before later study, marking, and room-art passes consume it.
+  const FAMILY_CHANGE_TYPES = Object.freeze(['ADD', 'REMOVE', 'MOVE', 'TURN', 'SWAP', 'COUNT', 'STATE', 'WRONG']);
+  const FAMILY_HOUSE_CASES = Object.freeze([
+    Object.freeze({ number: 0, id: 'engawa', name: 'ENGAWA', jp: 'えんがわ', role: 'hub', light: 'purple lanterns', exit: 'garden steps', feel: 'safe' }),
+    Object.freeze({ number: 1, id: 'genkan', name: 'GENKAN', jp: 'げんかん', light: 'bare bulb and purple spill', exit: 'front door', feel: 'ordinary tutorial' }),
+    Object.freeze({ number: 2, id: 'chanoma', name: 'CHANOMA', jp: 'ちゃのま', light: 'andon', exit: 'engawa step', feel: 'reference case', status: 'built' }),
+    Object.freeze({ number: 3, id: 'daidokoro', name: 'DAIDOKORO', jp: 'だいどころ', light: 'failing fluorescent tube', exit: 'corridor doorway', feel: 'drips, ticks, and a sink window' }),
+    Object.freeze({ number: 4, id: 'roka', name: 'ROKA', jp: 'ろうか', light: 'moonlight through shoji', exit: 'far end', feel: 'mostly state changes' }),
+    Object.freeze({ number: 5, id: 'kodomo-beya', name: 'KODOMO-BEYA', jp: 'こどもべや', light: 'small night light', exit: 'door', feel: 'cute vocabulary room' }),
+    Object.freeze({ number: 6, id: 'ofuro', name: 'OFURO', jp: 'おふろ', light: 'single bulb and steam', exit: 'sliding door', feel: 'mirror room' }),
+    Object.freeze({ number: 7, id: 'oshiire', name: 'OSHIIRE', jp: 'おしいれ', light: 'small candle or borrowed light', exit: 'sliding door', feel: 'closet dread', alternative: 'butsuma' }),
+    Object.freeze({ number: 8, id: 'nando', name: 'NANDO', jp: 'なんど', light: 'swinging bare bulb', exit: 'stairs down', feel: 'Pataskala room' }),
+  ]);
+  const FAMILY_HOUSE_RULES = Object.freeze({
+    roundsPerCase: CASE_ROUNDS,
+    study: Object.freeze({ perCase: true, timed: false, repeatOnCaseRestart: false, reviewFromHub: true }),
+    mistake: Object.freeze({ action: 'restart-case', unlimitedRestarts: true }),
+    changes: Object.freeze({ patient: 'zero-or-one', quicker: 'zero-one-or-occasional-two', lies: 'zero-one-or-more-two' }),
+    pataskala: Object.freeze({ role: 'presence', scoredTarget: false, risesWithCaseDepth: true, finalRoom: 'nando' }),
+    production: Object.freeze({ masterOnly: true, canvas: '1024x1536', safeBand: [0.22, 0.78], exitEdgeRequired: true }),
+  });
+  const ACTIVE_CASE_ID = 'chanoma';
+  const ACTIVE_CASE = FAMILY_HOUSE_CASES.find(entry => entry.id === ACTIVE_CASE_ID);
+  const ACTIVE_CASE_LABEL = String(ACTIVE_CASE.number).padStart(2, '0');
+
   const UI_COPY = Object.freeze({
     lanternDimmed: { kicker: 'THE LANTERN DIMMED', kickerJp: 'あんどんが くらくなった', title: 'MOVE FASTER.', titleJp: 'もっと はやく。', copy: 'The room outlasted the light. Start the search again before the next flame goes.', copyJp: 'へやが あかりより ながく のこった。つぎの ほのおが きえるまえに、もういちど さがそう。', button: 'SEARCH AGAIN', buttonJp: 'もういちど さがす' },
     roomDarker: { kicker: 'THE ROOM GOT DARKER', kickerJp: 'へやが くらくなった', title: 'TRY AGAIN.', titleJp: 'もういちど。', copy: 'The light is still here. Look once more, then choose.', copyJp: 'あかりは まだ ここに ある。もういちど みてから、えらぼう。', button: 'LOOK AGAIN', buttonJp: 'もういちど みる' },
-    lightLostSearch: { kicker: 'CASE FILE 07 / LIGHT LOST', kickerJp: 'じけんファイル 07 / あかりが きえた', title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The lantern burned out before you could report the room. Bring the light back and try again.', copyJp: 'へやを ほうこくするまえに、あんどんが きえた。あかりを もどして、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
-    lightLostReport: { kicker: 'CASE FILE 07 / LIGHT LOST', kickerJp: 'じけんファイル 07 / あかりが きえた', title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The case is not closed. Bring the light back and try the room again.', copyJp: 'じけんは おわっていない。あかりを もどして、もういちど へやを やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
-    complete: { kicker: 'CASE FILE 07 / SEALED', kickerJp: 'じけんファイル 07 / ふういん', title: 'THE ROOM LET GO.', titleJp: 'へやが はなした。', copy: 'You kept the light alive. Your notes are filed, and the door is where you left it.', copyJp: 'あかりを まもった。きろくを のこした。ドアは おいた ばしょに ある。', button: 'RETURN TO THE PROFILE', buttonJp: 'プロフィールへ もどる' },
+    lightLostSearch: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / LIGHT LOST`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / あかりが きえた`, title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The lantern burned out before you could report the room. Bring the light back and try again.', copyJp: 'へやを ほうこくするまえに、あんどんが きえた。あかりを もどして、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
+    lightLostReport: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / LIGHT LOST`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / あかりが きえた`, title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The case is not closed. Bring the light back and try the room again.', copyJp: 'じけんは おわっていない。あかりを もどして、もういちど へやを やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
+    complete: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / SEALED`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / ふういん`, title: 'THE ROOM LET GO.', titleJp: 'へやが はなした。', copy: 'You kept the light alive. Your notes are filed, and the door is where you left it.', copyJp: 'あかりを まもった。きろくを のこした。ドアは おいた ばしょに ある。', button: 'RETURN TO THE PROFILE', buttonJp: 'プロフィールへ もどる' },
   });
 
   const PATASKALA_POSES = [

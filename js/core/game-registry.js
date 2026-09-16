@@ -151,7 +151,7 @@ const BoohaGameRegistry = (() => {
       starThresholds: [1, 4, 7],
       saveId:         'bonus:family_room',
       bonus:          true,
-      shelfMeta:      { showScore: false, status: 'CASE FILE 07' },
+      shelfMeta:      { showScore: false, status: 'CASE FILE 02' },
     },
   ];
 
