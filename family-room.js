@@ -156,7 +156,11 @@
 
   function blitzTimes() {
     const log = weekLog();
-    return ['pb:vocab', 'pb:sentence', 'pb:question'].map(id => Number(log[id]?.ms) || Infinity);
+    const curriculums = ['pb', 'br', 'bc'];
+    const types = ['vocab', 'sentence', 'question'];
+    return types.map(type => Math.min(
+      ...curriculums.map(curriculum => Number(log[`${curriculum}:${type}`]?.ms) || Infinity)
+    ));
   }
 
   function unlockedTiers() {
