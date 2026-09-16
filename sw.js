@@ -184,6 +184,7 @@ const CORE_FILES = [
   `${BASE}/muenba.html`,
   `${BASE}/grimmerglen.html`,
   `${BASE}/grimmerglen-profile.html`,
+  `${BASE}/family-room.html`,
   `${BASE}/curriculum/bc/games-index.html`,
   `${BASE}/curriculum/bc/study-index.html`,
   `${BASE}/curriculum/br/games-index.html`,
@@ -216,6 +217,11 @@ const CORE_FILES = [
 // Keep only the small, always-needed shell here: the world's own scripts,
 // stylesheet, and default sprite.
 const CORE_ASSETS = [
+  `${BASE}/family-room.css`,
+  `${BASE}/family-room.js`,
+  `${BASE}/assets/family-room/living_base.webp`,
+  `${BASE}/assets/family-room/booha_idle.webp`,
+  `${BASE}/assets/family-room/booha_alert.webp`,
   `${BASE}/js/utsu-sfx.js`,
   `${BASE}/js/grimmerglen-data.js`,
   `${BASE}/js/grimmerglen-typing.js`,

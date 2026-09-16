@@ -143,6 +143,7 @@
   }
 
   function worldGateOpen() {
+    if (DEV_MODE || window.__devUtsuroba) return true;
     return window.BoohaUnlockSystem &&
       typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
       ? BoohaUnlockSystem.isWeeklyWorldGateOpen()
@@ -199,7 +200,9 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
-  const DEV_MODE = false;
+  const params = new URLSearchParams(window.location.search);
+  const DEV_MODE = params.get('dev') === '1';
+  if (DEV_MODE) window.__devUtsuroba = true;
 
   /* ═══════════════════════════════════════════
      COLOURS

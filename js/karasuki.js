@@ -3760,7 +3760,8 @@ const HAPPY_HOUSE_PORTAL = {
       let redirected = false;
       function goToUtsuroba() {
         if (redirected) return; redirected = true;
-        window.location.href = UTSUROBA_PORTAL.href;
+        const href = window.__devUtsuroba ? `${UTSUROBA_PORTAL.href}?dev=1` : UTSUROBA_PORTAL.href;
+        window.location.href = href;
       }
       vid.addEventListener('ended', goToUtsuroba);
       vid.addEventListener('error', e => { console.warn('[utsuroba video] error:', e); goToUtsuroba(); });
@@ -4530,6 +4531,7 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function _utsurobaCurriculumUnlocked() {
+    if (window.__devUtsuroba) return true;
     return window.BoohaUnlockSystem &&
       typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function'
       ? BoohaUnlockSystem.isWeeklyWorldGateOpen()

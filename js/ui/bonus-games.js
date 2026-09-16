@@ -13,6 +13,7 @@
     booha_blocks:      { icon:'assets/blocks/red_block.webp',                       jp:'ブーハー・ブロック',             k:'積木' },
     feed_booha:        { icon:'assets/feed/boo-eat.webp',                          jp:'ブーハーにキャンディをあげよう', k:'給食' },
     booha_destruction: { icon:'assets/destruction/optimized/booha_helmet_256.webp', jp:'ブーハー・デストラクション',     k:'破壊' },
+    family_room:       { icon:'assets/family-room/booha_alert.webp',               jp:'ファミリールーム',                    k:'家族の部屋' },
   };
 
   const KANJI_READINGS = {
@@ -20,6 +21,7 @@
     '積木': [['積木', 'つみき']],
     '給食': [['給食', 'きゅうしょく']],
     '破壊': [['破壊', 'はかい']],
+    '家族の部屋': [['家族', 'かぞく'], ['部屋', 'へや']],
   };
 
   function escapeHTML(value) {
@@ -46,7 +48,7 @@
       const unlocked = U.isBonusGameUnlocked(game.id);
       const entry = S.getEntry(game.saveId);
       const played = entry.attempts > 0;
-      const scoreText = !unlocked ? 'Locked this week' : played ? entry.highScore.toLocaleString() : 'Not played';
+      const scoreText = !unlocked ? 'Locked this week' : game.shelfMeta?.showScore === false ? (game.shelfMeta.status || 'Case file') : played ? entry.highScore.toLocaleString() : 'Not played';
       const chip = document.createElement(unlocked ? 'a' : 'div');
       chip.className = `g-chip ${unlocked ? 'unlocked' : ''}`;
       if (unlocked) chip.href = game.file;

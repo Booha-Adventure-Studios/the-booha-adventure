@@ -14,6 +14,7 @@ These are enforceable file/cache limits or runtime targets, not claims about eve
 | Root image-directory payload | 8 MiB |
 | Drifter image-directory payload | 1.8 MiB |
 | Grimmerglen image-directory payload | 12.9 MiB |
+| Family Room image-directory payload | 700 KiB |
 | Karasuki image-directory payload | 3.5 MiB |
 | Muenba image-directory payload | 9.2 MiB |
 | Utsuroba image-directory payload | 5.75 MiB |
