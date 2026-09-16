@@ -42,6 +42,12 @@ button { font: inherit; }
 .hud-brand { display: grid; gap: 5px; }
 .eyebrow { color: var(--amber); font-size: 10px; letter-spacing: .2em; opacity: .9; }
 .title { font-size: clamp(16px, 2.1vw, 25px); letter-spacing: .12em; }
+.andon { --andon-level: 1; display: inline-flex; align-items: center; gap: 7px; width: max-content; color: var(--muted); font-size: 8px; letter-spacing: .16em; opacity: calc(.34 + var(--andon-level) * .66); transition: opacity .3s ease, color .3s ease; }
+.andon-light { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 13px rgba(232,183,108,.8); }
+.andon.dim { color: rgba(233,229,220,.42); }
+.andon.dim .andon-light { box-shadow: 0 0 7px rgba(232,183,108,.42); }
+.andon.critical { color: var(--red); }
+.andon.critical .andon-light { background: var(--red); box-shadow: 0 0 12px rgba(187,74,63,.75); }
 .hud-right { display: flex; align-items: flex-start; gap: 22px; }
 .flame-meter { display: flex; gap: 7px; padding-top: 1px; filter: drop-shadow(0 0 9px rgba(232,183,108,.42)); }
 .flame { display: block; color: var(--amber); font-size: 19px; line-height: 1; transform: rotate(45deg) scale(.8); transition: color .22s ease, opacity .22s ease, transform .22s ease; }

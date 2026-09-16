@@ -7,9 +7,9 @@
   const MAX_FLAMES = 3;
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, falseAlertChance: 0 },
-    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, falseAlertChance: 0 },
-    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, falseAlertChance: .15 },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, falseAlertChance: 0, burnMs: 25000 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, falseAlertChance: 0, burnMs: 18000 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, falseAlertChance: .15, burnMs: 12000 },
   });
 
   const anomalies = [
@@ -36,6 +36,7 @@
   const messageButton = document.getElementById('message-button');
   const curtain = document.getElementById('transition-curtain');
   const observationNote = document.getElementById('observation-note');
+  const andon = document.getElementById('andon');
   const clueCard = document.getElementById('clue-card');
   const clueEn = document.getElementById('clue-en');
   const clueJp = document.getElementById('clue-jp');
@@ -83,6 +84,7 @@
   let markHoldTimer = 0;
   let markLocked = false;
   let markedPoint = null;
+  let burnoutHandled = false;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const easeOut = value => 1 - Math.pow(1 - clamp(value, 0, 1), 3);
@@ -144,6 +146,20 @@
     flameEls.forEach((el, index) => el.classList.toggle('off', index >= flames));
     const label = `Lantern light: ${flames} flame${flames === 1 ? '' : 's'}`;
     document.getElementById('flame-meter').setAttribute('aria-label', label);
+  }
+
+  function burnFraction(time = performance.now()) {
+    if (state !== 'playing' || !roundStarted) return state === 'caught' ? 0 : 1;
+    return clamp(1 - (time - roundStarted) / currentTier().burnMs, 0, 1);
+  }
+
+  function updateAndon(time = performance.now()) {
+    if (!andon) return;
+    const fraction = burnFraction(time);
+    andon.style.setProperty('--andon-level', String(fraction));
+    andon.classList.toggle('dim', fraction < .55);
+    andon.classList.toggle('critical', fraction < .22);
+    andon.setAttribute('aria-label', fraction < .22 ? 'Lantern light is nearly gone' : 'Lantern light is burning');
   }
 
   function updateTierButtons() {
@@ -313,7 +329,7 @@
     return Math.hypot(booha.x - tx, booha.y - ty) <= radius;
   }
 
-  function frame(time) { drawRoom(time); animationFrame = requestAnimationFrame(frame); }
+  function frame(time) { handleBurnout(time); updateAndon(time); drawRoom(time); animationFrame = requestAnimationFrame(frame); }
   function startLoop() { if (!animationFrame) animationFrame = requestAnimationFrame(frame); }
   function stopLoop() { if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = 0; } }
 
@@ -326,7 +342,7 @@
   function updateHud() { observationNote.textContent = state === 'playing' ? (markLocked ? 'MARK LOCKED / LEAVE WHEN READY' : 'DRAG BOOHA / HOLD TO MARK') : 'LOOK / LISTEN / REMEMBER'; updateFlames(); }
 
   function startRound() {
-    state = 'playing'; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); scheduleTell(); ping(176 + round * 13, .028);
+    state = 'playing'; burnoutHandled = false; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); scheduleTell(); ping(176 + round * 13, .028);
   }
 
   function enterRoom() {
@@ -366,6 +382,24 @@
     window.setTimeout(advanceCase, currentIsAnomaly ? (REDUCED_MOTION ? 500 : 1450) : (REDUCED_MOTION ? 80 : 420));
   }
 
+  function handleBurnout(time) {
+    if (state !== 'playing' || burnoutHandled || time - roundStarted < currentTier().burnMs) return;
+    burnoutHandled = true;
+    window.clearTimeout(droneTellTimer);
+    flames = Math.max(0, flames - 1);
+    wrongTone();
+    updateFlames(); updateAndon(time);
+    if (flames > 0) {
+      state = 'caught';
+      observationNote.textContent = 'THE ANDON WENT DARK';
+      showMessage('THE LANTERN DIMMED', 'MOVE FASTER.', 'The room outlasted the light. Start the search again before the next flame goes.', 'SEARCH AGAIN', () => { messagePanel.classList.remove('visible'); retryRound(); });
+      return;
+    }
+    state = 'caught';
+    observationNote.textContent = 'THE LANTERN WENT OUT';
+    showMessage('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The lantern burned out before you could report the room. Bring the light back and try again.', 'RESTART THE CASE', () => { messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); startRound(); });
+  }
+
   function handleWrong() {
     curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - 1); clearMarkingUi(); updateFlames();
     if (flames > 0) { showMessage('THE ROOM GOT DARKER', 'TRY AGAIN.', 'The light is still here. Look once more, then choose.', 'LOOK AGAIN', () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
@@ -375,6 +409,7 @@
 
   function retryRound() {
     state = 'playing';
+    burnoutHandled = false;
     roundStarted = performance.now();
     entryStarted = roundStarted;
     curtain.className = '';
@@ -460,5 +495,5 @@
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopLoop(); else { startLoop(); if (audioContext?.state === 'suspended' && audioEnabled) audioContext.resume(); } });
   window.addEventListener('keydown', event => { if (event.key === 'Enter' && state === 'title') enterRoom(); if ((event.key === 'Enter' || event.key === ' ') && state === 'playing') handleLeave(); });
 
-  resize(); updateFlames(); updateTierButtons(); startLoop();
+  resize(); updateFlames(); updateAndon(); updateTierButtons(); startLoop();
 })();
