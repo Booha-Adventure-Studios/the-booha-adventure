@@ -91,6 +91,15 @@ assert(markup.includes('message-title-en') && markup.includes('message-title-jp'
 assert(source.includes('function setBilingual') && source.includes('function setObservation') && source.includes('function setReportLabel'), 'dynamic room states must update both language lines together');
 assert(source.includes('function moveBoohaByKeyboard') && source.includes('arrowup') && source.includes('function startKeyboardMark') && source.includes('function releaseKeyboardMark'), 'keyboard play must support movement and hold-to-mark');
 assert(markup.includes('Space to mark') && markup.includes('スペースで しるし'), 'keyboard instructions must be bilingual');
+assert(source.includes('function shiftGameplayClocks') && source.includes('roundStarted += delta') && source.includes('failureStarted += delta'), 'hidden time must be removed from active gameplay clocks');
+assert(source.includes('function pauseForVisibility') && source.includes('function resumeFromVisibility') && source.includes("window.addEventListener('pagehide'"), 'visibility and BFCache lifecycle must pause and resume the room');
+assert(source.includes('booha.x = clamp(normalized.x * width') && source.includes("setObservation('SCREEN CHANGED / MARK AGAIN'"), 'resize must preserve normalized Booha position and invalidate stale marks');
+assert(source.includes('function imageReady(image)') && source.includes('image.naturalWidth > 0 && image.naturalHeight > 0'), 'canvas image draws must require a successful natural image size');
+assert(source.includes('function clearRoundTimers') && source.includes('window.clearTimeout(clueTimer); clueTimer = 0;'), 'round cleanup must own clue, transition, failure, and tell timers');
+assert(source.includes('clueVersion') && source.includes('if (version !== clueVersion) return'), 'an old clue timeout must not hide a later clue');
+assert(source.includes('canvas.setPointerCapture?.') && source.includes('canvas.releasePointerCapture?.'), 'pointer capture must survive touch movement and release on cancellation');
+assert(source.includes('Promise.allSettled(FAMILY_SFX_NAMES.map') && source.includes("console.warn('[Family Room] BGM unavailable')"), 'one failed audio asset must not reject or restart the successful audio loads');
+assert(source.includes('function scheduleResize') && !source.includes('resize(); updateFlames(); updateAndon(); updateTierButtons(); startLoop();'), 'title state must not start a continuous RAF loop');
 
 function classList() {
   const values = new Set();
