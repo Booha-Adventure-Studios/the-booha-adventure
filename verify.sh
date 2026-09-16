@@ -1266,14 +1266,21 @@ fi
 
 echo "[blitz] Pass 1 finish execution test"
 if node tests/blitz-finish-execution.test.cjs >/dev/null 2>&1; then
-  ok "Blitz record, ordinary, mastery, and fallback finishes render safely"
+  ok "Blitz perfect, record, failed, and fallback finishes render safely"
 else
   bad "Blitz finish execution test failed"
 fi
 
+echo "[blitz] perfect-run contract test"
+if node tests/blitz-perfect-run-contract.test.cjs >/dev/null 2>&1; then
+  ok "Blitz shared and standalone engines require flawless 15/15 runs"
+else
+  bad "Blitz perfect-run contract test failed"
+fi
+
 echo "[blitz] Pass 2 result-model test"
 if node tests/blitz-result-model.test.cjs >/dev/null 2>&1; then
-  ok "Blitz mastery, clean, and perfect clears persist as weekly results"
+  ok "Blitz perfect completions persist as weekly results"
 else
   bad "Blitz result-model test failed"
 fi

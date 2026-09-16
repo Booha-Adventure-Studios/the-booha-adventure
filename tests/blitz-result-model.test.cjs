@@ -34,22 +34,22 @@ function loadDayRecord() {
 
 const dayRecord = loadDayRecord();
 dayRecord.record({
-  saveId: 'blitz:pb:vocab', completed: true, recordEligible: false,
-  time: 18000, clearTier: 'mastery', mistakes: 3,
+  saveId: 'blitz:pb:vocab', completed: true, recordEligible: true,
+  time: 18000, clearTier: 'perfect', mistakes: 0,
 });
 let stored = dayRecord.getStored();
 let result = stored.meta.weekLog['2026-09-13|september-w2'].blitz['pb:vocab'];
 assert.strictEqual(result.ms, 18000);
-assert.strictEqual(result.tier, 'mastery');
-assert.strictEqual(result.mistakes, 3);
+assert.strictEqual(result.tier, 'perfect');
+assert.strictEqual(result.mistakes, 0);
 
 dayRecord.record({
   saveId: 'blitz:pb:vocab', completed: true, recordEligible: true,
-  time: 22000, clearTier: 'clean', mistakes: 1,
+  time: 22000, clearTier: 'perfect', mistakes: 0,
 });
 stored = dayRecord.getStored();
-assert.strictEqual(stored.meta.weekLog['2026-09-13|september-w2'].blitz['pb:vocab'].tier, 'clean',
-  'a clean clear must upgrade a mastery stamp even when slower');
+assert.strictEqual(stored.meta.weekLog['2026-09-13|september-w2'].blitz['pb:vocab'].tier, 'perfect',
+  'a slower perfect clear must not downgrade a weekly stamp');
 
 dayRecord.record({
   saveId: 'blitz:pb:vocab', completed: true, recordEligible: true,
@@ -73,4 +73,4 @@ assert.strictEqual(status.blitzDone, 1);
 assert.strictEqual(status.blitzStamps[0].tier, 'perfect');
 assert.strictEqual(status.complete, false);
 
-console.log('Blitz result-model test passed: mastery, clean, and perfect clears persist and render as weekly stamps.');
+console.log('Blitz result-model test passed: perfect completions persist and render as weekly stamps.');

@@ -24,7 +24,7 @@ assert.match(engine, /btn\.classList\.add\('wrong'\);\s*runIsActive = false;/,
   'wrong answers must not be resumed as if they were a backgrounded active run');
 assert.match(engine, /startTime = performance\.now\(\);\s*runIsActive = true;/,
   'retry and initial start must explicitly mark the timed run active');
-assert.match(engine, /function showWin\(ms\) \{\s*runIsActive = false;/,
+assert.match(engine, /function showWin\(ms\) \{[\s\S]*?feedbackState = 'complete';\s*runIsActive = false;/,
   'the finish card must not restart a completed run when the page returns');
 assert.match(engine, /overlay\._boohaBlitzVisibilityCleanup\?\.\(\);[\s\S]*?overlay\.remove\(\)/,
   'closing Blitz must clean up visibility listeners before removing the overlay');
