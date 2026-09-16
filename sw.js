@@ -180,6 +180,8 @@ const CURRENT_CACHES = {
   // restores arrow/WASD movement, Space marking, and Enter reporting.
   // Family Room hardening: deferred audio/Pataskala assets use the same runtime
   // cache request manifest while install-time room art remains fully precached.
+  // Family Room Pass 2: the manual study surface and blackout handoff stay on
+  // the existing network-first page/script path.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };

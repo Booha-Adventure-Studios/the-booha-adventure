@@ -14,6 +14,8 @@ const registry = fs.readFileSync(path.join(root, 'js/core/game-registry.js'), 'u
 assert(source.includes('const FAMILY_CHANGE_TYPES = Object.freeze') && ['ADD', 'REMOVE', 'MOVE', 'TURN', 'SWAP', 'COUNT', 'STATE', 'WRONG'].every(type => source.includes(`'${type}'`)), 'Pass 1 must lock the shared Family Room change vocabulary');
 assert(source.includes('const FAMILY_HOUSE_CASES = Object.freeze') && /number: 1, id: 'genkan'/.test(source) && /number: 2, id: 'chanoma'/.test(source) && /number: 8, id: 'nando'/.test(source), 'Pass 1 must lock the house case order');
 assert(source.includes("const ACTIVE_CASE_ID = 'chanoma'") && source.includes('ACTIVE_CASE_LABEL'), 'the built room must be explicitly registered as Case 02');
+assert(source.includes("state = 'study'") && source.includes('function beginCaseFromStudy') && source.includes("if (state === 'study')"), 'Pass 2 must separate manual study from timed dark gameplay');
+assert(markup.includes('id="study-panel"') && markup.includes('START THE CASE') && markup.includes('No timer. Start when ready.'), 'the study panel must explain its unlimited manual phase');
 assert(source.includes('repeatOnCaseRestart: false') && source.includes('reviewFromHub: true'), 'study review and restart behavior must be explicit in the design lock');
 assert(source.includes("role: 'presence'") && source.includes('scoredTarget: false'), 'Pataskala must be locked as a presence before later target mechanics');
 assert(markup.includes('CASE FILE 02 / CHANOMA') && !markup.includes('CASE FILE 07'), 'the built room label must be Case 02');
@@ -128,7 +130,7 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'flame-meter', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'flame-meter', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
 nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
 const flames = [0, 1, 2].map(index => Object.assign(element(`flame-${index}`), { dataset: { flame: String(index) } }));
@@ -174,6 +176,8 @@ vm.createContext(context);
 vm.runInContext(source, context, { filename: 'family-room.js' });
 
 nodes['start-button'].onclick();
+assert.strictEqual(nodes['study-panel'].hidden, false, 'entering the room must open the manual study phase');
+nodes['study-start-button'].onclick();
 for (let index = 0; index < 7; index += 1) {
   nodes['room-canvas'].onpointerdown({ clientX: 235, clientY: 476 });
   nodes['leave-button'].onclick();

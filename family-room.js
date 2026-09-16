@@ -85,6 +85,7 @@
   const ctx = canvas.getContext('2d');
   const controls = document.getElementById('controls');
   const startPanel = document.getElementById('start-panel');
+  const studyPanel = document.getElementById('study-panel');
   const messagePanel = document.getElementById('message-panel');
   const messageKicker = document.getElementById('message-kicker');
   const messageTitle = document.getElementById('message-title');
@@ -112,6 +113,8 @@
   const leaveEn = document.getElementById('leave-en');
   const leaveJp = document.getElementById('leave-jp');
   const backButton = document.getElementById('back-button');
+  const studyStartButton = document.getElementById('study-start-button');
+  const studyBackButton = document.getElementById('study-back-button');
   const flameEls = [...document.querySelectorAll('[data-flame]')];
   const tierButtons = [...document.querySelectorAll('[data-tier]')];
 
@@ -171,6 +174,7 @@
   let sfxLoadPromise = null;
   let bgmLoadPromise = null;
   let droneTellTimer = 0;
+  let studyCurtainTimer = 0;
   let clueTimer = 0;
   let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let pointerActive = false;
@@ -398,6 +402,13 @@
       if (time - failureStarted >= FAILURE_SILENCE_MS) drawFailureBooha(time);
       return;
     }
+    if (state === 'study') {
+      if (imageReady(baseImage)) {
+        ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
+        if (scanlineCanvas) { ctx.globalAlpha = .045; ctx.drawImage(scanlineCanvas, 0, 0, width, height); ctx.globalAlpha = 1; }
+      }
+      return;
+    }
     moveBooha();
     if (imageReady(baseImage)) {
       // Keep the room plate readable, then let Booha's lantern reveal only a
@@ -552,12 +563,18 @@
     messagePanel.classList.add('visible');
   }
 
-  function hidePanels() { startPanel.classList.remove('visible'); messagePanel.classList.remove('visible'); }
+  function hidePanels() {
+    startPanel.classList.remove('visible');
+    studyPanel.classList.remove('visible');
+    studyPanel.hidden = true;
+    messagePanel.classList.remove('visible');
+  }
   function clearRoundTimers() {
     window.clearTimeout(droneTellTimer); droneTellTimer = 0;
     window.clearTimeout(transitionTimer); transitionTimer = 0;
     window.clearTimeout(failureJumpTimer); failureJumpTimer = 0;
     window.clearTimeout(failurePanelTimer); failurePanelTimer = 0;
+    window.clearTimeout(studyCurtainTimer); studyCurtainTimer = 0;
     transitionStarted = 0;
   }
   function clearMarkingUi() {
@@ -578,7 +595,36 @@
 
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
-    round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); hidePanels(); requestFamilyRuntimeCache(); ensureAudio(); startRound();
+    clearRoundTimers();
+    round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentIsAnomaly = false;
+    state = 'study';
+    curtain.className = '';
+    controls.classList.add('hidden');
+    clearMarkingUi();
+    resetBooha();
+    startPanel.classList.remove('visible');
+    studyPanel.hidden = false;
+    studyPanel.classList.add('visible');
+    setObservation('STUDY THE ROOM', 'へやを おぼえる');
+    updateAndon();
+    updateFlames();
+    requestFamilyRuntimeCache();
+    ensureAudio();
+    studyStartButton.focus?.();
+    startLoop();
+  }
+
+  function beginCaseFromStudy() {
+    if (state !== 'study') return;
+    studyPanel.classList.remove('visible');
+    studyPanel.hidden = true;
+    caseStarted = performance.now();
+    startRound();
+    curtain.className = 'active';
+    const token = roundToken;
+    studyCurtainTimer = window.setTimeout(() => {
+      if (token === roundToken && state === 'playing') { curtain.className = ''; studyCurtainTimer = 0; }
+    }, REDUCED_MOTION ? 80 : 520);
   }
 
   function requestFamilyRuntimeCache() {
@@ -850,6 +896,8 @@
   function completeTone() { [330, 440, 660].forEach((frequency, index) => window.setTimeout(() => tone(frequency, .26, .035), index * 100)); }
 
   document.getElementById('start-button').addEventListener('click', enterRoom);
+  studyStartButton.addEventListener('click', beginCaseFromStudy);
+  studyBackButton.addEventListener('click', exitGame);
   backButton.addEventListener('click', exitGame);
   document.getElementById('leave-button').addEventListener('click', handleLeave);
   canvas.addEventListener('pointerdown', setBoohaTarget);
@@ -866,6 +914,7 @@
   window.addEventListener('pageshow', resumeFromVisibility, { passive: true });
   window.addEventListener('keydown', event => {
     if (event.key === 'Enter' && state === 'title') { event.preventDefault?.(); enterRoom(); return; }
+    if (event.key === 'Enter' && state === 'study') { event.preventDefault?.(); beginCaseFromStudy(); return; }
     if (state !== 'playing') return;
     const key = event.key.toLowerCase();
     const movement = { arrowup: [0, -1], w: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], arrowright: [1, 0], d: [1, 0] }[key];
