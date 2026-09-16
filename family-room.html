@@ -34,14 +34,25 @@
     <section id="controls" class="controls hidden" aria-label="Report the room / へやを ほうこくする">
       <button id="leave-button" class="choice-button leave-button" type="button">
         <span class="choice-arrow">↗</span>
-        <span class="choice-copy"><b><span id="leave-en">REPORT THE ROOM</span><span id="leave-jp" class="jp" lang="ja">へやを ほうこくする</span></b><small><span>marked = changed · unmarked = clean</span><span class="jp" lang="ja">しるし = へんか · しるしなし = きれい</span></small></span>
+        <span class="choice-copy"><b><span id="leave-en">REPORT THE ROOM</span><span id="leave-jp" class="jp" lang="ja">へやを ほうこくする</span></b><small><span>marks = changes · no marks = clean</span><span class="jp" lang="ja">しるし = へんか · しるしなし = きれい</span></small></span>
       </button>
+      <button id="undo-button" class="secondary-button undo-button" type="button" hidden><span>UNDO LAST MARK</span><span class="jp" lang="ja">さいごの しるしを けす</span></button>
+    </section>
+
+    <section id="mark-confirm-panel" class="panel mark-confirm-panel" aria-live="polite" aria-labelledby="mark-confirm-title" hidden>
+      <p class="panel-kicker"><span>MARK / CONFIRM</span><span class="jp" lang="ja">しるし / かくにん</span></p>
+      <h2 id="mark-confirm-title"><span id="mark-confirm-title-en">MARK THIS PLACE?</span><span id="mark-confirm-title-jp" class="jp" lang="ja">この ばしょに しるしを つける？</span></h2>
+      <p id="mark-confirm-object" class="mark-confirm-object"><span id="mark-confirm-object-en">THIS PLACE</span><span id="mark-confirm-object-jp" class="jp" lang="ja">この ばしょ</span></p>
+      <div class="confirm-actions">
+        <button id="mark-yes-button" class="primary-button" type="button"><span>YES, MARK IT</span><span class="jp" lang="ja">はい、しるしを つける</span></button>
+        <button id="mark-no-button" class="secondary-button" type="button"><span>NO, KEEP LOOKING</span><span class="jp" lang="ja">いいえ、まだ さがす</span></button>
+      </div>
     </section>
 
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
       <p class="panel-kicker"><span>CASE FILE 02 / CHANOMA</span><span class="jp" lang="ja">じけんファイル 02 / ちゃのま</span></p>
       <h1 id="start-title"><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
-      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha through the darkness, mark what changed, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。くらやみの なかで ブーハを ひっぱり、かわった ところに しるしを つけて、へやを ほうこくする。</span></p>
+      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha to a change and hold still. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを ひっぱり、じっと させる。しるしを かくにんして、へやを ほうこくする。</span></p>
       <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves / へやの うごきを えらぶ">
         <button class="tier-button selected" type="button" data-tier="patient"><b><span>THE ROOM IS PATIENT</span><span class="jp" lang="ja">へやは おだやか</span></b><small><span>the first case</span><span class="jp" lang="ja">はじめの じけん</span></small></button>
         <button class="tier-button" type="button" data-tier="quicker"><b><span>THE ROOM IS QUICKER</span><span class="jp" lang="ja">へやは はやい</span></b><small><span>three fast Blitz stamps</span><span class="jp" lang="ja">ブリッツの はやい しるし みっつ</span></small></button>
