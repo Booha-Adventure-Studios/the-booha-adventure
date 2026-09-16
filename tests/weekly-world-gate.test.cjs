@@ -107,9 +107,19 @@ assert.match(utsurobaSource, /getSpawnPoint\(PAGE_ID\)/,
   'Utsuroba should resume its saved room for a profile entry');
 assert.match(utsurobaSource, /function worldGateOpen\(\)/,
   'Utsuroba must guard direct URL entry with the shared weekly gate');
+assert.match(utsurobaSource, /const DEV_MODE = params\.get\('dev'\) === '1';/,
+  'Utsuroba DEV mode must require the explicit dev=1 query flag');
+assert.match(utsurobaSource, /if \(DEV_MODE\) window\.__devUtsuroba = true;/,
+  'Utsuroba DEV mode must establish the test override');
+assert.match(utsurobaSource, /if \(DEV_MODE \|\| window\.__devUtsuroba\) return true;/,
+  'Utsuroba DEV tools must be able to open the unfinished world');
 assert.match(utsurobaSource, /showLockedWorld\(\)/,
   'Utsuroba should show a friendly locked state');
 assert.match(utsurobaSource, /href = 'profile\.html'/,
   'Direct Utsuroba entry should provide a return to the Output profile');
+assert.match(karasukiSource, /UTSUROBA_PORTAL\.href\}\?dev=1/,
+  'Karasuki Utsuroba DEV entry must preserve the explicit dev route');
+assert.match(karasukiSource, /function _utsurobaCurriculumUnlocked\(\)[\s\S]*?if \(window\.__devUtsuroba\) return true;/,
+  'Karasuki Utsuroba popup must honor the DEV override');
 
 console.log('Weekly Output-world gate tests passed.');
