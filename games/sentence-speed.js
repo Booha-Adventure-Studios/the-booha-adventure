@@ -103,10 +103,10 @@ const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
    ══════════════════════════════════════════════════════════════ */
 const STREAK_LEVELS = [
   { min:0,  max:2,  level:0 },
-  { min:3,  max:3,  level:1 },
-  { min:4,  max:4,  level:2 },
-  { min:5,  max:5,  level:3 },
-  { min:6,  max:99, level:4 },
+  { min:3,  max:5,  level:1 },
+  { min:6,  max:8,  level:2 },
+  { min:9,  max:11, level:3 },
+  { min:12, max:99, level:4 },
 ];
 function getStreakLevel(s) {
   return (STREAK_LEVELS.find(t => s >= t.min && s <= t.max) ?? STREAK_LEVELS[0]).level;
@@ -114,14 +114,15 @@ function getStreakLevel(s) {
 
 /* Sentence-speed streak messages — different flavour from vocab-speed */
 const STREAK_MSG = {
-  1: { en:'Reading streak! Keep it up!',            jp:'続けてるね！すごい！',           kanji:'連続正解！すごい！' },
-  2: { en:'Sentence master in the making!',         jp:'文の達人になってきた！',          kanji:'文の達人への道！' },
-  3: { en:'Unstoppable reader! Full speed ahead!',  jp:'読むのが止まらない！全速前進！',   kanji:'読解無双！全速前進！' },
-  4: { en:'LEGENDARY! You speak English!',          jp:'最強！もう英語ペラペラ！',       kanji:'伝説！英語マスター！' },
+  1: { en:'ON FIRE!',       jp:'燃えてる！',       kanji:'燃えてる！' },
+  2: { en:'HEATING UP!',    jp:'どんどん熱く！',   kanji:'加熱中！' },
+  3: { en:'UNSTOPPABLE!',   jp:'止まらない！',     kanji:'無敵！' },
+  4: { en:'LEGENDARY!!',    jp:'伝説級！！',       kanji:'伝説！' },
 };
 
 /* Heat durations — slightly longer than vocab (sentences need more thinking) */
 const HEAT_DURATIONS = [12000, 9500, 7500, 5500, 3500];
+const STREAK_MILESTONES = [3, 6, 9, 12, 15];
 
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
@@ -572,6 +573,54 @@ S.textContent = `
 
 .ssp-choice.ssp-locked{ opacity:.42; pointer-events:none; transform:none !important; }
 
+/* Sustained streak gears: milestone flashes are brief, but the run state stays visible. */
+.ssp-wrap.streak-level-1 .ssp-prompt-box,
+.ssp-wrap.streak-level-1 .ssp-timer-track{ box-shadow:0 0 26px rgba(0,230,200,.22); }
+.ssp-wrap.streak-level-2 .ssp-prompt-box,
+.ssp-wrap.streak-level-2 .ssp-timer-track{ box-shadow:0 0 38px rgba(0,200,255,.3); }
+.ssp-wrap.streak-level-3 .ssp-prompt-box,
+.ssp-wrap.streak-level-3 .ssp-timer-track{ box-shadow:0 0 52px rgba(60,140,255,.4); }
+.ssp-wrap.streak-level-4 .ssp-prompt-box,
+.ssp-wrap.streak-level-4 .ssp-timer-track{ box-shadow:0 0 68px rgba(180,240,255,.52); animation:sspChargedBreath 2.4s ease-in-out infinite; }
+.ssp-wrap.streak-level-3 .ssp-choice,
+.ssp-wrap.streak-level-4 .ssp-choice{ box-shadow:0 0 18px rgba(0,180,255,.2), 0 6px 20px rgba(0,0,0,.35); }
+.ssp-wrap.streak-level-4 .ssp-choice{ box-shadow:0 0 24px rgba(180,240,255,.32), 0 6px 20px rgba(0,0,0,.35); }
+@keyframes sspChargedBreath{
+  0%,100%{ filter:brightness(1); }
+  50%{ filter:brightness(1.07); }
+}
+.ssp-prompt-box.ssp-hit{ animation:sspPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
+.ssp-dot.ssp-hit{ animation:sspDotHit 300ms cubic-bezier(.2,.9,.25,1) both; }
+.ssp-wrap .ssp-prompt-box.ssp-hit{ animation:sspPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
+@keyframes sspPromptHit{
+  0%{ transform:scale(1); } 38%{ transform:scale(1.025); } 100%{ transform:scale(1); }
+}
+@keyframes sspDotHit{
+  0%{ transform:scale(1); filter:brightness(1); } 45%{ transform:scale(1.5); filter:brightness(1.7); } 100%{ transform:scale(1); filter:brightness(1); }
+}
+@media (prefers-reduced-motion: reduce){
+  .ssp-wrap.streak-level-4 .ssp-prompt-box,
+  .ssp-wrap.streak-level-4 .ssp-timer-track,
+  .ssp-prompt-box.ssp-hit,
+  .ssp-dot.ssp-hit{ animation:none; filter:brightness(1.18); }
+}
+@media (prefers-reduced-motion: reduce){
+  .ssp-wrap.streak-level-4 .ssp-prompt-box,
+  .ssp-wrap.streak-level-4 .ssp-timer-track{ animation:none; }
+}
+
+.ssp-final-climax{
+  position:fixed; inset:0; z-index:1150; display:none; place-items:center; pointer-events:none;
+  background:radial-gradient(circle at 50% 48%, rgba(210,250,255,.72), rgba(40,150,255,.28) 24%, rgba(3,10,28,.88) 76%);
+}
+.ssp-final-climax.show{ display:grid; animation:sspFinalClimax 980ms cubic-bezier(.16,.9,.2,1) both; }
+.ssp-final-climax-label{ text-align:center; font-family:var(--game-font-title); font-weight:1000; color:#e8f8ff; text-shadow:0 0 18px #fff,0 0 44px #00ddff,0 0 90px #4466ff; }
+.ssp-final-climax-title{ font-size:clamp(30px,10vw,82px); letter-spacing:.08em; }
+.ssp-final-climax-count{ margin-top:.35rem; font-size:clamp(22px,6vw,52px); letter-spacing:.12em; }
+@keyframes sspFinalClimax{ 0%{opacity:0;transform:scale(.72)} 16%{opacity:1;transform:scale(1.1)} 46%{opacity:.96;transform:scale(1)} 100%{opacity:0;transform:scale(1.08)} }
+@media (prefers-reduced-motion: reduce){ .ssp-final-climax.show{ animation:sspFinalClimaxReduced 420ms ease both; } }
+@keyframes sspFinalClimaxReduced{ from{opacity:0} 35%{opacity:1} to{opacity:0} }
+
 .ssp-feedback-overlay{
   position:fixed; inset:0; z-index:1100; display:none; align-items:center; justify-content:center;
   padding:1rem; background:rgba(5,3,10,.76); backdrop-filter:blur(8px);
@@ -854,6 +903,13 @@ U.mount(`
   </div>
 </div>
 
+<div class="ssp-final-climax" id="ssp-final-climax" hidden aria-hidden="true">
+  <div class="ssp-final-climax-label">
+    <div class="ssp-final-climax-title">PERFECT RUN</div>
+    <div class="ssp-final-climax-count">15 / 15</div>
+  </div>
+</div>
+
 <!-- RESULTS — separate from main so header stays visible above it -->
 <div class="ssp-results-wrap" id="ssp-results-wrap">
 <div class="ssp-results" id="ssp-results">
@@ -977,6 +1033,7 @@ const feedbackOverlay = document.getElementById('ssp-feedback-overlay');
 const feedbackTitle = document.getElementById('ssp-feedback-title');
 const feedbackCopy = document.getElementById('ssp-feedback-copy');
 const feedbackContinue = document.getElementById('ssp-feedback-continue');
+const finalClimax = document.getElementById('ssp-final-climax');
 
 /* Build 15 progress dots */
 for (let i = 0; i < 15; i++) {
@@ -1042,6 +1099,19 @@ let heatDur   = 7000;
 let runStartedAt = 0;
 let feedbackState = 'awaiting-start';
 let recoveryPending = false;
+let finalClimaxTimer = null;
+let resultFxTimers = [];
+let resultAudio = null;
+
+function clearResultEffects() {
+  resultFxTimers.forEach(clearTimeout);
+  resultFxTimers = [];
+  if (resultAudio) {
+    try { resultAudio.pause(); resultAudio.currentTime = 0; } catch {}
+    resultAudio = null;
+  }
+  document.querySelectorAll('.ssp-confetti-piece').forEach(el => el.remove());
+}
 
 /* ══════════════════════════════════════════════════════════════
    DOTS
@@ -1054,6 +1124,18 @@ function updateDots() {
   }
 }
 
+function pulseCorrectUI() {
+  promptBox.classList.remove('ssp-hit');
+  void promptBox.offsetWidth;
+  promptBox.classList.add('ssp-hit');
+  const dot = document.getElementById(`ssp-d${idx}`);
+  if (dot) {
+    dot.classList.remove('ssp-hit');
+    void dot.offsetWidth;
+    dot.classList.add('ssp-hit');
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════
    STREAK UI — cyan family for sentence-speed
    ══════════════════════════════════════════════════════════════ */
@@ -1061,6 +1143,8 @@ const STREAK_COLORS = ['','#00ddff','#0099ff','#4466ff','#e8f8ff'];
 function updateStreakUI() {
   const lv = getStreakLevel(streak);
   const col = STREAK_COLORS[lv] || '#00ddff';
+  mainWrap.classList.remove('streak-level-1','streak-level-2','streak-level-3','streak-level-4');
+  if (lv > 0) mainWrap.classList.add(`streak-level-${lv}`);
   streakPill.style.setProperty('--streak-color', col);
   streakEl.textContent = streak;
 
@@ -1108,6 +1192,8 @@ function setAnswerInputEnabled(enabled) {
 
 function showFailureFeedback(kind) {
   stopHeat();
+  promptBox.classList.remove('ssp-hit');
+  updateDots();
   feedbackState = 'feedback';
   locked = true;
   setAnswerInputEnabled(false);
@@ -1237,8 +1323,12 @@ function handlePick(btn, en) {
     updateStreakUI();
     updateStreakBanner();
     updateDots();
+    pulseCorrectUI();
 
-    setTimeout(() => { idx++; renderQ(); }, 500);
+    const transitionMs = STREAK_MILESTONES.includes(streak)
+      ? (streak === 15 ? 620 : 560)
+      : 340;
+    setTimeout(() => { idx++; renderQ(); }, transitionMs);
 
   } else {
     btn.classList.add('ssp-wrong');
@@ -1333,7 +1423,7 @@ function fireConfetti(big = false) {
   const colors = ['#00f0dd','#0088ff','#aa44ff','#00ddff','#ffffff','#88ffee','#4455ff'];
   const cx = window.innerWidth / 2;
   const cy = window.innerHeight * 0.38;
-  const count = big ? 80 : 36;
+  const count = big ? 48 : 24;
   for (let i = 0; i < count; i++) {
     const el = document.createElement('div');
     el.className = 'ssp-confetti-piece';
@@ -1362,7 +1452,37 @@ function fireConfetti(big = false) {
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
   if (idx !== 15 || score !== 15 || streak !== 15 || feedbackState !== 'playing') return;
+  feedbackState = 'climax';
+  locked = true;
+  setAnswerInputEnabled(false);
+  stopHeat();
+  stopLvl4();
+
+  for (let i = 0; i < 15; i++) {
+    const d = document.getElementById(`ssp-d${i}`);
+    if (d) d.className = 'ssp-dot done';
+  }
+
+  const runTime = Math.max(0, performance.now() - runStartedAt);
+  finalClimax.hidden = false;
+  finalClimax.setAttribute('aria-hidden', 'false');
+  finalClimax.classList.remove('show');
+  void finalClimax.offsetWidth;
+  finalClimax.classList.add('show');
+  if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
+  finalClimaxTimer = setTimeout(() => {
+    if (feedbackState !== 'climax') return;
+    finalClimax.classList.remove('show');
+    finalClimax.hidden = true;
+    finalClimax.setAttribute('aria-hidden', 'true');
+    finalClimaxTimer = null;
+    revealResults(runTime);
+  }, (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 420 : 980);
+}
+
+function revealResults(runTime) {
   feedbackState = 'complete';
+  clearResultEffects();
   locked = true;
   setAnswerInputEnabled(false);
   stopHeat();
@@ -1382,8 +1502,6 @@ function showResults() {
 
   const tier = getTier(score);
   const pct  = 100;
-  const runTime = Math.max(0, performance.now() - runStartedAt);
-
   /* ── Dispatch to Booha Adventure save system ── */
 document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
@@ -1408,15 +1526,15 @@ document.dispatchEvent(new CustomEvent('booha:gameEnd', {
 
   /* Confetti + result sound */
   if (score === 15) {
-    setTimeout(() => fireConfetti(false), 400);
-    setTimeout(() => fireConfetti(true),  900);
+    resultFxTimers.push(setTimeout(() => fireConfetti(false), 400));
+    resultFxTimers.push(setTimeout(() => fireConfetti(true),  900));
   }
    
   if (CFG.sfxBase && tier.sound) {
-    const snd = new Audio(CFG.sfxBase + tier.sound);
-    snd.setAttribute('playsinline', '');
-    snd.setAttribute('webkit-playsinline', '');
-    snd.play().catch(() => {});
+    resultAudio = new Audio(CFG.sfxBase + tier.sound);
+    resultAudio.setAttribute('playsinline', '');
+    resultAudio.setAttribute('webkit-playsinline', '');
+    resultAudio.play().catch(() => {});
   }
 }
 
@@ -1424,6 +1542,12 @@ document.dispatchEvent(new CustomEvent('booha:gameEnd', {
    REPLAY / BACK
    ══════════════════════════════════════════════════════════════ */
 document.getElementById('ssp-replay').addEventListener('click', () => {
+  clearResultEffects();
+  if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
+  finalClimaxTimer = null;
+  finalClimax.classList.remove('show');
+  finalClimax.hidden = true;
+  finalClimax.setAttribute('aria-hidden', 'true');
   results.classList.remove('show');
   mainWrap.style.display = '';
 
@@ -1440,6 +1564,7 @@ document.getElementById('ssp-replay').addEventListener('click', () => {
 });
 
 document.getElementById('ssp-back').addEventListener('click', () => {
+  clearResultEffects();
   stopLvl4();
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
