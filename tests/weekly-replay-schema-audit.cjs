@@ -103,6 +103,12 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
     mariettaIntroSeen: false,
     mariettaIntroSkipped: false,
   },
+  familyRoom: {
+    activeCaseId: 'chanoma',
+    completedCases: {},
+    bestTier: null,
+    lastResult: null,
+  },
 });
 
 save.save(migrated);
@@ -143,6 +149,12 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.grimmerglen), {
   memoryQuestAccepted: false,
   mariettaIntroSeen: false,
   mariettaIntroSkipped: false,
+});
+assert.deepStrictEqual(plain(stored.weekly.worlds.familyRoom), {
+  activeCaseId: 'chanoma',
+  completedCases: {},
+  bestTier: null,
+  lastResult: null,
 });
 
 assert.deepStrictEqual(plain(stored.scores), { 'bc:ask_question': { completed: true, stars: 3 } });
