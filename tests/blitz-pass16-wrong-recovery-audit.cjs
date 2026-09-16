@@ -14,7 +14,7 @@ assert.match(engine, /CHAIN BROKEN — RELOAD!/,
   'Boo-riculum wrong feedback must acknowledge the broken chain');
 assert.match(engine, /LINK LOST — TRY AGAIN\./,
   'Boo-continuum wrong feedback must use a sleek recovery line');
-assert.match(engine, /function emitWrongMicroFeedback\(wrongBtn\)/,
+assert.match(engine, /function emitWrongMicroFeedback\(wrongBtn, answerRect, overlayRect\)/,
   'wrong answers must emit a small wrong-color feedback beat');
 assert.match(engine, /palette\.wrong\?\.color/,
   'wrong feedback must use the curriculum wrong color');

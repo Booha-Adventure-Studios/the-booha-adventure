@@ -14,13 +14,17 @@ const modes = [
   { file: 'question-blitz.js', api: 'QuestionBlitz', type: 'questions', legacy: 'questionBlitz', data: 'questions.json', saveId: 'question', overlay: 'qb-overlay' },
 ];
 
-const engineTag = index.indexOf('<script src="js/blitz-engine.js"></script>');
-assert(engineTag >= 0, 'index must load the shared Blitz engine');
+assert.match(index, /const BLITZ_SCRIPT_SOURCES = \[[\s\S]*?js\/blitz-engine\.js[\s\S]*?js\/question-blitz\.js[\s\S]*?\];/,
+  'index must retain the ordered shared Blitz module list for lazy loading');
+assert.match(index, /function loadBlitzEngines\(\)[\s\S]*?\.reduce\(/,
+  'index must load the shared Blitz modules sequentially on demand');
+for (const file of ['blitz-engine.js', ...modes.map(mode => mode.file)]) {
+  assert(!index.includes(`<script src="js/${file}"></script>`),
+    `${file} must not be eagerly parsed on the hub`);
+}
 
 for (const mode of modes) {
   const source = fs.readFileSync(path.join(root, 'js', mode.file), 'utf8');
-  const modeTag = index.indexOf(`<script src="js/${mode.file}"></script>`);
-  assert(modeTag > engineTag, `${mode.file} must load after the shared Blitz engine`);
   assert.match(source, /BoohaBlitzEngine\.create\(/, `${mode.file} must use the shared engine`);
   assert.match(source, /return blitzEngine\.launch\(\{ curr, monthSlug, weekNumber \}\);/,
     `${mode.file} public launch must delegate to the shared engine`);
