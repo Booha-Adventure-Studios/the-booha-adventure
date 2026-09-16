@@ -22,6 +22,13 @@
     lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, falseAlertChance: .15, burnMs: 12000 },
   });
 
+  const PATASKALA_POSES = [
+    { id: 'pataskala-standing', target: [.72, .29, .14], artSize: .2, en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-moving', target: [.79, .43, .17], artSize: .22, en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-crouch', target: [.77, .56, .18], artSize: .22, en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-emerging', target: [.22, .47, .16], artSize: .28, en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', kind: 'character', character: 'pataskala' },
+  ];
+
   const anomalies = [
     { id: 'bowl', target: [.79, .51, .09], artSize: .12, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', kind: 'added' },
     { id: 'cup', target: [.35, .49, .1], artSize: .11, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', kind: 'duplicated' },
@@ -65,6 +72,11 @@
     const image = new Image();
     image.src = `assets/family-room/overlays/${anomaly.id}.webp`;
     return [anomaly.id, image];
+  }));
+  const pataskalaArt = Object.fromEntries(PATASKALA_POSES.map(pose => {
+    const image = new Image();
+    image.src = `assets/family-room/pataskala/${pose.id}.webp`;
+    return [pose.id, image];
   }));
 
   let width = 0;
@@ -219,9 +231,23 @@
 
   function currentTier() { return TIER_RULES[selectedTier] || TIER_RULES.patient; }
 
+  function pataskalaChance() {
+    if (round < 2) return 0;
+    const progression = [.28, .34, .42, .5, .58][clamp(round - 2, 0, 4)] || .58;
+    const tierScale = selectedTier === 'patient' ? .78 : selectedTier === 'quicker' ? 1 : 1.14;
+    return clamp(progression * tierScale, 0, .7);
+  }
+
+  function pataskalaPose() {
+    const maxPose = selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2;
+    return random(PATASKALA_POSES.slice(0, maxPose + 1));
+  }
+
   function chooseRound() {
     currentIsAnomaly = Math.random() >= .5;
-    currentAnomaly = currentIsAnomaly ? random(anomalies) : null;
+    currentAnomaly = currentIsAnomaly
+      ? (Math.random() < pataskalaChance() ? pataskalaPose() : random(anomalies))
+      : null;
     const tier = currentTier();
     falseAlertPoint = !currentIsAnomaly && Math.random() < tier.falseAlertChance
       ? { u: .12 + Math.random() * .76, v: .2 + Math.random() * .56, radius: .1 }
@@ -232,7 +258,7 @@
 
   function drawAnomaly(anomaly) {
     if (!anomaly) return;
-    const art = anomalyArt[anomaly.id];
+    const art = anomaly.character === 'pataskala' ? pataskalaArt[anomaly.id] : anomalyArt[anomaly.id];
     if (!art?.complete) return;
     const [u, v] = anomaly.target;
     const [x, y] = currentPoint([u, v]);
@@ -243,8 +269,8 @@
     const drawWidth = sourceWidth * scale;
     const drawHeight = sourceHeight * scale;
     ctx.save();
-    ctx.globalAlpha = .95;
-    ctx.shadowColor = 'rgba(232,183,108,.42)';
+    ctx.globalAlpha = anomaly.character === 'pataskala' ? .9 : .95;
+    ctx.shadowColor = anomaly.character === 'pataskala' ? 'rgba(219,230,218,.18)' : 'rgba(232,183,108,.42)';
     ctx.shadowBlur = Math.max(5, maxDimension * .12);
     ctx.drawImage(art, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight);
     ctx.restore();
