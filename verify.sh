@@ -1271,6 +1271,13 @@ else
   bad "Blitz finish execution test failed"
 fi
 
+echo "[blitz] Pass 2 result-model test"
+if node tests/blitz-result-model.test.cjs >/dev/null 2>&1; then
+  ok "Blitz mastery, clean, and perfect clears persist as weekly results"
+else
+  bad "Blitz result-model test failed"
+fi
+
 echo "[blitz] Pass 1 performance audit"
 if node tests/blitz-pass1-performance-audit.cjs >/dev/null 2>&1; then
   ok "Blitz timer, low-power effects, batched particles, and blur fallback contracts pass"

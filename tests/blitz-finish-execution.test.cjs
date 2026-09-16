@@ -73,7 +73,10 @@ function runFinish({ recordEligible, isRecord, dispatchError = false }) {
     console: testConsole,
     performance: { now: () => 1234 },
     queue: [{ n: 1 }, { n: 2 }],
+    initialQueueLength: 2,
     bestStreak: 2,
+    mistakeCount: recordEligible ? 0 : 3,
+    CLEAN_CLEAR_MAX_MISTAKES: 2,
     runEligibleForRecord: recordEligible,
     runIsActive: true,
     visibilityPaused: false,
@@ -143,7 +146,7 @@ const record = runFinish({ recordEligible: true, isRecord: true });
 assert.match(record.dom.winScreen.children.winRecord.textContent, /NEW BOOHA RECORD/);
 
 const ordinary = runFinish({ recordEligible: true, isRecord: false });
-assert.strictEqual(ordinary.dom.winScreen.children.winRecord.textContent, 'CLEAR COMPLETE');
+assert.strictEqual(ordinary.dom.winScreen.children.winRecord.textContent, 'PERFECT CLEAR');
 
 const mastery = runFinish({ recordEligible: false, isRecord: false });
 assert.strictEqual(mastery.dom.winScreen.children.winRecord.textContent, 'MASTERY CLEAR · NO RECORD');

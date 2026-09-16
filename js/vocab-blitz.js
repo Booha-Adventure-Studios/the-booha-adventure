@@ -566,7 +566,7 @@ const SCOLDS = [
         <div class="vb-wrong-scold-hira" id="vsh"></div>
         <div class="vb-wrong-scold-en"   id="vse"></div>
         <div id="vb-wrong-status">READY FOR THE NEXT TRY</div>
-        <button id="vb-wrong-close" type="button">もう一度 / RETRY</button>
+        <button id="vb-wrong-close" type="button">つぎへ / CONTINUE</button>
       </div>
 
      <div id="vb-win">

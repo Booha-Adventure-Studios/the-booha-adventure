@@ -22,12 +22,12 @@ assert.match(engine, /previous best/,
   'the final card must show the delta from the previous best');
 assert.match(engine, /CLEAR COMPLETE/,
   'non-record clears must still have an explicit result state');
-assert.match(engine, /const isPerfectRun = recordEligible && bestStreak === queue\.length/,
-  'the final card must require a clean record-eligible run for perfect-run state');
-assert.match(engine, /PERFECT RUN · \$\{queue\.length\}\/\$\{queue\.length\}/,
+assert.match(engine, /const isPerfectRun = clearTier === 'perfect' && bestStreak === initialQueueLength/,
+  'the final card must require a mistake-free run for perfect-run state');
+assert.match(engine, /PERFECT RUN · \$\{initialQueueLength\}\/\$\{initialQueueLength\}/,
   'the final card must expose a perfect-run indicator');
-assert.match(engine, /finalCard\.perfect\.hidden = !\(isPerfectRun \|\| isMasteryClear\)/,
-  'the final-card status indicator must remain available for mastery clears');
+assert.match(engine, /finalCard\.perfect\.hidden = false/,
+  'the final-card status indicator must remain available for every clear tier');
 assert.match(engine, /MASTERY CLEAR · NO RECORD/,
   'retry completions must be identified as mastery clears without record status');
 assert.match(engine, /finalCard\.streak\.textContent = `BEST STREAK ×\$\{bestStreak\}`/,

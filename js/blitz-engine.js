@@ -60,6 +60,8 @@ window.BoohaBlitzEngine = (() => {
     }),
   });
   const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 5, 7, 10, 15]);
+  const WRONG_ANSWER_PENALTY_MS = 5000;
+  const CLEAN_CLEAR_MAX_MISTAKES = 2;
   const STREAK_EVENT_NOTES = Object.freeze({
     playful: Object.freeze({
       3: [523, 659], 5: [587, 740, 880], 7: [659, 784, 988],
@@ -317,7 +319,7 @@ window.BoohaBlitzEngine = (() => {
     }
   }
 
-  function saveBestTime(gameType, legacyKey, curr, ms, weekId) {
+  function saveBestTime(gameType, legacyKey, curr, ms, weekId, resultMeta = {}) {
     try {
       const data = readSave();
       const blitz = ensureBlitzStore(data, gameType, weekId);
@@ -326,7 +328,7 @@ window.BoohaBlitzEngine = (() => {
       const oldRecord = normalizeScore(blitz.records[gameType][curr]);
       const legacy = normalizeScore(legacyScore(data, legacyKey, curr));
       const bestBefore = [oldRecord, legacy].filter(Boolean).sort((a, b) => a.ms - b.ms)[0] || null;
-      const newScore = { ms, name: playerName, date: new Date().toISOString() };
+      const newScore = { ms, name: playerName, date: new Date().toISOString(), ...resultMeta };
       const isWeeklyRecord = !oldWeekly || ms < oldWeekly.ms;
       const isAllTimeRecord = !bestBefore || ms < bestBefore.ms;
 
@@ -352,7 +354,7 @@ window.BoohaBlitzEngine = (() => {
         isWeeklyRecord: false,
         isAllTimeRecord: false,
         oldRecord: null,
-        newScore: { ms, name: getPlayerName(), date: new Date().toISOString() },
+        newScore: { ms, name: getPlayerName(), date: new Date().toISOString(), ...resultMeta },
       };
     }
   }
@@ -2401,6 +2403,8 @@ window.BoohaBlitzEngine = (() => {
       let runIsActive = false;
       let visibilityPaused = false;
       let runEligibleForRecord = true;
+      let mistakeCount = 0;
+      const initialQueueLength = queue.length;
 
       function setBackground(streakValue = streak) {
         const next = backgroundFor(palette, bgIndex, streakValue);
@@ -2673,14 +2677,18 @@ window.BoohaBlitzEngine = (() => {
         wrongPopup.classList.remove('show');
         wrongPopup.scrollTop = 0;
         overlay.classList.remove('wrong-active');
+        const missedCard = queue[current];
+        const retryAt = Math.min(queue.length, current + 4 + Math.floor(Math.random() * 3));
+        queue.splice(retryAt, 0, missedCard);
+        current++;
         streak = 0;
-        elapsed = 0;
+        elapsed += WRONG_ANSWER_PENALTY_MS;
         clearElapsed = null;
-        startTime = performance.now();
+        startTime = performance.now() - elapsed;
         runIsActive = true;
         visibilityPaused = false;
         lastTimerPaint = -Infinity;
-        timerEl.textContent = '0.00s';
+        timerEl.textContent = fmtTime(elapsed);
         renderQuestion(true);
         startBGM();
         scheduleTimerTick(0);
@@ -2704,7 +2712,9 @@ window.BoohaBlitzEngine = (() => {
         btn.classList.add('wrong');
         runIsActive = false;
         visibilityPaused = false;
-        runEligibleForRecord = false;
+        mistakeCount++;
+        runEligibleForRecord = mistakeCount <= CLEAN_CLEAR_MAX_MISTAKES;
+        elapsed = startTime === null ? elapsed : performance.now() - startTime;
         spotlight.resetStreak();
         setBackground(0);
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
@@ -2732,7 +2742,8 @@ window.BoohaBlitzEngine = (() => {
           jpWordEl.textContent = card.jp;
           hiraEl.textContent = card.hira;
         });
-        progressEl.textContent = `${current + 1} / ${queue.length}`;
+        const progress = `${Math.min(current + 1, initialQueueLength)} / ${initialQueueLength}`;
+        progressEl.textContent = queue.length > initialQueueLength ? `${progress} · REPLAYS` : progress;
         const wrong = shuffle(weekCards.filter(c => c.n !== card.n)).slice(0, 5);
         const options = shuffle([card, ...wrong]);
         optionsEl.innerHTML = '';
@@ -2758,6 +2769,7 @@ window.BoohaBlitzEngine = (() => {
         if (gameStarted) return;
         gameStarted = true;
         runEligibleForRecord = true;
+        mistakeCount = 0;
         startBGM();
         playStartSting();
         startCard.card.classList.add('launching');
@@ -2784,8 +2796,11 @@ window.BoohaBlitzEngine = (() => {
         visibilityPaused = false;
         const weekId = makeWeekId(monthSlug, weekNumber);
         const recordEligible = runEligibleForRecord;
-        const isPerfectRun = recordEligible && bestStreak === queue.length;
-        const isMasteryClear = !recordEligible;
+        const clearTier = mistakeCount === 0
+          ? 'perfect'
+          : mistakeCount <= CLEAN_CLEAR_MAX_MISTAKES ? 'clean' : 'mastery';
+        const isPerfectRun = clearTier === 'perfect' && bestStreak === initialQueueLength;
+        const isMasteryClear = clearTier === 'mastery';
         const revealFinishFallback = () => {
           try {
             winScreen.classList.add('show');
@@ -2808,7 +2823,10 @@ window.BoohaBlitzEngine = (() => {
 
         try {
         const result = recordEligible
-          ? saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId)
+          ? saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId, {
+            clearTier,
+            mistakes: mistakeCount,
+          })
           : {
             isWeeklyRecord: false,
             isAllTimeRecord: false,
@@ -2824,7 +2842,9 @@ window.BoohaBlitzEngine = (() => {
             score: 100,
             completed: true,
             recordEligible,
-            ...(recordEligible ? { time: ms } : {}),
+            time: ms,
+            clearTier,
+            mistakes: mistakeCount,
           },
         }));
 
@@ -2862,9 +2882,13 @@ window.BoohaBlitzEngine = (() => {
         } else if (isMasteryClear) {
           recordEl.textContent = 'MASTERY CLEAR · NO RECORD';
           bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
-          deltaEl.textContent = 'RETRY RUN — RECORDS REQUIRE A CLEAN START';
+          deltaEl.textContent = `${mistakeCount} MISTAKES — KEEP BUILDING YOUR MEMORY`;
+        } else if (clearTier === 'clean') {
+          recordEl.textContent = 'CLEAN CLEAR · RECORD PENALTY APPLIED';
+          bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
+          deltaEl.textContent = `${mistakeCount} MISTAKE${mistakeCount === 1 ? '' : 'S'} · +${fmtTime(mistakeCount * WRONG_ANSWER_PENALTY_MS)}`;
         } else {
-          recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST · #1' : 'CLEAR COMPLETE';
+          recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST · #1' : 'PERFECT CLEAR';
           bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
           deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs previous best` : (weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}` : '');
         }
@@ -2875,10 +2899,12 @@ window.BoohaBlitzEngine = (() => {
         if (finalCard.residual) {
           finalCard.residual.textContent = `${palette.streak?.label || 'STREAK'} ENERGY ×${bestStreak} — STILL GLOWING`;
         }
-        finalCard.perfect.hidden = !(isPerfectRun || isMasteryClear);
+        finalCard.perfect.hidden = false;
         finalCard.perfect.textContent = isMasteryClear
           ? 'MASTERY CLEAR · NO RECORD'
-          : isPerfectRun ? `PERFECT RUN · ${queue.length}/${queue.length}` : '';
+          : clearTier === 'clean'
+            ? `CLEAN CLEAR · ${mistakeCount} MISTAKE${mistakeCount === 1 ? '' : 'S'}`
+            : `PERFECT RUN · ${initialQueueLength}/${initialQueueLength}`;
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         spotlight.nameplate.classList.add('complete');
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
