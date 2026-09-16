@@ -20,6 +20,8 @@ const CURRENT_CACHES = {
   // the page/script remain network-first, so no cache version bump is needed.
   // Family Room Pass 6 adds the wrong-mark red hazard and exit escape path;
   // the page/script remain network-first, so no cache version bump is needed.
+  // Family Room Pass 7 starts BGM after the study handoff, adds audio-only
+  // anomaly rounds, and gives Pataskala a late within-round movement cue.
   pages:  'booha-pages-2026-411',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
