@@ -13,7 +13,8 @@ assert(!source.includes('localStorage'), 'the room must use the shared save/even
 assert(!source.includes('creature-1'), 'the photoreal creature beat must be retired');
 assert(source.includes('saveId: SAVE_ID'), 'the room must submit a registered save id');
 assert(source.includes('progress = Math.max(0, progress - 1)'), 'wrong calls must lower hidden case progress');
-assert(source.includes('flames = Math.min(MAX_FLAMES, flames + 1)'), 'a correct mark must return lantern light');
+assert(source.includes('if (flames < MAX_FLAMES) flames += 1'), 'a correct mark must return lantern light only below maximum');
+assert(source.includes('function retryRound()') && source.includes('chooseRound();'), 'a wrong call must reroll the room before retrying');
 
 function classList() {
   const values = new Set();
