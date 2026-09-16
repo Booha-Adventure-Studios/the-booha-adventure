@@ -24,7 +24,8 @@ assert(!source.includes('beginMarking') && !source.includes('mark-skip'), 'the o
 assert(source.includes('MARK_HOLD_MS = 600') && source.includes('lockMark'), 'marking must require a hold before it locks');
 assert(source.includes('lightRadius') && source.includes('moveBooha'), 'Booha movement must drive the lantern reveal');
 assert(source.includes('alertMultiplier: 2') && source.includes('alertMultiplier: 1.2') && source.includes('alertMultiplier: 1'), 'alert distance must scale with the room tier');
-assert(source.includes('falseAlertChance: .15') && source.includes('falseAlertPoint'), 'the Lies tier must support false proximity alerts');
+assert(source.includes('realTellChance: 1') && source.includes('realTellChance: .55') && source.includes('realTellChance: .3'), 'each tier must tune whether the presence tell is available');
+assert(source.includes('falseAlertChance: .25') && source.includes('falseAlertPoint') && source.includes('const shouldTell = tellAvailable'), 'the Lies tier must support uncertain and false proximity alerts');
 assert(source.includes('function isBoohaAlerting()') && source.includes('currentPoint(target)'), 'Booha alerting must be proximity-based');
 assert(!source.includes('time - roundStarted > 2100'), 'the alert sprite must not be a timed giveaway');
 assert(source.includes('burnMs: 25000') && source.includes('burnMs: 18000') && source.includes('burnMs: 12000'), 'each room tier must have its own lantern burn window');
@@ -53,7 +54,7 @@ assert(source.includes('const FAMILY_AUDIO = Object.freeze') && source.includes(
 assert(source.includes('function loadAudioBuffers') && source.includes('function startBgm') && source.includes('function playSfx'), 'Family Room audio must use the shared WebAudio lifecycle');
 assert(source.includes('AUDIO_LEVELS = Object.freeze') && source.includes('master: .72'), 'Family Room audio must use a capped master volume');
 assert(source.includes("playSfx('move', AUDIO_LEVELS.move)") && source.includes("playSfx('anomaly', AUDIO_LEVELS.anomaly)"), 'movement and anomaly cues must be connected to gameplay');
-assert(source.includes("playSfx(Math.random() < .5 ? 'jump1' : 'jump2', AUDIO_LEVELS.jump)"), 'failure must choose one of the two jump-scare screams');
+assert(source.includes('jumpLevel: .24') && source.includes('jumpLevel: .4') && source.includes('jumpLevel: .58') && source.includes('playSfx(Math.random() < .5 ? \'jump1\' : \'jump2\', jumpLevel)'), 'failure must choose one of the two jump-scare screams at the room tier volume');
 assert(serviceWorker.includes("`${BASE}/assets/`"), 'Family Room audio must use the runtime asset cache path');
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
 assert(markup.includes('id="leave-button"') && markup.includes('REPORT THE ROOM') && source.includes('REPORT & CONTINUE'), 'the room must use one explicit report/continue button');
