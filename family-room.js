@@ -23,6 +23,14 @@
     lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, falseAlertChance: .15, burnMs: 12000 },
   });
 
+  const UI_COPY = Object.freeze({
+    lanternDimmed: { kicker: 'THE LANTERN DIMMED', kickerJp: 'あんどんが くらくなった', title: 'MOVE FASTER.', titleJp: 'もっと はやく。', copy: 'The room outlasted the light. Start the search again before the next flame goes.', copyJp: 'へやが あかりより ながく のこった。つぎの ほのおが きえるまえに、もういちど さがそう。', button: 'SEARCH AGAIN', buttonJp: 'もういちど さがす' },
+    roomDarker: { kicker: 'THE ROOM GOT DARKER', kickerJp: 'へやが くらくなった', title: 'TRY AGAIN.', titleJp: 'もういちど。', copy: 'The light is still here. Look once more, then choose.', copyJp: 'あかりは まだ ここに ある。もういちど みてから、えらぼう。', button: 'LOOK AGAIN', buttonJp: 'もういちど みる' },
+    lightLostSearch: { kicker: 'CASE FILE 07 / LIGHT LOST', kickerJp: 'じけんファイル 07 / あかりが きえた', title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The lantern burned out before you could report the room. Bring the light back and try again.', copyJp: 'へやを ほうこくするまえに、あんどんが きえた。あかりを もどして、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
+    lightLostReport: { kicker: 'CASE FILE 07 / LIGHT LOST', kickerJp: 'じけんファイル 07 / あかりが きえた', title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The case is not closed. Bring the light back and try the room again.', copyJp: 'じけんは おわっていない。あかりを もどして、もういちど へやを やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
+    complete: { kicker: 'CASE FILE 07 / SEALED', kickerJp: 'じけんファイル 07 / ふういん', title: 'THE ROOM LET GO.', titleJp: 'へやが はなした。', copy: 'You kept the light alive. Your notes are filed, and the door is where you left it.', copyJp: 'あかりを まもった。きろくを のこした。ドアは おいた ばしょに ある。', button: 'RETURN TO THE PROFILE', buttonJp: 'プロフィールへ もどる' },
+  });
+
   const PATASKALA_POSES = [
     { id: 'pataskala-standing', target: [.7, .29, .14], artSize: .15, en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', kind: 'character', character: 'pataskala' },
     { id: 'pataskala-moving', target: [.74, .43, .17], artSize: .16, en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', kind: 'character', character: 'pataskala' },
@@ -52,14 +60,28 @@
   const messageTitle = document.getElementById('message-title');
   const messageCopy = document.getElementById('message-copy');
   const messageButton = document.getElementById('message-button');
+  const messageKickerEn = document.getElementById('message-kicker-en');
+  const messageKickerJp = document.getElementById('message-kicker-jp');
+  const messageTitleEn = document.getElementById('message-title-en');
+  const messageTitleJp = document.getElementById('message-title-jp');
+  const messageCopyEn = document.getElementById('message-copy-en');
+  const messageCopyJp = document.getElementById('message-copy-jp');
+  const messageButtonEn = document.getElementById('message-button-en');
+  const messageButtonJp = document.getElementById('message-button-jp');
   const curtain = document.getElementById('transition-curtain');
   const observationNote = document.getElementById('observation-note');
+  const observationEn = document.getElementById('observation-en');
+  const observationJp = document.getElementById('observation-jp');
   const andon = document.getElementById('andon');
   const clueCard = document.getElementById('clue-card');
   const clueEn = document.getElementById('clue-en');
   const clueJp = document.getElementById('clue-jp');
   const soundToggle = document.getElementById('sound-toggle');
   const soundState = document.getElementById('sound-state');
+  const soundStateJp = document.getElementById('sound-state-jp');
+  const leaveEn = document.getElementById('leave-en');
+  const leaveJp = document.getElementById('leave-jp');
+  const backButton = document.getElementById('back-button');
   const flameEls = [...document.querySelectorAll('[data-flame]')];
   const tierButtons = [...document.querySelectorAll('[data-tier]')];
 
@@ -179,8 +201,20 @@
 
   function updateFlames() {
     flameEls.forEach((el, index) => el.classList.toggle('off', index >= flames));
-    const label = `Lantern light: ${flames} flame${flames === 1 ? '' : 's'}`;
+    const label = `Lantern light: ${flames} flame${flames === 1 ? '' : 's'} / あんどんの あかり: ${flames}つ`;
     document.getElementById('flame-meter').setAttribute('aria-label', label);
+  }
+
+  function setBilingual(enNode, jpNode, en, jp) {
+    enNode.textContent = en;
+    jpNode.textContent = jp;
+  }
+
+  function setObservation(en, jp) { setBilingual(observationEn, observationJp, en, jp); }
+
+  function setReportLabel(locked) {
+    setBilingual(leaveEn, leaveJp, locked ? 'REPORT & CONTINUE' : 'REPORT THE ROOM', locked ? 'ほうこくして つぎへ' : 'へやを ほうこくする');
+    document.getElementById('leave-button').classList.toggle('armed', locked);
   }
 
   function burnFraction(time = performance.now()) {
@@ -194,7 +228,7 @@
     andon.style.setProperty('--andon-level', String(fraction));
     andon.classList.toggle('dim', fraction < .55);
     andon.classList.toggle('critical', fraction < .22);
-    andon.setAttribute('aria-label', fraction < .22 ? 'Lantern light is nearly gone' : 'Lantern light is burning');
+    andon.setAttribute('aria-label', fraction < .22 ? 'Lantern light is nearly gone / あんどんの あかりが きえそう' : 'Lantern light is burning / あんどんが もえている');
   }
 
   function updateTierButtons() {
@@ -397,13 +431,18 @@
   function startLoop() { if (!animationFrame) animationFrame = requestAnimationFrame(frame); }
   function stopLoop() { if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = 0; } }
 
-  function showMessage(kicker, title, copy, buttonText, handler) {
-    messageKicker.textContent = kicker; messageTitle.textContent = title; messageCopy.textContent = copy; messageButton.textContent = buttonText; messageButton.onclick = handler; messagePanel.classList.add('visible');
+  function showMessage(message, handler) {
+    setBilingual(messageKickerEn, messageKickerJp, message.kicker, message.kickerJp);
+    setBilingual(messageTitleEn, messageTitleJp, message.title, message.titleJp);
+    setBilingual(messageCopyEn, messageCopyJp, message.copy, message.copyJp);
+    setBilingual(messageButtonEn, messageButtonJp, message.button, message.buttonJp);
+    messageButton.onclick = handler;
+    messagePanel.classList.add('visible');
   }
 
   function hidePanels() { startPanel.classList.remove('visible'); messagePanel.classList.remove('visible'); }
-  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; markHoldOrigin = null; window.clearTimeout(markHoldTimer); markHoldTimer = 0; }
-  function updateHud() { observationNote.textContent = state === 'playing' ? (markLocked ? 'MARK LOCKED / LEAVE WHEN READY' : 'DRAG BOOHA / HOLD TO MARK') : 'LOOK / LISTEN / REMEMBER'; updateFlames(); }
+  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; markHoldOrigin = null; window.clearTimeout(markHoldTimer); markHoldTimer = 0; setReportLabel(false); }
+  function updateHud() { if (state === 'playing') setObservation(markLocked ? 'MARK LOCKED / REPORT THE ROOM' : 'DRAG BOOHA / HOLD TO MARK', markLocked ? 'しるしを つけた / へやを ほうこくする' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markLocked); updateFlames(); }
 
   function startRound() {
     state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028);
@@ -455,17 +494,17 @@
     updateFlames(); updateAndon(time);
     if (flames > 0) {
       state = 'caught';
-      observationNote.textContent = 'THE ANDON WENT DARK';
-      showMessage('THE LANTERN DIMMED', 'MOVE FASTER.', 'The room outlasted the light. Start the search again before the next flame goes.', 'SEARCH AGAIN', () => { messagePanel.classList.remove('visible'); retryRound(); });
+      setObservation('THE ANDON WENT DARK', 'あんどんが きえた');
+      showMessage(UI_COPY.lanternDimmed, () => { messagePanel.classList.remove('visible'); retryRound(); });
       return;
     }
-    beginFailure('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The lantern burned out before you could report the room. Bring the light back and try again.');
+    beginFailure(UI_COPY.lightLostSearch);
   }
 
   function handleWrong() {
     curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - 1); clearMarkingUi(); updateFlames();
-    if (flames > 0) { showMessage('THE ROOM GOT DARKER', 'TRY AGAIN.', 'The light is still here. Look once more, then choose.', 'LOOK AGAIN', () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
-    beginFailure('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The case is not closed. Bring the light back and try the room again.');
+    if (flames > 0) { showMessage(UI_COPY.roomDarker, () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
+    beginFailure(UI_COPY.lightLostReport);
   }
 
   function restartCase() {
@@ -479,10 +518,10 @@
     ambientGain.gain.setValueAtTime(0, audioContext.currentTime);
   }
 
-  function beginFailure(kicker, title, copy) {
-    state = 'caught'; failureStarted = performance.now(); observationNote.textContent = 'THE LANTERN WENT OUT'; silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
+  function beginFailure(message) {
+    state = 'caught'; failureStarted = performance.now(); setObservation('THE LANTERN WENT OUT', 'あかりが きえた'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
     window.setTimeout(() => { if (state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', AUDIO_LEVELS.jump); }, FAILURE_SILENCE_MS + 60);
-    window.setTimeout(() => { if (state === 'caught' && failureStarted) showMessage(kicker, title, copy, 'RESTART THE CASE', restartCase); }, FAILURE_PANEL_DELAY_MS);
+    window.setTimeout(() => { if (state === 'caught' && failureStarted) showMessage(message, restartCase); }, FAILURE_PANEL_DELAY_MS);
   }
 
   function retryRound() {
@@ -517,7 +556,7 @@
       window.clearTimeout(markHoldTimer);
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
     }
-    observationNote.textContent = 'HOLD BOOHA STILL';
+    setObservation('HOLD BOOHA STILL', 'ブーハを じっと させる');
   }
 
   function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event); }
@@ -529,16 +568,17 @@
     markLocked = true;
     markedPoint = [booha.targetX, booha.targetY, lightRadius()];
     rightTone();
-    observationNote.textContent = 'MARK LOCKED / LEAVE WHEN READY';
+    setReportLabel(true);
+    setObservation('MARK LOCKED / REPORT THE ROOM', 'しるしを つけた / へやを ほうこくする');
   }
 
-  function showClue() { clueEn.textContent = currentAnomaly.en; clueJp.textContent = currentAnomaly.jp; clueCard.hidden = false; observationNote.textContent = 'MARK RETURNED TO THE LANTERN'; window.clearTimeout(clueTimer); clueTimer = window.setTimeout(() => { clueCard.hidden = true; }, 1300); }
+  function showClue() { clueEn.textContent = currentAnomaly.en; clueJp.textContent = currentAnomaly.jp; clueCard.hidden = false; setObservation('MARK RETURNED TO THE LANTERN', 'しるしが あかりに もどった'); window.clearTimeout(clueTimer); clueTimer = window.setTimeout(() => { clueCard.hidden = true; }, 1300); }
 
   function submitResult() {
     document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId: SAVE_ID, score: marks, completed: true, time: performance.now() - caseStarted, recordEligible: true, recentRun: { marks, calls: correctCalls, tier: selectedTier } } }));
   }
 
-  function showComplete() { state = 'complete'; controls.classList.add('hidden'); clearMarkingUi(); observationNote.textContent = 'EXIT FOUND'; completeTone(); submitResult(); showMessage('CASE FILE 07 / SEALED', 'THE ROOM LET GO.', 'You kept the light alive. Your notes are filed, and the door is where you left it.', 'RETURN TO THE PROFILE', exitGame); }
+  function showComplete() { state = 'complete'; controls.classList.add('hidden'); clearMarkingUi(); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); showMessage(UI_COPY.complete, exitGame); }
 
   function exitGame() {
     try {
@@ -549,7 +589,12 @@
   }
 
   function toggleSound() {
-    audioEnabled = !audioEnabled; soundState.textContent = audioEnabled ? 'ON' : 'OFF'; soundToggle.setAttribute('aria-pressed', String(audioEnabled)); if (audioEnabled) ensureAudio(); if (audioMasterGain && audioContext) audioMasterGain.gain.setTargetAtTime(audioEnabled ? AUDIO_LEVELS.master : 0, audioContext.currentTime, .04); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12);
+    audioEnabled = !audioEnabled;
+    setBilingual(soundState, soundStateJp, audioEnabled ? 'ON' : 'OFF', audioEnabled ? 'オン' : 'オフ');
+    soundToggle.setAttribute('aria-pressed', String(audioEnabled));
+    if (audioEnabled) ensureAudio();
+    if (audioMasterGain && audioContext) audioMasterGain.gain.setTargetAtTime(audioEnabled ? AUDIO_LEVELS.master : 0, audioContext.currentTime, .04);
+    if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12);
   }
 
   function ensureAudio() {
@@ -599,6 +644,7 @@
   function completeTone() { [330, 440, 660].forEach((frequency, index) => window.setTimeout(() => tone(frequency, .26, .035), index * 100)); }
 
   document.getElementById('start-button').addEventListener('click', enterRoom);
+  backButton.addEventListener('click', exitGame);
   document.getElementById('leave-button').addEventListener('click', handleLeave);
   canvas.addEventListener('pointerdown', setBoohaTarget);
   canvas.addEventListener('pointermove', moveBoohaTarget);
