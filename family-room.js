@@ -16,6 +16,7 @@
     jump2: 'assets/family-room/audio/family_jump-2.mp3',
   });
   const AUDIO_LEVELS = Object.freeze({ bgm: .07, move: .16, anomaly: .34, jump: .58, master: .72 });
+  const FAMILY_SFX_NAMES = Object.freeze(['move', 'anomaly', 'jump1', 'jump2']);
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
     patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 25000 },
@@ -132,7 +133,8 @@
   let bgmGain = null;
   let bgmSource = null;
   let audioBuffers = Object.create(null);
-  let audioLoadPromise = null;
+  let sfxLoadPromise = null;
+  let bgmLoadPromise = null;
   let droneTellTimer = 0;
   let clueTimer = 0;
   let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
@@ -454,7 +456,17 @@
 
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
-    round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); hidePanels(); ensureAudio(); startRound();
+    round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); hidePanels(); requestFamilyRuntimeCache(); ensureAudio(); startRound();
+  }
+
+  function requestFamilyRuntimeCache() {
+    const controller = window.navigator?.serviceWorker?.controller;
+    if (!controller) return;
+    const urls = [
+      ...Object.values(FAMILY_AUDIO),
+      ...PATASKALA_POSES.map(pose => `assets/family-room/pataskala/${pose.id}.webp`),
+    ].map(url => new URL(url, window.location.href).pathname);
+    controller.postMessage({ type: 'CACHE_URLS', payload: urls });
   }
 
   function advanceCase() { progress = Math.min(CASE_ROUNDS, progress + 1); round += 1; if (progress >= CASE_ROUNDS) showComplete(); else startRound(); }
@@ -616,13 +628,23 @@
   }
 
   function loadAudioBuffers() {
-    if (!audioContext || audioLoadPromise || typeof window.fetch !== 'function') return audioLoadPromise;
-    audioLoadPromise = Promise.all(Object.entries(FAMILY_AUDIO).map(async ([name, url]) => {
+    if (!audioContext || typeof window.fetch !== 'function') return null;
+    if (!sfxLoadPromise) {
+      sfxLoadPromise = Promise.all(FAMILY_SFX_NAMES.map(name => loadAudioBuffer(name, FAMILY_AUDIO[name])))
+        .catch(() => { sfxLoadPromise = null; });
+    }
+    if (!bgmLoadPromise) {
+      bgmLoadPromise = loadAudioBuffer('bgm', FAMILY_AUDIO.bgm)
+        .then(() => { if (audioEnabled && state === 'playing') startBgm(); })
+        .catch(() => { bgmLoadPromise = null; });
+    }
+    return Promise.allSettled([sfxLoadPromise, bgmLoadPromise]);
+  }
+
+  async function loadAudioBuffer(name, url) {
       const response = await window.fetch(url);
       if (!response.ok) throw new Error(`Family Room audio failed: ${name}`);
       audioBuffers[name] = await audioContext.decodeAudioData(await response.arrayBuffer());
-    })).then(() => { if (audioEnabled && state === 'playing') startBgm(); }).catch(() => { audioLoadPromise = null; });
-    return audioLoadPromise;
   }
 
   function startBgm() {
