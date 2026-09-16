@@ -319,7 +319,18 @@
     showMessage('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The case is not closed. Bring the light back and try the room again.', 'RESTART THE CASE', () => { messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); startRound(); });
   }
 
-  function retryRound() { state = 'playing'; entryStarted = performance.now(); transitionStarted = 0; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); updateHud(); scheduleTell(); }
+  function retryRound() {
+    state = 'playing';
+    roundStarted = performance.now();
+    entryStarted = roundStarted;
+    transitionStarted = 0;
+    curtain.className = '';
+    controls.classList.remove('hidden');
+    clearMarkingUi();
+    chooseRound();
+    updateHud();
+    scheduleTell();
+  }
 
   function beginMarking() { state = 'marking'; controls.classList.add('hidden'); markPrompt.hidden = false; markSkip.hidden = false; observationNote.textContent = 'THE ROOM REMEMBERS'; }
 
@@ -330,7 +341,9 @@
     const [tx, ty] = currentPoint(currentAnomaly.target);
     const radius = Math.max(30, Math.min(width, height) * currentAnomaly.target[2] * .72);
     if (Math.hypot(x - tx, y - ty) > radius) { ping(84, .018); observationNote.textContent = 'NOT THERE / LOOK AGAIN'; return; }
-    marks += 1; flames = Math.min(MAX_FLAMES, flames + 1); rightTone(); clearMarkingUi(); showClue(); updateFlames(); window.setTimeout(advanceCase, REDUCED_MOTION ? 500 : 1450);
+    marks += 1;
+    if (flames < MAX_FLAMES) flames += 1;
+    rightTone(); clearMarkingUi(); showClue(); updateFlames(); window.setTimeout(advanceCase, REDUCED_MOTION ? 500 : 1450);
   }
 
   function showClue() { clueEn.textContent = currentAnomaly.en; clueJp.textContent = currentAnomaly.jp; clueCard.hidden = false; observationNote.textContent = 'MARK RETURNED TO THE LANTERN'; window.clearTimeout(clueTimer); clueTimer = window.setTimeout(() => { clueCard.hidden = true; }, 1300); }
