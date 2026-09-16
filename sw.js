@@ -22,6 +22,8 @@ const CURRENT_CACHES = {
   // the page/script remain network-first, so no cache version bump is needed.
   // Family Room Pass 7 starts BGM after the study handoff, adds audio-only
   // anomaly rounds, and gives Pataskala a late within-round movement cue.
+  // Family Room entrance pass replaces the lime orb with the photoreal
+  // flashlight sprite and adds the bilingual enter/closed popup in Utsuroba.
   pages:  'booha-pages-2026-411',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
@@ -287,6 +289,7 @@ const CORE_ASSETS = [
   `${BASE}/assets/img/grimmerglen/booha_grimmerglen_version_1.webp`,
   `${BASE}/assets/img/background-1.webp`,
   `${BASE}/assets/img/booha_ghost.webp`,
+  `${BASE}/assets/img/family-room/flashlight.webp`,
   `${BASE}/assets/img/profile.webp`,
   `${BASE}/assets/img/pre-boo.webp`,
   `${BASE}/assets/img/boo-tree.webp`,
