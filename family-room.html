@@ -9,7 +9,7 @@
 </head>
 <body>
   <main id="game-shell" aria-label="Family Room observation game">
-    <canvas id="room-canvas" aria-label="A dark family room to inspect"></canvas>
+    <canvas id="room-canvas" aria-label="A dark family room. Drag Booha through the room and hold him still to mark a change."></canvas>
 
     <header class="hud">
       <div class="hud-brand">
@@ -27,37 +27,30 @@
     </header>
 
     <div id="observation-note" class="observation-note">LOOK / LISTEN / REMEMBER</div>
-    <div id="mark-prompt" class="mark-prompt" hidden>TAP WHAT CHANGED</div>
-    <button id="mark-skip" class="mark-skip" type="button" hidden>CONTINUE WITHOUT MARKING <span>→</span></button>
-
     <div id="clue-card" class="clue-card" aria-live="polite" hidden>
       <span class="clue-kicker">CASE NOTE</span>
       <strong id="clue-en"></strong>
       <span id="clue-jp" class="clue-jp"></span>
     </div>
 
-    <section id="controls" class="controls hidden" aria-label="Choose a direction">
-      <button id="back-button" class="choice-button" type="button" data-choice="back">
-        <span class="choice-arrow">↶</span>
-        <span><b>GO BACK</b><small>the room is different</small></span>
-      </button>
-      <button id="straight-button" class="choice-button" type="button" data-choice="straight">
-        <span><b>GO STRAIGHT</b><small>the room is normal</small></span>
-        <span class="choice-arrow">↷</span>
+    <section id="controls" class="controls hidden" aria-label="Report the room">
+      <button id="leave-button" class="choice-button leave-button" type="button">
+        <span class="choice-arrow">↗</span>
+        <span><b>LEAVE THE ROOM</b><small>marked = changed · unmarked = clean</small></span>
       </button>
     </section>
 
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
       <p class="panel-kicker">CASE FILE 07 / FAMILY ROOM</p>
       <h1 id="start-title">DON'T BLINK.</h1>
-      <p class="panel-copy">The room repeats. If it looks normal, go straight. If anything has changed, go back.</p>
+      <p class="panel-copy">The room repeats. Drag Booha through the darkness. Hold him still where something changed, then leave. If the room is clean, leave without marking anything.</p>
       <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves">
         <button class="tier-button selected" type="button" data-tier="patient"><b>THE ROOM IS PATIENT</b><small>the first case</small></button>
         <button class="tier-button" type="button" data-tier="quicker"><b>THE ROOM IS QUICKER</b><small>three fast Blitz stamps</small></button>
         <button class="tier-button" type="button" data-tier="lies"><b>THE ROOM LIES TO YOU</b><small>three very fast stamps</small></button>
       </div>
       <button id="start-button" class="primary-button" type="button">ENTER THE ROOM <span>→</span></button>
-      <p class="panel-foot">Keyboard: <kbd>↑</kbd> straight &nbsp; <kbd>↓</kbd> back</p>
+      <p class="panel-foot">Drag Booha to look &nbsp;·&nbsp; hold to mark &nbsp;·&nbsp; <kbd>Enter</kbd> leave</p>
     </section>
 
     <section id="message-panel" class="panel" aria-live="polite">
