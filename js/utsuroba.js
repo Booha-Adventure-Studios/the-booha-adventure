@@ -996,6 +996,7 @@
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = './assets/img/booha_ghost.webp';
+  const familyRoomFlashlightArt = makeUtsurobaDeferredImage('./assets/img/family-room/flashlight.webp');
 
   /* Round 2 Pass 13 (celebration dance): three dedicated dance-pose
      frames, swapped on a beat during startCelebration() instead of
@@ -1110,6 +1111,7 @@
   let gardenPreviousFocus = null;
   let utsuProfilePortal = null;
   let utsuProfileOverlay = null, utsuProfileOpen = false, utsuProfilePreviousFocus = null;
+  let familyRoomPopOverlay = null, familyRoomPopOpen = false, familyRoomPopPreviousFocus = null, familyRoomPopCooldownUntil = 0;
   let utsurobaRotateOverlay = null;
   let utsurobaViewportRefreshFrame = 0;
 
@@ -1182,6 +1184,24 @@
       .utsu-profile-pop-actions button span{display:block;margin-top:3px;font-size:.74em;opacity:.8;}
       .utsu-profile-pop-actions button:hover,.utsu-profile-pop-actions button:focus-visible{border-color:#fff;background:rgba(216,168,255,.25);transform:translateY(-1px);outline:none;}
       .utsu-profile-pop-actions button:last-child{border-color:rgba(255,255,255,.24);background:transparent;color:rgba(255,255,255,.72);}
+      #family-room-pop-overlay .utsu-profile-pop-box{border-color:rgba(197,255,104,.72);background:linear-gradient(155deg,#17200f,#0b1009 72%);box-shadow:0 0 0 1px rgba(197,255,104,.14),0 0 42px rgba(133,194,24,.34),0 0 100px rgba(45,74,6,.28),inset 0 0 50px rgba(0,0,0,.56);}
+      #family-room-pop-overlay .utsu-profile-pop-box::before{background:linear-gradient(90deg,transparent,#baff45,#fff5bb,#baff45,transparent);}
+      #family-room-pop-overlay .utsu-profile-pop-box::after{border-color:rgba(197,255,104,.16);}
+      #family-room-pop-overlay .utsu-profile-pop-icon{width:166px;height:102px;margin-bottom:10px;}
+      #family-room-pop-overlay .family-room-pop-icon::before{background:radial-gradient(ellipse,rgba(202,255,72,.42),rgba(255,222,129,.16) 42%,transparent 72%);filter:blur(10px);}
+      #family-room-pop-overlay .family-room-pop-icon img{width:166px;height:102px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 7px #fff1ac) drop-shadow(0 0 24px #baff45);}
+      #family-room-pop-overlay .family-room-pop-icon.is-closed::before{opacity:.22;filter:grayscale(1) blur(8px);}
+      #family-room-pop-overlay .family-room-pop-icon.is-closed img{filter:grayscale(.8) brightness(.34) drop-shadow(0 0 3px rgba(186,255,69,.32));}
+      #family-room-pop-overlay .family-room-pop-eyebrow{color:#caff65;}
+      #family-room-pop-overlay .family-room-pop-eyebrow .jp,#family-room-pop-overlay .family-room-pop-title .jp{display:block;margin-top:3px;font-size:.78em;letter-spacing:.05em;opacity:.78;}
+      #family-room-pop-overlay .family-room-pop-title{color:#f2ffd6;text-shadow:0 0 16px rgba(186,255,69,.42);}
+      #family-room-pop-overlay .family-room-pop-title-jp{color:rgba(230,255,190,.72);}
+      #family-room-pop-overlay .family-room-pop-copy{color:#f5ffe7;}
+      #family-room-pop-overlay .family-room-pop-warning{position:relative;margin:16px 0 0;padding:10px 12px;border:1px solid rgba(255,177,111,.48);border-radius:9px;background:rgba(255,132,68,.09);color:#ffd2af;font:800 clamp(.7rem,2.3vw,.82rem)/1.35 system-ui,sans-serif;letter-spacing:.04em;}
+      #family-room-pop-overlay .family-room-pop-warning small{display:block;margin-top:4px;color:rgba(255,222,194,.72);font:600 .82em/1.4 Georgia,serif;letter-spacing:.04em;}
+      #family-room-pop-overlay .family-room-pop-actions button{border-color:rgba(197,255,104,.7);background:rgba(186,255,69,.12);color:#efffd0;}
+      #family-room-pop-overlay .family-room-pop-actions button:hover,#family-room-pop-overlay .family-room-pop-actions button:focus-visible{border-color:#fff;background:rgba(186,255,69,.24);}
+      #family-room-pop-overlay .family-room-pop-actions button:last-child{border-color:rgba(255,255,255,.24);background:transparent;color:rgba(239,255,208,.72);}
       @keyframes utsuProfileOverlayIn{from{background:rgba(0,0,0,0)}to{background:rgba(0,0,0,.86)}}
       @keyframes utsuProfilePopIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
       @keyframes utsuProfileShimmer{0%,100%{background-position:200% 0}50%{background-position:0 0}}
@@ -1577,6 +1597,90 @@
       scheduleUtsurobaFrame();
     }, 350);
   }
+
+  function injectFamilyRoomPopup() {
+    if (familyRoomPopOverlay) return;
+    familyRoomPopOverlay = document.createElement('div');
+    familyRoomPopOverlay.id = 'family-room-pop-overlay';
+    familyRoomPopOverlay.className = 'utsu-profile-pop-overlay';
+    familyRoomPopOverlay.setAttribute('role', 'dialog');
+    familyRoomPopOverlay.setAttribute('aria-modal', 'true');
+    familyRoomPopOverlay.setAttribute('aria-hidden', 'true');
+    familyRoomPopOverlay.tabIndex = -1;
+    familyRoomPopOverlay.innerHTML = `
+      <div class="utsu-profile-pop-box" role="document" aria-labelledby="family-room-pop-title">
+        <button class="utsu-profile-pop-close" type="button" aria-label="Close / とじる">✕</button>
+        <div class="utsu-profile-pop-icon family-room-pop-icon is-closed"><img id="family-room-pop-icon" src="./assets/img/family-room/flashlight.webp" alt="Flashlight"></div>
+        <p class="utsu-profile-pop-eyebrow family-room-pop-eyebrow"><span id="family-room-pop-eyebrow-en">CASE FILE 02 / CLOSED</span><span id="family-room-pop-eyebrow-jp" class="jp" lang="ja">じけんファイル 02 / しまっている</span></p>
+        <h2 id="family-room-pop-title" class="family-room-pop-title"><span id="family-room-pop-title-en">THE FAMILY ROOM</span><span id="family-room-pop-title-jp" class="jp" lang="ja">かぞくの へや</span></h2>
+        <p class="utsu-profile-pop-copy family-room-pop-copy"><span id="family-room-pop-copy-en"></span><small id="family-room-pop-copy-jp" lang="ja"></small></p>
+        <p class="family-room-pop-warning"><span>⚠ This is a horror puzzle game!</span><small lang="ja">⚠ これは こわい なぞときゲーム！</small></p>
+        <div class="utsu-profile-pop-actions family-room-pop-actions"></div>
+      </div>`;
+    document.body.appendChild(familyRoomPopOverlay);
+    familyRoomPopOverlay.querySelector('.utsu-profile-pop-close').addEventListener('click', closeFamilyRoomPopup);
+    familyRoomPopOverlay.addEventListener('click', event => { if (event.target === familyRoomPopOverlay) closeFamilyRoomPopup(); });
+    familyRoomPopOverlay.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); closeFamilyRoomPopup(); return; }
+      trapOverlayFocus(familyRoomPopOverlay, event);
+    });
+  }
+
+  function isFamilyRoomPopupOpen() { return familyRoomPopOpen; }
+
+  function openFamilyRoomPopup() {
+    if (!familyRoomPopOverlay || familyRoomPopOpen || performance.now() < familyRoomPopCooldownUntil) return;
+    familyRoomPopPreviousFocus = document.activeElement;
+    familyRoomPopOpen = true;
+    state.inputLocked = true;
+    state.clickTarget = null;
+    state.moving = false;
+    pauseUtsurobaFrameLoop();
+    const open = familyRoomOpen();
+    const icon = familyRoomPopOverlay.querySelector('.family-room-pop-icon');
+    const iconImage = familyRoomPopOverlay.querySelector('#family-room-pop-icon');
+    icon.classList.toggle('is-closed', !open);
+    iconImage.alt = open ? 'Flashlight switched on' : 'Flashlight switched off';
+    const eyebrowEn = familyRoomPopOverlay.querySelector('#family-room-pop-eyebrow-en');
+    const eyebrowJp = familyRoomPopOverlay.querySelector('#family-room-pop-eyebrow-jp');
+    const copyEn = familyRoomPopOverlay.querySelector('#family-room-pop-copy-en');
+    const copyJp = familyRoomPopOverlay.querySelector('#family-room-pop-copy-jp');
+    eyebrowEn.textContent = open ? 'CASE FILE 02 / OPEN' : 'CASE FILE 02 / CLOSED';
+    eyebrowJp.textContent = open ? 'じけんファイル 02 / あいている' : 'じけんファイル 02 / しまっている';
+    copyEn.textContent = open
+      ? 'The Family Room is open. Enter if you are ready.'
+      : 'The Family Room is closed. Complete nine games this week to open it.';
+    copyJp.textContent = open
+      ? 'かぞくの へやが あいている。じゅんびが できたら はいる。'
+      : 'かぞくの へやは しまっている。こんしゅう 9つの ゲームを おわると あく。';
+    const actions = familyRoomPopOverlay.querySelector('.family-room-pop-actions');
+    actions.innerHTML = open
+      ? '<button type="button" data-family-room-enter><span>ENTER</span><span>はいる</span></button><button type="button" data-family-room-stay><span>STAY HERE</span><span>ここに いる</span></button>'
+      : '<button type="button" data-family-room-stay><span>OK</span><span>わかった</span></button>';
+    actions.querySelector('[data-family-room-enter]')?.addEventListener('click', enterFamilyRoom);
+    actions.querySelector('[data-family-room-stay]').addEventListener('click', closeFamilyRoomPopup);
+    familyRoomPopOverlay.classList.add('is-open');
+    familyRoomPopOverlay.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => (actions.querySelector('[data-family-room-enter]') || actions.querySelector('[data-family-room-stay]'))?.focus());
+  }
+
+  function closeFamilyRoomPopup() {
+    if (!familyRoomPopOverlay || !familyRoomPopOpen) return;
+    familyRoomPopOpen = false;
+    familyRoomPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+    familyRoomPopOverlay.classList.remove('is-open');
+    familyRoomPopOverlay.setAttribute('aria-hidden', 'true');
+    state.inputLocked = false;
+    const previousFocus = familyRoomPopPreviousFocus;
+    familyRoomPopPreviousFocus = null;
+    setTimeout(() => {
+      if (previousFocus && document.contains(previousFocus) && typeof previousFocus.focus === 'function') {
+        try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+      }
+      scheduleUtsurobaFrame();
+    }, 220);
+  }
+
   function doExitToKarasuki() {
     if (state.exitingToKarasuki) return;
     state.exitingToKarasuki = true; state.clickTarget = null; state.moving = false;
@@ -1593,7 +1697,8 @@
   }
 
   function enterFamilyRoom() {
-    if (!familyRoomOpen() || state.inputLocked) return;
+    if (!familyRoomOpen() || state.exitingToKarasuki) return;
+    familyRoomPopOpen = false;
     state.inputLocked = true;
     state.clickTarget = null;
     state.moving = false;
@@ -3007,6 +3112,7 @@
     injectWeeklyReadingChallenge();
     injectEchoesTracker();
     injectUtsurobaProfilePopup();
+    injectFamilyRoomPopup();
     if (DEV_MODE) { injectDevPanel(); }
     utsurobaRotateOverlay = document.createElement('div');
     utsurobaRotateOverlay.id = 'rotate-overlay';
@@ -3369,13 +3475,13 @@
   function clickCheckFamilyRoomPortal(wx, wy) {
     if (state.roomId !== FAMILY_ROOM_PORTAL.roomId) return false;
     if (Math.hypot(wx - FAMILY_ROOM_PORTAL.x, wy - FAMILY_ROOM_PORTAL.y) > FAMILY_ROOM_PORTAL.r) return false;
-    if (familyRoomOpen()) enterFamilyRoom();
+    openFamilyRoomPopup();
     return true;
   }
 
   function checkFamilyRoomPortal() {
-    if (state.roomId !== FAMILY_ROOM_PORTAL.roomId || !familyRoomOpen() || state.inputLocked) return;
-    if (Math.hypot(state.x - FAMILY_ROOM_PORTAL.x, state.y - FAMILY_ROOM_PORTAL.y) <= FAMILY_ROOM_PORTAL.r) enterFamilyRoom();
+    if (state.roomId !== FAMILY_ROOM_PORTAL.roomId || state.inputLocked) return;
+    if (Math.hypot(state.x - FAMILY_ROOM_PORTAL.x, state.y - FAMILY_ROOM_PORTAL.y) <= FAMILY_ROOM_PORTAL.r) openFamilyRoomPopup();
   }
 
   function drawFamilyRoomPortal(now) {
@@ -3389,8 +3495,8 @@
     const cy = FAMILY_ROOM_PORTAL.y + wobble;
     ctx.save();
 
-    // The open entrance is a sickly green breach in the room: the smoke is
-    // deliberately dark so the orb reads as an intrusion rather than a UI
+    // The open entrance is a sickly green breach in the room: the smoke stays
+    // deliberately dark so the flashlight reads as an intrusion, not a UI
     // waypoint.
     const haze = ctx.createRadialGradient(cx, cy, 0, cx, cy, 82 + pulse * 12);
     haze.addColorStop(0, open ? 'rgba(190,255,35,0.30)' : 'rgba(55,65,20,0.12)');
@@ -3420,24 +3526,25 @@
 
     if (open) {
       ctx.globalAlpha = 0.65 + pulse * 0.2;
-      ctx.strokeStyle = '#9dff18'; ctx.lineWidth = 2; ctx.shadowBlur = 15; ctx.shadowColor = '#9dff18';
+      ctx.strokeStyle = '#baff45'; ctx.lineWidth = 2; ctx.shadowBlur = 15; ctx.shadowColor = '#baff45';
       ctx.setLineDash([5, 8]); ctx.lineDashOffset = -sec * 10;
-      ctx.beginPath(); ctx.ellipse(cx, cy, 40 + pulse * 5, 25 + pulse * 4, sec * 0.18, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(cx, cy, 52 + pulse * 6, 31 + pulse * 4, sec * 0.18, 0, Math.PI * 2); ctx.stroke();
       ctx.setLineDash([]); ctx.shadowBlur = 0;
     }
 
-    const coreR = 10 + pulse * 3.5;
-    const core = ctx.createRadialGradient(cx - coreR * 0.32, cy - coreR * 0.34, 0, cx, cy, coreR);
-    core.addColorStop(0, open ? '#f4ffd5' : '#777957');
-    core.addColorStop(0.3, open ? '#d4ff69' : '#4e5335');
-    core.addColorStop(0.68, open ? '#9dff18' : '#292d18');
-    core.addColorStop(1, open ? '#315600' : '#080a06');
-    ctx.globalAlpha = reveal * (0.96 + pulse * 0.04);
-    ctx.shadowBlur = open ? 25 + pulse * 18 : 7;
-    ctx.shadowColor = open ? '#9dff18' : '#30351b';
-    ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy, coreR, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
-    ctx.globalAlpha = reveal * (open ? 0.72 : 0.25); ctx.fillStyle = open ? '#ffffff' : '#aaa978';
-    ctx.beginPath(); ctx.arc(cx - coreR * 0.3, cy - coreR * 0.3, coreR * 0.3, 0, Math.PI * 2); ctx.fill();
+    // The generated photo has a dark studio field; screen blending makes that
+    // field disappear against Utsuroba while preserving the lit lens and beam.
+    const flashlight = ensureUtsurobaImage(familyRoomFlashlightArt);
+    if (flashlight.complete && flashlight.naturalWidth > 0) {
+      const flashlightW = 170 + pulse * 10;
+      const flashlightH = flashlightW * (flashlight.naturalHeight / flashlight.naturalWidth || 2 / 3);
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = reveal * (open ? 0.94 : 0.34);
+      ctx.filter = open ? 'brightness(1.05) saturate(1.08)' : 'grayscale(.8) brightness(.34)';
+      ctx.drawImage(flashlight, cx - flashlightW / 2, cy - flashlightH / 2, flashlightW, flashlightH);
+      ctx.restore();
+    }
     ctx.restore();
   }
 
@@ -3814,6 +3921,7 @@
       convergenceOpen        ||
       gardenOpen              ||
       utsuProfileOpen         ||
+      familyRoomPopOpen       ||
       weeklyChallengeOpen    ||
       (window.UtsurobaReading && window.UtsurobaReading.isOpen()) ||
       isExitPopOpen()
@@ -3826,7 +3934,7 @@
   function staticFrameOverlayOpen() {
     return drifterPanelOpen || convergenceOpen || gardenOpen || weeklyChallengeOpen
       || readingJournalOpen || (window.UtsurobaReading && window.UtsurobaReading.isOpen())
-      || isExitPopOpen() || utsuProfileOpen;
+      || isExitPopOpen() || utsuProfileOpen || familyRoomPopOpen;
   }
 
   // Pass 3: DOM popups do not need the world canvas to keep repainting behind
