@@ -51,6 +51,28 @@ assert(source.includes('markedPoint = [booha.targetX, booha.targetY, lightRadius
 assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 92'), 'Booha must leave more of the lantern reveal unobstructed');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
+const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
+const portraitSourceRatios = {
+  bowl: [512 / 512, 342 / 512], cup: [512 / 512, 468 / 512], eyes: [512 / 512, 256 / 512],
+  shadow: [512 / 512, 768 / 512], talisman: [512 / 512, 768 / 512], lantern: [512 / 512, 342 / 512],
+  futon: [512 / 512, 342 / 512], seams: [512 / 512, 171 / 512], teapot: [512 / 512, 342 / 512], crescent: [512 / 512, 468 / 512],
+  'pataskala-standing': [512 / 768, 768 / 768], 'pataskala-moving': [512 / 768, 768 / 768],
+  'pataskala-crouch': [512 / 768, 768 / 768], 'pataskala-emerging': [512 / 768, 768 / 768],
+};
+assert(portraitEntries.length === 14, 'portrait regression must cover every anomaly and Pataskala pose');
+const portraitWidth = 390;
+const portraitHeight = 844;
+const portraitScale = Math.max(portraitWidth / 1024, portraitHeight / 1536);
+const portraitPlate = { w: 1024 * portraitScale, h: 1536 * portraitScale, x: (portraitWidth - 1024 * portraitScale) / 2, y: 0 };
+portraitEntries.forEach(([, id, uText, vText, sizeText]) => {
+  const [sourceWidthRatio, sourceHeightRatio] = portraitSourceRatios[id];
+  const maxDimension = portraitPlate.w * Number(sizeText);
+  const drawWidth = maxDimension * sourceWidthRatio;
+  const drawHeight = maxDimension * sourceHeightRatio;
+  const x = portraitPlate.x + Number(uText) * portraitPlate.w;
+  const y = portraitPlate.y + Number(vText) * portraitPlate.h;
+  assert(x - drawWidth / 2 >= 0 && x + drawWidth / 2 <= portraitWidth && y - drawHeight / 2 >= 0 && y + drawHeight / 2 <= portraitHeight, `${id} must remain fully visible at 390x844`);
+});
 assert(source.includes('const FAMILY_AUDIO = Object.freeze') && source.includes('family_BGM.mp3') && source.includes('family_jump-2.mp3'), 'the Family Room audio set must be declared');
 assert(source.includes('const FAMILY_SFX_NAMES') && source.includes('function loadAudioBuffer') && source.includes('function loadAudioBuffers') && source.includes('function startBgm') && source.includes('function playSfx'), 'Family Room audio must use the shared WebAudio lifecycle');
 assert(source.includes('sfxLoadPromise') && source.includes('bgmLoadPromise') && source.includes('Promise.allSettled'), 'small Family Room cues must load independently of the long BGM');
