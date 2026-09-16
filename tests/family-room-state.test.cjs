@@ -62,6 +62,9 @@ assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.
 assert(source.includes('maxChanges: 1') && source.includes('maxChanges: 2') && source.includes('twoChangeChance: .24') && source.includes('twoChangeChance: .52'), 'room tiers must define when two-change rounds can appear');
 assert(source.includes('let currentAnomalies = []') && source.includes('function reportIsCorrect') && source.includes('currentAnomalies.every'), 'reports must validate every required change and reject missing or extra marks');
 assert(source.includes('currentPresence = Math.random() < pataskalaChance()') && source.includes('currentPresence || falseAlertPoint'), 'Pataskala presence must remain separate from scored room changes');
+assert(source.includes('WRONG_MARK_GRACE_MS = 700') && source.includes('function startWrongMarkHazard') && source.includes('function updateWrongMarkHazard'), 'a wrong confirmed mark must create a readable hazard state');
+assert(source.includes('function boohaAtExit') && source.includes("RUN TO THE EXIT") && source.includes('beginFailure(UI_COPY.caseReset)'), 'the wrong-mark hazard must be escapable at the exit and fatal on contact');
+assert(source.includes("playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + .1))") && source.includes('rgba(255,82,62,.92)'), 'wrong marks must have distinct red visual and audio feedback');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
