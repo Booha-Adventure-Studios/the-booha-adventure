@@ -24,9 +24,8 @@ assert(!source.includes('round-number'), 'the case must not expose a round count
 assert(!source.includes('localStorage'), 'the room must use the shared save/event layer');
 assert(!source.includes('creature-1'), 'the photoreal creature beat must be retired');
 assert(source.includes('saveId: SAVE_ID'), 'the room must submit a registered save id');
-assert(source.includes('progress = Math.max(0, progress - currentTier().progressPenalty)'), 'wrong calls must apply the selected tier progress penalty');
-assert(source.includes('if (flames < MAX_FLAMES) flames += 1'), 'a correct mark must return lantern light only below maximum');
-assert(source.includes('function retryRound()') && source.includes('chooseRound();'), 'a wrong call must reroll the room before retrying');
+assert(!source.includes('MAX_FLAMES') && !source.includes('flames'), 'Pass 3 must remove flame lives from the room state');
+assert(source.includes('function restartCase()') && source.includes('round = 0; progress = 0;'), 'a mistake must restart the whole case from round one');
 assert(!source.includes("['pb:vocab', 'pb:sentence', 'pb:question']"), 'tier gates must not be hard-coded to Pre-Boo');
 assert(source.includes("const curriculums = ['pb', 'br', 'bc'];") && source.includes('`${curriculum}:${type}`'), 'tier gates must read Blitz stamps across all curricula');
 assert(!source.includes("state = 'marking'"), 'marking must be part of observation, not a separate phase');
@@ -39,10 +38,10 @@ assert(source.includes('falseAlertChance: .25') && source.includes('falseAlertPo
 assert(source.includes('function isBoohaAlerting()') && source.includes('currentPoint(target)'), 'Booha alerting must be proximity-based');
 assert(!source.includes('time - roundStarted > 2100'), 'the alert sprite must not be a timed giveaway');
 assert(source.includes('burnMs: 35000') && source.includes('burnMs: 18000') && source.includes('burnMs: 12000'), 'each room tier must have its own lantern burn window');
-assert(source.includes('progressPenalty: 0') && source.includes('progressPenalty: 1') && source.includes('currentTier().progressPenalty'), 'Patient must recover from a wrong report without losing case progress');
-assert(source.includes('function handleBurnout(time)') && source.includes('flames = Math.max(0, flames - 1)'), 'burnout must cost one flame');
-assert(source.includes('function updateAndon') && source.includes('THE ANDON WENT DARK'), 'the lantern clock must use a dimming andon, not a number');
-assert(markup.includes('id="andon"') && markup.includes('ROOM LIGHT'), 'the lantern burn indicator must have a corner status element');
+assert(source.includes('function handleBurnout(time)') && source.includes('beginFailure(UI_COPY.caseReset)'), 'burnout must restart the case instead of consuming a life');
+assert(source.includes('function handleWrong()') && source.includes('beginFailure(UI_COPY.caseReset)'), 'a wrong report must restart the case instead of consuming a life');
+assert(source.includes('function updateAndon') && source.includes('burnFraction'), 'the lantern clock must use a dimming andon, not a number');
+assert(markup.includes('id="andon"') && markup.includes('ROOM LIGHT') && !markup.includes('flame-meter'), 'the lantern burn indicator must be the only light readout');
 assert(source.includes('function drawShojiDawn') && source.includes('progress / CASE_ROUNDS'), 'case progress must brighten the shoji without a counter');
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
@@ -59,6 +58,7 @@ assert(source.includes('plate.w * anomaly.artSize') && source.includes('plate.w 
 assert(source.includes('drawAnomaly(currentAnomaly);') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'anomalies must be faintly visible outside the lantern and the light rim must blend into the room');
 assert(source.includes('markedPoint = [booha.targetX, booha.targetY, lightRadius()]') && source.includes('markRadius'), 'marking must judge whether the anomaly is inside the lantern at lock time');
 assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 92'), 'Booha must leave more of the lantern reveal unobstructed');
+assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.includes('.26 - minimum'), 'the lantern radius must shrink continuously with a playable minimum');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
@@ -130,10 +130,9 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'flame-meter', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
 nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
-const flames = [0, 1, 2].map(index => Object.assign(element(`flame-${index}`), { dataset: { flame: String(index) } }));
 const listeners = {};
 nodes['room-canvas'].getContext = () => ({
   setTransform() {}, clearRect() {}, fillRect() {}, drawImage() {}, save() {}, restore() {},
@@ -153,7 +152,7 @@ const document = {
   readyState: 'complete',
   getElementById: id => nodes[id],
   createElement: tag => tag === 'canvas' ? canvasElement() : element(tag),
-  querySelectorAll: selector => selector === '[data-flame]' ? flames : [],
+  querySelectorAll: () => [],
   addEventListener(type, handler) { listeners[type] = handler; },
   dispatchEvent(event) { if (event.type === 'booha:gameEnd') events.push(event.detail); },
 };

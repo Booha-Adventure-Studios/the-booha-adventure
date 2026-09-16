@@ -53,10 +53,6 @@ button { font: inherit; }
 .andon.critical { color: var(--red); }
 .andon.critical .andon-light { background: var(--red); box-shadow: 0 0 12px rgba(187,74,63,.75); }
 .hud-right { display: flex; align-items: flex-start; gap: 22px; }
-.flame-meter { display: flex; gap: 7px; padding-top: 1px; filter: drop-shadow(0 0 9px rgba(232,183,108,.42)); }
-.flame { display: block; color: var(--amber); font-size: 19px; line-height: 1; transform: rotate(45deg) scale(.8); transition: color .22s ease, opacity .22s ease, transform .22s ease; }
-.flame::after { content: ''; display: block; width: 7px; height: 12px; margin: -7px auto 0; border-radius: 50% 50% 45% 45%; background: currentColor; opacity: .75; transform: rotate(-45deg); }
-.flame.off { color: #34302a; opacity: .5; filter: none; transform: rotate(45deg) scale(.68); }
 .sound-toggle { pointer-events: auto; display: inline-flex; align-items: baseline; gap: 5px; border: 0; border-bottom: 1px solid var(--line); padding: 4px 0 5px; color: var(--muted); background: none; font-size: 10px; letter-spacing: .16em; cursor: pointer; }
 .sound-toggle > .jp { display: inline; }
 .sound-toggle:hover, .sound-toggle:focus-visible { color: var(--ink); border-color: var(--ink); outline: none; }
@@ -133,8 +129,6 @@ kbd { border: 1px solid var(--line); padding: 3px 5px; color: var(--ink); }
   .choice-arrow { font-size: 18px; }
   .panel { width: calc(100% - 24px); padding: 25px 18px; }
   .hud-right { gap: 12px; }
-  .flame-meter { gap: 3px; }
-  .flame { font-size: 16px; }
   .clue-card { bottom: max(92px, calc(env(safe-area-inset-bottom) + 82px)); }
   .tier-button { display: block; }
   .tier-button small { display: block; margin-top: 4px; }
