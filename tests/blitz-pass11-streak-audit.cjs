@@ -12,7 +12,7 @@ assert.match(engine, /label: 'CHAIN', marker: '✦'/,
   'Boo-continuum must use an elegant chain identity');
 assert.match(engine, /booha-blitz-streak-meter-fill/,
   'the shared streak HUD must include a lightweight visible meter');
-assert.match(engine, /STREAK_EVENT_THRESHOLDS = Object\.freeze\(\[3, 5, 8, 12, 15\]\)/,
+assert.match(engine, /STREAK_EVENT_THRESHOLDS = Object\.freeze\(\[3, 6, 9, 12, 15\]\)/,
   'the shared streak HUD must expose one fifteen-step escalation ladder');
 assert.match(engine, /function setStreak\(streak, eventThreshold = 0, runLength = 15\)/,
   'the streak meter must accept the actual run length');

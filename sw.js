@@ -162,6 +162,9 @@ const CURRENT_CACHES = {
   // Pass 1: freeze Karasuki during the Grimmerglen popup/exit transition.
   // Pass 2: defer Grimmerglen collectible images until their room needs them.
   // Blitz Pass 1: throttle timer paints and reduce celebration paint pressure.
+  // Blitz celebration pass: milestone tiers use the 3/6/9/12/15 ladder and
+  // perfect runs reveal their result card after the brief climax; scripts stay
+  // network-first with this cached fallback for offline play.
   // Family Room Pass 8: authored audio is fetched on room entry through the
   // existing runtime asset cache rather than added to the install-time core.
   // Family Room Pataskala pass: character poses use that same deferred path.

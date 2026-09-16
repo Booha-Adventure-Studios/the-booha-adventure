@@ -21,7 +21,7 @@ assert.match(engine, /questionOverlayRect = overlay\.getBoundingClientRect\(\);/
   'the overlay rectangle must be captured after question layout');
 assert.match(engine, /const answerRect = isMinimalPower\(\) \|\| REDUCED_MOTION \? null : btn\.getBoundingClientRect\(\);/,
   'the selected answer rectangle must be captured once at tap time');
-assert.match(engine, /correctDetonate\(btn, answerRect, overlayRect\);/,
+assert.match(engine, /correctDetonate\(btn, answerRect, overlayRect(?:, milestone)?\);/,
   'correct feedback must consume the cached geometry');
 assert.match(engine, /emitWrongMicroFeedback\(btn, answerRect, overlayRect\);/,
   'wrong feedback must consume the cached geometry');

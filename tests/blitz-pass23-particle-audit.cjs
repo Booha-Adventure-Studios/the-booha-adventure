@@ -14,11 +14,11 @@ assert.match(engine, /animation: boohaBlitzWrongSpark 400ms/,
   'wrong sparks must resolve quickly without lingering noise');
 assert.match(engine, /\.booha-blitz-streak-spark-large \{[\s\S]*?width: clamp\(11px, 1\.8vw, 16px\)/,
   'high streak events must include one larger readable spark');
-assert.match(engine, /const fullCount = \(\{ 3: 6, 5: 12, 8: 20, 12: 32, 15: 48 \}\)\[threshold\] \|\| 6/,
+assert.match(engine, /const fullCount = \(\{ 3: 6, 6: 12, 9: 20, 12: 32, 15: 48 \}\)\[threshold\] \|\| 6/,
   'high streak events must increase the particle burst across the unified ladder');
 assert.match(engine, /function emitStreakSparks\(\)[\s\S]*?if \(isMinimalPower\(\) \|\| REDUCED_MOTION\) return;[\s\S]*?const count = effectCount\(fullCount\)/,
   'streak particle bursts must retain low-power limits without hidden nodes');
-assert.match(engine, /const count = isLowPower\(\) \? 4 : streak >= 5 \? 10 : 6/,
+assert.match(engine, /const count = isLowPower\(\) \? 4 : streak >= 6 \? 10 : 6/,
   'correct feedback must keep modest bursts across reduced tiers');
 assert.match(engine, /const size = 5 \+ Math\.random\(\) \* 6/,
   'celebration particles must avoid sub-five-pixel sizing');

@@ -94,23 +94,24 @@ const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
 
 const STREAK_LEVELS = [
   { min:0, max:2, level:0 },
-  { min:3, max:3, level:1 },
-  { min:4, max:4, level:2 },
-  { min:5, max:5, level:3 },
-  { min:6, max:99, level:4 },
+  { min:3, max:5, level:1 },
+  { min:6, max:8, level:2 },
+  { min:9, max:11, level:3 },
+  { min:12, max:99, level:4 },
 ];
 function getStreakLevel(s) {
   return (STREAK_LEVELS.find(t => s >= t.min && s <= t.max) ?? STREAK_LEVELS[0]).level;
 }
 
 const STREAK_MSG = {
-  1: { en:'Great start! Keep going!',        jp:'いいね！続けよう！',         kanji:'好調！続けよう！' },
-  2: { en:"On fire! You're on a roll!",      jp:'すごい！どんどんいこう！',    kanji:'絶好調！どんどん行こう！' },
-  3: { en:'Unstoppable! Amazing speed!',     jp:'止まらない！スピードすごい！', kanji:'止まらない！驚異の速さ！' },
-  4: { en:'LEGENDARY! You are the fastest!', jp:'最強！世界一速い！',          kanji:'最強！世界最速！' },
+  1: { en:'ON FIRE!',       jp:'燃えてる！',       kanji:'燃えてる！' },
+  2: { en:'HEATING UP!',    jp:'どんどん熱く！',   kanji:'加熱中！' },
+  3: { en:'UNSTOPPABLE!',   jp:'止まらない！',     kanji:'無敵！' },
+  4: { en:'LEGENDARY!!',    jp:'伝説級！！',       kanji:'伝説！' },
 };
 
 const HEAT_DURATIONS = [5000, 4200, 3200, 2400, 1600];
+const STREAK_MILESTONES = [3, 6, 9, 12, 15];
 
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
@@ -650,6 +651,50 @@ S.textContent = `
   transform:none !important;
 }
 
+/* Sustained streak gears: milestone flashes are brief, but the run state stays visible. */
+.vs-wrap.streak-level-1 .vs-prompt-box,
+.vs-wrap.streak-level-1 .vs-timer-track{ box-shadow:0 0 26px rgba(255,204,0,.22); }
+.vs-wrap.streak-level-2 .vs-prompt-box,
+.vs-wrap.streak-level-2 .vs-timer-track{ box-shadow:0 0 38px rgba(255,120,0,.3); }
+.vs-wrap.streak-level-3 .vs-prompt-box,
+.vs-wrap.streak-level-3 .vs-timer-track{ box-shadow:0 0 52px rgba(255,60,0,.4); }
+.vs-wrap.streak-level-4 .vs-prompt-box,
+.vs-wrap.streak-level-4 .vs-timer-track{ box-shadow:0 0 68px rgba(255,200,0,.52); animation:vsChargedBreath 2.4s ease-in-out infinite; }
+.vs-wrap.streak-level-3 .vs-choice,
+.vs-wrap.streak-level-4 .vs-choice{ box-shadow:0 0 18px rgba(255,120,0,.2), 0 6px 20px rgba(0,0,0,.35); }
+.vs-wrap.streak-level-4 .vs-choice{ box-shadow:0 0 24px rgba(255,200,0,.32), 0 6px 20px rgba(0,0,0,.35); }
+@keyframes vsChargedBreath{
+  0%,100%{ filter:brightness(1); }
+  50%{ filter:brightness(1.07); }
+}
+.vs-prompt-box.vs-hit{ animation:vsPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
+.vs-dot.vs-hit{ animation:vsDotHit 300ms cubic-bezier(.2,.9,.25,1) both; }
+.vs-wrap .vs-prompt-box.vs-hit{ animation:vsPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
+@keyframes vsPromptHit{
+  0%{ transform:scale(1); } 38%{ transform:scale(1.025); } 100%{ transform:scale(1); }
+}
+@keyframes vsDotHit{
+  0%{ transform:scale(1); filter:brightness(1); } 45%{ transform:scale(1.5); filter:brightness(1.7); } 100%{ transform:scale(1); filter:brightness(1); }
+}
+@media (prefers-reduced-motion: reduce){
+  .vs-wrap.streak-level-4 .vs-prompt-box,
+  .vs-wrap.streak-level-4 .vs-timer-track,
+  .vs-prompt-box.vs-hit,
+  .vs-dot.vs-hit{ animation:none; filter:brightness(1.18); }
+}
+
+.vs-final-climax{
+  position:fixed; inset:0; z-index:1150; display:none; place-items:center; pointer-events:none;
+  background:radial-gradient(circle at 50% 48%, rgba(255,238,140,.72), rgba(255,120,0,.28) 24%, rgba(20,8,0,.88) 76%);
+}
+.vs-final-climax.show{ display:grid; animation:vsFinalClimax 980ms cubic-bezier(.16,.9,.2,1) both; }
+.vs-final-climax-label{ text-align:center; font-family:var(--game-font-title); font-weight:1000; color:#fffbe1; text-shadow:0 0 18px #fff,0 0 44px #ff9d00,0 0 90px #ff4b00; }
+.vs-final-climax-title{ font-size:clamp(30px,10vw,82px); letter-spacing:.08em; }
+.vs-final-climax-count{ margin-top:.35rem; font-size:clamp(22px,6vw,52px); letter-spacing:.12em; }
+@keyframes vsFinalClimax{ 0%{opacity:0;transform:scale(.72)} 16%{opacity:1;transform:scale(1.1)} 46%{opacity:.96;transform:scale(1)} 100%{opacity:0;transform:scale(1.08)} }
+@media (prefers-reduced-motion: reduce){ .vs-final-climax.show{ animation:vsFinalClimaxReduced 420ms ease both; } }
+@keyframes vsFinalClimaxReduced{ from{opacity:0} 35%{opacity:1} to{opacity:0} }
+
 .vs-feedback-overlay{
   position:fixed; inset:0; z-index:1100; display:none; align-items:center; justify-content:center;
   padding:1rem; background:rgba(5,3,10,.76); backdrop-filter:blur(8px);
@@ -984,6 +1029,13 @@ U.mount(`
   </div>
 </div>
 
+<div class="vs-final-climax" id="vs-final-climax" hidden aria-hidden="true">
+  <div class="vs-final-climax-label">
+    <div class="vs-final-climax-title">PERFECT RUN</div>
+    <div class="vs-final-climax-count">15 / 15</div>
+  </div>
+</div>
+
 <!-- RESULTS — separate from main wrap so header stays visible above it -->
 <div class="vs-results" id="vs-results">
   <div class="vs-res-inner">
@@ -1106,6 +1158,7 @@ const feedbackOverlay = document.getElementById('vs-feedback-overlay');
 const feedbackTitle = document.getElementById('vs-feedback-title');
 const feedbackCopy = document.getElementById('vs-feedback-copy');
 const feedbackContinue = document.getElementById('vs-feedback-continue');
+const finalClimax = document.getElementById('vs-final-climax');
 
 /* ── Build 15 progress dots ── */
 for (let i = 0; i < 15; i++) {
@@ -1171,6 +1224,19 @@ let heatDur   = 5000;
 let runStartedAt = 0;
 let feedbackState = 'awaiting-start';
 let recoveryPending = false;
+let finalClimaxTimer = null;
+let resultFxTimers = [];
+let resultAudio = null;
+
+function clearResultEffects() {
+  resultFxTimers.forEach(clearTimeout);
+  resultFxTimers = [];
+  if (resultAudio) {
+    try { resultAudio.pause(); resultAudio.currentTime = 0; } catch {}
+    resultAudio = null;
+  }
+  document.querySelectorAll('.vs-confetti-piece').forEach(el => el.remove());
+}
 
 /* ══════════════════════════════════════════════════════════════
    DOTS
@@ -1183,6 +1249,18 @@ function updateDots() {
   }
 }
 
+function pulseCorrectUI() {
+  promptBox.classList.remove('vs-hit');
+  void promptBox.offsetWidth;
+  promptBox.classList.add('vs-hit');
+  const dot = document.getElementById(`vs-d${idx}`);
+  if (dot) {
+    dot.classList.remove('vs-hit');
+    void dot.offsetWidth;
+    dot.classList.add('vs-hit');
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════
    STREAK COLORS
    ══════════════════════════════════════════════════════════════ */
@@ -1190,6 +1268,8 @@ const STREAK_COLORS = ['','#ffcc00','#ff9900','#ff4400','#ffe000'];
 function updateStreakUI() {
   const lv = getStreakLevel(streak);
   const col = STREAK_COLORS[lv] || 'var(--game-primary)';
+  mainWrap.classList.remove('streak-level-1','streak-level-2','streak-level-3','streak-level-4');
+  if (lv > 0) mainWrap.classList.add(`streak-level-${lv}`);
   streakPill.style.setProperty('--streak-color', col);
   streakEl.textContent = streak;
 
@@ -1237,6 +1317,8 @@ function setAnswerInputEnabled(enabled) {
 
 function showFailureFeedback(kind) {
   stopHeat();
+  promptBox.classList.remove('vs-hit');
+  updateDots();
   feedbackState = 'feedback';
   locked = true;
   setAnswerInputEnabled(false);
@@ -1365,8 +1447,12 @@ function handlePick(btn, en) {
     updateStreakUI();
     updateStreakBanner();
     updateDots();
+    pulseCorrectUI();
 
-    setTimeout(() => { idx++; renderQ(); }, 480);
+    const transitionMs = STREAK_MILESTONES.includes(streak)
+      ? (streak === 15 ? 620 : 560)
+      : 320;
+    setTimeout(() => { idx++; renderQ(); }, transitionMs);
 
   } else {
     btn.classList.add('vs-wrong');
@@ -1434,7 +1520,7 @@ function fireConfetti(big = false) {
   const colors = ['#ffcc00','#aaff22','#ff2288','#22ddff','#cc88ff','#ff6600','#ffffff'];
   const cx = window.innerWidth / 2;
   const cy = window.innerHeight * 0.38;
-  const count = big ? 80 : 36;
+  const count = big ? 48 : 24;
   for (let i = 0; i < count; i++) {
     const el = document.createElement('div');
     el.className = 'vs-confetti-piece';
@@ -1463,7 +1549,37 @@ function fireConfetti(big = false) {
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
   if (idx !== 15 || score !== 15 || streak !== 15 || feedbackState !== 'playing') return;
+  feedbackState = 'climax';
+  locked = true;
+  setAnswerInputEnabled(false);
+  stopHeat();
+  stopStreakAudio();
+
+  for (let i = 0; i < 15; i++) {
+    const d = document.getElementById(`vs-d${i}`);
+    if (d) d.className = 'vs-dot done';
+  }
+
+  const runTime = Math.max(0, performance.now() - runStartedAt);
+  finalClimax.hidden = false;
+  finalClimax.setAttribute('aria-hidden', 'false');
+  finalClimax.classList.remove('show');
+  void finalClimax.offsetWidth;
+  finalClimax.classList.add('show');
+  if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
+  finalClimaxTimer = setTimeout(() => {
+    if (feedbackState !== 'climax') return;
+    finalClimax.classList.remove('show');
+    finalClimax.hidden = true;
+    finalClimax.setAttribute('aria-hidden', 'true');
+    finalClimaxTimer = null;
+    revealResults(runTime);
+  }, (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 420 : 980);
+}
+
+function revealResults(runTime) {
   feedbackState = 'complete';
+  clearResultEffects();
   locked = true;
   setAnswerInputEnabled(false);
   stopHeat();
@@ -1483,8 +1599,6 @@ function showResults() {
 
   const tier = getTier(score);
   const pct  = 100;
-  const runTime = Math.max(0, performance.now() - runStartedAt);
-
   /* ── Dispatch to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
   detail: {
@@ -1509,18 +1623,24 @@ function showResults() {
 
   /* Confetti + result sound */
   if (score === 15) {
-    setTimeout(() => fireConfetti(false), 400);
-    setTimeout(() => fireConfetti(true),  900);
+    resultFxTimers.push(setTimeout(() => fireConfetti(false), 400));
+    resultFxTimers.push(setTimeout(() => fireConfetti(true),  900));
   }
-  const snd = new Audio(CFG.sfxBase + tier.sound);
-  snd.setAttribute('playsinline', '');
-  snd.play().catch(() => {});
+  resultAudio = new Audio(CFG.sfxBase + tier.sound);
+  resultAudio.setAttribute('playsinline', '');
+  resultAudio.play().catch(() => {});
 }
 
 /* ══════════════════════════════════════════════════════════════
    REPLAY / BACK
    ══════════════════════════════════════════════════════════════ */
 document.getElementById('vs-replay').addEventListener('click', () => {
+  clearResultEffects();
+  if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
+  finalClimaxTimer = null;
+  finalClimax.classList.remove('show');
+  finalClimax.hidden = true;
+  finalClimax.setAttribute('aria-hidden', 'true');
   results.classList.remove('show');
   mainWrap.style.display = '';
 
@@ -1538,6 +1658,7 @@ document.getElementById('vs-replay').addEventListener('click', () => {
 });
 
 document.getElementById('vs-back').addEventListener('click', () => {
+  clearResultEffects();
   stopStreakAudio();
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
