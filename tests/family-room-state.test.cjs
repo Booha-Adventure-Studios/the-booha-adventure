@@ -38,6 +38,10 @@ assert(source.includes('function drawFailureBooha') && source.includes('if (time
 assert(source.includes('const anomalyArt = Object.fromEntries') && source.includes('assets/family-room/overlays/${anomaly.id}.webp'), 'anomalies must load authored room overlays');
 assert(source.includes('artSize') && source.includes('ctx.drawImage(art'), 'anomaly rendering must use real art instead of procedural doodles');
 assert(['bowl', 'cup', 'eyes', 'shadow', 'talisman', 'lantern', 'futon', 'seams', 'teapot', 'crescent'].every(id => serviceWorker.includes(`/assets/family-room/overlays/${id}.webp`)), 'all authored anomaly overlays must be precached');
+assert(source.includes('const PATASKALA_POSES = [') && source.includes("character: 'pataskala'"), 'Pataskala must have a named character anomaly set');
+assert(source.includes('assets/family-room/pataskala/${pose.id}.webp') && ['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => fs.existsSync(path.join(root, `assets/family-room/pataskala/${id}.webp`))), 'all Pataskala poses must load as authored transparent assets');
+assert(source.includes('function pataskalaChance') && source.includes('if (round < 2) return 0'), 'Pataskala must emerge progressively after the opening cases');
+assert(source.includes("selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2"), 'the emerging Pataskala pose must be reserved for the Lies tier');
 assert(source.includes('const FAMILY_AUDIO = Object.freeze') && source.includes('family_BGM.mp3') && source.includes('family_jump-2.mp3'), 'the Family Room audio set must be declared');
 assert(source.includes('function loadAudioBuffers') && source.includes('function startBgm') && source.includes('function playSfx'), 'Family Room audio must use the shared WebAudio lifecycle');
 assert(source.includes('AUDIO_LEVELS = Object.freeze') && source.includes('master: .72'), 'Family Room audio must use a capped master volume');
