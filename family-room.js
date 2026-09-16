@@ -21,9 +21,9 @@
     || (Number.isFinite(window.navigator?.hardwareConcurrency) && window.navigator.hardwareConcurrency <= 2);
   if (LOW_POWER) document.documentElement.classList.add('low-power');
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 35000 },
-    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, jumpLevel: .4, burnMs: 18000 },
-    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, jumpLevel: .58, burnMs: 12000 },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, maxChanges: 1, twoChangeChance: 0, jumpLevel: .24, burnMs: 35000 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, maxChanges: 2, twoChangeChance: .24, jumpLevel: .4, burnMs: 18000 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, maxChanges: 2, twoChangeChance: .52, jumpLevel: .58, burnMs: 12000 },
   });
 
   // Pass 1 design lock: the house order and content vocabulary live in one
@@ -160,6 +160,8 @@
   let marks = 0;
   let correctCalls = 0;
   let currentAnomaly = null;
+  let currentAnomalies = [];
+  let currentPresence = null;
   let currentIsAnomaly = false;
   let falseAlertPoint = null;
   let tellAvailable = false;
@@ -356,17 +358,26 @@
   }
 
   function chooseRound() {
-    currentIsAnomaly = Math.random() >= .5;
-    currentAnomaly = currentIsAnomaly
-      ? (Math.random() < pataskalaChance() ? pataskalaPose() : random(anomalies))
-      : null;
     const tier = currentTier();
+    const hasChange = Math.random() >= .5;
+    const changeCount = hasChange
+      ? Math.min(tier.maxChanges, 1 + (Math.random() < tier.twoChangeChance ? 1 : 0))
+      : 0;
+    const pool = [...anomalies];
+    currentAnomalies = [];
+    for (let index = 0; index < changeCount; index += 1) {
+      const choice = Math.floor(Math.random() * pool.length);
+      currentAnomalies.push(pool.splice(choice, 1)[0]);
+    }
+    currentAnomaly = currentAnomalies[0] || null;
+    currentIsAnomaly = currentAnomalies.length > 0;
+    currentPresence = Math.random() < pataskalaChance() ? pataskalaPose() : null;
     falseAlertPoint = !currentIsAnomaly && Math.random() < tier.falseAlertChance
       ? { u: .22 + Math.random() * .56, v: .2 + Math.random() * .56, radius: .1 }
       : null;
     tellAvailable = currentIsAnomaly
       ? Math.random() < tier.realTellChance
-      : Boolean(falseAlertPoint);
+      : Boolean(currentPresence || falseAlertPoint);
   }
 
   function currentPoint([u, v]) { return [plate.x + u * plate.w, plate.y + v * plate.h]; }
@@ -389,6 +400,10 @@
     ctx.shadowBlur = Math.max(5, maxDimension * .12);
     ctx.drawImage(art, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight);
     ctx.restore();
+  }
+
+  function drawAnomalies(list) {
+    list.forEach(drawAnomaly);
   }
 
   function imageReady(image) {
@@ -417,14 +432,14 @@
       ctx.save();
       ctx.globalAlpha = state === 'caught' ? .07 : .16;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
-      drawAnomaly(currentAnomaly);
+      drawAnomalies(currentAnomalies); drawAnomaly(currentPresence);
       ctx.restore();
       const radius = lightRadius();
       ctx.save();
       ctx.beginPath(); ctx.arc(booha.x, booha.y, radius, 0, Math.PI * 2); ctx.clip();
       ctx.globalAlpha = state === 'caught' ? .24 : 1;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
-      drawAnomaly(currentAnomaly);
+      drawAnomalies(currentAnomalies); drawAnomaly(currentPresence);
       const light = ctx.createRadialGradient(booha.x, booha.y, radius * .48, booha.x, booha.y, radius);
       light.addColorStop(0, 'rgba(0,0,0,0)');
       light.addColorStop(1, 'rgba(0,0,0,.84)');
@@ -526,17 +541,20 @@
   }
 
   function alertTarget() {
-    if (currentIsAnomaly && currentAnomaly) return currentAnomaly.target;
+    if (currentAnomaly) return currentAnomaly.target;
     if (falseAlertPoint) return [falseAlertPoint.u, falseAlertPoint.v, falseAlertPoint.radius];
+    if (currentPresence) return currentPresence.target;
     return null;
   }
 
   function isBoohaAlerting() {
-    const target = alertTarget();
-    if (!target) return false;
-    const [tx, ty] = currentPoint(target);
-    const radius = Math.max(30, plate.w * target[2] * .72) * currentTier().alertMultiplier;
-    return Math.hypot(booha.x - tx, booha.y - ty) <= radius;
+    const targets = [...currentAnomalies, ...(currentPresence ? [currentPresence] : [])].map(anomaly => anomaly.target);
+    if (falseAlertPoint) targets.push([falseAlertPoint.u, falseAlertPoint.v, falseAlertPoint.radius]);
+    return targets.some(target => {
+      const [tx, ty] = currentPoint(target);
+      const radius = Math.max(30, plate.w * target[2] * .72) * currentTier().alertMultiplier;
+      return Math.hypot(booha.x - tx, booha.y - ty) <= radius;
+    });
   }
 
   function frame(time) {
@@ -621,7 +639,7 @@
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
     clearRoundTimers();
-    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentIsAnomaly = false;
+    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; currentIsAnomaly = false;
     state = 'study';
     curtain.className = '';
     controls.classList.add('hidden');
@@ -681,17 +699,28 @@
     ambientOscillator.frequency.setTargetAtTime(42, audioContext.currentTime + .5, .1);
   }
 
+  function markMatchesAnomaly(mark, anomaly) {
+    const [tx, ty] = currentPoint(anomaly.target);
+    return Math.hypot(mark.x - tx, mark.y - ty) <= mark.radius;
+  }
+
+  function reportIsCorrect() {
+    if (!currentAnomalies.length) return markedPoints.length === 0;
+    if (markedPoints.length !== currentAnomalies.length) return false;
+    return markedPoints.every(mark => currentAnomalies.some(anomaly => markMatchesAnomaly(mark, anomaly)))
+      && currentAnomalies.every(anomaly => markedPoints.some(mark => markMatchesAnomaly(mark, anomaly)));
+  }
+
   function handleLeave() {
     if (state !== 'playing' || pendingMark) return;
     state = 'transition'; transitionStarted = performance.now(); controls.classList.add('hidden'); silenceDrone();
-    const [tx, ty] = currentAnomaly ? currentPoint(currentAnomaly.target) : [0, 0];
-    const markedAnomaly = Boolean(currentAnomaly && markedPoints.length === 1 && markedPoints.some(mark => Math.hypot(mark.x - tx, mark.y - ty) <= mark.radius));
-    const correct = currentIsAnomaly ? markedAnomaly : markedPoints.length === 0;
+    const correct = reportIsCorrect();
     const token = roundToken;
-    if (!correct) { wrongTone(); if (currentIsAnomaly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
+    if (!correct) { wrongTone(); if (currentAnomalies.length) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
-    if (currentIsAnomaly) { marks += 1; showClue(); }
-    transitionTimer = window.setTimeout(() => { if (token === roundToken) advanceCase(); }, currentIsAnomaly ? (REDUCED_MOTION ? 500 : 1450) : (REDUCED_MOTION ? 80 : 420));
+    if (currentAnomalies.length) { marks += currentAnomalies.length; showClue(); }
+    const transitionDelay = currentAnomalies.length ? (REDUCED_MOTION ? 500 : 1450 + (currentAnomalies.length - 1) * 350) : (REDUCED_MOTION ? 80 : 420);
+    transitionTimer = window.setTimeout(() => { if (token === roundToken) advanceCase(); }, transitionDelay);
   }
 
   function handleBurnout(time) {
@@ -799,8 +828,12 @@
   }
 
   function showMarkConfirm() {
-    const labelEn = currentAnomaly?.labelEn || 'THIS PLACE';
-    const labelJp = currentAnomaly?.labelJp || 'この ばしょ';
+    const nearbyChange = currentAnomalies
+      .map(anomaly => ({ anomaly, distance: Math.hypot(pendingMark.x - currentPoint(anomaly.target)[0], pendingMark.y - currentPoint(anomaly.target)[1]) }))
+      .filter(entry => entry.distance <= pendingMark.radius)
+      .sort((a, b) => a.distance - b.distance)[0]?.anomaly;
+    const labelEn = nearbyChange?.labelEn || 'THIS PLACE';
+    const labelJp = nearbyChange?.labelJp || 'この ばしょ';
     setBilingual(markConfirmTitleEn, markConfirmTitleJp, `MARK THE ${labelEn}?`, `${labelJp}に しるしを つける？`);
     setBilingual(markConfirmObjectEn, markConfirmObjectJp, labelEn, labelJp);
     markConfirmPanel.hidden = false;
@@ -844,7 +877,9 @@
   }
 
   function showClue() {
-    clueEn.textContent = currentAnomaly.en; clueJp.textContent = currentAnomaly.jp; clueCard.hidden = false; setObservation('MARK RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
+    clueEn.textContent = currentAnomalies.map(anomaly => anomaly.en).join(' / ');
+    clueJp.textContent = currentAnomalies.map(anomaly => anomaly.jp).join(' / ');
+    clueCard.hidden = false; setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
     clueVersion += 1; const version = clueVersion; window.clearTimeout(clueTimer);
     clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 1300);
   }

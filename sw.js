@@ -16,6 +16,8 @@ const CURRENT_CACHES = {
   // Family Room Pass 4 adds explicit mark confirmation, persistent marks, and
   // undo-before-report; keep the established cache version for network-first
   // runtime files while documenting the shipped interaction change.
+  // Family Room Pass 5 adds tiered two-change rounds and exact mark matching;
+  // the page/script remain network-first, so no cache version bump is needed.
   pages:  'booha-pages-2026-411',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
