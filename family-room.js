@@ -4,6 +4,7 @@
   const SAVE_ID = 'bonus:family_room';
   const CASE_ROUNDS = 7;
   const MARK_HOLD_MS = 600;
+  const MARK_DEAD_ZONE_PX = 8;
   const FAILURE_SILENCE_MS = 1200;
   const FAILURE_PANEL_DELAY_MS = 1800;
   const MAX_FLAMES = 3;
@@ -23,23 +24,23 @@
   });
 
   const PATASKALA_POSES = [
-    { id: 'pataskala-standing', target: [.72, .29, .14], artSize: .2, en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-moving', target: [.79, .43, .17], artSize: .22, en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-crouch', target: [.77, .56, .18], artSize: .22, en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-emerging', target: [.22, .47, .16], artSize: .28, en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-standing', target: [.7, .29, .14], artSize: .15, en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-moving', target: [.74, .43, .17], artSize: .16, en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-crouch', target: [.73, .56, .18], artSize: .16, en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-emerging', target: [.25, .47, .16], artSize: .2, en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', kind: 'character', character: 'pataskala' },
   ];
 
   const anomalies = [
-    { id: 'bowl', target: [.79, .51, .09], artSize: .12, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', kind: 'added' },
+    { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', kind: 'added' },
     { id: 'cup', target: [.35, .49, .1], artSize: .11, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', kind: 'duplicated' },
-    { id: 'eyes', target: [.75, .25, .12], artSize: .11, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', kind: 'watching' },
-    { id: 'shadow', target: [.7, .23, .18], artSize: .2, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', kind: 'state' },
-    { id: 'talisman', target: [.17, .23, .12], artSize: .12, en: 'A paper charm was not there before.', jp: 'おふだが なかった。', kind: 'added' },
-    { id: 'lantern', target: [.17, .42, .12], artSize: .1, en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', kind: 'state' },
-    { id: 'futon', target: [.82, .37, .16], artSize: .18, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', kind: 'moved' },
-    { id: 'seams', target: [.55, .68, .16], artSize: .08, en: 'One tatami seam has disappeared.', jp: 'たたみの めが ひとつ きえた。', kind: 'missing' },
-    { id: 'teapot', target: [.27, .49, .12], artSize: .13, en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', kind: 'moved' },
-    { id: 'crescent', target: [.84, .30, .1], artSize: .11, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', kind: 'added' },
+    { id: 'eyes', target: [.73, .25, .12], artSize: .08, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', kind: 'watching' },
+    { id: 'shadow', target: [.68, .23, .18], artSize: .14, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', kind: 'state' },
+    { id: 'talisman', target: [.23, .23, .12], artSize: .09, en: 'A paper charm was not there before.', jp: 'おふだが なかった。', kind: 'added' },
+    { id: 'lantern', target: [.23, .31, .12], artSize: .075, en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', kind: 'state' },
+    { id: 'futon', target: [.76, .37, .16], artSize: .125, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', kind: 'moved' },
+    { id: 'seams', target: [.55, .68, .16], artSize: .06, en: 'One tatami seam has disappeared.', jp: 'たたみの めが ひとつ きえた。', kind: 'missing' },
+    { id: 'teapot', target: [.29, .44, .12], artSize: .095, en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', kind: 'moved' },
+    { id: 'crescent', target: [.77, .30, .1], artSize: .08, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', kind: 'added' },
   ];
 
   const canvas = document.getElementById('room-canvas');
@@ -113,6 +114,7 @@
   let clueTimer = 0;
   let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let pointerActive = false;
+  let markHoldOrigin = null;
   let markHoldTimer = 0;
   let markLocked = false;
   let markedPoint = null;
@@ -264,7 +266,7 @@
     const [x, y] = currentPoint([u, v]);
     const sourceWidth = art.naturalWidth || 512;
     const sourceHeight = art.naturalHeight || 512;
-    const maxDimension = Math.max(32, Math.min(width, height) * anomaly.artSize);
+    const maxDimension = Math.max(32, plate.w * anomaly.artSize);
     const scale = maxDimension / Math.max(sourceWidth, sourceHeight);
     const drawWidth = sourceWidth * scale;
     const drawHeight = sourceHeight * scale;
@@ -291,6 +293,7 @@
       ctx.save();
       ctx.globalAlpha = state === 'caught' ? .07 : .16;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
+      drawAnomaly(currentAnomaly);
       ctx.restore();
       const radius = lightRadius();
       ctx.save();
@@ -300,7 +303,7 @@
       drawAnomaly(currentAnomaly);
       const light = ctx.createRadialGradient(booha.x, booha.y, radius * .48, booha.x, booha.y, radius);
       light.addColorStop(0, 'rgba(0,0,0,0)');
-      light.addColorStop(1, 'rgba(0,0,0,.72)');
+      light.addColorStop(1, 'rgba(0,0,0,.84)');
       ctx.fillStyle = light; ctx.fillRect(booha.x - radius, booha.y - radius, radius * 2, radius * 2);
       ctx.restore();
       if (vignetteCanvas) ctx.drawImage(vignetteCanvas, 0, 0, width, height);
@@ -360,7 +363,7 @@
   function drawBooha(time) {
     const image = isBoohaAlerting() ? alertBooha : idleBooha;
     if (!image.complete) return;
-    const size = clamp(Math.min(width, height) * .13, 66, 116);
+    const size = clamp(Math.min(width, height) * .1, 52, 92);
     const bob = REDUCED_MOTION ? 0 : Math.sin(time / 410) * 3;
     ctx.save();
     ctx.globalAlpha = .76;
@@ -386,7 +389,7 @@
     const target = alertTarget();
     if (!target) return false;
     const [tx, ty] = currentPoint(target);
-    const radius = Math.max(30, Math.min(width, height) * target[2] * .72) * currentTier().alertMultiplier;
+    const radius = Math.max(30, plate.w * target[2] * .72) * currentTier().alertMultiplier;
     return Math.hypot(booha.x - tx, booha.y - ty) <= radius;
   }
 
@@ -399,7 +402,7 @@
   }
 
   function hidePanels() { startPanel.classList.remove('visible'); messagePanel.classList.remove('visible'); }
-  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; window.clearTimeout(markHoldTimer); markHoldTimer = 0; }
+  function clearMarkingUi() { clueCard.hidden = true; markLocked = false; markedPoint = null; markHoldOrigin = null; window.clearTimeout(markHoldTimer); markHoldTimer = 0; }
   function updateHud() { observationNote.textContent = state === 'playing' ? (markLocked ? 'MARK LOCKED / LEAVE WHEN READY' : 'DRAG BOOHA / HOLD TO MARK') : 'LOOK / LISTEN / REMEMBER'; updateFlames(); }
 
   function startRound() {
@@ -434,8 +437,8 @@
     state = 'transition'; controls.classList.add('hidden');
     const [mx, my] = markedPoint || [0, 0];
     const [tx, ty] = currentAnomaly ? currentPoint(currentAnomaly.target) : [0, 0];
-    const radius = currentAnomaly ? Math.max(30, Math.min(width, height) * currentAnomaly.target[2] * .72) : 0;
-    const markedAnomaly = Boolean(markedPoint && currentAnomaly && Math.hypot(mx - tx, my - ty) <= radius);
+    const markRadius = markedPoint?.[2] || 0;
+    const markedAnomaly = Boolean(markedPoint && currentAnomaly && Math.hypot(mx - tx, my - ty) <= markRadius);
     const correct = currentIsAnomaly ? markedAnomaly : !markedPoint;
     if (!correct) { wrongTone(); if (currentIsAnomaly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; window.setTimeout(handleWrong, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
@@ -499,24 +502,32 @@
   function setBoohaTarget(event) {
     if (state !== 'playing') return;
     const rect = canvas.getBoundingClientRect();
-    booha.targetX = clamp(event.clientX - rect.left, 0, width);
-    booha.targetY = clamp(event.clientY - rect.top, 0, height);
+    const nextX = clamp(event.clientX - rect.left, 0, width);
+    const nextY = clamp(event.clientY - rect.top, 0, height);
+    const startsHold = !pointerActive || !markHoldOrigin;
+    const movedBeyondDeadZone = markHoldOrigin
+      && Math.hypot(nextX - markHoldOrigin[0], nextY - markHoldOrigin[1]) > MARK_DEAD_ZONE_PX;
+    booha.targetX = nextX;
+    booha.targetY = nextY;
     pointerActive = true;
-    markLocked = false;
-    markedPoint = null;
-    window.clearTimeout(markHoldTimer);
-    markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
+    if (startsHold || (!markLocked && movedBeyondDeadZone)) {
+      markHoldOrigin = [nextX, nextY];
+      markLocked = false;
+      markedPoint = null;
+      window.clearTimeout(markHoldTimer);
+      markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
+    }
     observationNote.textContent = 'HOLD BOOHA STILL';
   }
 
   function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event); }
-  function releaseBooha() { pointerActive = false; if (!markLocked) window.clearTimeout(markHoldTimer); }
+  function releaseBooha() { pointerActive = false; markHoldOrigin = null; if (!markLocked) window.clearTimeout(markHoldTimer); }
 
   function lockMark() {
     markHoldTimer = 0;
     if (state !== 'playing' || !pointerActive) return;
     markLocked = true;
-    markedPoint = [booha.targetX, booha.targetY];
+    markedPoint = [booha.targetX, booha.targetY, lightRadius()];
     rightTone();
     observationNote.textContent = 'MARK LOCKED / LEAVE WHEN READY';
   }
