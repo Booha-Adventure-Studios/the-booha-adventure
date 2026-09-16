@@ -59,23 +59,23 @@
   });
 
   const PATASKALA_POSES = [
-    { id: 'pataskala-standing', target: [.7, .29, .14], artSize: .15, en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-moving', target: [.74, .43, .17], artSize: .16, en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-crouch', target: [.73, .56, .18], artSize: .16, en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-emerging', target: [.25, .47, .16], artSize: .2, en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-standing', target: [.7, .29, .14], artSize: .15, en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-moving', target: [.74, .43, .17], artSize: .16, en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-crouch', target: [.73, .56, .18], artSize: .16, en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-emerging', target: [.25, .47, .16], artSize: .2, en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
   ];
 
   const anomalies = [
-    { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', kind: 'added' },
-    { id: 'cup', target: [.35, .49, .1], artSize: .11, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', kind: 'duplicated' },
-    { id: 'eyes', target: [.73, .25, .12], artSize: .08, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', kind: 'watching' },
-    { id: 'shadow', target: [.68, .23, .18], artSize: .14, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', kind: 'state' },
-    { id: 'talisman', target: [.23, .23, .12], artSize: .09, en: 'A paper charm was not there before.', jp: 'おふだが なかった。', kind: 'added' },
-    { id: 'lantern', target: [.23, .31, .12], artSize: .075, en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', kind: 'state' },
-    { id: 'futon', target: [.76, .37, .16], artSize: .125, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', kind: 'moved' },
-    { id: 'seams', target: [.55, .68, .16], artSize: .06, en: 'One tatami seam has disappeared.', jp: 'たたみの めが ひとつ きえた。', kind: 'missing' },
-    { id: 'teapot', target: [.29, .44, .12], artSize: .095, en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', kind: 'moved' },
-    { id: 'crescent', target: [.77, .30, .1], artSize: .08, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', kind: 'added' },
+    { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', labelEn: 'BOWL', labelJp: 'おわん', kind: 'added' },
+    { id: 'cup', target: [.35, .49, .1], artSize: .11, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', labelEn: 'CUP', labelJp: 'コップ', kind: 'duplicated' },
+    { id: 'eyes', target: [.73, .25, .12], artSize: .08, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', labelEn: 'SHOJI', labelJp: 'しょうじ', kind: 'watching' },
+    { id: 'shadow', target: [.68, .23, .18], artSize: .14, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', labelEn: 'SHOJI SHADOW', labelJp: 'しょうじの かげ', kind: 'state' },
+    { id: 'talisman', target: [.23, .23, .12], artSize: .09, en: 'A paper charm was not there before.', jp: 'おふだが なかった。', labelEn: 'PAPER CHARM', labelJp: 'おふだ', kind: 'added' },
+    { id: 'lantern', target: [.23, .31, .12], artSize: .075, en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', labelEn: 'LANTERN', labelJp: 'あんどん', kind: 'state' },
+    { id: 'futon', target: [.76, .37, .16], artSize: .125, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', labelEn: 'FUTON', labelJp: 'ふとん', kind: 'moved' },
+    { id: 'seams', target: [.55, .68, .16], artSize: .06, en: 'One tatami seam has disappeared.', jp: 'たたみの めが ひとつ きえた。', labelEn: 'TATAMI SEAM', labelJp: 'たたみの め', kind: 'missing' },
+    { id: 'teapot', target: [.29, .44, .12], artSize: .095, en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', labelEn: 'TEAPOT', labelJp: 'きゅうす', kind: 'moved' },
+    { id: 'crescent', target: [.77, .30, .1], artSize: .08, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', labelEn: 'MOON', labelJp: 'つき', kind: 'added' },
   ];
 
   const canvas = document.getElementById('room-canvas');
@@ -109,6 +109,14 @@
   const soundStateJp = document.getElementById('sound-state-jp');
   const leaveEn = document.getElementById('leave-en');
   const leaveJp = document.getElementById('leave-jp');
+  const undoButton = document.getElementById('undo-button');
+  const markConfirmPanel = document.getElementById('mark-confirm-panel');
+  const markConfirmTitleEn = document.getElementById('mark-confirm-title-en');
+  const markConfirmTitleJp = document.getElementById('mark-confirm-title-jp');
+  const markConfirmObjectEn = document.getElementById('mark-confirm-object-en');
+  const markConfirmObjectJp = document.getElementById('mark-confirm-object-jp');
+  const markYesButton = document.getElementById('mark-yes-button');
+  const markNoButton = document.getElementById('mark-no-button');
   const backButton = document.getElementById('back-button');
   const studyStartButton = document.getElementById('study-start-button');
   const studyBackButton = document.getElementById('study-back-button');
@@ -178,7 +186,8 @@
   let markHoldOrigin = null;
   let markHoldTimer = 0;
   let markLocked = false;
-  let markedPoint = null;
+  let markedPoints = [];
+  let pendingMark = null;
   let burnoutHandled = false;
   let failureStarted = 0;
   let pauseStartedAt = 0;
@@ -277,9 +286,11 @@
 
   function setObservation(en, jp) { setBilingual(observationEn, observationJp, en, jp); }
 
-  function setReportLabel(locked) {
-    setBilingual(leaveEn, leaveJp, locked ? 'REPORT & CONTINUE' : 'REPORT THE ROOM', locked ? 'ほうこくして つぎへ' : 'へやを ほうこくする');
-    document.getElementById('leave-button').classList.toggle('armed', locked);
+  function setReportLabel(hasMarks = markedPoints.length > 0) {
+    setBilingual(leaveEn, leaveJp, 'REPORT THE ROOM', 'へやを ほうこくする');
+    document.getElementById('leave-button').classList.toggle('armed', hasMarks);
+    undoButton.hidden = !hasMarks;
+    undoButton.classList.toggle('visible', hasMarks);
   }
 
   function burnFraction(time = performance.now()) {
@@ -428,6 +439,7 @@
     if (!REDUCED_MOTION && state !== 'title') {
       ctx.save(); ctx.globalAlpha = .035 + Math.sin(time / 260) * .012; ctx.fillStyle = '#fff'; ctx.fillRect(0, (time / 8) % height, width, 1); ctx.restore();
     }
+    drawMarks();
     if (state !== 'caught') drawBooha(time);
   }
 
@@ -485,12 +497,31 @@
     ctx.shadowColor = `rgba(229,176,89,${.2 + fraction * .16})`;
     ctx.shadowBlur = 12 + fraction * 5;
     ctx.drawImage(image, booha.x - size / 2, booha.y - size / 2 + bob, size, size);
-    if (markLocked) {
+    if (pendingMark) {
       ctx.globalAlpha = .9;
       ctx.strokeStyle = '#e8b76c';
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(booha.x, booha.y, size * .68, 0, Math.PI * 2); ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  function drawMarks() {
+    if (!markedPoints.length) return;
+    ctx.save();
+    markedPoints.forEach(mark => {
+      ctx.globalAlpha = .86;
+      ctx.strokeStyle = '#e8b76c';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(mark.x, mark.y, Math.max(12, mark.radius * .42), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = .95;
+      ctx.fillStyle = '#e8b76c';
+      ctx.beginPath();
+      ctx.arc(mark.x, mark.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
     ctx.restore();
   }
 
@@ -573,11 +604,13 @@
     clueVersion += 1;
     window.clearTimeout(clueTimer); clueTimer = 0;
     clueCard.hidden = true;
-    markLocked = false; markedPoint = null; markHoldOrigin = null; keyboardMarkActive = false;
+    markLocked = false; pendingMark = null; markedPoints = []; markHoldOrigin = null; keyboardMarkActive = false;
     window.clearTimeout(markHoldTimer); markHoldTimer = 0;
+    markConfirmPanel.hidden = true;
+    markConfirmPanel.classList.remove('visible');
     setReportLabel(false);
   }
-  function updateHud() { if (state === 'playing') setObservation(markLocked ? 'MARK LOCKED / REPORT THE ROOM' : 'DRAG BOOHA / HOLD TO MARK', markLocked ? 'しるしを つけた / へやを ほうこくする' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markLocked); }
+  function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / HOLD TO MARK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
 
   function startRound() {
     clearRoundTimers();
@@ -649,13 +682,11 @@
   }
 
   function handleLeave() {
-    if (state !== 'playing') return;
+    if (state !== 'playing' || pendingMark) return;
     state = 'transition'; transitionStarted = performance.now(); controls.classList.add('hidden'); silenceDrone();
-    const [mx, my] = markedPoint || [0, 0];
     const [tx, ty] = currentAnomaly ? currentPoint(currentAnomaly.target) : [0, 0];
-    const markRadius = markedPoint?.[2] || 0;
-    const markedAnomaly = Boolean(markedPoint && currentAnomaly && Math.hypot(mx - tx, my - ty) <= markRadius);
-    const correct = currentIsAnomaly ? markedAnomaly : !markedPoint;
+    const markedAnomaly = Boolean(currentAnomaly && markedPoints.length === 1 && markedPoints.some(mark => Math.hypot(mark.x - tx, mark.y - ty) <= mark.radius));
+    const correct = currentIsAnomaly ? markedAnomaly : markedPoints.length === 0;
     const token = roundToken;
     if (!correct) { wrongTone(); if (currentIsAnomaly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
@@ -698,7 +729,7 @@
   }
 
   function setBoohaTarget(event) {
-    if (state !== 'playing') return;
+    if (state !== 'playing' || pendingMark) return;
     const rect = canvas.getBoundingClientRect();
     const nextX = clamp(event.clientX - rect.left, 0, width);
     const nextY = clamp(event.clientY - rect.top, 0, height);
@@ -713,7 +744,6 @@
     if (startsHold || (!markLocked && movedBeyondDeadZone)) {
       markHoldOrigin = [nextX, nextY];
       markLocked = false;
-      markedPoint = null;
       window.clearTimeout(markHoldTimer);
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
     }
@@ -729,7 +759,7 @@
   }
 
   function moveBoohaByKeyboard(dx, dy) {
-    if (state !== 'playing' || markLocked) return;
+    if (state !== 'playing' || markLocked || pendingMark) return;
     const step = Math.max(28, Math.min(width, height) * .06);
     booha.targetX = clamp(booha.targetX + dx * step, 0, width);
     booha.targetY = clamp(booha.targetY + dy * step, 0, height);
@@ -743,7 +773,7 @@
   }
 
   function startKeyboardMark() {
-    if (state !== 'playing' || markLocked) return;
+    if (state !== 'playing' || markLocked || pendingMark) return;
     keyboardMarkActive = true;
     pointerActive = false;
     markHoldOrigin = [booha.targetX, booha.targetY];
@@ -764,10 +794,53 @@
     markHoldTimer = 0;
     if (state !== 'playing' || (!pointerActive && !keyboardMarkActive)) return;
     markLocked = true;
-    markedPoint = [booha.targetX, booha.targetY, lightRadius()];
+    pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
+    showMarkConfirm();
+  }
+
+  function showMarkConfirm() {
+    const labelEn = currentAnomaly?.labelEn || 'THIS PLACE';
+    const labelJp = currentAnomaly?.labelJp || 'この ばしょ';
+    setBilingual(markConfirmTitleEn, markConfirmTitleJp, `MARK THE ${labelEn}?`, `${labelJp}に しるしを つける？`);
+    setBilingual(markConfirmObjectEn, markConfirmObjectJp, labelEn, labelJp);
+    markConfirmPanel.hidden = false;
+    markConfirmPanel.classList.add('visible');
+    setObservation('CONFIRM THE MARK', 'しるしを かくにん');
+    markYesButton.focus?.();
+  }
+
+  function confirmMark() {
+    if (state !== 'playing' || !pendingMark) return;
+    markedPoints.push(pendingMark);
+    pendingMark = null;
+    markLocked = false;
+    pointerActive = false;
+    keyboardMarkActive = false;
+    markHoldOrigin = null;
+    markConfirmPanel.hidden = true;
+    markConfirmPanel.classList.remove('visible');
     rightTone();
     setReportLabel(true);
-    setObservation('MARK LOCKED / REPORT THE ROOM', 'しるしを つけた / へやを ほうこくする');
+    setObservation('MARK ADDED / FIND ANOTHER OR REPORT', 'しるしを つけた / つぎを さがすか ほうこく');
+  }
+
+  function cancelMark() {
+    if (state !== 'playing' || !pendingMark) return;
+    pendingMark = null;
+    markLocked = false;
+    markHoldOrigin = null;
+    keyboardMarkActive = false;
+    window.clearTimeout(markHoldTimer); markHoldTimer = 0;
+    markConfirmPanel.hidden = true;
+    markConfirmPanel.classList.remove('visible');
+    setObservation('KEEP LOOKING', 'まだ さがす');
+  }
+
+  function undoLastMark() {
+    if (state !== 'playing' || pendingMark || !markedPoints.length) return;
+    markedPoints.pop();
+    setReportLabel(markedPoints.length > 0);
+    setObservation(markedPoints.length ? 'LAST MARK REMOVED / KEEP LOOKING' : 'ALL MARKS REMOVED / KEEP LOOKING', markedPoints.length ? 'さいごの しるしを けした / まだ さがす' : 'しるしを ぜんぶ けした / まだ さがす');
   }
 
   function showClue() {
@@ -869,6 +942,9 @@
   studyBackButton.addEventListener('click', exitGame);
   backButton.addEventListener('click', exitGame);
   document.getElementById('leave-button').addEventListener('click', handleLeave);
+  undoButton.addEventListener('click', undoLastMark);
+  markYesButton.addEventListener('click', confirmMark);
+  markNoButton.addEventListener('click', cancelMark);
   canvas.addEventListener('pointerdown', setBoohaTarget);
   canvas.addEventListener('pointermove', moveBoohaTarget);
   canvas.addEventListener('pointerup', releaseBooha);

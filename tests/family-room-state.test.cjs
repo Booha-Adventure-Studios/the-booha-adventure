@@ -56,7 +56,7 @@ assert(source.includes("selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2
 assert(source.includes('MARK_DEAD_ZONE_PX = 8') && source.includes('markHoldOrigin'), 'touch marking must tolerate small pointer tremor');
 assert(source.includes('plate.w * anomaly.artSize') && source.includes('plate.w * target[2]'), 'anomaly sizing and alert radii must follow the room plate');
 assert(source.includes('drawAnomaly(currentAnomaly);') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'anomalies must be faintly visible outside the lantern and the light rim must blend into the room');
-assert(source.includes('markedPoint = [booha.targetX, booha.targetY, lightRadius()]') && source.includes('markRadius'), 'marking must judge whether the anomaly is inside the lantern at lock time');
+assert(source.includes('pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() }') && source.includes('markedPoints.some') && source.includes('mark.radius'), 'marking must judge whether the anomaly is inside the lantern at lock time');
 assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 92'), 'Booha must leave more of the lantern reveal unobstructed');
 assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.includes('.26 - minimum'), 'the lantern radius must shrink continuously with a playable minimum');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
@@ -93,7 +93,8 @@ assert(serviceWorker.includes("`${BASE}/assets/`"), 'Family Room audio must use 
 assert(['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => serviceWorker.includes(`/assets/family-room/pataskala/${id}.webp`)), 'all Pataskala poses must be install-safe');
 assert(source.includes('function requestFamilyRuntimeCache') && source.includes("type: 'CACHE_URLS'"), 'Family Room must ask the service worker to retain deferred media after entry');
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
-assert(markup.includes('id="leave-button"') && markup.includes('REPORT THE ROOM') && source.includes('REPORT & CONTINUE'), 'the room must use one explicit report/continue button');
+assert(markup.includes('id="leave-button"') && markup.includes('REPORT THE ROOM') && markup.includes('id="undo-button"') && source.includes('function handleLeave'), 'the room must use one explicit report button with mark undo support');
+assert(markup.includes('id="mark-confirm-panel"') && markup.includes('YES, MARK IT') && markup.includes('NO, KEEP LOOKING') && source.includes('function confirmMark') && source.includes('function cancelMark'), 'marking must require a clear bilingual confirmation before it is recorded');
 assert(markup.includes('id="start-button"') && markup.includes('ENTER THE ROOM') && markup.includes('へやに はいる'), 'the start action must clearly say enter the room in both languages');
 assert(markup.includes('id="back-button"') && markup.includes('BACK TO PROFILE'), 'back must be reserved for leaving the game');
 assert(markup.includes('id="observation-en"') && markup.includes('id="observation-jp"') && source.includes('HOLD BOOHA STILL'), 'marking guidance must have paired English and Japanese lines');
@@ -130,7 +131,7 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp', 'undo-button', 'mark-confirm-panel', 'mark-confirm-title-en', 'mark-confirm-title-jp', 'mark-confirm-object-en', 'mark-confirm-object-jp', 'mark-yes-button', 'mark-no-button'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
 nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
 const listeners = {};
@@ -179,6 +180,7 @@ assert.strictEqual(nodes['study-panel'].hidden, false, 'entering the room must o
 nodes['study-start-button'].onclick();
 for (let index = 0; index < 7; index += 1) {
   nodes['room-canvas'].onpointerdown({ clientX: 235, clientY: 476 });
+  nodes['mark-yes-button'].onclick();
   nodes['leave-button'].onclick();
 }
 
