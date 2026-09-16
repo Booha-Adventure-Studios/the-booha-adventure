@@ -31,6 +31,8 @@ The current built room is Case 02, Chanoma. The save identity remains `bonus:fam
 - A mistake restarts the whole case, with unlimited restarts.
 - Patient uses zero-or-one changes; Quicker introduces occasional two-change rounds; Lies uses more two-change rounds.
 - Removal changes are markable as empty spaces.
+- A wrong confirmed mark becomes a red hazard: reach the bottom exit edge to
+  continue the round, or let it touch Booha and restart the case.
 - Pataskala is initially an atmospheric presence, not a scored ordinary object.
 - Pataskala’s presence rises with case depth and is strongest in Nando.
 
