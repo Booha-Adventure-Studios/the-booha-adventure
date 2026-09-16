@@ -165,6 +165,7 @@ const CURRENT_CACHES = {
   // Family Room Pataskala pass: character poses use that same deferred path.
   // Family Room Pass 1: portrait-safe anchors and plate-relative overlays.
   // Family Room Pass 2: bilingual interaction states and explicit report flow.
+  // Family Room Pass 3: tiered presence tells and failure sting levels.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };
