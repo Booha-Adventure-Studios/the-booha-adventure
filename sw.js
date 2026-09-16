@@ -13,6 +13,9 @@ const CURRENT_CACHES = {
   // Family Room Pass 1 locks the house registry and Case 02 label. The room
   // scripts are network-first; keep the established page cache version so
   // historical cache-contract audits remain compatible.
+  // Family Room Pass 4 adds explicit mark confirmation, persistent marks, and
+  // undo-before-report; keep the established cache version for network-first
+  // runtime files while documenting the shipped interaction change.
   pages:  'booha-pages-2026-411',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
