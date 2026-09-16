@@ -211,6 +211,10 @@ window.BoohaSync = (() => {
       if (tierProgress && (hasEntries(tierProgress.objects) || hasEntries(tierProgress.objectSlots) ||
           tierProgress.activeTargetType || tierProgress.carriedObjectId)) return false;
     }
+    if (w.worlds?.familyRoom?.activeCaseId && w.worlds.familyRoom.activeCaseId !== 'chanoma') return false;
+    if (w.worlds?.familyRoom?.completedCases && Object.keys(w.worlds.familyRoom.completedCases).length) return false;
+    if (w.worlds?.familyRoom?.bestTier) return false;
+    if (w.worlds?.familyRoom?.lastResult) return false;
     if (d.collection && (hasEntries(d.collection.wanderers) || hasItems(d.collection.wanderers))) return false;
 
     // A weekly reset can leave the live weekly bucket empty while the player

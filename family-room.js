@@ -53,6 +53,7 @@
   const ACTIVE_CASE_ID = 'chanoma';
   const ACTIVE_CASE = FAMILY_HOUSE_CASES.find(entry => entry.id === ACTIVE_CASE_ID);
   const ACTIVE_CASE_LABEL = String(ACTIVE_CASE.number).padStart(2, '0');
+  const TIER_RANK = Object.freeze({ patient: 1, quicker: 2, lies: 3 });
 
   const UI_COPY = Object.freeze({
     caseReset: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / CASE RESET`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / じけんを はじめから`, title: 'THE ROOM SENT YOU BACK.', titleJp: 'へやが あなたを もどした。', copy: 'A mistake sends you back to the start of this case. The study room will not return. Try again when you are ready.', copyJp: 'まちがえると、この じけんの はじめに もどる。おぼえる へやは もう でてこない。じゅんびが できたら、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
@@ -998,9 +999,41 @@
     clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 1300);
   }
 
+  function recordFamilyRoomCompletion() {
+    const save = window.BoohaAdventure?.save;
+    if (!save?.load || !save?.save) return false;
+    try {
+      const data = save.load();
+      const weekly = data.weekly && typeof data.weekly === 'object' ? data.weekly : (data.weekly = {});
+      const worlds = weekly.worlds && typeof weekly.worlds === 'object' ? weekly.worlds : (weekly.worlds = {});
+      const familyRoom = worlds.familyRoom && typeof worlds.familyRoom === 'object' ? worlds.familyRoom : (worlds.familyRoom = {});
+      const completedCases = familyRoom.completedCases && typeof familyRoom.completedCases === 'object' && !Array.isArray(familyRoom.completedCases)
+        ? familyRoom.completedCases : (familyRoom.completedCases = {});
+      const prior = completedCases[ACTIVE_CASE_ID] && typeof completedCases[ACTIVE_CASE_ID] === 'object'
+        ? completedCases[ACTIVE_CASE_ID] : {};
+      const priorRank = TIER_RANK[prior.bestTier] || 0;
+      const currentRank = TIER_RANK[selectedTier] || 0;
+      const bestTier = currentRank >= priorRank ? selectedTier : (prior.bestTier || selectedTier);
+      familyRoom.activeCaseId = ACTIVE_CASE_ID;
+      familyRoom.bestTier = (TIER_RANK[familyRoom.bestTier] || 0) >= currentRank ? familyRoom.bestTier : selectedTier;
+      completedCases[ACTIVE_CASE_ID] = {
+        sealedAt: Number(prior.sealedAt) || Date.now(),
+        bestTier,
+      };
+      // This is deliberately score-free. The shared gameEnd event remains the
+      // one place that records hidden marks for existing arcade compatibility.
+      familyRoom.lastResult = { caseId: ACTIVE_CASE_ID, tier: selectedTier, completedAt: Date.now() };
+      return save.save(data);
+    } catch (error) {
+      console.warn('[Family Room] weekly case record unavailable', error);
+      return false;
+    }
+  }
+
   function submitResult() {
     if (completionSubmitted) return;
     completionSubmitted = true;
+    recordFamilyRoomCompletion();
     document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId: SAVE_ID, score: marks, completed: true, time: performance.now() - caseStarted, recordEligible: true, recentRun: { marks, calls: correctCalls, tier: selectedTier } } }));
   }
 

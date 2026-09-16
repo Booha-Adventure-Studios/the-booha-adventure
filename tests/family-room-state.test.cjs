@@ -19,7 +19,7 @@ assert(markup.includes('id="study-panel"') && markup.includes('START THE CASE') 
 assert(source.includes('repeatOnCaseRestart: false') && source.includes('reviewFromHub: true'), 'study review and restart behavior must be explicit in the design lock');
 assert(source.includes("role: 'presence'") && source.includes('scoredTarget: false'), 'Pataskala must be locked as a presence before later target mechanics');
 assert(markup.includes('CASE FILE 02 / CHANOMA') && !markup.includes('CASE FILE 07'), 'the built room label must be Case 02');
-assert(registry.includes("status: 'CASE FILE 02'"), 'the registered Family Room status must use the built case number');
+assert(registry.includes("status: 'CASE FILE 02 / OPEN'") && registry.includes("statusCompleted: 'CASE FILE 02 / SEALED'"), 'the registered Family Room statuses must use the built case number');
 assert(!source.includes('round-number'), 'the case must not expose a round counter');
 assert(!source.includes('localStorage'), 'the room must use the shared save/event layer');
 assert(!source.includes('creature-1'), 'the photoreal creature beat must be retired');
@@ -102,6 +102,7 @@ assert(source.includes('jumpLevel: .24') && source.includes('jumpLevel: .4') && 
 assert(serviceWorker.includes("`${BASE}/assets/`"), 'Family Room audio must use the runtime asset cache path');
 assert(['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => serviceWorker.includes(`/assets/family-room/pataskala/${id}.webp`)), 'all Pataskala poses must be install-safe');
 assert(source.includes('function requestFamilyRuntimeCache') && source.includes("type: 'CACHE_URLS'"), 'Family Room must ask the service worker to retain deferred media after entry');
+assert(source.includes('function recordFamilyRoomCompletion') && source.includes('completedCases[ACTIVE_CASE_ID]') && source.includes('lastResult'), 'Pass 8 must record a score-free weekly case seal in the shared save layer');
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
 assert(markup.includes('id="leave-button"') && markup.includes('REPORT THE ROOM') && markup.includes('id="undo-button"') && source.includes('function handleLeave'), 'the room must use one explicit report button with mark undo support');
 assert(markup.includes('id="mark-confirm-panel"') && markup.includes('YES, MARK IT') && markup.includes('NO, KEEP LOOKING') && source.includes('function confirmMark') && source.includes('function cancelMark'), 'marking must require a clear bilingual confirmation before it is recorded');

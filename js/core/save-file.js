@@ -140,6 +140,15 @@ const BoohaSaveFile = (() => {
         mariettaIntroSeen: false,
         mariettaIntroSkipped: false,
       },
+      familyRoom: {
+        // The current case is a routing pointer, not a round counter. Case
+        // completion is kept as a small weekly record so the profile can say
+        // whether the file is still open without exposing a score.
+        activeCaseId: 'chanoma',
+        completedCases: {},
+        bestTier: null,
+        lastResult: null,
+      },
     };
   }
 
@@ -241,6 +250,12 @@ const BoohaSaveFile = (() => {
     if (current.grimmerglen.memoryQuestAccepted === undefined) current.grimmerglen.memoryQuestAccepted = false;
     if (current.grimmerglen.mariettaIntroSeen === undefined) current.grimmerglen.mariettaIntroSeen = false;
     if (current.grimmerglen.mariettaIntroSkipped === undefined) current.grimmerglen.mariettaIntroSkipped = false;
+
+    if (!current.familyRoom || typeof current.familyRoom !== 'object' || Array.isArray(current.familyRoom)) current.familyRoom = {};
+    if (typeof current.familyRoom.activeCaseId !== 'string') current.familyRoom.activeCaseId = 'chanoma';
+    if (!current.familyRoom.completedCases || typeof current.familyRoom.completedCases !== 'object' || Array.isArray(current.familyRoom.completedCases)) current.familyRoom.completedCases = {};
+    if (current.familyRoom.bestTier !== null && !['patient', 'quicker', 'lies'].includes(current.familyRoom.bestTier)) current.familyRoom.bestTier = null;
+    if (current.familyRoom.lastResult !== null && (typeof current.familyRoom.lastResult !== 'object' || Array.isArray(current.familyRoom.lastResult))) current.familyRoom.lastResult = null;
   }
 
   function _ensureGrimmerglenLifetime(save) {
