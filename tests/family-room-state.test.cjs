@@ -55,10 +55,13 @@ assert(source.includes('function pataskalaChance') && source.includes('if (round
 assert(source.includes("selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2"), 'the emerging Pataskala pose must be reserved for the Lies tier');
 assert(source.includes('MARK_DEAD_ZONE_PX = 8') && source.includes('markHoldOrigin'), 'touch marking must tolerate small pointer tremor');
 assert(source.includes('plate.w * anomaly.artSize') && source.includes('plate.w * target[2]'), 'anomaly sizing and alert radii must follow the room plate');
-assert(source.includes('drawAnomaly(currentAnomaly);') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'anomalies must be faintly visible outside the lantern and the light rim must blend into the room');
+assert(source.includes('function drawAnomalies(list)') && source.includes('drawAnomalies(currentAnomalies)') && source.includes('drawAnomaly(currentPresence)') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'multiple changes and Pataskala must be faintly visible outside the lantern and the light rim must blend into the room');
 assert(source.includes('pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() }') && source.includes('markedPoints.some') && source.includes('mark.radius'), 'marking must judge whether the anomaly is inside the lantern at lock time');
 assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 92'), 'Booha must leave more of the lantern reveal unobstructed');
 assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.includes('.26 - minimum'), 'the lantern radius must shrink continuously with a playable minimum');
+assert(source.includes('maxChanges: 1') && source.includes('maxChanges: 2') && source.includes('twoChangeChance: .24') && source.includes('twoChangeChance: .52'), 'room tiers must define when two-change rounds can appear');
+assert(source.includes('let currentAnomalies = []') && source.includes('function reportIsCorrect') && source.includes('currentAnomalies.every'), 'reports must validate every required change and reject missing or extra marks');
+assert(source.includes('currentPresence = Math.random() < pataskalaChance()') && source.includes('currentPresence || falseAlertPoint'), 'Pataskala presence must remain separate from scored room changes');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
