@@ -5,6 +5,8 @@
   const CASE_ROUNDS = 7;
   const MARK_HOLD_MS = 600;
   const MARK_DEAD_ZONE_PX = 8;
+  const WRONG_MARK_GRACE_MS = 700;
+  const EXIT_BAND_V = .86;
   const FAILURE_SILENCE_MS = 1200;
   const FAILURE_PANEL_DELAY_MS = 1800;
   const FAMILY_AUDIO = Object.freeze({
@@ -21,9 +23,9 @@
     || (Number.isFinite(window.navigator?.hardwareConcurrency) && window.navigator.hardwareConcurrency <= 2);
   if (LOW_POWER) document.documentElement.classList.add('low-power');
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, maxChanges: 1, twoChangeChance: 0, jumpLevel: .24, burnMs: 35000 },
-    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, maxChanges: 2, twoChangeChance: .24, jumpLevel: .4, burnMs: 18000 },
-    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, maxChanges: 2, twoChangeChance: .52, jumpLevel: .58, burnMs: 12000 },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, maxChanges: 1, twoChangeChance: 0, hazardSpeed: 115, jumpLevel: .24, burnMs: 35000 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, maxChanges: 2, twoChangeChance: .24, hazardSpeed: 165, jumpLevel: .4, burnMs: 18000 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, maxChanges: 2, twoChangeChance: .52, hazardSpeed: 210, jumpLevel: .58, burnMs: 12000 },
   });
 
   // Pass 1 design lock: the house order and content vocabulary live in one
@@ -163,6 +165,7 @@
   let currentAnomalies = [];
   let currentPresence = null;
   let currentIsAnomaly = false;
+  let wrongMarkHazard = null;
   let falseAlertPoint = null;
   let tellAvailable = false;
   let roundStarted = 0;
@@ -426,6 +429,7 @@
       return;
     }
     moveBooha();
+    updateWrongMarkHazard(time);
     if (imageReady(baseImage)) {
       // Keep the room plate readable, then let Booha's lantern reveal only a
       // small moving circle at full brightness.
@@ -454,6 +458,7 @@
     if (!REDUCED_MOTION && state !== 'title') {
       ctx.save(); ctx.globalAlpha = .035 + Math.sin(time / 260) * .012; ctx.fillStyle = '#fff'; ctx.fillRect(0, (time / 8) % height, width, 1); ctx.restore();
     }
+    drawWrongMarkHazard(time);
     drawMarks();
     if (state !== 'caught') drawBooha(time);
   }
@@ -540,6 +545,61 @@
     ctx.restore();
   }
 
+  function drawWrongMarkHazard(time) {
+    if (!wrongMarkHazard) return;
+    const pulse = REDUCED_MOTION ? 1 : 1 + Math.sin(time / 120) * .08;
+    const radius = wrongMarkHazard.radius * pulse;
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const smoke = ctx.createRadialGradient(wrongMarkHazard.x, wrongMarkHazard.y, 1, wrongMarkHazard.x, wrongMarkHazard.y, radius * 2.4);
+    smoke.addColorStop(0, 'rgba(255,82,62,.92)');
+    smoke.addColorStop(.32, 'rgba(190,35,35,.62)');
+    smoke.addColorStop(1, 'rgba(80,0,0,0)');
+    ctx.fillStyle = smoke;
+    ctx.beginPath(); ctx.arc(wrongMarkHazard.x, wrongMarkHazard.y, radius * 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = .92;
+    ctx.strokeStyle = '#ff5545';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(wrongMarkHazard.x, wrongMarkHazard.y, radius, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+
+  function clearWrongMarkHazard() { wrongMarkHazard = null; }
+
+  function boohaAtExit() { return booha.y >= height * EXIT_BAND_V; }
+
+  function updateWrongMarkHazard(time) {
+    if (!wrongMarkHazard) return;
+    if (boohaAtExit()) {
+      clearWrongMarkHazard();
+      pointerActive = false;
+      keyboardMarkActive = false;
+      markHoldOrigin = null;
+      window.clearTimeout(markHoldTimer); markHoldTimer = 0;
+      controls.classList.remove('hidden');
+      setReportLabel(markedPoints.length > 0);
+      setObservation('EXIT REACHED / REPORT OR KEEP LOOKING', 'でぐちに ついた / ほうこくするか まだ さがす');
+      return;
+    }
+    if (time < wrongMarkHazard.graceUntil) return;
+    const elapsed = Math.min(.05, Math.max(0, (time - wrongMarkHazard.lastTime) / 1000));
+    wrongMarkHazard.lastTime = time;
+    const dx = booha.x - wrongMarkHazard.x;
+    const dy = booha.y - wrongMarkHazard.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance <= wrongMarkHazard.radius + Math.min(width, height) * .045) {
+      clearWrongMarkHazard();
+      beginFailure(UI_COPY.caseReset);
+      return;
+    }
+    if (distance > 0) {
+      const step = Math.min(distance, currentTier().hazardSpeed * elapsed);
+      wrongMarkHazard.x += (dx / distance) * step;
+      wrongMarkHazard.y += (dy / distance) * step;
+    }
+  }
+
   function alertTarget() {
     if (currentAnomaly) return currentAnomaly.target;
     if (falseAlertPoint) return [falseAlertPoint.u, falseAlertPoint.v, falseAlertPoint.radius];
@@ -622,6 +682,7 @@
     clueVersion += 1;
     window.clearTimeout(clueTimer); clueTimer = 0;
     clueCard.hidden = true;
+    clearWrongMarkHazard();
     markLocked = false; pendingMark = null; markedPoints = []; markHoldOrigin = null; keyboardMarkActive = false;
     window.clearTimeout(markHoldTimer); markHoldTimer = 0;
     markConfirmPanel.hidden = true;
@@ -712,7 +773,7 @@
   }
 
   function handleLeave() {
-    if (state !== 'playing' || pendingMark) return;
+    if (state !== 'playing' || pendingMark || wrongMarkHazard) return;
     state = 'transition'; transitionStarted = performance.now(); controls.classList.add('hidden'); silenceDrone();
     const correct = reportIsCorrect();
     const token = roundToken;
@@ -750,7 +811,7 @@
   }
 
   function beginFailure(message) {
-    clearRoundTimers(); state = 'caught'; failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
+    clearRoundTimers(); clearWrongMarkHazard(); state = 'caught'; failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
     const jumpLevel = currentTier().jumpLevel ?? AUDIO_LEVELS.jump;
     const token = roundToken;
     failureJumpTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
@@ -770,6 +831,10 @@
     booha.targetY = nextY;
     keyboardMarkActive = false;
     pointerActive = true;
+    if (wrongMarkHazard) {
+      setObservation('RUN TO THE EXIT', 'でぐちへ にげる');
+      return;
+    }
     if (startsHold || (!markLocked && movedBeyondDeadZone)) {
       markHoldOrigin = [nextX, nextY];
       markLocked = false;
@@ -792,7 +857,9 @@
     const step = Math.max(28, Math.min(width, height) * .06);
     booha.targetX = clamp(booha.targetX + dx * step, 0, width);
     booha.targetY = clamp(booha.targetY + dy * step, 0, height);
-    if (keyboardMarkActive) {
+    if (wrongMarkHazard) {
+      setObservation('RUN TO THE EXIT', 'でぐちへ にげる');
+    } else if (keyboardMarkActive) {
       markHoldOrigin = [booha.targetX, booha.targetY];
       window.clearTimeout(markHoldTimer);
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
@@ -802,7 +869,7 @@
   }
 
   function startKeyboardMark() {
-    if (state !== 'playing' || markLocked || pendingMark) return;
+    if (state !== 'playing' || markLocked || pendingMark || wrongMarkHazard) return;
     keyboardMarkActive = true;
     pointerActive = false;
     markHoldOrigin = [booha.targetX, booha.targetY];
@@ -821,7 +888,7 @@
 
   function lockMark() {
     markHoldTimer = 0;
-    if (state !== 'playing' || (!pointerActive && !keyboardMarkActive)) return;
+    if (state !== 'playing' || wrongMarkHazard || (!pointerActive && !keyboardMarkActive)) return;
     markLocked = true;
     pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
     showMarkConfirm();
@@ -842,9 +909,24 @@
     markYesButton.focus?.();
   }
 
+  function startWrongMarkHazard(mark) {
+    const now = performance.now();
+    wrongMarkHazard = {
+      x: mark.x,
+      y: mark.y,
+      radius: clamp(mark.radius * .34, 22, 42),
+      graceUntil: now + WRONG_MARK_GRACE_MS,
+      lastTime: now,
+    };
+    controls.classList.add('hidden');
+    wrongTone();
+    playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + .1));
+    setObservation('WRONG MARK / RUN TO THE EXIT', 'まちがいの しるし / でぐちへ にげる');
+  }
+
   function confirmMark() {
     if (state !== 'playing' || !pendingMark) return;
-    markedPoints.push(pendingMark);
+    const mark = pendingMark;
     pendingMark = null;
     markLocked = false;
     pointerActive = false;
@@ -852,6 +934,11 @@
     markHoldOrigin = null;
     markConfirmPanel.hidden = true;
     markConfirmPanel.classList.remove('visible');
+    if (!currentAnomalies.some(anomaly => markMatchesAnomaly(mark, anomaly))) {
+      startWrongMarkHazard(mark);
+      return;
+    }
+    markedPoints.push(mark);
     rightTone();
     setReportLabel(true);
     setObservation('MARK ADDED / FIND ANOTHER OR REPORT', 'しるしを つけた / つぎを さがすか ほうこく');
