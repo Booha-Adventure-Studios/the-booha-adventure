@@ -572,6 +572,24 @@ S.textContent = `
 
 .ssp-choice.ssp-locked{ opacity:.42; pointer-events:none; transform:none !important; }
 
+.ssp-feedback-overlay{
+  position:fixed; inset:0; z-index:1100; display:none; align-items:center; justify-content:center;
+  padding:1rem; background:rgba(5,3,10,.76); backdrop-filter:blur(8px);
+}
+.ssp-feedback-overlay.show{ display:flex; animation:sspFeedbackIn .22s ease both; }
+.ssp-feedback-overlay.closing{ animation:sspFeedbackOut .18s ease both; pointer-events:none; }
+.ssp-feedback-card{
+  width:min(460px,100%); padding:2rem; border:2px solid #ef4444; border-radius:28px;
+  background:var(--game-surface); color:var(--game-text); text-align:center;
+  box-shadow:0 0 50px rgba(239,68,68,.28),0 20px 50px rgba(0,0,0,.5);
+}
+.ssp-feedback-kicker{ color:#ff8a8a; font-size:.78rem; font-weight:800; letter-spacing:.14em; }
+.ssp-feedback-card h2{ margin:.55rem 0 .5rem; }
+.ssp-feedback-card p{ color:var(--game-muted); line-height:1.55; margin:0 auto 1.25rem; }
+.ssp-feedback-continue.is-pressed{ transform:translateY(2px) scale(.98); opacity:.72; }
+@keyframes sspFeedbackIn{ from{opacity:0;transform:scale(.96)} to{opacity:1;transform:none} }
+@keyframes sspFeedbackOut{ from{opacity:1;transform:none} to{opacity:0;transform:scale(.98)} }
+
 /* ══ STREAK BANNER — electric teal/cyan palette ══ */
 .ssp-streak-banner{
   max-width:680px; margin:.7rem auto 0;
@@ -805,8 +823,8 @@ U.mount(`
 <div class="ssp-wrap" id="ssp-main-wrap">
   <div class="ssp-dots-row" id="ssp-dots"></div>
   <div class="ssp-hud">
-    <div class="ssp-pill">Q <b id="ssp-qnum">1</b> / 15</div>
-    <div class="ssp-pill">Score <b id="ssp-score">0</b> / 15</div>
+    <div class="ssp-pill">RUN <b id="ssp-qnum">0</b> / 15</div>
+    <div class="ssp-pill">PERFECT <b id="ssp-score">0</b> / 15</div>
     <div class="ssp-streak-pill" id="ssp-streak-pill">Streak <b id="ssp-streak">0</b></div>
   </div>
   <div class="ssp-timer-wrap">
@@ -824,6 +842,15 @@ U.mount(`
     <div id="ssp-banner-en"    class="ssp-banner-en"></div>
     <div id="ssp-banner-jp"    class="ssp-banner-jp"></div>
     <div id="ssp-banner-kanji" class="ssp-banner-kanji"></div>
+  </div>
+</div>
+
+<div class="ssp-feedback-overlay" id="ssp-feedback-overlay" hidden>
+  <div class="ssp-feedback-card" role="alertdialog" aria-modal="true" aria-labelledby="ssp-feedback-title">
+    <div class="ssp-feedback-kicker">RUN RESET / 連続が きれました</div>
+    <h2 id="ssp-feedback-title">Keep going.</h2>
+    <p id="ssp-feedback-copy">A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.</p>
+    <button class="game-btn game-btn-primary ssp-feedback-continue" id="ssp-feedback-continue" type="button">CONTINUE / つぎへ</button>
   </div>
 </div>
 
@@ -873,8 +900,8 @@ U.mount(`
       <div class="ssp-how-step">
         <div class="ssp-how-num">3</div>
         <div>
-          <div class="ssp-how-en">Score a point for each correct first-try answer.</div>
-          <div class="ssp-how-jp">一発正解でポイントゲット！</div>
+          <div class="ssp-how-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
+          <div class="ssp-how-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
         </div>
       </div>
       <div class="ssp-how-step">
@@ -914,8 +941,8 @@ U.mount(`
       <div class="ssp-start-step">
         <div class="ssp-start-num">3</div>
         <div>
-          <div class="ssp-start-en">Build your streak to speed up the timer!</div>
-          <div class="ssp-start-jp">連続正解でタイマーが速くなるよ！</div>
+          <div class="ssp-start-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
+          <div class="ssp-start-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
         </div>
       </div>
       <button class="ssp-start-btn" id="ssp-start-btn">START / はじめよう</button>
@@ -946,6 +973,10 @@ const dotsRow     = document.getElementById('ssp-dots');
 const startOverlay= document.getElementById('ssp-start-overlay');
 const helpBtn     = document.getElementById('ssp-help');
 const modalOverlay= document.getElementById('ssp-modal-overlay');
+const feedbackOverlay = document.getElementById('ssp-feedback-overlay');
+const feedbackTitle = document.getElementById('ssp-feedback-title');
+const feedbackCopy = document.getElementById('ssp-feedback-copy');
+const feedbackContinue = document.getElementById('ssp-feedback-continue');
 
 /* Build 15 progress dots */
 for (let i = 0; i < 15; i++) {
@@ -965,16 +996,36 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOverlay
 /* ══════════════════════════════════════════════════════════════
    START OVERLAY
    ══════════════════════════════════════════════════════════════ */
+function bindSingleActivation(element, handler) {
+  let suppressClickUntil = 0;
+  element.addEventListener('pointerup', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    suppressClickUntil = performance.now() + 500;
+    handler(event);
+  }, { passive: false });
+  element.addEventListener('click', event => {
+    if (performance.now() < suppressClickUntil) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      return;
+    }
+    handler(event);
+  });
+}
+
 function doStart() {
   unlockAllAudio();
+  feedbackState = 'playing';
+  order = U.shuffle(CFG.cards.slice(0, 15));
+  idx = 0; score = 0; streak = 0; lastLevel = 0;
+  runStartedAt = performance.now();
   startOverlay.classList.add('hiding');
   setTimeout(() => { startOverlay.style.display = 'none'; }, 380);
   renderQ();
 }
-document.getElementById('ssp-start-btn').addEventListener('click', doStart);
-document.getElementById('ssp-start-btn').addEventListener('touchstart', (e) => {
-  e.preventDefault(); doStart();
-}, { passive: false });
 
 /* ══════════════════════════════════════════════════════════════
    STATE
@@ -985,10 +1036,12 @@ let score     = 0;
 let streak    = 0;
 let lastLevel = 0;
 let locked    = false;
-let firstTry  = true;
 let heatRAF   = 0;
 let heatStart = 0;
 let heatDur   = 7000;
+let runStartedAt = 0;
+let feedbackState = 'awaiting-start';
+let recoveryPending = false;
 
 /* ══════════════════════════════════════════════════════════════
    DOTS
@@ -1045,18 +1098,71 @@ function startHeat() {
   heatRAF = requestAnimationFrame(tick);
 }
 
+function setAnswerInputEnabled(enabled) {
+  grid.setAttribute('aria-disabled', String(!enabled));
+  grid.querySelectorAll('.ssp-choice').forEach(btn => {
+    btn.disabled = !enabled;
+    btn.setAttribute('aria-disabled', String(!enabled));
+  });
+}
+
+function showFailureFeedback(kind) {
+  stopHeat();
+  feedbackState = 'feedback';
+  locked = true;
+  setAnswerInputEnabled(false);
+  feedbackTitle.textContent = kind === 'timeout' ? 'Time ran out.' : 'That answer was not correct.';
+  feedbackCopy.textContent = 'A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.';
+  feedbackContinue.disabled = false;
+  feedbackContinue.removeAttribute('aria-disabled');
+  feedbackContinue.classList.remove('is-pressed');
+  feedbackOverlay.hidden = false;
+  feedbackOverlay.classList.remove('closing');
+  feedbackOverlay.classList.add('show');
+  requestAnimationFrame(() => feedbackContinue.focus());
+}
+
+function continueFromFailure(event) {
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+  if (feedbackState !== 'feedback' || recoveryPending) return;
+  recoveryPending = true;
+  feedbackState = 'advancing';
+  locked = true;
+  setAnswerInputEnabled(false);
+  feedbackContinue.disabled = true;
+  feedbackContinue.setAttribute('aria-disabled', 'true');
+  feedbackContinue.classList.add('is-pressed');
+  feedbackOverlay.classList.add('closing');
+  setTimeout(() => {
+    feedbackOverlay.classList.remove('show', 'closing');
+    feedbackOverlay.hidden = true;
+    order = U.shuffle(CFG.cards.slice(0, 15));
+    idx = 0; score = 0; streak = 0; lastLevel = 0;
+    runStartedAt = performance.now();
+    scoreEl.textContent = '0';
+    streakEl.textContent = '0';
+    updateStreakUI();
+    updateStreakBanner();
+    feedbackState = 'playing';
+    recoveryPending = false;
+    renderQ();
+  }, 200);
+}
+
 /* ══════════════════════════════════════════════════════════════
    RENDER QUESTION
    ══════════════════════════════════════════════════════════════ */
 function renderQ() {
-  if (idx >= order.length) { showResults(); return; }
+  if (idx >= 15) { showResults(); return; }
 
-  locked   = false;
-  firstTry = true;
+  locked   = true;
+  setAnswerInputEnabled(false);
   grid.innerHTML = '';
 
   const card = order[idx];
-  qnumEl.textContent = idx + 1;
+  qnumEl.textContent = idx;
   jpEl.textContent   = card.jp;
   hiraEl.textContent = card.hira || '';
   updateDots();
@@ -1065,7 +1171,7 @@ function renderQ() {
   const distractors = U.shuffle(pool).slice(0, 3);
   const choices     = U.shuffle([card, ...distractors]);
 
- choices.forEach((c, ci) => {
+  choices.forEach((c, ci) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'ssp-choice';
@@ -1073,14 +1179,9 @@ function renderQ() {
     btn.setAttribute('aria-label', c.en);
     btn.textContent = c.en;
 
-    btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
+    bindSingleActivation(btn, event => {
       unlockAllAudio();
-      handlePick(btn, c.en);
-    }, { passive: false });
-    btn.addEventListener('click', (e) => {
-      if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
-      handlePick(btn, c.en);
+      handlePick(btn, c.en, event);
     });
 
     grid.appendChild(btn);
@@ -1097,14 +1198,21 @@ function renderQ() {
     }, i * 60);
   });
 
-  startHeat();
+  if (feedbackState === 'playing') {
+    requestAnimationFrame(() => {
+      if (feedbackState !== 'playing') return;
+      locked = false;
+      setAnswerInputEnabled(true);
+      startHeat();
+    });
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
    HANDLE PICK
    ══════════════════════════════════════════════════════════════ */
 function handlePick(btn, en) {
-  if (locked) return;
+  if (locked || feedbackState !== 'playing') return;
   const now = Date.now();
   if (now - lastPickAt < PICK_DEBOUNCE_MS) return;
   lastPickAt = now;
@@ -1122,8 +1230,8 @@ function handlePick(btn, en) {
     btn.classList.add('ssp-correct');
     U.playSFX('ding');
 
-    if (firstTry) { score++; streak++; }
-    else           { streak = 0; }
+    score++;
+    streak++;
 
     scoreEl.textContent = score;
     updateStreakUI();
@@ -1134,21 +1242,12 @@ function handlePick(btn, en) {
 
   } else {
     btn.classList.add('ssp-wrong');
-    firstTry = false;
     streak   = 0;
     updateStreakUI();
     updateStreakBanner();
     U.playSFX('fart');
 
-    setTimeout(() => {
-      locked = false;
-      firstTry = false;
-      Array.from(grid.children).forEach(b => {
-        b.classList.remove('ssp-locked', 'ssp-wrong');
-        b.style.transition = '';
-      });
-      startHeat();
-    }, 580);
+    showFailureFeedback('wrong');
   }
 }
 
@@ -1156,9 +1255,8 @@ function handlePick(btn, en) {
    TIMEOUT
    ══════════════════════════════════════════════════════════════ */
 function onTimeout() {
-  if (locked) return;
+  if (locked || feedbackState !== 'playing') return;
   locked   = true;
-  firstTry = false;
   streak   = 0;
   updateStreakUI();
   updateStreakBanner();
@@ -1166,12 +1264,7 @@ function onTimeout() {
 
   Array.from(grid.children).forEach(b => b.classList.add('ssp-locked'));
 
-  setTimeout(() => {
-    locked = false;
-    firstTry = false;
-    Array.from(grid.children).forEach(b => b.classList.remove('ssp-locked'));
-    startHeat();
-  }, 580);
+  showFailureFeedback('timeout');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1268,6 +1361,10 @@ function fireConfetti(big = false) {
               saveId for sentence_speed
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
+  if (idx !== 15 || score !== 15 || streak !== 15 || feedbackState !== 'playing') return;
+  feedbackState = 'complete';
+  locked = true;
+  setAnswerInputEnabled(false);
   stopHeat();
   stopLvl4();
 
@@ -1284,14 +1381,19 @@ function showResults() {
   results.classList.add('show');
 
   const tier = getTier(score);
-  const pct  = Math.round((score / 15) * 100);
+  const pct  = 100;
+  const runTime = Math.max(0, performance.now() - runStartedAt);
 
   /* ── Dispatch to Booha Adventure save system ── */
 document.dispatchEvent(new CustomEvent('booha:gameEnd', {
     detail: {
       saveId:    `${CFG.curriculum}:sentence_speed`,
       score:     pct,
-      completed: pct >= 40,
+      completed: true,
+      recordEligible: true,
+      time: runTime,
+      clearTier: 'perfect',
+      mistakes: 0,
     }
   }));
 
@@ -1327,10 +1429,13 @@ document.getElementById('ssp-replay').addEventListener('click', () => {
 
   streakBanner.className = 'ssp-streak-banner';
   idx = 0; score = 0; streak = 0; lastLevel = 0;
+  feedbackState = 'playing';
+  recoveryPending = false;
+  runStartedAt = performance.now();
   scoreEl.textContent  = '0';
   streakEl.textContent = '0';
   updateStreakUI();
-  order = U.shuffle(order);
+  order = U.shuffle(CFG.cards.slice(0, 15));
   renderQ();
 });
 
@@ -1339,6 +1444,7 @@ document.getElementById('ssp-back').addEventListener('click', () => {
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
 
-/* renderQ() is triggered by the START button only. */
+bindSingleActivation(document.getElementById('ssp-start-btn'), doStart);
+bindSingleActivation(feedbackContinue, continueFromFailure);
 
 })();

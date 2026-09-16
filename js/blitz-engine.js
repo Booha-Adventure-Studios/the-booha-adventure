@@ -60,8 +60,6 @@ window.BoohaBlitzEngine = (() => {
     }),
   });
   const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 5, 8, 12, 15]);
-  const WRONG_ANSWER_PENALTY_MS = 5000;
-  const CLEAN_CLEAR_MAX_MISTAKES = 2;
   const STREAK_EVENT_NOTES = Object.freeze({
     playful: Object.freeze({
       3: [523, 659], 5: [587, 740, 880], 8: [659, 784, 988],
@@ -623,6 +621,18 @@ window.BoohaBlitzEngine = (() => {
         display: flex;
         animation: boohaBlitzWrongCard 240ms cubic-bezier(.2, .9, .25, 1) both;
       }
+      #vb-wrong-popup.blitz-wrong-feedback.show.closing,
+      #sb-wrong-popup.blitz-wrong-feedback.show.closing,
+      #qb-wrong-popup.blitz-wrong-feedback.show.closing {
+        animation: boohaBlitzWrongCardOut 180ms ease both;
+        pointer-events: none;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback #vb-wrong-close.is-pressed,
+      #sb-wrong-popup.blitz-wrong-feedback #sb-wrong-close.is-pressed,
+      #qb-wrong-popup.blitz-wrong-feedback #qb-wrong-close.is-pressed {
+        transform: translateY(2px) scale(.98);
+        opacity: .72;
+      }
       #vb-wrong-popup.blitz-wrong-feedback .vb-wrong-kanji,
       #sb-wrong-popup.blitz-wrong-feedback .sb-wrong-jp,
       #qb-wrong-popup.blitz-wrong-feedback .qb-wrong-jp,
@@ -723,6 +733,10 @@ window.BoohaBlitzEngine = (() => {
       @keyframes boohaBlitzWrongCard {
         from { opacity: 0; transform: translate(-50%, 22px) scale(.97); }
         to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      }
+      @keyframes boohaBlitzWrongCardOut {
+        from { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        to { opacity: 0; transform: translate(-50%, 10px) scale(.98); }
       }
       @keyframes boohaBlitzWrongSpark {
         0% { opacity: 0; transform: translate(-50%, -50%) scale(.5); }
@@ -2306,7 +2320,7 @@ window.BoohaBlitzEngine = (() => {
     function startGame(allCards, curr, weekNumber, palette, monthSlug) {
       const offset = (weekNumber - 1) * 15;
       const weekCards = allCards.slice(offset, offset + 15);
-      if (weekCards.length < 6) {
+      if (weekCards.length < 15) {
         alert(config.notEnoughMessage);
         return;
       }
@@ -2495,7 +2509,7 @@ window.BoohaBlitzEngine = (() => {
       const spotlight = createPlayerSpotlight(overlay, palette);
       const finalCard = ensureFinalCard(winScreen, palette);
       const startCard = createStartCard(overlay, palette);
-      const queue = shuffle(weekCards);
+      let queue = shuffle(weekCards);
       let current = 0;
       let startTime = null;
       let elapsed = 0;
@@ -2512,10 +2526,38 @@ window.BoohaBlitzEngine = (() => {
       let finalHoldInterval = null;
       let runIsActive = false;
       let visibilityPaused = false;
-      let runEligibleForRecord = true;
       let mistakeCount = 0;
       let questionOverlayRect = null;
+      let feedbackState = 'awaiting-start';
+      let recoveryPending = false;
+      let runEpoch = 0;
       const initialQueueLength = queue.length;
+
+      function setAnswerInputEnabled(enabled) {
+        optionsEl.setAttribute('aria-disabled', String(!enabled));
+        optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(button => {
+          button.disabled = !enabled;
+          button.setAttribute('aria-disabled', String(!enabled));
+        });
+      }
+
+      function bindPointerAction(button, handler) {
+        let suppressClickUntil = 0;
+        button.addEventListener('pointerup', event => {
+          event.preventDefault();
+          event.stopPropagation();
+          suppressClickUntil = performance.now() + 500;
+          handler(event);
+        }, { passive: false });
+        button.addEventListener('click', event => {
+          if (performance.now() < suppressClickUntil) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          handler(event);
+        });
+      }
 
       function setBackground(streakValue = streak) {
         const next = backgroundFor(palette, bgIndex, streakValue);
@@ -2753,7 +2795,12 @@ window.BoohaBlitzEngine = (() => {
             optionsEl.style.visibility = 'hidden';
             renderQuestion();
             if (scrollEl) scrollEl.scrollTop = 0;
-            requestAnimationFrame(() => { optionsEl.style.visibility = ''; });
+            requestAnimationFrame(() => {
+              optionsEl.style.visibility = '';
+              feedbackState = 'playing';
+              locked = false;
+              setAnswerInputEnabled(true);
+            });
           }
         }, config.nextDelay || 200);
       }
@@ -2785,6 +2832,7 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function showWrongPopup(correct) {
+        if (feedbackState !== 'feedback-pending') return;
         const scold = config.scolds[Math.floor(Math.random() * config.scolds.length)];
         const wrongJp = overlay.querySelector(selector('wrongJp'));
         const wrongHira = overlay.querySelector(selector('wrongHira'));
@@ -2804,35 +2852,73 @@ window.BoohaBlitzEngine = (() => {
         wrongPopup.classList.remove('wrong-feel-playful', 'wrong-feel-arcade', 'wrong-feel-sleek');
         wrongPopup.classList.add(`wrong-feel-${palette.feel || 'playful'}`);
         overlay.classList.add('wrong-active');
+        setAnswerInputEnabled(false);
         wrongPopup.scrollTop = 0;
+        wrongPopup.setAttribute('aria-hidden', 'false');
+        const continueButton = overlay.querySelector(selector('wrongClose'));
+        if (continueButton) {
+          continueButton.disabled = false;
+          continueButton.classList.remove('is-pressed');
+        }
+        feedbackState = 'feedback';
         wrongPopup.classList.add('show');
       }
 
-      function recoverFromWrong() {
-        if (!wrongPopup.classList.contains('show')) return;
-        wrongPopup.classList.remove('show');
-        wrongPopup.scrollTop = 0;
+      function recoverFromWrong(event) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
+        event?.stopImmediatePropagation?.();
+        if (feedbackState !== 'feedback' || recoveryPending) return;
+        recoveryPending = true;
+        feedbackState = 'advancing';
+        locked = true;
+        runIsActive = false;
+        setAnswerInputEnabled(false);
+        const continueButton = overlay.querySelector(selector('wrongClose'));
+        if (continueButton) {
+          continueButton.disabled = true;
+          continueButton.setAttribute('aria-disabled', 'true');
+          continueButton.classList.add('is-pressed');
+        }
+        wrongPopup.classList.add('closing');
+        wrongPopup.setAttribute('aria-hidden', 'true');
         overlay.classList.remove('wrong-active');
-        const missedCard = queue[current];
-        const retryAt = Math.min(queue.length, current + 4 + Math.floor(Math.random() * 3));
-        queue.splice(retryAt, 0, missedCard);
-        current++;
-        streak = 0;
-        elapsed += WRONG_ANSWER_PENALTY_MS;
-        clearElapsed = null;
-        startTime = performance.now() - elapsed;
-        runIsActive = true;
-        visibilityPaused = false;
-        lastTimerPaint = -Infinity;
-        timerEl.textContent = fmtTime(elapsed);
-        renderQuestion(true);
-        startBGM();
-        scheduleTimerTick(0);
-        requestAnimationFrame(() => optionsEl.querySelector(`.${config.optionClass}`)?.focus());
+        const recoveryEpoch = runEpoch;
+        setTimeout(() => {
+          if (recoveryEpoch !== runEpoch) return;
+          wrongPopup.classList.remove('show', 'closing');
+          wrongPopup.scrollTop = 0;
+          queue = shuffle(weekCards);
+          current = 0;
+          streak = 0;
+          bestStreak = 0;
+          mistakeCount = 0;
+          clearElapsed = null;
+          elapsed = 0;
+          startTime = null;
+          lastTimerPaint = -Infinity;
+          timerEl.textContent = fmtTime(0);
+          renderQuestion(true);
+          setTimeout(() => {
+            if (recoveryEpoch !== runEpoch) return;
+            recoveryPending = false;
+            feedbackState = 'playing';
+            locked = false;
+            runIsActive = true;
+            visibilityPaused = false;
+            startTime = performance.now();
+            elapsed = 0;
+            timerEl.textContent = fmtTime(0);
+            startBGM();
+            scheduleTimerTick(0);
+            setAnswerInputEnabled(true);
+            requestAnimationFrame(() => optionsEl.querySelector(`.${config.optionClass}`)?.focus());
+          }, 200);
+        }, 180);
       }
 
       function handleAnswer(btn, chosen, correct) {
-        if (locked) return;
+        if (locked || feedbackState !== 'playing' || !runIsActive) return;
         locked = true;
         const answerRect = isMinimalPower() || REDUCED_MOTION ? null : btn.getBoundingClientRect();
         const overlayRect = isMinimalPower() || REDUCED_MOTION ? null : questionOverlayRect;
@@ -2849,9 +2935,10 @@ window.BoohaBlitzEngine = (() => {
 
         btn.classList.add('wrong');
         runIsActive = false;
+        feedbackState = 'feedback-pending';
+        setAnswerInputEnabled(false);
         visibilityPaused = false;
         mistakeCount++;
-        runEligibleForRecord = mistakeCount <= CLEAN_CLEAR_MAX_MISTAKES;
         elapsed = startTime === null ? elapsed : performance.now() - startTime;
         spotlight.resetStreak();
         setBackground(0);
@@ -2864,11 +2951,15 @@ window.BoohaBlitzEngine = (() => {
         overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
         stopTimer();
         stopBGM();
-        setTimeout(() => showWrongPopup(correct), config.wrongDelay || 320);
+        const answerEpoch = runEpoch;
+        setTimeout(() => {
+          if (answerEpoch === runEpoch) showWrongPopup(correct);
+        }, config.wrongDelay || 320);
       }
 
       function renderQuestion(recover = false) {
-        locked = false;
+        locked = true;
+        setAnswerInputEnabled(false);
         const card = queue[current];
         bgIndex++;
         setBackground(streak);
@@ -2880,8 +2971,7 @@ window.BoohaBlitzEngine = (() => {
           jpWordEl.textContent = card.jp;
           hiraEl.textContent = card.hira;
         });
-        const progress = `${Math.min(current + 1, initialQueueLength)} / ${initialQueueLength}`;
-        progressEl.textContent = queue.length > initialQueueLength ? `${progress} · REPLAYS` : progress;
+        progressEl.textContent = `${Math.min(current, initialQueueLength)} / ${initialQueueLength}`;
         const wrong = shuffle(weekCards.filter(c => c.n !== card.n)).slice(0, 5);
         const options = shuffle([card, ...wrong]);
         optionsEl.innerHTML = '';
@@ -2897,9 +2987,10 @@ window.BoohaBlitzEngine = (() => {
           }
           btn.type = 'button';
           btn.textContent = opt.en;
-          btn.addEventListener('click', () => handleAnswer(btn, opt, card));
+          bindPointerAction(btn, () => handleAnswer(btn, opt, card));
           optionsEl.appendChild(btn);
         });
+        setAnswerInputEnabled(false);
         questionOverlayRect = overlay.getBoundingClientRect();
         if (current === 0 && startTime === null && gameStarted) startTime = performance.now();
       }
@@ -2907,7 +2998,6 @@ window.BoohaBlitzEngine = (() => {
       function beginGame() {
         if (gameStarted) return;
         gameStarted = true;
-        runEligibleForRecord = true;
         mistakeCount = 0;
         startBGM();
         playStartSting();
@@ -2917,7 +3007,9 @@ window.BoohaBlitzEngine = (() => {
           startCard.card.remove();
           startTime = performance.now();
           runIsActive = true;
+          feedbackState = 'playing';
           visibilityPaused = false;
+          setAnswerInputEnabled(true);
           scheduleTimerTick(0);
           overlay._boohaBlitzPerformanceCleanup = monitorFramePerformance(
             overlay,
@@ -2933,15 +3025,14 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function showWin(ms) {
+        const isPerfectRun = current === initialQueueLength && streak === initialQueueLength && bestStreak === initialQueueLength && mistakeCount === 0;
+        if (!isPerfectRun) return;
+        feedbackState = 'complete';
         runIsActive = false;
         visibilityPaused = false;
         const weekId = makeWeekId(monthSlug, weekNumber);
-        const recordEligible = runEligibleForRecord;
-        const clearTier = mistakeCount === 0
-          ? 'perfect'
-          : mistakeCount <= CLEAN_CLEAR_MAX_MISTAKES ? 'clean' : 'mastery';
-        const isPerfectRun = clearTier === 'perfect' && bestStreak === initialQueueLength;
-        const isMasteryClear = clearTier === 'mastery';
+        const recordEligible = true;
+        const clearTier = 'perfect';
         const revealFinishFallback = () => {
           try {
             winScreen.classList.add('show');
@@ -2966,7 +3057,7 @@ window.BoohaBlitzEngine = (() => {
         const result = recordEligible
           ? saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId, {
             clearTier,
-            mistakes: mistakeCount,
+            mistakes: 0,
           })
           : {
             isWeeklyRecord: false,
@@ -3020,14 +3111,6 @@ window.BoohaBlitzEngine = (() => {
           recordEl.textContent = '🏆 NEW BOOHA RECORD';
           bestEl.textContent = `PERSONAL BEST: ${fmtTime(ms)}`;
           deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than previous best` : 'FIRST PERSONAL BEST';
-        } else if (isMasteryClear) {
-          recordEl.textContent = 'MASTERY CLEAR · NO RECORD';
-          bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
-          deltaEl.textContent = `${mistakeCount} MISTAKES — KEEP BUILDING YOUR MEMORY`;
-        } else if (clearTier === 'clean') {
-          recordEl.textContent = 'CLEAN CLEAR · RECORD PENALTY APPLIED';
-          bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
-          deltaEl.textContent = `${mistakeCount} MISTAKE${mistakeCount === 1 ? '' : 'S'} · +${fmtTime(mistakeCount * WRONG_ANSWER_PENALTY_MS)}`;
         } else {
           recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST · #1' : 'PERFECT CLEAR';
           bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
@@ -3041,11 +3124,7 @@ window.BoohaBlitzEngine = (() => {
           finalCard.residual.textContent = `${palette.streak?.label || 'STREAK'} ENERGY ×${bestStreak} — STILL GLOWING`;
         }
         finalCard.perfect.hidden = false;
-        finalCard.perfect.textContent = isMasteryClear
-          ? 'MASTERY CLEAR · NO RECORD'
-          : clearTier === 'clean'
-            ? `CLEAN CLEAR · ${mistakeCount} MISTAKE${mistakeCount === 1 ? '' : 'S'}`
-            : `PERFECT RUN · ${initialQueueLength}/${initialQueueLength}`;
+        finalCard.perfect.textContent = `PERFECT RUN · ${initialQueueLength}/${initialQueueLength}`;
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         spotlight.nameplate.classList.add('complete');
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
@@ -3062,14 +3141,20 @@ window.BoohaBlitzEngine = (() => {
       }
 
       const cleanupAndClose = () => {
+        runEpoch++;
+        feedbackState = 'closed';
+        recoveryPending = false;
         stopFinalHold();
         stopStreakBeat();
         performanceDiagnostic?.destroy();
         closeGame(overlay, stopTimer, stopBGM);
       };
-      overlay.querySelector(selector('wrongClose')).addEventListener('click', recoverFromWrong);
+      bindPointerAction(overlay.querySelector(selector('wrongClose')), recoverFromWrong);
       overlay.querySelector(selector('quit')).addEventListener('click', cleanupAndClose);
       overlay.querySelector(selector('playAgain')).addEventListener('click', () => {
+        runEpoch++;
+        feedbackState = 'closed';
+        recoveryPending = false;
         stopFinalHold();
         stopStreakBeat();
         stopTimer();
@@ -3086,7 +3171,7 @@ window.BoohaBlitzEngine = (() => {
       scheduleTimerTick(0);
       renderQuestion();
       spotlight.announce(`${spotlight.playerName}, READY?`);
-      startCard.button.addEventListener('click', beginGame);
+      bindPointerAction(startCard.button, beginGame);
       requestAnimationFrame(() => startCard.button.focus());
     }
 

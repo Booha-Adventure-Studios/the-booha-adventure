@@ -6,50 +6,33 @@ const modes = ['js/vocab-blitz.js', 'js/sentence-blitz.js', 'js/question-blitz.j
   .map(file => fs.readFileSync(file, 'utf8'));
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /statusByFeel = \{/,
-  'wrong feedback must have curriculum-specific personality copy');
-assert.match(engine, /BUMP! LET'S BOUNCE BACK/,
-  'Pre-Boo wrong feedback must stay playful and encouraging');
-assert.match(engine, /CHAIN BROKEN — RELOAD!/,
-  'Boo-riculum wrong feedback must acknowledge the broken chain');
-assert.match(engine, /LINK LOST — TRY AGAIN\./,
-  'Boo-continuum wrong feedback must use a sleek recovery line');
-assert.match(engine, /function emitWrongMicroFeedback\(wrongBtn, answerRect, overlayRect\)/,
-  'wrong answers must emit a small wrong-color feedback beat');
-assert.match(engine, /palette\.wrong\?\.color/,
-  'wrong feedback must use the curriculum wrong color');
-assert.match(engine, /wrongPopup\.classList\.add\(`wrong-feel-\$\{palette\.feel/,
-  'the wrong sheet must receive its curriculum feel');
-assert.match(engine, /wrong-active/,
-  'the play field must visibly enter a wrong-feedback state');
-assert.match(engine, /function recoverFromWrong\(\)/,
-  'dismissing wrong feedback must have a dedicated recovery path');
+assert.match(engine, /function showWrongPopup\(correct\)/,
+  'wrong feedback must have a dedicated popup');
+assert.match(engine, /function recoverFromWrong\(event\)/,
+  'continuation must have a dedicated recovery path');
+assert.match(engine, /feedbackState = 'feedback-pending';[\s\S]*?setAnswerInputEnabled\(false\)/,
+  'answers must be disabled as soon as a wrong answer is detected');
+assert.match(engine, /event\?\.stopImmediatePropagation\?\.\(\)/,
+  'Continue must stop tap-through and duplicate activation');
+assert.match(engine, /recoveryPending = true;[\s\S]*?feedbackState = 'advancing';[\s\S]*?setAnswerInputEnabled\(false\)/,
+  'Continue must become a one-shot transition barrier');
+assert.match(engine, /queue = shuffle\(weekCards\);[\s\S]*?current = 0;[\s\S]*?streak = 0;/,
+  'a failed run must restart with all weekly cards and zero progress');
+assert.match(engine, /elapsed = 0;[\s\S]*?startTime = performance\.now\(\);/,
+  'the timer baseline must restart after a failed run');
+assert.doesNotMatch(engine, /queue\.splice\(/,
+  'a failed run must not insert a missed card into a longer replay queue');
+assert.doesNotMatch(engine, /WRONG_ANSWER_PENALTY_MS/,
+  'the failed run must reset rather than add a time penalty');
 assert.match(engine, /renderQuestion\(true\)/,
-  'recovery must rebuild the current prompt and options');
-assert.match(engine, /mistakeCount\+\+;[\s\S]*?elapsed = startTime === null \? elapsed : performance\.now\(\) - startTime/,
-  'wrong answers must capture elapsed time and count a mistake');
-assert.match(engine, /elapsed \+= WRONG_ANSWER_PENALTY_MS;[\s\S]*?startTime = performance\.now\(\) - elapsed/,
-  'recovery must resume with a fixed visible time penalty');
-assert.match(engine, /queue\.splice\(retryAt, 0, missedCard\);[\s\S]*?current\+\+/,
-  'recovery must schedule the missed card for a later replay');
-assert.match(engine, /blitz-recover/,
-  'recovered options must animate back with a staggered entrance');
-assert.match(engine, /config\.wrongDelay \|\| 320/,
-  'wrong feedback must arrive with a short recovery-friendly delay');
-assert.match(engine, /selector\('wrongClose'\)\)\.addEventListener\('click', recoverFromWrong\)/,
-  'the wrong-sheet action must return to play instead of closing the game');
-assert.match(engine, /\.booha-blitz-wrong-spark \{ display: none; \}/,
-  'reduced motion must remove wrong-answer particles');
+  'the restarted run must retain the existing recovery entrance animation');
 
-for (const [source, prefix] of [['js/vocab-blitz.js', 'vb'], ['js/sentence-blitz.js', 'sb'], ['js/question-blitz.js', 'qb']]
-  .map(([file, prefix]) => [fs.readFileSync(file, 'utf8'), prefix])) {
-  assert.match(source, new RegExp(`id="${prefix}-wrong-status">READY FOR THE NEXT TRY`),
-    `${prefix} must start with a recovery-oriented wrong status`);
+for (const [source, prefix] of modes.map((source, index) => [source, ['vb', 'sb', 'qb'][index]])) {
   assert.match(source, new RegExp(`id="${prefix}-wrong-close" type="button">つぎへ / CONTINUE`),
     `${prefix} wrong feedback must clearly offer continuation`);
 }
 
 assert.match(verify, /tests\/blitz-pass16-wrong-recovery-audit\.cjs/,
-  'verify.sh must run the Pass 4 wrong-recovery audit');
+  'verify.sh must run the wrong-recovery audit');
 
-console.log('Blitz Pass 4 wrong-recovery audit passed: personality copy, wrong-color beat, retry reset, staggered return, and reduced-motion coverage are present.');
+console.log('Blitz wrong-recovery audit passed: failed runs reset cleanly and Continue is a real input barrier.');

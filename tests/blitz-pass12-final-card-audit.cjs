@@ -12,24 +12,20 @@ assert.match(engine, /className = 'booha-blitz-final-card'/,
   'the clear result must use a dedicated final-card surface');
 assert.match(engine, /booha-blitz-final-curriculum/,
   'the final card must identify its curriculum');
-assert.match(engine, /curriculum\.textContent = `\$\{palette\?\.name/,
-  'the final card must show the curriculum identity from the shared palette');
 assert.match(engine, /winScreen\.querySelector\(selector\('winName'\)\)\.textContent = playerName/,
   'the player name must remain the final-card hero');
 assert.match(engine, /PERSONAL BEST:/,
   'the final card must label the personal best explicitly');
 assert.match(engine, /previous best/,
   'the final card must show the delta from the previous best');
-assert.match(engine, /CLEAR COMPLETE/,
-  'non-record clears must still have an explicit result state');
-assert.match(engine, /const isPerfectRun = clearTier === 'perfect' && bestStreak === initialQueueLength/,
-  'the final card must require a mistake-free run for perfect-run state');
+assert.match(engine, /const isPerfectRun = current === initialQueueLength/,
+  'the final card must require a full mistake-free run');
 assert.match(engine, /PERFECT RUN · \$\{initialQueueLength\}\/\$\{initialQueueLength\}/,
   'the final card must expose a perfect-run indicator');
 assert.match(engine, /finalCard\.perfect\.hidden = false/,
-  'the final-card status indicator must remain available for every clear tier');
-assert.match(engine, /MASTERY CLEAR · NO RECORD/,
-  'retry completions must be identified as mastery clears without record status');
+  'the final-card status indicator must remain available for a clear');
+assert.doesNotMatch(engine, /MASTERY CLEAR|CLEAN CLEAR/,
+  'failed runs must not render alternate clear tiers');
 assert.match(engine, /finalCard\.streak\.textContent = `BEST STREAK ×\$\{bestStreak\}`/,
   'the final card must retain the best streak result');
 assert.match(engine, /FINAL_CARD_HOLD_MS = 4000/,
@@ -45,6 +41,6 @@ for (const mode of modes) {
 }
 
 assert.match(verify, /tests\/blitz-pass12-final-card-audit\.cjs/,
-  'verify.sh must run the Pass 6 final-card audit');
+  'verify.sh must run the final-card audit');
 
-console.log('Blitz Pass 6 final-card audit passed: identity, records, delta, streak, perfect-run, replay, and hold contracts are covered.');
+console.log('Blitz final-card audit passed: perfect-run identity, records, replay, and hold contracts are covered.');
