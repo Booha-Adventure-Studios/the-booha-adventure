@@ -21,6 +21,8 @@ assert(source.includes("if (state.roomId === MUENBA_NUPPI.roomId && !state.navig
 assert(source.includes("const MUENBA_NUPPI = { roomId: 'room_01', x: 940, y: 215"), 'Nuppi must stay clear of the room 01 up arrow');
 assert(dataSource.includes("up:    { x: 767, y: 284 }"), 'room 01 up-arrow coordinates must remain stable');
 assert(karasukiSource.includes('const masterAlpha = unlocked ? 1 : moveReveal * 0.38;'), 'unlocked Utsuroba must not be dimmed by movement reveal');
+assert(karasukiSource.includes('roomId  : "room_05"') && karasukiSource.includes('x       : 364') && karasukiSource.includes('y       : 246'), 'Utsuroba must enter from Karasuki room_05 at the requested coordinates');
+assert(karasukiSource.includes('#9dff18') && karasukiSource.includes('rgba(0,0,0,0.62)'), 'open Utsuroba must use an eerie lime orb with black smoke');
 assert(karasukiSource.includes('const unlocked = muenbaUnlocked();'), 'Karasuki must evaluate the Muenba unlocked state before drawing');
 assert(karasukiSource.includes('const masterAlpha = unlocked ? 1 : moveReveal;'), 'unlocked Muenba must not be dimmed by movement reveal');
 assert(karasukiSource.includes("ctx.strokeStyle = unlocked ? '#75f2b5' : '#9b7da9';"), 'unlocked Muenba must use a vivid spectral rim');

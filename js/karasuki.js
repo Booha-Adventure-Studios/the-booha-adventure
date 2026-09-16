@@ -96,9 +96,9 @@ const HAPPY_HOUSE_PORTAL = {
 
   
   const UTSUROBA_PORTAL = {
-    roomId  : "room_15",
-    x       : 381,
-    y       : 264,
+    roomId  : "room_05",
+    x       : 364,
+    y       : 246,
     r       : 48,
     videoSrc: "assets/video/utsuroba_intro.mp4",
     href    : "utsuroba.html",
@@ -3607,7 +3607,7 @@ const HAPPY_HOUSE_PORTAL = {
     if (state.roomId !== UTSUROBA_PORTAL.roomId) return;
     const sec        = now / 1000;
     const moveReveal = Math.max(0.18, Math.min(1, state.distMovedSinceSpawn / ARROW_MOVE_THRESHOLD));
-    
+
     const cx       = UTSUROBA_PORTAL.x, cy = UTSUROBA_PORTAL.y;
     const unlocked = _utsurobaCurriculumUnlocked();
     // An unlocked entrance must remain readable before Booha moves. Movement
@@ -3618,38 +3618,67 @@ const HAPPY_HOUSE_PORTAL = {
     const pulse2 = 0.5 + 0.5 * Math.sin(sec * 1.7 + 0.8);
     const bob    = Math.sin(sec * 1.3) * 4;
     ctx.save();
-    const hazeR = 72 + pulse * 10;
-    const haze  = ctx.createRadialGradient(cx, cy + bob, 0, cx, cy + bob, hazeR);
-    haze.addColorStop(0, 'rgba(255,248,220,0.22)'); haze.addColorStop(0.45, 'rgba(255,220,100,0.12)'); haze.addColorStop(1, 'transparent');
-    ctx.globalAlpha = masterAlpha * (0.6 + pulse * 0.3); ctx.fillStyle = haze;
-    ctx.beginPath(); ctx.arc(cx, cy + bob, hazeR, 0, Math.PI * 2); ctx.fill();
+    const orbY = cy + bob;
+    const hazeR = 78 + pulse * 12;
+    const haze  = ctx.createRadialGradient(cx, orbY, 0, cx, orbY, hazeR);
+    haze.addColorStop(0, unlocked ? 'rgba(190,255,35,0.28)' : 'rgba(100,90,50,0.12)');
+    haze.addColorStop(0.42, unlocked ? 'rgba(104,168,0,0.18)' : 'rgba(35,30,25,0.16)');
+    haze.addColorStop(1, 'transparent');
+    ctx.globalAlpha = masterAlpha * (0.62 + pulse * 0.28); ctx.fillStyle = haze;
+    ctx.beginPath(); ctx.arc(cx, orbY, hazeR, 0, Math.PI * 2); ctx.fill();
+
+    // Open Utsuroba is an intrusion, not a friendly waypoint: a sickly lime
+    // core sits inside a few slow black smoke pockets.
+    const smokePuffs = [
+      [-31, 12, 34, 23, 0.2], [-18, -23, 27, 25, 1.1], [18, -27, 32, 22, 2.0],
+      [34, 9, 30, 25, 2.7], [14, 29, 35, 20, 3.5], [-25, 30, 27, 19, 4.3],
+    ];
+    smokePuffs.forEach(([dx, dy, rx, ry, phase], i) => {
+      const driftX = Math.sin(sec * (0.42 + i * 0.025) + phase) * 7;
+      const driftY = Math.cos(sec * (0.36 + i * 0.02) + phase) * 5;
+      const puffR = 0.88 + 0.12 * Math.sin(sec * 1.5 + phase);
+      const px = cx + dx + driftX;
+      const py = orbY + dy + driftY;
+      const smoke = ctx.createRadialGradient(px - rx * 0.2, py - ry * 0.25, 2, px, py, Math.max(rx, ry));
+      smoke.addColorStop(0, unlocked ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0.38)');
+      smoke.addColorStop(0.58, unlocked ? 'rgba(4,6,2,0.34)' : 'rgba(8,7,5,0.22)');
+      smoke.addColorStop(1, 'transparent');
+      ctx.save();
+      ctx.translate(px, py); ctx.scale(puffR, ry / rx);
+      ctx.globalAlpha = masterAlpha * (0.58 + 0.12 * Math.sin(sec * 1.2 + phase));
+      ctx.fillStyle = smoke; ctx.beginPath(); ctx.arc(0, 0, rx, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    });
+
     if (unlocked) {
-      const rings = [{ r: 32, speed: 0.55, dotR: 2.2, count: 5 }, { r: 46, speed: -0.38, dotR: 1.6, count: 7 }];
-      rings.forEach(ring => {
-        for (let i = 0; i < ring.count; i++) {
-          const angle   = sec * ring.speed + (i / ring.count) * Math.PI * 2;
-          const dx      = cx + Math.cos(angle) * ring.r;
-          const dy      = cy + bob + Math.sin(angle) * ring.r * 0.55;
-          const twinkle = 0.4 + 0.6 * Math.abs(Math.sin(sec * 4.5 + i * 1.4));
-          ctx.globalAlpha = masterAlpha * twinkle * 0.85;
-          ctx.fillStyle   = i % 2 === 0 ? '#ffd966' : '#fff8d0';
-          ctx.shadowBlur  = 6; ctx.shadowColor = '#ffd966';
-          ctx.beginPath(); ctx.arc(dx, dy, ring.dotR, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
-        }
-      });
+      ctx.globalAlpha = masterAlpha * (0.58 + pulse * 0.22);
+      ctx.strokeStyle = '#9dff18'; ctx.shadowBlur = 14; ctx.shadowColor = '#9dff18';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 8]); ctx.lineDashOffset = -sec * 10;
+      ctx.beginPath(); ctx.ellipse(cx, orbY, 39 + pulse2 * 5, 24 + pulse2 * 4, sec * 0.18, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]); ctx.shadowBlur = 0;
     }
-    const midR = 18 + pulse2 * 6;
-    const midG = ctx.createRadialGradient(cx, cy + bob, midR * 0.2, cx, cy + bob, midR);
-    midG.addColorStop(0, 'rgba(255,240,160,0.55)'); midG.addColorStop(0.6, 'rgba(255,200,60,0.28)'); midG.addColorStop(1, 'transparent');
-    ctx.globalAlpha = masterAlpha * (0.7 + pulse * 0.25); ctx.fillStyle = midG;
-    ctx.beginPath(); ctx.arc(cx, cy + bob, midR, 0, Math.PI * 2); ctx.fill();
+
+    const midR = 19 + pulse2 * 6;
+    const midG = ctx.createRadialGradient(cx, orbY, midR * 0.16, cx, orbY, midR);
+    midG.addColorStop(0, unlocked ? 'rgba(226,255,160,0.72)' : 'rgba(142,128,76,0.30)');
+    midG.addColorStop(0.55, unlocked ? 'rgba(153,255,24,0.40)' : 'rgba(81,74,42,0.18)');
+    midG.addColorStop(1, 'transparent');
+    ctx.globalAlpha = masterAlpha * (0.72 + pulse * 0.24); ctx.fillStyle = midG;
+    ctx.beginPath(); ctx.arc(cx, orbY, midR, 0, Math.PI * 2); ctx.fill();
+
     const coreR = 9 + pulse * 3.5;
-    const core  = ctx.createRadialGradient(cx - coreR * 0.3, cy + bob - coreR * 0.3, 0, cx, cy + bob, coreR);
-    core.addColorStop(0, '#ffffff'); core.addColorStop(0.3, '#fffde8'); core.addColorStop(0.65, '#ffd966'); core.addColorStop(1, '#c8860a');
-    ctx.globalAlpha = masterAlpha * (0.95 + pulse * 0.05); ctx.shadowBlur = 22 + pulse * 18; ctx.shadowColor = '#ffeea0';
-    ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy + bob, coreR, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
-    ctx.globalAlpha = masterAlpha * (0.6 + pulse2 * 0.25); ctx.fillStyle = '#ffffff';
-    ctx.beginPath(); ctx.arc(cx - coreR * 0.3, cy + bob - coreR * 0.3, coreR * 0.3, 0, Math.PI * 2); ctx.fill();
+    const core  = ctx.createRadialGradient(cx - coreR * 0.32, orbY - coreR * 0.34, 0, cx, orbY, coreR);
+    core.addColorStop(0, unlocked ? '#f4ffd5' : '#8a8660');
+    core.addColorStop(0.28, unlocked ? '#d4ff69' : '#5f613e');
+    core.addColorStop(0.68, unlocked ? '#9dff18' : '#353a1c');
+    core.addColorStop(1, unlocked ? '#315600' : '#0b0d08');
+    ctx.globalAlpha = masterAlpha * (0.96 + pulse * 0.04);
+    ctx.shadowBlur = unlocked ? 24 + pulse * 18 : 8;
+    ctx.shadowColor = unlocked ? '#9dff18' : '#403f22';
+    ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, orbY, coreR, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+    ctx.globalAlpha = masterAlpha * (unlocked ? (0.68 + pulse2 * 0.2) : 0.28); ctx.fillStyle = unlocked ? '#ffffff' : '#b9b67b';
+    ctx.beginPath(); ctx.arc(cx - coreR * 0.3, orbY - coreR * 0.3, coreR * 0.3, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
 
@@ -3741,7 +3770,7 @@ const HAPPY_HOUSE_PORTAL = {
     const fadeEl = document.getElementById('kara-fade');
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`; fadeEl.style.opacity = '1';
     setTimeout(() => {
-      try { sessionStorage.setItem('utsuroba_return_room', 'room_15'); } catch (_) {}
+      try { sessionStorage.setItem('utsuroba_return_room', 'room_05'); } catch (_) {}
       _playUtsuobaIntroVideo();
     }, FADE_MS + 60);
   }

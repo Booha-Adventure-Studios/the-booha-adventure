@@ -1572,7 +1572,7 @@
     fadeEl.style.transition = `opacity ${FADE_MS}ms ease-in`;
     fadeEl.style.opacity    = '1';
     setTimeout(() => {
-      try { sessionStorage.setItem('utsuroba_return_room','room_15'); } catch(_) {}
+      try { sessionStorage.setItem('utsuroba_return_room','room_05'); } catch(_) {}
       window.location.href = KARASUKI_EXIT.href;
     }, FADE_MS+60);
   }
