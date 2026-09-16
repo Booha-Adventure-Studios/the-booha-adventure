@@ -51,11 +51,14 @@ assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 9
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 assert(source.includes('const FAMILY_AUDIO = Object.freeze') && source.includes('family_BGM.mp3') && source.includes('family_jump-2.mp3'), 'the Family Room audio set must be declared');
-assert(source.includes('function loadAudioBuffers') && source.includes('function startBgm') && source.includes('function playSfx'), 'Family Room audio must use the shared WebAudio lifecycle');
+assert(source.includes('const FAMILY_SFX_NAMES') && source.includes('function loadAudioBuffer') && source.includes('function loadAudioBuffers') && source.includes('function startBgm') && source.includes('function playSfx'), 'Family Room audio must use the shared WebAudio lifecycle');
+assert(source.includes('sfxLoadPromise') && source.includes('bgmLoadPromise') && source.includes('Promise.allSettled'), 'small Family Room cues must load independently of the long BGM');
 assert(source.includes('AUDIO_LEVELS = Object.freeze') && source.includes('master: .72'), 'Family Room audio must use a capped master volume');
 assert(source.includes("playSfx('move', AUDIO_LEVELS.move)") && source.includes("playSfx('anomaly', AUDIO_LEVELS.anomaly)"), 'movement and anomaly cues must be connected to gameplay');
 assert(source.includes('jumpLevel: .24') && source.includes('jumpLevel: .4') && source.includes('jumpLevel: .58') && source.includes('playSfx(Math.random() < .5 ? \'jump1\' : \'jump2\', jumpLevel)'), 'failure must choose one of the two jump-scare screams at the room tier volume');
 assert(serviceWorker.includes("`${BASE}/assets/`"), 'Family Room audio must use the runtime asset cache path');
+assert(['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => serviceWorker.includes(`/assets/family-room/pataskala/${id}.webp`)), 'all Pataskala poses must be install-safe');
+assert(source.includes('function requestFamilyRuntimeCache') && source.includes("type: 'CACHE_URLS'"), 'Family Room must ask the service worker to retain deferred media after entry');
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
 assert(markup.includes('id="leave-button"') && markup.includes('REPORT THE ROOM') && source.includes('REPORT & CONTINUE'), 'the room must use one explicit report/continue button');
 assert(markup.includes('id="start-button"') && markup.includes('ENTER THE ROOM') && markup.includes('へやに はいる'), 'the start action must clearly say enter the room in both languages');
