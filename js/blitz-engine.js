@@ -87,6 +87,14 @@ window.BoohaBlitzEngine = (() => {
       (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 2) ||
       (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 2)
     ) ? 'reduced' : 'full';
+  const BLITZ_DIAGNOSTIC_ENABLED = (() => {
+    try {
+      const search = typeof window !== 'undefined' && window.location ? window.location.search : '';
+      return typeof URLSearchParams === 'function' && new URLSearchParams(search).get('blitzdiag') === '1';
+    } catch {
+      return false;
+    }
+  })();
   const LOW_POWER = HARDWARE_PERFORMANCE_TIER !== 'full';
   let RUNTIME_PERFORMANCE_TIER = null;
   let RUNTIME_LOW_POWER = false;
@@ -117,6 +125,62 @@ window.BoohaBlitzEngine = (() => {
     overlay.classList.toggle('runtime-low-power', tier === 'minimal' && RUNTIME_PERFORMANCE_TIER === 'minimal');
   }
 
+  function createPerformanceDiagnostic(overlay) {
+    if (!BLITZ_DIAGNOSTIC_ENABLED) return null;
+    const panel = document.createElement('pre');
+    panel.className = 'booha-blitz-performance-diagnostic';
+    panel.setAttribute('aria-hidden', 'true');
+    overlay.appendChild(panel);
+
+    const memory = typeof navigator !== 'undefined' && Number.isFinite(navigator.deviceMemory)
+      ? `${navigator.deviceMemory}GB`
+      : 'n/a';
+    const cores = typeof navigator !== 'undefined' && Number.isFinite(navigator.hardwareConcurrency)
+      ? String(navigator.hardwareConcurrency)
+      : 'n/a';
+    const state = {
+      status: HARDWARE_PERFORMANCE_TIER === 'minimal' ? 'not sampled' : 'waiting',
+      runtimeTier: performanceTier(),
+      averageFrameTime: null,
+      slowFrames: 0,
+      frameCount: 0,
+      sampledMs: 0,
+    };
+
+    const render = () => {
+      const slowPercent = state.frameCount
+        ? `${((state.slowFrames / state.frameCount) * 100).toFixed(1)}%`
+        : '--';
+      const average = Number.isFinite(state.averageFrameTime)
+        ? `${state.averageFrameTime.toFixed(1)}ms`
+        : '--';
+      const sampled = state.sampledMs > 0 ? ` · sampled ${(state.sampledMs / 1000).toFixed(1)}s` : '';
+      const activeClasses = Array.from(overlay.classList)
+        .filter(name => /power|blitz-compositor/.test(name))
+        .join(' ') || 'none';
+      panel.textContent = [
+        'BLITZ DIAGNOSTIC',
+        `HARDWARE TIER  ${HARDWARE_PERFORMANCE_TIER}  (deviceMemory: ${memory} · cores: ${cores})`,
+        `RUNTIME TIER   ${state.runtimeTier}  (${state.status}${sampled})`,
+        `avg frame      ${average}  slow frames ${slowPercent} (${state.slowFrames}/${state.frameCount})`,
+        `reduced-motion ${REDUCED_MOTION}`,
+        `active classes ${activeClasses}`,
+      ].join('\n');
+    };
+
+    render();
+    return {
+      update(patch = {}) {
+        Object.assign(state, patch);
+        state.runtimeTier = patch.runtimeTier || performanceTier();
+        render();
+      },
+      destroy() {
+        panel.remove();
+      },
+    };
+  }
+
   function enableRuntimeLowPower(overlay) {
     RUNTIME_PERFORMANCE_TIER = 'minimal';
     RUNTIME_LOW_POWER = true;
@@ -129,8 +193,18 @@ window.BoohaBlitzEngine = (() => {
     applyPerformanceTier(overlay);
   }
 
-  function monitorFramePerformance(overlay, onPoorPerformance) {
-    if (HARDWARE_PERFORMANCE_TIER === 'minimal') return () => {};
+  function monitorFramePerformance(overlay, onPoorPerformance, onProgress) {
+    if (HARDWARE_PERFORMANCE_TIER === 'minimal') {
+      onProgress?.({
+        status: 'not sampled',
+        runtimeTier: HARDWARE_PERFORMANCE_TIER,
+        averageFrameTime: null,
+        slowFrames: 0,
+        frameCount: 0,
+        sampledMs: 0,
+      });
+      return () => {};
+    }
     const monitorStartedAt = performance.now();
     const settleUntil = monitorStartedAt + PERFORMANCE_SETTLE_MS;
     let startedAt = null;
@@ -140,6 +214,7 @@ window.BoohaBlitzEngine = (() => {
     let totalFrameTime = 0;
     let rafId = null;
     let active = true;
+    let lastProgressAt = -Infinity;
 
     const stop = () => {
       if (!active) return;
@@ -164,12 +239,31 @@ window.BoohaBlitzEngine = (() => {
       totalFrameTime += frameTime;
       if (frameTime >= 34) slowFrames++;
       frameCount++;
+      if (onProgress && now - lastProgressAt >= 250) {
+        lastProgressAt = now;
+        onProgress({
+          status: 'sampling',
+          runtimeTier: performanceTier(),
+          averageFrameTime: totalFrameTime / Math.max(1, frameCount),
+          slowFrames,
+          frameCount,
+          sampledMs: now - startedAt,
+        });
+      }
       if (now - startedAt >= PERFORMANCE_WINDOW_MS) {
         const averageFrameTime = totalFrameTime / Math.max(1, frameCount);
         const tier = averageFrameTime >= 34 || slowFrames >= 12
           ? 'minimal'
           : averageFrameTime >= 22 || slowFrames >= 5 ? 'reduced' : 'full';
-        onPoorPerformance({ averageFrameTime, slowFrames, tier });
+        onPoorPerformance({ averageFrameTime, slowFrames, frameCount, sampledMs: now - startedAt, tier });
+        onProgress?.({
+          status: 'complete',
+          runtimeTier: tier,
+          averageFrameTime,
+          slowFrames,
+          frameCount,
+          sampledMs: now - startedAt,
+        });
         stop();
         return;
       }
@@ -397,6 +491,22 @@ window.BoohaBlitzEngine = (() => {
         place-items: center;
         isolation: isolate;
         contain: layout style;
+      }
+      .booha-blitz-performance-diagnostic {
+        position: fixed;
+        top: max(env(safe-area-inset-top, 0px) + 8px, 8px);
+        left: max(env(safe-area-inset-left, 0px) + 8px, 8px);
+        z-index: 120;
+        margin: 0;
+        padding: 8px 10px;
+        border: 1px solid rgba(255,255,255,.38);
+        border-radius: 6px;
+        background: rgba(0,0,0,.78);
+        color: #ffffff;
+        font: 10px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        white-space: pre;
+        pointer-events: none;
+        text-align: left;
       }
       #vb-overlay, #sb-overlay, #qb-overlay {
         height: 100vh;
@@ -2216,6 +2326,8 @@ window.BoohaBlitzEngine = (() => {
       applyPerformanceTier(overlay);
       overlay.classList.add('blitz-compositor');
       applyPalette(overlay, palette);
+      const performanceDiagnostic = createPerformanceDiagnostic(overlay);
+      performanceDiagnostic?.update({ status: 'ready' });
 
       const bgm = new Audio('assets/audio/blitz.mp3');
       bgm.loop = true;
@@ -2800,7 +2912,9 @@ window.BoohaBlitzEngine = (() => {
             ({ tier }) => {
               if (tier === 'minimal') enableRuntimeLowPower(overlay);
               else if (tier === 'reduced') enableRuntimeReducedPower(overlay);
+              performanceDiagnostic?.update({ status: 'decision', runtimeTier: performanceTier() });
             },
+            progress => performanceDiagnostic?.update(progress),
           );
           spotlight.announce(`${spotlight.playerName}, GO!`);
         }, 140);
@@ -2938,6 +3052,7 @@ window.BoohaBlitzEngine = (() => {
       const cleanupAndClose = () => {
         stopFinalHold();
         stopStreakBeat();
+        performanceDiagnostic?.destroy();
         closeGame(overlay, stopTimer, stopBGM);
       };
       overlay.querySelector(selector('wrongClose')).addEventListener('click', recoverFromWrong);
@@ -2950,6 +3065,7 @@ window.BoohaBlitzEngine = (() => {
         overlay._boohaBlitzPerformanceCleanup?.();
         overlay._boohaBlitzViewportCleanup?.();
         overlay._boohaBlitzVisibilityCleanup?.();
+        performanceDiagnostic?.destroy();
         overlay.remove();
         launch({ curr, monthSlug, weekNumber });
       });
