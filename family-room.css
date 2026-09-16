@@ -23,7 +23,7 @@ button { font: inherit; }
 
 #game-shell { position: fixed; inset: 0; isolation: isolate; background: #030303; }
 
-#room-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#room-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
 
 .grain {
   position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: .18;
@@ -31,7 +31,7 @@ button { font: inherit; }
   mix-blend-mode: screen;
 }
 
-.hud, .observation-note, .controls, .panel, .mark-prompt, .mark-skip, .clue-card { position: absolute; z-index: 10; }
+.hud, .observation-note, .controls, .panel, .clue-card { position: absolute; z-index: 10; }
 
 .hud {
   top: max(22px, env(safe-area-inset-top)); left: max(22px, env(safe-area-inset-left)); right: max(22px, env(safe-area-inset-right));
@@ -51,18 +51,14 @@ button { font: inherit; }
 .sound-toggle:hover, .sound-toggle:focus-visible { color: var(--ink); border-color: var(--ink); outline: none; }
 
 .observation-note { top: clamp(78px, 13vh, 110px); left: 50%; transform: translateX(-50%); color: rgba(233,229,220,.48); font-size: 10px; letter-spacing: .34em; white-space: nowrap; }
-.mark-prompt { top: clamp(78px, 13vh, 110px); left: 50%; transform: translateX(-50%); color: var(--amber); font-size: 11px; letter-spacing: .26em; text-shadow: 0 0 18px rgba(232,183,108,.5); }
-.mark-skip { left: 50%; bottom: max(128px, calc(env(safe-area-inset-bottom) + 112px)); transform: translateX(-50%); border: 0; border-bottom: 1px solid var(--line); color: var(--muted); background: rgba(3,3,3,.7); padding: 7px 4px; font-size: 9px; letter-spacing: .1em; cursor: pointer; }
-.mark-skip:hover, .mark-skip:focus-visible { color: var(--ink); border-color: var(--ink); outline: none; }
-
 .controls {
   left: 50%; bottom: max(34px, env(safe-area-inset-bottom)); transform: translateX(-50%);
-  display: flex; gap: 12px; width: min(680px, calc(100% - 36px)); justify-content: center; transition: opacity .25s ease, transform .25s ease;
+  display: flex; width: min(420px, calc(100% - 36px)); justify-content: center; transition: opacity .25s ease, transform .25s ease;
 }
 .controls.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 12px); }
 
 .choice-button {
-  flex: 1; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 17px;
+  width: 100%; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 17px;
   border: 1px solid rgba(233,229,220,.28); background: rgba(5,5,5,.68); color: var(--ink); cursor: pointer; text-align: left; transition: background .16s ease, border-color .16s ease, transform .16s ease;
 }
 .choice-button:hover, .choice-button:focus-visible { background: rgba(233,229,220,.92); border-color: var(--ink); color: #050505; outline: none; transform: translateY(-3px); }
@@ -109,8 +105,8 @@ kbd { border: 1px solid var(--line); padding: 3px 5px; color: var(--ink); }
   .hud-right { gap: 10px; }
   .eyebrow { font-size: 8px; }
   .title { font-size: 15px; }
-  .observation-note, .mark-prompt { top: 72px; font-size: 8px; letter-spacing: .22em; }
-  .controls { width: calc(100% - 20px); bottom: max(12px, env(safe-area-inset-bottom)); gap: 6px; }
+  .observation-note { top: 72px; font-size: 8px; letter-spacing: .22em; }
+  .controls { width: calc(100% - 20px); bottom: max(12px, env(safe-area-inset-bottom)); }
   .choice-button { min-height: 58px; padding: 11px 12px; }
   .choice-button b { font-size: 10px; letter-spacing: .08em; }
   .choice-button small { font-size: 8px; margin-top: 5px; }
@@ -119,7 +115,7 @@ kbd { border: 1px solid var(--line); padding: 3px 5px; color: var(--ink); }
   .hud-right { gap: 12px; }
   .flame-meter { gap: 3px; }
   .flame { font-size: 16px; }
-  .mark-skip, .clue-card { bottom: max(92px, calc(env(safe-area-inset-bottom) + 82px)); }
+  .clue-card { bottom: max(92px, calc(env(safe-area-inset-bottom) + 82px)); }
   .tier-button { display: block; }
   .tier-button small { display: block; margin-top: 4px; }
 }
