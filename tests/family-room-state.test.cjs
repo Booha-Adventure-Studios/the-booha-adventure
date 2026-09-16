@@ -26,6 +26,10 @@ assert(source.includes('alertMultiplier: 2') && source.includes('alertMultiplier
 assert(source.includes('falseAlertChance: .15') && source.includes('falseAlertPoint'), 'the Lies tier must support false proximity alerts');
 assert(source.includes('function isBoohaAlerting()') && source.includes('currentPoint(target)'), 'Booha alerting must be proximity-based');
 assert(!source.includes('time - roundStarted > 2100'), 'the alert sprite must not be a timed giveaway');
+assert(source.includes('burnMs: 25000') && source.includes('burnMs: 18000') && source.includes('burnMs: 12000'), 'each room tier must have its own lantern burn window');
+assert(source.includes('function handleBurnout(time)') && source.includes('flames = Math.max(0, flames - 1)'), 'burnout must cost one flame');
+assert(source.includes('function updateAndon') && source.includes('THE ANDON WENT DARK'), 'the lantern clock must use a dimming andon, not a number');
+assert(markup.includes('id="andon"') && markup.includes('ROOM LIGHT'), 'the lantern burn indicator must have a corner status element');
 assert(markup.includes('id="leave-button"') && markup.includes('LEAVE THE ROOM'), 'the room must use one leave/report button');
 
 function classList() {
@@ -47,8 +51,9 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'transition-curtain', 'observation-note', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'flame-meter', 'start-button', 'leave-button'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'transition-curtain', 'observation-note', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'flame-meter', 'start-button', 'leave-button'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
+nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
 const flames = [0, 1, 2].map(index => Object.assign(element(`flame-${index}`), { dataset: { flame: String(index) } }));
 const listeners = {};
 nodes['room-canvas'].getContext = () => ({
