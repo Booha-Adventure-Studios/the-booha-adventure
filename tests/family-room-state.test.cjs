@@ -9,6 +9,7 @@ const vm = require('vm');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'family-room.js'), 'utf8');
 const markup = fs.readFileSync(path.join(root, 'family-room.html'), 'utf8');
+const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 assert(!source.includes('round-number'), 'the case must not expose a round counter');
 assert(!source.includes('localStorage'), 'the room must use the shared save/event layer');
 assert(!source.includes('creature-1'), 'the photoreal creature beat must be retired');
@@ -34,6 +35,9 @@ assert(source.includes('function drawShojiDawn') && source.includes('progress / 
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
 assert(source.includes('function drawFailureBooha') && source.includes('if (time - failureStarted >= FAILURE_SILENCE_MS)'), 'Booha must glow alone after the silence');
+assert(source.includes('const anomalyArt = Object.fromEntries') && source.includes('assets/family-room/overlays/${anomaly.id}.webp'), 'anomalies must load authored room overlays');
+assert(source.includes('artSize') && source.includes('ctx.drawImage(art'), 'anomaly rendering must use real art instead of procedural doodles');
+assert(['bowl', 'cup', 'eyes', 'shadow', 'talisman', 'lantern', 'futon', 'seams', 'teapot', 'crescent'].every(id => serviceWorker.includes(`/assets/family-room/overlays/${id}.webp`)), 'all authored anomaly overlays must be precached');
 assert(markup.includes('id="leave-button"') && markup.includes('LEAVE THE ROOM'), 'the room must use one leave/report button');
 
 function classList() {

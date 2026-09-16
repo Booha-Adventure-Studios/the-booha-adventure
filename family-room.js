@@ -14,16 +14,16 @@
   });
 
   const anomalies = [
-    { id: 'bowl', target: [.79, .51, .09], en: "The bowl wasn't there before.", jp: 'おわんが なかった。', kind: 'added' },
-    { id: 'cup', target: [.35, .49, .1], en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', kind: 'duplicated' },
-    { id: 'eyes', target: [.75, .25, .12], en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', kind: 'watching' },
-    { id: 'shadow', target: [.7, .23, .18], en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', kind: 'state' },
-    { id: 'talisman', target: [.17, .23, .12], en: 'A paper charm was not there before.', jp: 'おふだが なかった。', kind: 'added' },
-    { id: 'lantern', target: [.17, .42, .12], en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', kind: 'state' },
-    { id: 'futon', target: [.82, .37, .16], en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', kind: 'moved' },
-    { id: 'seams', target: [.55, .68, .16], en: 'One tatami seam has disappeared.', jp: 'たたみの めが ひとつ きえた。', kind: 'missing' },
-    { id: 'teapot', target: [.27, .49, .12], en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', kind: 'moved' },
-    { id: 'crescent', target: [.84, .30, .1], en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', kind: 'added' },
+    { id: 'bowl', target: [.79, .51, .09], artSize: .12, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', kind: 'added' },
+    { id: 'cup', target: [.35, .49, .1], artSize: .11, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', kind: 'duplicated' },
+    { id: 'eyes', target: [.75, .25, .12], artSize: .11, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', kind: 'watching' },
+    { id: 'shadow', target: [.7, .23, .18], artSize: .2, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', kind: 'state' },
+    { id: 'talisman', target: [.17, .23, .12], artSize: .12, en: 'A paper charm was not there before.', jp: 'おふだが なかった。', kind: 'added' },
+    { id: 'lantern', target: [.17, .42, .12], artSize: .1, en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', kind: 'state' },
+    { id: 'futon', target: [.82, .37, .16], artSize: .18, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', kind: 'moved' },
+    { id: 'seams', target: [.55, .68, .16], artSize: .08, en: 'One tatami seam has disappeared.', jp: 'たたみの めが ひとつ きえた。', kind: 'missing' },
+    { id: 'teapot', target: [.27, .49, .12], artSize: .13, en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', kind: 'moved' },
+    { id: 'crescent', target: [.84, .30, .1], artSize: .11, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', kind: 'added' },
   ];
 
   const canvas = document.getElementById('room-canvas');
@@ -52,6 +52,11 @@
   idleBooha.src = 'assets/family-room/booha_idle.webp';
   const alertBooha = new Image();
   alertBooha.src = 'assets/family-room/booha_alert.webp';
+  const anomalyArt = Object.fromEntries(anomalies.map(anomaly => {
+    const image = new Image();
+    image.src = `assets/family-room/overlays/${anomaly.id}.webp`;
+    return [anomaly.id, image];
+  }));
 
   let width = 0;
   let height = 0;
@@ -213,43 +218,21 @@
 
   function drawAnomaly(anomaly) {
     if (!anomaly) return;
+    const art = anomalyArt[anomaly.id];
+    if (!art?.complete) return;
     const [u, v] = anomaly.target;
     const [x, y] = currentPoint([u, v]);
-    const s = Math.max(12, Math.min(width, height) * .032);
+    const sourceWidth = art.naturalWidth || 512;
+    const sourceHeight = art.naturalHeight || 512;
+    const maxDimension = Math.max(32, Math.min(width, height) * anomaly.artSize);
+    const scale = maxDimension / Math.max(sourceWidth, sourceHeight);
+    const drawWidth = sourceWidth * scale;
+    const drawHeight = sourceHeight * scale;
     ctx.save();
-    ctx.lineWidth = Math.max(1.4, s * .08);
-    ctx.shadowColor = 'rgba(232,183,108,.55)';
-    ctx.shadowBlur = s * .75;
-    if (anomaly.kind === 'watching') {
-      ctx.fillStyle = '#f3d79a';
-      ctx.beginPath(); ctx.ellipse(x - s * .65, y, s * .31, s * .21, -.12, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(x + s * .65, y, s * .31, s * .21, .12, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#21180e';
-      ctx.beginPath(); ctx.arc(x - s * .65, y, s * .1, 0, Math.PI * 2); ctx.arc(x + s * .65, y, s * .1, 0, Math.PI * 2); ctx.fill();
-    } else if (anomaly.kind === 'crescent') {
-      ctx.fillStyle = '#e8b76c';
-      ctx.beginPath(); ctx.arc(x, y, s * .65, .3, Math.PI * 1.7); ctx.arc(x + s * .25, y - s * .18, s * .58, Math.PI * .92, Math.PI * 1.95, true); ctx.fill();
-    } else if (anomaly.kind === 'bowl') {
-      ctx.fillStyle = '#d9c7a5';
-      ctx.beginPath(); ctx.ellipse(x, y, s * 1.35, s * .55, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#75634b'; ctx.beginPath(); ctx.ellipse(x, y - s * .06, s * .92, s * .25, 0, 0, Math.PI * 2); ctx.fill();
-    } else if (anomaly.kind === 'talisman') {
-      ctx.fillStyle = '#d7b46c'; ctx.fillRect(x - s * .45, y - s * .8, s * .9, s * 1.6);
-      ctx.fillStyle = '#6b2720'; ctx.font = `${Math.max(9, s * .45)}px serif`; ctx.textAlign = 'center'; ctx.fillText('し', x, y + s * .17);
-    } else if (anomaly.kind === 'cup' || anomaly.kind === 'teapot') {
-      ctx.fillStyle = anomaly.kind === 'teapot' ? '#20201b' : '#b8a78d';
-      ctx.beginPath(); ctx.ellipse(x, y, s * 1.05, s * .72, anomaly.kind === 'teapot' ? -.35 : 0, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#e8b76c';
-      ctx.beginPath(); ctx.arc(x + s * .9, y, s * .38, -.9, .9); ctx.stroke();
-    } else if (anomaly.kind === 'lantern') {
-      ctx.fillStyle = 'rgba(235,170,69,.65)'; ctx.beginPath(); ctx.moveTo(x, y - s); ctx.quadraticCurveTo(x + s * .75, y, x, y + s); ctx.quadraticCurveTo(x - s * .75, y, x, y - s); ctx.fill();
-    } else if (anomaly.kind === 'futon') {
-      ctx.strokeStyle = '#d2c1a0'; ctx.beginPath(); ctx.moveTo(x - s * 1.25, y + s * .6); ctx.lineTo(x + s * 1.25, y - s * .6); ctx.stroke();
-    } else if (anomaly.kind === 'seams') {
-      ctx.strokeStyle = 'rgba(20,22,20,.85)'; ctx.lineWidth = s * .32; ctx.beginPath(); ctx.moveTo(x - s * 2, y); ctx.lineTo(x + s * 2, y); ctx.stroke();
-    } else if (anomaly.kind === 'shadow') {
-      ctx.fillStyle = 'rgba(12,17,20,.8)'; ctx.beginPath(); ctx.ellipse(x, y, s * 2.2, s * 2.8, -.25, 0, Math.PI * 2); ctx.fill();
-    }
+    ctx.globalAlpha = .95;
+    ctx.shadowColor = 'rgba(232,183,108,.42)';
+    ctx.shadowBlur = Math.max(5, maxDimension * .12);
+    ctx.drawImage(art, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight);
     ctx.restore();
   }
 
