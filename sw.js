@@ -60,8 +60,8 @@ const CURRENT_CACHES = {
   // route fetches the updated loaders online while preserving offline copies.
   // Room-transition readiness and weekly ECHOES fixes continue to use that
   // network-first JavaScript route; retain the cache for offline fallback.
-  // Family Room pass: the Utsuroba entrance moved to Karasuki room_05 and its
-  // portal DEV route is carried by the network-first JavaScript path.
+  // Family Room entrance pass: the playable lime/black-smoke portal now lives
+  // inside Utsuroba room_05 and is carried by the network-first JavaScript path.
   // Muenba 28A adds the shared decoded sample-loader and pitch variation API.
   // Muenba 28B adds staggered authored scream playback, decay, and danger-state cleanup.
   // Muenba 28C primes all authored clips after the first gesture and avoids immediate repeats.
