@@ -60,6 +60,8 @@ const CURRENT_CACHES = {
   // route fetches the updated loaders online while preserving offline copies.
   // Room-transition readiness and weekly ECHOES fixes continue to use that
   // network-first JavaScript route; retain the cache for offline fallback.
+  // Blitz engine audit: shared and standalone speed games now require a
+  // flawless 15-card run; network-first JavaScript delivers that contract.
   // Family Room entrance pass: the playable lime/black-smoke portal now lives
   // inside Utsuroba room_05 and is carried by the network-first JavaScript path.
   // Family Room Pass 1: wrong reports reroll the room and correct marks only

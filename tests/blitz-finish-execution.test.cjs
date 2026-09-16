@@ -11,10 +11,6 @@ const source = fs.readFileSync(path.join(root, 'js', 'blitz-engine.js'), 'utf8')
 const start = source.indexOf('      function showWin(ms) {');
 const end = source.indexOf('      const cleanupAndClose', start);
 assert(start >= 0 && end > start, 'showWin() must remain present in the shared engine');
-
-// Execute the production showWin() body with a small DOM double. This keeps
-// the regression test dependency-free while still exercising the finish
-// branches and their DOM writes, rather than checking source text only.
 const showWinSource = source.slice(start, end).trim();
 
 class FakeClassList {
@@ -32,10 +28,7 @@ class FakeClassList {
 class FakeElement {
   constructor() {
     this.classList = new FakeClassList();
-    this.style = {
-      setProperty: (name, value) => { this.style[name] = value; },
-      removeProperty: name => { delete this.style[name]; },
-    };
+    this.style = { setProperty: (name, value) => { this.style[name] = value; } };
     this.textContent = '';
     this.hidden = false;
     this.disabled = false;
@@ -65,19 +58,19 @@ function makeFinishDom() {
   };
 }
 
-function runFinish({ recordEligible, isRecord, dispatchError = false }) {
+function runFinish({ perfect = true, isRecord = false, dispatchError = false } = {}) {
   const dom = makeFinishDom();
   const events = [];
-  const testConsole = { ...console, error: () => {} };
+  let saveCalls = 0;
   const context = {
-    console: testConsole,
+    console: { ...console, error: () => {} },
     performance: { now: () => 1234 },
-    queue: [{ n: 1 }, { n: 2 }],
+    current: perfect ? 2 : 1,
     initialQueueLength: 2,
-    bestStreak: 2,
-    mistakeCount: recordEligible ? 0 : 3,
-    CLEAN_CLEAR_MAX_MISTAKES: 2,
-    runEligibleForRecord: recordEligible,
+    streak: perfect ? 2 : 1,
+    bestStreak: perfect ? 2 : 1,
+    mistakeCount: perfect ? 0 : 1,
+    feedbackState: 'playing',
     runIsActive: true,
     visibilityPaused: false,
     monthSlug: 'january',
@@ -88,74 +81,51 @@ function runFinish({ recordEligible, isRecord, dispatchError = false }) {
     finalCard: dom.finalCard,
     FINAL_CARD_HOLD_MS: 4000,
     palette: {
-      name: 'Pre-Boo',
-      accent: '#ff6fb5',
-      glow: 'rgba(255,111,181,.62)',
-      timerColor: '#fff0a8',
-      rewardColors: ['#fffbe1', '#ffe27a'],
-      rewardGlow: 'rgba(255,184,72,.72)',
-      streak: { label: 'STREAK' },
+      name: 'Pre-Boo', accent: '#ff6fb5', glow: 'rgba(255,111,181,.62)', timerColor: '#fff0a8',
+      rewardColors: ['#fffbe1', '#ffe27a'], rewardGlow: 'rgba(255,184,72,.72)', streak: { label: 'STREAK' },
     },
     config: {
-      apiName: 'Test Blitz',
-      gameType: 'vocab',
-      legacyKey: 'blitzVocab',
-      saveId: 'vocab',
+      apiName: 'Test Blitz', gameType: 'vocab', legacyKey: 'blitzVocab', saveId: 'vocab',
       winCopy: { record: 'RECORD', clear: 'CLEAR', jp: 'クリア!' },
     },
     selector: key => key,
     makeWeekId: () => 'test-week',
-    saveBestTime: () => ({
-      isWeeklyRecord: false,
-      isAllTimeRecord: isRecord,
-      oldRecord: isRecord ? null : { ms: 900 },
-      saveFailed: false,
-    }),
+    saveBestTime: () => { saveCalls++; return { isWeeklyRecord: false, isAllTimeRecord: isRecord, oldRecord: isRecord ? null : { ms: 900 }, saveFailed: false }; },
     getBestScore: () => ({ ms: 900, name: 'PLAYER' }),
     getWeeklyScore: () => ({ ms: 900 }),
     getPlayerName: () => 'PLAYER',
     fmtTime: ms => `${(ms / 1000).toFixed(2)}s`,
-    document: {
-      dispatchEvent: event => {
-        events.push(event);
-        if (dispatchError) throw new Error('listener failure');
-      },
-    },
+    document: { dispatchEvent: event => { events.push(event); if (dispatchError) throw new Error('listener failure'); } },
     CustomEvent: function CustomEvent(type, init) { return { type, ...init }; },
-    emitPerfectFlash: () => {},
-    emitFinishFlash: () => {},
-    playFinalStinger: () => {},
-    startFinalHold: () => {},
-    celebrate: () => {},
+    emitPerfectFlash: () => {}, emitFinishFlash: () => {}, playFinalStinger: () => {}, startFinalHold: () => {}, celebrate: () => {},
   };
-  context.spotlight = {
-    playerName: 'PLAYER',
-    nameplate: new FakeElement(),
-    announce: () => {},
-  };
+  context.spotlight = { playerName: 'PLAYER', nameplate: new FakeElement(), announce: () => {} };
 
   const showWin = vm.runInNewContext(`(${showWinSource})`, context);
-  assert.doesNotThrow(() => showWin(1234), 'showWin() must not throw for any finish outcome');
-  assert(dom.winScreen.classList.contains('show'), 'finish screen must be visible');
-  assert(dom.winScreen.children.winRecord.textContent, 'finish result must have non-empty text');
-  assert.strictEqual(dom.winScreen.children.winTime.textContent, '1.23s');
-  return { dom, events };
+  assert.doesNotThrow(() => showWin(1234), 'showWin() must not throw');
+  return { dom, events, saveCalls };
 }
 
-const record = runFinish({ recordEligible: true, isRecord: true });
+const perfect = runFinish();
+assert(perfect.dom.winScreen.classList.contains('show'), 'perfect finish screen must be visible');
+assert.strictEqual(perfect.dom.winScreen.children.winRecord.textContent, 'PERFECT CLEAR');
+assert.strictEqual(perfect.events.length, 1, 'perfect run must emit one completion event');
+assert.strictEqual(perfect.events[0].detail.completed, true);
+assert.strictEqual(perfect.events[0].detail.mistakes, 0);
+assert.strictEqual(perfect.saveCalls, 1, 'perfect run must save its PB');
+
+const record = runFinish({ isRecord: true });
 assert.match(record.dom.winScreen.children.winRecord.textContent, /NEW BOOHA RECORD/);
 
-const ordinary = runFinish({ recordEligible: true, isRecord: false });
-assert.strictEqual(ordinary.dom.winScreen.children.winRecord.textContent, 'PERFECT CLEAR');
+const failed = runFinish({ perfect: false });
+assert(!failed.dom.winScreen.classList.contains('show'), 'failed run must not show a completion card');
+assert.strictEqual(failed.events.length, 0, 'failed run must not emit completion');
+assert.strictEqual(failed.saveCalls, 0, 'failed run must not save a PB');
 
-const mastery = runFinish({ recordEligible: false, isRecord: false });
-assert.strictEqual(mastery.dom.winScreen.children.winRecord.textContent, 'MASTERY CLEAR · NO RECORD');
-assert.strictEqual(mastery.events[0].detail.recordEligible, false);
-
-const fallback = runFinish({ recordEligible: true, isRecord: false, dispatchError: true });
+const fallback = runFinish({ dispatchError: true });
 for (const key of ['playAgain', 'winClose']) {
   assert.strictEqual(fallback.dom.winScreen.children[key].disabled, false,
     `finish fallback must leave ${key} enabled`);
 }
 
-console.log('Blitz finish execution test passed: record, ordinary, mastery, and fallback finishes render safely.');
+console.log('Blitz finish execution test passed: perfect, record, failed, and fallback paths are safe.');

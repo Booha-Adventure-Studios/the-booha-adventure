@@ -8,9 +8,9 @@ assert.match(engine, /if \(!bgm\.paused\) return;/,
   'BGM start should be idempotent while still resuming a paused track');
 assert.match(engine, /const playback = bgm\.play\(\);[\s\S]*?playback\?\.catch/,
   'BGM resume should safely handle browsers that return a play promise');
-assert.match(engine, /function recoverFromWrong\(\) \{[\s\S]*?wrongPopup\.classList\.remove\('show'\)[\s\S]*?startBGM\(\);/,
+assert.match(engine, /function recoverFromWrong\(event\) \{[\s\S]*?wrongPopup\.classList\.remove\('show', 'closing'\)[\s\S]*?startBGM\(\);/,
   'retrying from the wrong-answer popup must resume BGM from the trusted click');
-assert.match(engine, /stopTimer\(\);\s*stopBGM\(\);\s*setTimeout\(\(\) => showWrongPopup\(correct\)/,
+assert.match(engine, /stopTimer\(\);\s*stopBGM\(\);\s*const answerEpoch = runEpoch;\s*setTimeout\(\(\) => \{[\s\S]*?showWrongPopup\(correct\)/,
   'wrong answers should still pause BGM while the feedback popup is open');
 assert.match(verify, /tests\/blitz-pass29-wrong-retry-bgm-audit\.cjs/,
   'verify.sh must run the wrong-retry BGM audit');

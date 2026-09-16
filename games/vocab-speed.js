@@ -650,6 +650,24 @@ S.textContent = `
   transform:none !important;
 }
 
+.vs-feedback-overlay{
+  position:fixed; inset:0; z-index:1100; display:none; align-items:center; justify-content:center;
+  padding:1rem; background:rgba(5,3,10,.76); backdrop-filter:blur(8px);
+}
+.vs-feedback-overlay.show{ display:flex; animation:vsFeedbackIn .22s ease both; }
+.vs-feedback-overlay.closing{ animation:vsFeedbackOut .18s ease both; pointer-events:none; }
+.vs-feedback-card{
+  width:min(460px,100%); padding:2rem; border:2px solid #ef4444; border-radius:28px;
+  background:var(--game-surface); color:var(--game-text); text-align:center;
+  box-shadow:0 0 50px rgba(239,68,68,.28),0 20px 50px rgba(0,0,0,.5);
+}
+.vs-feedback-kicker{ color:#ff8a8a; font-size:.78rem; font-weight:800; letter-spacing:.14em; }
+.vs-feedback-card h2{ margin:.55rem 0 .5rem; }
+.vs-feedback-card p{ color:var(--game-muted); line-height:1.55; margin:0 auto 1.25rem; }
+.vs-feedback-continue.is-pressed{ transform:translateY(2px) scale(.98); opacity:.72; }
+@keyframes vsFeedbackIn{ from{opacity:0;transform:scale(.96)} to{opacity:1;transform:none} }
+@keyframes vsFeedbackOut{ from{opacity:1;transform:none} to{opacity:0;transform:scale(.98)} }
+
 /* ══════════════════════════════════════════════════════════════
    STREAK BANNER
    ══════════════════════════════════════════════════════════════ */
@@ -935,8 +953,8 @@ U.mount(`
 <div class="vs-wrap" id="vs-main-wrap">
   <div class="vs-dots-row" id="vs-dots"></div>
   <div class="vs-hud">
-    <div class="vs-pill">Q <b id="vs-qnum">1</b> / 15</div>
-    <div class="vs-pill">Score <b id="vs-score">0</b> / 15</div>
+    <div class="vs-pill">RUN <b id="vs-qnum">0</b> / 15</div>
+    <div class="vs-pill">PERFECT <b id="vs-score">0</b> / 15</div>
     <div class="vs-streak-pill" id="vs-streak-pill">Streak <b id="vs-streak">0</b></div>
   </div>
   <div class="vs-timer-wrap">
@@ -954,6 +972,15 @@ U.mount(`
     <div id="vs-banner-en"    class="vs-banner-en"></div>
     <div id="vs-banner-jp"    class="vs-banner-jp"></div>
     <div id="vs-banner-kanji" class="vs-banner-kanji"></div>
+  </div>
+</div>
+
+<div class="vs-feedback-overlay" id="vs-feedback-overlay" hidden>
+  <div class="vs-feedback-card" role="alertdialog" aria-modal="true" aria-labelledby="vs-feedback-title">
+    <div class="vs-feedback-kicker">RUN RESET / 連続が きれました</div>
+    <h2 id="vs-feedback-title">Keep going.</h2>
+    <p id="vs-feedback-copy">A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.</p>
+    <button class="game-btn game-btn-primary vs-feedback-continue" id="vs-feedback-continue" type="button">CONTINUE / つぎへ</button>
   </div>
 </div>
 
@@ -1002,8 +1029,8 @@ U.mount(`
       <div class="vs-how-step">
         <div class="vs-how-num">3</div>
         <div>
-          <div class="vs-how-en">Score a point for each correct first-try answer.</div>
-          <div class="vs-how-jp">一発正解でポイントゲット！</div>
+          <div class="vs-how-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
+          <div class="vs-how-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
         </div>
       </div>
       <div class="vs-how-step">
@@ -1043,8 +1070,8 @@ U.mount(`
       <div class="vs-start-step">
         <div class="vs-start-num">3</div>
         <div>
-          <div class="vs-start-en">Keep your streak alive to level up the challenge!</div>
-          <div class="vs-start-jp">連続正解でレベルアップ！タイマーが速くなるよ！</div>
+          <div class="vs-start-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
+          <div class="vs-start-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
         </div>
       </div>
       <button class="vs-start-btn" id="vs-start-btn">START / はじめよう</button>
@@ -1075,6 +1102,10 @@ const dotsRow     = document.getElementById('vs-dots');
 const startOverlay= document.getElementById('vs-start-overlay');
 const helpBtn     = document.getElementById('vs-help');
 const modalOverlay= document.getElementById('vs-modal-overlay');
+const feedbackOverlay = document.getElementById('vs-feedback-overlay');
+const feedbackTitle = document.getElementById('vs-feedback-title');
+const feedbackCopy = document.getElementById('vs-feedback-copy');
+const feedbackContinue = document.getElementById('vs-feedback-continue');
 
 /* ── Build 15 progress dots ── */
 for (let i = 0; i < 15; i++) {
@@ -1094,19 +1125,36 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOverlay
 /* ══════════════════════════════════════════════════════════════
    START OVERLAY
    ══════════════════════════════════════════════════════════════ */
-document.getElementById('vs-start-btn').addEventListener('click', () => {
+function bindSingleActivation(element, handler) {
+  let suppressClickUntil = 0;
+  element.addEventListener('pointerup', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    suppressClickUntil = performance.now() + 500;
+    handler(event);
+  }, { passive: false });
+  element.addEventListener('click', event => {
+    if (performance.now() < suppressClickUntil) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation?.();
+      return;
+    }
+    handler(event);
+  });
+}
+
+function doStart() {
   unlockAllAudio();
+  feedbackState = 'playing';
+  order = U.shuffle(CFG.cards.slice(0, 15));
+  idx = 0; score = 0; streak = 0; lastLevel = 0;
+  runStartedAt = performance.now();
   startOverlay.classList.add('hiding');
   setTimeout(() => { startOverlay.style.display = 'none'; }, 380);
   renderQ();
-});
-document.getElementById('vs-start-btn').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  unlockAllAudio();
-  startOverlay.classList.add('hiding');
-  setTimeout(() => { startOverlay.style.display = 'none'; }, 380);
-  renderQ();
-}, { passive: false });
+}
 
 /* ══════════════════════════════════════════════════════════════
    STATE
@@ -1117,10 +1165,12 @@ let score     = 0;
 let streak    = 0;
 let lastLevel = 0;
 let locked    = false;
-let firstTry  = true;
 let heatRAF   = 0;
 let heatStart = 0;
 let heatDur   = 5000;
+let runStartedAt = 0;
+let feedbackState = 'awaiting-start';
+let recoveryPending = false;
 
 /* ══════════════════════════════════════════════════════════════
    DOTS
@@ -1177,18 +1227,71 @@ function startHeat() {
   heatRAF = requestAnimationFrame(tick);
 }
 
+function setAnswerInputEnabled(enabled) {
+  grid.setAttribute('aria-disabled', String(!enabled));
+  grid.querySelectorAll('.vs-choice').forEach(btn => {
+    btn.disabled = !enabled;
+    btn.setAttribute('aria-disabled', String(!enabled));
+  });
+}
+
+function showFailureFeedback(kind) {
+  stopHeat();
+  feedbackState = 'feedback';
+  locked = true;
+  setAnswerInputEnabled(false);
+  feedbackTitle.textContent = kind === 'timeout' ? 'Time ran out.' : 'That answer was not correct.';
+  feedbackCopy.textContent = 'A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.';
+  feedbackContinue.disabled = false;
+  feedbackContinue.removeAttribute('aria-disabled');
+  feedbackContinue.classList.remove('is-pressed');
+  feedbackOverlay.hidden = false;
+  feedbackOverlay.classList.remove('closing');
+  feedbackOverlay.classList.add('show');
+  requestAnimationFrame(() => feedbackContinue.focus());
+}
+
+function continueFromFailure(event) {
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+  event?.stopImmediatePropagation?.();
+  if (feedbackState !== 'feedback' || recoveryPending) return;
+  recoveryPending = true;
+  feedbackState = 'advancing';
+  locked = true;
+  setAnswerInputEnabled(false);
+  feedbackContinue.disabled = true;
+  feedbackContinue.setAttribute('aria-disabled', 'true');
+  feedbackContinue.classList.add('is-pressed');
+  feedbackOverlay.classList.add('closing');
+  setTimeout(() => {
+    feedbackOverlay.classList.remove('show', 'closing');
+    feedbackOverlay.hidden = true;
+    order = U.shuffle(CFG.cards.slice(0, 15));
+    idx = 0; score = 0; streak = 0; lastLevel = 0;
+    runStartedAt = performance.now();
+    scoreEl.textContent = '0';
+    streakEl.textContent = '0';
+    updateStreakUI();
+    updateStreakBanner();
+    feedbackState = 'playing';
+    recoveryPending = false;
+    renderQ();
+  }, 200);
+}
+
 /* ══════════════════════════════════════════════════════════════
    RENDER QUESTION
    ══════════════════════════════════════════════════════════════ */
 function renderQ() {
-  if (idx >= order.length) { showResults(); return; }
+  if (idx >= 15) { showResults(); return; }
 
-  locked   = false;
-  firstTry = true;
+  locked   = true;
+  setAnswerInputEnabled(false);
   grid.innerHTML = '';
 
   const card = order[idx];
-  qnumEl.textContent = idx + 1;
+  qnumEl.textContent = idx;
   jpEl.textContent   = card.jp;
   hiraEl.textContent = card.hira || '';
   updateDots();
@@ -1205,14 +1308,9 @@ function renderQ() {
     btn.setAttribute('aria-label', c.en);
     btn.textContent = c.en;
 
-    btn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
+    bindSingleActivation(btn, event => {
       unlockAllAudio();
-      handlePick(btn, c.en);
-    }, { passive: false });
-    btn.addEventListener('click', (e) => {
-      if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
-      handlePick(btn, c.en);
+      handlePick(btn, c.en, event);
     });
 
     grid.appendChild(btn);
@@ -1228,14 +1326,21 @@ function renderQ() {
     }, i * 55);
   });
 
-  startHeat();
+  if (feedbackState === 'playing') {
+    requestAnimationFrame(() => {
+      if (feedbackState !== 'playing') return;
+      locked = false;
+      setAnswerInputEnabled(true);
+      startHeat();
+    });
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
    HANDLE PICK
    ══════════════════════════════════════════════════════════════ */
 function handlePick(btn, en) {
-  if (locked) return;
+  if (locked || feedbackState !== 'playing') return;
   const now = Date.now();
   if (now - lastPickAt < PICK_DEBOUNCE_MS) return;
   lastPickAt = now;
@@ -1253,40 +1358,24 @@ function handlePick(btn, en) {
     btn.classList.add('vs-correct');
     U.playSFX('ding');
 
-    if (firstTry) {
-      score++;
-      streak++;
-    } else {
-      streak = 0;
-    }
+    score = idx + 1;
+    streak++;
 
     scoreEl.textContent = score;
     updateStreakUI();
     updateStreakBanner();
     updateDots();
 
-    setTimeout(() => {
-      idx++;
-      renderQ();
-    }, 480);
+    setTimeout(() => { idx++; renderQ(); }, 480);
 
   } else {
     btn.classList.add('vs-wrong');
-    firstTry = false;
     streak   = 0;
     updateStreakUI();
     updateStreakBanner();
     U.playSFX('fart');
 
-    setTimeout(() => {
-      locked = false;
-      firstTry = false;
-      Array.from(grid.children).forEach(b => {
-        b.classList.remove('vs-locked', 'vs-wrong');
-        b.style.transition = '';
-      });
-      startHeat();
-    }, 560);
+    showFailureFeedback('wrong');
   }
 }
 
@@ -1294,9 +1383,8 @@ function handlePick(btn, en) {
    TIMEOUT
    ══════════════════════════════════════════════════════════════ */
 function onTimeout() {
-  if (locked) return;
+  if (locked || feedbackState !== 'playing') return;
   locked   = true;
-  firstTry = false;
   streak   = 0;
   updateStreakUI();
   updateStreakBanner();
@@ -1304,12 +1392,7 @@ function onTimeout() {
 
   Array.from(grid.children).forEach(b => b.classList.add('vs-locked'));
 
-  setTimeout(() => {
-    locked = false;
-    firstTry = false;
-    Array.from(grid.children).forEach(b => b.classList.remove('vs-locked'));
-    startHeat();
-  }, 560);
+  showFailureFeedback('timeout');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1379,6 +1462,10 @@ function fireConfetti(big = false) {
              booha:gameEnd with correct saveId for vocab_speed
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
+  if (idx !== 15 || score !== 15 || streak !== 15 || feedbackState !== 'playing') return;
+  feedbackState = 'complete';
+  locked = true;
+  setAnswerInputEnabled(false);
   stopHeat();
   stopStreakAudio();
 
@@ -1395,14 +1482,19 @@ function showResults() {
   results.classList.add('show');
 
   const tier = getTier(score);
-  const pct  = Math.round((score / 15) * 100);
+  const pct  = 100;
+  const runTime = Math.max(0, performance.now() - runStartedAt);
 
   /* ── Dispatch to Booha Adventure save system ── */
   document.dispatchEvent(new CustomEvent('booha:gameEnd', {
   detail: {
     saveId:    `${CFG.curriculum}:vocab_speed`,
     score:     pct,
-    completed: pct >= 40,
+    completed: true,
+    recordEligible: true,
+    time: runTime,
+    clearTier: 'perfect',
+    mistakes: 0,
   }
 }));
 
@@ -1435,10 +1527,13 @@ document.getElementById('vs-replay').addEventListener('click', () => {
   streakBanner.className = 'vs-streak-banner';
 
   idx = 0; score = 0; streak = 0; lastLevel = 0;
+  feedbackState = 'playing';
+  recoveryPending = false;
+  runStartedAt = performance.now();
   scoreEl.textContent  = '0';
   streakEl.textContent = '0';
   updateStreakUI();
-  order = U.shuffle(order);
+  order = U.shuffle(CFG.cards.slice(0, 15));
   renderQ();
 });
 
@@ -1447,9 +1542,8 @@ document.getElementById('vs-back').addEventListener('click', () => {
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
 
-/* ══════════════════════════════════════════════════════════════
-   NOTE: renderQ() is triggered by the START button, not here.
-   ══════════════════════════════════════════════════════════════ */
+bindSingleActivation(document.getElementById('vs-start-btn'), doStart);
+bindSingleActivation(feedbackContinue, continueFromFailure);
 
 })();
     

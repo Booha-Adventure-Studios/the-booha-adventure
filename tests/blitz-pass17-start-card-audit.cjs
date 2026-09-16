@@ -16,7 +16,7 @@ assert.match(engine, /blitz-awaiting-start/,
   'the first question must wait behind the start card');
 assert.match(engine, /function playStartSting\(\)/,
   'starting the run must have a short audio sting');
-assert.match(engine, /startCard\.button\.addEventListener\('click', beginGame\)/,
+assert.match(engine, /bindPointerAction\(startCard\.button, beginGame\)/,
   'the first-impression action must be user-triggered');
 assert.match(engine, /startBGM\(\);[\s\S]*?playStartSting\(\);[\s\S]*?startCard\.card\.classList\.add\('launching'\)/,
   'start must press, sound, and transition without a dead-air step');
