@@ -142,6 +142,17 @@ const BoohaGameRegistry = (() => {
       saveId:         'bonus:booha_invaders',
       bonus:          true,
     },
+    {
+      id:             'family_room',
+      name:           'The Family Room',
+      file:           'family-room.html',
+      category:       'bonus',
+      scoreMax:       7,
+      starThresholds: [1, 4, 7],
+      saveId:         'bonus:family_room',
+      bonus:          true,
+      shelfMeta:      { showScore: false, status: 'CASE FILE 07' },
+    },
   ];
 
   // ── Build full entries (9 games × 3 curriculums = 27) ────────────────────

@@ -1670,6 +1670,13 @@ else
   bad "Performance asset-budget audit failed"
 fi
 
+echo "[family-room] state-machine audit"
+if node tests/family-room-state.test.cjs >/dev/null 2>&1; then
+  ok "Family Room hidden progression, lantern, marking, and gameEnd contracts pass"
+else
+  bad "Family Room state-machine audit failed"
+fi
+
 echo "[security] Liar Machine name HTML-safety audit"
 if node tests/liar-machine-name-safety-audit.cjs >/dev/null 2>&1; then
   ok "Liar Machine live and stored-name HTML escaping contracts pass"

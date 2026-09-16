@@ -240,11 +240,12 @@ const BoohaUnlockSystem = (() => {
 
   // ── Weekly bonus game unlock ──────────────────────────────────────────────
 const BONUS_GAMES = [
-    'booha_invaders',
-    'booha_blocks',
-    'feed_booha',
-    'booha_destruction',
-  ];
+  'booha_invaders',
+  'booha_blocks',
+  'feed_booha',
+  'booha_destruction',
+  'family_room',
+];
 
   function checkWeeklyBonusGames() {
     const registry  = BoohaAdventure.registry;

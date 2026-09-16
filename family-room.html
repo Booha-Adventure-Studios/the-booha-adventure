@@ -13,18 +13,30 @@
 
     <header class="hud">
       <div class="hud-brand">
-        <span class="eyebrow">UTSUROBA / PREDEVELOPMENT</span>
+        <span class="eyebrow">UTSUROBA / CASEWORK</span>
         <span class="title">FAMILY ROOM</span>
       </div>
       <div class="hud-right">
-        <div class="loop-readout"><span id="round-number">01</span><span class="slash">/</span><span>07</span></div>
+        <div id="flame-meter" class="flame-meter" role="status" aria-label="Lantern light: three flames">
+          <span class="flame" data-flame="0" aria-hidden="true">◆</span>
+          <span class="flame" data-flame="1" aria-hidden="true">◆</span>
+          <span class="flame" data-flame="2" aria-hidden="true">◆</span>
+        </div>
         <button id="sound-toggle" class="sound-toggle" type="button" aria-pressed="true">SOUND <span id="sound-state">ON</span></button>
       </div>
     </header>
 
-    <div id="observation-note" class="observation-note">OBSERVE THE ROOM</div>
+    <div id="observation-note" class="observation-note">LOOK / LISTEN / REMEMBER</div>
+    <div id="mark-prompt" class="mark-prompt" hidden>TAP WHAT CHANGED</div>
+    <button id="mark-skip" class="mark-skip" type="button" hidden>CONTINUE WITHOUT MARKING <span>→</span></button>
 
-    <section id="controls" class="controls" aria-label="Choose a direction">
+    <div id="clue-card" class="clue-card" aria-live="polite" hidden>
+      <span class="clue-kicker">CASE NOTE</span>
+      <strong id="clue-en"></strong>
+      <span id="clue-jp" class="clue-jp"></span>
+    </div>
+
+    <section id="controls" class="controls hidden" aria-label="Choose a direction">
       <button id="back-button" class="choice-button" type="button" data-choice="back">
         <span class="choice-arrow">↶</span>
         <span><b>GO BACK</b><small>the room is different</small></span>
@@ -39,6 +51,11 @@
       <p class="panel-kicker">CASE FILE 07 / FAMILY ROOM</p>
       <h1 id="start-title">DON'T BLINK.</h1>
       <p class="panel-copy">The room repeats. If it looks normal, go straight. If anything has changed, go back.</p>
+      <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves">
+        <button class="tier-button selected" type="button" data-tier="patient"><b>THE ROOM IS PATIENT</b><small>the first case</small></button>
+        <button class="tier-button" type="button" data-tier="quicker"><b>THE ROOM IS QUICKER</b><small>three fast Blitz stamps</small></button>
+        <button class="tier-button" type="button" data-tier="lies"><b>THE ROOM LIES TO YOU</b><small>three very fast stamps</small></button>
+      </div>
       <button id="start-button" class="primary-button" type="button">ENTER THE ROOM <span>→</span></button>
       <p class="panel-foot">Keyboard: <kbd>↑</kbd> straight &nbsp; <kbd>↓</kbd> back</p>
     </section>
@@ -50,9 +67,22 @@
       <button id="message-button" class="primary-button" type="button"></button>
     </section>
 
-    <div id="transition-curtain" aria-hidden="true"></div>
-    <div class="grain" aria-hidden="true"></div>
-  </main>
+  <div id="transition-curtain" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+</main>
+  <script>document.documentElement.classList.add('token-checking');</script>
+  <script src="./js/token.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/core/adventure-core.js"></script>
+  <script src="js/core/save-file.js"></script>
+  <script src="js/sync-client.js"></script>
+  <script src="js/core/save-utils.js"></script>
+  <script src="js/core/day-record.js"></script>
+  <script src="js/core/save-code.js"></script>
+  <script src="js/core/game-registry.js"></script>
+  <script src="js/core/score-system.js"></script>
+  <script src="js/core/unlock-system.js"></script>
+  <script src="js/core/page-state.js"></script>
   <script src="family-room.js"></script>
 </body>
 </html>
