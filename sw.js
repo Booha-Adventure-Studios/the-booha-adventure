@@ -166,6 +166,8 @@ const CURRENT_CACHES = {
   // Family Room Pass 1: portrait-safe anchors and plate-relative overlays.
   // Family Room Pass 2: bilingual interaction states and explicit report flow.
   // Family Room Pass 3: tiered presence tells and failure sting levels.
+  // Family Room Pass 4: Pataskala is install-safe; audio and remaining art
+  // are requested into the runtime cache when the room is entered.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };
@@ -248,6 +250,10 @@ const CORE_ASSETS = [
   `${BASE}/assets/family-room/overlays/seams.webp`,
   `${BASE}/assets/family-room/overlays/teapot.webp`,
   `${BASE}/assets/family-room/overlays/crescent.webp`,
+  `${BASE}/assets/family-room/pataskala/pataskala-standing.webp`,
+  `${BASE}/assets/family-room/pataskala/pataskala-moving.webp`,
+  `${BASE}/assets/family-room/pataskala/pataskala-crouch.webp`,
+  `${BASE}/assets/family-room/pataskala/pataskala-emerging.webp`,
   `${BASE}/js/utsu-sfx.js`,
   `${BASE}/js/grimmerglen-data.js`,
   `${BASE}/js/grimmerglen-typing.js`,
