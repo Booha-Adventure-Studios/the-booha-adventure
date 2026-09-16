@@ -15,6 +15,8 @@ assert(source.includes('saveId: SAVE_ID'), 'the room must submit a registered sa
 assert(source.includes('progress = Math.max(0, progress - 1)'), 'wrong calls must lower hidden case progress');
 assert(source.includes('if (flames < MAX_FLAMES) flames += 1'), 'a correct mark must return lantern light only below maximum');
 assert(source.includes('function retryRound()') && source.includes('chooseRound();'), 'a wrong call must reroll the room before retrying');
+assert(!source.includes("['pb:vocab', 'pb:sentence', 'pb:question']"), 'tier gates must not be hard-coded to Pre-Boo');
+assert(source.includes("const curriculums = ['pb', 'br', 'bc'];") && source.includes('`${curriculum}:${type}`'), 'tier gates must read Blitz stamps across all curricula');
 
 function classList() {
   const values = new Set();
