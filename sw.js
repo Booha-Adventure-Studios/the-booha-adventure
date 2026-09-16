@@ -182,6 +182,8 @@ const CURRENT_CACHES = {
   // cache request manifest while install-time room art remains fully precached.
   // Family Room Pass 2: the manual study surface and blackout handoff stay on
   // the existing network-first page/script path.
+  // Family Room Pass 3: the andon/light-pressure rules are script-only; no new
+  // install-time media is required.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };

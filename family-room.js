@@ -7,7 +7,6 @@
   const MARK_DEAD_ZONE_PX = 8;
   const FAILURE_SILENCE_MS = 1200;
   const FAILURE_PANEL_DELAY_MS = 1800;
-  const MAX_FLAMES = 3;
   const FAMILY_AUDIO = Object.freeze({
     bgm: 'assets/family-room/audio/family_BGM.mp3',
     move: 'assets/family-room/audio/family_move-1.mp3',
@@ -22,9 +21,9 @@
     || (Number.isFinite(window.navigator?.hardwareConcurrency) && window.navigator.hardwareConcurrency <= 2);
   if (LOW_POWER) document.documentElement.classList.add('low-power');
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 35000, progressPenalty: 0 },
-    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, jumpLevel: .4, burnMs: 18000, progressPenalty: 1 },
-    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, jumpLevel: .58, burnMs: 12000, progressPenalty: 1 },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 35000 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, jumpLevel: .4, burnMs: 18000 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, jumpLevel: .58, burnMs: 12000 },
   });
 
   // Pass 1 design lock: the house order and content vocabulary live in one
@@ -54,11 +53,9 @@
   const ACTIVE_CASE_LABEL = String(ACTIVE_CASE.number).padStart(2, '0');
 
   const UI_COPY = Object.freeze({
-    lanternDimmed: { kicker: 'THE LANTERN DIMMED', kickerJp: 'あんどんが くらくなった', title: 'MOVE FASTER.', titleJp: 'もっと はやく。', copy: 'The room outlasted the light. Start the search again before the next flame goes.', copyJp: 'へやが あかりより ながく のこった。つぎの ほのおが きえるまえに、もういちど さがそう。', button: 'SEARCH AGAIN', buttonJp: 'もういちど さがす' },
-    roomDarker: { kicker: 'THE ROOM GOT DARKER', kickerJp: 'へやが くらくなった', title: 'TRY AGAIN.', titleJp: 'もういちど。', copy: 'The light is still here. Look once more, then choose.', copyJp: 'あかりは まだ ここに ある。もういちど みてから、えらぼう。', button: 'LOOK AGAIN', buttonJp: 'もういちど みる' },
-    lightLostSearch: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / LIGHT LOST`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / あかりが きえた`, title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The lantern burned out before you could report the room. Bring the light back and try again.', copyJp: 'へやを ほうこくするまえに、あんどんが きえた。あかりを もどして、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
+    caseReset: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / CASE RESET`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / じけんを はじめから`, title: 'THE ROOM SENT YOU BACK.', titleJp: 'へやが あなたを もどした。', copy: 'A mistake sends you back to the start of this case. The study room will not return. Try again when you are ready.', copyJp: 'まちがえると、この じけんの はじめに もどる。おぼえる へやは もう でてこない。じゅんびが できたら、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
     lightLostReport: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / LIGHT LOST`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / あかりが きえた`, title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The case is not closed. Bring the light back and try the room again.', copyJp: 'じけんは おわっていない。あかりを もどして、もういちど へやを やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
-    complete: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / SEALED`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / ふういん`, title: 'THE ROOM LET GO.', titleJp: 'へやが はなした。', copy: 'You kept the light alive. Your notes are filed, and the door is where you left it.', copyJp: 'あかりを まもった。きろくを のこした。ドアは おいた ばしょに ある。', button: 'RETURN TO THE PROFILE', buttonJp: 'プロフィールへ もどる' },
+    complete: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / SEALED`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / ふういん`, title: 'THE ROOM LET GO.', titleJp: 'へやが はなした。', copy: 'You kept the room in view. Your notes are filed, and the door is where you left it.', copyJp: 'へやを みつづけた。きろくを のこした。ドアは おいた ばしょに ある。', button: 'RETURN TO THE PROFILE', buttonJp: 'プロフィールへ もどる' },
   });
 
   const PATASKALA_POSES = [
@@ -152,7 +149,6 @@
   let selectedTier = 'patient';
   let round = 0;
   let progress = 0;
-  let flames = MAX_FLAMES;
   let marks = 0;
   let correctCalls = 0;
   let currentAnomaly = null;
@@ -272,12 +268,6 @@
     sctx.globalAlpha = .075;
     sctx.fillStyle = '#e8b76c';
     for (let y = 0; y < height; y += 4) sctx.fillRect(0, y, width, 1);
-  }
-
-  function updateFlames() {
-    flameEls.forEach((el, index) => el.classList.toggle('off', index >= flames));
-    const label = `Lantern light: ${flames} flame${flames === 1 ? '' : 's'} / あんどんの あかり: ${flames}つ`;
-    document.getElementById('flame-meter').setAttribute('aria-label', label);
   }
 
   function setBilingual(enNode, jpNode, en, jp) {
@@ -430,7 +420,7 @@
       ctx.fillStyle = light; ctx.fillRect(booha.x - radius, booha.y - radius, radius * 2, radius * 2);
       ctx.restore();
       if (vignetteCanvas) ctx.drawImage(vignetteCanvas, 0, 0, width, height);
-      const darkness = (MAX_FLAMES - flames) * .06;
+      const darkness = (1 - burnFraction(time)) * .12;
       if (darkness) { ctx.fillStyle = `rgba(0,0,0,${darkness})`; ctx.fillRect(0, 0, width, height); }
       drawShojiDawn();
     }
@@ -473,8 +463,9 @@
   }
 
   function lightRadius() {
-    const radii = [0, .12, .18, .22, .26];
-    return Math.min(width, height) * (radii[clamp(flames, 0, MAX_FLAMES)] || .12);
+    const fraction = burnFraction();
+    const minimum = REDUCED_MOTION ? .065 : .05;
+    return Math.min(width, height) * (minimum + (.26 - minimum) * fraction);
   }
 
   function moveBooha() {
@@ -490,8 +481,9 @@
     const bob = REDUCED_MOTION ? 0 : Math.sin(time / 410) * 3;
     ctx.save();
     ctx.globalAlpha = .76;
-    ctx.shadowColor = `rgba(229,176,89,${.24 + flames * .12})`;
-    ctx.shadowBlur = 13 + flames * 3;
+    const fraction = burnFraction(time);
+    ctx.shadowColor = `rgba(229,176,89,${.2 + fraction * .16})`;
+    ctx.shadowBlur = 12 + fraction * 5;
     ctx.drawImage(image, booha.x - size / 2, booha.y - size / 2 + bob, size, size);
     if (markLocked) {
       ctx.globalAlpha = .9;
@@ -585,7 +577,7 @@
     window.clearTimeout(markHoldTimer); markHoldTimer = 0;
     setReportLabel(false);
   }
-  function updateHud() { if (state === 'playing') setObservation(markLocked ? 'MARK LOCKED / REPORT THE ROOM' : 'DRAG BOOHA / HOLD TO MARK', markLocked ? 'しるしを つけた / へやを ほうこくする' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markLocked); updateFlames(); }
+  function updateHud() { if (state === 'playing') setObservation(markLocked ? 'MARK LOCKED / REPORT THE ROOM' : 'DRAG BOOHA / HOLD TO MARK', markLocked ? 'しるしを つけた / へやを ほうこくする' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markLocked); }
 
   function startRound() {
     clearRoundTimers();
@@ -596,7 +588,7 @@
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
     clearRoundTimers();
-    round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentIsAnomaly = false;
+    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentIsAnomaly = false;
     state = 'study';
     curtain.className = '';
     controls.classList.add('hidden');
@@ -607,7 +599,6 @@
     studyPanel.classList.add('visible');
     setObservation('STUDY THE ROOM', 'へやを おぼえる');
     updateAndon();
-    updateFlames();
     requestFamilyRuntimeCache();
     ensureAudio();
     studyStartButton.focus?.();
@@ -668,7 +659,7 @@
     const token = roundToken;
     if (!correct) { wrongTone(); if (currentIsAnomaly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
-    if (currentIsAnomaly) { marks += 1; if (flames < MAX_FLAMES) flames += 1; showClue(); updateFlames(); }
+    if (currentIsAnomaly) { marks += 1; showClue(); }
     transitionTimer = window.setTimeout(() => { if (token === roundToken) advanceCase(); }, currentIsAnomaly ? (REDUCED_MOTION ? 500 : 1450) : (REDUCED_MOTION ? 80 : 420));
   }
 
@@ -676,27 +667,19 @@
     if (state !== 'playing' || burnoutHandled || time - roundStarted < currentTier().burnMs) return;
     burnoutHandled = true;
     clearRoundTimers();
-    flames = Math.max(0, flames - 1);
     wrongTone();
-    updateFlames(); updateAndon(time);
-    if (flames > 0) {
-      state = 'caught';
-      setObservation('THE ANDON WENT DARK', 'あんどんが きえた');
-      showMessage(UI_COPY.lanternDimmed, () => { messagePanel.classList.remove('visible'); retryRound(); });
-      return;
-    }
-    beginFailure(UI_COPY.lightLostSearch);
+    updateAndon(time);
+    beginFailure(UI_COPY.caseReset);
   }
 
   function handleWrong() {
     if (state !== 'transition') return;
-    transitionTimer = 0; transitionStarted = 0; curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - currentTier().progressPenalty); clearMarkingUi(); updateFlames();
-    if (flames > 0) { showMessage(UI_COPY.roomDarker, () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
-    beginFailure(UI_COPY.lightLostReport);
+    transitionTimer = 0; transitionStarted = 0; curtain.className = ''; clearMarkingUi();
+    beginFailure(UI_COPY.caseReset);
   }
 
   function restartCase() {
-    clearRoundTimers(); messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); startRound();
+    clearRoundTimers(); messagePanel.classList.remove('visible'); round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); startRound();
   }
 
   function silenceDrone() {
@@ -707,25 +690,11 @@
   }
 
   function beginFailure(message) {
-    clearRoundTimers(); state = 'caught'; failureStarted = performance.now(); setObservation('THE LANTERN WENT OUT', 'あかりが きえた'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
+    clearRoundTimers(); state = 'caught'; failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
     const jumpLevel = currentTier().jumpLevel ?? AUDIO_LEVELS.jump;
     const token = roundToken;
     failureJumpTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
     failurePanelTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) showMessage(message, restartCase); }, FAILURE_PANEL_DELAY_MS);
-  }
-
-  function retryRound() {
-    clearRoundTimers(); state = 'playing';
-    burnoutHandled = false;
-    roundStarted = performance.now();
-    entryStarted = roundStarted;
-    curtain.className = '';
-    controls.classList.remove('hidden');
-    clearMarkingUi();
-    resetBooha();
-    chooseRound();
-    updateHud();
-    scheduleTell();
   }
 
   function setBoohaTarget(event) {
@@ -924,5 +893,5 @@
   });
   window.addEventListener('keyup', event => { if (event.key === ' ' || event.key === 'Spacebar') releaseKeyboardMark(); });
 
-  resize(); updateFlames(); updateAndon(); updateTierButtons();
+  resize(); updateAndon(); updateTierButtons();
 })();
