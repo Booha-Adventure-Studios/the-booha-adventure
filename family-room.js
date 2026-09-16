@@ -4,6 +4,7 @@
   const SAVE_ID = 'bonus:family_room';
   const CASE_ROUNDS = 7;
   const MARK_HOLD_MS = 600;
+  const FAILURE_SILENCE_MS = 1200;
   const MAX_FLAMES = 3;
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
@@ -85,6 +86,7 @@
   let markLocked = false;
   let markedPoint = null;
   let burnoutHandled = false;
+  let failureStarted = 0;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const easeOut = value => 1 - Math.pow(1 - clamp(value, 0, 1), 3);
@@ -255,6 +257,10 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#020202'; ctx.fillRect(0, 0, width, height);
+    if (state === 'caught' && failureStarted) {
+      if (time - failureStarted >= FAILURE_SILENCE_MS) drawFailureBooha(time);
+      return;
+    }
     moveBooha();
     if (baseImage.complete) {
       // Keep the room plate readable, then let Booha's lantern reveal only a
@@ -277,12 +283,44 @@
       if (vignetteCanvas) ctx.drawImage(vignetteCanvas, 0, 0, width, height);
       const darkness = (MAX_FLAMES - flames) * .06;
       if (darkness) { ctx.fillStyle = `rgba(0,0,0,${darkness})`; ctx.fillRect(0, 0, width, height); }
+      drawShojiDawn();
     }
     if (scanlineCanvas) ctx.drawImage(scanlineCanvas, 0, 0, width, height);
     if (!REDUCED_MOTION && state !== 'title') {
       ctx.save(); ctx.globalAlpha = .035 + Math.sin(time / 260) * .012; ctx.fillStyle = '#fff'; ctx.fillRect(0, (time / 8) % height, width, 1); ctx.restore();
     }
     if (state !== 'caught') drawBooha(time);
+  }
+
+  function drawShojiDawn() {
+    if (!progress) return;
+    const x = plate.x + plate.w * .57;
+    const y = plate.y + plate.h * .08;
+    const w = plate.w * .34;
+    const h = plate.h * .32;
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = .025 + (progress / CASE_ROUNDS) * .22;
+    const dawn = ctx.createLinearGradient(x, y + h, x + w, y);
+    dawn.addColorStop(0, 'rgba(170,180,174,.25)');
+    dawn.addColorStop(.55, 'rgba(224,220,194,.72)');
+    dawn.addColorStop(1, 'rgba(247,238,203,.9)');
+    ctx.fillStyle = dawn;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
+  }
+
+  function drawFailureBooha(time) {
+    if (!idleBooha.complete) return;
+    const size = clamp(Math.min(width, height) * .075, 38, 62);
+    const x = width / 2;
+    const y = height * .7;
+    ctx.save();
+    ctx.globalAlpha = .72;
+    ctx.shadowColor = 'rgba(229,176,89,.9)';
+    ctx.shadowBlur = 18 + Math.sin(time / 260) * 3;
+    ctx.drawImage(idleBooha, x - size / 2, y - size / 2, size, size);
+    ctx.restore();
   }
 
   function lightRadius() {
@@ -342,7 +380,7 @@
   function updateHud() { observationNote.textContent = state === 'playing' ? (markLocked ? 'MARK LOCKED / LEAVE WHEN READY' : 'DRAG BOOHA / HOLD TO MARK') : 'LOOK / LISTEN / REMEMBER'; updateFlames(); }
 
   function startRound() {
-    state = 'playing'; burnoutHandled = false; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); scheduleTell(); ping(176 + round * 13, .028);
+    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); scheduleTell(); ping(176 + round * 13, .028);
   }
 
   function enterRoom() {
@@ -395,16 +433,29 @@
       showMessage('THE LANTERN DIMMED', 'MOVE FASTER.', 'The room outlasted the light. Start the search again before the next flame goes.', 'SEARCH AGAIN', () => { messagePanel.classList.remove('visible'); retryRound(); });
       return;
     }
-    state = 'caught';
-    observationNote.textContent = 'THE LANTERN WENT OUT';
-    showMessage('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The lantern burned out before you could report the room. Bring the light back and try again.', 'RESTART THE CASE', () => { messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); startRound(); });
+    beginFailure('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The lantern burned out before you could report the room. Bring the light back and try again.');
   }
 
   function handleWrong() {
     curtain.className = ''; flames = Math.max(0, flames - 1); progress = Math.max(0, progress - 1); clearMarkingUi(); updateFlames();
     if (flames > 0) { showMessage('THE ROOM GOT DARKER', 'TRY AGAIN.', 'The light is still here. Look once more, then choose.', 'LOOK AGAIN', () => { messagePanel.classList.remove('visible'); retryRound(); }); return; }
-    state = 'caught'; observationNote.textContent = 'THE LANTERN WENT OUT';
-    showMessage('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The case is not closed. Bring the light back and try the room again.', 'RESTART THE CASE', () => { messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); startRound(); });
+    beginFailure('CASE FILE 07 / LIGHT LOST', 'THE ROOM KEPT YOU.', 'The case is not closed. Bring the light back and try the room again.');
+  }
+
+  function restartCase() {
+    messagePanel.classList.remove('visible'); round = 0; progress = 0; flames = MAX_FLAMES; marks = 0; correctCalls = 0; caseStarted = performance.now(); startRound();
+  }
+
+  function silenceDrone() {
+    window.clearTimeout(droneTellTimer);
+    if (!ambientGain || !audioContext) return;
+    ambientGain.gain.cancelScheduledValues(audioContext.currentTime);
+    ambientGain.gain.setValueAtTime(0, audioContext.currentTime);
+  }
+
+  function beginFailure(kicker, title, copy) {
+    state = 'caught'; failureStarted = performance.now(); observationNote.textContent = 'THE LANTERN WENT OUT'; silenceDrone(); updateAndon();
+    window.setTimeout(() => { if (state === 'caught' && failureStarted) showMessage(kicker, title, copy, 'RESTART THE CASE', restartCase); }, FAILURE_SILENCE_MS);
   }
 
   function retryRound() {

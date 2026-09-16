@@ -30,6 +30,10 @@ assert(source.includes('burnMs: 25000') && source.includes('burnMs: 18000') && s
 assert(source.includes('function handleBurnout(time)') && source.includes('flames = Math.max(0, flames - 1)'), 'burnout must cost one flame');
 assert(source.includes('function updateAndon') && source.includes('THE ANDON WENT DARK'), 'the lantern clock must use a dimming andon, not a number');
 assert(markup.includes('id="andon"') && markup.includes('ROOM LIGHT'), 'the lantern burn indicator must have a corner status element');
+assert(source.includes('function drawShojiDawn') && source.includes('progress / CASE_ROUNDS'), 'case progress must brighten the shoji without a counter');
+assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
+assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
+assert(source.includes('function drawFailureBooha') && source.includes('if (time - failureStarted >= FAILURE_SILENCE_MS)'), 'Booha must glow alone after the silence');
 assert(markup.includes('id="leave-button"') && markup.includes('LEAVE THE ROOM'), 'the room must use one leave/report button');
 
 function classList() {
