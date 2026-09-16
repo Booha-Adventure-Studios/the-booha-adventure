@@ -59,21 +59,21 @@ window.BoohaBlitzEngine = (() => {
       rewardColors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], rewardGlow: 'rgba(240,201,106,.72)',
     }),
   });
-  const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 5, 7, 10, 15]);
+  const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 5, 8, 12, 15]);
   const WRONG_ANSWER_PENALTY_MS = 5000;
   const CLEAN_CLEAR_MAX_MISTAKES = 2;
   const STREAK_EVENT_NOTES = Object.freeze({
     playful: Object.freeze({
-      3: [523, 659], 5: [587, 740, 880], 7: [659, 784, 988],
-      10: [784, 988, 1175], 15: [880, 1109, 1319, 1760],
+      3: [523, 659], 5: [587, 740, 880], 8: [659, 784, 988],
+      12: [784, 988, 1175], 15: [880, 1109, 1319, 1760],
     }),
     arcade: Object.freeze({
-      3: [392, 494], 5: [494, 622, 784], 7: [587, 740, 932],
-      10: [659, 831, 1047], 15: [784, 988, 1245, 1568],
+      3: [392, 494], 5: [494, 622, 784], 8: [587, 740, 932],
+      12: [659, 831, 1047], 15: [784, 988, 1245, 1568],
     }),
     sleek: Object.freeze({
-      3: [440, 554], 5: [523, 659, 831], 7: [587, 740, 988],
-      10: [659, 831, 1047], 15: [784, 988, 1175, 1568],
+      3: [440, 554], 5: [523, 659, 831], 8: [587, 740, 988],
+      12: [659, 831, 1047], 15: [784, 988, 1175, 1568],
     }),
   });
   const TIMER_PAINT_INTERVAL_MS = 100;
@@ -807,7 +807,7 @@ window.BoohaBlitzEngine = (() => {
         animation: boohaBlitzStreakPop 320ms cubic-bezier(.2, 1.35, .3, 1) both;
       }
       .booha-blitz-nameplate.streak-hold {
-        animation: boohaBlitzStreakHold 1250ms ease-out both;
+        animation: boohaBlitzStreakHold 900ms ease-out both;
       }
       .booha-blitz-nameplate.streak-event-live {
         --streak-event-color: var(--streak-color, var(--blitz-accent));
@@ -825,11 +825,11 @@ window.BoohaBlitzEngine = (() => {
         border-width: 3px;
         box-shadow: 0 0 34px var(--streak-event-color), 0 0 64px var(--blitz-streak-glow);
       }
-      .booha-blitz-nameplate.streak-event-7 {
+      .booha-blitz-nameplate.streak-event-8 {
         border-width: 3px;
         box-shadow: 0 0 38px var(--streak-event-color), 0 0 76px var(--blitz-streak-glow);
       }
-      .booha-blitz-nameplate.streak-event-10 {
+      .booha-blitz-nameplate.streak-event-12 {
         border-width: 3px;
         box-shadow: 0 0 44px var(--streak-event-color), 0 0 88px var(--blitz-streak-glow);
       }
@@ -885,12 +885,12 @@ window.BoohaBlitzEngine = (() => {
       .blitz-feel-arcade.streak-event-live {
         box-shadow: inset 0 0 48px rgba(0,255,238,.24);
       }
-      .blitz-feel-sleek.streak-event-live { transform: scale(1.002); }
-      .booha-blitz-nameplate.streak-milestone-3 { box-shadow: 0 0 24px var(--streak-color), 0 0 42px var(--blitz-streak-glow); }
-      .booha-blitz-nameplate.streak-milestone-5 { box-shadow: 0 0 30px var(--streak-color), 0 0 54px var(--blitz-streak-glow); }
-      .booha-blitz-nameplate.streak-milestone-8 { border-width: 3px; box-shadow: 0 0 34px var(--streak-color), 0 0 68px var(--blitz-streak-glow); }
-      .blitz-feel-playful .booha-blitz-nameplate.streak-milestone-5::before,
-      .blitz-feel-playful .booha-blitz-nameplate.streak-milestone-8::before {
+      .booha-blitz-nameplate.streak-event-live {
+        transform: translate(-50%, -50%) scale(var(--streak-event-scale, 1.02));
+      }
+      .blitz-feel-sleek.streak-event-live { transform: translate(-50%, -50%) scale(var(--streak-event-scale, 1.002)); }
+      .blitz-feel-playful .booha-blitz-nameplate.streak-event-5::before,
+      .blitz-feel-playful .booha-blitz-nameplate.streak-event-8::before {
         content: '✦';
         position: absolute;
         left: -18px;
@@ -898,7 +898,7 @@ window.BoohaBlitzEngine = (() => {
         font-size: 18px;
         text-shadow: 0 0 12px var(--streak-color);
       }
-      .blitz-feel-playful .booha-blitz-nameplate.streak-milestone-8::after {
+      .blitz-feel-playful .booha-blitz-nameplate.streak-event-8::after {
         content: '✧';
         position: absolute;
         right: -18px;
@@ -909,7 +909,7 @@ window.BoohaBlitzEngine = (() => {
       .blitz-feel-arcade .booha-blitz-streak-meter-fill {
         background: repeating-linear-gradient(90deg, #39ff14 0 8px, #00ffee 8px 14px);
       }
-      .blitz-feel-arcade .booha-blitz-nameplate.streak-milestone-5::before {
+      .blitz-feel-arcade .booha-blitz-nameplate.streak-event-5::before {
         content: 'COMBO';
         position: absolute;
         top: -10px;
@@ -919,7 +919,7 @@ window.BoohaBlitzEngine = (() => {
         letter-spacing: 1.5px;
         text-shadow: 0 0 10px #00ffee;
       }
-      .blitz-feel-arcade .booha-blitz-nameplate.streak-milestone-8::before {
+      .blitz-feel-arcade .booha-blitz-nameplate.streak-event-8::before {
         content: 'CHAIN MAX';
         position: absolute;
         top: -10px;
@@ -932,7 +932,7 @@ window.BoohaBlitzEngine = (() => {
       .blitz-feel-sleek .booha-blitz-streak-meter-fill {
         background: linear-gradient(90deg, #f0c96a, #dfeaff);
       }
-      .blitz-feel-sleek .booha-blitz-nameplate.streak-milestone-8 {
+      .blitz-feel-sleek .booha-blitz-nameplate.streak-event-8 {
         letter-spacing: 2.4px;
       }
       @keyframes boohaBlitzStreakPop {
@@ -1854,24 +1854,22 @@ window.BoohaBlitzEngine = (() => {
       let announceToken = 0;
       let streakHoldTimer = null;
       let streakEventTimer = null;
-      const eventClasses = ['streak-event-live', 'streak-event-3', 'streak-event-5', 'streak-event-7', 'streak-event-10', 'streak-event-15'];
+      const eventClasses = ['streak-event-live', 'streak-event-3', 'streak-event-5', 'streak-event-8', 'streak-event-12', 'streak-event-15'];
       function clearStreakEventClasses() {
         overlay.classList.remove('streak-event-live');
         nameplate.classList.remove(...eventClasses);
+        nameplate.style.removeProperty('--streak-event-scale');
       }
       function emitStreakSparks() {
         const threshold = arguments.length ? arguments[0] : 0;
-        const count = isMinimalPower()
-          ? 3
-          : isLowPower()
-            ? 4
-            : threshold >= 5 ? (palette.feel === 'arcade' ? 14 : 12) : palette.feel === 'arcade' ? 8 : 6;
+        const fullCount = ({ 3: 6, 5: 12, 8: 20, 12: 32, 15: 48 })[threshold] || 6;
+        const count = isMinimalPower() ? 3 : effectCount(fullCount);
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
           const angle = (i / count) * Math.PI * 2 + Math.random() * 0.35;
           const distance = 24 + Math.random() * 32;
-          spark.className = `booha-blitz-streak-spark${threshold >= 5 && i === 0 ? ' booha-blitz-streak-spark-large' : ''}`;
+          spark.className = `booha-blitz-streak-spark${threshold >= 8 && i === 0 ? ' booha-blitz-streak-spark-large' : ''}`;
           spark.style.cssText = `--sx:${Math.cos(angle) * distance}px;--sy:${Math.sin(angle) * distance}px;--spark-delay:${Math.random() * 50}ms;`;
           spark.addEventListener('animationend', () => spark.remove(), { once: true });
           fragment.appendChild(spark);
@@ -1885,17 +1883,20 @@ window.BoohaBlitzEngine = (() => {
         clearStreakEventClasses();
         void nameplate.offsetWidth;
         const className = `streak-event-${threshold}`;
+        const eventScale = ({ 3: 1.02, 5: 1.03, 8: 1.04, 12: 1.05, 15: 1.06 })[threshold] || 1.02;
         overlay.classList.add('streak-event-live');
         nameplate.classList.add('streak-event-live', className, 'streak-hold');
+        nameplate.style.setProperty('--streak-event-scale', eventScale);
         emitStreakSparks(threshold);
-        streakHoldTimer = setTimeout(() => nameplate.classList.remove('streak-hold'), 1250);
-        streakEventTimer = setTimeout(clearStreakEventClasses, 780);
+        const holdMs = ({ 3: 400, 5: 520, 8: 650, 12: 780, 15: 900 })[threshold] || 400;
+        streakHoldTimer = setTimeout(() => nameplate.classList.remove('streak-hold'), holdMs);
+        streakEventTimer = setTimeout(clearStreakEventClasses, holdMs);
       }
       function announce(message, final = false, variant = '') {
         announceToken++;
         callout.classList.remove('show');
         callout.classList.toggle('final', final);
-        callout.classList.remove('fire');
+        callout.classList.toggle('fire', variant === 'fire');
         callout.classList.toggle('combo', variant === 'combo');
         callout.classList.toggle('chain', variant === 'chain');
         callout.textContent = message;
@@ -1913,10 +1914,9 @@ window.BoohaBlitzEngine = (() => {
         callout.textContent = '';
       }
 
-      function setStreak(streak, eventThreshold = 0) {
+      function setStreak(streak, eventThreshold = 0, runLength = 15) {
         nameplate.classList.remove(
-          'streak-tier-1', 'streak-tier-2', 'streak-tier-3', 'streak-tier-4', 'streak-tier-5',
-          'streak-milestone-2', 'streak-milestone-3', 'streak-milestone-5', 'streak-milestone-8'
+          'streak-tier-1', 'streak-tier-2', 'streak-tier-3', 'streak-tier-4', 'streak-tier-5'
         );
         if (!streak) {
           if (streakHoldTimer) clearTimeout(streakHoldTimer);
@@ -1930,24 +1930,23 @@ window.BoohaBlitzEngine = (() => {
           nameplate.style.setProperty('--streak-progress', '0%');
           nameplate.style.removeProperty('--streak-color');
           nameplate.removeAttribute('data-streak');
-          nameplate.removeAttribute('data-milestone');
           nameplate.classList.remove('streak-active');
           return;
         }
-        const tier = streak >= 10 ? 5 : streak >= 8 ? 4 : streak >= 5 ? 3 : streak >= 3 ? 2 : 1;
-        const milestone = streak >= 8 ? 8 : streak >= 5 ? 5 : streak >= 3 ? 3 : streak >= 2 ? 2 : 0;
+        const tier = STREAK_EVENT_THRESHOLDS.reduce(
+          (level, threshold, index) => streak >= threshold ? index + 2 : level,
+          1,
+        );
         const label = palette.streak?.label || 'STREAK';
         const marker = palette.streak?.marker || '★';
         nameplate.classList.add('streak-active', `streak-tier-${tier}`);
         nameplate.dataset.streak = String(streak);
-        if (milestone) nameplate.classList.add(`streak-milestone-${milestone}`);
-        nameplate.dataset.milestone = milestone ? String(milestone) : '1';
         const streakColors = palette.streak?.colors || [];
         const colorIndex = eventThreshold
           ? Math.max(0, STREAK_EVENT_THRESHOLDS.indexOf(eventThreshold))
           : Math.min(streakColors.length - 1, Math.max(0, tier - 1));
         if (streakColors[colorIndex]) nameplate.style.setProperty('--streak-color', streakColors[colorIndex]);
-        nameplate.style.setProperty('--streak-progress', `${Math.min(100, streak * 10)}%`);
+        nameplate.style.setProperty('--streak-progress', `${Math.min(100, (streak / Math.max(1, runLength)) * 100)}%`);
         streakMarkerEl.textContent = marker;
         streakEl.textContent = `${label} ×${streak}`;
         nameplate.classList.remove('streak-pop');
@@ -2477,11 +2476,27 @@ window.BoohaBlitzEngine = (() => {
         bestStreak = Math.max(bestStreak, streak);
         const eventThreshold = STREAK_EVENT_THRESHOLDS.includes(streak) ? streak : 0;
         spotlight.clearAnnouncement();
-        spotlight.setStreak(streak, eventThreshold);
+        spotlight.setStreak(streak, eventThreshold, initialQueueLength);
         setBackground(streak);
         if (eventThreshold) {
           playStreakBeat(eventThreshold);
           if (palette.feel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
+          const copy = {
+            playful: {
+              3: '×3 — NICE!', 5: '×5 — HOT!', 8: '×8 — WILD!', 12: '×12 — RIDICULOUS!',
+              15: `${spotlight.playerName}, PERFECT RUN!`,
+            },
+            arcade: {
+              3: 'COMBO ×3', 5: 'COMBO ×5 — SURGE', 8: 'COMBO ×8 — OVERDRIVE',
+              12: 'COMBO ×12 — MAX POWER', 15: `${spotlight.playerName} — PERFECT CHAIN`,
+            },
+            sleek: {
+              3: 'CHAIN ×3', 5: 'CHAIN ×5 — LOCKED', 8: 'CHAIN ×8 — RESONANT',
+              12: 'CHAIN ×12 — ASCENDANT', 15: `${spotlight.playerName} — UNBROKEN`,
+            },
+          };
+          const variant = palette.feel === 'arcade' ? 'combo' : palette.feel === 'sleek' ? 'chain' : 'fire';
+          spotlight.announce(copy[palette.feel]?.[eventThreshold] || `×${eventThreshold}`, false, variant);
         }
       }
 

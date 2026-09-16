@@ -14,8 +14,10 @@ assert.match(engine, /animation: boohaBlitzWrongSpark 400ms/,
   'wrong sparks must resolve quickly without lingering noise');
 assert.match(engine, /\.booha-blitz-streak-spark-large \{[\s\S]*?width: clamp\(11px, 1\.8vw, 16px\)/,
   'high streak events must include one larger readable spark');
-assert.match(engine, /threshold >= 5 \? \(palette\.feel === 'arcade' \? 14 : 12\)/,
-  'high streak events must increase the particle burst while retaining low-power limits');
+assert.match(engine, /const fullCount = \(\{ 3: 6, 5: 12, 8: 20, 12: 32, 15: 48 \}\)\[threshold\] \|\| 6/,
+  'high streak events must increase the particle burst across the unified ladder');
+assert.match(engine, /const count = isMinimalPower\(\) \? 3 : effectCount\(fullCount\)/,
+  'streak particle bursts must retain low-power limits');
 assert.match(engine, /const count = isMinimalPower\(\) \? 2 : isLowPower\(\) \? 4 : streak >= 5 \? 10 : 6/,
   'correct feedback must keep modest bursts across reduced and minimal tiers');
 assert.match(engine, /const size = 5 \+ Math\.random\(\) \* 6/,

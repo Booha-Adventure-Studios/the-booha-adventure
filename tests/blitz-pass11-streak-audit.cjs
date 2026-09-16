@@ -12,12 +12,12 @@ assert.match(engine, /label: 'CHAIN', marker: '✦'/,
   'Boo-continuum must use an elegant chain identity');
 assert.match(engine, /booha-blitz-streak-meter-fill/,
   'the shared streak HUD must include a lightweight visible meter');
-assert.match(engine, /streak-milestone-2.*streak-milestone-3.*streak-milestone-5.*streak-milestone-8/s,
-  'the shared streak HUD must expose the requested escalation milestones');
-assert.match(engine, /Math\.min\(100, streak \* 10\)/,
-  'the streak meter must scale with the consecutive-correct streak');
-assert.match(engine, /nameplate\.classList\.remove\([\s\S]*?streak-milestone-8/s,
-  'reset must remove milestone state');
+assert.match(engine, /STREAK_EVENT_THRESHOLDS = Object\.freeze\(\[3, 5, 8, 12, 15\]\)/,
+  'the shared streak HUD must expose one fifteen-step escalation ladder');
+assert.match(engine, /function setStreak\(streak, eventThreshold = 0, runLength = 15\)/,
+  'the streak meter must accept the actual run length');
+assert.match(engine, /streak \/ Math\.max\(1, runLength\)/,
+  'the streak meter must scale against the run length');
 assert.match(engine, /nameplate\.removeAttribute\('data-streak'\)/,
   'reset must clear the visible streak identity');
 assert.match(engine, /function clearAnnouncement\(\)/,
