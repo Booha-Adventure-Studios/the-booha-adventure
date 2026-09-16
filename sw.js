@@ -64,6 +64,8 @@ const CURRENT_CACHES = {
   // inside Utsuroba room_05 and is carried by the network-first JavaScript path.
   // Family Room Pass 1: wrong reports reroll the room and correct marks only
   // replenish lantern light when the meter is below its maximum.
+  // Family Room Pass 2: tier gates use the fastest current-week Blitz stamp
+  // across each curriculum, still carried by the network-first JS path.
   // Muenba 28A adds the shared decoded sample-loader and pitch variation API.
   // Muenba 28B adds staggered authored scream playback, decay, and danger-state cleanup.
   // Muenba 28C primes all authored clips after the first gesture and avoids immediate repeats.
