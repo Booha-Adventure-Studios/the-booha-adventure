@@ -18,9 +18,9 @@
   const AUDIO_LEVELS = Object.freeze({ bgm: .07, move: .16, anomaly: .34, jump: .58, master: .72 });
   const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, falseAlertChance: 0, burnMs: 25000 },
-    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, falseAlertChance: 0, burnMs: 18000 },
-    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, falseAlertChance: .15, burnMs: 12000 },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, jumpLevel: .24, burnMs: 25000 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, jumpLevel: .4, burnMs: 18000 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, jumpLevel: .58, burnMs: 12000 },
   });
 
   const UI_COPY = Object.freeze({
@@ -119,6 +119,7 @@
   let currentAnomaly = null;
   let currentIsAnomaly = false;
   let falseAlertPoint = null;
+  let tellAvailable = false;
   let roundStarted = 0;
   let transitionStarted = 0;
   let entryStarted = 0;
@@ -286,8 +287,11 @@
       : null;
     const tier = currentTier();
     falseAlertPoint = !currentIsAnomaly && Math.random() < tier.falseAlertChance
-      ? { u: .12 + Math.random() * .76, v: .2 + Math.random() * .56, radius: .1 }
+      ? { u: .22 + Math.random() * .56, v: .2 + Math.random() * .56, radius: .1 }
       : null;
+    tellAvailable = currentIsAnomaly
+      ? Math.random() < tier.realTellChance
+      : Boolean(falseAlertPoint);
   }
 
   function currentPoint([u, v]) { return [plate.x + u * plate.w, plate.y + v * plate.h]; }
@@ -457,7 +461,7 @@
 
   function scheduleTell() {
     window.clearTimeout(droneTellTimer);
-    const shouldTell = currentIsAnomaly || Boolean(falseAlertPoint);
+    const shouldTell = tellAvailable;
     if (!shouldTell) return;
     droneTellTimer = window.setTimeout(() => { if (state === 'playing') { tellPresence(); playSfx('move', AUDIO_LEVELS.move); } }, 900 + Math.random() * 500);
   }
@@ -520,7 +524,8 @@
 
   function beginFailure(message) {
     state = 'caught'; failureStarted = performance.now(); setObservation('THE LANTERN WENT OUT', 'あかりが きえた'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
-    window.setTimeout(() => { if (state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', AUDIO_LEVELS.jump); }, FAILURE_SILENCE_MS + 60);
+    const jumpLevel = currentTier().jumpLevel ?? AUDIO_LEVELS.jump;
+    window.setTimeout(() => { if (state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
     window.setTimeout(() => { if (state === 'caught' && failureStarted) showMessage(message, restartCase); }, FAILURE_PANEL_DELAY_MS);
   }
 
