@@ -33,6 +33,10 @@ The current built room is Case 02, Chanoma. The save identity remains `bonus:fam
 - Removal changes are markable as empty spaces.
 - A wrong confirmed mark becomes a red hazard: reach the bottom exit edge to
   continue the round, or let it touch Booha and restart the case.
+- Some rounds may be audio-only: the room is visually unchanged, but a sound
+  tells the player to report the room without marking a location.
+- Pataskala may move once during a round; its movement announces presence, not
+  the location of a scored change.
 - Pataskala is initially an atmospheric presence, not a scored ordinary object.
 - Pataskala’s presence rises with case depth and is strongest in Nando.
 

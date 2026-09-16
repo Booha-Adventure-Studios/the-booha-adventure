@@ -61,10 +61,14 @@ assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 9
 assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.includes('.26 - minimum'), 'the lantern radius must shrink continuously with a playable minimum');
 assert(source.includes('maxChanges: 1') && source.includes('maxChanges: 2') && source.includes('twoChangeChance: .24') && source.includes('twoChangeChance: .52'), 'room tiers must define when two-change rounds can appear');
 assert(source.includes('let currentAnomalies = []') && source.includes('function reportIsCorrect') && source.includes('currentAnomalies.every'), 'reports must validate every required change and reject missing or extra marks');
-assert(source.includes('currentPresence = Math.random() < pataskalaChance()') && source.includes('currentPresence || falseAlertPoint'), 'Pataskala presence must remain separate from scored room changes');
+assert(source.includes('currentPresence = currentAudioOnly ? null') && source.includes('Boolean(currentPresence || falseAlertPoint)'), 'Pataskala presence must remain separate from scored room changes');
 assert(source.includes('WRONG_MARK_GRACE_MS = 700') && source.includes('function startWrongMarkHazard') && source.includes('function updateWrongMarkHazard'), 'a wrong confirmed mark must create a readable hazard state');
 assert(source.includes('function boohaAtExit') && source.includes("RUN TO THE EXIT") && source.includes('beginFailure(UI_COPY.caseReset)'), 'the wrong-mark hazard must be escapable at the exit and fatal on contact');
 assert(source.includes("playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + .1))") && source.includes('rgba(255,82,62,.92)'), 'wrong marks must have distinct red visual and audio feedback');
+assert(source.includes('const AUDIO_ONLY_CHANGE = Object.freeze') && source.includes('audioOnlyChance: .08') && source.includes('audioOnlyChance: .16'), 'audio-only anomalies must be explicit and tier-weighted');
+assert(source.includes('currentAudioOnly = !hasChange') && source.includes('if (currentAudioOnly) return markedPoints.length === 0') && source.includes('AUDIO_ONLY_CHANGE.en'), 'an audio-only anomaly must be reportable without a location mark and teach its sentence after a correct report');
+assert(source.includes('function schedulePataskalaMovement') && source.includes('currentPresence = random(choices') && source.includes("playSfx('move', AUDIO_LEVELS.move)"), 'Pataskala must be able to move once within a round with an authored movement cue');
+assert(source.includes('ensureAudio(); startBgm();') && source.includes('window.clearTimeout(pataskalaMoveTimer)'), 'BGM must start after the study handoff and Pataskala timers must be cleared on round cleanup');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];

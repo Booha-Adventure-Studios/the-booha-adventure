@@ -23,9 +23,9 @@
     || (Number.isFinite(window.navigator?.hardwareConcurrency) && window.navigator.hardwareConcurrency <= 2);
   if (LOW_POWER) document.documentElement.classList.add('low-power');
   const TIER_RULES = Object.freeze({
-    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, maxChanges: 1, twoChangeChance: 0, hazardSpeed: 115, jumpLevel: .24, burnMs: 35000 },
-    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, maxChanges: 2, twoChangeChance: .24, hazardSpeed: 165, jumpLevel: .4, burnMs: 18000 },
-    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, maxChanges: 2, twoChangeChance: .52, hazardSpeed: 210, jumpLevel: .58, burnMs: 12000 },
+    patient: { label: 'THE ROOM IS PATIENT', alertMultiplier: 2, realTellChance: 1, falseAlertChance: 0, audioOnlyChance: .08, maxChanges: 1, twoChangeChance: 0, hazardSpeed: 115, jumpLevel: .24, burnMs: 35000 },
+    quicker: { label: 'THE ROOM IS QUICKER', alertMultiplier: 1.2, realTellChance: .55, falseAlertChance: .1, audioOnlyChance: .12, maxChanges: 2, twoChangeChance: .24, hazardSpeed: 165, jumpLevel: .4, burnMs: 18000 },
+    lies: { label: 'THE ROOM LIES TO YOU', alertMultiplier: 1, realTellChance: .3, falseAlertChance: .25, audioOnlyChance: .16, maxChanges: 2, twoChangeChance: .52, hazardSpeed: 210, jumpLevel: .58, burnMs: 12000 },
   });
 
   // Pass 1 design lock: the house order and content vocabulary live in one
@@ -79,6 +79,7 @@
     { id: 'teapot', target: [.29, .44, .12], artSize: .095, en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', labelEn: 'TEAPOT', labelJp: 'きゅうす', kind: 'moved' },
     { id: 'crescent', target: [.77, .30, .1], artSize: .08, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', labelEn: 'MOON', labelJp: 'つき', kind: 'added' },
   ];
+  const AUDIO_ONLY_CHANGE = Object.freeze({ id: 'audio-only', en: 'The room made a sound it did not make before.', jp: 'へやが まえには しなかった おとを たてた。', labelEn: 'THE ROOM', labelJp: 'へや', kind: 'audio' });
 
   const canvas = document.getElementById('room-canvas');
   const ctx = canvas.getContext('2d');
@@ -164,6 +165,7 @@
   let currentAnomaly = null;
   let currentAnomalies = [];
   let currentPresence = null;
+  let currentAudioOnly = false;
   let currentIsAnomaly = false;
   let wrongMarkHazard = null;
   let falseAlertPoint = null;
@@ -184,6 +186,7 @@
   let bgmLoadPromise = null;
   let droneTellTimer = 0;
   let studyCurtainTimer = 0;
+  let pataskalaMoveTimer = 0;
   let clueTimer = 0;
   let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let pointerActive = false;
@@ -363,6 +366,7 @@
   function chooseRound() {
     const tier = currentTier();
     const hasChange = Math.random() >= .5;
+    currentAudioOnly = !hasChange && Math.random() < tier.audioOnlyChance;
     const changeCount = hasChange
       ? Math.min(tier.maxChanges, 1 + (Math.random() < tier.twoChangeChance ? 1 : 0))
       : 0;
@@ -373,12 +377,14 @@
       currentAnomalies.push(pool.splice(choice, 1)[0]);
     }
     currentAnomaly = currentAnomalies[0] || null;
-    currentIsAnomaly = currentAnomalies.length > 0;
-    currentPresence = Math.random() < pataskalaChance() ? pataskalaPose() : null;
+    currentIsAnomaly = currentAnomalies.length > 0 || currentAudioOnly;
+    currentPresence = currentAudioOnly ? null : (Math.random() < pataskalaChance() ? pataskalaPose() : null);
     falseAlertPoint = !currentIsAnomaly && Math.random() < tier.falseAlertChance
       ? { u: .22 + Math.random() * .56, v: .2 + Math.random() * .56, radius: .1 }
       : null;
-    tellAvailable = currentIsAnomaly
+    tellAvailable = currentAudioOnly
+      ? true
+      : currentIsAnomaly
       ? Math.random() < tier.realTellChance
       : Boolean(currentPresence || falseAlertPoint);
   }
@@ -672,6 +678,7 @@
   }
   function clearRoundTimers() {
     window.clearTimeout(droneTellTimer); droneTellTimer = 0;
+    window.clearTimeout(pataskalaMoveTimer); pataskalaMoveTimer = 0;
     window.clearTimeout(transitionTimer); transitionTimer = 0;
     window.clearTimeout(failureJumpTimer); failureJumpTimer = 0;
     window.clearTimeout(failurePanelTimer); failurePanelTimer = 0;
@@ -694,13 +701,13 @@
   function startRound() {
     clearRoundTimers();
     roundToken += 1;
-    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
+    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
   }
 
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
     clearRoundTimers();
-    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; currentIsAnomaly = false;
+    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; currentAudioOnly = false; currentIsAnomaly = false;
     state = 'study';
     curtain.className = '';
     controls.classList.add('hidden');
@@ -746,6 +753,7 @@
 
   function scheduleTell() {
     window.clearTimeout(droneTellTimer);
+    schedulePataskalaMovement();
     const shouldTell = tellAvailable;
     if (!shouldTell) return;
     droneTellTimer = window.setTimeout(() => { if (state === 'playing') { tellPresence(); playSfx('move', AUDIO_LEVELS.move); } }, 900 + Math.random() * 500);
@@ -760,12 +768,28 @@
     ambientOscillator.frequency.setTargetAtTime(42, audioContext.currentTime + .5, .1);
   }
 
+  function schedulePataskalaMovement() {
+    window.clearTimeout(pataskalaMoveTimer); pataskalaMoveTimer = 0;
+    if (!currentPresence) return;
+    const token = roundToken;
+    pataskalaMoveTimer = window.setTimeout(() => {
+      pataskalaMoveTimer = 0;
+      if (token !== roundToken || state !== 'playing' || !currentPresence) return;
+      const choices = PATASKALA_POSES.filter(pose => pose.id !== currentPresence.id);
+      currentPresence = random(choices.length ? choices : PATASKALA_POSES);
+      tellPresence();
+      playSfx('move', AUDIO_LEVELS.move);
+      setObservation('SOMETHING MOVED / KEEP LOOKING', 'なにかが うごいた / まだ さがす');
+    }, 5200 + Math.random() * 1800);
+  }
+
   function markMatchesAnomaly(mark, anomaly) {
     const [tx, ty] = currentPoint(anomaly.target);
     return Math.hypot(mark.x - tx, mark.y - ty) <= mark.radius;
   }
 
   function reportIsCorrect() {
+    if (currentAudioOnly) return markedPoints.length === 0;
     if (!currentAnomalies.length) return markedPoints.length === 0;
     if (markedPoints.length !== currentAnomalies.length) return false;
     return markedPoints.every(mark => currentAnomalies.some(anomaly => markMatchesAnomaly(mark, anomaly)))
@@ -777,10 +801,10 @@
     state = 'transition'; transitionStarted = performance.now(); controls.classList.add('hidden'); silenceDrone();
     const correct = reportIsCorrect();
     const token = roundToken;
-    if (!correct) { wrongTone(); if (currentAnomalies.length) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
+    if (!correct) { wrongTone(); if (currentAnomalies.length || currentAudioOnly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
-    if (currentAnomalies.length) { marks += currentAnomalies.length; showClue(); }
-    const transitionDelay = currentAnomalies.length ? (REDUCED_MOTION ? 500 : 1450 + (currentAnomalies.length - 1) * 350) : (REDUCED_MOTION ? 80 : 420);
+    if (currentAnomalies.length || currentAudioOnly) { marks += currentAnomalies.length + (currentAudioOnly ? 1 : 0); showClue(); }
+    const transitionDelay = currentAnomalies.length ? (REDUCED_MOTION ? 500 : 1450 + (currentAnomalies.length - 1) * 350) : (currentAudioOnly ? (REDUCED_MOTION ? 300 : 900) : (REDUCED_MOTION ? 80 : 420));
     transitionTimer = window.setTimeout(() => { if (token === roundToken) advanceCase(); }, transitionDelay);
   }
 
@@ -811,7 +835,7 @@
   }
 
   function beginFailure(message) {
-    clearRoundTimers(); clearWrongMarkHazard(); state = 'caught'; failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(.018, audioContext.currentTime, .08); updateAndon();
+    clearRoundTimers(); clearWrongMarkHazard(); state = 'caught'; failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); updateAndon();
     const jumpLevel = currentTier().jumpLevel ?? AUDIO_LEVELS.jump;
     const token = roundToken;
     failureJumpTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
@@ -964,8 +988,11 @@
   }
 
   function showClue() {
-    clueEn.textContent = currentAnomalies.map(anomaly => anomaly.en).join(' / ');
-    clueJp.textContent = currentAnomalies.map(anomaly => anomaly.jp).join(' / ');
+    const enNotes = currentAnomalies.map(anomaly => anomaly.en);
+    const jpNotes = currentAnomalies.map(anomaly => anomaly.jp);
+    if (currentAudioOnly) { enNotes.push(AUDIO_ONLY_CHANGE.en); jpNotes.push(AUDIO_ONLY_CHANGE.jp); }
+    clueEn.textContent = enNotes.join(' / ');
+    clueJp.textContent = jpNotes.join(' / ');
     clueCard.hidden = false; setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
     clueVersion += 1; const version = clueVersion; window.clearTimeout(clueTimer);
     clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 1300);
@@ -977,7 +1004,7 @@
     document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId: SAVE_ID, score: marks, completed: true, time: performance.now() - caseStarted, recordEligible: true, recentRun: { marks, calls: correctCalls, tier: selectedTier } } }));
   }
 
-  function showComplete() { if (state === 'complete') return; clearRoundTimers(); state = 'complete'; controls.classList.add('hidden'); clearMarkingUi(); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); stopLoop(); showMessage(UI_COPY.complete, exitGame); }
+  function showComplete() { if (state === 'complete') return; clearRoundTimers(); state = 'complete'; controls.classList.add('hidden'); clearMarkingUi(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); stopLoop(); showMessage(UI_COPY.complete, exitGame); }
 
   function exitGame() {
     try {
