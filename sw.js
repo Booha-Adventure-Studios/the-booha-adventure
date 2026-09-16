@@ -160,6 +160,8 @@ const CURRENT_CACHES = {
   // Pass 1: freeze Karasuki during the Grimmerglen popup/exit transition.
   // Pass 2: defer Grimmerglen collectible images until their room needs them.
   // Blitz Pass 1: throttle timer paints and reduce celebration paint pressure.
+  // Family Room Pass 8: authored audio is fetched on room entry through the
+  // existing runtime asset cache rather than added to the install-time core.
   assets: 'booha-assets-2026-566',
   decks:  'booha-decks-2026-310',
 };
