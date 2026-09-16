@@ -59,18 +59,18 @@ window.BoohaBlitzEngine = (() => {
       rewardColors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], rewardGlow: 'rgba(240,201,106,.72)',
     }),
   });
-  const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 5, 8, 12, 15]);
+  const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 6, 9, 12, 15]);
   const STREAK_EVENT_NOTES = Object.freeze({
     playful: Object.freeze({
-      3: [523, 659], 5: [587, 740, 880], 8: [659, 784, 988],
+      3: [523, 659], 6: [587, 740, 880], 9: [659, 784, 988],
       12: [784, 988, 1175], 15: [880, 1109, 1319, 1760],
     }),
     arcade: Object.freeze({
-      3: [392, 494], 5: [494, 622, 784], 8: [587, 740, 932],
+      3: [392, 494], 6: [494, 622, 784], 9: [587, 740, 932],
       12: [659, 831, 1047], 15: [784, 988, 1245, 1568],
     }),
     sleek: Object.freeze({
-      3: [440, 554], 5: [523, 659, 831], 8: [587, 740, 988],
+      3: [440, 554], 6: [523, 659, 831], 9: [587, 740, 988],
       12: [659, 831, 1047], 15: [784, 988, 1175, 1568],
     }),
   });
@@ -943,11 +943,11 @@ window.BoohaBlitzEngine = (() => {
       .booha-blitz-nameplate.streak-event-3 {
         box-shadow: 0 0 28px var(--streak-event-color), 0 0 52px var(--blitz-streak-glow);
       }
-      .booha-blitz-nameplate.streak-event-5 {
+      .booha-blitz-nameplate.streak-event-6 {
         border-width: 3px;
         box-shadow: 0 0 34px var(--streak-event-color), 0 0 64px var(--blitz-streak-glow);
       }
-      .booha-blitz-nameplate.streak-event-8 {
+      .booha-blitz-nameplate.streak-event-9 {
         border-width: 3px;
         box-shadow: 0 0 38px var(--streak-event-color), 0 0 76px var(--blitz-streak-glow);
       }
@@ -959,6 +959,31 @@ window.BoohaBlitzEngine = (() => {
         border-width: 4px;
         box-shadow: 0 0 52px var(--streak-event-color), 0 0 108px var(--blitz-streak-glow);
       }
+      .blitz-compositor.streak-tier-1 .booha-blitz-prompt,
+      .blitz-compositor.streak-tier-1 .booha-blitz-answer { box-shadow: 0 0 24px var(--blitz-glow); }
+      .blitz-compositor.streak-tier-2 .booha-blitz-prompt,
+      .blitz-compositor.streak-tier-2 .booha-blitz-answer { box-shadow: 0 0 32px var(--blitz-glow), 0 0 2px var(--blitz-accent); }
+      .blitz-compositor.streak-tier-3 .booha-blitz-prompt,
+      .blitz-compositor.streak-tier-3 .booha-blitz-answer { box-shadow: 0 0 42px var(--blitz-glow), 0 0 3px var(--blitz-accent); }
+      .blitz-compositor.streak-tier-4 .booha-blitz-prompt,
+      .blitz-compositor.streak-tier-4 .booha-blitz-answer {
+        box-shadow: 0 0 54px var(--blitz-glow), 0 0 4px var(--blitz-accent);
+        animation: boohaBlitzChargedBreath 2.8s ease-in-out infinite;
+      }
+      .blitz-compositor.streak-tier-5 .booha-blitz-prompt,
+      .blitz-compositor.streak-tier-5 .booha-blitz-answer {
+        box-shadow: 0 0 66px var(--blitz-glow), 0 0 5px var(--blitz-accent);
+        animation: boohaBlitzChargedBreath 2.2s ease-in-out infinite;
+      }
+      .blitz-compositor.streak-tier-2 .booha-blitz-nameplate,
+      .blitz-compositor.streak-tier-3 .booha-blitz-nameplate,
+      .blitz-compositor.streak-tier-4 .booha-blitz-nameplate,
+      .blitz-compositor.streak-tier-5 .booha-blitz-nameplate { animation: boohaBlitzChargedNameplate 2.4s ease-in-out infinite; }
+      .blitz-compositor.streak-tier-4 .booha-blitz-nameplate,
+      .blitz-compositor.streak-tier-5 .booha-blitz-nameplate { font-size: clamp(12px, 3.2vw, 21px); }
+      .blitz-compositor.streak-tier-3 .booha-blitz-answer,
+      .blitz-compositor.streak-tier-4 .booha-blitz-answer,
+      .blitz-compositor.streak-tier-5 .booha-blitz-answer { border-color: var(--streak-color, var(--blitz-accent)); }
       .booha-blitz-streak-spark {
         position: absolute;
         left: 50%;
@@ -1011,8 +1036,8 @@ window.BoohaBlitzEngine = (() => {
         transform: translate(-50%, -50%) scale(var(--streak-event-scale, 1.02));
       }
       .blitz-feel-sleek.streak-event-live { transform: translate(-50%, -50%) scale(var(--streak-event-scale, 1.002)); }
-      .blitz-feel-playful .booha-blitz-nameplate.streak-event-5::before,
-      .blitz-feel-playful .booha-blitz-nameplate.streak-event-8::before {
+      .blitz-feel-playful .booha-blitz-nameplate.streak-event-6::before,
+      .blitz-feel-playful .booha-blitz-nameplate.streak-event-9::before {
         content: '✦';
         position: absolute;
         left: -18px;
@@ -1020,7 +1045,7 @@ window.BoohaBlitzEngine = (() => {
         font-size: 18px;
         text-shadow: 0 0 12px var(--streak-color);
       }
-      .blitz-feel-playful .booha-blitz-nameplate.streak-event-8::after {
+      .blitz-feel-playful .booha-blitz-nameplate.streak-event-9::after {
         content: '✧';
         position: absolute;
         right: -18px;
@@ -1031,7 +1056,7 @@ window.BoohaBlitzEngine = (() => {
       .blitz-feel-arcade .booha-blitz-streak-meter-fill {
         background: repeating-linear-gradient(90deg, #39ff14 0 8px, #00ffee 8px 14px);
       }
-      .blitz-feel-arcade .booha-blitz-nameplate.streak-event-5::before {
+      .blitz-feel-arcade .booha-blitz-nameplate.streak-event-6::before {
         content: 'COMBO';
         position: absolute;
         top: -10px;
@@ -1041,7 +1066,7 @@ window.BoohaBlitzEngine = (() => {
         letter-spacing: 1.5px;
         text-shadow: 0 0 10px #00ffee;
       }
-      .blitz-feel-arcade .booha-blitz-nameplate.streak-event-8::before {
+      .blitz-feel-arcade .booha-blitz-nameplate.streak-event-9::before {
         content: 'CHAIN MAX';
         position: absolute;
         top: -10px;
@@ -1054,7 +1079,13 @@ window.BoohaBlitzEngine = (() => {
       .blitz-feel-sleek .booha-blitz-streak-meter-fill {
         background: linear-gradient(90deg, #f0c96a, #dfeaff);
       }
-      .blitz-feel-sleek .booha-blitz-nameplate.streak-event-8 {
+      .blitz-compositor.correct-impact { animation: boohaBlitzCorrectImpact 320ms ease-out both; }
+      @keyframes boohaBlitzCorrectImpact {
+        0% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
+        35% { box-shadow: inset 0 0 90px var(--blitz-glow); }
+        100% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
+      }
+      .blitz-feel-sleek .booha-blitz-nameplate.streak-event-9 {
         letter-spacing: 2.4px;
       }
       @keyframes boohaBlitzStreakPop {
@@ -1081,6 +1112,14 @@ window.BoohaBlitzEngine = (() => {
         0% { opacity: 0; transform: translate(-50%, -50%) scale(.4); }
         20% { opacity: 1; }
         100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
+      }
+      @keyframes boohaBlitzChargedBreath {
+        0%, 100% { filter: brightness(1); }
+        50% { filter: brightness(1.06); }
+      }
+      @keyframes boohaBlitzChargedNameplate {
+        0%, 100% { filter: brightness(1); }
+        50% { filter: brightness(1.16); }
       }
       @keyframes boohaBlitzCorrectPop {
         0% { transform: scale(1); }
@@ -1227,6 +1266,9 @@ window.BoohaBlitzEngine = (() => {
         text-shadow: 0 0 12px #fff, 0 0 34px #ffd700, 0 0 78px #ff5a00;
       }
       .booha-blitz-perfect-flash.record { animation-duration: 1050ms; }
+      #vb-win.climax-awaiting > *,
+      #sb-win.climax-awaiting > *,
+      #qb-win.climax-awaiting > * { visibility: hidden; }
       @keyframes boohaBlitzPerfectFlash {
         0% { opacity: 0; transform: scale(.74); }
         16% { opacity: 1; transform: scale(1.08); }
@@ -1636,6 +1678,15 @@ window.BoohaBlitzEngine = (() => {
         .booha-blitz-nameplate.streak-hold { animation: none; filter: none; }
         .booha-blitz-nameplate.streak-event-live .booha-blitz-streak-marker,
         .booha-blitz-nameplate.streak-event-live .booha-blitz-streak-meter-fill { animation: none; }
+        .blitz-compositor.streak-tier-4 .booha-blitz-prompt,
+        .blitz-compositor.streak-tier-5 .booha-blitz-prompt,
+        .blitz-compositor.streak-tier-4 .booha-blitz-answer,
+        .blitz-compositor.streak-tier-5 .booha-blitz-answer,
+        .blitz-compositor.streak-tier-2 .booha-blitz-nameplate,
+        .blitz-compositor.streak-tier-3 .booha-blitz-nameplate,
+        .blitz-compositor.streak-tier-4 .booha-blitz-nameplate,
+        .blitz-compositor.streak-tier-5 .booha-blitz-nameplate { animation: none; }
+        .blitz-compositor.correct-impact { animation: none; box-shadow: inset 0 0 34px var(--blitz-glow); }
         .booha-blitz-streak-meter,
         .booha-blitz-streak-meter-fill { transition: none; }
         .booha-blitz-streak-spark { display: none; }
@@ -1976,7 +2027,8 @@ window.BoohaBlitzEngine = (() => {
       let announceToken = 0;
       let streakHoldTimer = null;
       let streakEventTimer = null;
-      const eventClasses = ['streak-event-live', 'streak-event-3', 'streak-event-5', 'streak-event-8', 'streak-event-12', 'streak-event-15'];
+      const eventClasses = ['streak-event-live', 'streak-event-3', 'streak-event-6', 'streak-event-9', 'streak-event-12', 'streak-event-15'];
+      const tierClasses = ['streak-tier-1', 'streak-tier-2', 'streak-tier-3', 'streak-tier-4', 'streak-tier-5'];
       function clearStreakEventClasses() {
         overlay.classList.remove('streak-event-live');
         nameplate.classList.remove(...eventClasses);
@@ -1985,7 +2037,7 @@ window.BoohaBlitzEngine = (() => {
       function emitStreakSparks() {
         const threshold = arguments.length ? arguments[0] : 0;
         if (isMinimalPower() || REDUCED_MOTION) return;
-        const fullCount = ({ 3: 6, 5: 12, 8: 20, 12: 32, 15: 48 })[threshold] || 6;
+        const fullCount = ({ 3: 6, 6: 12, 9: 20, 12: 32, 15: 48 })[threshold] || 6;
         const count = effectCount(fullCount);
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
@@ -2006,12 +2058,12 @@ window.BoohaBlitzEngine = (() => {
         clearStreakEventClasses();
         void nameplate.offsetWidth;
         const className = `streak-event-${threshold}`;
-        const eventScale = ({ 3: 1.02, 5: 1.03, 8: 1.04, 12: 1.05, 15: 1.06 })[threshold] || 1.02;
+        const eventScale = ({ 3: 1.02, 6: 1.03, 9: 1.04, 12: 1.06, 15: 1.1 })[threshold] || 1.02;
         overlay.classList.add('streak-event-live');
         nameplate.classList.add('streak-event-live', className, 'streak-hold');
         nameplate.style.setProperty('--streak-event-scale', eventScale);
         emitStreakSparks(threshold);
-        const holdMs = ({ 3: 400, 5: 520, 8: 650, 12: 780, 15: 900 })[threshold] || 400;
+        const holdMs = ({ 3: 900, 6: 1000, 9: 1120, 12: 1300, 15: 1500 })[threshold] || 900;
         streakHoldTimer = setTimeout(() => nameplate.classList.remove('streak-hold'), holdMs);
         streakEventTimer = setTimeout(clearStreakEventClasses, holdMs);
       }
@@ -2038,9 +2090,8 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function setStreak(streak, eventThreshold = 0, runLength = 15) {
-        nameplate.classList.remove(
-          'streak-tier-1', 'streak-tier-2', 'streak-tier-3', 'streak-tier-4', 'streak-tier-5'
-        );
+        nameplate.classList.remove(...tierClasses);
+        overlay.classList.remove(...tierClasses);
         if (!streak) {
           if (streakHoldTimer) clearTimeout(streakHoldTimer);
           if (streakEventTimer) clearTimeout(streakEventTimer);
@@ -2054,15 +2105,17 @@ window.BoohaBlitzEngine = (() => {
           nameplate.style.removeProperty('--streak-color');
           nameplate.removeAttribute('data-streak');
           nameplate.classList.remove('streak-active');
+          overlay.classList.remove(...tierClasses);
           return;
         }
-        const tier = STREAK_EVENT_THRESHOLDS.reduce(
+        const tier = Math.min(5, STREAK_EVENT_THRESHOLDS.reduce(
           (level, threshold, index) => streak >= threshold ? index + 2 : level,
           1,
-        );
+        ));
         const label = palette.streak?.label || 'STREAK';
         const marker = palette.streak?.marker || '★';
         nameplate.classList.add('streak-active', `streak-tier-${tier}`);
+        overlay.classList.add(`streak-tier-${tier}`);
         nameplate.dataset.streak = String(streak);
         const streakColors = palette.streak?.colors || [];
         const colorIndex = eventThreshold
@@ -2081,6 +2134,8 @@ window.BoohaBlitzEngine = (() => {
       function resetStreak() {
         nameplate.classList.remove('streak-pop', 'streak-hold');
         clearAnnouncement();
+        overlay.querySelector('.booha-blitz-fire-wallpaper')?.remove();
+        overlay.querySelectorAll('.booha-blitz-streak-spark').forEach(spark => spark.remove());
         setStreak(0);
       }
 
@@ -2372,7 +2427,8 @@ window.BoohaBlitzEngine = (() => {
             oscillator.type = palette.feel === 'sleek' ? 'sine' : palette.feel === 'arcade' ? 'square' : 'triangle';
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
-            gain.gain.exponentialRampToValueAtTime(palette.feel === 'arcade' ? 0.045 : 0.035, startAt + 0.012);
+            const peak = threshold >= 12 ? 0.065 : threshold >= 9 ? 0.055 : threshold >= 6 ? 0.045 : 0.035;
+            gain.gain.exponentialRampToValueAtTime(palette.feel === 'arcade' ? peak : peak * 0.82, startAt + 0.012);
             gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.14);
             oscillator.connect(gain);
             gain.connect(streakAudioCtx.destination);
@@ -2433,7 +2489,7 @@ window.BoohaBlitzEngine = (() => {
             oscillator.type = isRecord ? 'triangle' : palette.feel === 'sleek' ? 'sine' : 'triangle';
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
-            gain.gain.exponentialRampToValueAtTime(isRecord ? 0.05 : 0.035, startAt + 0.014);
+            gain.gain.exponentialRampToValueAtTime(isRecord ? 0.07 : isPerfectRun ? 0.06 : 0.035, startAt + 0.014);
             gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.22);
             oscillator.connect(gain);
             gain.connect(streakAudioCtx.destination);
@@ -2531,6 +2587,8 @@ window.BoohaBlitzEngine = (() => {
       let feedbackState = 'awaiting-start';
       let recoveryPending = false;
       let runEpoch = 0;
+      let impactTimer = null;
+      let climaxTimer = null;
       const initialQueueLength = queue.length;
 
       function setAnswerInputEnabled(enabled) {
@@ -2637,21 +2695,22 @@ window.BoohaBlitzEngine = (() => {
           if (palette.feel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
           const copy = {
             playful: {
-              3: '×3 — NICE!', 5: '×5 — HOT!', 8: '×8 — WILD!', 12: '×12 — RIDICULOUS!',
+              3: '×3 — NICE!', 6: '×6 — HOT!', 9: '×9 — WILD!', 12: '×12 — RIDICULOUS!',
               15: `${spotlight.playerName}, PERFECT RUN!`,
             },
             arcade: {
-              3: 'COMBO ×3', 5: 'COMBO ×5 — SURGE', 8: 'COMBO ×8 — OVERDRIVE',
+              3: 'COMBO ×3', 6: 'COMBO ×6 — SURGE', 9: 'COMBO ×9 — OVERDRIVE',
               12: 'COMBO ×12 — MAX POWER', 15: `${spotlight.playerName} — PERFECT CHAIN`,
             },
             sleek: {
-              3: 'CHAIN ×3', 5: 'CHAIN ×5 — LOCKED', 8: 'CHAIN ×8 — RESONANT',
+              3: 'CHAIN ×3', 6: 'CHAIN ×6 — LOCKED', 9: 'CHAIN ×9 — RESONANT',
               12: 'CHAIN ×12 — ASCENDANT', 15: `${spotlight.playerName} — UNBROKEN`,
             },
           };
           const variant = palette.feel === 'arcade' ? 'combo' : palette.feel === 'sleek' ? 'chain' : 'fire';
-          spotlight.announce(copy[palette.feel]?.[eventThreshold] || `×${eventThreshold}`, false, variant);
+          spotlight.announce(copy[palette.feel]?.[eventThreshold] || `×${eventThreshold}`, eventThreshold === 15, variant);
         }
+        return eventThreshold;
       }
 
       function stopFinalHold() {
@@ -2699,7 +2758,7 @@ window.BoohaBlitzEngine = (() => {
         const ovr = overlayRect || overlay.getBoundingClientRect();
         const cx = r.left - ovr.left + r.width / 2;
         const cy = r.top - ovr.top + r.height / 2;
-        const count = isLowPower() ? 4 : streak >= 5 ? 10 : 6;
+        const count = isLowPower() ? 4 : streak >= 6 ? 10 : 6;
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < count; i++) {
           const spark = document.createElement('span');
@@ -2713,7 +2772,15 @@ window.BoohaBlitzEngine = (() => {
         overlay.appendChild(fragment);
       }
 
-      function correctDetonate(correctBtn, answerRect, overlayRect) {
+      function correctDetonate(correctBtn, answerRect, overlayRect, milestone = 0) {
+        overlay.classList.remove('correct-impact');
+        void overlay.offsetWidth;
+        overlay.classList.add('correct-impact');
+        if (impactTimer) clearTimeout(impactTimer);
+        impactTimer = setTimeout(() => {
+          overlay.classList.remove('correct-impact');
+          impactTimer = null;
+        }, 340);
         correctBtn.classList.add('micro-win');
         correctBtn.style.transition = 'none';
         correctBtn.style.background = palette.correct?.color || '#00ff64';
@@ -2786,6 +2853,9 @@ window.BoohaBlitzEngine = (() => {
           }, 90);
         }
 
+        const nextDelay = milestone
+          ? Math.max(config.nextDelay || 200, milestone === 15 ? 620 : 560)
+          : (config.nextDelay || 200);
         setTimeout(() => {
           if (current >= queue.length) {
             stopTimer();
@@ -2802,7 +2872,7 @@ window.BoohaBlitzEngine = (() => {
               setAnswerInputEnabled(true);
             });
           }
-        }, config.nextDelay || 200);
+        }, nextDelay);
       }
 
       function emitWrongMicroFeedback(wrongBtn, answerRect, overlayRect) {
@@ -2926,10 +2996,10 @@ window.BoohaBlitzEngine = (() => {
         if (chosen.n === correct.n) {
           btn.classList.add('correct');
           current++;
-          updateStreak();
+          const milestone = updateStreak();
           playCorrectHit();
           if (current >= queue.length) clearElapsed = performance.now() - startTime;
-          correctDetonate(btn, answerRect, overlayRect);
+          correctDetonate(btn, answerRect, overlayRect, milestone);
           return;
         }
 
@@ -3130,7 +3200,14 @@ window.BoohaBlitzEngine = (() => {
         spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
         if (isPerfectRun) emitPerfectFlash(overlay, palette, playerName);
         else if (isRecord) emitFinishFlash(overlay, palette, playerName, 'record');
-        winScreen.classList.add('show');
+        winScreen.classList.add('show', 'climax-awaiting');
+        if (climaxTimer) clearTimeout(climaxTimer);
+        const revealEpoch = runEpoch;
+        climaxTimer = setTimeout(() => {
+          if (revealEpoch !== runEpoch) return;
+          winScreen.classList.remove('climax-awaiting');
+          climaxTimer = null;
+        }, REDUCED_MOTION ? 420 : 980);
         playFinalStinger(isRecord, isPerfectRun);
         startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
         celebrate(overlay, palette, isRecord);
@@ -3144,6 +3221,11 @@ window.BoohaBlitzEngine = (() => {
         runEpoch++;
         feedbackState = 'closed';
         recoveryPending = false;
+        if (impactTimer) clearTimeout(impactTimer);
+        if (climaxTimer) clearTimeout(climaxTimer);
+        impactTimer = null;
+        climaxTimer = null;
+        winScreen.classList.remove('climax-awaiting');
         stopFinalHold();
         stopStreakBeat();
         performanceDiagnostic?.destroy();
@@ -3155,6 +3237,10 @@ window.BoohaBlitzEngine = (() => {
         runEpoch++;
         feedbackState = 'closed';
         recoveryPending = false;
+        if (impactTimer) clearTimeout(impactTimer);
+        if (climaxTimer) clearTimeout(climaxTimer);
+        impactTimer = null;
+        climaxTimer = null;
         stopFinalHold();
         stopStreakBeat();
         stopTimer();
