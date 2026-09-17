@@ -17,7 +17,7 @@ assert(source.includes("const ACTIVE_CASE_ID = 'chanoma'") && source.includes('A
 assert(source.includes("state = 'study'") && source.includes('function beginCaseFromStudy') && source.includes("if (state === 'study')"), 'Pass 2 must separate manual study from timed dark gameplay');
 assert(markup.includes('id="study-panel"') && markup.includes('START THE CASE') && markup.includes('No timer. Start when ready.'), 'the study panel must explain its unlimited manual phase');
 assert(source.includes('repeatOnCaseRestart: false') && source.includes('reviewFromHub: true'), 'study review and restart behavior must be explicit in the design lock');
-assert(source.includes("role: 'presence'") && source.includes('scoredTarget: false'), 'Pataskala must be locked as a presence before later target mechanics');
+assert(source.includes("role: 'presence'") && source.includes('scoredTarget: false') && source.includes('markableTarget: true') && source.includes("targetId: 'pataskala'"), 'Pataskala must remain a non-scored but explicitly markable presence target');
 assert(markup.includes('CASE FILE 02 / CHANOMA') && !markup.includes('CASE FILE 07'), 'the built room label must be Case 02');
 assert(registry.includes("status: 'CASE FILE 02 / OPEN'") && registry.includes("statusCompleted: 'CASE FILE 02 / SEALED'"), 'the registered Family Room statuses must use the built case number');
 assert(!source.includes('round-number'), 'the case must not expose a round counter');
@@ -63,7 +63,7 @@ assert(source.includes('pendingMark = { x: booha.targetX, y: booha.targetY, radi
 assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 92'), 'Booha must leave more of the lantern reveal unobstructed');
 assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.includes('.26 - minimum'), 'the lantern radius must shrink continuously with a playable minimum');
 assert(source.includes('maxChanges: 1') && source.includes('maxChanges: 2') && source.includes('twoChangeChance: .24') && source.includes('twoChangeChance: .52'), 'room tiers must define when two-change rounds can appear');
-assert(source.includes('let currentAnomalies = []') && source.includes('function reportIsCorrect') && source.includes('currentAnomalies.every'), 'reports must validate every required change and reject missing or extra marks');
+assert(source.includes('let currentAnomalies = []') && source.includes('function reportIsCorrect') && source.includes('requiredTargets.every'), 'reports must validate every required change and reject missing or extra marks');
 assert(source.includes('currentPresence = currentAudioOnly ? null') && source.includes('Boolean(currentPresence || falseAlertPoint)'), 'Pataskala presence must remain separate from scored room changes');
 assert(source.includes('WRONG_MARK_GRACE_MS = 700') && source.includes('function startWrongMarkHazard') && source.includes('function updateWrongMarkHazard'), 'a wrong confirmed mark must create a readable hazard state');
 assert(source.includes('function boohaAtExit') && source.includes("RUN TO THE EXIT") && source.includes('beginFailure(UI_COPY.caseReset)'), 'the wrong-mark hazard must be escapable at the exit and fatal on contact');
@@ -71,6 +71,7 @@ assert(source.includes("playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + 
 assert(source.includes('const AUDIO_ONLY_CHANGE = Object.freeze') && source.includes('audioOnlyChance: .08') && source.includes('audioOnlyChance: .16'), 'audio-only anomalies must be explicit and tier-weighted');
 assert(source.includes('currentAudioOnly = !hasChange') && source.includes('if (currentAudioOnly) return markedPoints.length === 0') && source.includes('AUDIO_ONLY_CHANGE.en'), 'an audio-only anomaly must be reportable without a location mark and teach its sentence after a correct report');
 assert(source.includes('function schedulePataskalaMovement') && source.includes('currentPresence = random(choices') && source.includes("playSfx('move', AUDIO_LEVELS.move)"), 'Pataskala must be able to move once within a round with an authored movement cue');
+assert(source.includes("targetId: 'pataskala'") && source.includes('artSize: .28') && source.includes('target: [.7, .29, .22]'), 'Pataskala must use adult-scale art and an expanded target radius');
 assert(source.includes('ensureAudio(); startBgm();') && source.includes('window.clearTimeout(pataskalaMoveTimer)'), 'BGM must start after the study handoff and Pataskala timers must be cleared on round cleanup');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
@@ -123,6 +124,11 @@ assert(source.includes('booha.x = clamp(normalized.x * width') && source.include
 assert(source.includes('function imageReady(image)') && source.includes('image.naturalWidth > 0 && image.naturalHeight > 0'), 'canvas image draws must require a successful natural image size');
 assert(source.includes('function clearRoundTimers') && source.includes('window.clearTimeout(clueTimer); clueTimer = 0;'), 'round cleanup must own clue, transition, failure, and tell timers');
 assert(source.includes('clueVersion') && source.includes('if (version !== clueVersion) return'), 'an old clue timeout must not hide a later clue');
+assert(source.includes('const WRONG_MARK_TELEGRAPH_MS = 1500') && source.includes('telegraphUntil'), 'wrong marks must telegraph before the hazard becomes active');
+const hazardStart = source.slice(source.indexOf('function startWrongMarkHazard'), source.indexOf('function confirmMark'));
+assert(!hazardStart.includes('setControlsVisible(false)'), 'wrong-mark hazards must keep movement controls visible');
+assert(source.includes('const CLUE_DISPLAY_MS = 7600') && source.includes('function enqueueClue') && source.includes('clueQueue'), 'clue notifications must remain readable and queue instead of overwriting one another');
+assert(source.includes('function releasePointerInteraction') && source.includes('hidePanel(markConfirmPanel)'), 'opening or cancelling a mark confirmation must release pointer capture and finish panel cleanup');
 assert(source.includes('canvas.setPointerCapture?.') && source.includes('canvas.releasePointerCapture?.'), 'pointer capture must survive touch movement and release on cancellation');
 assert(source.includes('Promise.allSettled(FAMILY_SFX_NAMES.map') && source.includes("console.warn('[Family Room] BGM unavailable')"), 'one failed audio asset must not reject or restart the successful audio loads');
 assert(source.includes('function scheduleResize') && !source.includes('resize(); updateFlames(); updateAndon(); updateTierButtons(); startLoop();'), 'title state must not start a continuous RAF loop');

@@ -6,6 +6,9 @@
   const MARK_HOLD_MS = 600;
   const MARK_DEAD_ZONE_PX = 8;
   const WRONG_MARK_GRACE_MS = 700;
+  const WRONG_MARK_TELEGRAPH_MS = 1500;
+  const CLUE_DISPLAY_MS = 7600;
+  const PANEL_FADE_MS = 320;
   const EXIT_BAND_V = .86;
   const FAILURE_SILENCE_MS = 1200;
   const FAILURE_PANEL_DELAY_MS = 1800;
@@ -47,7 +50,7 @@
     study: Object.freeze({ perCase: true, timed: false, repeatOnCaseRestart: false, reviewFromHub: true }),
     mistake: Object.freeze({ action: 'restart-case', unlimitedRestarts: true }),
     changes: Object.freeze({ patient: 'zero-or-one', quicker: 'zero-one-or-occasional-two', lies: 'zero-one-or-more-two' }),
-    pataskala: Object.freeze({ role: 'presence', scoredTarget: false, risesWithCaseDepth: true, finalRoom: 'nando' }),
+    pataskala: Object.freeze({ role: 'presence', scoredTarget: false, markableTarget: true, risesWithCaseDepth: true, finalRoom: 'nando', targetId: 'pataskala' }),
     production: Object.freeze({ masterOnly: true, canvas: '1024x1536', safeBand: [0.22, 0.78], exitEdgeRequired: true }),
   });
   const ACTIVE_CASE_ID = 'chanoma';
@@ -62,10 +65,10 @@
   });
 
   const PATASKALA_POSES = [
-    { id: 'pataskala-standing', target: [.7, .29, .14], artSize: .15, en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-moving', target: [.74, .43, .17], artSize: .16, en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-crouch', target: [.73, .56, .18], artSize: .16, en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-emerging', target: [.25, .47, .16], artSize: .2, en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-standing', target: [.7, .29, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-moving', target: [.74, .43, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-crouch', target: [.73, .56, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-emerging', target: [.25, .47, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
   ];
 
   const anomalies = [
@@ -190,14 +193,20 @@
   let studyCurtainTimer = 0;
   let pataskalaMoveTimer = 0;
   let clueTimer = 0;
+  let clueFadeTimer = 0;
+  let clueQueue = [];
+  let clueActive = false;
+  let queuedObservation = null;
   let booha = { x: 0, y: 0, targetX: 0, targetY: 0 };
   let pointerActive = false;
+  let activePointerId = null;
   let keyboardMarkActive = false;
   let markHoldOrigin = null;
   let markHoldStartedAt = 0;
   let markHoldTimer = 0;
   let markLocked = false;
   let markedPoints = [];
+  let undoGhost = null;
   let pendingMark = null;
   let burnoutHandled = false;
   let failureStarted = 0;
@@ -226,8 +235,9 @@
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     if (LOW_POWER) dpr = Math.min(dpr, 1);
     const targetAspect = (baseImage.naturalWidth || 1024) / (baseImage.naturalHeight || 1536);
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
+    const visibleViewport = window.visualViewport;
+    const viewportWidth = Math.max(1, Math.round(visibleViewport?.width || window.innerWidth));
+    const viewportHeight = Math.max(1, Math.round(visibleViewport?.height || window.innerHeight));
     if (viewportWidth / viewportHeight > targetAspect) {
       height = viewportHeight;
       width = Math.round(viewportHeight * targetAspect);
@@ -304,7 +314,51 @@
     jpNode.textContent = jp;
   }
 
-  function setObservation(en, jp) { setBilingual(observationEn, observationJp, en, jp); }
+  function setObservation(en, jp, options = {}) {
+    if (clueActive && !options.immediate) {
+      queuedObservation = { en, jp };
+      return;
+    }
+    queuedObservation = null;
+    setBilingual(observationEn, observationJp, en, jp);
+  }
+
+  function flushQueuedObservation() {
+    if (!queuedObservation || clueActive) return;
+    const next = queuedObservation;
+    queuedObservation = null;
+    setBilingual(observationEn, observationJp, next.en, next.jp);
+  }
+
+  function showPanel(panel) {
+    if (!panel) return;
+    panel._visibilityToken = (panel._visibilityToken || 0) + 1;
+    window.clearTimeout(panel._hideTimer);
+    panel.hidden = false;
+    const reveal = () => {
+      if (!panel.hidden) panel.classList.add('visible');
+    };
+    if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(reveal);
+    else reveal();
+  }
+
+  function hidePanel(panel) {
+    if (!panel) return;
+    const token = (panel._visibilityToken || 0) + 1;
+    panel._visibilityToken = token;
+    panel.classList.remove('visible');
+    const finish = () => {
+      if (panel._visibilityToken !== token) return;
+      panel.hidden = true;
+      panel._hideTimer = 0;
+    };
+    const onTransitionEnd = event => {
+      if (event.propertyName === 'opacity') finish();
+    };
+    panel.addEventListener('transitionend', onTransitionEnd, { once: true });
+    window.clearTimeout(panel._hideTimer);
+    panel._hideTimer = window.setTimeout(finish, PANEL_FADE_MS + 40);
+  }
 
   function setReportLabel(hasMarks = markedPoints.length > 0) {
     setBilingual(leaveEn, leaveJp, 'REPORT THE ROOM', 'へやを ほうこくする');
@@ -556,7 +610,6 @@
   }
 
   function drawMarks() {
-    if (!markedPoints.length) return;
     ctx.save();
     markedPoints.forEach(mark => {
       ctx.globalAlpha = .86;
@@ -571,26 +624,52 @@
       ctx.arc(mark.x, mark.y, 3, 0, Math.PI * 2);
       ctx.fill();
     });
+    if (undoGhost) {
+      const elapsed = performance.now() - undoGhost.startedAt;
+      const fade = clamp(1 - elapsed / 900, 0, 1);
+      if (!fade) {
+        undoGhost = null;
+      } else {
+        ctx.globalAlpha = fade * .72;
+        ctx.strokeStyle = '#e8b76c';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.arc(undoGhost.x, undoGhost.y, Math.max(12, undoGhost.radius * (.42 + (1 - fade) * .16)), 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
     ctx.restore();
   }
 
   function drawWrongMarkHazard(time) {
     if (!wrongMarkHazard) return;
+    const telegraphing = time < wrongMarkHazard.telegraphUntil;
+    const telegraphProgress = telegraphing
+      ? clamp((time - wrongMarkHazard.startedAt) / WRONG_MARK_TELEGRAPH_MS, 0, 1)
+      : 1;
     const pulse = REDUCED_MOTION ? 1 : 1 + Math.sin(time / 120) * .08;
-    const radius = wrongMarkHazard.radius * pulse;
+    const expansion = telegraphing ? .58 + telegraphProgress * .12 : .7 + Math.min(1, (time - wrongMarkHazard.telegraphUntil) / 900) * .3;
+    const radius = wrongMarkHazard.radius * expansion * pulse;
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     const smoke = ctx.createRadialGradient(wrongMarkHazard.x, wrongMarkHazard.y, 1, wrongMarkHazard.x, wrongMarkHazard.y, radius * 2.4);
-    smoke.addColorStop(0, 'rgba(255,82,62,.92)');
-    smoke.addColorStop(.32, 'rgba(190,35,35,.62)');
+    smoke.addColorStop(0, telegraphing ? 'rgba(255,170,72,.72)' : 'rgba(255,82,62,.92)');
+    smoke.addColorStop(.32, telegraphing ? 'rgba(190,90,35,.42)' : 'rgba(190,35,35,.62)');
     smoke.addColorStop(1, 'rgba(80,0,0,0)');
     ctx.fillStyle = smoke;
     ctx.beginPath(); ctx.arc(wrongMarkHazard.x, wrongMarkHazard.y, radius * 2.4, 0, Math.PI * 2); ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = .92;
-    ctx.strokeStyle = '#ff5545';
+    ctx.strokeStyle = telegraphing ? '#ffbd67' : '#ff5545';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(wrongMarkHazard.x, wrongMarkHazard.y, radius, 0, Math.PI * 2); ctx.stroke();
+    if (telegraphing) {
+      ctx.globalAlpha = .72;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(wrongMarkHazard.x, wrongMarkHazard.y, radius * (1.2 + Math.sin(time / 180) * .12), 0, Math.PI * 2); ctx.stroke();
+    }
     ctx.restore();
   }
 
@@ -602,17 +681,14 @@
     if (!wrongMarkHazard) return;
     if (boohaAtExit()) {
       clearWrongMarkHazard();
-      pointerActive = false;
+      releasePointerInteraction();
       keyboardMarkActive = false;
-      markHoldOrigin = null;
-      markHoldStartedAt = 0;
-      window.clearTimeout(markHoldTimer); markHoldTimer = 0;
       setControlsVisible(true);
       setReportLabel(markedPoints.length > 0);
-      setObservation('EXIT REACHED / REPORT OR KEEP LOOKING', 'でぐちに ついた / ほうこくするか まだ さがす');
+      setObservation('EXIT REACHED / REPORT OR KEEP LOOKING', 'でぐちに ついた / ほうこくするか まだ さがす', { immediate: true });
       return;
     }
-    if (time < wrongMarkHazard.graceUntil) return;
+    if (time < wrongMarkHazard.graceUntil || time < wrongMarkHazard.telegraphUntil) return;
     const elapsed = Math.min(.05, Math.max(0, (time - wrongMarkHazard.lastTime) / 1000));
     wrongMarkHazard.lastTime = time;
     const dx = booha.x - wrongMarkHazard.x;
@@ -691,14 +767,13 @@
     setBilingual(messageCopyEn, messageCopyJp, message.copy, message.copyJp);
     setBilingual(messageButtonEn, messageButtonJp, message.button, message.buttonJp);
     messageButton.onclick = handler;
-    messagePanel.classList.add('visible');
+    showPanel(messagePanel);
   }
 
   function hidePanels() {
-    startPanel.classList.remove('visible');
-    studyPanel.classList.remove('visible');
-    studyPanel.hidden = true;
-    messagePanel.classList.remove('visible');
+    hidePanel(startPanel);
+    hidePanel(studyPanel);
+    hidePanel(messagePanel);
   }
   function clearRoundTimers() {
     window.clearTimeout(droneTellTimer); droneTellTimer = 0;
@@ -712,12 +787,17 @@
   function clearMarkingUi() {
     clueVersion += 1;
     window.clearTimeout(clueTimer); clueTimer = 0;
+    window.clearTimeout(clueFadeTimer); clueFadeTimer = 0;
+    clueQueue = [];
+    clueActive = false;
+    queuedObservation = null;
     clueCard.hidden = true;
+    clueCard.classList.remove('is-fading');
     clearWrongMarkHazard();
-    markLocked = false; pendingMark = null; markedPoints = []; markHoldOrigin = null; markHoldStartedAt = 0; keyboardMarkActive = false;
-    window.clearTimeout(markHoldTimer); markHoldTimer = 0;
-    markConfirmPanel.hidden = true;
-    markConfirmPanel.classList.remove('visible');
+    undoGhost = null;
+    markLocked = false; pendingMark = null; markedPoints = []; keyboardMarkActive = false;
+    releasePointerInteraction();
+    hidePanel(markConfirmPanel);
     setReportLabel(false);
   }
   function setControlsVisible(visible) {
@@ -742,9 +822,8 @@
     setControlsVisible(false);
     clearMarkingUi();
     resetBooha();
-    startPanel.classList.remove('visible');
-    studyPanel.hidden = false;
-    studyPanel.classList.add('visible');
+    hidePanel(startPanel);
+    showPanel(studyPanel);
     setObservation('STUDY THE ROOM', 'へやを おぼえる');
     updateAndon();
     requestFamilyRuntimeCache();
@@ -755,8 +834,7 @@
 
   function beginCaseFromStudy() {
     if (state !== 'study') return;
-    studyPanel.classList.remove('visible');
-    studyPanel.hidden = true;
+    hidePanel(studyPanel);
     caseStarted = performance.now();
     startRound();
     showLightTipOnce();
@@ -815,15 +893,26 @@
 
   function markMatchesAnomaly(mark, anomaly) {
     const [tx, ty] = currentPoint(anomaly.target);
-    return Math.hypot(mark.x - tx, mark.y - ty) <= mark.radius;
+    const targetRadius = anomaly.targetId === 'pataskala'
+      ? Math.max(mark.radius, plate.w * anomaly.target[2] * .72)
+      : mark.radius;
+    return Math.hypot(mark.x - tx, mark.y - ty) <= targetRadius;
+  }
+
+  function reportTargets() {
+    return [
+      ...currentAnomalies,
+      ...(currentPresence?.targetId === 'pataskala' ? [currentPresence] : []),
+    ];
   }
 
   function reportIsCorrect() {
     if (currentAudioOnly) return markedPoints.length === 0;
-    if (!currentAnomalies.length) return markedPoints.length === 0;
-    if (markedPoints.length !== currentAnomalies.length) return false;
-    return markedPoints.every(mark => currentAnomalies.some(anomaly => markMatchesAnomaly(mark, anomaly)))
-      && currentAnomalies.every(anomaly => markedPoints.some(mark => markMatchesAnomaly(mark, anomaly)));
+    const requiredTargets = currentAnomalies;
+    const validTargets = reportTargets();
+    if (markedPoints.length < requiredTargets.length || markedPoints.length > validTargets.length) return false;
+    return markedPoints.every(mark => validTargets.some(anomaly => markMatchesAnomaly(mark, anomaly)))
+      && requiredTargets.every(anomaly => markedPoints.some(mark => markMatchesAnomaly(mark, anomaly)));
   }
 
   function handleLeave() {
@@ -854,7 +943,7 @@
   }
 
   function restartCase() {
-    clearRoundTimers(); messagePanel.classList.remove('visible'); round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); startRound();
+    clearRoundTimers(); hidePanel(messagePanel); round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); startRound();
   }
 
   function silenceDrone() {
@@ -865,11 +954,24 @@
   }
 
   function beginFailure(message) {
-    clearRoundTimers(); clearWrongMarkHazard(); state = 'caught'; setControlsVisible(false); failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); updateAndon();
+    clearRoundTimers(); clearMarkingUi(); clearWrongMarkHazard(); state = 'caught'; setControlsVisible(false); failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから', { immediate: true }); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); updateAndon();
     const jumpLevel = currentTier().jumpLevel ?? AUDIO_LEVELS.jump;
     const token = roundToken;
     failureJumpTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
     failurePanelTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) showMessage(message, restartCase); }, FAILURE_PANEL_DELAY_MS);
+  }
+
+  function releasePointerInteraction() {
+    const pointerId = activePointerId;
+    pointerActive = false;
+    activePointerId = null;
+    markHoldOrigin = null;
+    markHoldStartedAt = 0;
+    window.clearTimeout(markHoldTimer);
+    markHoldTimer = 0;
+    if (pointerId != null && canvas.hasPointerCapture?.(pointerId)) {
+      canvas.releasePointerCapture?.(pointerId);
+    }
   }
 
   function setBoohaTarget(event) {
@@ -878,6 +980,7 @@
     const nextX = clamp(event.clientX - rect.left, 0, width);
     const nextY = clamp(event.clientY - rect.top, 0, height);
     canvas.setPointerCapture?.(event.pointerId);
+    activePointerId = event.pointerId;
     const startsHold = !pointerActive || !markHoldOrigin;
     const movedBeyondDeadZone = markHoldOrigin
       && Math.hypot(nextX - markHoldOrigin[0], nextY - markHoldOrigin[1]) > MARK_DEAD_ZONE_PX;
@@ -886,7 +989,7 @@
     keyboardMarkActive = false;
     pointerActive = true;
     if (wrongMarkHazard) {
-      setObservation('RUN TO THE EXIT', 'でぐちへ にげる');
+      setObservation('RUN TO THE EXIT', 'でぐちへ にげる', { immediate: true });
       return;
     }
     if (startsHold || (!markLocked && movedBeyondDeadZone)) {
@@ -901,11 +1004,8 @@
 
   function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event); }
   function releaseBooha(event) {
-    pointerActive = false;
-    markHoldOrigin = null;
-    markHoldStartedAt = 0;
-    if (event?.pointerId != null) canvas.releasePointerCapture?.(event.pointerId);
-    if (!markLocked) { window.clearTimeout(markHoldTimer); markHoldTimer = 0; }
+    if (event?.pointerId != null) activePointerId = event.pointerId;
+    releasePointerInteraction();
   }
 
   function moveBoohaByKeyboard(dx, dy) {
@@ -914,7 +1014,7 @@
     booha.targetX = clamp(booha.targetX + dx * step, 0, width);
     booha.targetY = clamp(booha.targetY + dy * step, 0, height);
     if (wrongMarkHazard) {
-      setObservation('RUN TO THE EXIT', 'でぐちへ にげる');
+      setObservation('RUN TO THE EXIT', 'でぐちへ にげる', { immediate: true });
     } else if (keyboardMarkActive) {
       markHoldOrigin = [booha.targetX, booha.targetY];
       window.clearTimeout(markHoldTimer);
@@ -927,8 +1027,8 @@
 
   function startKeyboardMark() {
     if (state !== 'playing' || markLocked || pendingMark || wrongMarkHazard) return;
+    releasePointerInteraction();
     keyboardMarkActive = true;
-    pointerActive = false;
     markHoldOrigin = [booha.targetX, booha.targetY];
     window.clearTimeout(markHoldTimer);
     markHoldStartedAt = performance.now();
@@ -955,27 +1055,25 @@
   }
 
   function showMarkConfirm() {
-    const nearbyChange = currentAnomalies
+    releasePointerInteraction();
+    keyboardMarkActive = false;
+    const nearbyChange = reportTargets()
       .map(anomaly => ({ anomaly, distance: Math.hypot(pendingMark.x - currentPoint(anomaly.target)[0], pendingMark.y - currentPoint(anomaly.target)[1]) }))
-      .filter(entry => entry.distance <= pendingMark.radius)
+      .filter(entry => markMatchesAnomaly(pendingMark, entry.anomaly))
       .sort((a, b) => a.distance - b.distance)[0]?.anomaly;
     const labelEn = nearbyChange?.labelEn || 'THIS PLACE';
     const labelJp = nearbyChange?.labelJp || 'この ばしょ';
     setBilingual(markConfirmTitleEn, markConfirmTitleJp, `MARK THE ${labelEn}?`, `${labelJp}に しるしを つける？`);
     setBilingual(markConfirmObjectEn, markConfirmObjectJp, labelEn, labelJp);
-    markConfirmPanel.hidden = false;
-    markConfirmPanel.classList.add('visible');
-    setObservation('CONFIRM THE MARK', 'しるしを かくにん');
+    showPanel(markConfirmPanel);
+    setObservation('CONFIRM THE MARK', 'しるしを かくにん', { immediate: true });
     markYesButton.focus?.();
   }
 
   function attemptMark() {
     if (state !== 'playing' || pendingMark || wrongMarkHazard) return;
-    pointerActive = false;
+    releasePointerInteraction();
     keyboardMarkActive = false;
-    markHoldOrigin = null;
-    markHoldStartedAt = 0;
-    window.clearTimeout(markHoldTimer); markHoldTimer = 0;
     pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
     showMarkConfirm();
   }
@@ -986,13 +1084,14 @@
       x: mark.x,
       y: mark.y,
       radius: clamp(mark.radius * .34, 22, 42),
-      graceUntil: now + WRONG_MARK_GRACE_MS,
+      startedAt: now,
+      telegraphUntil: now + WRONG_MARK_TELEGRAPH_MS,
+      graceUntil: now + Math.max(WRONG_MARK_GRACE_MS, WRONG_MARK_TELEGRAPH_MS),
       lastTime: now,
     };
-    setControlsVisible(false);
     wrongTone();
     playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + .1));
-    setObservation('WRONG MARK / RUN TO THE EXIT', 'まちがいの しるし / でぐちへ にげる');
+    setObservation('WRONG MARK / RUN TO THE EXIT', 'まちがいの しるし / でぐちへ にげる', { immediate: true });
   }
 
   function confirmMark() {
@@ -1004,9 +1103,9 @@
     keyboardMarkActive = false;
     markHoldOrigin = null;
     markHoldStartedAt = 0;
-    markConfirmPanel.hidden = true;
-    markConfirmPanel.classList.remove('visible');
-    if (!currentAnomalies.some(anomaly => markMatchesAnomaly(mark, anomaly))) {
+    releasePointerInteraction();
+    hidePanel(markConfirmPanel);
+    if (!reportTargets().some(anomaly => markMatchesAnomaly(mark, anomaly))) {
       startWrongMarkHazard(mark);
       return;
     }
@@ -1020,31 +1119,67 @@
     if (state !== 'playing' || !pendingMark) return;
     pendingMark = null;
     markLocked = false;
-    markHoldOrigin = null;
-    markHoldStartedAt = 0;
+    releasePointerInteraction();
     keyboardMarkActive = false;
-    window.clearTimeout(markHoldTimer); markHoldTimer = 0;
-    markConfirmPanel.hidden = true;
-    markConfirmPanel.classList.remove('visible');
+    hidePanel(markConfirmPanel);
+    canvas.removeAttribute('aria-disabled');
     setObservation('KEEP LOOKING', 'まだ さがす');
   }
 
   function undoLastMark() {
     if (state !== 'playing' || pendingMark || !markedPoints.length) return;
-    markedPoints.pop();
+    const removedMark = markedPoints.pop();
+    undoGhost = { ...removedMark, startedAt: performance.now() };
     setReportLabel(markedPoints.length > 0);
     setObservation(markedPoints.length ? 'LAST MARK REMOVED / KEEP LOOKING' : 'ALL MARKS REMOVED / KEEP LOOKING', markedPoints.length ? 'さいごの しるしを けした / まだ さがす' : 'しるしを ぜんぶ けした / まだ さがす');
+  }
+
+  function displayNextClue() {
+    if (!clueQueue.length) {
+      clueActive = false;
+      clueCard.hidden = true;
+      clueCard.classList.remove('is-fading');
+      clueTimer = 0;
+      clueFadeTimer = 0;
+      flushQueuedObservation();
+      return;
+    }
+    clueActive = true;
+    const next = clueQueue.shift();
+    clueEn.textContent = next.en;
+    clueJp.textContent = next.jp;
+    clueCard.classList.remove('is-fading');
+    clueCard.hidden = false;
+    clueVersion += 1;
+    const version = clueVersion;
+    window.clearTimeout(clueTimer);
+    window.clearTimeout(clueFadeTimer);
+    clueTimer = window.setTimeout(() => {
+      if (version !== clueVersion) return;
+      clueTimer = 0;
+      clueCard.classList.add('is-fading');
+      clueFadeTimer = window.setTimeout(() => {
+        if (version !== clueVersion) return;
+        clueFadeTimer = 0;
+        clueCard.hidden = true;
+        clueCard.classList.remove('is-fading');
+        clueActive = false;
+        displayNextClue();
+      }, PANEL_FADE_MS);
+    }, next.duration);
+  }
+
+  function enqueueClue(en, jp, duration = CLUE_DISPLAY_MS) {
+    clueQueue.push({ en, jp, duration });
+    if (!clueActive) displayNextClue();
   }
 
   function showClue() {
     const enNotes = currentAnomalies.map(anomaly => anomaly.en);
     const jpNotes = currentAnomalies.map(anomaly => anomaly.jp);
     if (currentAudioOnly) { enNotes.push(AUDIO_ONLY_CHANGE.en); jpNotes.push(AUDIO_ONLY_CHANGE.jp); }
-    clueEn.textContent = enNotes.join(' / ');
-    clueJp.textContent = jpNotes.join(' / ');
-    clueCard.hidden = false; setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
-    clueVersion += 1; const version = clueVersion; window.clearTimeout(clueTimer);
-    clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 1300);
+    enqueueClue(enNotes.join(' / '), jpNotes.join(' / '));
+    setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった', { immediate: true });
   }
 
   function showLightTipOnce() {
@@ -1056,13 +1191,10 @@
       if (!data.meta || typeof data.meta !== 'object' || Array.isArray(data.meta)) data.meta = {};
       data.meta.familyRoomLightTipShown = true;
       if (!save.save(data)) return;
-      clueEn.textContent = "Booha's light shrinks as it burns — keep it close to search the room.";
-      clueJp.textContent = 'ブーハの あかりは もえると ちいさくなる。そばで へやを さがそう。';
-      clueCard.hidden = false;
-      clueVersion += 1;
-      const version = clueVersion;
-      window.clearTimeout(clueTimer);
-      clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 3000);
+      enqueueClue(
+        "Booha's light shrinks as it burns — keep it close to search the room.",
+        'ブーハの あかりは もえると ちいさくなる。そばで へやを さがそう。',
+      );
     } catch (error) {
       console.warn('[Family Room] light tip unavailable', error);
     }
