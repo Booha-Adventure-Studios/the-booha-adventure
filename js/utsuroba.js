@@ -3524,24 +3524,29 @@
       ctx.restore();
     });
 
-    if (open) {
-      ctx.globalAlpha = 0.65 + pulse * 0.2;
-      ctx.strokeStyle = '#baff45'; ctx.lineWidth = 2; ctx.shadowBlur = 15; ctx.shadowColor = '#baff45';
-      ctx.setLineDash([5, 8]); ctx.lineDashOffset = -sec * 10;
-      ctx.beginPath(); ctx.ellipse(cx, cy, 52 + pulse * 6, 31 + pulse * 4, sec * 0.18, 0, Math.PI * 2); ctx.stroke();
-      ctx.setLineDash([]); ctx.shadowBlur = 0;
-    }
-
     // The generated photo has a dark studio field; screen blending makes that
     // field disappear against Utsuroba while preserving the lit lens and beam.
     const flashlight = ensureUtsurobaImage(familyRoomFlashlightArt);
     if (flashlight.complete && flashlight.naturalWidth > 0) {
-      const flashlightW = 170 + pulse * 10;
+      const windowPulse = REDUCED_MOTION ? .72 : .55 + .45 * Math.sin(sec * 2.1);
+      const glowRadius = 48 + windowPulse * 12;
+      const greenGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+      greenGlow.addColorStop(0, `rgba(186,255,69,${(open ? .3 : .1) * windowPulse})`);
+      greenGlow.addColorStop(.5, `rgba(186,255,69,${(open ? .16 : .05) * windowPulse})`);
+      greenGlow.addColorStop(1, 'rgba(186,255,69,0)');
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = reveal;
+      ctx.fillStyle = greenGlow;
+      ctx.beginPath(); ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2); ctx.fill();
+
+      const flashlightW = 85 + pulse * 5;
       const flashlightH = flashlightW * (flashlight.naturalHeight / flashlight.naturalWidth || 2 / 3);
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
-      ctx.globalAlpha = reveal * (open ? 0.94 : 0.34);
+      ctx.globalAlpha = reveal * (open ? .94 : .34) * (.86 + windowPulse * .14);
       ctx.filter = open ? 'brightness(1.05) saturate(1.08)' : 'grayscale(.8) brightness(.34)';
+      ctx.shadowColor = `rgba(186,255,69,${(open ? .42 : .14) * windowPulse})`;
+      ctx.shadowBlur = 10 + windowPulse * 10;
       ctx.drawImage(flashlight, cx - flashlightW / 2, cy - flashlightH / 2, flashlightW, flashlightH);
       ctx.restore();
     }
