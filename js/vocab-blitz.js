@@ -173,7 +173,10 @@ const SCOLDS = [
         line-height: 1;
         text-align: center;
         color: #fff;
-        text-shadow: 0 0 32px var(--vb-glow), 0 0 64px var(--vb-glow), 0 0 96px var(--vb-glow);
+        text-shadow:
+          0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--vb-glow),
+          0 0 var(--blitz-word-glow, 64px) var(--vb-glow),
+          0 0 calc(var(--blitz-word-glow, 64px) * 1.5) var(--vb-glow);
         animation: vbWordPop 300ms cubic-bezier(.34,1.56,.64,1) both;
       }
       @keyframes vbWordPop {
@@ -186,7 +189,7 @@ const SCOLDS = [
         color: var(--vb-hira-color);
         text-align: center;
         letter-spacing: 2px;
-        text-shadow: 0 0 16px var(--vb-glow);
+        text-shadow: 0 0 calc(var(--blitz-word-glow, 64px) * .28) var(--vb-glow);
         animation: vbWordPop 300ms 60ms cubic-bezier(.34,1.56,.64,1) both;
       }
 
@@ -270,6 +273,38 @@ const SCOLDS = [
         40%  { transform: translateX(8px); }
         60%  { transform: translateX(-6px); }
         80%  { transform: translateX(6px); }
+      }
+
+      @media (min-width: 900px) and (orientation: landscape) {
+        #vb-overlay {
+          display: grid;
+          grid-template-columns: 1fr minmax(380px, 46vw);
+          grid-template-rows: auto 1fr;
+          align-items: stretch;
+        }
+        #vb-timer-bar { grid-column: 1 / -1; }
+        #vb-stage {
+          grid-column: 1;
+          grid-row: 2;
+          padding: 0 clamp(24px, 4vw, 72px);
+        }
+        #vb-options {
+          grid-column: 2;
+          grid-row: 2;
+          width: 100%;
+          max-width: none;
+          grid-template-columns: 1fr;
+          align-content: center;
+          gap: clamp(14px, 1.6vw, 24px);
+          padding: 0 clamp(24px, 4vw, 64px) clamp(24px, 4vh, 56px) 0;
+        }
+        #vb-jp-word { font-size: clamp(96px, 9vw, 200px); }
+        #vb-hira { font-size: clamp(26px, 2.2vw, 44px); }
+        .vb-opt {
+          font-size: clamp(20px, 1.8vw, 34px);
+          padding: clamp(20px, 2.2vh, 34px) clamp(16px, 1.6vw, 28px);
+          border-radius: clamp(18px, 1.6vw, 28px);
+        }
       }
 
       /* ── BG flash on correct ── */

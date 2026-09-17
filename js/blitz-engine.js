@@ -75,8 +75,8 @@ window.BoohaBlitzEngine = (() => {
     }),
   });
   const TIMER_PAINT_INTERVAL_MS = 100;
-  const PERFORMANCE_SETTLE_MS = 900;
-  const PERFORMANCE_WINDOW_MS = 2600;
+  const PERFORMANCE_SETTLE_MS = 2000;
+  const PERFORMANCE_WINDOW_MS = 4500;
   const REDUCED_MOTION = typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const HARDWARE_PERFORMANCE_TIER = typeof navigator !== 'undefined' && (
@@ -248,9 +248,10 @@ window.BoohaBlitzEngine = (() => {
       }
       if (now - startedAt >= PERFORMANCE_WINDOW_MS) {
         const averageFrameTime = totalFrameTime / Math.max(1, frameCount);
-        const tier = averageFrameTime >= 34 || slowFrames >= 12
+        const slowRatio = slowFrames / Math.max(1, frameCount);
+        const tier = averageFrameTime >= 30 && slowRatio >= 0.35
           ? 'minimal'
-          : averageFrameTime >= 22 || slowFrames >= 5 ? 'reduced' : 'full';
+          : averageFrameTime >= 20 && slowRatio >= 0.18 ? 'reduced' : 'full';
         onPoorPerformance({ averageFrameTime, slowFrames, frameCount, sampledMs: now - startedAt, tier });
         onProgress?.({
           status: 'complete',
@@ -279,11 +280,13 @@ window.BoohaBlitzEngine = (() => {
     const main = index === 0 && energy === 0 && palette.background?.main
       ? palette.background.main
       : `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-    const secondaryHue = (hue + (palette.hueStep || 51) / 2 + energy) % 360;
+    const secondaryHue = (hue + (palette.hueStep || 51) * 1.4 + energy * 2) % 360;
     const secondary = energy === 0 && palette.background?.secondary
       ? palette.background.secondary
-      : `hsl(${secondaryHue}, ${Math.min(100, saturation + 4)}%, ${Math.min(46, lightness + 3)}%)`;
-    return `linear-gradient(145deg, ${main} 0%, ${secondary} 100%)`;
+      : `hsl(${secondaryHue}, ${Math.min(100, saturation + 10)}%, ${Math.min(52, lightness + 14)}%)`;
+    const accent = `hsl(${(hue + 180) % 360}, ${Math.min(100, saturation)}%, ${Math.min(30, lightness + 4)}%)`;
+    return `radial-gradient(70% 55% at 50% 40%, ${secondary} 0%, transparent 72%),` +
+      `linear-gradient(145deg, ${main} 0%, ${accent} 100%)`;
   }
 
   function shuffle(arr) {
@@ -508,6 +511,67 @@ window.BoohaBlitzEngine = (() => {
         height: 100vh;
         height: var(--blitz-viewport-height, 100dvh);
         max-height: var(--blitz-viewport-height, 100dvh);
+      }
+      .blitz-compositor::before {
+        content: '';
+        position: fixed;
+        inset: -15%;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(46% 34% at 24% 38%, color-mix(in srgb, var(--blitz-accent) 42%, transparent), transparent 72%),
+          radial-gradient(42% 36% at 78% 66%, color-mix(in srgb, var(--blitz-accent) 30%, transparent), transparent 74%);
+        opacity: .10;
+        transform: translate3d(0, 0, 0) scale(1);
+        animation: boohaBlitzAurora 9s ease-in-out infinite alternate;
+      }
+      .booha-blitz-atmosphere {
+        position: absolute;
+        inset: -8%;
+        z-index: 0;
+        pointer-events: none;
+        opacity: .12;
+        transform: translate3d(0, 0, 0) scale(1.02);
+        animation: boohaBlitzAtmosphere 11s ease-in-out infinite alternate;
+      }
+      .booha-blitz-atmosphere-playful {
+        background:
+          radial-gradient(circle at 18% 78%, rgba(255, 79, 171, .42), transparent 35%),
+          radial-gradient(circle at 82% 24%, rgba(255, 226, 122, .28), transparent 34%);
+      }
+      .booha-blitz-atmosphere-arcade {
+        background:
+          repeating-linear-gradient(135deg, transparent 0 42px, rgba(0, 255, 238, .13) 44px 47px, transparent 50px 100px),
+          linear-gradient(115deg, rgba(0, 255, 238, .18), transparent 44%, rgba(57, 255, 20, .14));
+      }
+      .booha-blitz-atmosphere-sleek {
+        background:
+          linear-gradient(115deg, transparent 0 34%, rgba(240, 201, 106, .18) 42%, transparent 50%),
+          linear-gradient(245deg, transparent 0 58%, rgba(223, 234, 255, .14) 66%, transparent 74%);
+      }
+      .blitz-compositor.low-power::before,
+      .blitz-compositor.reduced-power::before,
+      .blitz-compositor.low-power .booha-blitz-atmosphere,
+      .blitz-compositor.reduced-power .booha-blitz-atmosphere {
+        animation: none;
+        opacity: .06;
+      }
+      @keyframes boohaBlitzAurora {
+        from { opacity: .10; transform: translate3d(-1%, 1%, 0) scale(1); }
+        to { opacity: .22; transform: translate3d(1%, -1%, 0) scale(1.04); }
+      }
+      @keyframes boohaBlitzAtmosphere {
+        from { opacity: .08; transform: translate3d(-1%, 0, 0) scale(1.02); }
+        to { opacity: .18; transform: translate3d(1%, -1%, 0) scale(1.06); }
+      }
+      @media (min-width: 900px) and (orientation: landscape) {
+        .booha-blitz-feedback {
+          grid-column: 1 / -1;
+          grid-row: 2;
+          align-self: start;
+          justify-self: stretch;
+          width: 100%;
+        }
       }
       #vb-overlay #vb-quit, #sb-overlay #sb-quit, #qb-overlay #qb-quit {
         right: max(env(safe-area-inset-right, 0px) + 16px, 16px);
@@ -959,20 +1023,20 @@ window.BoohaBlitzEngine = (() => {
         border-width: 4px;
         box-shadow: 0 0 52px var(--streak-event-color), 0 0 108px var(--blitz-streak-glow);
       }
-      .blitz-compositor.streak-tier-1 .booha-blitz-prompt,
       .blitz-compositor.streak-tier-1 .booha-blitz-answer { box-shadow: 0 0 24px var(--blitz-glow); }
-      .blitz-compositor.streak-tier-2 .booha-blitz-prompt,
       .blitz-compositor.streak-tier-2 .booha-blitz-answer { box-shadow: 0 0 32px var(--blitz-glow), 0 0 2px var(--blitz-accent); }
-      .blitz-compositor.streak-tier-3 .booha-blitz-prompt,
       .blitz-compositor.streak-tier-3 .booha-blitz-answer { box-shadow: 0 0 42px var(--blitz-glow), 0 0 3px var(--blitz-accent); }
-      .blitz-compositor.streak-tier-4 .booha-blitz-prompt,
       .blitz-compositor.streak-tier-4 .booha-blitz-answer {
         box-shadow: 0 0 54px var(--blitz-glow), 0 0 4px var(--blitz-accent);
       }
-      .blitz-compositor.streak-tier-5 .booha-blitz-prompt,
       .blitz-compositor.streak-tier-5 .booha-blitz-answer {
         box-shadow: 0 0 66px var(--blitz-glow), 0 0 5px var(--blitz-accent);
       }
+      .blitz-compositor.streak-tier-1 { --blitz-word-glow: 40px; }
+      .blitz-compositor.streak-tier-2 { --blitz-word-glow: 54px; }
+      .blitz-compositor.streak-tier-3 { --blitz-word-glow: 70px; }
+      .blitz-compositor.streak-tier-4 { --blitz-word-glow: 88px; }
+      .blitz-compositor.streak-tier-5 { --blitz-word-glow: 112px; }
       .blitz-compositor.streak-tier-2 .booha-blitz-nameplate,
       .blitz-compositor.streak-tier-3 .booha-blitz-nameplate,
       .blitz-compositor.streak-tier-4 .booha-blitz-nameplate,
@@ -1116,8 +1180,8 @@ window.BoohaBlitzEngine = (() => {
         100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
       }
       @keyframes boohaBlitzChargedWash {
-        0%, 100% { opacity: 0; }
-        50% { opacity: .22; }
+        0%, 100% { opacity: .10; }
+        50% { opacity: .30; }
       }
       @keyframes boohaBlitzCorrectImpactWash {
         0%, 100% { opacity: 0; }
@@ -1167,6 +1231,13 @@ window.BoohaBlitzEngine = (() => {
         text-shadow: 0 0 12px var(--blitz-accent), 0 0 34px var(--blitz-accent);
         opacity: 0;
         pointer-events: none;
+      }
+      .blitz-compositor.milestone-center .booha-blitz-callout {
+        position: fixed;
+        top: 50%;
+        z-index: 90;
+        max-width: 92vw;
+        font-size: clamp(34px, 8vw, 120px);
       }
       .booha-blitz-callout.show { animation: boohaBlitzCallout 1050ms cubic-bezier(.2,.8,.2,1) both; }
       .booha-blitz-fire-wallpaper {
@@ -1945,7 +2016,19 @@ window.BoohaBlitzEngine = (() => {
           background: linear-gradient(135deg, var(--streak-color, var(--blitz-accent)), transparent 72%);
           opacity: 0;
           transform: none;
-          animation: boohaBlitzChargedWash 2.8s ease-in-out infinite;
+          animation: boohaBlitzChargedWash 2.4s ease-in-out infinite;
+        }
+        #${config.overlayId}.blitz-compositor.streak-tier-3 .${config.optionClass} {
+          background: color-mix(in srgb, var(--blitz-option-bg) 92%, var(--streak-color, var(--blitz-accent)) 8%);
+        }
+        #${config.overlayId}.blitz-compositor.streak-tier-4 .${config.optionClass} {
+          background: color-mix(in srgb, var(--blitz-option-bg) 78%, var(--streak-color, var(--blitz-accent)) 22%);
+        }
+        #${config.overlayId}.blitz-compositor.streak-tier-5 .${config.optionClass} {
+          border-width: 3px;
+          background: color-mix(in srgb, var(--blitz-option-bg) 62%, var(--streak-color, var(--blitz-accent)) 38%);
+          color: #151018;
+          text-shadow: none;
         }
         #${config.overlayId}.reduced-power .${config.optionClass}::after,
         #${config.overlayId}.low-power .${config.optionClass}::after {
@@ -2000,6 +2083,7 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-wrong', palette.wrong?.color || '#ff1e1e');
       overlay.style.setProperty('--blitz-popup-bg', palette.popup?.background || 'rgba(0,0,0,.92)');
       overlay.style.setProperty('--blitz-streak-glow', palette.streak?.glow || palette.glow);
+      overlay.style.setProperty('--blitz-option-bg', palette.optionBg || 'rgba(255,255,255,.14)');
       const motion = palette.motion || {};
       overlay.style.setProperty('--blitz-motion-ease', motion.particleEasing || palette.particleEasing || 'ease-out');
       overlay.style.setProperty('--blitz-option-duration', `${motion.optionDurationMs || 320}ms`);
@@ -2060,6 +2144,7 @@ window.BoohaBlitzEngine = (() => {
       const tierClasses = ['streak-tier-1', 'streak-tier-2', 'streak-tier-3', 'streak-tier-4', 'streak-tier-5'];
       function clearStreakEventClasses() {
         overlay.classList.remove('streak-event-live');
+        overlay.classList.remove('milestone-center');
         nameplate.classList.remove(...eventClasses);
         nameplate.style.removeProperty('--streak-event-scale');
       }
@@ -2089,6 +2174,7 @@ window.BoohaBlitzEngine = (() => {
         const className = `streak-event-${threshold}`;
         const eventScale = ({ 3: 1.02, 6: 1.03, 9: 1.04, 12: 1.06, 15: 1.1 })[threshold] || 1.02;
         overlay.classList.add('streak-event-live');
+        if (threshold >= 9) overlay.classList.add('milestone-center');
         nameplate.classList.add('streak-event-live', className, 'streak-hold');
         nameplate.style.setProperty('--streak-event-scale', eventScale);
         emitStreakSparks(threshold);
@@ -2199,6 +2285,13 @@ window.BoohaBlitzEngine = (() => {
 
     function emitPerfectFlash(overlay, palette, playerName) {
       emitFinishFlash(overlay, palette, playerName, 'perfect');
+    }
+
+    function mountPersistentAtmosphere(overlay, palette) {
+      const atmosphere = document.createElement('div');
+      atmosphere.className = `booha-blitz-atmosphere blitz-atmosphere-${palette.feel || 'arcade'}`;
+      atmosphere.setAttribute('aria-hidden', 'true');
+      overlay.insertBefore(atmosphere, overlay.firstChild);
     }
 
     function emitFireWallpaper(overlay, playerName, threshold = 0) {
@@ -2427,6 +2520,7 @@ window.BoohaBlitzEngine = (() => {
       applyPerformanceTier(overlay);
       overlay.classList.add('blitz-compositor');
       applyPalette(overlay, palette);
+      mountPersistentAtmosphere(overlay, palette);
       const performanceDiagnostic = createPerformanceDiagnostic(overlay);
       performanceDiagnostic?.update({ status: 'ready' });
 

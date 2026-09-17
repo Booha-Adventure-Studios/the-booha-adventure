@@ -21,8 +21,8 @@ assert.match(engine, /secondary: 'hsl\(205, 48%, 15%\)'/,
 
 assert.match(engine, /function backgroundFor\(palette, index = 0\)/,
   'the shared engine must render the theme background as a gradient');
-assert.match(engine, /linear-gradient\(145deg, \$\{main\} 0%, \$\{secondary\} 100%\)/,
-  'theme backgrounds must use both main and secondary colors');
+assert.match(engine, /radial-gradient\(70% 55% at 50% 40%, \$\{secondary\} 0%, transparent 72%\)[\s\S]*?linear-gradient\(145deg, \$\{main\} 0%, \$\{accent\} 100%\)/,
+  'theme backgrounds must use a visible radial secondary wash and main/accent gradient');
 assert.match(engine, /#vb-overlay\.blitz-feel-playful \.vb-opt/,
   'Pre-Boo must have a shared playful option treatment');
 assert.match(engine, /#sb-overlay\.blitz-feel-arcade \.sb-opt/,
