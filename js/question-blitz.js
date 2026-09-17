@@ -615,7 +615,7 @@ window.QuestionBlitz = (() => {
     particleClass: 'qb-particle',
     particleAnimation: 'qbParticle',
     celebrationMode: 'question',
-    speedTargetMs: 90000,
+    speedTargetMs: 58000,
     finalCard: {
       badge: 'SPEED SOLVED',
       detail: 'ANSWERED UNDER PRESSURE',

@@ -654,7 +654,7 @@ const SCOLDS = [
     particleClass: 'vb-particle',
     particleAnimation: 'vbParticle',
     celebrationMode: 'vocab',
-    speedTargetMs: 90000,
+    speedTargetMs: 45000,
     finalCard: {
       badge: 'WORD STORM',
       detail: 'EVERY WORD LANDED',
