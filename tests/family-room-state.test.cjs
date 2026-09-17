@@ -52,10 +52,10 @@ assert(source.includes('function drawFailureBooha') && source.includes('if (time
 assert(source.includes('const anomalyArt = Object.fromEntries') && source.includes('assets/family-room/overlays/${anomaly.id}.webp'), 'anomalies must load authored room overlays');
 assert(source.includes('artSize') && source.includes('ctx.drawImage(art'), 'anomaly rendering must use real art instead of procedural doodles');
 assert(['bowl', 'cup', 'eyes', 'shadow', 'talisman', 'lantern', 'futon', 'seams', 'teapot', 'crescent'].every(id => serviceWorker.includes(`/assets/family-room/overlays/${id}.webp`)), 'all authored anomaly overlays must be precached');
-assert(source.includes('const PATASKALA_POSES = [') && source.includes("character: 'pataskala'"), 'Pataskala must have a named character anomaly set');
-assert(source.includes('assets/family-room/pataskala/${pose.id}.webp') && ['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => fs.existsSync(path.join(root, `assets/family-room/pataskala/${id}.webp`))), 'all Pataskala poses must load as authored transparent assets');
+assert(source.includes('const PATASKALA_POSES = [') && source.includes("character: 'pataskala'"), 'Pataskala must have a named character threat set');
+assert(source.includes('assets/family-room/pataskala/${pose.id}.webp') && ['pataskala_far', 'pataskala_enter', 'pataskala_approach', 'pataskala_near', 'pataskala_catch'].every(id => fs.existsSync(path.join(root, `assets/family-room/pataskala/${id}.webp`))), 'the smallest Pataskala production set must load as authored transparent assets');
 assert(source.includes('function pataskalaChance') && source.includes('phase.pataskalaBaseChance') && source.includes('pataskalaCooldownRounds'), 'Pataskala must emerge progressively with a cooldown between threats');
-assert(source.includes("selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2"), 'the emerging Pataskala pose must be reserved for the Lies tier');
+assert(source.includes('PATASKALA_POSES[PATASKALA_POSES.length - 1]') && source.includes('pataskala_catch'), 'the catch pose must be reserved for the failure beat');
 assert(source.includes('MARK_DEAD_ZONE_PX = 8') && source.includes('markHoldOrigin'), 'touch marking must tolerate small pointer tremor');
 assert(source.includes('plate.w * anomaly.artSize') && source.includes('plate.w * target[2]'), 'anomaly sizing and alert radii must follow the room plate');
 assert(source.includes('function drawAnomalies(list)') && source.includes('drawAnomalies(currentAnomalies)') && source.includes('drawPataskalaThreat()') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'multiple changes and the active Pataskala threat must be faintly visible outside the lantern and the light rim must blend into the room');
@@ -71,24 +71,24 @@ assert(source.includes("playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + 
 assert(source.includes('const AUDIO_ONLY_CHANGE = Object.freeze') && source.includes('audioOnlyChance: .08') && source.includes('audioOnlyChance: .16'), 'audio-only anomalies must be explicit and tier-weighted');
 assert(source.includes('currentAudioOnly = !hasChange') && source.includes('if (currentAudioOnly) return markedPoints.length === 0') && source.includes('AUDIO_ONLY_CHANGE.en'), 'an audio-only anomaly must be reportable without a location mark and teach its sentence after a correct report');
 assert(source.includes('function schedulePataskalaThreat') && source.includes('function beginPataskalaThreat') && source.includes('function updatePataskalaThreat') && source.includes("playSfx('move', AUDIO_LEVELS.move)"), 'Pataskala must approach Booha within a timed, authored threat window');
-assert(!source.includes("targetId: 'pataskala'") && source.includes('artSize: .28') && source.includes('target: [.7, .29, .22]'), 'Pataskala must use adult-scale authored art without entering the report target registry');
+assert(!source.includes("targetId: 'pataskala'") && source.includes('pataskala_far') && source.includes('target: [.7, .29, .22]'), 'Pataskala must use the staged authored art set without entering the report target registry');
 assert(source.includes('ensureAudio(); startBgm();') && source.includes('window.clearTimeout(pataskalaMoveTimer)'), 'BGM must start after the study handoff and Pataskala timers must be cleared on round cleanup');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
-assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
+assert(anchorUs.length === 15 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
 const portraitSourceRatios = {
   bowl: [512 / 512, 342 / 512], cup: [512 / 512, 468 / 512], eyes: [512 / 512, 256 / 512],
   shadow: [512 / 512, 768 / 512], talisman: [512 / 512, 768 / 512], lantern: [512 / 512, 342 / 512],
   futon: [512 / 512, 342 / 512], seams: [512 / 512, 171 / 512], teapot: [512 / 512, 342 / 512], crescent: [512 / 512, 468 / 512],
-  'pataskala-standing': [512 / 768, 768 / 768], 'pataskala-moving': [512 / 768, 768 / 768],
-  'pataskala-crouch': [512 / 768, 768 / 768], 'pataskala-emerging': [512 / 768, 768 / 768],
+  pataskala_far: [512 / 768, 768 / 768], pataskala_enter: [512 / 768, 768 / 768],
+  pataskala_approach: [512 / 768, 768 / 768], pataskala_near: [512 / 768, 768 / 768], pataskala_catch: [512 / 768, 768 / 768],
 };
-assert(portraitEntries.length === 14, 'portrait regression must cover every anomaly and Pataskala pose');
+assert(portraitEntries.length === 15, 'portrait regression must cover every anomaly and Pataskala pose');
 const portraitWidth = 390;
 const portraitHeight = 844;
 const portraitScale = Math.max(portraitWidth / 1024, portraitHeight / 1536);
 const portraitPlate = { w: 1024 * portraitScale, h: 1536 * portraitScale, x: (portraitWidth - 1024 * portraitScale) / 2, y: 0 };
-portraitEntries.forEach(([, id, uText, vText, sizeText]) => {
+portraitEntries.filter(([, id]) => id !== 'pataskala_catch').forEach(([, id, uText, vText, sizeText]) => {
   const [sourceWidthRatio, sourceHeightRatio] = portraitSourceRatios[id];
   const maxDimension = portraitPlate.w * Number(sizeText);
   const drawWidth = maxDimension * sourceWidthRatio;
@@ -104,7 +104,7 @@ assert(source.includes('AUDIO_LEVELS = Object.freeze') && source.includes('maste
 assert(source.includes("playSfx('move', AUDIO_LEVELS.move)") && source.includes("playSfx('anomaly', AUDIO_LEVELS.anomaly)"), 'movement and anomaly cues must be connected to gameplay');
 assert(source.includes('jumpLevel: .24') && source.includes('jumpLevel: .4') && source.includes('jumpLevel: .58') && source.includes('playSfx(Math.random() < .5 ? \'jump1\' : \'jump2\', jumpLevel)'), 'failure must choose one of the two jump-scare screams at the room tier volume');
 assert(serviceWorker.includes("`${BASE}/assets/`"), 'Family Room audio must use the runtime asset cache path');
-assert(['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => serviceWorker.includes(`/assets/family-room/pataskala/${id}.webp`)), 'all Pataskala poses must be install-safe');
+assert(['pataskala_far', 'pataskala_enter', 'pataskala_approach', 'pataskala_near', 'pataskala_catch'].every(id => serviceWorker.includes(`/assets/family-room/pataskala/${id}.webp`)), 'the Pataskala production set must be install-safe');
 assert(source.includes('function requestFamilyRuntimeCache') && source.includes("type: 'CACHE_URLS'"), 'Family Room must ask the service worker to retain deferred media after entry');
 assert(source.includes('function recordFamilyRoomCompletion') && source.includes('completedCases[ACTIVE_CASE_ID]') && source.includes('lastResult'), 'Pass 8 must record a score-free weekly case seal in the shared save layer');
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
