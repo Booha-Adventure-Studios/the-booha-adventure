@@ -873,7 +873,7 @@ U.mount(`
   <div class="ssp-dots-row" id="ssp-dots"></div>
   <div class="ssp-hud">
     <div class="ssp-pill">RUN <b id="ssp-qnum">0</b> / 15</div>
-    <div class="ssp-pill">PERFECT <b id="ssp-score">0</b> / 15</div>
+    <div class="ssp-pill">SCORE <b id="ssp-score">0</b> / 15</div>
     <div class="ssp-streak-pill" id="ssp-streak-pill">Streak <b id="ssp-streak">0</b></div>
   </div>
   <div class="ssp-timer-wrap">
@@ -896,16 +896,16 @@ U.mount(`
 
 <div class="ssp-feedback-overlay" id="ssp-feedback-overlay" hidden>
   <div class="ssp-feedback-card" role="alertdialog" aria-modal="true" aria-labelledby="ssp-feedback-title">
-    <div class="ssp-feedback-kicker">RUN RESET / 連続が きれました</div>
+    <div class="ssp-feedback-kicker">MISSED / つぎへ</div>
     <h2 id="ssp-feedback-title">Keep going.</h2>
-    <p id="ssp-feedback-copy">A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.</p>
+    <p id="ssp-feedback-copy">That question is missed, but your run continues.</p>
     <button class="game-btn game-btn-primary ssp-feedback-continue" id="ssp-feedback-continue" type="button">CONTINUE / つぎへ</button>
   </div>
 </div>
 
 <div class="ssp-final-climax" id="ssp-final-climax" hidden aria-hidden="true">
   <div class="ssp-final-climax-label">
-    <div class="ssp-final-climax-title">PERFECT RUN</div>
+    <div class="ssp-final-climax-title">PERFECT SCORE</div>
     <div class="ssp-final-climax-count">15 / 15</div>
   </div>
 </div>
@@ -956,8 +956,8 @@ U.mount(`
       <div class="ssp-how-step">
         <div class="ssp-how-num">3</div>
         <div>
-          <div class="ssp-how-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
-          <div class="ssp-how-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
+          <div class="ssp-how-en">Finish all 15 questions. Correct answers build your score and streak.</div>
+          <div class="ssp-how-jp">15問さいごまで あそぼう。正解でスコアとれんぞく正解がふえるよ。</div>
         </div>
       </div>
       <div class="ssp-how-step">
@@ -997,8 +997,8 @@ U.mount(`
       <div class="ssp-start-step">
         <div class="ssp-start-num">3</div>
         <div>
-          <div class="ssp-start-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
-          <div class="ssp-start-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
+          <div class="ssp-start-en">Finish all 15 questions. Correct answers build your score and streak.</div>
+          <div class="ssp-start-jp">15問さいごまで あそぼう。正解でスコアとれんぞく正解がふえるよ。</div>
         </div>
       </div>
       <button class="ssp-start-btn" id="ssp-start-btn">START / はじめよう</button>
@@ -1077,7 +1077,7 @@ function doStart() {
   unlockAllAudio();
   feedbackState = 'playing';
   order = U.shuffle(CFG.cards.slice(0, 15));
-  idx = 0; score = 0; streak = 0; lastLevel = 0;
+  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
   runStartedAt = performance.now();
   startOverlay.classList.add('hiding');
   setTimeout(() => { startOverlay.style.display = 'none'; }, 380);
@@ -1099,6 +1099,7 @@ let heatDur   = 7000;
 let runStartedAt = 0;
 let feedbackState = 'awaiting-start';
 let recoveryPending = false;
+let mistakes = 0;
 let finalClimaxTimer = null;
 let resultFxTimers = [];
 let resultAudio = null;
@@ -1198,7 +1199,7 @@ function showFailureFeedback(kind) {
   locked = true;
   setAnswerInputEnabled(false);
   feedbackTitle.textContent = kind === 'timeout' ? 'Time ran out.' : 'That answer was not correct.';
-  feedbackCopy.textContent = 'A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.';
+  feedbackCopy.textContent = 'That question is missed, but your run continues.';
   feedbackContinue.disabled = false;
   feedbackContinue.removeAttribute('aria-disabled');
   feedbackContinue.classList.remove('is-pressed');
@@ -1224,13 +1225,6 @@ function continueFromFailure(event) {
   setTimeout(() => {
     feedbackOverlay.classList.remove('show', 'closing');
     feedbackOverlay.hidden = true;
-    order = U.shuffle(CFG.cards.slice(0, 15));
-    idx = 0; score = 0; streak = 0; lastLevel = 0;
-    runStartedAt = performance.now();
-    scoreEl.textContent = '0';
-    streakEl.textContent = '0';
-    updateStreakUI();
-    updateStreakBanner();
     feedbackState = 'playing';
     recoveryPending = false;
     renderQ();
@@ -1248,7 +1242,7 @@ function renderQ() {
   grid.innerHTML = '';
 
   const card = order[idx];
-  qnumEl.textContent = idx;
+  qnumEl.textContent = idx + 1;
   jpEl.textContent   = card.jp;
   hiraEl.textContent = card.hira || '';
   updateDots();
@@ -1337,7 +1331,8 @@ function handlePick(btn, en) {
     updateStreakBanner();
     U.playSFX('fart');
 
-    showFailureFeedback('wrong');
+    mistakes++;
+    setTimeout(() => { idx++; renderQ(); }, 340);
   }
 }
 
@@ -1346,6 +1341,7 @@ function handlePick(btn, en) {
    ══════════════════════════════════════════════════════════════ */
 function onTimeout() {
   if (locked || feedbackState !== 'playing') return;
+  stopHeat();
   locked   = true;
   streak   = 0;
   updateStreakUI();
@@ -1354,7 +1350,8 @@ function onTimeout() {
 
   Array.from(grid.children).forEach(b => b.classList.add('ssp-locked'));
 
-  showFailureFeedback('timeout');
+  mistakes++;
+  setTimeout(() => { idx++; renderQ(); }, 340);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1451,8 +1448,8 @@ function fireConfetti(big = false) {
               saveId for sentence_speed
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
-  if (idx !== 15 || score !== 15 || streak !== 15 || feedbackState !== 'playing') return;
-  feedbackState = 'climax';
+  if (idx !== 15 || feedbackState !== 'playing') return;
+  feedbackState = 'complete';
   locked = true;
   setAnswerInputEnabled(false);
   stopHeat();
@@ -1463,21 +1460,7 @@ function showResults() {
     if (d) d.className = 'ssp-dot done';
   }
 
-  const runTime = Math.max(0, performance.now() - runStartedAt);
-  finalClimax.hidden = false;
-  finalClimax.setAttribute('aria-hidden', 'false');
-  finalClimax.classList.remove('show');
-  void finalClimax.offsetWidth;
-  finalClimax.classList.add('show');
-  if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
-  finalClimaxTimer = setTimeout(() => {
-    if (feedbackState !== 'climax') return;
-    finalClimax.classList.remove('show');
-    finalClimax.hidden = true;
-    finalClimax.setAttribute('aria-hidden', 'true');
-    finalClimaxTimer = null;
-    revealResults(runTime);
-  }, (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 420 : 980);
+  revealResults(Math.max(0, performance.now() - runStartedAt));
 }
 
 function revealResults(runTime) {
@@ -1501,21 +1484,9 @@ function revealResults(runTime) {
   results.classList.add('show');
 
   const tier = getTier(score);
-  const pct  = 100;
-  /* ── Dispatch to Booha Adventure save system ── */
-document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-    detail: {
-      saveId:    `${CFG.curriculum}:sentence_speed`,
-      score:     pct,
-      completed: true,
-      recordEligible: true,
-      time: runTime,
-      clearTier: 'perfect',
-      mistakes: 0,
-    }
-  }));
+  const pct  = Math.round((score / 15) * 100);
 
-  /* Populate scorecard */
+  /* Populate before submitting: save/unlock listeners can be synchronous. */
   results.style.setProperty('--ssp-tier-color', tier.color);
   document.getElementById('ssp-rs').textContent = `${score} / 15`;
   document.getElementById('ssp-rp').textContent = `${pct}%`;
@@ -1523,6 +1494,16 @@ document.dispatchEvent(new CustomEvent('booha:gameEnd', {
   document.getElementById('ssp-re').textContent = tier.en;
   document.getElementById('ssp-rj').textContent = tier.jp;
   document.getElementById('ssp-rk').textContent = tier.kanji;
+
+  U.emitGameEnd({
+      saveId:    `${CFG.curriculum}:sentence_speed`,
+      score:     pct,
+      completed: true,
+      recordEligible: true,
+      time: runTime,
+      clearTier: score === 15 ? 'perfect' : 'mastery',
+      mistakes,
+  });
 
   /* Confetti + result sound */
   if (score === 15) {
@@ -1552,7 +1533,7 @@ document.getElementById('ssp-replay').addEventListener('click', () => {
   mainWrap.style.display = '';
 
   streakBanner.className = 'ssp-streak-banner';
-  idx = 0; score = 0; streak = 0; lastLevel = 0;
+  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
   feedbackState = 'playing';
   recoveryPending = false;
   runStartedAt = performance.now();

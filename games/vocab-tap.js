@@ -1290,13 +1290,11 @@ function showResults() {
   /* ── Save score to Booha Adventure save system ─────────────────────────
      Guard with optional chaining so the game never crashes if
      BoohaAdventure isn't mounted yet (e.g. standalone testing).        */
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-  detail: {
+  U.emitGameEnd({
     saveId:    `${CFG.curriculum}:vocab_tap`,
     score:     pct,
     completed: pct >= 40,
-  }
-}));
+  });
   /* ────────────────────────────────────────────────────────────────────── */
 
   const resEl = document.getElementById('vt-results');

@@ -1273,7 +1273,7 @@ fi
 
 echo "[blitz] perfect-run contract test"
 if node tests/blitz-perfect-run-contract.test.cjs >/dev/null 2>&1; then
-  ok "Blitz shared and standalone engines require flawless 15/15 runs"
+  ok "Weekly speed engines finish normal 15-card runs and submit score/stars"
 else
   bad "Blitz perfect-run contract test failed"
 fi

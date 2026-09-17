@@ -1301,15 +1301,13 @@ function showResults() {
   const pct  = Math.round((score / total) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-    detail: {
+  U.emitGameEnd({
       saveId:    `${CFG.curriculum}:sentence_order`,
       score:     pct,
       completed: true,
       recovered: recoveredCount,
       recoveryBoosts: recoveryBoostCount,
-    }
-  }));
+  });
 
   /* Populate scorecard */
   results.style.setProperty('--tier-color', tier.color);

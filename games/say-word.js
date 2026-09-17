@@ -495,7 +495,7 @@ function showResults() {
   if (outer) outer.style.display = '';
   results.classList.add('show');
   const tier = getTier(score), pct = Math.round((score / 15) * 100);
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId:`${CFG.curriculum}:say_word`, score:pct, completed:pct >= 40 } }));
+  U.emitGameEnd({ saveId:`${CFG.curriculum}:say_word`, score:pct, completed:pct >= 40 });
   results.style.setProperty('--stw-tier-color', tier.color);
   document.getElementById('stw-rs').textContent = `${score} / 15`;
   document.getElementById('stw-rp').textContent = `${pct}%`;
