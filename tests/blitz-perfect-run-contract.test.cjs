@@ -26,7 +26,7 @@ assert.match(shared, /streak-tier-1.*streak-tier-5/s,
   'shared Blitz must retain a visible streak tier after a milestone event');
 assert.match(shared, /eventThreshold === 15/,
   'shared Blitz must distinguish the perfect-run climax from ordinary milestones');
-assert.match(shared, /@keyframes boohaBlitzChargedWash[\s\S]*?50% \{ opacity: \.22; \}/,
+assert.match(shared, /@keyframes boohaBlitzChargedWash[\s\S]*?50% \{ opacity: \.30; \}/,
   'high streak answer energy must use a visible opacity wash');
 assert.doesNotMatch(shared, /@keyframes boohaBlitzChargedBreath/,
   'high streak answer energy must not animate filter brightness');

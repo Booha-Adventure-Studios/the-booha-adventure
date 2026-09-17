@@ -179,7 +179,10 @@ window.SentenceBlitz = (() => {
         line-height: 1.3;
         text-align: center;
         color: #fff;
-        text-shadow: 0 0 24px var(--sb-glow), 0 0 48px var(--sb-glow);
+        text-shadow:
+          0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--sb-glow),
+          0 0 var(--blitz-word-glow, 64px) var(--sb-glow),
+          0 0 calc(var(--blitz-word-glow, 64px) * 1.5) var(--sb-glow);
         animation: sbWordPop 300ms cubic-bezier(.34,1.56,.64,1) both;
         max-width: 680px; width: 100%;
       }
@@ -194,7 +197,7 @@ window.SentenceBlitz = (() => {
         text-align: center;
         letter-spacing: 1.5px;
         line-height: 1.6;
-        text-shadow: 0 0 12px var(--sb-glow);
+        text-shadow: 0 0 calc(var(--blitz-word-glow, 64px) * .28) var(--sb-glow);
         animation: sbWordPop 300ms 60ms cubic-bezier(.34,1.56,.64,1) both;
         max-width: 680px; width: 100%;
       }
@@ -237,6 +240,42 @@ window.SentenceBlitz = (() => {
       .sb-opt:nth-child(4) { --opt-delay: 150ms; }
       .sb-opt:nth-child(5) { --opt-delay: 190ms; }
       .sb-opt:nth-child(6) { --opt-delay: 230ms; }
+
+      @media (min-width: 900px) and (orientation: landscape) {
+        #sb-overlay {
+          display: grid;
+          grid-template-columns: 1fr minmax(380px, 46vw);
+          grid-template-rows: auto 1fr;
+          align-items: stretch;
+        }
+        #sb-timer-bar { grid-column: 1 / -1; }
+        #sb-scroll {
+          display: contents;
+          overflow: visible;
+        }
+        #sb-prompt {
+          grid-column: 1;
+          grid-row: 2;
+          justify-content: center;
+          padding: 0 clamp(24px, 4vw, 72px);
+        }
+        #sb-options {
+          grid-column: 2;
+          grid-row: 2;
+          align-self: center;
+          width: 100%;
+          max-width: none;
+          gap: clamp(14px, 1.6vw, 24px);
+          padding: 0 clamp(24px, 4vw, 64px) clamp(24px, 4vh, 56px) 0;
+        }
+        #sb-jp-word { font-size: clamp(34px, 4.2vw, 78px); }
+        #sb-hira { font-size: clamp(20px, 2.2vw, 34px); }
+        .sb-opt {
+          font-size: clamp(20px, 1.8vw, 32px);
+          padding: clamp(18px, 2vh, 30px) clamp(16px, 1.6vw, 28px);
+          border-radius: clamp(16px, 1.6vw, 26px);
+        }
+      }
 
       .sb-opt:hover {
         background: var(--sb-opt-hover);

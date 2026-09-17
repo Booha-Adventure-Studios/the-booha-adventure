@@ -175,7 +175,10 @@ window.QuestionBlitz = (() => {
         font-size: clamp(20px, min(4.5vw, 5vh), 40px);
         font-weight: 900; line-height: 1.35;
         text-align: center; color: #fff;
-        text-shadow: 0 0 20px var(--qb-glow), 0 0 40px var(--qb-glow);
+        text-shadow:
+          0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--qb-glow),
+          0 0 var(--blitz-word-glow, 64px) var(--qb-glow),
+          0 0 calc(var(--blitz-word-glow, 64px) * 1.5) var(--qb-glow);
         animation: qbWordPop 300ms cubic-bezier(.34,1.56,.64,1) both;
         max-width: 680px; width: 100%;
       }
@@ -189,7 +192,7 @@ window.QuestionBlitz = (() => {
         color: var(--qb-hira-color);
         text-align: center; letter-spacing: 1.5px;
         line-height: 1.6;
-        text-shadow: 0 0 10px var(--qb-glow);
+        text-shadow: 0 0 calc(var(--blitz-word-glow, 64px) * .28) var(--qb-glow);
         animation: qbWordPop 300ms 60ms cubic-bezier(.34,1.56,.64,1) both;
         max-width: 680px; width: 100%;
       }
@@ -228,6 +231,42 @@ window.QuestionBlitz = (() => {
       .qb-opt:nth-child(4) { --opt-delay: 150ms; }
       .qb-opt:nth-child(5) { --opt-delay: 190ms; }
       .qb-opt:nth-child(6) { --opt-delay: 230ms; }
+
+      @media (min-width: 900px) and (orientation: landscape) {
+        #qb-overlay {
+          display: grid;
+          grid-template-columns: 1fr minmax(380px, 46vw);
+          grid-template-rows: auto 1fr;
+          align-items: stretch;
+        }
+        #qb-timer-bar { grid-column: 1 / -1; }
+        #qb-scroll {
+          display: contents;
+          overflow: visible;
+        }
+        #qb-prompt {
+          grid-column: 1;
+          grid-row: 2;
+          justify-content: center;
+          padding: 0 clamp(24px, 4vw, 72px);
+        }
+        #qb-options {
+          grid-column: 2;
+          grid-row: 2;
+          align-self: center;
+          width: 100%;
+          max-width: none;
+          gap: clamp(14px, 1.6vw, 24px);
+          padding: 0 clamp(24px, 4vw, 64px) clamp(24px, 4vh, 56px) 0;
+        }
+        #qb-jp-word { font-size: clamp(32px, 3.8vw, 72px); }
+        #qb-hira { font-size: clamp(18px, 2vw, 30px); }
+        .qb-opt {
+          font-size: clamp(20px, 1.8vw, 32px);
+          padding: clamp(18px, 2vh, 30px) clamp(16px, 1.6vw, 28px);
+          border-radius: clamp(16px, 1.6vw, 26px);
+        }
+      }
 
       .qb-opt:hover {
         background: var(--qb-opt-hover);
