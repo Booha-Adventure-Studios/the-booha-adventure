@@ -29,12 +29,14 @@ assert.match(engine, /function renderSeparateReading\(jpContainer, hiraContainer
   'the fail screen must render Japanese and furigana in separate blocks');
 assert.match(engine, /hiraContainer\.hidden = false/,
   'the fail-screen furigana block must be visible when feedback opens');
-assert.match(vocab, /const formatBlitzTime = BoohaBlitzEngine\.fmtTime/,
-  'the fastest-player panel must use the shared time formatter');
+assert.match(engine, /function recordDateLabel\(value\)/,
+  'the records panel must format saved record dates in the shared engine');
+assert.match(engine, /fmtTime\(item\.score\.ms\)/,
+  'the records panel must use the shared time formatter');
 assert.ok(!/\$\{fmtTime\(/.test(vocab),
-  'the fastest-player panel must not call an undefined local fmtTime');
-assert.match(vocab, /window\.CALENDAR\?\.getCurrentCurriculumWeek/, 
-  'the fastest-player panel must resolve a week when opened without explicit context');
+  'the vocab skin must not call an undefined local fmtTime');
+assert.match(engine, /window\.CALENDAR\?\.getCurrentCurriculumWeek/,
+  'the records panel must resolve a week when opened without explicit context');
 for (const [source, prefix] of [[vocab, 'vb'], [sentence, 'sb'], [questions, 'qb']]) {
   assert.match(source, new RegExp('\\.' + prefix + '-wrong-hira\\[hidden\\]'),
     prefix + ' furigana block must support the shared hidden state');

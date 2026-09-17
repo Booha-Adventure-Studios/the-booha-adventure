@@ -305,9 +305,21 @@ window.BoohaBlitzEngine = (() => {
     return `${s}.${String(cents).padStart(2, '0')}s`;
   }
 
+  const SPEED_TARGETS = Object.freeze({
+    vocab: 45000,
+    sentences: 60000,
+    questions: 58000,
+  });
+
   function speedTargetFor(config) {
-    const baseline = Number(config.speedTargetMs) > 0 ? Number(config.speedTargetMs) : 90000;
+    const baseline = Number(config.speedTargetMs) > 0
+      ? Number(config.speedTargetMs)
+      : Number(SPEED_TARGETS[config.gameType]) || 90000;
     return Math.round(baseline);
+  }
+
+  function speedTargetForGame(gameType) {
+    return Number(SPEED_TARGETS[gameType]) || 90000;
   }
 
   function speedBandFor(ms, targetMs) {
@@ -3479,6 +3491,14 @@ window.BoohaBlitzEngine = (() => {
         launch({ curr, monthSlug, weekNumber });
       });
       overlay.querySelector(selector('winClose')).addEventListener('click', cleanupAndClose);
+      const recordsButton = selector('records') ? overlay.querySelector(selector('records')) : null;
+      recordsButton?.addEventListener('click', event => {
+        openRecordsPanel({
+          monthSlug,
+          weekNumber,
+          returnFocus: event.currentTarget,
+        });
+      });
 
       scheduleTimerTick(0);
       renderQuestion();
@@ -3525,6 +3545,298 @@ window.BoohaBlitzEngine = (() => {
     };
   }
 
+  const RECORD_LEGACY_KEYS = Object.freeze({
+    vocab: 'vocabBlitz',
+    sentences: 'sentenceBlitz',
+    questions: 'questionBlitz',
+  });
+  const RECORD_GAMES = Object.freeze([
+    Object.freeze({ id: 'vocab', label: 'VOCAB', jp: '単語' }),
+    Object.freeze({ id: 'sentences', label: 'SENTENCES', jp: '文章' }),
+    Object.freeze({ id: 'questions', label: 'QUESTIONS', jp: '問題' }),
+  ]);
+  const RECORD_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
+
+  function recordDateLabel(value) {
+    if (!value) return '--';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '--';
+    try {
+      return new Intl.DateTimeFormat('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric',
+      }).format(date).toUpperCase();
+    } catch (_) {
+      return date.toISOString().slice(0, 10);
+    }
+  }
+
+  function resolveRecordsWeek(ctx = {}) {
+    const liveWeek = ctx.monthSlug && ctx.weekNumber
+      ? ctx
+      : window.CALENDAR?.getCurrentCurriculumWeek?.();
+    return liveWeek?.monthSlug && liveWeek?.weekNumber
+      ? makeWeekId(liveWeek.monthSlug, liveWeek.weekNumber)
+      : null;
+  }
+
+  function buildRecordsPanel() {
+    const panel = document.createElement('div');
+    panel.id = 'blitz-rec-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-labelledby', 'blitz-rec-title');
+    panel.setAttribute('aria-hidden', 'true');
+    panel.innerHTML = `
+      <section id="blitz-rec-inner">
+        <header id="blitz-rec-top">
+          <div>
+            <div id="blitz-rec-title">RECORDS</div>
+            <div id="blitz-rec-title-jp">きろく</div>
+          </div>
+          <button id="blitz-rec-close" type="button">とじる</button>
+        </header>
+        <div id="blitz-rec-toggle" role="group" aria-label="Record range">
+          <button type="button" data-record-scope="weekly" aria-pressed="true">今週 <span>THIS WEEK</span></button>
+          <button type="button" data-record-scope="alltime" aria-pressed="false">これまで <span>ALL TIME</span></button>
+        </div>
+        <div id="blitz-rec-hero" aria-live="polite">
+          <div id="blitz-rec-hero-label">FASTEST EVER</div>
+          <div id="blitz-rec-hero-time">--</div>
+          <div id="blitz-rec-hero-meta">YOUR FIRST RECORD STARTS HERE</div>
+        </div>
+        <div id="blitz-rec-board" aria-label="Blitz records board"></div>
+        <div id="blitz-rec-progress" aria-live="polite"></div>
+      </section>
+    `;
+
+    let style = document.getElementById('blitz-rec-styles');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'blitz-rec-styles';
+      style.textContent = `
+        #blitz-rec-panel {
+          position: fixed; inset: 0; z-index: 10000; display: none;
+          align-items: center; justify-content: center;
+          padding: max(env(safe-area-inset-top,0px) + 12px, 14px)
+                   max(env(safe-area-inset-right,0px) + 12px, 14px)
+                   max(env(safe-area-inset-bottom,0px) + 12px, 14px)
+                   max(env(safe-area-inset-left,0px) + 12px, 14px);
+          background: linear-gradient(145deg, rgba(18,5,30,.97), rgba(4,18,30,.97));
+          font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,
+            "Noto Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+        }
+        #blitz-rec-panel.show { display: flex; }
+        #blitz-rec-inner {
+          width: min(560px, 100%); max-height: min(760px, 100%);
+          overflow-y: auto; overscroll-behavior: contain;
+          border: 2px solid rgba(255,255,255,.36); border-radius: 26px;
+          background: linear-gradient(145deg, rgba(99,26,94,.98), rgba(14,35,61,.98));
+          box-shadow: 0 24px 70px rgba(0,0,0,.72), 0 0 0 2px rgba(255,255,255,.08),
+            0 0 42px rgba(255,111,181,.28);
+          color: #fff;
+        }
+        #blitz-rec-top {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 18px 20px 12px;
+        }
+        #blitz-rec-title { font-size: clamp(18px,4vw,25px); font-weight: 1000; letter-spacing: 2px; }
+        #blitz-rec-title-jp { color: rgba(255,255,255,.68); font-size: 12px; letter-spacing: 2px; }
+        #blitz-rec-close {
+          appearance: none; border: 1px solid rgba(255,255,255,.42); border-radius: 999px;
+          padding: 8px 14px; background: rgba(0,0,0,.18); color: #fff; font-weight: 900;
+          cursor: pointer;
+        }
+        #blitz-rec-toggle { display: flex; gap: 8px; padding: 0 20px 14px; }
+        #blitz-rec-toggle button {
+          flex: 1; appearance: none; border: 1px solid rgba(255,255,255,.22);
+          border-radius: 999px; padding: 8px 10px; background: rgba(0,0,0,.2);
+          color: rgba(255,255,255,.58); font-weight: 950; cursor: pointer;
+        }
+        #blitz-rec-toggle button span { display: block; margin-top: 2px; font-size: 9px; letter-spacing: 1px; }
+        #blitz-rec-toggle button[aria-pressed="true"] {
+          color: #15101e; border-color: #ffe27a; background: #ffe27a;
+          box-shadow: 0 0 20px rgba(255,226,122,.42);
+        }
+        #blitz-rec-hero {
+          margin: 0 20px 16px; padding: 15px 16px 17px; text-align: center;
+          border: 1px solid rgba(255,226,122,.62); border-radius: 18px;
+          background: linear-gradient(135deg, rgba(255,226,122,.17), rgba(255,111,181,.14));
+          box-shadow: 0 0 24px rgba(255,226,122,.12);
+        }
+        #blitz-rec-hero-label { color: #ffe27a; font-size: 11px; font-weight: 1000; letter-spacing: 2px; }
+        #blitz-rec-hero-time { margin: 1px 0 0; font-size: clamp(52px,13vw,76px); font-weight: 1000; line-height: .98; letter-spacing: -2px; font-variant-numeric: tabular-nums; text-shadow: 0 0 22px rgba(255,226,122,.55); }
+        #blitz-rec-hero-meta { color: rgba(255,255,255,.8); font-size: clamp(10px,2.4vw,13px); font-weight: 800; letter-spacing: .8px; }
+        #blitz-rec-board { display: grid; grid-template-columns: minmax(74px, .7fr) repeat(3, minmax(0, 1fr)); gap: 7px; padding: 0 20px; }
+        .blitz-rec-corner { min-height: 20px; }
+        .blitz-rec-game-head { padding: 5px 2px 7px; text-align: center; color: rgba(255,255,255,.76); font-size: clamp(8px,2vw,11px); font-weight: 1000; letter-spacing: .7px; }
+        .blitz-rec-game-head span { display: block; color: rgba(255,255,255,.52); font-size: 10px; letter-spacing: 1px; }
+        .blitz-rec-curr-head { display: flex; flex-direction: column; justify-content: center; padding: 8px 4px; color: #fff; font-size: clamp(10px,2.4vw,13px); font-weight: 1000; line-height: 1.1; }
+        .blitz-rec-curr-head span { margin-top: 4px; color: rgba(255,255,255,.55); font-size: 9px; letter-spacing: .5px; }
+        .blitz-rec-cell { min-height: 103px; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 8px 9px; border: 1px solid var(--rec-accent); border-radius: 14px; background: linear-gradient(145deg, color-mix(in srgb, var(--rec-accent) 22%, transparent), rgba(0,0,0,.2)); box-shadow: 0 0 15px color-mix(in srgb, var(--rec-accent) 24%, transparent); }
+        .blitz-rec-cell.is-open { border-style: dashed; background: rgba(0,0,0,.16); box-shadow: none; }
+        .blitz-rec-cell-top { display: flex; justify-content: flex-end; min-height: 15px; }
+        .blitz-rec-medal { padding: 3px 5px; border-radius: 999px; font-size: 8px; font-weight: 1000; letter-spacing: .7px; color: #18111e; background: var(--rec-accent); }
+        .blitz-rec-cell.is-open .blitz-rec-medal { color: rgba(255,255,255,.62); background: rgba(255,255,255,.1); }
+        .blitz-rec-time { align-self: center; font-size: clamp(17px,4vw,25px); font-weight: 1000; font-variant-numeric: tabular-nums; line-height: 1; }
+        .blitz-rec-cell.is-open .blitz-rec-time { color: rgba(255,255,255,.58); font-size: clamp(14px,3vw,18px); }
+        .blitz-rec-target { align-self: center; color: rgba(255,255,255,.58); font-size: 8px; font-weight: 900; letter-spacing: .8px; }
+        #blitz-rec-progress { display: flex; align-items: center; gap: 9px; padding: 16px 20px 19px; color: rgba(255,255,255,.78); font-size: 10px; font-weight: 1000; letter-spacing: 1px; }
+        #blitz-rec-progress-segments { display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px; flex: 1; }
+        .blitz-rec-progress-segment { height: 7px; border-radius: 99px; background: rgba(255,255,255,.16); }
+        .blitz-rec-progress-segment.is-cleared { background: var(--rec-accent); box-shadow: 0 0 9px var(--rec-accent); }
+        @media (max-width: 430px) {
+          #blitz-rec-inner { border-radius: 20px; }
+          #blitz-rec-top, #blitz-rec-toggle, #blitz-rec-board, #blitz-rec-progress { padding-left: 12px; padding-right: 12px; }
+          #blitz-rec-hero { margin-left: 12px; margin-right: 12px; }
+          .blitz-rec-cell { min-height: 92px; padding-left: 5px; padding-right: 5px; }
+          #blitz-rec-board { gap: 4px; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    document.body.appendChild(panel);
+
+    const close = () => {
+      panel.classList.remove('show');
+      panel.setAttribute('aria-hidden', 'true');
+      const returnFocus = panel._recordsReturnFocus;
+      if (returnFocus && returnFocus.isConnected && typeof returnFocus.focus === 'function') {
+        requestAnimationFrame(() => returnFocus.focus());
+      }
+    };
+    panel._closeRecords = close;
+    panel.querySelector('#blitz-rec-close').addEventListener('click', close);
+    panel.addEventListener('click', event => {
+      if (event.target === panel) close();
+    });
+    panel.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...panel.querySelectorAll('button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+    panel.querySelectorAll('[data-record-scope]').forEach(button => {
+      button.addEventListener('click', () => {
+        panel._recordsScope = button.dataset.recordScope;
+        renderRecordsPanel(panel);
+      });
+    });
+    return panel;
+  }
+
+  function renderRecordsPanel(panel) {
+    const scope = panel._recordsScope || 'weekly';
+    const weekId = panel._recordsWeekId;
+    const board = panel.querySelector('#blitz-rec-board');
+    const scores = [];
+    RECORD_CURRICULA.forEach(curr => RECORD_GAMES.forEach(game => {
+      const score = scope === 'weekly'
+        ? getWeeklyScoreFor(game.id, curr, weekId)
+        : getRecordScoreFor(game.id, RECORD_LEGACY_KEYS[game.id], curr);
+      scores.push({ game, curr, score });
+    }));
+
+    const hero = RECORD_CURRICULA.flatMap(curr => RECORD_GAMES.map(game => ({
+      curr,
+      game,
+      score: getRecordScoreFor(game.id, RECORD_LEGACY_KEYS[game.id], curr),
+    }))).filter(item => item.score).sort((a, b) => a.score.ms - b.score.ms)[0];
+    panel.querySelector('#blitz-rec-hero-time').textContent = hero ? fmtTime(hero.score.ms) : '--';
+    panel.querySelector('#blitz-rec-hero-meta').textContent = hero
+      ? `${hero.score.name && hero.score.name !== 'UNKNOWN' ? hero.score.name : 'PLAYER 1'} · ${recordDateLabel(hero.score.date)} · ${hero.game.label} / ${THEMES[hero.curr].name}`
+      : 'YOUR FIRST RECORD STARTS HERE';
+    panel.querySelectorAll('[data-record-scope]').forEach(button => {
+      button.setAttribute('aria-pressed', String(button.dataset.recordScope === scope));
+    });
+
+    board.innerHTML = '';
+    const corner = document.createElement('div');
+    corner.className = 'blitz-rec-corner';
+    board.appendChild(corner);
+    RECORD_GAMES.forEach(game => {
+      const heading = document.createElement('div');
+      heading.className = 'blitz-rec-game-head';
+      heading.innerHTML = `${game.label}<span>${game.jp}</span>`;
+      board.appendChild(heading);
+    });
+    RECORD_CURRICULA.forEach(curr => {
+      const theme = THEMES[curr];
+      const row = document.createElement('div');
+      row.className = 'blitz-rec-curr-head';
+      row.textContent = theme.name;
+      const jp = document.createElement('span');
+      jp.textContent = theme.nameJp;
+      row.appendChild(jp);
+      board.appendChild(row);
+      RECORD_GAMES.forEach(game => {
+        const item = scores.find(entry => entry.curr === curr && entry.game.id === game.id);
+        const target = speedTargetForGame(game.id);
+        const band = item.score ? speedBandFor(item.score.ms, target) : null;
+        const cell = document.createElement('div');
+        cell.className = `blitz-rec-cell ${item.score ? `band-${band}` : 'is-open'}`;
+        cell.style.setProperty('--rec-accent', theme.accent);
+        cell.setAttribute('aria-label', item.score
+          ? `${theme.name} ${game.label}: ${fmtTime(item.score.ms)}, ${band}`
+          : `${theme.name} ${game.label}: target ${fmtTime(target)}`);
+        const top = document.createElement('div');
+        top.className = 'blitz-rec-cell-top';
+        const medal = document.createElement('span');
+        medal.className = 'blitz-rec-medal';
+        medal.textContent = item.score ? band.toUpperCase() : 'TARGET';
+        top.appendChild(medal);
+        const time = document.createElement('div');
+        time.className = 'blitz-rec-time';
+        time.textContent = item.score ? fmtTime(item.score.ms) : fmtTime(target);
+        const targetLabel = document.createElement('div');
+        targetLabel.className = 'blitz-rec-target';
+        targetLabel.textContent = item.score ? 'PERSONAL RECORD' : 'FIRST CLEAR GOAL';
+        cell.append(top, time, targetLabel);
+        board.appendChild(cell);
+      });
+    });
+
+    const cleared = scores.filter(item => item.score).length;
+    const progress = panel.querySelector('#blitz-rec-progress');
+    progress.innerHTML = '';
+    const segments = document.createElement('div');
+    segments.id = 'blitz-rec-progress-segments';
+    scores.forEach(item => {
+      const segment = document.createElement('span');
+      segment.className = `blitz-rec-progress-segment ${item.score ? 'is-cleared' : ''}`;
+      segment.style.setProperty('--rec-accent', THEMES[item.curr].accent);
+      segments.appendChild(segment);
+    });
+    const label = document.createElement('span');
+    label.textContent = `${cleared}/9 ${scope === 'weekly' ? 'CLEARED THIS WEEK' : 'ALL-TIME RECORDS'}`;
+    progress.append(segments, label);
+  }
+
+  function openRecordsPanel(ctx = {}) {
+    let panel = document.getElementById('blitz-rec-panel');
+    if (!panel) panel = buildRecordsPanel();
+    panel._recordsWeekId = resolveRecordsWeek(ctx);
+    panel._recordsScope = ctx.scope === 'alltime' ? 'alltime' : 'weekly';
+    panel._recordsReturnFocus = ctx.returnFocus || document.activeElement;
+    renderRecordsPanel(panel);
+    panel.classList.add('show');
+    panel.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => panel.querySelector('#blitz-rec-close')?.focus());
+    return panel;
+  }
+
   return {
     themes: THEMES,
     PERFORMANCE_TIER: HARDWARE_PERFORMANCE_TIER,
@@ -3538,6 +3850,9 @@ window.BoohaBlitzEngine = (() => {
     getRecordScoreFor,
     getWeeklyScoreFor,
     scoreName,
+    SPEED_TARGETS,
+    speedTargetForGame,
+    openRecordsPanel,
     create,
   };
 })();
