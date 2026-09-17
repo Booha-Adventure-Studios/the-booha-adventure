@@ -144,6 +144,10 @@ assert.match(utsurobaSource, /CASE FILE 02 \/ CLOSED[\s\S]*?Complete nine games 
   'the closed popup must explain the weekly unlock');
 assert.match(utsurobaSource, /data-family-room-enter/,
   'the open popup must offer an explicit enter action');
+assert.match(utsurobaSource, /family-room-pop-title-en\">AKIYA/,
+  'the Family Room popup must display the player-facing Akiya name');
+assert.doesNotMatch(utsurobaSource, /The Family Room|THE FAMILY ROOM|かぞくの へや/,
+  'the Family Room popup must not retain the old player-facing name');
 assert.match(utsurobaSource, /family-room\/flashlight\.webp/,
   'the popup must use the flashlight sprite');
 assert.match(utsurobaSource, /showLockedWorld\(\)/,
