@@ -4,7 +4,7 @@ const assert = require('assert');
 const engine = fs.readFileSync('js/blitz-engine.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /function createStartCard\(overlay, palette\)/,
+assert.match(engine, /function createStartCard\(overlay, palette(?:, speedTarget)?\)/,
   'Blitz must use a shared start card across all curricula');
 assert.match(engine, /booha-blitz-start-card/,
   'the first impression must have a dedicated start-card surface');
@@ -12,6 +12,12 @@ assert.match(engine, /Tap to start the run · タップしてスタート/,
   'the start card must clearly tell the player how to begin');
 assert.match(engine, /START BLITZ →/,
   'the start card must expose a clear start action');
+assert.match(engine, /function speedTargetFor\(config, bestMs\)/,
+  'the start card target must be derived from a shared speed target');
+assert.match(engine, /booha-blitz-start-target/,
+  'the start card must show the preparation target before the timer begins');
+assert.match(engine, /function speedBandFor\(ms, targetMs\)/,
+  'perfect-run spectacle must have explicit speed bands');
 assert.match(engine, /blitz-awaiting-start/,
   'the first question must wait behind the start card');
 assert.match(engine, /function playStartSting\(\)/,

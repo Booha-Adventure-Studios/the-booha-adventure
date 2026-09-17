@@ -1679,7 +1679,14 @@ function renderHub() {
   const playerName = getBoohaFirstName();
 
   const existing = document.getElementById('blitzArcade');
-  if (existing) existing.remove();
+  if (existing) {
+    const handlers = existing._boohaBlitzHubEventHandlers;
+    if (handlers) {
+      document.removeEventListener('booha:gameEnd', handlers.gameEnd);
+      document.removeEventListener('booha:weeklyReset', handlers.weeklyReset);
+    }
+    existing.remove();
+  }
 
   
 const thisWeek = getCurrentCurriculumWeek();
@@ -1772,6 +1779,17 @@ const PILLS = [
   });
 }
 
+  const hubEventHandlers = {
+    gameEnd: event => {
+      const saveId = String(event.detail?.saveId || '');
+      if (saveId.startsWith('blitz:')) renderPills();
+    },
+    weeklyReset: () => renderPills(),
+  };
+  arcade._boohaBlitzHubEventHandlers = hubEventHandlers;
+  document.addEventListener('booha:gameEnd', hubEventHandlers.gameEnd);
+  document.addEventListener('booha:weeklyReset', hubEventHandlers.weeklyReset);
+
   
   TABS.forEach(tab => {
     const btn = document.createElement('button');
@@ -1820,10 +1838,6 @@ const PILLS = [
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPillsWhenEnginesReady);
   else initPillsWhenEnginesReady();
-  document.addEventListener('booha:weeklyReset', () => {
-    if (window.VocabBlitz && window.SentenceBlitz && window.QuestionBlitz) renderPills();
-  });
-
   const weekCards = document.getElementById('weekCards');
 
   

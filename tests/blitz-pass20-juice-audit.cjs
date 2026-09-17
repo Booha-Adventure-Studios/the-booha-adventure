@@ -20,8 +20,8 @@ assert.match(engine, /function emitPerfectFlash\(overlay, palette, playerName\)/
   'perfect clears must have a distinct finishing flash');
 assert.match(engine, /booha-blitz-perfect-flash-label/,
   'the perfect flash must identify the player');
-assert.match(engine, /if \(isPerfectRun\) emitPerfectFlash\(overlay, palette, playerName\)/,
-  'the perfect flash must be limited to perfect clears');
+assert.match(engine, /if \(isPerfectRun && speedBand === 'elite'\) emitFinishFlash\(overlay, palette, playerName, 'speed'\);[\s\S]*?else if \(isPerfectRun && speedBand === 'target'\) emitPerfectFlash\(overlay, palette, playerName\);[\s\S]*?else if \(isPerfectRun\) emitFinishFlash\(overlay, palette, playerName, 'clear'\);/,
+  'finishing spectacle must remain limited to perfect clears and scale with speed');
 assert.match(engine, /\.booha-blitz-perfect-flash \{ animation: none; opacity: \.88; \}/,
   'the perfect flash must fall back safely for reduced motion');
 assert.match(engine, /if \(!REDUCED_MOTION\) \{\n\s+overlay\.classList\.add\('shake'\)/,

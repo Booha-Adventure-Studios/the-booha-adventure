@@ -6,12 +6,12 @@ const verify = fs.readFileSync('verify.sh', 'utf8');
 
 assert.match(engine, /function emitFinishFlash\(overlay, palette, playerName, kind = 'perfect'\)/,
   'finish flashes should share one helper with an explicit result kind');
-assert.match(engine, /flash\.className = `booha-blitz-perfect-flash\$\{isRecordFlash \? ' record' : ''\}`/,
-  'record finishes should use the distinct record flash class');
-assert.match(engine, /label\.textContent = isRecordFlash \? `\$\{playerName\} · NEW RECORD!` : `\$\{playerName\} · PERFECT!`/,
-  'record and perfect finishes should have distinct readable labels');
-assert.match(engine, /if \(isPerfectRun\) emitPerfectFlash\(overlay, palette, playerName\);\s*else if \(isRecord\) emitFinishFlash\(overlay, palette, playerName, 'record'\);/,
-  'perfect and record flashes should be emitted for their matching result states');
+assert.match(engine, /flash\.className = `booha-blitz-perfect-flash\$\{isRecordFlash \? ' record' : ''\}\$\{isSpeedFlash \? ' speed' : ''\}\$\{isClearFlash \? ' clear' : ''\}`/,
+  'record, speed, and ordinary clears should use distinct flash classes');
+assert.match(engine, /label\.textContent = isRecordFlash[\s\S]*?isSpeedFlash \? `\$\{playerName\} · SPEED OVERDRIVE!/,
+  'finish states should have distinct readable labels');
+assert.match(engine, /if \(isPerfectRun && speedBand === 'elite'\) emitFinishFlash\(overlay, palette, playerName, 'speed'\);[\s\S]*?else if \(isPerfectRun\) emitFinishFlash\(overlay, palette, playerName, 'clear'\);/,
+  'finish spectacle should scale with the speed band');
 assert.match(engine, /\.booha-blitz-perfect-flash\.record \{ animation-duration: 1050ms; \}/,
   'record flash should hold long enough to read');
 assert.match(engine, /\.booha-blitz-perfect-flash\.record \.booha-blitz-perfect-flash-label \{[\s\S]*?color: #fff7b0;/,
