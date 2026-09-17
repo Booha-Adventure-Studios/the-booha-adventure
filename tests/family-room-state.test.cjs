@@ -17,7 +17,7 @@ assert(source.includes("const ACTIVE_CASE_ID = 'chanoma'") && source.includes('A
 assert(source.includes("state = 'study'") && source.includes('function beginCaseFromStudy') && source.includes("if (state === 'study')"), 'Pass 2 must separate manual study from timed dark gameplay');
 assert(markup.includes('id="study-panel"') && markup.includes('START THE CASE') && markup.includes('No timer. Start when ready.'), 'the study panel must explain its unlimited manual phase');
 assert(source.includes('repeatOnCaseRestart: false') && source.includes('reviewFromHub: true'), 'study review and restart behavior must be explicit in the design lock');
-assert(source.includes("role: 'presence'") && source.includes('scoredTarget: false') && source.includes('markableTarget: true') && source.includes("targetId: 'pataskala'"), 'Pataskala must remain a non-scored but explicitly markable presence target');
+assert(source.includes("role: 'threat'") && source.includes('scoredTarget: false') && source.includes('markableTarget: false') && !source.includes("targetId: 'pataskala'"), 'Pataskala must remain a non-scored, non-markable threat');
 assert(markup.includes('CASE FILE 02 / CHANOMA') && !markup.includes('CASE FILE 07'), 'the built room label must be Case 02');
 assert(registry.includes("status: 'CASE FILE 02 / OPEN'") && registry.includes("statusCompleted: 'CASE FILE 02 / SEALED'"), 'the registered Family Room statuses must use the built case number');
 assert(!source.includes('round-number'), 'the case must not expose a round counter');
@@ -42,9 +42,9 @@ assert(source.includes('function handleBurnout(time)') && source.includes('begin
 assert(source.includes('function handleWrong()') && source.includes('beginFailure(UI_COPY.caseReset)'), 'a wrong report must restart the case instead of consuming a life');
 assert(source.includes('function updateAndon') && source.includes('burnFraction'), 'the lantern clock must use a dimming andon, not a number');
 assert(markup.includes('id="andon"') && markup.includes("BOOHA'S LIGHT") && markup.includes('class="andon andon-primary"') && !markup.includes('flame-meter'), 'Booha\'s light must be the primary light readout');
-assert(source.includes('function drawShojiDawn') && source.includes('progress / CASE_ROUNDS'), 'case progress must brighten the shoji without a counter');
+assert(!source.includes('function drawShojiDawn') && source.includes('const CASE_PHASES'), 'the room must avoid the opaque shoji rectangle and use explicit pacing phases');
 assert(source.includes('const inheritedAlpha = ctx.globalAlpha') && source.includes('inheritedAlpha * (anomaly.character'), 'anomaly opacity must preserve the ambient shadow pass');
-assert(source.includes('const targetAspect') && source.includes('canvas.style.margin = \'0 auto\''), 'the room canvas must stay within the portrait art aspect');
+assert(source.includes('width = viewportWidth') && source.includes('height = viewportHeight') && source.includes("canvas.style.margin = '0'"), 'the room canvas must fill the viewport while the portrait art cover-crops inside it');
 assert(source.includes('markHoldStartedAt') && source.includes('heldMs / MARK_HOLD_MS'), 'the hold-to-mark gesture must show visible progress');
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
@@ -54,24 +54,24 @@ assert(source.includes('artSize') && source.includes('ctx.drawImage(art'), 'anom
 assert(['bowl', 'cup', 'eyes', 'shadow', 'talisman', 'lantern', 'futon', 'seams', 'teapot', 'crescent'].every(id => serviceWorker.includes(`/assets/family-room/overlays/${id}.webp`)), 'all authored anomaly overlays must be precached');
 assert(source.includes('const PATASKALA_POSES = [') && source.includes("character: 'pataskala'"), 'Pataskala must have a named character anomaly set');
 assert(source.includes('assets/family-room/pataskala/${pose.id}.webp') && ['pataskala-standing', 'pataskala-moving', 'pataskala-crouch', 'pataskala-emerging'].every(id => fs.existsSync(path.join(root, `assets/family-room/pataskala/${id}.webp`))), 'all Pataskala poses must load as authored transparent assets');
-assert(source.includes('function pataskalaChance') && source.includes('if (round < 2) return 0'), 'Pataskala must emerge progressively after the opening cases');
+assert(source.includes('function pataskalaChance') && source.includes('phase.pataskalaBaseChance') && source.includes('pataskalaCooldownRounds'), 'Pataskala must emerge progressively with a cooldown between threats');
 assert(source.includes("selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2"), 'the emerging Pataskala pose must be reserved for the Lies tier');
 assert(source.includes('MARK_DEAD_ZONE_PX = 8') && source.includes('markHoldOrigin'), 'touch marking must tolerate small pointer tremor');
 assert(source.includes('plate.w * anomaly.artSize') && source.includes('plate.w * target[2]'), 'anomaly sizing and alert radii must follow the room plate');
-assert(source.includes('function drawAnomalies(list)') && source.includes('drawAnomalies(currentAnomalies)') && source.includes('drawAnomaly(currentPresence)') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'multiple changes and Pataskala must be faintly visible outside the lantern and the light rim must blend into the room');
+assert(source.includes('function drawAnomalies(list)') && source.includes('drawAnomalies(currentAnomalies)') && source.includes('drawPataskalaThreat()') && source.includes("light.addColorStop(1, 'rgba(0,0,0,.84)')"), 'multiple changes and the active Pataskala threat must be faintly visible outside the lantern and the light rim must blend into the room');
 assert(source.includes('pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() }') && source.includes('markedPoints.some') && source.includes('mark.radius'), 'marking must judge whether the anomaly is inside the lantern at lock time');
 assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 92'), 'Booha must leave more of the lantern reveal unobstructed');
 assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.includes('.26 - minimum'), 'the lantern radius must shrink continuously with a playable minimum');
 assert(source.includes('maxChanges: 1') && source.includes('maxChanges: 2') && source.includes('twoChangeChance: .24') && source.includes('twoChangeChance: .52'), 'room tiers must define when two-change rounds can appear');
 assert(source.includes('let currentAnomalies = []') && source.includes('function reportIsCorrect') && source.includes('requiredTargets.every'), 'reports must validate every required change and reject missing or extra marks');
-assert(source.includes('currentPresence = currentAudioOnly ? null') && source.includes('Boolean(currentPresence || falseAlertPoint)'), 'Pataskala presence must remain separate from scored room changes');
+assert(source.includes('currentPresence = currentAudioOnly ? null') && source.includes('Boolean(falseAlertPoint)') && source.includes('reportTargets()'), 'Pataskala must remain separate from scored room changes');
 assert(source.includes('WRONG_MARK_GRACE_MS = 700') && source.includes('function startWrongMarkHazard') && source.includes('function updateWrongMarkHazard'), 'a wrong confirmed mark must create a readable hazard state');
 assert(source.includes('function boohaAtExit') && source.includes("RUN TO THE EXIT") && source.includes('beginFailure(UI_COPY.caseReset)'), 'the wrong-mark hazard must be escapable at the exit and fatal on contact');
 assert(source.includes("playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + .1))") && source.includes('rgba(255,82,62,.92)'), 'wrong marks must have distinct red visual and audio feedback');
 assert(source.includes('const AUDIO_ONLY_CHANGE = Object.freeze') && source.includes('audioOnlyChance: .08') && source.includes('audioOnlyChance: .16'), 'audio-only anomalies must be explicit and tier-weighted');
 assert(source.includes('currentAudioOnly = !hasChange') && source.includes('if (currentAudioOnly) return markedPoints.length === 0') && source.includes('AUDIO_ONLY_CHANGE.en'), 'an audio-only anomaly must be reportable without a location mark and teach its sentence after a correct report');
-assert(source.includes('function schedulePataskalaMovement') && source.includes('currentPresence = random(choices') && source.includes("playSfx('move', AUDIO_LEVELS.move)"), 'Pataskala must be able to move once within a round with an authored movement cue');
-assert(source.includes("targetId: 'pataskala'") && source.includes('artSize: .28') && source.includes('target: [.7, .29, .22]'), 'Pataskala must use adult-scale art and an expanded target radius');
+assert(source.includes('function schedulePataskalaThreat') && source.includes('function beginPataskalaThreat') && source.includes('function updatePataskalaThreat') && source.includes("playSfx('move', AUDIO_LEVELS.move)"), 'Pataskala must approach Booha within a timed, authored threat window');
+assert(!source.includes("targetId: 'pataskala'") && source.includes('artSize: .28') && source.includes('target: [.7, .29, .22]'), 'Pataskala must use adult-scale authored art without entering the report target registry');
 assert(source.includes('ensureAudio(); startBgm();') && source.includes('window.clearTimeout(pataskalaMoveTimer)'), 'BGM must start after the study handoff and Pataskala timers must be cleared on round cleanup');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 14 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
@@ -169,7 +169,7 @@ function canvasElement() {
 
 const events = [];
 const deterministicMath = Object.create(Math);
-deterministicMath.random = () => 0.599;
+deterministicMath.random = () => 0.2;
 const document = {
   readyState: 'complete',
   getElementById: id => nodes[id],
@@ -199,14 +199,12 @@ vm.runInContext(source, context, { filename: 'family-room.js' });
 nodes['start-button'].onclick();
 assert.strictEqual(nodes['study-panel'].hidden, false, 'entering the room must open the manual study phase');
 nodes['study-start-button'].onclick();
-for (let index = 0; index < 7; index += 1) {
-  nodes['room-canvas'].onpointerdown({ clientX: 235, clientY: 476 });
-  nodes['mark-yes-button'].onclick();
+for (let index = 0; index < 11; index += 1) {
   nodes['leave-button'].onclick();
 }
 
 assert.strictEqual(events.length, 1, 'a complete case must emit one game-end event');
 assert.strictEqual(events[0].saveId, 'bonus:family_room');
 assert.strictEqual(events[0].completed, true);
-assert.strictEqual(events[0].score, 7, 'the submitted score must be marked changes, not elapsed time');
+assert.strictEqual(events[0].score, 0, 'the submitted score must be marked changes, not elapsed time');
 console.log('Family Room state-machine audit passed: hidden progression, lantern recovery, marking, and gameEnd contract work.');
