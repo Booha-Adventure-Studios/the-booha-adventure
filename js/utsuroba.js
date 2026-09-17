@@ -1191,7 +1191,7 @@
       #family-room-pop-overlay .utsu-profile-pop-box::after{border-color:rgba(197,255,104,.16);}
       #family-room-pop-overlay .utsu-profile-pop-icon{width:166px;height:102px;margin-bottom:10px;}
       #family-room-pop-overlay .family-room-pop-icon::before{background:radial-gradient(ellipse,rgba(202,255,72,.42),rgba(255,222,129,.16) 42%,transparent 72%);filter:blur(10px);}
-      #family-room-pop-overlay .family-room-pop-icon img{width:166px;height:102px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 7px #fff1ac) drop-shadow(0 0 24px #baff45);}
+      #family-room-pop-overlay .family-room-pop-icon img{width:166px;height:102px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 7px #fff1ac);}
       #family-room-pop-overlay .family-room-pop-icon.is-closed::before{opacity:.22;filter:grayscale(1) blur(8px);}
       #family-room-pop-overlay .family-room-pop-icon.is-closed img{filter:grayscale(.8) brightness(.34) drop-shadow(0 0 3px rgba(186,255,69,.32));}
       #family-room-pop-overlay .family-room-pop-eyebrow{color:#caff65;}
@@ -1614,7 +1614,7 @@
         <button class="utsu-profile-pop-close" type="button" aria-label="Close / とじる">✕</button>
         <div class="utsu-profile-pop-icon family-room-pop-icon is-closed"><img id="family-room-pop-icon" src="./assets/img/family-room/flashlight.webp" alt="Flashlight"></div>
         <p class="utsu-profile-pop-eyebrow family-room-pop-eyebrow"><span id="family-room-pop-eyebrow-en">CASE FILE 02 / CLOSED</span><span id="family-room-pop-eyebrow-jp" class="jp" lang="ja">じけんファイル 02 / しまっている</span></p>
-        <h2 id="family-room-pop-title" class="family-room-pop-title"><span id="family-room-pop-title-en">THE FAMILY ROOM</span><span id="family-room-pop-title-jp" class="jp" lang="ja">かぞくの へや</span></h2>
+        <h2 id="family-room-pop-title" class="family-room-pop-title"><span id="family-room-pop-title-en">AKIYA</span><span id="family-room-pop-title-jp" class="jp" lang="ja">あきや</span></h2>
         <p class="utsu-profile-pop-copy family-room-pop-copy"><span id="family-room-pop-copy-en"></span><small id="family-room-pop-copy-jp" lang="ja"></small></p>
         <p class="family-room-pop-warning"><span>⚠ This is a horror puzzle game!</span><small lang="ja">⚠ これは こわい なぞときゲーム！</small></p>
         <div class="utsu-profile-pop-actions family-room-pop-actions"></div>
@@ -1650,11 +1650,11 @@
     eyebrowEn.textContent = open ? 'CASE FILE 02 / OPEN' : 'CASE FILE 02 / CLOSED';
     eyebrowJp.textContent = open ? 'じけんファイル 02 / あいている' : 'じけんファイル 02 / しまっている';
     copyEn.textContent = open
-      ? 'The Family Room is open. Enter if you are ready.'
-      : 'The Family Room is closed. Complete nine games this week to open it.';
+      ? 'Akiya is open. Enter if you are ready.'
+      : 'Akiya is closed. Complete nine games this week to open it.';
     copyJp.textContent = open
-      ? 'かぞくの へやが あいている。じゅんびが できたら はいる。'
-      : 'かぞくの へやは しまっている。こんしゅう 9つの ゲームを おわると あく。';
+      ? 'あきやが あいている。じゅんびが できたら はいる。'
+      : 'あきやは しまっている。こんしゅう 9つの ゲームを おわると あく。';
     const actions = familyRoomPopOverlay.querySelector('.family-room-pop-actions');
     actions.innerHTML = open
       ? '<button type="button" data-family-room-enter><span>ENTER</span><span>はいる</span></button><button type="button" data-family-room-stay><span>STAY HERE</span><span>ここに いる</span></button>'
@@ -3547,8 +3547,8 @@
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = reveal * (open ? .94 : .34) * (.86 + windowPulse * .14);
       ctx.filter = open ? 'brightness(1.05) saturate(1.08)' : 'grayscale(.8) brightness(.34)';
-      ctx.shadowColor = `rgba(186,255,69,${(open ? .42 : .14) * windowPulse})`;
-      ctx.shadowBlur = 10 + windowPulse * 10;
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
       ctx.drawImage(flashlight, cx - flashlightW / 2, cy - flashlightH / 2, flashlightW, flashlightH);
       ctx.restore();
     }
