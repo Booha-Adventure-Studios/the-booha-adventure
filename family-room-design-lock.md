@@ -24,7 +24,7 @@ The current built room is Case 02, Chanoma. The save identity remains `bonus:fam
 
 ## Locked behavior for later passes
 
-- Each case has seven rounds.
+- Each case has eleven rounds across three phases: quiet (3), uneasy (4), and danger (4).
 - Each case begins with a player-dismissed lit study phase; there is no study countdown.
 - A case restart does not replay the study phase.
 - The Engawa hub provides a separate room-review path.
@@ -35,10 +35,30 @@ The current built room is Case 02, Chanoma. The save identity remains `bonus:fam
   continue the round, or let it touch Booha and restart the case.
 - Some rounds may be audio-only: the room is visually unchanged, but a sound
   tells the player to report the room without marking a location.
-- Pataskala may move once during a round; its movement announces presence, not
-  the location of a scored change.
-- Pataskala is initially an atmospheric presence, not a scored ordinary object.
-- Pataskala’s presence rises with case depth and is strongest in Nando.
+- Pataskala is a non-markable threat, never a scored ordinary object.
+- Pataskala appears silently inside the room, has a short discovery window, then
+  advances toward Booha. The player must reach the bottom threshold to escape;
+  escaping resumes the same investigation without regenerating its anomalies.
+- During a Pataskala threat, report, undo, mark, and mark confirmation are
+  disabled while movement remains active. A catch restarts the case.
+- Pataskala uses the authored staged sprites `far`, `enter`, `approach`, `near`,
+  and `catch`; the same assets may be mirrored and placed at multiple room
+  anchors.
+
+## Viewport and room-space lock
+
+- The browser canvas fills the visible viewport, but the 1024×1536 master room
+  is always contained inside it with `Math.min` scaling. Wide screens show dark
+  presentation pillars; no room art is cropped or stretched.
+- `plate` is the gameplay world. Booha, marks, anomaly anchors, Pataskala,
+  hazards, the light radius, and the exit are all mapped through `plate.x`,
+  `plate.y`, `plate.w`, and `plate.h`.
+- Pointer input in presentation pillars is ignored. Keyboard and pointer
+  movement are clamped to the contained room. Resize/orientation changes
+  preserve Booha’s normalized position within the old and new plate.
+- Environmental changes store their `anchorId` and `region` directly on each
+  generated instance so repeat avoidance does not reconstruct metadata from
+  floating-point coordinates.
 
 ## Locked change vocabulary
 
@@ -56,6 +76,10 @@ Every future object record uses one or more of:
 - Keep markable objects inside the portrait-safe horizontal band `u = 0.22–0.78`.
 - Show a doorway, threshold, step, or other escape edge along the bottom of every room.
 - Use one visible warm practical light source per room.
+- Chanoma’s minimum Pataskala production set is `pataskala_far.webp`,
+  `pataskala_enter.webp`, `pataskala_approach.webp`, `pataskala_near.webp`,
+  and `pataskala_catch.webp`; these are deferred until room entry and reused
+  left/center/right with canvas mirroring.
 - Do not generate new rooms until Chanoma’s revised loop has been playtested.
 
 ## Pass gate
