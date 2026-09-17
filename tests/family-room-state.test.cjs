@@ -44,7 +44,8 @@ assert(source.includes('function updateAndon') && source.includes('burnFraction'
 assert(markup.includes('id="andon"') && markup.includes("BOOHA'S LIGHT") && markup.includes('class="andon andon-primary"') && !markup.includes('flame-meter'), 'Booha\'s light must be the primary light readout');
 assert(!source.includes('function drawShojiDawn') && source.includes('const CASE_PHASES'), 'the room must avoid the opaque shoji rectangle and use explicit pacing phases');
 assert(source.includes('const inheritedAlpha = ctx.globalAlpha') && source.includes('inheritedAlpha * (anomaly.character'), 'anomaly opacity must preserve the ambient shadow pass');
-assert(source.includes('width = viewportWidth') && source.includes('height = viewportHeight') && source.includes("canvas.style.margin = '0'"), 'the room canvas must fill the viewport while the portrait art cover-crops inside it');
+assert(source.includes('width = viewportWidth') && source.includes('height = viewportHeight') && source.includes("canvas.style.margin = '0'"), 'the room canvas must fill the viewport while the complete portrait room is contained inside it');
+assert(source.includes('const scale = Math.min(width / iw, height / ih)') && !source.includes('const scale = Math.max(width / iw, height / ih)'), 'the room plate must use contain scaling rather than cover cropping');
 assert(source.includes('markHoldStartedAt') && source.includes('heldMs / MARK_HOLD_MS'), 'the hold-to-mark gesture must show visible progress');
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
@@ -64,6 +65,7 @@ assert(source.includes('Math.min(width, height) * .1') && source.includes('52, 9
 assert(source.includes('const minimum = REDUCED_MOTION ? .065 : .05') && source.includes('.26 - minimum'), 'the lantern radius must shrink continuously with a playable minimum');
 assert(source.includes('maxChanges: 1') && source.includes('maxChanges: 2') && source.includes('twoChangeChance: .24') && source.includes('twoChangeChance: .52'), 'room tiers must define when two-change rounds can appear');
 assert(source.includes('let currentAnomalies = []') && source.includes('function reportIsCorrect') && source.includes('requiredTargets.every'), 'reports must validate every required change and reject missing or extra marks');
+assert(source.includes('anchorId, region: anchor.region') && source.includes("anomaly.region || 'unknown'"), 'generated anomalies must retain direct anchor metadata for repeat avoidance and debugging');
 assert(source.includes('currentPresence = currentAudioOnly ? null') && source.includes('Boolean(falseAlertPoint)') && source.includes('reportTargets()'), 'Pataskala must remain separate from scored room changes');
 assert(source.includes('WRONG_MARK_GRACE_MS = 700') && source.includes('function startWrongMarkHazard') && source.includes('function updateWrongMarkHazard'), 'a wrong confirmed mark must create a readable hazard state');
 assert(source.includes('function boohaAtExit') && source.includes("RUN TO THE EXIT") && source.includes('beginFailure(UI_COPY.caseReset)'), 'the wrong-mark hazard must be escapable at the exit and fatal on contact');
@@ -72,9 +74,13 @@ assert(source.includes('const AUDIO_ONLY_CHANGE = Object.freeze') && source.incl
 assert(source.includes('currentAudioOnly = !hasChange') && source.includes('if (currentAudioOnly) return markedPoints.length === 0') && source.includes('AUDIO_ONLY_CHANGE.en'), 'an audio-only anomaly must be reportable without a location mark and teach its sentence after a correct report');
 assert(source.includes('function schedulePataskalaThreat') && source.includes('function beginPataskalaThreat') && source.includes('function updatePataskalaThreat') && source.includes("playSfx('move', AUDIO_LEVELS.move)"), 'Pataskala must approach Booha within a timed, authored threat window');
 assert(!source.includes("targetId: 'pataskala'") && source.includes('pataskala_far') && source.includes('target: [.7, .29, .22]'), 'Pataskala must use the staged authored art set without entering the report target registry');
+assert(source.includes('discoveryUntil') && source.includes('pataskalaThreat.alerted') && !source.includes('PATA_SURVIVAL_MS'), 'Pataskala must allow discovery before pursuit and must not auto-safe on a survival timer');
+assert(source.includes('if (boohaAtExit())') && source.includes('currentPresence = null') && source.includes('handleLeave()'), 'reaching the room exit must end only the active threat and resume the same investigation');
+assert(source.includes('wrongMarkHazard || pataskalaThreat') && source.includes('leaveButton.disabled = !visible || Boolean(pataskalaThreat)'), 'active Pataskala must disable reporting while leaving movement available');
 assert(source.includes('ensureAudio(); startBgm();') && source.includes('window.clearTimeout(pataskalaMoveTimer)'), 'BGM must start after the study handoff and Pataskala timers must be cleared on round cleanup');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 15 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
+assert(source.includes('function roomContains') && source.includes('clamp(booha.targetX + dx * step, plate.x, plate.x + plate.w)'), 'Booha movement must be contained by the displayed room plate');
 const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
 const portraitSourceRatios = {
   bowl: [512 / 512, 342 / 512], cup: [512 / 512, 468 / 512], eyes: [512 / 512, 256 / 512],
@@ -84,18 +90,29 @@ const portraitSourceRatios = {
   pataskala_approach: [512 / 768, 768 / 768], pataskala_near: [512 / 768, 768 / 768], pataskala_catch: [512 / 768, 768 / 768],
 };
 assert(portraitEntries.length === 15, 'portrait regression must cover every anomaly and Pataskala pose');
-const portraitWidth = 390;
-const portraitHeight = 844;
-const portraitScale = Math.max(portraitWidth / 1024, portraitHeight / 1536);
-const portraitPlate = { w: 1024 * portraitScale, h: 1536 * portraitScale, x: (portraitWidth - 1024 * portraitScale) / 2, y: 0 };
-portraitEntries.filter(([, id]) => id !== 'pataskala_catch').forEach(([, id, uText, vText, sizeText]) => {
-  const [sourceWidthRatio, sourceHeightRatio] = portraitSourceRatios[id];
-  const maxDimension = portraitPlate.w * Number(sizeText);
-  const drawWidth = maxDimension * sourceWidthRatio;
-  const drawHeight = maxDimension * sourceHeightRatio;
-  const x = portraitPlate.x + Number(uText) * portraitPlate.w;
-  const y = portraitPlate.y + Number(vText) * portraitPlate.h;
-  assert(x - drawWidth / 2 >= 0 && x + drawWidth / 2 <= portraitWidth && y - drawHeight / 2 >= 0 && y + drawHeight / 2 <= portraitHeight, `${id} must remain fully visible at 390x844`);
+const containedViewports = [[1920, 1080], [1366, 768], [1280, 800], [1366, 1024], [1024, 1366], [844, 390], [390, 844]];
+const roomAnchors = [...source.matchAll(/u:\s*(0?\.\d+),\s*v:\s*(0?\.\d+)/g)].map(([, u, v]) => [Number(u), Number(v)]);
+containedViewports.forEach(([viewportWidth, viewportHeight]) => {
+  const scale = Math.min(viewportWidth / 1024, viewportHeight / 1536);
+  const containedPlate = { w: 1024 * scale, h: 1536 * scale, x: (viewportWidth - 1024 * scale) / 2, y: (viewportHeight - 1536 * scale) / 2 };
+  const tolerance = .001;
+  assert(containedPlate.x >= -tolerance && containedPlate.y >= -tolerance, `contained plate must start inside ${viewportWidth}x${viewportHeight}`);
+  assert(containedPlate.x + containedPlate.w <= viewportWidth + tolerance && containedPlate.y + containedPlate.h <= viewportHeight + tolerance, `contained plate must fit inside ${viewportWidth}x${viewportHeight}`);
+  assert(Math.abs(containedPlate.w / containedPlate.h - 1024 / 1536) < tolerance, `contained plate must preserve aspect ratio at ${viewportWidth}x${viewportHeight}`);
+  roomAnchors.forEach(([u, v]) => {
+    const x = containedPlate.x + u * containedPlate.w;
+    const y = containedPlate.y + v * containedPlate.h;
+    assert(x >= containedPlate.x - tolerance && x <= containedPlate.x + containedPlate.w + tolerance && y >= containedPlate.y - tolerance && y <= containedPlate.y + containedPlate.h + tolerance, `room anchor must be visible at ${viewportWidth}x${viewportHeight}`);
+  });
+  portraitEntries.filter(([, id]) => id !== 'pataskala_catch').forEach(([, id, uText, vText, sizeText]) => {
+    const [sourceWidthRatio, sourceHeightRatio] = portraitSourceRatios[id];
+    const maxDimension = containedPlate.w * Number(sizeText);
+    const drawWidth = maxDimension * sourceWidthRatio;
+    const drawHeight = maxDimension * sourceHeightRatio;
+    const x = containedPlate.x + Number(uText) * containedPlate.w;
+    const y = containedPlate.y + Number(vText) * containedPlate.h;
+    assert(x - drawWidth / 2 >= containedPlate.x - tolerance && x + drawWidth / 2 <= containedPlate.x + containedPlate.w + tolerance && y - drawHeight / 2 >= containedPlate.y - tolerance && y + drawHeight / 2 <= containedPlate.y + containedPlate.h + tolerance, `${id} sprite bounds must remain inside the room at ${viewportWidth}x${viewportHeight}`);
+  });
 });
 assert(source.includes('const FAMILY_AUDIO = Object.freeze') && source.includes('family_BGM.mp3') && source.includes('family_jump-2.mp3'), 'the Family Room audio set must be declared');
 assert(source.includes('const FAMILY_SFX_NAMES') && source.includes('function loadAudioBuffer') && source.includes('function loadAudioBuffers') && source.includes('function startBgm') && source.includes('function playSfx'), 'Family Room audio must use the shared WebAudio lifecycle');
@@ -104,7 +121,7 @@ assert(source.includes('AUDIO_LEVELS = Object.freeze') && source.includes('maste
 assert(source.includes("playSfx('move', AUDIO_LEVELS.move)") && source.includes("playSfx('anomaly', AUDIO_LEVELS.anomaly)"), 'movement and anomaly cues must be connected to gameplay');
 assert(source.includes('jumpLevel: .24') && source.includes('jumpLevel: .4') && source.includes('jumpLevel: .58') && source.includes('playSfx(Math.random() < .5 ? \'jump1\' : \'jump2\', jumpLevel)'), 'failure must choose one of the two jump-scare screams at the room tier volume');
 assert(serviceWorker.includes("`${BASE}/assets/`"), 'Family Room audio must use the runtime asset cache path');
-assert(['pataskala_far', 'pataskala_enter', 'pataskala_approach', 'pataskala_near', 'pataskala_catch'].every(id => serviceWorker.includes(`/assets/family-room/pataskala/${id}.webp`)), 'the Pataskala production set must be install-safe');
+assert(source.includes('const FAMILY_DEFERRED_ASSETS') && source.includes('PATASKALA_POSES.map'), 'the Pataskala production set must remain deferred until room entry');
 assert(source.includes('function requestFamilyRuntimeCache') && source.includes("type: 'CACHE_URLS'"), 'Family Room must ask the service worker to retain deferred media after entry');
 assert(source.includes('function recordFamilyRoomCompletion') && source.includes('completedCases[ACTIVE_CASE_ID]') && source.includes('lastResult'), 'Pass 8 must record a score-free weekly case seal in the shared save layer');
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
@@ -120,7 +137,7 @@ assert(source.includes('function moveBoohaByKeyboard') && source.includes('arrow
 assert(markup.includes('Space to mark') && markup.includes('スペースで しるし'), 'keyboard instructions must be bilingual');
 assert(source.includes('function shiftGameplayClocks') && source.includes('roundStarted += delta') && source.includes('failureStarted += delta'), 'hidden time must be removed from active gameplay clocks');
 assert(source.includes('function pauseForVisibility') && source.includes('function resumeFromVisibility') && source.includes("window.addEventListener('pagehide'"), 'visibility and BFCache lifecycle must pause and resume the room');
-assert(source.includes('booha.x = clamp(normalized.x * width') && source.includes("setObservation('SCREEN CHANGED / MARK AGAIN'"), 'resize must preserve normalized Booha position and invalidate stale marks');
+assert(source.includes('roomCoordinates(booha.x, booha.y, oldPlate)') && source.includes('roomPointFromCoordinates(normalized.position)') && source.includes("setObservation('SCREEN CHANGED / MARK AGAIN'"), 'resize must preserve Booha position in plate coordinates and invalidate stale marks');
 assert(source.includes('function imageReady(image)') && source.includes('image.naturalWidth > 0 && image.naturalHeight > 0'), 'canvas image draws must require a successful natural image size');
 assert(source.includes('function clearRoundTimers') && source.includes('window.clearTimeout(clueTimer); clueTimer = 0;'), 'round cleanup must own clue, transition, failure, and tell timers');
 assert(source.includes('clueVersion') && source.includes('if (version !== clueVersion) return'), 'an old clue timeout must not hide a later clue');
