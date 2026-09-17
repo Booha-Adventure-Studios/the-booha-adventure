@@ -976,7 +976,7 @@
     markHoldOrigin = null;
     markHoldStartedAt = 0;
     window.clearTimeout(markHoldTimer); markHoldTimer = 0;
-    pendingMark = { x: booha.x, y: booha.y, radius: lightRadius() };
+    pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
     showMarkConfirm();
   }
 
@@ -1059,7 +1059,6 @@
       clueEn.textContent = "Booha's light shrinks as it burns — keep it close to search the room.";
       clueJp.textContent = 'ブーハの あかりは もえると ちいさくなる。そばで へやを さがそう。';
       clueCard.hidden = false;
-      setObservation("BOOHA'S LIGHT / KEEP IT CLOSE", 'ブーハの あかり / そばで さがす');
       clueVersion += 1;
       const version = clueVersion;
       window.clearTimeout(clueTimer);
