@@ -3530,7 +3530,11 @@
     // field disappear against Utsuroba while preserving the lit lens and beam.
     const flashlight = ensureUtsurobaImage(familyRoomFlashlightArt);
     if (flashlight.complete && flashlight.naturalWidth > 0) {
-      const windowPulse = REDUCED_MOTION ? .72 : .55 + .45 * Math.sin(sec * 2.1);
+      // Keep this portal draw path self-contained so a partial route setup
+      // cannot interrupt the room_05 render loop.
+      const reducedMotion = typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const windowPulse = reducedMotion ? .72 : .55 + .45 * Math.sin(sec * 2.1);
       const glowRadius = 48 + windowPulse * 12;
       const greenGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
       greenGlow.addColorStop(0, `rgba(186,255,69,${(open ? .3 : .1) * windowPulse})`);
