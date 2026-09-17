@@ -74,10 +74,11 @@
   });
 
   const PATASKALA_POSES = [
-    { id: 'pataskala-standing', target: [.7, .29, .22], artSize: .28, en: 'Something is standing in the room.', jp: 'なにかが へやに たっている。', kind: 'threat', character: 'pataskala' },
-    { id: 'pataskala-moving', target: [.74, .43, .22], artSize: .28, en: 'Something crossed the room.', jp: 'なにかが へやを よこぎった。', kind: 'threat', character: 'pataskala' },
-    { id: 'pataskala-crouch', target: [.73, .56, .22], artSize: .28, en: 'Something is crouching by the futon.', jp: 'なにかが ふとんの そばに しゃがんでいる。', kind: 'threat', character: 'pataskala' },
-    { id: 'pataskala-emerging', target: [.25, .47, .22], artSize: .28, en: 'Something is coming out of the shadows.', jp: 'なにかが かげから でてくる。', kind: 'threat', character: 'pataskala' },
+    { id: 'pataskala_far', target: [.7, .29, .22], artSize: .16, en: 'Something is far inside the room.', jp: 'なにかが へやの おくに いる。', kind: 'threat', character: 'pataskala', stage: 0 },
+    { id: 'pataskala_enter', target: [.74, .43, .22], artSize: .2, en: 'Something is entering the room.', jp: 'なにかが へやに はいってくる。', kind: 'threat', character: 'pataskala', stage: .22 },
+    { id: 'pataskala_approach', target: [.73, .56, .22], artSize: .24, en: 'Something is coming closer.', jp: 'なにかが ちかづいてくる。', kind: 'threat', character: 'pataskala', stage: .48 },
+    { id: 'pataskala_near', target: [.25, .47, .22], artSize: .28, en: 'Something is almost here.', jp: 'なにかが すぐ そこに いる。', kind: 'threat', character: 'pataskala', stage: .76 },
+    { id: 'pataskala_catch', target: [.25, .47, .22], artSize: .34, en: 'The shadow is on you.', jp: 'かげが あなたに おいついた。', kind: 'threat', character: 'pataskala', stage: 1 },
   ];
 
   const ROOM_ANCHORS = Object.freeze({
@@ -210,6 +211,7 @@
   let recentAnchorRegions = [];
   let currentPresence = null;
   let pataskalaThreat = null;
+  let failureThreat = null;
   let pataskalaCooldownRounds = 0;
   let currentAudioOnly = false;
   let currentIsAnomaly = false;
@@ -476,8 +478,7 @@
   }
 
   function pataskalaPose() {
-    const maxPose = selectedTier === 'lies' ? PATASKALA_POSES.length - 1 : 2;
-    return random(PATASKALA_POSES.slice(0, maxPose + 1));
+    return PATASKALA_POSES[0];
   }
 
   function chooseRound() {
@@ -575,7 +576,9 @@
     ctx.globalAlpha = inheritedAlpha * (.32 + pataskalaThreat.stage * .58);
     ctx.shadowColor = 'rgba(219,230,218,.28)';
     ctx.shadowBlur = Math.max(8, maxDimension * .14);
-    ctx.drawImage(art, pataskalaThreat.x - drawWidth / 2, pataskalaThreat.y - drawHeight / 2, drawWidth, drawHeight);
+    ctx.translate(pataskalaThreat.x, pataskalaThreat.y);
+    ctx.scale(pataskalaThreat.flip ? -1 : 1, 1);
+    ctx.drawImage(art, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
     ctx.restore();
   }
 
@@ -588,7 +591,10 @@
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#020202'; ctx.fillRect(0, 0, width, height);
     if (state === 'caught' && failureStarted) {
-      if (time - failureStarted >= FAILURE_SILENCE_MS) drawFailureBooha(time);
+      if (time - failureStarted >= FAILURE_SILENCE_MS) {
+        drawFailureThreat(time);
+        drawFailureBooha(time);
+      }
       return;
     }
     if (state === 'study') {
@@ -643,6 +649,21 @@
     ctx.shadowColor = 'rgba(229,176,89,.9)';
     ctx.shadowBlur = 18 + Math.sin(time / 260) * 3;
     ctx.drawImage(idleBooha, x - size / 2, y - size / 2, size, size);
+    ctx.restore();
+  }
+
+  function drawFailureThreat(time) {
+    if (!failureThreat) return;
+    const art = pataskalaArt.pataskala_catch;
+    if (!imageReady(art)) return;
+    const size = clamp(Math.min(width, height) * .34, 180, 360);
+    ctx.save();
+    ctx.globalAlpha = .72;
+    ctx.shadowColor = 'rgba(12,12,12,.96)';
+    ctx.shadowBlur = 24 + Math.sin(time / 180) * 4;
+    ctx.translate(failureThreat.x, failureThreat.y);
+    ctx.scale(failureThreat.flip ? -1 : 1, 1);
+    ctx.drawImage(art, -size / 2, -size * .72, size, size * 1.5);
     ctx.restore();
   }
 
@@ -808,6 +829,7 @@
       pose: currentPresence,
       x: startX,
       y: startY,
+      flip: fromRight,
       startedAt: performance.now(),
       lastTime: performance.now(),
       startDistance: Math.max(1, Math.hypot(booha.x - startX, booha.y - startY)),
@@ -829,6 +851,8 @@
     const distance = Math.hypot(dx, dy);
     pataskalaThreat.stage = clamp(1 - distance / pataskalaThreat.startDistance, 0, 1);
     if (distance <= Math.min(width, height) * PATA_CATCH_DISTANCE) {
+      pataskalaThreat.pose = PATASKALA_POSES[PATASKALA_POSES.length - 1];
+      failureThreat = { ...pataskalaThreat };
       beginFailure(UI_COPY.caseReset);
       return;
     }
@@ -839,6 +863,13 @@
       updateHud();
       return;
     }
+    pataskalaThreat.pose = pataskalaThreat.stage >= .88
+      ? PATASKALA_POSES[3]
+      : pataskalaThreat.stage >= .58
+      ? PATASKALA_POSES[2]
+      : pataskalaThreat.stage >= .28
+      ? PATASKALA_POSES[1]
+      : PATASKALA_POSES[0];
     if (distance > 0) {
       const speed = Math.min(width, height) * (.13 + pataskalaThreat.stage * .11);
       const step = Math.min(distance, speed * elapsed);
@@ -955,13 +986,13 @@
     clearRoundTimers();
     pataskalaCooldownRounds = Math.max(0, pataskalaCooldownRounds - 1);
     roundToken += 1;
-    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; setControlsVisible(true); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
+    state = 'playing'; failureThreat = null; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; setControlsVisible(true); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
   }
 
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
     clearRoundTimers();
-    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; pataskalaThreat = null; pataskalaCooldownRounds = 0; recentAnomalyIds = []; recentAnchorRegions = []; currentAudioOnly = false; currentIsAnomaly = false;
+    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; pataskalaThreat = null; failureThreat = null; pataskalaCooldownRounds = 0; recentAnomalyIds = []; recentAnchorRegions = []; currentAudioOnly = false; currentIsAnomaly = false;
     state = 'study';
     curtain.className = '';
     setControlsVisible(false);
