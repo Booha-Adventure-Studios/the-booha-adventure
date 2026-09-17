@@ -1075,22 +1075,33 @@
     clearRoundTimers();
     clearMarkingUi();
     silenceDrone();
-    state = 'study';
-    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0;
-    currentAnomaly = null; currentAnomalies = []; currentPresence = null;
-    pataskalaThreat = null; failureThreat = null; pataskalaCooldownRounds = 0;
-    recentAnomalyIds = []; recentAnchorRegions = [];
-    currentAudioOnly = false; currentIsAnomaly = false; falseAlertPoint = null; tellAvailable = false;
-    failureStarted = 0; burnoutHandled = false; curtain.className = '';
-    setControlsVisible(false);
+    state = 'playing';
+    currentPresence = null;
+    pataskalaThreat = null; failureThreat = null; pataskalaCooldownRounds = PATA_COOLDOWN_ROUNDS;
+    tellAvailable = false;
+    transitionStarted = 0; failureStarted = 0; burnoutHandled = false; roundStarted = performance.now(); curtain.className = '';
     resetBooha();
     hidePanel(startPanel);
+    hidePanel(studyPanel);
     hidePanel(messagePanel);
-    showPanel(studyPanel);
-    setObservation('STUDY THE ROOM', 'へやを おぼえる', { immediate: true });
+    setControlsVisible(true);
+    updateHud();
     updateAndon();
-    studyStartButton.focus?.();
+    ensureAudio();
+    startBgm();
     startLoop();
+  }
+
+  function continueFromClue() {
+    if (state !== 'transition') {
+      closeClueCard();
+      if (state === 'playing') updateHud();
+      return;
+    }
+    window.clearTimeout(transitionTimer);
+    transitionTimer = 0;
+    closeClueCard();
+    advanceCase();
   }
 
   function beginCaseFromStudy() {
@@ -1630,7 +1641,7 @@
   canvas.addEventListener('pointerup', releaseBooha);
   canvas.addEventListener('pointercancel', releaseBooha);
   soundToggle.addEventListener('click', toggleSound);
-  clueCloseButton?.addEventListener('click', () => { closeClueCard(); updateHud(); });
+  clueCloseButton?.addEventListener('click', continueFromClue);
   flyAwayButton?.addEventListener('click', flyAwayToSafeRoom);
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; updateTierButtons(); }));
   window.addEventListener('resize', scheduleResize);
