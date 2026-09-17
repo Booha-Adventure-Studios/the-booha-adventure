@@ -122,7 +122,7 @@
     { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', labelEn: 'BOWL', labelJp: 'おわん', kind: 'added' },
     { id: 'cup', target: [.35, .49, .1], artSize: .075, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', labelEn: 'CUP', labelJp: 'コップ', kind: 'duplicated' },
     { id: 'eyes', target: [.73, .25, .12], artSize: .08, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', labelEn: 'SHOJI', labelJp: 'しょうじ', kind: 'watching' },
-    { id: 'shadow', target: [.68, .23, .18], artSize: .14, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', labelEn: 'SHOJI SHADOW', labelJp: 'しょうじの かげ', kind: 'state' },
+    { id: 'shadow', target: [.68, .23, .18], artSize: .25, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', labelEn: 'SHOJI SHADOW', labelJp: 'しょうじの かげ', kind: 'state' },
     { id: 'talisman', target: [.23, .23, .12], artSize: .09, en: 'A paper charm was not there before.', jp: 'おふだが なかった。', labelEn: 'PAPER CHARM', labelJp: 'おふだ', kind: 'added' },
     { id: 'lantern', target: [.23, .31, .12], artSize: .075, en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', labelEn: 'LANTERN', labelJp: 'あんどん', kind: 'state' },
     { id: 'futon', target: [.76, .37, .16], artSize: .2, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', labelEn: 'FUTON', labelJp: 'ふとん', kind: 'moved' },
@@ -157,6 +157,7 @@
   const andonFill = document.getElementById('andon-fill');
   const leaveButton = document.getElementById('leave-button');
   const clueCard = document.getElementById('clue-card');
+  const clueCloseButton = document.getElementById('clue-close');
   const clueEn = document.getElementById('clue-en');
   const clueJp = document.getElementById('clue-jp');
   const soundToggle = document.getElementById('sound-toggle');
@@ -1017,6 +1018,15 @@
     transitionStarted = 0;
   }
   function clearMarkingUi() {
+    closeClueCard();
+    clearWrongMarkHazard();
+    undoGhost = null;
+    markLocked = false; pendingMark = null; markedPoints = []; keyboardMarkActive = false;
+    releasePointerInteraction();
+    hidePanel(markConfirmPanel);
+    setReportLabel(false);
+  }
+  function closeClueCard() {
     clueVersion += 1;
     window.clearTimeout(clueTimer); clueTimer = 0;
     window.clearTimeout(clueFadeTimer); clueFadeTimer = 0;
@@ -1025,12 +1035,6 @@
     queuedObservation = null;
     clueCard.hidden = true;
     clueCard.classList.remove('is-fading');
-    clearWrongMarkHazard();
-    undoGhost = null;
-    markLocked = false; pendingMark = null; markedPoints = []; keyboardMarkActive = false;
-    releasePointerInteraction();
-    hidePanel(markConfirmPanel);
-    setReportLabel(false);
   }
   function setControlsVisible(visible) {
     controls.classList.toggle('hidden', !visible);
@@ -1062,6 +1066,29 @@
     updateAndon();
     requestFamilyRuntimeCache();
     ensureAudio();
+    studyStartButton.focus?.();
+    startLoop();
+  }
+
+  function flyAwayToSafeRoom() {
+    if (state !== 'playing' && state !== 'transition') return;
+    clearRoundTimers();
+    clearMarkingUi();
+    silenceDrone();
+    state = 'study';
+    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0;
+    currentAnomaly = null; currentAnomalies = []; currentPresence = null;
+    pataskalaThreat = null; failureThreat = null; pataskalaCooldownRounds = 0;
+    recentAnomalyIds = []; recentAnchorRegions = [];
+    currentAudioOnly = false; currentIsAnomaly = false; falseAlertPoint = null; tellAvailable = false;
+    failureStarted = 0; burnoutHandled = false; curtain.className = '';
+    setControlsVisible(false);
+    resetBooha();
+    hidePanel(startPanel);
+    hidePanel(messagePanel);
+    showPanel(studyPanel);
+    setObservation('STUDY THE ROOM', 'へやを おぼえる', { immediate: true });
+    updateAndon();
     studyStartButton.focus?.();
     startLoop();
   }
@@ -1603,7 +1630,8 @@
   canvas.addEventListener('pointerup', releaseBooha);
   canvas.addEventListener('pointercancel', releaseBooha);
   soundToggle.addEventListener('click', toggleSound);
-  flyAwayButton?.addEventListener('click', exitGame);
+  clueCloseButton?.addEventListener('click', () => { closeClueCard(); updateHud(); });
+  flyAwayButton?.addEventListener('click', flyAwayToSafeRoom);
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; updateTierButtons(); }));
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);

@@ -25,6 +25,7 @@
     </header>
 
     <div id="clue-card" class="clue-card" aria-live="polite" hidden>
+      <button id="clue-close" class="clue-close" type="button" aria-label="Close case note / じけんメモを とじる">×</button>
       <span class="clue-kicker"><span>CASE NOTE</span><span class="jp" lang="ja">じけんメモ</span></span>
       <strong id="clue-en"></strong>
       <span id="clue-jp" class="clue-jp"></span>
@@ -35,10 +36,9 @@
         <span class="choice-arrow">↗</span>
         <span class="choice-copy"><b><span id="leave-en">REPORT THE ROOM</span><span id="leave-jp" class="jp" lang="ja">へやを ほうこくする</span></b><small><span>marks = changes · no marks = clean</span><span class="jp" lang="ja">しるし = へんか · しるしなし = きれい</span></small></span>
       </button>
+      <button id="fly-away-button" class="choice-button fly-away-button" type="button"><span>FLY AWAY</span><span class="jp" lang="ja">とびさる</span></button>
       <button id="undo-button" class="secondary-button undo-button" type="button" hidden><span>UNDO LAST MARK</span><span class="jp" lang="ja">さいごの しるしを けす</span></button>
     </section>
-
-    <button id="fly-away-button" class="fly-away-button" type="button"><span>FLY AWAY</span><span class="jp" lang="ja">とびさる</span></button>
 
     <section id="mark-confirm-panel" class="panel mark-confirm-panel" aria-live="polite" aria-labelledby="mark-confirm-title" hidden>
       <p class="panel-kicker"><span>MARK / CONFIRM</span><span class="jp" lang="ja">しるし / かくにん</span></p>
