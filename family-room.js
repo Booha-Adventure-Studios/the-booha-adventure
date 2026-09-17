@@ -14,7 +14,10 @@
   const WRONG_MARK_TELEGRAPH_MS = 1500;
   const CLUE_DISPLAY_MS = 7600;
   const PANEL_FADE_MS = 320;
-  const PATA_DISCOVERY_MS = 900;
+  const PATA_DISCOVERY_MS = 1500;
+  const PATASKALA_SIZE_MULTIPLIER = 2.5;
+  const PATA_SPEED_FAR = .075;
+  const PATA_SPEED_NEAR = .14;
   const PATA_COOLDOWN_ROUNDS = 2;
   const PATA_CATCH_DISTANCE = .065;
   const COMPLETION_QUIET_MS = 2400;
@@ -117,12 +120,12 @@
 
   const anomalies = [
     { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', labelEn: 'BOWL', labelJp: 'おわん', kind: 'added' },
-    { id: 'cup', target: [.35, .49, .1], artSize: .11, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', labelEn: 'CUP', labelJp: 'コップ', kind: 'duplicated' },
+    { id: 'cup', target: [.35, .49, .1], artSize: .075, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', labelEn: 'CUP', labelJp: 'コップ', kind: 'duplicated' },
     { id: 'eyes', target: [.73, .25, .12], artSize: .08, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', labelEn: 'SHOJI', labelJp: 'しょうじ', kind: 'watching' },
     { id: 'shadow', target: [.68, .23, .18], artSize: .14, en: 'The shadow behind the shoji moved.', jp: 'しょうじの かげが うごいた。', labelEn: 'SHOJI SHADOW', labelJp: 'しょうじの かげ', kind: 'state' },
     { id: 'talisman', target: [.23, .23, .12], artSize: .09, en: 'A paper charm was not there before.', jp: 'おふだが なかった。', labelEn: 'PAPER CHARM', labelJp: 'おふだ', kind: 'added' },
     { id: 'lantern', target: [.23, .31, .12], artSize: .075, en: 'The lantern flame is looking the wrong way.', jp: 'あんどんの ほのおが ちがう。', labelEn: 'LANTERN', labelJp: 'あんどん', kind: 'state' },
-    { id: 'futon', target: [.76, .37, .16], artSize: .125, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', labelEn: 'FUTON', labelJp: 'ふとん', kind: 'moved' },
+    { id: 'futon', target: [.76, .37, .16], artSize: .2, en: 'The futon is facing the room.', jp: 'ふとんが へやを むいている。', labelEn: 'FUTON', labelJp: 'ふとん', kind: 'moved' },
     { id: 'seams', target: [.55, .68, .16], artSize: .06, en: 'One tatami seam has disappeared.', jp: 'たたみの めが ひとつ きえた。', labelEn: 'TATAMI SEAM', labelJp: 'たたみの め', kind: 'missing' },
     { id: 'teapot', target: [.29, .44, .12], artSize: .095, en: 'The teapot has turned toward you.', jp: 'きゅうすが こちらを むいた。', labelEn: 'TEAPOT', labelJp: 'きゅうす', kind: 'moved' },
     { id: 'crescent', target: [.77, .30, .1], artSize: .08, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', labelEn: 'MOON', labelJp: 'つき', kind: 'added' },
@@ -148,7 +151,6 @@
   const messageButtonEn = document.getElementById('message-button-en');
   const messageButtonJp = document.getElementById('message-button-jp');
   const curtain = document.getElementById('transition-curtain');
-  const observationNote = document.getElementById('observation-note');
   const observationEn = document.getElementById('observation-en');
   const observationJp = document.getElementById('observation-jp');
   const andon = document.getElementById('andon');
@@ -171,6 +173,7 @@
   const markConfirmObjectJp = document.getElementById('mark-confirm-object-jp');
   const markYesButton = document.getElementById('mark-yes-button');
   const markNoButton = document.getElementById('mark-no-button');
+  const flyAwayButton = document.getElementById('fly-away-button');
   const backButton = document.getElementById('back-button');
   const studyStartButton = document.getElementById('study-start-button');
   const studyBackButton = document.getElementById('study-back-button');
@@ -370,11 +373,13 @@
   }
 
   function setBilingual(enNode, jpNode, en, jp) {
+    if (!enNode || !jpNode) return;
     enNode.textContent = en;
     jpNode.textContent = jp;
   }
 
   function setObservation(en, jp, options = {}) {
+    if (!observationEn || !observationJp) return;
     if (clueActive && !options.immediate) {
       queuedObservation = { en, jp };
       return;
@@ -586,7 +591,7 @@
     if (!imageReady(art)) return;
     const sourceWidth = art.naturalWidth || 512;
     const sourceHeight = art.naturalHeight || 768;
-    const maxDimension = Math.max(42, plate.w * pose.artSize);
+    const maxDimension = Math.max(42, plate.w * pose.artSize * PATASKALA_SIZE_MULTIPLIER);
     const scale = maxDimension / Math.max(sourceWidth, sourceHeight);
     const drawWidth = sourceWidth * scale;
     const drawHeight = sourceHeight * scale;
@@ -676,7 +681,7 @@
     if (!failureThreat) return;
     const art = pataskalaArt.pataskala_catch;
     if (!imageReady(art)) return;
-    const size = clamp(Math.min(width, height) * .34, 180, 360);
+    const size = Math.max(180, Math.min(width, height) * .34 * PATASKALA_SIZE_MULTIPLIER);
     ctx.save();
     ctx.globalAlpha = .72;
     ctx.shadowColor = 'rgba(12,12,12,.96)';
@@ -914,6 +919,7 @@
     if (time < pataskalaThreat.discoveryUntil) return;
     if (!pataskalaThreat.alerted) {
       pataskalaThreat.alerted = true;
+      showPriorityClue('SOMETHING IS APPROACHING / RUN TO THE EXIT', 'なにかが ちかづいている / でぐちへ にげる');
       setObservation('KEEP MOVING / FIND THE EXIT', 'うごきつづける / でぐちを さがす', { immediate: true });
       tellPresence();
       playSfx('move', AUDIO_LEVELS.move);
@@ -926,7 +932,7 @@
       ? PATASKALA_POSES[1]
       : PATASKALA_POSES[0];
     if (distance > 0) {
-      const speed = roomMinDimension() * (.13 + pataskalaThreat.stage * .11);
+      const speed = roomMinDimension() * (PATA_SPEED_FAR + (PATA_SPEED_NEAR - PATA_SPEED_FAR) * pataskalaThreat.stage);
       const step = Math.min(distance, speed * elapsed);
       pataskalaThreat.x += (dx / distance) * step;
       pataskalaThreat.y += (dy / distance) * step;
@@ -1145,7 +1151,8 @@
     if (!correct) { wrongTone(); if (currentAnomalies.length || currentAudioOnly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
     correctCalls += 1; rightTone();
     if (currentAnomalies.length || currentAudioOnly) { marks += currentAnomalies.length + (currentAudioOnly ? 1 : 0); showClue(); }
-    const transitionDelay = currentAnomalies.length ? (REDUCED_MOTION ? 500 : 1450 + (currentAnomalies.length - 1) * 350) : (currentAudioOnly ? (REDUCED_MOTION ? 300 : 900) : (REDUCED_MOTION ? 80 : 420));
+    const reportClueDelay = currentAnomalies.length || currentAudioOnly ? CLUE_DISPLAY_MS + PANEL_FADE_MS : 0;
+    const transitionDelay = reportClueDelay || (currentAnomalies.length ? (REDUCED_MOTION ? 500 : 1450 + (currentAnomalies.length - 1) * 350) : (currentAudioOnly ? (REDUCED_MOTION ? 300 : 900) : (REDUCED_MOTION ? 80 : 420)));
     transitionTimer = window.setTimeout(() => { if (token === roundToken) advanceCase(); }, transitionDelay);
   }
 
@@ -1196,7 +1203,15 @@
     }
   }
 
-  function setBoohaTarget(event) {
+  function cancelPendingMarkHold() {
+    if (markLocked) return;
+    markHoldOrigin = null;
+    markHoldStartedAt = 0;
+    window.clearTimeout(markHoldTimer);
+    markHoldTimer = 0;
+  }
+
+  function setBoohaTarget(event, options = {}) {
     if (state !== 'playing' || pendingMark) return;
     const rect = canvas.getBoundingClientRect();
     const rawX = event.clientX - rect.left;
@@ -1206,7 +1221,7 @@
     const nextY = rawY;
     canvas.setPointerCapture?.(event.pointerId);
     activePointerId = event.pointerId;
-    const startsHold = !pointerActive || !markHoldOrigin;
+    const isPointerStart = options.start === true;
     const movedBeyondDeadZone = markHoldOrigin
       && Math.hypot(nextX - markHoldOrigin[0], nextY - markHoldOrigin[1]) > MARK_DEAD_ZONE_PX;
     booha.targetX = nextX;
@@ -1214,20 +1229,22 @@
     keyboardMarkActive = false;
     pointerActive = true;
     if (wrongMarkHazard || pataskalaThreat) {
+      cancelPendingMarkHold();
       setObservation(wrongMarkHazard ? 'RUN TO THE EXIT' : 'KEEP MOVING / FIND THE EXIT', wrongMarkHazard ? 'でぐちへ にげる' : 'うごきつづける / でぐちを さがす', { immediate: true });
       return;
     }
-    if (startsHold || (!markLocked && movedBeyondDeadZone)) {
+    if (isPointerStart) {
       markHoldOrigin = [nextX, nextY];
       markLocked = false;
       window.clearTimeout(markHoldTimer);
       markHoldStartedAt = performance.now();
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
+    } else if (movedBeyondDeadZone) {
+      cancelPendingMarkHold();
     }
-    setObservation('HOLD BOOHA STILL', 'ブーハを じっと させる');
   }
 
-  function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event); }
+  function moveBoohaTarget(event) { if (pointerActive) setBoohaTarget(event, { start: false }); }
   function releaseBooha(event) {
     if (event?.pointerId != null) activePointerId = event.pointerId;
     releasePointerInteraction();
@@ -1403,8 +1420,26 @@
     const enNotes = currentAnomalies.map(anomaly => anomaly.en);
     const jpNotes = currentAnomalies.map(anomaly => anomaly.jp);
     if (currentAudioOnly) { enNotes.push(AUDIO_ONLY_CHANGE.en); jpNotes.push(AUDIO_ONLY_CHANGE.jp); }
+    clueQueue = [];
+    clueActive = false;
+    clueVersion += 1;
+    window.clearTimeout(clueTimer); clueTimer = 0;
+    window.clearTimeout(clueFadeTimer); clueFadeTimer = 0;
+    clueCard.hidden = true;
+    clueCard.classList.remove('is-fading');
     enqueueClue(enNotes.join(' / '), jpNotes.join(' / '));
     setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
+  }
+
+  function showPriorityClue(en, jp) {
+    clueQueue = [];
+    clueActive = false;
+    clueVersion += 1;
+    window.clearTimeout(clueTimer); clueTimer = 0;
+    window.clearTimeout(clueFadeTimer); clueFadeTimer = 0;
+    clueCard.hidden = true;
+    clueCard.classList.remove('is-fading');
+    enqueueClue(en, jp);
   }
 
   function showLightTipOnce() {
@@ -1571,11 +1606,12 @@
   undoButton.addEventListener('click', undoLastMark);
   markYesButton.addEventListener('click', confirmMark);
   markNoButton.addEventListener('click', cancelMark);
-  canvas.addEventListener('pointerdown', setBoohaTarget);
+  canvas.addEventListener('pointerdown', event => setBoohaTarget(event, { start: true }));
   canvas.addEventListener('pointermove', moveBoohaTarget);
   canvas.addEventListener('pointerup', releaseBooha);
   canvas.addEventListener('pointercancel', releaseBooha);
   soundToggle.addEventListener('click', toggleSound);
+  flyAwayButton?.addEventListener('click', exitGame);
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; updateTierButtons(); }));
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);
