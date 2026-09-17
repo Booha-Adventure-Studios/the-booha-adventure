@@ -289,7 +289,6 @@ const CORE_ASSETS = [
   `${BASE}/assets/img/grimmerglen/booha_grimmerglen_version_1.webp`,
   `${BASE}/assets/img/background-1.webp`,
   `${BASE}/assets/img/booha_ghost.webp`,
-  `${BASE}/assets/img/family-room/flashlight.webp`,
   `${BASE}/assets/img/profile.webp`,
   `${BASE}/assets/img/pre-boo.webp`,
   `${BASE}/assets/img/boo-tree.webp`,
