@@ -70,14 +70,6 @@ button { font: inherit; }
   display: flex; flex-wrap: wrap; gap: 7px; width: min(420px, calc(100% - 36px)); justify-content: center; transition: opacity .25s ease, transform .25s ease;
 }
 .controls.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, 12px); }
-.fly-away-button {
-  position: absolute; left: max(18px, env(safe-area-inset-left)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 25;
-  display: inline-flex; flex-direction: column; gap: 3px; min-width: 116px; min-height: 48px; padding: 9px 13px;
-  border: 1px solid rgba(233,229,220,.28); color: var(--muted); background: rgba(5,5,5,.78); box-shadow: 0 8px 28px rgba(0,0,0,.42);
-  cursor: pointer; text-align: left; letter-spacing: .12em; font-size: 10px; transition: color .16s ease, border-color .16s ease, background .16s ease, transform .16s ease;
-}
-.fly-away-button:hover, .fly-away-button:focus-visible { color: var(--ink); border-color: var(--amber); background: rgba(86,166,255,.18); outline: none; transform: translateY(-2px); }
-.fly-away-button .jp { color: var(--muted); font-size: 10px; }
 
 .choice-button {
   width: 100%; min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 17px;
@@ -90,6 +82,13 @@ button { font: inherit; }
 .choice-arrow { font-size: 22px; color: var(--amber); }
 .choice-button.armed { border-color: var(--amber); background: rgba(86,166,255,.12); }
 .choice-button.armed .choice-arrow { text-shadow: 0 0 16px rgba(86,166,255,.88); }
+.fly-away-button {
+  flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px;
+  border-color: rgba(86,166,255,.68); color: var(--ink); background: rgba(25,65,112,.48);
+  letter-spacing: .12em; font-size: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.42), 0 0 24px rgba(86,166,255,.12);
+}
+.fly-away-button:hover, .fly-away-button:focus-visible { color: var(--ink); border-color: #9bd0ff; background: rgba(45,105,175,.62); outline: none; transform: translateY(-2px); }
+.fly-away-button .jp { color: rgba(233,229,220,.72); font-size: 10px; }
 
 .panel {
   top: 50%; left: 50%; width: min(520px, calc(100% - 40px)); max-height: calc(100vh - 16px); overflow-y: auto; overscroll-behavior: contain; transform: translate(-50%, -50%); padding: clamp(16px, min(4vw, 4vh), 44px); text-align: center; border: 1px solid rgba(233,229,220,.24); background: var(--panel); box-shadow: 0 25px 100px rgba(0,0,0,.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s ease, visibility 0s linear .3s;
@@ -101,14 +100,16 @@ button { font: inherit; }
   bottom: max(20px, env(safe-area-inset-bottom));
   transform: translateX(-50%);
   width: min(420px, calc(100% - 24px));
-  padding: 14px 20px;
+  max-height: calc(100dvh - 24px);
+  padding: 12px 18px 16px;
   background: rgba(7,7,7,.55);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: 0 10px 30px rgba(0,0,0,.5);
 }
-.study-panel h2 { font-size: clamp(18px, 2.2vw, 24px); letter-spacing: .08em; }
-.study-panel .panel-copy { max-width: 380px; margin: 8px auto 12px; font-size: clamp(12px, 1.7vw, 14px); line-height: 1.6; }
+.study-panel h2 { font-size: clamp(18px, 2.2vw, 24px); letter-spacing: .08em; line-height: 1.12; }
+.study-panel .panel-copy { max-width: 380px; margin: 6px auto 10px; font-size: clamp(12px, 1.7vw, 14px); line-height: 1.5; }
+.study-panel .panel-copy > span { display: block; }
 .study-panel .panel-foot { margin-top: 8px; }
 .study-panel .panel-kicker { margin-bottom: 9px; }
 .panel-kicker { margin: 0 0 16px; color: var(--amber); font-size: 10px; letter-spacing: .2em; }
@@ -141,8 +142,10 @@ kbd { border: 1px solid var(--line); padding: 3px 5px; color: var(--ink); }
 .tier-button small { font-size: 8px; letter-spacing: .05em; opacity: .7; }
 .tier-button.selected { border-color: var(--amber); color: var(--ink); background: rgba(86,166,255,.12); }
 .tier-button:disabled { cursor: not-allowed; opacity: .32; }
-.clue-card { left: 50%; bottom: max(126px, calc(env(safe-area-inset-bottom) + 110px)); transform: translateX(-50%); display: grid; gap: 5px; width: min(360px, calc(100% - 36px)); padding: 12px 15px; border-left: 2px solid var(--amber); background: rgba(5,5,5,.88); box-shadow: 0 14px 50px rgba(0,0,0,.6); text-align: left; opacity: 1; transition: opacity .32s ease; }
+.clue-card { left: 50%; bottom: max(206px, calc(env(safe-area-inset-bottom) + 190px)); transform: translateX(-50%); display: grid; gap: 5px; width: min(360px, calc(100% - 36px)); padding: 12px 42px 12px 15px; border-left: 2px solid var(--amber); background: rgba(5,5,5,.88); box-shadow: 0 14px 50px rgba(0,0,0,.6); text-align: left; opacity: 1; transition: opacity .32s ease; }
 .clue-card.is-fading { opacity: 0; }
+.clue-close { position: absolute; top: 5px; right: 7px; width: 28px; height: 28px; padding: 0; border: 0; color: rgba(233,229,220,.62); background: transparent; cursor: pointer; font-family: system-ui, sans-serif; font-size: 22px; line-height: 1; }
+.clue-close:hover, .clue-close:focus-visible { color: var(--ink); outline: none; }
 .clue-kicker { color: var(--amber); font-size: 8px; letter-spacing: .2em; }
 .clue-card strong, .clue-jp { min-width: 0; overflow-wrap: anywhere; white-space: normal; }
 .clue-card strong { font-family: system-ui, sans-serif; font-size: 13px; font-weight: 500; line-height: 1.4; }
@@ -160,16 +163,15 @@ kbd { border: 1px solid var(--line); padding: 3px 5px; color: var(--ink); }
   .hud { top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left)); right: max(14px, env(safe-area-inset-right)); }
   .hud-right { gap: 10px; }
   .title { font-size: 15px; }
-  .controls { left: auto; right: 10px; width: calc(100% - 124px); bottom: max(10px, env(safe-area-inset-bottom)); transform: none; }
-  .controls.hidden { transform: translateY(12px); }
-  .fly-away-button { left: max(10px, env(safe-area-inset-left)); bottom: max(10px, env(safe-area-inset-bottom)); min-width: 102px; min-height: 44px; padding: 8px 10px; font-size: 9px; }
+  .controls { left: 50%; right: auto; width: calc(100% - 20px); bottom: max(10px, env(safe-area-inset-bottom)); transform: translateX(-50%); }
+  .controls.hidden { transform: translate(-50%, 12px); }
   .choice-button { min-height: 68px; padding: 11px 12px; }
   .choice-button b { font-size: 10px; letter-spacing: .08em; }
   .choice-button small { font-size: 8px; margin-top: 5px; }
   .choice-arrow { font-size: 18px; }
   .panel { width: calc(100% - 24px); padding: 25px 18px; }
   .hud-right { gap: 12px; }
-  .clue-card { bottom: max(92px, calc(env(safe-area-inset-bottom) + 82px)); }
+  .clue-card { bottom: max(174px, calc(env(safe-area-inset-bottom) + 158px)); }
   .tier-button { display: block; }
   .tier-button small { display: block; margin-top: 4px; }
 }
