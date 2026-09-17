@@ -530,7 +530,7 @@ function showResults() {
   if (outer) outer.style.display = '';
   results.classList.add('show');
   const tier = getTier(score), pct = Math.round((score / 15) * 100);
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId: `${CFG.curriculum}:ask_question`, score: pct, completed: pct >= 40 } }));
+  U.emitGameEnd({ saveId: `${CFG.curriculum}:ask_question`, score: pct, completed: pct >= 40 });
   results.style.setProperty('--aq-tier-color', tier.color);
   document.getElementById('aq-rs').textContent = `${score} / 15`;
   document.getElementById('aq-rp').textContent = `${pct}%`;

@@ -999,7 +999,7 @@ U.mount(`
   <div class="vs-dots-row" id="vs-dots"></div>
   <div class="vs-hud">
     <div class="vs-pill">RUN <b id="vs-qnum">0</b> / 15</div>
-    <div class="vs-pill">PERFECT <b id="vs-score">0</b> / 15</div>
+    <div class="vs-pill">SCORE <b id="vs-score">0</b> / 15</div>
     <div class="vs-streak-pill" id="vs-streak-pill">Streak <b id="vs-streak">0</b></div>
   </div>
   <div class="vs-timer-wrap">
@@ -1022,16 +1022,16 @@ U.mount(`
 
 <div class="vs-feedback-overlay" id="vs-feedback-overlay" hidden>
   <div class="vs-feedback-card" role="alertdialog" aria-modal="true" aria-labelledby="vs-feedback-title">
-    <div class="vs-feedback-kicker">RUN RESET / 連続が きれました</div>
+    <div class="vs-feedback-kicker">MISSED / つぎへ</div>
     <h2 id="vs-feedback-title">Keep going.</h2>
-    <p id="vs-feedback-copy">A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.</p>
+    <p id="vs-feedback-copy">That question is missed, but your run continues.</p>
     <button class="game-btn game-btn-primary vs-feedback-continue" id="vs-feedback-continue" type="button">CONTINUE / つぎへ</button>
   </div>
 </div>
 
 <div class="vs-final-climax" id="vs-final-climax" hidden aria-hidden="true">
   <div class="vs-final-climax-label">
-    <div class="vs-final-climax-title">PERFECT RUN</div>
+    <div class="vs-final-climax-title">PERFECT SCORE</div>
     <div class="vs-final-climax-count">15 / 15</div>
   </div>
 </div>
@@ -1081,8 +1081,8 @@ U.mount(`
       <div class="vs-how-step">
         <div class="vs-how-num">3</div>
         <div>
-          <div class="vs-how-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
-          <div class="vs-how-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
+          <div class="vs-how-en">Finish all 15 questions. Correct answers build your score and streak.</div>
+          <div class="vs-how-jp">15問さいごまで あそぼう。正解でスコアとれんぞく正解がふえるよ。</div>
         </div>
       </div>
       <div class="vs-how-step">
@@ -1122,8 +1122,8 @@ U.mount(`
       <div class="vs-start-step">
         <div class="vs-start-num">3</div>
         <div>
-          <div class="vs-start-en">Answer all 15 correctly in a row. One mistake resets the run.</div>
-          <div class="vs-start-jp">15問れんぞくで正解しよう。1回まちがえると最初から。</div>
+          <div class="vs-start-en">Finish all 15 questions. Correct answers build your score and streak.</div>
+          <div class="vs-start-jp">15問さいごまで あそぼう。正解でスコアとれんぞく正解がふえるよ。</div>
         </div>
       </div>
       <button class="vs-start-btn" id="vs-start-btn">START / はじめよう</button>
@@ -1202,7 +1202,7 @@ function doStart() {
   unlockAllAudio();
   feedbackState = 'playing';
   order = U.shuffle(CFG.cards.slice(0, 15));
-  idx = 0; score = 0; streak = 0; lastLevel = 0;
+  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
   runStartedAt = performance.now();
   startOverlay.classList.add('hiding');
   setTimeout(() => { startOverlay.style.display = 'none'; }, 380);
@@ -1224,6 +1224,7 @@ let heatDur   = 5000;
 let runStartedAt = 0;
 let feedbackState = 'awaiting-start';
 let recoveryPending = false;
+let mistakes = 0;
 let finalClimaxTimer = null;
 let resultFxTimers = [];
 let resultAudio = null;
@@ -1323,7 +1324,7 @@ function showFailureFeedback(kind) {
   locked = true;
   setAnswerInputEnabled(false);
   feedbackTitle.textContent = kind === 'timeout' ? 'Time ran out.' : 'That answer was not correct.';
-  feedbackCopy.textContent = 'A perfect run needs 15 correct answers in a row. Your run returns to 0 / 15.';
+  feedbackCopy.textContent = 'That question is missed, but your run continues.';
   feedbackContinue.disabled = false;
   feedbackContinue.removeAttribute('aria-disabled');
   feedbackContinue.classList.remove('is-pressed');
@@ -1349,13 +1350,6 @@ function continueFromFailure(event) {
   setTimeout(() => {
     feedbackOverlay.classList.remove('show', 'closing');
     feedbackOverlay.hidden = true;
-    order = U.shuffle(CFG.cards.slice(0, 15));
-    idx = 0; score = 0; streak = 0; lastLevel = 0;
-    runStartedAt = performance.now();
-    scoreEl.textContent = '0';
-    streakEl.textContent = '0';
-    updateStreakUI();
-    updateStreakBanner();
     feedbackState = 'playing';
     recoveryPending = false;
     renderQ();
@@ -1373,7 +1367,7 @@ function renderQ() {
   grid.innerHTML = '';
 
   const card = order[idx];
-  qnumEl.textContent = idx;
+  qnumEl.textContent = idx + 1;
   jpEl.textContent   = card.jp;
   hiraEl.textContent = card.hira || '';
   updateDots();
@@ -1461,7 +1455,8 @@ function handlePick(btn, en) {
     updateStreakBanner();
     U.playSFX('fart');
 
-    showFailureFeedback('wrong');
+    mistakes++;
+    setTimeout(() => { idx++; renderQ(); }, 320);
   }
 }
 
@@ -1470,6 +1465,7 @@ function handlePick(btn, en) {
    ══════════════════════════════════════════════════════════════ */
 function onTimeout() {
   if (locked || feedbackState !== 'playing') return;
+  stopHeat();
   locked   = true;
   streak   = 0;
   updateStreakUI();
@@ -1478,7 +1474,8 @@ function onTimeout() {
 
   Array.from(grid.children).forEach(b => b.classList.add('vs-locked'));
 
-  showFailureFeedback('timeout');
+  mistakes++;
+  setTimeout(() => { idx++; renderQ(); }, 320);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1548,8 +1545,8 @@ function fireConfetti(big = false) {
              booha:gameEnd with correct saveId for vocab_speed
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
-  if (idx !== 15 || score !== 15 || streak !== 15 || feedbackState !== 'playing') return;
-  feedbackState = 'climax';
+  if (idx !== 15 || feedbackState !== 'playing') return;
+  feedbackState = 'complete';
   locked = true;
   setAnswerInputEnabled(false);
   stopHeat();
@@ -1560,21 +1557,7 @@ function showResults() {
     if (d) d.className = 'vs-dot done';
   }
 
-  const runTime = Math.max(0, performance.now() - runStartedAt);
-  finalClimax.hidden = false;
-  finalClimax.setAttribute('aria-hidden', 'false');
-  finalClimax.classList.remove('show');
-  void finalClimax.offsetWidth;
-  finalClimax.classList.add('show');
-  if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
-  finalClimaxTimer = setTimeout(() => {
-    if (feedbackState !== 'climax') return;
-    finalClimax.classList.remove('show');
-    finalClimax.hidden = true;
-    finalClimax.setAttribute('aria-hidden', 'true');
-    finalClimaxTimer = null;
-    revealResults(runTime);
-  }, (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 420 : 980);
+  revealResults(Math.max(0, performance.now() - runStartedAt));
 }
 
 function revealResults(runTime) {
@@ -1598,21 +1581,9 @@ function revealResults(runTime) {
   results.classList.add('show');
 
   const tier = getTier(score);
-  const pct  = 100;
-  /* ── Dispatch to Booha Adventure save system ── */
-  document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-  detail: {
-    saveId:    `${CFG.curriculum}:vocab_speed`,
-    score:     pct,
-    completed: true,
-    recordEligible: true,
-    time: runTime,
-    clearTier: 'perfect',
-    mistakes: 0,
-  }
-}));
+  const pct  = Math.round((score / 15) * 100);
 
-  /* Populate scorecard */
+  /* Populate before submitting: save/unlock listeners can be synchronous. */
   results.style.setProperty('--tier-color', tier.color);
   document.getElementById('vs-rs').textContent = `${score} / 15`;
   document.getElementById('vs-rp').textContent = `${pct}%`;
@@ -1620,6 +1591,16 @@ function revealResults(runTime) {
   document.getElementById('vs-re').textContent = tier.en;
   document.getElementById('vs-rj').textContent = tier.jp;
   document.getElementById('vs-rk').textContent = tier.kanji;
+
+  U.emitGameEnd({
+    saveId:    `${CFG.curriculum}:vocab_speed`,
+    score:     pct,
+    completed: true,
+    recordEligible: true,
+    time: runTime,
+    clearTier: score === 15 ? 'perfect' : 'mastery',
+    mistakes,
+  });
 
   /* Confetti + result sound */
   if (score === 15) {
@@ -1646,7 +1627,7 @@ document.getElementById('vs-replay').addEventListener('click', () => {
 
   streakBanner.className = 'vs-streak-banner';
 
-  idx = 0; score = 0; streak = 0; lastLevel = 0;
+  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
   feedbackState = 'playing';
   recoveryPending = false;
   runStartedAt = performance.now();

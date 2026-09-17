@@ -324,6 +324,23 @@ const UTILS = {
     return this.RESULT_MSGS.find(m => score <= m.maxScore) || this.RESULT_MSGS.at(-1);
   },
 
+  /*
+   * Submit a result after the scorecard has been painted. Result listeners
+   * perform synchronous save/unlock work and can be expensive on iPad Safari;
+   * keeping that work off the result reveal prevents a half-filled card from
+   * looking frozen when storage or sync is slow.
+   */
+  emitGameEnd(detail) {
+    const send = () => {
+      try {
+        document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail }));
+      } catch (error) {
+        console.error('[game-utils] Could not submit game result:', error);
+      }
+    };
+    setTimeout(send, 0);
+  },
+
   /* ══════════════════════════════
      SAGE VOICE PLAYER
      ══════════════════════════════ */

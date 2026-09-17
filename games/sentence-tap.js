@@ -1065,13 +1065,11 @@ function showResults() {
   const pct  = Math.round((score / 15) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
-document.dispatchEvent(new CustomEvent('booha:gameEnd', {
-    detail: {
+U.emitGameEnd({
       saveId:    `${CFG.curriculum}:sentence_tap`,
       score:     pct,
       completed: pct >= 40,
-    }
-  }));
+  });
 
   /* ✅ Fixed: was 'vt-results' (vocab-tap leftover), now 'st-results' */
   const resEl = document.getElementById('st-results');
