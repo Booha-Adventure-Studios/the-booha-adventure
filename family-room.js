@@ -14,10 +14,11 @@
   const WRONG_MARK_TELEGRAPH_MS = 1500;
   const CLUE_DISPLAY_MS = 7600;
   const PANEL_FADE_MS = 320;
-  const PATA_SURVIVAL_MS = 6200;
+  const PATA_DISCOVERY_MS = 900;
   const PATA_COOLDOWN_ROUNDS = 2;
   const PATA_CATCH_DISTANCE = .065;
   const COMPLETION_QUIET_MS = 2400;
+  const DEBUG_ROOM_COORDINATES = false;
   const EXIT_BAND_V = .86;
   const FAILURE_SILENCE_MS = 1200;
   const FAILURE_PANEL_DELAY_MS = 1800;
@@ -107,6 +108,12 @@
     teapot: ['tableLeft', 'tableCenter'],
     crescent: ['shojiLeft', 'shojiCenter', 'shojiRight'],
   });
+  const PATASKALA_SPAWN_ANCHORS = Object.freeze([
+    Object.freeze({ id: 'rear-shoji', u: .52, v: .22, region: 'upper-center' }),
+    Object.freeze({ id: 'rear-right', u: .75, v: .31, region: 'upper-right' }),
+    Object.freeze({ id: 'left-alcove', u: .23, v: .28, region: 'upper-left' }),
+    Object.freeze({ id: 'far-doorway', u: .58, v: .38, region: 'middle-center' }),
+  ]);
 
   const anomalies = [
     { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', labelEn: 'BOWL', labelJp: 'おわん', kind: 'added' },
@@ -146,6 +153,7 @@
   const observationJp = document.getElementById('observation-jp');
   const andon = document.getElementById('andon');
   const andonFill = document.getElementById('andon-fill');
+  const leaveButton = document.getElementById('leave-button');
   const clueCard = document.getElementById('clue-card');
   const clueEn = document.getElementById('clue-en');
   const clueJp = document.getElementById('clue-jp');
@@ -266,16 +274,29 @@
   const easeOut = value => 1 - Math.pow(1 - clamp(value, 0, 1), 3);
   const random = list => list[Math.floor(Math.random() * list.length)];
 
+  function roomPoint([u, v]) { return [plate.x + clamp(u, 0, 1) * plate.w, plate.y + clamp(v, 0, 1) * plate.h]; }
+  function roomCoordinates(x, y, sourcePlate = plate) {
+    if (!sourcePlate.w || !sourcePlate.h) return { u: .5, v: .5 };
+    return {
+      u: clamp((x - sourcePlate.x) / sourcePlate.w, 0, 1),
+      v: clamp((y - sourcePlate.y) / sourcePlate.h, 0, 1),
+    };
+  }
+  function roomPointFromCoordinates({ u, v }) { return roomPoint([u, v]); }
+  function roomContains(x, y) { return x >= plate.x && x <= plate.x + plate.w && y >= plate.y && y <= plate.y + plate.h; }
+  function roomMinDimension() { return Math.max(1, Math.min(plate.w, plate.h)); }
+
   function resize() {
     const oldWidth = width;
     const oldHeight = height;
     const hadViewport = oldWidth > 0 && oldHeight > 0;
+    const oldPlate = { ...plate };
     const normalized = hadViewport ? {
-      x: booha.x / oldWidth,
-      y: booha.y / oldHeight,
-      targetX: booha.targetX / oldWidth,
-      targetY: booha.targetY / oldHeight,
+      position: roomCoordinates(booha.x, booha.y, oldPlate),
+      target: roomCoordinates(booha.targetX, booha.targetY, oldPlate),
     } : null;
+    const threatPosition = pataskalaThreat && oldPlate.w ? roomCoordinates(pataskalaThreat.x, pataskalaThreat.y, oldPlate) : null;
+    const failurePosition = failureThreat && oldPlate.w ? roomCoordinates(failureThreat.x, failureThreat.y, oldPlate) : null;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     if (LOW_POWER) dpr = Math.min(dpr, 1);
     const visibleViewport = window.visualViewport;
@@ -288,17 +309,17 @@
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     canvas.style.margin = '0';
+    rebuildOverlays();
     if (normalized) {
-      booha.x = clamp(normalized.x * width, 0, width);
-      booha.y = clamp(normalized.y * height, 0, height);
-      booha.targetX = clamp(normalized.targetX * width, 0, width);
-      booha.targetY = clamp(normalized.targetY * height, 0, height);
+      [booha.x, booha.y] = roomPointFromCoordinates(normalized.position);
+      [booha.targetX, booha.targetY] = roomPointFromCoordinates(normalized.target);
+      if (pataskalaThreat && threatPosition) [pataskalaThreat.x, pataskalaThreat.y] = roomPointFromCoordinates(threatPosition);
+      if (failureThreat && failurePosition) [failureThreat.x, failureThreat.y] = roomPointFromCoordinates(failurePosition);
       if (state === 'playing' && (oldWidth !== width || oldHeight !== height)) {
         clearMarkingUi();
         setObservation('SCREEN CHANGED / MARK AGAIN', 'がめんが かわった / もういちど しるし');
       }
     } else resetBooha();
-    rebuildOverlays();
     if (!document.hidden) drawRoom(performance.now());
   }
 
@@ -308,13 +329,14 @@
   }
 
   function resetBooha() {
-    booha = { x: width / 2, y: height * .74, targetX: width / 2, targetY: height * .74 };
+    const [x, y] = roomPoint([.5, .74]);
+    booha = { x, y, targetX: x, targetY: y };
   }
 
   function rebuildOverlays() {
     const iw = baseImage.naturalWidth || 1024;
     const ih = baseImage.naturalHeight || 1536;
-    const scale = Math.max(width / iw, height / ih);
+    const scale = Math.min(width / iw, height / ih);
     plate = { w: iw * scale, h: ih * scale, x: (width - iw * scale) / 2, y: (height - ih * scale) / 2 };
 
     vignetteCanvas = document.createElement('canvas');
@@ -507,7 +529,7 @@
       });
       const anchorId = random(anchorCandidates.length ? anchorCandidates : anchorIds);
       const anchor = ROOM_ANCHORS[anchorId] || { u: choice.target[0], v: choice.target[1], radius: choice.target[2], scale: 1, region: 'unknown' };
-      const selected = { ...choice, target: [anchor.u, anchor.v, anchor.radius], artSize: choice.artSize * anchor.scale };
+      const selected = { ...choice, anchorId, region: anchor.region, target: [anchor.u, anchor.v, anchor.radius], artSize: choice.artSize * anchor.scale };
       currentAnomalies.push(selected);
       usedRegions.push(anchor.region);
       const poolIndex = pool.indexOf(choice);
@@ -516,10 +538,7 @@
       if (fallbackIndex >= 0) fallbackPool.splice(fallbackIndex, 1);
     }
     recentAnomalyIds = [...recentAnomalyIds, ...currentAnomalies.map(anomaly => anomaly.id)].slice(-4);
-    recentAnchorRegions = [...recentAnchorRegions, ...currentAnomalies.map(anomaly => {
-      const anchorId = Object.keys(ROOM_ANCHORS).find(id => ROOM_ANCHORS[id].u === anomaly.target[0] && ROOM_ANCHORS[id].v === anomaly.target[1]);
-      return ROOM_ANCHORS[anchorId]?.region || 'unknown';
-    })].slice(-4);
+    recentAnchorRegions = [...recentAnchorRegions, ...currentAnomalies.map(anomaly => anomaly.region || 'unknown')].slice(-4);
     currentAnomaly = currentAnomalies[0] || null;
     currentIsAnomaly = currentAnomalies.length > 0 || currentAudioOnly;
     currentPresence = currentAudioOnly ? null : (Math.random() < pataskalaChance() ? pataskalaPose() : null);
@@ -533,7 +552,7 @@
       : Boolean(falseAlertPoint);
   }
 
-  function currentPoint([u, v]) { return [plate.x + u * plate.w, plate.y + v * plate.h]; }
+  function currentPoint([u, v]) { return roomPoint([u, v]); }
 
   function drawAnomaly(anomaly) {
     if (!anomaly) return;
@@ -567,7 +586,7 @@
     if (!imageReady(art)) return;
     const sourceWidth = art.naturalWidth || 512;
     const sourceHeight = art.naturalHeight || 768;
-    const maxDimension = Math.max(42, plate.w * (.12 + pataskalaThreat.stage * .16));
+    const maxDimension = Math.max(42, plate.w * pose.artSize);
     const scale = maxDimension / Math.max(sourceWidth, sourceHeight);
     const drawWidth = sourceWidth * scale;
     const drawHeight = sourceHeight * scale;
@@ -636,6 +655,7 @@
     }
     drawWrongMarkHazard(time);
     drawMarks();
+    drawRoomDebug();
     if (state !== 'caught') drawBooha(time);
   }
 
@@ -671,7 +691,7 @@
     const fraction = burnFraction();
     const minimum = REDUCED_MOTION ? .065 : .05;
     const lowLightFraction = fraction < .1 ? fraction * .45 : fraction;
-    return Math.min(width, height) * (minimum + (.26 - minimum) * lowLightFraction);
+    return roomMinDimension() * (minimum + (.26 - minimum) * lowLightFraction);
   }
 
   function moveBooha() {
@@ -774,9 +794,33 @@
     ctx.restore();
   }
 
+  function drawRoomDebug() {
+    if (!DEBUG_ROOM_COORDINATES) return;
+    ctx.save();
+    ctx.globalAlpha = .9;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#7dff75';
+    ctx.strokeRect(plate.x, plate.y, plate.w, plate.h);
+    ctx.fillStyle = 'rgba(125,255,117,.2)';
+    ctx.fillRect(plate.x, plate.y + plate.h * EXIT_BAND_V, plate.w, plate.h * (1 - EXIT_BAND_V));
+    Object.entries(ROOM_ANCHORS).forEach(([id, anchor]) => {
+      const [x, y] = roomPoint([anchor.u, anchor.v]);
+      ctx.fillStyle = '#e8b76c';
+      ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillText(id, x + 8, y - 8);
+    });
+    PATASKALA_SPAWN_ANCHORS.forEach(anchor => {
+      const [x, y] = roomPoint([anchor.u, anchor.v]);
+      ctx.strokeStyle = '#c78cff';
+      ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillText(`P:${anchor.id}`, x + 12, y + 4);
+    });
+    ctx.restore();
+  }
+
   function clearWrongMarkHazard() { wrongMarkHazard = null; }
 
-  function boohaAtExit() { return booha.y >= height * EXIT_BAND_V; }
+  function boohaAtExit() { return booha.y >= plate.y + plate.h * EXIT_BAND_V; }
 
   function updateWrongMarkHazard(time) {
     if (!wrongMarkHazard) return;
@@ -795,7 +839,7 @@
     const dx = booha.x - wrongMarkHazard.x;
     const dy = booha.y - wrongMarkHazard.y;
     const distance = Math.hypot(dx, dy);
-    if (distance <= wrongMarkHazard.radius + Math.min(width, height) * .045) {
+    if (distance <= wrongMarkHazard.radius + roomMinDimension() * .045) {
       clearWrongMarkHazard();
       beginFailure(UI_COPY.caseReset);
       return;
@@ -822,24 +866,27 @@
 
   function beginPataskalaThreat() {
     if (state !== 'playing' || !currentPresence || pataskalaThreat || wrongMarkHazard) return;
-    const fromRight = booha.x < width * .5;
-    const startX = fromRight ? width + Math.min(width, height) * .12 : -Math.min(width, height) * .12;
-    const startY = clamp(booha.y + (Math.random() - .5) * height * .24, height * .24, height * .76);
+    const distances = PATASKALA_SPAWN_ANCHORS.map(anchor => ({ anchor, distance: Math.hypot(booha.x - roomPoint([anchor.u, anchor.v])[0], booha.y - roomPoint([anchor.u, anchor.v])[1]) }));
+    distances.sort((a, b) => b.distance - a.distance);
+    const spawn = distances[Math.floor(Math.random() * Math.min(2, distances.length))].anchor;
+    const [startX, startY] = roomPoint([spawn.u, spawn.v]);
+    const fromRight = startX > booha.x;
     pataskalaThreat = {
       pose: currentPresence,
       x: startX,
       y: startY,
       flip: fromRight,
+      spawnAnchorId: spawn.id,
+      discoveryUntil: performance.now() + PATA_DISCOVERY_MS,
+      alerted: false,
       startedAt: performance.now(),
       lastTime: performance.now(),
       startDistance: Math.max(1, Math.hypot(booha.x - startX, booha.y - startY)),
       stage: 0,
     };
     cancelMarkingForThreat();
-    markButton.disabled = true;
-    setObservation('KEEP MOVING / FIND THE EXIT', 'うごきつづける / でぐちを さがす', { immediate: true });
-    tellPresence();
-    playSfx('move', AUDIO_LEVELS.move);
+    setControlsVisible(true);
+    pataskalaThreat.discoveryUntil = performance.now() + PATA_DISCOVERY_MS;
   }
 
   function updatePataskalaThreat(time) {
@@ -850,18 +897,26 @@
     const dy = booha.y - pataskalaThreat.y;
     const distance = Math.hypot(dx, dy);
     pataskalaThreat.stage = clamp(1 - distance / pataskalaThreat.startDistance, 0, 1);
-    if (distance <= Math.min(width, height) * PATA_CATCH_DISTANCE) {
+    if (boohaAtExit()) {
+      clearPataskalaThreat();
+      currentPresence = null;
+      pataskalaCooldownRounds = PATA_COOLDOWN_ROUNDS;
+      setControlsVisible(true);
+      updateHud();
+      return;
+    }
+    if (distance <= roomMinDimension() * PATA_CATCH_DISTANCE) {
       pataskalaThreat.pose = PATASKALA_POSES[PATASKALA_POSES.length - 1];
       failureThreat = { ...pataskalaThreat };
       beginFailure(UI_COPY.caseReset);
       return;
     }
-    if (time - pataskalaThreat.startedAt >= PATA_SURVIVAL_MS) {
-      clearPataskalaThreat();
-      currentPresence = null;
-      pataskalaCooldownRounds = PATA_COOLDOWN_ROUNDS;
-      updateHud();
-      return;
+    if (time < pataskalaThreat.discoveryUntil) return;
+    if (!pataskalaThreat.alerted) {
+      pataskalaThreat.alerted = true;
+      setObservation('KEEP MOVING / FIND THE EXIT', 'うごきつづける / でぐちを さがす', { immediate: true });
+      tellPresence();
+      playSfx('move', AUDIO_LEVELS.move);
     }
     pataskalaThreat.pose = pataskalaThreat.stage >= .88
       ? PATASKALA_POSES[3]
@@ -871,7 +926,7 @@
       ? PATASKALA_POSES[1]
       : PATASKALA_POSES[0];
     if (distance > 0) {
-      const speed = Math.min(width, height) * (.13 + pataskalaThreat.stage * .11);
+      const speed = roomMinDimension() * (.13 + pataskalaThreat.stage * .11);
       const step = Math.min(distance, speed * elapsed);
       pataskalaThreat.x += (dx / distance) * step;
       pataskalaThreat.y += (dy / distance) * step;
@@ -976,8 +1031,9 @@
   function setControlsVisible(visible) {
     controls.classList.toggle('hidden', !visible);
     markButton.hidden = !visible;
-    if (!visible) markButton.disabled = true;
-    else if (!pataskalaThreat) markButton.disabled = false;
+    leaveButton.disabled = !visible || Boolean(pataskalaThreat);
+    undoButton.disabled = !visible || Boolean(pataskalaThreat);
+    markButton.disabled = !visible || Boolean(pataskalaThreat);
   }
 
   function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / TAP MARK TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / マークを おす'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
@@ -1082,7 +1138,7 @@
   }
 
   function handleLeave() {
-    if (state !== 'playing' || pendingMark || wrongMarkHazard) return;
+    if (state !== 'playing' || pendingMark || wrongMarkHazard || pataskalaThreat) return;
     state = 'transition'; transitionStarted = performance.now(); setControlsVisible(false); silenceDrone();
     const correct = reportIsCorrect();
     const token = roundToken;
@@ -1143,8 +1199,11 @@
   function setBoohaTarget(event) {
     if (state !== 'playing' || pendingMark) return;
     const rect = canvas.getBoundingClientRect();
-    const nextX = clamp(event.clientX - rect.left, 0, width);
-    const nextY = clamp(event.clientY - rect.top, 0, height);
+    const rawX = event.clientX - rect.left;
+    const rawY = event.clientY - rect.top;
+    if (!roomContains(rawX, rawY)) return;
+    const nextX = rawX;
+    const nextY = rawY;
     canvas.setPointerCapture?.(event.pointerId);
     activePointerId = event.pointerId;
     const startsHold = !pointerActive || !markHoldOrigin;
@@ -1176,9 +1235,9 @@
 
   function moveBoohaByKeyboard(dx, dy) {
     if (state !== 'playing' || markLocked || pendingMark) return;
-    const step = Math.max(28, Math.min(width, height) * .06);
-    booha.targetX = clamp(booha.targetX + dx * step, 0, width);
-    booha.targetY = clamp(booha.targetY + dy * step, 0, height);
+    const step = Math.max(28, roomMinDimension() * .06);
+    booha.targetX = clamp(booha.targetX + dx * step, plate.x, plate.x + plate.w);
+    booha.targetY = clamp(booha.targetY + dy * step, plate.y, plate.y + plate.h);
     if (wrongMarkHazard) {
       setObservation('RUN TO THE EXIT', 'でぐちへ にげる', { immediate: true });
     } else if (keyboardMarkActive) {

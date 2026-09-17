@@ -1678,10 +1678,11 @@ else
 fi
 
 echo "[family-room] state-machine audit"
-if node tests/family-room-state.test.cjs >/dev/null 2>&1; then
+if family_room_output=$(node tests/family-room-state.test.cjs 2>&1); then
   ok "Family Room hidden progression, lantern, marking, and gameEnd contracts pass"
 else
   bad "Family Room state-machine audit failed"
+  printf '%s\n' "$family_room_output" | sed 's/^/       /'
 fi
 
 echo "[security] Liar Machine name HTML-safety audit"
