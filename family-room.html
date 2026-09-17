@@ -35,9 +35,6 @@
         <span class="choice-arrow">↗</span>
         <span class="choice-copy"><b><span id="leave-en">REPORT THE ROOM</span><span id="leave-jp" class="jp" lang="ja">へやを ほうこくする</span></b><small><span>marks = changes · no marks = clean</span><span class="jp" lang="ja">しるし = へんか · しるしなし = きれい</span></small></span>
       </button>
-      <button id="mark-button" class="secondary-button mark-button" type="button" hidden>
-        <span>MARK THIS SPOT</span><span class="jp" lang="ja">ここに しるしを つける</span>
-      </button>
       <button id="undo-button" class="secondary-button undo-button" type="button" hidden><span>UNDO LAST MARK</span><span class="jp" lang="ja">さいごの しるしを けす</span></button>
     </section>
 
@@ -55,8 +52,8 @@
 
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
       <p class="panel-kicker"><span>CASE FILE 02 / CHANOMA</span><span class="jp" lang="ja">じけんファイル 02 / ちゃのま</span></p>
-      <h1 id="start-title"><span class="case-title">AKIYA</span><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
-      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha to a change, then hold Booha still or use MARK THIS SPOT. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを ひっぱり、じっと させるか マークを おす。しるしを かくにんして、へやを ほうこくする。</span></p>
+      <h1 id="start-title"><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
+      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Move Booha to a change, then hold Booha still to mark it. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを うごかし、じっと させて しるしを つける。しるしを かくにんして、へやを ほうこくする。</span></p>
       <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves / へやの うごきを えらぶ">
         <button class="tier-button selected" type="button" data-tier="patient"><b><span>THE ROOM IS PATIENT</span><span class="jp" lang="ja">へやは おだやか</span></b><small><span>the first case</span><span class="jp" lang="ja">はじめの じけん</span></small></button>
         <button class="tier-button" type="button" data-tier="quicker"><b><span>THE ROOM IS QUICKER</span><span class="jp" lang="ja">へやは はやい</span></b><small><span>three fast Blitz stamps</span><span class="jp" lang="ja">ブリッツの はやい しるし みっつ</span></small></button>
@@ -64,13 +61,13 @@
       </div>
       <button id="start-button" class="primary-button" type="button"><span>ENTER THE ROOM</span><span class="jp" lang="ja">へやに はいる</span><span class="button-arrow" aria-hidden="true">→</span></button>
       <button id="back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
-      <p class="panel-foot"><span>Enter opens the study · Drag or arrows move · MARK checks Booha's spot · Space to mark too · Enter reports</span><span class="jp" lang="ja">Enterで へやを おぼえる · ひっぱるか やじるしで うごかす · MARKで ブーハの ばしょを しらべる · スペースで しるし · Enterで ほうこく</span></p>
+      <p class="panel-foot"><span>Enter opens the study · Drag or arrows move · Hold Booha still to mark · Enter reports</span><span class="jp" lang="ja">Enterで へやを おぼえる · ひっぱるか やじるしで うごかす · ブーハを じっと させて しるし · Enterで ほうこく</span></p>
     </section>
 
     <section id="study-panel" class="panel study-panel" aria-labelledby="study-title" hidden>
       <p class="panel-kicker"><span>CASE FILE 02 / CHANOMA</span><span class="jp" lang="ja">じけんファイル 02 / ちゃのま</span></p>
       <h2 id="study-title"><span>STUDY THE ROOM.</span><span class="jp" lang="ja">へやを おぼえる。</span></h2>
-      <p class="panel-copy"><span>Take as long as you need. Remember what belongs here, and notice the way out. Start the case when you are ready.</span><span class="jp" lang="ja">じぶんの ペースで みる。ここに あるものと、でぐちを おぼえる。じゅんびが できたら、じけんを はじめる。</span></p>
+      <p class="panel-copy"><span>Take as long as you need. Remember what belongs here and notice the way out. Start when ready.</span><span class="jp" lang="ja">じぶんの ペースで みて、ものと でぐちを おぼえる。じゅんびが できたら はじめる。</span></p>
       <button id="study-start-button" class="primary-button" type="button"><span>START THE CASE</span><span class="jp" lang="ja">じけんを はじめる</span><span class="button-arrow" aria-hidden="true">→</span></button>
       <button id="study-back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
       <p class="panel-foot"><span>No timer. Start when ready.</span><span class="jp" lang="ja">じかんせいげんなし。じゅんびが できたら はじめる。</span></p>
