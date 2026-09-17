@@ -114,6 +114,7 @@
   const leaveEn = document.getElementById('leave-en');
   const leaveJp = document.getElementById('leave-jp');
   const undoButton = document.getElementById('undo-button');
+  const markButton = document.getElementById('mark-button');
   const markConfirmPanel = document.getElementById('mark-confirm-panel');
   const markConfirmTitleEn = document.getElementById('mark-confirm-title-en');
   const markConfirmTitleJp = document.getElementById('mark-confirm-title-jp');
@@ -193,6 +194,7 @@
   let pointerActive = false;
   let keyboardMarkActive = false;
   let markHoldOrigin = null;
+  let markHoldStartedAt = 0;
   let markHoldTimer = 0;
   let markLocked = false;
   let markedPoints = [];
@@ -223,12 +225,21 @@
     } : null;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     if (LOW_POWER) dpr = Math.min(dpr, 1);
-    width = window.innerWidth;
-    height = window.innerHeight;
+    const targetAspect = (baseImage.naturalWidth || 1024) / (baseImage.naturalHeight || 1536);
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    if (viewportWidth / viewportHeight > targetAspect) {
+      height = viewportHeight;
+      width = Math.round(viewportHeight * targetAspect);
+    } else {
+      width = viewportWidth;
+      height = viewportHeight;
+    }
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
+    canvas.style.margin = '0 auto';
     if (normalized) {
       booha.x = clamp(normalized.x * width, 0, width);
       booha.y = clamp(normalized.y * height, 0, height);
@@ -313,7 +324,7 @@
     andon.style.setProperty('--andon-level', String(fraction));
     andon.classList.toggle('dim', fraction < .55);
     andon.classList.toggle('critical', fraction < .22);
-    andon.setAttribute('aria-label', fraction < .22 ? 'Lantern light is nearly gone / あんどんの あかりが きえそう' : 'Lantern light is burning / あんどんが もえている');
+    andon.setAttribute('aria-label', fraction < .22 ? "Booha's light is nearly gone / ブーハの あかりが きえそう" : "Booha's light is burning / ブーハの あかりが もえている");
   }
 
   function updateTierButtons() {
@@ -404,8 +415,9 @@
     const scale = maxDimension / Math.max(sourceWidth, sourceHeight);
     const drawWidth = sourceWidth * scale;
     const drawHeight = sourceHeight * scale;
+    const inheritedAlpha = ctx.globalAlpha;
     ctx.save();
-    ctx.globalAlpha = anomaly.character === 'pataskala' ? .9 : .95;
+    ctx.globalAlpha = inheritedAlpha * (anomaly.character === 'pataskala' ? .9 : .95);
     ctx.shadowColor = anomaly.character === 'pataskala' ? 'rgba(219,230,218,.18)' : 'rgba(232,183,108,.42)';
     ctx.shadowBlur = Math.max(5, maxDimension * .12);
     ctx.drawImage(art, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight);
@@ -530,6 +542,16 @@
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(booha.x, booha.y, size * .68, 0, Math.PI * 2); ctx.stroke();
     }
+    if (markHoldOrigin && !markLocked && !pendingMark) {
+      const heldMs = Math.max(0, time - markHoldStartedAt);
+      const fraction = clamp(heldMs / MARK_HOLD_MS, 0, 1);
+      ctx.globalAlpha = .95;
+      ctx.strokeStyle = '#e8b76c';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(booha.x, booha.y, size * .68, -Math.PI / 2, -Math.PI / 2 + fraction * Math.PI * 2);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 
@@ -583,8 +605,9 @@
       pointerActive = false;
       keyboardMarkActive = false;
       markHoldOrigin = null;
+      markHoldStartedAt = 0;
       window.clearTimeout(markHoldTimer); markHoldTimer = 0;
-      controls.classList.remove('hidden');
+      setControlsVisible(true);
       setReportLabel(markedPoints.length > 0);
       setObservation('EXIT REACHED / REPORT OR KEEP LOOKING', 'でぐちに ついた / ほうこくするか まだ さがす');
       return;
@@ -691,18 +714,23 @@
     window.clearTimeout(clueTimer); clueTimer = 0;
     clueCard.hidden = true;
     clearWrongMarkHazard();
-    markLocked = false; pendingMark = null; markedPoints = []; markHoldOrigin = null; keyboardMarkActive = false;
+    markLocked = false; pendingMark = null; markedPoints = []; markHoldOrigin = null; markHoldStartedAt = 0; keyboardMarkActive = false;
     window.clearTimeout(markHoldTimer); markHoldTimer = 0;
     markConfirmPanel.hidden = true;
     markConfirmPanel.classList.remove('visible');
     setReportLabel(false);
   }
-  function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / HOLD TO MARK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / じっと させて しるし'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
+  function setControlsVisible(visible) {
+    controls.classList.toggle('hidden', !visible);
+    markButton.hidden = !visible;
+  }
+
+  function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / TAP MARK TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / マークを おす'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
 
   function startRound() {
     clearRoundTimers();
     roundToken += 1;
-    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; controls.classList.remove('hidden'); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
+    state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; setControlsVisible(true); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
   }
 
   function enterRoom() {
@@ -711,7 +739,7 @@
     round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; currentAudioOnly = false; currentIsAnomaly = false;
     state = 'study';
     curtain.className = '';
-    controls.classList.add('hidden');
+    setControlsVisible(false);
     clearMarkingUi();
     resetBooha();
     startPanel.classList.remove('visible');
@@ -731,6 +759,7 @@
     studyPanel.hidden = true;
     caseStarted = performance.now();
     startRound();
+    showLightTipOnce();
     curtain.className = 'active';
     const token = roundToken;
     studyCurtainTimer = window.setTimeout(() => {
@@ -799,7 +828,7 @@
 
   function handleLeave() {
     if (state !== 'playing' || pendingMark || wrongMarkHazard) return;
-    state = 'transition'; transitionStarted = performance.now(); controls.classList.add('hidden'); silenceDrone();
+    state = 'transition'; transitionStarted = performance.now(); setControlsVisible(false); silenceDrone();
     const correct = reportIsCorrect();
     const token = roundToken;
     if (!correct) { wrongTone(); if (currentAnomalies.length || currentAudioOnly) playSfx('anomaly', AUDIO_LEVELS.anomaly); curtain.className = 'active catch'; transitionTimer = window.setTimeout(() => { if (token === roundToken) handleWrong(); }, REDUCED_MOTION ? 80 : 260); return; }
@@ -836,7 +865,7 @@
   }
 
   function beginFailure(message) {
-    clearRoundTimers(); clearWrongMarkHazard(); state = 'caught'; failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); updateAndon();
+    clearRoundTimers(); clearWrongMarkHazard(); state = 'caught'; setControlsVisible(false); failureStarted = performance.now(); setObservation('CASE RESET', 'じけんを はじめから'); silenceDrone(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); updateAndon();
     const jumpLevel = currentTier().jumpLevel ?? AUDIO_LEVELS.jump;
     const token = roundToken;
     failureJumpTimer = window.setTimeout(() => { if (token === roundToken && state === 'caught' && failureStarted) playSfx(Math.random() < .5 ? 'jump1' : 'jump2', jumpLevel); }, FAILURE_SILENCE_MS + 60);
@@ -864,6 +893,7 @@
       markHoldOrigin = [nextX, nextY];
       markLocked = false;
       window.clearTimeout(markHoldTimer);
+      markHoldStartedAt = performance.now();
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
     }
     setObservation('HOLD BOOHA STILL', 'ブーハを じっと させる');
@@ -873,6 +903,7 @@
   function releaseBooha(event) {
     pointerActive = false;
     markHoldOrigin = null;
+    markHoldStartedAt = 0;
     if (event?.pointerId != null) canvas.releasePointerCapture?.(event.pointerId);
     if (!markLocked) { window.clearTimeout(markHoldTimer); markHoldTimer = 0; }
   }
@@ -887,6 +918,7 @@
     } else if (keyboardMarkActive) {
       markHoldOrigin = [booha.targetX, booha.targetY];
       window.clearTimeout(markHoldTimer);
+      markHoldStartedAt = performance.now();
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
     } else {
       setObservation('ARROWS MOVE BOOHA / SPACE MARKS', 'やじるしで ブーハを うごかす / スペースで しるし');
@@ -899,6 +931,7 @@
     pointerActive = false;
     markHoldOrigin = [booha.targetX, booha.targetY];
     window.clearTimeout(markHoldTimer);
+    markHoldStartedAt = performance.now();
     markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
     setObservation('HOLD SPACE STILL', 'スペースを じっと おす');
   }
@@ -907,12 +940,14 @@
     keyboardMarkActive = false;
     if (!markLocked) {
       markHoldOrigin = null;
+      markHoldStartedAt = 0;
       window.clearTimeout(markHoldTimer);
     }
   }
 
   function lockMark() {
     markHoldTimer = 0;
+    markHoldStartedAt = 0;
     if (state !== 'playing' || wrongMarkHazard || (!pointerActive && !keyboardMarkActive)) return;
     markLocked = true;
     pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
@@ -934,6 +969,17 @@
     markYesButton.focus?.();
   }
 
+  function attemptMark() {
+    if (state !== 'playing' || pendingMark || wrongMarkHazard) return;
+    pointerActive = false;
+    keyboardMarkActive = false;
+    markHoldOrigin = null;
+    markHoldStartedAt = 0;
+    window.clearTimeout(markHoldTimer); markHoldTimer = 0;
+    pendingMark = { x: booha.x, y: booha.y, radius: lightRadius() };
+    showMarkConfirm();
+  }
+
   function startWrongMarkHazard(mark) {
     const now = performance.now();
     wrongMarkHazard = {
@@ -943,7 +989,7 @@
       graceUntil: now + WRONG_MARK_GRACE_MS,
       lastTime: now,
     };
-    controls.classList.add('hidden');
+    setControlsVisible(false);
     wrongTone();
     playSfx('anomaly', Math.min(.48, AUDIO_LEVELS.anomaly + .1));
     setObservation('WRONG MARK / RUN TO THE EXIT', 'まちがいの しるし / でぐちへ にげる');
@@ -957,6 +1003,7 @@
     pointerActive = false;
     keyboardMarkActive = false;
     markHoldOrigin = null;
+    markHoldStartedAt = 0;
     markConfirmPanel.hidden = true;
     markConfirmPanel.classList.remove('visible');
     if (!currentAnomalies.some(anomaly => markMatchesAnomaly(mark, anomaly))) {
@@ -974,6 +1021,7 @@
     pendingMark = null;
     markLocked = false;
     markHoldOrigin = null;
+    markHoldStartedAt = 0;
     keyboardMarkActive = false;
     window.clearTimeout(markHoldTimer); markHoldTimer = 0;
     markConfirmPanel.hidden = true;
@@ -997,6 +1045,28 @@
     clueCard.hidden = false; setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
     clueVersion += 1; const version = clueVersion; window.clearTimeout(clueTimer);
     clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 1300);
+  }
+
+  function showLightTipOnce() {
+    const save = window.BoohaAdventure?.save;
+    if (!save?.load || !save?.save) return;
+    try {
+      const data = save.load();
+      if (!data || typeof data !== 'object' || data.meta?.familyRoomLightTipShown) return;
+      if (!data.meta || typeof data.meta !== 'object' || Array.isArray(data.meta)) data.meta = {};
+      data.meta.familyRoomLightTipShown = true;
+      if (!save.save(data)) return;
+      clueEn.textContent = "Booha's light shrinks as it burns — keep it close to search the room.";
+      clueJp.textContent = 'ブーハの あかりは もえると ちいさくなる。そばで へやを さがそう。';
+      clueCard.hidden = false;
+      setObservation("BOOHA'S LIGHT / KEEP IT CLOSE", 'ブーハの あかり / そばで さがす');
+      clueVersion += 1;
+      const version = clueVersion;
+      window.clearTimeout(clueTimer);
+      clueTimer = window.setTimeout(() => { if (version !== clueVersion) return; clueTimer = 0; clueCard.hidden = true; }, 3000);
+    } catch (error) {
+      console.warn('[Family Room] light tip unavailable', error);
+    }
   }
 
   function recordFamilyRoomCompletion() {
@@ -1037,7 +1107,7 @@
     document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId: SAVE_ID, score: marks, completed: true, time: performance.now() - caseStarted, recordEligible: true, recentRun: { marks, calls: correctCalls, tier: selectedTier } } }));
   }
 
-  function showComplete() { if (state === 'complete') return; clearRoundTimers(); state = 'complete'; controls.classList.add('hidden'); clearMarkingUi(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); stopLoop(); showMessage(UI_COPY.complete, exitGame); }
+  function showComplete() { if (state === 'complete') return; clearRoundTimers(); state = 'complete'; setControlsVisible(false); clearMarkingUi(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); stopLoop(); showMessage(UI_COPY.complete, exitGame); }
 
   function exitGame() {
     try {
@@ -1124,6 +1194,7 @@
   studyBackButton.addEventListener('click', exitGame);
   backButton.addEventListener('click', exitGame);
   document.getElementById('leave-button').addEventListener('click', handleLeave);
+  markButton.addEventListener('click', attemptMark);
   undoButton.addEventListener('click', undoLastMark);
   markYesButton.addEventListener('click', confirmMark);
   markNoButton.addEventListener('click', cancelMark);

@@ -41,8 +41,11 @@ assert(source.includes('burnMs: 35000') && source.includes('burnMs: 18000') && s
 assert(source.includes('function handleBurnout(time)') && source.includes('beginFailure(UI_COPY.caseReset)'), 'burnout must restart the case instead of consuming a life');
 assert(source.includes('function handleWrong()') && source.includes('beginFailure(UI_COPY.caseReset)'), 'a wrong report must restart the case instead of consuming a life');
 assert(source.includes('function updateAndon') && source.includes('burnFraction'), 'the lantern clock must use a dimming andon, not a number');
-assert(markup.includes('id="andon"') && markup.includes('ROOM LIGHT') && !markup.includes('flame-meter'), 'the lantern burn indicator must be the only light readout');
+assert(markup.includes('id="andon"') && markup.includes("BOOHA'S LIGHT") && markup.includes('class="andon andon-primary"') && !markup.includes('flame-meter'), 'Booha\'s light must be the primary light readout');
 assert(source.includes('function drawShojiDawn') && source.includes('progress / CASE_ROUNDS'), 'case progress must brighten the shoji without a counter');
+assert(source.includes('const inheritedAlpha = ctx.globalAlpha') && source.includes('inheritedAlpha * (anomaly.character'), 'anomaly opacity must preserve the ambient shadow pass');
+assert(source.includes('const targetAspect') && source.includes('canvas.style.margin = \'0 auto\''), 'the room canvas must stay within the portrait art aspect');
+assert(source.includes('markHoldStartedAt') && source.includes('heldMs / MARK_HOLD_MS'), 'the hold-to-mark gesture must show visible progress');
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
 assert(source.includes('function drawFailureBooha') && source.includes('if (time - failureStarted >= FAILURE_SILENCE_MS)'), 'Booha must glow alone after the silence');
@@ -106,6 +109,7 @@ assert(source.includes('function recordFamilyRoomCompletion') && source.includes
 assert(!serviceWorker.includes('/assets/family-room/audio/family_BGM.mp3'), 'the long Family Room BGM must not enter the install-time core cache');
 assert(markup.includes('id="leave-button"') && markup.includes('REPORT THE ROOM') && markup.includes('id="undo-button"') && source.includes('function handleLeave'), 'the room must use one explicit report button with mark undo support');
 assert(markup.includes('id="mark-confirm-panel"') && markup.includes('YES, MARK IT') && markup.includes('NO, KEEP LOOKING') && source.includes('function confirmMark') && source.includes('function cancelMark'), 'marking must require a clear bilingual confirmation before it is recorded');
+assert(markup.includes('id="mark-button"') && markup.includes('MARK THIS SPOT') && source.includes('function attemptMark') && source.includes('markButton.addEventListener'), 'marking must have a discoverable one-tap action');
 assert(markup.includes('id="start-button"') && markup.includes('ENTER THE ROOM') && markup.includes('へやに はいる'), 'the start action must clearly say enter the room in both languages');
 assert(markup.includes('id="back-button"') && markup.includes('BACK TO PROFILE'), 'back must be reserved for leaving the game');
 assert(markup.includes('id="observation-en"') && markup.includes('id="observation-jp"') && source.includes('HOLD BOOHA STILL'), 'marking guidance must have paired English and Japanese lines');
@@ -142,7 +146,7 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp', 'undo-button', 'mark-confirm-panel', 'mark-confirm-title-en', 'mark-confirm-title-jp', 'mark-confirm-object-en', 'mark-confirm-object-jp', 'mark-yes-button', 'mark-no-button'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp', 'undo-button', 'mark-button', 'mark-confirm-panel', 'mark-confirm-title-en', 'mark-confirm-title-jp', 'mark-confirm-object-en', 'mark-confirm-object-jp', 'mark-yes-button', 'mark-no-button'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
 nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
 const listeners = {};
