@@ -12,6 +12,10 @@ assert.match(shared, /queue = shuffle\(weekCards\);[\s\S]*?current = 0;[\s\S]*?e
   'shared recovery must restart the full run at zero');
 assert.match(shared, /function bindPointerAction\(button, handler\)/,
   'shared answers must use one pointer activation path');
+assert.match(shared, /function bindPointerAction\(button, handler\)\s*\{[\s\S]*?let downId = null[\s\S]*?sameTouch = event\.pointerId === downId[\s\S]*?moved = Math\.hypot\(event\.clientX - downX, event\.clientY - downY\) > 10[\s\S]*?if \(!sameTouch \|\| moved\) return;/,
+  'shared answers must ignore pointer releases that started elsewhere or moved into a scroll gesture');
+assert.match(shared, /feedbackState = 'playing';\s*visibilityPaused = false;\s*locked = false;\s*setAnswerInputEnabled\(true\);/,
+  'starting a run must open both the logical and native answer-input locks');
 assert.match(shared, /current === initialQueueLength && streak === initialQueueLength && bestStreak === initialQueueLength && mistakeCount === 0/,
   'shared completion must require 15 correct answers in a row');
 assert.doesNotMatch(shared, /queue\.splice\(|WRONG_ANSWER_PENALTY_MS|CLEAN_CLEAR_MAX_MISTAKES|MASTERY CLEAR|CLEAN CLEAR/,
@@ -22,6 +26,14 @@ assert.match(shared, /streak-tier-1.*streak-tier-5/s,
   'shared Blitz must retain a visible streak tier after a milestone event');
 assert.match(shared, /eventThreshold === 15/,
   'shared Blitz must distinguish the perfect-run climax from ordinary milestones');
+assert.match(shared, /@keyframes boohaBlitzChargedWash[\s\S]*?50% \{ opacity: \.22; \}/,
+  'high streak answer energy must use a visible opacity wash');
+assert.doesNotMatch(shared, /@keyframes boohaBlitzChargedBreath/,
+  'high streak answer energy must not animate filter brightness');
+assert.match(shared, /correct-impact::after[\s\S]*?@keyframes boohaBlitzCorrectImpactWash/,
+  'correct impact must use an opacity overlay rather than an animated viewport shadow');
+assert.match(shared, /threshold >= 9 && i === 0/,
+  'large streak sparks must begin at the first reachable 9-streak milestone');
 
 for (const [source, prefix] of [[vocab, 'vs'], [sentence, 'ssp']]) {
   assert.match(source, /U\.shuffle\(CFG\.cards\.slice\(0, 15\)\)/,
