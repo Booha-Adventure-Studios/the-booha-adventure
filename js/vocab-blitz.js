@@ -200,6 +200,8 @@ const SCOLDS = [
         grid-template-columns: 1fr 1fr;
         gap: clamp(8px,2vw,14px);
         padding: 0 0 max(env(safe-area-inset-bottom,0px) + 16px, 20px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         position: relative; z-index: 2;
       }
 
@@ -305,6 +307,16 @@ const SCOLDS = [
           padding: clamp(20px, 2.2vh, 34px) clamp(16px, 1.6vw, 28px);
           border-radius: clamp(18px, 1.6vw, 28px);
         }
+      }
+
+      @media (min-width: 900px) and (orientation: landscape) and (max-height: 720px) {
+        #vb-options { grid-template-columns: 1fr 1fr; }
+        .vb-opt {
+          font-size: clamp(16px, 1.4vw, 24px);
+          padding: clamp(12px, 1.6vh, 20px) clamp(12px, 1.2vw, 20px);
+        }
+        #vb-jp-word { font-size: clamp(64px, 7vw, 120px); }
+        #vb-hira { font-size: clamp(20px, 1.8vw, 30px); }
       }
 
       /* ── BG flash on correct ── */
@@ -642,6 +654,7 @@ const SCOLDS = [
     particleClass: 'vb-particle',
     particleAnimation: 'vbParticle',
     celebrationMode: 'vocab',
+    speedTargetMs: 90000,
     finalCard: {
       badge: 'WORD STORM',
       detail: 'EVERY WORD LANDED',
