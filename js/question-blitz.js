@@ -202,6 +202,8 @@ window.QuestionBlitz = (() => {
         flex: 0 0 auto; width: 100%; max-width: 680px;
         display: flex; flex-direction: column;
         gap: clamp(7px,1.5vw,11px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .qb-opt {
@@ -266,6 +268,16 @@ window.QuestionBlitz = (() => {
           padding: clamp(18px, 2vh, 30px) clamp(16px, 1.6vw, 28px);
           border-radius: clamp(16px, 1.6vw, 26px);
         }
+      }
+
+      @media (min-width: 900px) and (orientation: landscape) and (max-height: 720px) {
+        #qb-options { display: grid; grid-template-columns: 1fr 1fr; }
+        .qb-opt {
+          font-size: clamp(16px, 1.4vw, 24px);
+          padding: clamp(12px, 1.6vh, 20px) clamp(12px, 1.2vw, 20px);
+        }
+        #qb-jp-word { font-size: clamp(26px, 3.2vw, 54px); }
+        #qb-hira { font-size: clamp(16px, 1.7vw, 28px); }
       }
 
       .qb-opt:hover {
@@ -603,6 +615,7 @@ window.QuestionBlitz = (() => {
     particleClass: 'qb-particle',
     particleAnimation: 'qbParticle',
     celebrationMode: 'question',
+    speedTargetMs: 90000,
     finalCard: {
       badge: 'SPEED SOLVED',
       detail: 'ANSWERED UNDER PRESSURE',

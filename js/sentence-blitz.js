@@ -208,6 +208,8 @@ window.SentenceBlitz = (() => {
         display: flex;
         flex-direction: column;
         gap: clamp(7px,1.5vw,11px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .sb-opt {
@@ -275,6 +277,16 @@ window.SentenceBlitz = (() => {
           padding: clamp(18px, 2vh, 30px) clamp(16px, 1.6vw, 28px);
           border-radius: clamp(16px, 1.6vw, 26px);
         }
+      }
+
+      @media (min-width: 900px) and (orientation: landscape) and (max-height: 720px) {
+        #sb-options { display: grid; grid-template-columns: 1fr 1fr; }
+        .sb-opt {
+          font-size: clamp(16px, 1.4vw, 24px);
+          padding: clamp(12px, 1.6vh, 20px) clamp(12px, 1.2vw, 20px);
+        }
+        #sb-jp-word { font-size: clamp(28px, 3.4vw, 58px); }
+        #sb-hira { font-size: clamp(18px, 1.8vw, 30px); }
       }
 
       .sb-opt:hover {
@@ -605,6 +617,7 @@ window.SentenceBlitz = (() => {
     particleClass: 'sb-particle',
     particleAnimation: 'sbParticle',
     celebrationMode: 'sentence',
+    speedTargetMs: 90000,
     finalCard: {
       badge: 'LINE LOCKED',
       detail: 'EVERY SENTENCE CONNECTED',

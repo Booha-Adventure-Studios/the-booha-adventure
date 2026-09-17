@@ -30,3 +30,22 @@ explicit lossless allowlist, and the decoded Wanderer-cache model. Browser
 runtime monitors measure actual frame windows and memory estimates.
 Representative-device testing is still required for Safari/iOS thermal
 behavior, page hide/resume, audio activity, and visual edge quality.
+
+## Blitz pre-release check
+
+Before shipping a Blitz visual or performance change, run the three games
+with `?blitzdiag=1` and check the following in Chrome DevTools:
+
+1. Use Performance CPU throttling at 6×, then 20×, and confirm the runtime
+   tier settles to `reduced` or `minimal` without making the run unusable.
+2. In Rendering, emulate `prefers-reduced-motion` and confirm the game stays
+   readable, answerable, and restartable.
+3. Use the device toolbar at `1024 × 600` landscape and confirm all six
+   answers remain reachable; repeat at `1280 × 600` and `960 × 540`.
+4. Verify a clean perfect run updates the HUB pill immediately, and a weekly
+   reset updates it without requiring a tab switch or page reload.
+
+The diagnostic overlay reports the active hardware/runtime tier, average frame
+time, slow-frame ratio, and sample window. These checks complement the static
+audits in `verify.sh`; they do not replace testing on a representative phone
+or tablet when one is available.
