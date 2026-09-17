@@ -1186,24 +1186,22 @@
       .utsu-profile-pop-actions button span{display:block;margin-top:3px;font-size:.74em;opacity:.8;}
       .utsu-profile-pop-actions button:hover,.utsu-profile-pop-actions button:focus-visible{border-color:#fff;background:rgba(216,168,255,.25);transform:translateY(-1px);outline:none;}
       .utsu-profile-pop-actions button:last-child{border-color:rgba(255,255,255,.24);background:transparent;color:rgba(255,255,255,.72);}
-      #family-room-pop-overlay .utsu-profile-pop-box{border-color:rgba(197,255,104,.72);background:linear-gradient(155deg,#17200f,#0b1009 72%);box-shadow:0 0 0 1px rgba(197,255,104,.14),0 0 42px rgba(133,194,24,.34),0 0 100px rgba(45,74,6,.28),inset 0 0 50px rgba(0,0,0,.56);}
-      #family-room-pop-overlay .utsu-profile-pop-box::before{background:linear-gradient(90deg,transparent,#baff45,#fff5bb,#baff45,transparent);}
-      #family-room-pop-overlay .utsu-profile-pop-box::after{border-color:rgba(197,255,104,.16);}
-      #family-room-pop-overlay .utsu-profile-pop-icon{width:166px;height:102px;margin-bottom:10px;}
-      #family-room-pop-overlay .family-room-pop-icon::before{background:radial-gradient(ellipse,rgba(202,255,72,.42),rgba(255,222,129,.16) 42%,transparent 72%);filter:blur(10px);}
-      #family-room-pop-overlay .family-room-pop-icon img{width:166px;height:102px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 7px #fff1ac);}
+      #family-room-pop-overlay .utsu-profile-pop-box{border-color:rgba(188,139,255,.78);background:linear-gradient(155deg,#1b1230,#0b0713 72%);box-shadow:0 0 0 1px rgba(188,139,255,.16),0 0 42px rgba(125,74,210,.42),0 0 100px rgba(55,25,110,.34),inset 0 0 50px rgba(0,0,0,.56);}
+      #family-room-pop-overlay .utsu-profile-pop-box::before{background:linear-gradient(90deg,transparent,#9f6bff,#f0e2ff,#9f6bff,transparent);}
+      #family-room-pop-overlay .utsu-profile-pop-box::after{border-color:rgba(188,139,255,.18);}
+      #family-room-pop-overlay .utsu-profile-pop-icon{width:220px;height:140px;margin-bottom:10px;overflow:visible;}
+      #family-room-pop-overlay .family-room-pop-icon::before{background:radial-gradient(ellipse,rgba(155,103,255,.44),rgba(211,183,255,.18) 42%,transparent 72%);filter:blur(10px);z-index:0;}
+      #family-room-pop-overlay .family-room-pop-icon img{position:relative;z-index:1;width:220px;height:140px;object-fit:contain;mix-blend-mode:normal;filter:drop-shadow(0 0 7px #eee2ff);}
       #family-room-pop-overlay .family-room-pop-icon.is-closed::before{opacity:.22;filter:grayscale(1) blur(8px);}
-      #family-room-pop-overlay .family-room-pop-icon.is-closed img{filter:grayscale(.8) brightness(.34) drop-shadow(0 0 3px rgba(186,255,69,.32));}
-      #family-room-pop-overlay .family-room-pop-eyebrow{color:#caff65;}
-      #family-room-pop-overlay .family-room-pop-eyebrow .jp,#family-room-pop-overlay .family-room-pop-title .jp{display:block;margin-top:3px;font-size:.78em;letter-spacing:.05em;opacity:.78;}
-      #family-room-pop-overlay .family-room-pop-title{color:#f2ffd6;text-shadow:0 0 16px rgba(186,255,69,.42);}
-      #family-room-pop-overlay .family-room-pop-title-jp{color:rgba(230,255,190,.72);}
-      #family-room-pop-overlay .family-room-pop-copy{color:#f5ffe7;}
-      #family-room-pop-overlay .family-room-pop-warning{position:relative;margin:16px 0 0;padding:10px 12px;border:1px solid rgba(255,177,111,.48);border-radius:9px;background:rgba(255,132,68,.09);color:#ffd2af;font:800 clamp(.7rem,2.3vw,.82rem)/1.35 system-ui,sans-serif;letter-spacing:.04em;}
-      #family-room-pop-overlay .family-room-pop-warning small{display:block;margin-top:4px;color:rgba(255,222,194,.72);font:600 .82em/1.4 Georgia,serif;letter-spacing:.04em;}
-      #family-room-pop-overlay .family-room-pop-actions button{border-color:rgba(197,255,104,.7);background:rgba(186,255,69,.12);color:#efffd0;}
-      #family-room-pop-overlay .family-room-pop-actions button:hover,#family-room-pop-overlay .family-room-pop-actions button:focus-visible{border-color:#fff;background:rgba(186,255,69,.24);}
-      #family-room-pop-overlay .family-room-pop-actions button:last-child{border-color:rgba(255,255,255,.24);background:transparent;color:rgba(239,255,208,.72);}
+      #family-room-pop-overlay .family-room-pop-icon.is-closed img{filter:grayscale(.8) brightness(.34) drop-shadow(0 0 3px rgba(155,103,255,.42));}
+      #family-room-pop-overlay .family-room-pop-title{color:#f0e5ff;text-shadow:0 0 16px rgba(155,103,255,.48);}
+      #family-room-pop-overlay .family-room-pop-title-jp{color:rgba(225,210,255,.76);}
+      #family-room-pop-overlay .family-room-pop-copy{color:#f6f0ff;}
+      #family-room-pop-overlay .family-room-pop-warning{position:relative;margin:16px 0 0;padding:10px 12px;border:1px solid rgba(205,166,255,.5);border-radius:9px;background:rgba(145,92,220,.12);color:#eadcff;font:800 clamp(.7rem,2.3vw,.82rem)/1.35 system-ui,sans-serif;letter-spacing:.04em;}
+      #family-room-pop-overlay .family-room-pop-warning small{display:block;margin-top:4px;color:rgba(225,210,255,.76);font:600 .82em/1.4 Georgia,serif;letter-spacing:.04em;}
+      #family-room-pop-overlay .family-room-pop-actions button{border-color:rgba(188,139,255,.72);background:rgba(155,103,255,.14);color:#f0e5ff;}
+      #family-room-pop-overlay .family-room-pop-actions button:hover,#family-room-pop-overlay .family-room-pop-actions button:focus-visible{border-color:#fff;background:rgba(155,103,255,.28);}
+      #family-room-pop-overlay .family-room-pop-actions button:last-child{border-color:rgba(255,255,255,.24);background:transparent;color:rgba(240,229,255,.76);}
       @keyframes utsuProfileOverlayIn{from{background:rgba(0,0,0,0)}to{background:rgba(0,0,0,.86)}}
       @keyframes utsuProfilePopIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
       @keyframes utsuProfileShimmer{0%,100%{background-position:200% 0}50%{background-position:0 0}}
@@ -1613,7 +1611,6 @@
       <div class="utsu-profile-pop-box" role="document" aria-labelledby="family-room-pop-title">
         <button class="utsu-profile-pop-close" type="button" aria-label="Close / とじる">✕</button>
         <div class="utsu-profile-pop-icon family-room-pop-icon is-closed"><img id="family-room-pop-icon" src="./assets/img/family-room/flashlight.webp" alt="Flashlight"></div>
-        <p class="utsu-profile-pop-eyebrow family-room-pop-eyebrow"><span id="family-room-pop-eyebrow-en">CASE FILE 02 / CLOSED</span><span id="family-room-pop-eyebrow-jp" class="jp" lang="ja">じけんファイル 02 / しまっている</span></p>
         <h2 id="family-room-pop-title" class="family-room-pop-title"><span id="family-room-pop-title-en">AKIYA</span><span id="family-room-pop-title-jp" class="jp" lang="ja">あきや</span></h2>
         <p class="utsu-profile-pop-copy family-room-pop-copy"><span id="family-room-pop-copy-en"></span><small id="family-room-pop-copy-jp" lang="ja"></small></p>
         <p class="family-room-pop-warning"><span>⚠ This is a horror puzzle game!</span><small lang="ja">⚠ これは こわい なぞときゲーム！</small></p>
@@ -1643,12 +1640,8 @@
     const iconImage = familyRoomPopOverlay.querySelector('#family-room-pop-icon');
     icon.classList.toggle('is-closed', !open);
     iconImage.alt = open ? 'Flashlight switched on' : 'Flashlight switched off';
-    const eyebrowEn = familyRoomPopOverlay.querySelector('#family-room-pop-eyebrow-en');
-    const eyebrowJp = familyRoomPopOverlay.querySelector('#family-room-pop-eyebrow-jp');
     const copyEn = familyRoomPopOverlay.querySelector('#family-room-pop-copy-en');
     const copyJp = familyRoomPopOverlay.querySelector('#family-room-pop-copy-jp');
-    eyebrowEn.textContent = open ? 'CASE FILE 02 / OPEN' : 'CASE FILE 02 / CLOSED';
-    eyebrowJp.textContent = open ? 'じけんファイル 02 / あいている' : 'じけんファイル 02 / しまっている';
     copyEn.textContent = open
       ? 'Akiya is open. Enter if you are ready.'
       : 'Akiya is closed. Complete nine games this week to open it.';
@@ -3497,12 +3490,12 @@
     const cy = FAMILY_ROOM_PORTAL.y + wobble;
     ctx.save();
 
-    // The open entrance is a sickly green breach in the room: the smoke stays
+    // The open entrance is a violet breach in the room: the smoke stays
     // deliberately dark so the flashlight reads as an intrusion, not a UI
     // waypoint.
     const haze = ctx.createRadialGradient(cx, cy, 0, cx, cy, 82 + pulse * 12);
-    haze.addColorStop(0, open ? 'rgba(190,255,35,0.30)' : 'rgba(55,65,20,0.12)');
-    haze.addColorStop(0.42, open ? 'rgba(101,160,0,0.17)' : 'rgba(18,20,12,0.15)');
+    haze.addColorStop(0, open ? 'rgba(155,103,255,0.30)' : 'rgba(55,35,85,0.12)');
+    haze.addColorStop(0.42, open ? 'rgba(92,53,160,0.17)' : 'rgba(18,12,28,0.15)');
     haze.addColorStop(1, 'transparent');
     ctx.globalAlpha = reveal * (0.7 + pulse * 0.2);
     ctx.fillStyle = haze;
@@ -3526,8 +3519,8 @@
       ctx.restore();
     });
 
-    // The generated photo has a dark studio field; screen blending makes that
-    // field disappear against Utsuroba while preserving the lit lens and beam.
+    // The generated photo has transparency around the body and beam; render it
+    // source-over after the violet halo so the flashlight stays in front.
     const flashlight = ensureUtsurobaImage(familyRoomFlashlightArt);
     if (flashlight.complete && flashlight.naturalWidth > 0) {
       // Keep this portal draw path self-contained so a partial route setup
@@ -3536,19 +3529,19 @@
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const windowPulse = reducedMotion ? .72 : .55 + .45 * Math.sin(sec * 2.1);
       const glowRadius = 48 + windowPulse * 12;
-      const greenGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
-      greenGlow.addColorStop(0, `rgba(186,255,69,${(open ? .3 : .1) * windowPulse})`);
-      greenGlow.addColorStop(.5, `rgba(186,255,69,${(open ? .16 : .05) * windowPulse})`);
-      greenGlow.addColorStop(1, 'rgba(186,255,69,0)');
+      const violetGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowRadius);
+      violetGlow.addColorStop(0, `rgba(155,103,255,${(open ? .3 : .1) * windowPulse})`);
+      violetGlow.addColorStop(.5, `rgba(155,103,255,${(open ? .16 : .05) * windowPulse})`);
+      violetGlow.addColorStop(1, 'rgba(155,103,255,0)');
       ctx.globalCompositeOperation = 'screen';
       ctx.globalAlpha = reveal;
-      ctx.fillStyle = greenGlow;
+      ctx.fillStyle = violetGlow;
       ctx.beginPath(); ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2); ctx.fill();
 
       const flashlightW = 85 + pulse * 5;
       const flashlightH = flashlightW * (flashlight.naturalHeight / flashlight.naturalWidth || 2 / 3);
       ctx.save();
-      ctx.globalCompositeOperation = 'screen';
+      ctx.globalCompositeOperation = 'source-over';
       ctx.globalAlpha = reveal * (open ? .94 : .34) * (.86 + windowPulse * .14);
       ctx.filter = open ? 'brightness(1.05) saturate(1.08)' : 'grayscale(.8) brightness(.34)';
       ctx.shadowColor = 'transparent';

@@ -126,12 +126,12 @@ assert.match(familyRoomPortalDraw, /const flashlightW = 85 \+ pulse \* 5;/,
   'the Family Room portal flashlight must be reduced to the intended size');
 assert.doesNotMatch(familyRoomPortalDraw, /setLineDash\(/,
   'the Family Room portal must not use a dashed ring around the flashlight');
-assert.match(familyRoomPortalDraw, /rgba\(186,255,69/,
-  'the Family Room portal flashlight must pulse with the window green');
+assert.match(familyRoomPortalDraw, /rgba\(155,103,255/,
+  'the Family Room portal flashlight must pulse with the spooky violet');
 assert.match(utsurobaSource, /family-room\/flashlight\.webp/,
   'the Family Room portal must use the generated flashlight sprite');
-assert.match(utsurobaSource, /mix-blend-mode:[^;]*screen/,
-  'the flashlight sprite must blend cleanly into the dark Utsuroba room');
+assert.match(utsurobaSource, /family-room-pop-icon img\{[^}]*mix-blend-mode:normal/,
+  'the popup flashlight must render above its violet glow without screen-blending the beam away');
 assert.match(utsurobaSource, /rgba\(0,0,0,0\.66\)/,
   'the open Family Room portal must use black smoke');
 assert.match(utsurobaSource, /family-room\.html/,
@@ -140,8 +140,10 @@ assert.match(utsurobaSource, /function injectFamilyRoomPopup\(\)/,
   'Utsuroba must provide a dedicated Family Room popup');
 assert.match(utsurobaSource, /This is a horror puzzle game!/,
   'the Family Room popup must warn students that the game is horror');
-assert.match(utsurobaSource, /CASE FILE 02 \/ CLOSED[\s\S]*?Complete nine games this week/,
+assert.match(utsurobaSource, /Complete nine games this week/,
   'the closed popup must explain the weekly unlock');
+assert.doesNotMatch(utsurobaSource, /CASE FILE 02 \/ OPEN|じけんファイル 02 \/ あいている/,
+  'the Family Room popup must omit the unnecessary open case-file eyebrow');
 assert.match(utsurobaSource, /data-family-room-enter/,
   'the open popup must offer an explicit enter action');
 assert.match(utsurobaSource, /family-room-pop-title-en\">AKIYA/,
