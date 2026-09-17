@@ -165,7 +165,6 @@
   const leaveEn = document.getElementById('leave-en');
   const leaveJp = document.getElementById('leave-jp');
   const undoButton = document.getElementById('undo-button');
-  const markButton = document.getElementById('mark-button');
   const markConfirmPanel = document.getElementById('mark-confirm-panel');
   const markConfirmTitleEn = document.getElementById('mark-confirm-title-en');
   const markConfirmTitleJp = document.getElementById('mark-confirm-title-jp');
@@ -368,7 +367,7 @@
     const sctx = scanlineCanvas.getContext('2d');
     sctx.scale(dpr, dpr);
     sctx.globalAlpha = .075;
-    sctx.fillStyle = '#e8b76c';
+    sctx.fillStyle = '#6eb6ff';
     for (let y = 0; y < height; y += 4) sctx.fillRect(0, y, width, 1);
   }
 
@@ -574,7 +573,7 @@
     const inheritedAlpha = ctx.globalAlpha;
     ctx.save();
     ctx.globalAlpha = inheritedAlpha * (anomaly.character === 'pataskala' ? .9 : .95);
-    ctx.shadowColor = anomaly.character === 'pataskala' ? 'rgba(219,230,218,.18)' : 'rgba(232,183,108,.42)';
+    ctx.shadowColor = anomaly.character === 'pataskala' ? 'rgba(219,230,218,.18)' : 'rgba(86,166,255,.42)';
     ctx.shadowBlur = Math.max(5, maxDimension * .12);
     ctx.drawImage(art, x - drawWidth / 2, y - drawHeight / 2, drawWidth, drawHeight);
     ctx.restore();
@@ -671,7 +670,7 @@
     const y = height * .7;
     ctx.save();
     ctx.globalAlpha = .72;
-    ctx.shadowColor = 'rgba(229,176,89,.9)';
+    ctx.shadowColor = 'rgba(105,182,255,.9)';
     ctx.shadowBlur = 18 + Math.sin(time / 260) * 3;
     ctx.drawImage(idleBooha, x - size / 2, y - size / 2, size, size);
     ctx.restore();
@@ -713,12 +712,12 @@
     ctx.save();
     ctx.globalAlpha = .76;
     const fraction = burnFraction(time);
-    ctx.shadowColor = `rgba(229,176,89,${.2 + fraction * .16})`;
+    ctx.shadowColor = `rgba(105,182,255,${.2 + fraction * .16})`;
     ctx.shadowBlur = 12 + fraction * 5;
     ctx.drawImage(image, booha.x - size / 2, booha.y - size / 2 + bob, size, size);
     if (pendingMark) {
       ctx.globalAlpha = .9;
-      ctx.strokeStyle = '#e8b76c';
+      ctx.strokeStyle = '#6eb6ff';
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.arc(booha.x, booha.y, size * .68, 0, Math.PI * 2); ctx.stroke();
     }
@@ -726,7 +725,7 @@
       const heldMs = Math.max(0, time - markHoldStartedAt);
       const fraction = clamp(heldMs / MARK_HOLD_MS, 0, 1);
       ctx.globalAlpha = .95;
-      ctx.strokeStyle = '#e8b76c';
+      ctx.strokeStyle = '#6eb6ff';
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(booha.x, booha.y, size * .68, -Math.PI / 2, -Math.PI / 2 + fraction * Math.PI * 2);
@@ -739,13 +738,13 @@
     ctx.save();
     markedPoints.forEach(mark => {
       ctx.globalAlpha = .86;
-      ctx.strokeStyle = '#e8b76c';
+      ctx.strokeStyle = '#6eb6ff';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(mark.x, mark.y, Math.max(12, mark.radius * .42), 0, Math.PI * 2);
       ctx.stroke();
       ctx.globalAlpha = .95;
-      ctx.fillStyle = '#e8b76c';
+      ctx.fillStyle = '#6eb6ff';
       ctx.beginPath();
       ctx.arc(mark.x, mark.y, 3, 0, Math.PI * 2);
       ctx.fill();
@@ -757,7 +756,7 @@
         undoGhost = null;
       } else {
         ctx.globalAlpha = fade * .72;
-        ctx.strokeStyle = '#e8b76c';
+        ctx.strokeStyle = '#6eb6ff';
         ctx.lineWidth = 2;
         ctx.setLineDash([5, 5]);
         ctx.beginPath();
@@ -781,14 +780,14 @@
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
     const smoke = ctx.createRadialGradient(wrongMarkHazard.x, wrongMarkHazard.y, 1, wrongMarkHazard.x, wrongMarkHazard.y, radius * 2.4);
-    smoke.addColorStop(0, telegraphing ? 'rgba(255,170,72,.72)' : 'rgba(255,82,62,.92)');
-    smoke.addColorStop(.32, telegraphing ? 'rgba(190,90,35,.42)' : 'rgba(190,35,35,.62)');
+    smoke.addColorStop(0, telegraphing ? 'rgba(98,175,255,.72)' : 'rgba(255,82,62,.92)');
+    smoke.addColorStop(.32, telegraphing ? 'rgba(51,112,190,.42)' : 'rgba(190,35,35,.62)');
     smoke.addColorStop(1, 'rgba(80,0,0,0)');
     ctx.fillStyle = smoke;
     ctx.beginPath(); ctx.arc(wrongMarkHazard.x, wrongMarkHazard.y, radius * 2.4, 0, Math.PI * 2); ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = .92;
-    ctx.strokeStyle = telegraphing ? '#ffbd67' : '#ff5545';
+    ctx.strokeStyle = telegraphing ? '#7dbaff' : '#ff5545';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.arc(wrongMarkHazard.x, wrongMarkHazard.y, radius, 0, Math.PI * 2); ctx.stroke();
     if (telegraphing) {
@@ -810,7 +809,7 @@
     ctx.fillRect(plate.x, plate.y + plate.h * EXIT_BAND_V, plate.w, plate.h * (1 - EXIT_BAND_V));
     Object.entries(ROOM_ANCHORS).forEach(([id, anchor]) => {
       const [x, y] = roomPoint([anchor.u, anchor.v]);
-      ctx.fillStyle = '#e8b76c';
+      ctx.fillStyle = '#6eb6ff';
       ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
       ctx.fillText(id, x + 8, y - 8);
     });
@@ -866,7 +865,6 @@
 
   function clearPataskalaThreat() {
     pataskalaThreat = null;
-    markButton.disabled = false;
   }
 
   function beginPataskalaThreat() {
@@ -1036,13 +1034,11 @@
   }
   function setControlsVisible(visible) {
     controls.classList.toggle('hidden', !visible);
-    markButton.hidden = !visible;
     leaveButton.disabled = !visible || Boolean(pataskalaThreat);
     undoButton.disabled = !visible || Boolean(pataskalaThreat);
-    markButton.disabled = !visible || Boolean(pataskalaThreat);
   }
 
-  function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / TAP MARK TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / マークを おす'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
+  function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / HOLD TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / じっと させる'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
 
   function startRound() {
     clearRoundTimers();
@@ -1211,6 +1207,10 @@
     markHoldTimer = 0;
   }
 
+  function boohaInteractionRadius() {
+    return clamp(Math.min(width, height) * .1, 52, 92) * .78;
+  }
+
   function setBoohaTarget(event, options = {}) {
     if (state !== 'playing' || pendingMark) return;
     const rect = canvas.getBoundingClientRect();
@@ -1222,6 +1222,7 @@
     canvas.setPointerCapture?.(event.pointerId);
     activePointerId = event.pointerId;
     const isPointerStart = options.start === true;
+    const pointerOnBooha = Math.hypot(nextX - booha.x, nextY - booha.y) <= boohaInteractionRadius();
     const movedBeyondDeadZone = markHoldOrigin
       && Math.hypot(nextX - markHoldOrigin[0], nextY - markHoldOrigin[1]) > MARK_DEAD_ZONE_PX;
     booha.targetX = nextX;
@@ -1233,13 +1234,13 @@
       setObservation(wrongMarkHazard ? 'RUN TO THE EXIT' : 'KEEP MOVING / FIND THE EXIT', wrongMarkHazard ? 'でぐちへ にげる' : 'うごきつづける / でぐちを さがす', { immediate: true });
       return;
     }
-    if (isPointerStart) {
+    if (isPointerStart && pointerOnBooha) {
       markHoldOrigin = [nextX, nextY];
       markLocked = false;
       window.clearTimeout(markHoldTimer);
       markHoldStartedAt = performance.now();
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
-    } else if (movedBeyondDeadZone) {
+    } else if (isPointerStart || movedBeyondDeadZone) {
       cancelPendingMarkHold();
     }
   }
@@ -1310,14 +1311,6 @@
     showPanel(markConfirmPanel);
     setObservation('CONFIRM THE MARK', 'しるしを かくにん', { immediate: true });
     markYesButton.focus?.();
-  }
-
-  function attemptMark() {
-    if (state !== 'playing' || pendingMark || wrongMarkHazard || pataskalaThreat) return;
-    releasePointerInteraction();
-    keyboardMarkActive = false;
-    pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
-    showMarkConfirm();
   }
 
   function startWrongMarkHazard(mark) {
@@ -1602,7 +1595,6 @@
   studyBackButton.addEventListener('click', exitGame);
   backButton.addEventListener('click', exitGame);
   document.getElementById('leave-button').addEventListener('click', handleLeave);
-  markButton.addEventListener('click', attemptMark);
   undoButton.addEventListener('click', undoLastMark);
   markYesButton.addEventListener('click', confirmMark);
   markNoButton.addEventListener('click', cancelMark);
