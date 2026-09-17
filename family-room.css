@@ -83,12 +83,12 @@ button { font: inherit; }
 .choice-button.armed { border-color: var(--amber); background: rgba(86,166,255,.12); }
 .choice-button.armed .choice-arrow { text-shadow: 0 0 16px rgba(86,166,255,.88); }
 .fly-away-button {
-  flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px;
-  border-color: rgba(86,166,255,.68); color: var(--ink); background: rgba(25,65,112,.48);
-  letter-spacing: .12em; font-size: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.42), 0 0 24px rgba(86,166,255,.12);
+  flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  border-color: rgba(185,145,255,.78); color: #f1e9ff; background: rgba(91,54,145,.52);
+  text-align: center; letter-spacing: .15em; font-size: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.42), 0 0 24px rgba(165,118,255,.2);
 }
-.fly-away-button:hover, .fly-away-button:focus-visible { color: var(--ink); border-color: #9bd0ff; background: rgba(45,105,175,.62); outline: none; transform: translateY(-2px); }
-.fly-away-button .jp { color: rgba(233,229,220,.72); font-size: 10px; }
+.fly-away-button:hover, .fly-away-button:focus-visible { color: #fff; border-color: #d9c2ff; background: rgba(119,76,184,.7); outline: none; transform: translateY(-2px); }
+.fly-away-button .jp { color: rgba(241,233,255,.82); font-size: 11px; letter-spacing: .06em; }
 
 .panel {
   top: 50%; left: 50%; width: min(520px, calc(100% - 40px)); max-height: calc(100vh - 16px); overflow-y: auto; overscroll-behavior: contain; transform: translate(-50%, -50%); padding: clamp(16px, min(4vw, 4vh), 44px); text-align: center; border: 1px solid rgba(233,229,220,.24); background: var(--panel); box-shadow: 0 25px 100px rgba(0,0,0,.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s ease, visibility 0s linear .3s;
@@ -126,8 +126,8 @@ button { font: inherit; }
 .primary-button .button-arrow { margin-left: 4px; font-size: 17px; vertical-align: -1px; }
 .secondary-button { display: inline-flex; flex-direction: column; gap: 3px; margin-top: 10px; padding: 8px 12px; border: 0; color: rgba(233,229,220,.55); background: transparent; cursor: pointer; font-size: 10px; letter-spacing: .12em; }
 .secondary-button:hover, .secondary-button:focus-visible { color: var(--ink); outline: 1px solid rgba(233,229,220,.32); outline-offset: 3px; }
-.undo-button { display: inline-flex; width: auto; min-height: 44px; margin-top: 0; padding: 8px 12px; border: 1px solid rgba(233,229,220,.2); background: rgba(5,5,5,.62); }
-.undo-button:hover, .undo-button:focus-visible { background: rgba(233,229,220,.92); }
+.undo-button { display: inline-flex; width: 100%; min-height: 74px; align-items: center; justify-content: center; margin-top: 0; padding: 13px 17px; border: 1px solid rgba(255,151,143,.72); color: #ffd4cf; background: rgba(137,48,55,.34); text-align: center; }
+.undo-button:hover, .undo-button:focus-visible { color: #fff4f2; border-color: #ffaaa2; background: rgba(174,61,69,.58); outline: none; }
 .mark-confirm-panel { z-index: 14; width: min(470px, calc(100% - 28px)); padding: clamp(22px, 4vw, 34px); }
 .mark-confirm-panel .panel-kicker { margin-bottom: 12px; }
 .mark-confirm-panel h2 { font-size: clamp(25px, 5vw, 42px); }

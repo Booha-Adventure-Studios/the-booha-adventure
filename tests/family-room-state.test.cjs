@@ -150,7 +150,9 @@ const hazardStart = source.slice(source.indexOf('function startWrongMarkHazard')
 assert(!hazardStart.includes('setControlsVisible(false)'), 'wrong-mark hazards must keep movement controls visible');
 assert(source.includes('const CLUE_DISPLAY_MS = 7600') && source.includes('function enqueueClue') && source.includes('clueQueue'), 'clue notifications must remain readable and queue instead of overwriting one another');
 assert(source.includes('const PATASKALA_SIZE_MULTIPLIER = 2.5') && source.includes('PATA_SPEED_FAR = .075') && source.includes('PATA_SPEED_NEAR = .14') && source.includes('showPriorityClue'), 'Pataskala must be enlarged, warned, and slowed enough to make the exit reachable');
-assert(markup.includes('id="clue-close"') && source.includes('function closeClueCard'), 'case notes must be dismissible');
+assert(markup.includes('id="clue-close"') && source.includes('function closeClueCard') && source.includes('function continueFromClue') && source.includes('clueCloseButton?.addEventListener(\'click\', continueFromClue)'), 'case notes must advance cleanly instead of leaving the transition frozen');
+const safeRoomSource = source.slice(source.indexOf('function flyAwayToSafeRoom'), source.indexOf('function continueFromClue'));
+assert(safeRoomSource.includes("state = 'playing';") && safeRoomSource.includes('currentPresence = null;') && !safeRoomSource.includes('showPanel(studyPanel)'), 'Fly Away must return to safe play without reopening the entry popup');
 assert(styles.includes('.study-panel h2 > .jp') && styles.includes('white-space: nowrap'), 'the Study heading Japanese title must stay on one readable line');
 assert(source.includes("id: 'cup'", source.indexOf('const anomalies')) && source.includes('artSize: .075') && source.includes("id: 'futon'") && source.includes('artSize: .2'), 'the cup and futon art bounds must use their corrected room scale');
 assert(source.includes('const reportClueDelay = currentAnomalies.length || currentAudioOnly ? CLUE_DISPLAY_MS + PANEL_FADE_MS : 0'), 'a successful report must leave its clue visible before the next round begins');
