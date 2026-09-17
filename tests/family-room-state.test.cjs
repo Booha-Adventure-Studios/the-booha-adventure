@@ -130,7 +130,8 @@ assert(markup.includes('id="mark-confirm-panel"') && markup.includes('YES, MARK 
 assert(markup.includes('id="mark-button"') && markup.includes('MARK THIS SPOT') && source.includes('function attemptMark') && source.includes('markButton.addEventListener'), 'marking must have a discoverable one-tap action');
 assert(markup.includes('id="start-button"') && markup.includes('ENTER THE ROOM') && markup.includes('へやに はいる'), 'the start action must clearly say enter the room in both languages');
 assert(markup.includes('id="back-button"') && markup.includes('BACK TO PROFILE'), 'back must be reserved for leaving the game');
-assert(markup.includes('id="observation-en"') && markup.includes('id="observation-jp"') && source.includes('HOLD BOOHA STILL'), 'marking guidance must have paired English and Japanese lines');
+assert(!markup.includes('id="observation-note"') && source.includes('function cancelPendingMarkHold') && source.includes('options.start === true'), 'the transient top-center observation banner must be removed and hold marking must begin only on pointer-down');
+assert(markup.includes('id="fly-away-button"') && markup.includes('FLY AWAY') && source.includes('flyAwayButton') && source.includes('exitGame'), 'the room must always offer a way back to the start');
 assert(markup.includes('message-title-en') && markup.includes('message-title-jp') && markup.includes('message-button-en') && markup.includes('message-button-jp'), 'message panels must render bilingual pairs');
 assert(source.includes('function setBilingual') && source.includes('function setObservation') && source.includes('function setReportLabel'), 'dynamic room states must update both language lines together');
 assert(source.includes('function moveBoohaByKeyboard') && source.includes('arrowup') && source.includes('function startKeyboardMark') && source.includes('function releaseKeyboardMark'), 'keyboard play must support movement and hold-to-mark');
@@ -145,6 +146,9 @@ assert(source.includes('const WRONG_MARK_TELEGRAPH_MS = 1500') && source.include
 const hazardStart = source.slice(source.indexOf('function startWrongMarkHazard'), source.indexOf('function confirmMark'));
 assert(!hazardStart.includes('setControlsVisible(false)'), 'wrong-mark hazards must keep movement controls visible');
 assert(source.includes('const CLUE_DISPLAY_MS = 7600') && source.includes('function enqueueClue') && source.includes('clueQueue'), 'clue notifications must remain readable and queue instead of overwriting one another');
+assert(source.includes('const PATASKALA_SIZE_MULTIPLIER = 2.5') && source.includes('PATA_SPEED_FAR = .075') && source.includes('PATA_SPEED_NEAR = .14') && source.includes('showPriorityClue'), 'Pataskala must be enlarged, warned, and slowed enough to make the exit reachable');
+assert(source.includes("id: 'cup'", source.indexOf('const anomalies')) && source.includes('artSize: .075') && source.includes("id: 'futon'") && source.includes('artSize: .2'), 'the cup and futon art bounds must use their corrected room scale');
+assert(source.includes('const reportClueDelay = currentAnomalies.length || currentAudioOnly ? CLUE_DISPLAY_MS + PANEL_FADE_MS : 0'), 'a successful report must leave its clue visible before the next round begins');
 assert(source.includes('function releasePointerInteraction') && source.includes('hidePanel(markConfirmPanel)'), 'opening or cancelling a mark confirmation must release pointer capture and finish panel cleanup');
 assert(source.includes('canvas.setPointerCapture?.') && source.includes('canvas.releasePointerCapture?.'), 'pointer capture must survive touch movement and release on cancellation');
 assert(source.includes('Promise.allSettled(FAMILY_SFX_NAMES.map') && source.includes("console.warn('[Family Room] BGM unavailable')"), 'one failed audio asset must not reject or restart the successful audio loads');
@@ -169,7 +173,7 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'leave-button', 'leave-en', 'leave-jp', 'undo-button', 'mark-button', 'mark-confirm-panel', 'mark-confirm-title-en', 'mark-confirm-title-jp', 'mark-confirm-object-en', 'mark-confirm-object-jp', 'mark-yes-button', 'mark-no-button'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'fly-away-button', 'leave-button', 'leave-en', 'leave-jp', 'undo-button', 'mark-button', 'mark-confirm-panel', 'mark-confirm-title-en', 'mark-confirm-title-jp', 'mark-confirm-object-en', 'mark-confirm-object-jp', 'mark-yes-button', 'mark-no-button'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
 nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
 const listeners = {};

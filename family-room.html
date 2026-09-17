@@ -24,7 +24,6 @@
       </div>
     </header>
 
-    <div id="observation-note" class="observation-note"><span id="observation-en">LOOK / LISTEN / REMEMBER</span><span id="observation-jp" class="jp" lang="ja">みて / きいて / おぼえる</span></div>
     <div id="clue-card" class="clue-card" aria-live="polite" hidden>
       <span class="clue-kicker"><span>CASE NOTE</span><span class="jp" lang="ja">じけんメモ</span></span>
       <strong id="clue-en"></strong>
@@ -42,6 +41,8 @@
       <button id="undo-button" class="secondary-button undo-button" type="button" hidden><span>UNDO LAST MARK</span><span class="jp" lang="ja">さいごの しるしを けす</span></button>
     </section>
 
+    <button id="fly-away-button" class="fly-away-button" type="button"><span>FLY AWAY</span><span class="jp" lang="ja">とびさる</span></button>
+
     <section id="mark-confirm-panel" class="panel mark-confirm-panel" aria-live="polite" aria-labelledby="mark-confirm-title" hidden>
       <p class="panel-kicker"><span>MARK / CONFIRM</span><span class="jp" lang="ja">しるし / かくにん</span></p>
       <h2 id="mark-confirm-title"><span id="mark-confirm-title-en">MARK THIS PLACE?</span><span id="mark-confirm-title-jp" class="jp" lang="ja">この ばしょに しるしを つける？</span></h2>
@@ -55,7 +56,7 @@
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
       <p class="panel-kicker"><span>CASE FILE 02 / CHANOMA</span><span class="jp" lang="ja">じけんファイル 02 / ちゃのま</span></p>
       <h1 id="start-title"><span class="case-title">AKIYA</span><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
-      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha to a change, then tap MARK THIS SPOT or hold still. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを ひっぱり、マークを おすか じっと させる。しるしを かくにんして、へやを ほうこくする。</span></p>
+      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha to a change, then hold Booha still or use MARK THIS SPOT. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを ひっぱり、じっと させるか マークを おす。しるしを かくにんして、へやを ほうこくする。</span></p>
       <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves / へやの うごきを えらぶ">
         <button class="tier-button selected" type="button" data-tier="patient"><b><span>THE ROOM IS PATIENT</span><span class="jp" lang="ja">へやは おだやか</span></b><small><span>the first case</span><span class="jp" lang="ja">はじめの じけん</span></small></button>
         <button class="tier-button" type="button" data-tier="quicker"><b><span>THE ROOM IS QUICKER</span><span class="jp" lang="ja">へやは はやい</span></b><small><span>three fast Blitz stamps</span><span class="jp" lang="ja">ブリッツの はやい しるし みっつ</span></small></button>
@@ -75,7 +76,7 @@
       <p class="panel-foot"><span>No timer. Start when ready.</span><span class="jp" lang="ja">じかんせいげんなし。じゅんびが できたら はじめる。</span></p>
     </section>
 
-    <section id="message-panel" class="panel" aria-live="polite">
+    <section id="message-panel" class="panel message-panel" aria-live="polite">
       <p id="message-kicker" class="panel-kicker"><span id="message-kicker-en"></span><span id="message-kicker-jp" class="jp" lang="ja"></span></p>
       <h2 id="message-title"><span id="message-title-en"></span><span id="message-title-jp" class="jp" lang="ja"></span></h2>
       <p id="message-copy" class="panel-copy"><span id="message-copy-en"></span><span id="message-copy-jp" class="jp" lang="ja"></span></p>
