@@ -4,19 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#050505" />
-  <title>Family Room // Utsuroba</title>
+  <title>Akiya // Utsuroba</title>
   <link rel="stylesheet" href="family-room.css" />
 </head>
 <body>
-  <main id="game-shell" aria-label="Family Room observation game / かぞくの へやの かんさつゲーム">
-    <canvas id="room-canvas" aria-label="A dark family room. Drag Booha through the room and hold him still to mark a change. くらい かぞくの へやで、ブーハを うごかして へんかに しるしを つけます。"></canvas>
+  <main id="game-shell" aria-label="Akiya observation game / あきや の かんさつゲーム">
+    <canvas id="room-canvas" aria-label="A dark, empty house. Drag Booha through the room and mark a change. くらい、からの いえで、ブーハを うごかして へんかに しるしを つけます。"></canvas>
 
     <header class="hud">
       <div class="hud-brand">
-        <span class="eyebrow"><span>UTSUROBA / CASEWORK</span><span class="jp" lang="ja">うつろば / じけん</span></span>
-        <span class="title"><span>FAMILY ROOM</span><span class="jp" lang="ja">かぞくの へや</span></span>
-        <div id="andon" class="andon" role="status" aria-label="Lantern light is burning / あんどんが もえている">
-          <span class="andon-light" aria-hidden="true"></span><span><span>ROOM LIGHT</span><span class="jp" lang="ja">へやの あかり</span></span>
+        <span class="title hud-case-tag"><span>AKIYA</span><span class="jp" lang="ja">あきや</span></span>
+        <div id="andon" class="andon andon-primary" role="status" aria-label="Booha's light is burning / ブーハの あかりが もえている">
+          <span class="andon-light" aria-hidden="true"></span><span><span>BOOHA'S LIGHT</span><span class="jp" lang="ja">ブーハの あかり</span></span>
         </div>
       </div>
       <div class="hud-right">
@@ -36,6 +35,9 @@
         <span class="choice-arrow">↗</span>
         <span class="choice-copy"><b><span id="leave-en">REPORT THE ROOM</span><span id="leave-jp" class="jp" lang="ja">へやを ほうこくする</span></b><small><span>marks = changes · no marks = clean</span><span class="jp" lang="ja">しるし = へんか · しるしなし = きれい</span></small></span>
       </button>
+      <button id="mark-button" class="secondary-button mark-button" type="button" hidden>
+        <span>MARK THIS SPOT</span><span class="jp" lang="ja">ここに しるしを つける</span>
+      </button>
       <button id="undo-button" class="secondary-button undo-button" type="button" hidden><span>UNDO LAST MARK</span><span class="jp" lang="ja">さいごの しるしを けす</span></button>
     </section>
 
@@ -52,7 +54,7 @@
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
       <p class="panel-kicker"><span>CASE FILE 02 / CHANOMA</span><span class="jp" lang="ja">じけんファイル 02 / ちゃのま</span></p>
       <h1 id="start-title"><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
-      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha to a change and hold still. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを ひっぱり、じっと させる。しるしを かくにんして、へやを ほうこくする。</span></p>
+      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Drag Booha to a change, then tap MARK THIS SPOT or hold still. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを ひっぱり、マークを おすか じっと させる。しるしを かくにんして、へやを ほうこくする。</span></p>
       <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves / へやの うごきを えらぶ">
         <button class="tier-button selected" type="button" data-tier="patient"><b><span>THE ROOM IS PATIENT</span><span class="jp" lang="ja">へやは おだやか</span></b><small><span>the first case</span><span class="jp" lang="ja">はじめの じけん</span></small></button>
         <button class="tier-button" type="button" data-tier="quicker"><b><span>THE ROOM IS QUICKER</span><span class="jp" lang="ja">へやは はやい</span></b><small><span>three fast Blitz stamps</span><span class="jp" lang="ja">ブリッツの はやい しるし みっつ</span></small></button>
@@ -60,7 +62,7 @@
       </div>
       <button id="start-button" class="primary-button" type="button"><span>ENTER THE ROOM</span><span class="jp" lang="ja">へやに はいる</span><span class="button-arrow" aria-hidden="true">→</span></button>
       <button id="back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
-      <p class="panel-foot"><span>Enter opens the study · Drag or arrows move · Space to mark · Enter reports</span><span class="jp" lang="ja">Enterで へやを おぼえる · ひっぱるか やじるしで うごかす · スペースで しるし · Enterで ほうこく</span></p>
+      <p class="panel-foot"><span>Enter opens the study · Drag or arrows move · MARK checks Booha's spot · Space to mark too · Enter reports</span><span class="jp" lang="ja">Enterで へやを おぼえる · ひっぱるか やじるしで うごかす · MARKで ブーハの ばしょを しらべる · スペースで しるし · Enterで ほうこく</span></p>
     </section>
 
     <section id="study-panel" class="panel study-panel" aria-labelledby="study-title" hidden>
