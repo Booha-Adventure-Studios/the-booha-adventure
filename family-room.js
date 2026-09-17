@@ -2,13 +2,22 @@
   'use strict';
 
   const SAVE_ID = 'bonus:family_room';
-  const CASE_ROUNDS = 7;
+  const CASE_PHASES = Object.freeze([
+    Object.freeze({ id: 'quiet', rounds: 3, maxChanges: 1, twoChangeChance: 0, audioOnlyChance: .08, pataskalaBaseChance: 0 }),
+    Object.freeze({ id: 'uneasy', rounds: 4, maxChanges: 2, twoChangeChance: .2, audioOnlyChance: .13, pataskalaBaseChance: .1 }),
+    Object.freeze({ id: 'danger', rounds: 4, maxChanges: 2, twoChangeChance: .42, audioOnlyChance: .18, pataskalaBaseChance: .24 }),
+  ]);
+  const CASE_ROUNDS = CASE_PHASES.reduce((total, phase) => total + phase.rounds, 0);
   const MARK_HOLD_MS = 600;
   const MARK_DEAD_ZONE_PX = 8;
   const WRONG_MARK_GRACE_MS = 700;
   const WRONG_MARK_TELEGRAPH_MS = 1500;
   const CLUE_DISPLAY_MS = 7600;
   const PANEL_FADE_MS = 320;
+  const PATA_SURVIVAL_MS = 6200;
+  const PATA_COOLDOWN_ROUNDS = 2;
+  const PATA_CATCH_DISTANCE = .065;
+  const COMPLETION_QUIET_MS = 2400;
   const EXIT_BAND_V = .86;
   const FAILURE_SILENCE_MS = 1200;
   const FAILURE_PANEL_DELAY_MS = 1800;
@@ -50,7 +59,7 @@
     study: Object.freeze({ perCase: true, timed: false, repeatOnCaseRestart: false, reviewFromHub: true }),
     mistake: Object.freeze({ action: 'restart-case', unlimitedRestarts: true }),
     changes: Object.freeze({ patient: 'zero-or-one', quicker: 'zero-one-or-occasional-two', lies: 'zero-one-or-more-two' }),
-    pataskala: Object.freeze({ role: 'presence', scoredTarget: false, markableTarget: true, risesWithCaseDepth: true, finalRoom: 'nando', targetId: 'pataskala' }),
+    pataskala: Object.freeze({ role: 'threat', scoredTarget: false, markableTarget: false, risesWithCaseDepth: true, finalRoom: 'nando' }),
     production: Object.freeze({ masterOnly: true, canvas: '1024x1536', safeBand: [0.22, 0.78], exitEdgeRequired: true }),
   });
   const ACTIVE_CASE_ID = 'chanoma';
@@ -65,11 +74,38 @@
   });
 
   const PATASKALA_POSES = [
-    { id: 'pataskala-standing', target: [.7, .29, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala is standing in the room.', jp: 'パタスカラが へやに たっている。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-moving', target: [.74, .43, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala crossed the room.', jp: 'パタスカラが へやを よこぎった。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-crouch', target: [.73, .56, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala is crouching by the futon.', jp: 'パタスカラが ふとんの そばに しゃがんでいる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
-    { id: 'pataskala-emerging', target: [.25, .47, .22], artSize: .28, targetId: 'pataskala', en: 'Pataskala is coming out of the shadows.', jp: 'パタスカラが かげから でてくる。', labelEn: 'PATASKALA', labelJp: 'パタスカラ', kind: 'character', character: 'pataskala' },
+    { id: 'pataskala-standing', target: [.7, .29, .22], artSize: .28, en: 'Something is standing in the room.', jp: 'なにかが へやに たっている。', kind: 'threat', character: 'pataskala' },
+    { id: 'pataskala-moving', target: [.74, .43, .22], artSize: .28, en: 'Something crossed the room.', jp: 'なにかが へやを よこぎった。', kind: 'threat', character: 'pataskala' },
+    { id: 'pataskala-crouch', target: [.73, .56, .22], artSize: .28, en: 'Something is crouching by the futon.', jp: 'なにかが ふとんの そばに しゃがんでいる。', kind: 'threat', character: 'pataskala' },
+    { id: 'pataskala-emerging', target: [.25, .47, .22], artSize: .28, en: 'Something is coming out of the shadows.', jp: 'なにかが かげから でてくる。', kind: 'threat', character: 'pataskala' },
   ];
+
+  const ROOM_ANCHORS = Object.freeze({
+    tableLeft: Object.freeze({ u: .23, v: .48, radius: .09, scale: .94, region: 'middle-left' }),
+    tableCenter: Object.freeze({ u: .35, v: .49, radius: .1, scale: 1, region: 'middle-center' }),
+    tableRight: Object.freeze({ u: .45, v: .49, radius: .1, scale: .96, region: 'middle-right' }),
+    shojiLeft: Object.freeze({ u: .36, v: .25, radius: .11, scale: .94, region: 'upper-left' }),
+    shojiCenter: Object.freeze({ u: .54, v: .25, radius: .11, scale: 1, region: 'upper-center' }),
+    shojiRight: Object.freeze({ u: .7, v: .25, radius: .12, scale: .98, region: 'upper-right' }),
+    alcove: Object.freeze({ u: .23, v: .24, radius: .12, scale: 1, region: 'upper-left' }),
+    futonFar: Object.freeze({ u: .74, v: .37, radius: .15, scale: .96, region: 'middle-right' }),
+    futonNear: Object.freeze({ u: .74, v: .55, radius: .18, scale: 1.08, region: 'lower-right' }),
+    tatamiFar: Object.freeze({ u: .55, v: .61, radius: .14, scale: .9, region: 'middle-center' }),
+    tatamiNear: Object.freeze({ u: .55, v: .7, radius: .16, scale: 1.05, region: 'lower-center' }),
+  });
+
+  const ANOMALY_ANCHORS = Object.freeze({
+    bowl: ['tableRight', 'tableCenter'],
+    cup: ['tableLeft', 'tableCenter', 'tableRight'],
+    eyes: ['shojiLeft', 'shojiCenter', 'shojiRight'],
+    shadow: ['shojiLeft', 'shojiCenter', 'shojiRight'],
+    talisman: ['alcove'],
+    lantern: ['alcove'],
+    futon: ['futonFar', 'futonNear'],
+    seams: ['tatamiFar', 'tatamiNear'],
+    teapot: ['tableLeft', 'tableCenter'],
+    crescent: ['shojiLeft', 'shojiCenter', 'shojiRight'],
+  });
 
   const anomalies = [
     { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', labelEn: 'BOWL', labelJp: 'おわん', kind: 'added' },
@@ -108,6 +144,7 @@
   const observationEn = document.getElementById('observation-en');
   const observationJp = document.getElementById('observation-jp');
   const andon = document.getElementById('andon');
+  const andonFill = document.getElementById('andon-fill');
   const clueCard = document.getElementById('clue-card');
   const clueEn = document.getElementById('clue-en');
   const clueJp = document.getElementById('clue-jp');
@@ -169,7 +206,11 @@
   let correctCalls = 0;
   let currentAnomaly = null;
   let currentAnomalies = [];
+  let recentAnomalyIds = [];
+  let recentAnchorRegions = [];
   let currentPresence = null;
+  let pataskalaThreat = null;
+  let pataskalaCooldownRounds = 0;
   let currentAudioOnly = false;
   let currentIsAnomaly = false;
   let wrongMarkHazard = null;
@@ -214,6 +255,7 @@
   let transitionTimer = 0;
   let failureJumpTimer = 0;
   let failurePanelTimer = 0;
+  let completionTimer = 0;
   let clueVersion = 0;
   let roundToken = 0;
   let completionSubmitted = false;
@@ -234,22 +276,16 @@
     } : null;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     if (LOW_POWER) dpr = Math.min(dpr, 1);
-    const targetAspect = (baseImage.naturalWidth || 1024) / (baseImage.naturalHeight || 1536);
     const visibleViewport = window.visualViewport;
     const viewportWidth = Math.max(1, Math.round(visibleViewport?.width || window.innerWidth));
     const viewportHeight = Math.max(1, Math.round(visibleViewport?.height || window.innerHeight));
-    if (viewportWidth / viewportHeight > targetAspect) {
-      height = viewportHeight;
-      width = Math.round(viewportHeight * targetAspect);
-    } else {
-      width = viewportWidth;
-      height = viewportHeight;
-    }
+    width = viewportWidth;
+    height = viewportHeight;
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
-    canvas.style.margin = '0 auto';
+    canvas.style.margin = '0';
     if (normalized) {
       booha.x = clamp(normalized.x * width, 0, width);
       booha.y = clamp(normalized.y * height, 0, height);
@@ -378,6 +414,12 @@
     andon.style.setProperty('--andon-level', String(fraction));
     andon.classList.toggle('dim', fraction < .55);
     andon.classList.toggle('critical', fraction < .22);
+    andon.classList.toggle('urgent', fraction < .25);
+    andon.classList.toggle('low', fraction < .1);
+    if (andonFill) {
+      andonFill.style.width = `${Math.round(fraction * 100)}%`;
+      andonFill.setAttribute('aria-valuenow', String(Math.round(fraction * 100)));
+    }
     andon.setAttribute('aria-label', fraction < .22 ? "Booha's light is nearly gone / ブーハの あかりが きえそう" : "Booha's light is burning / ブーハの あかりが もえている");
   }
 
@@ -417,11 +459,20 @@
 
   function currentTier() { return TIER_RULES[selectedTier] || TIER_RULES.patient; }
 
+  function currentPhase() {
+    let elapsed = 0;
+    for (const phase of CASE_PHASES) {
+      if (progress < elapsed + phase.rounds) return phase;
+      elapsed += phase.rounds;
+    }
+    return CASE_PHASES[CASE_PHASES.length - 1];
+  }
+
   function pataskalaChance() {
-    if (round < 2) return 0;
-    const progression = [.28, .34, .42, .5, .58][clamp(round - 2, 0, 4)] || .58;
+    const phase = currentPhase();
+    if (phase.pataskalaBaseChance <= 0 || pataskalaCooldownRounds > 0) return 0;
     const tierScale = selectedTier === 'patient' ? .78 : selectedTier === 'quicker' ? 1 : 1.14;
-    return clamp(progression * tierScale, 0, .7);
+    return clamp(phase.pataskalaBaseChance * tierScale, 0, .32);
   }
 
   function pataskalaPose() {
@@ -431,17 +482,43 @@
 
   function chooseRound() {
     const tier = currentTier();
+    const phase = currentPhase();
     const hasChange = Math.random() >= .5;
-    currentAudioOnly = !hasChange && Math.random() < tier.audioOnlyChance;
+    currentAudioOnly = !hasChange && Math.random() < Math.max(tier.audioOnlyChance, phase.audioOnlyChance);
     const changeCount = hasChange
-      ? Math.min(tier.maxChanges, 1 + (Math.random() < tier.twoChangeChance ? 1 : 0))
+      ? Math.min(Math.min(tier.maxChanges, phase.maxChanges), 1 + (Math.random() < Math.max(tier.twoChangeChance, phase.twoChangeChance) ? 1 : 0))
       : 0;
-    const pool = [...anomalies];
+    const pool = anomalies.filter(anomaly => !recentAnomalyIds.includes(anomaly.id));
+    const fallbackPool = [...anomalies];
+    const usedRegions = [];
     currentAnomalies = [];
     for (let index = 0; index < changeCount; index += 1) {
-      const choice = Math.floor(Math.random() * pool.length);
-      currentAnomalies.push(pool.splice(choice, 1)[0]);
+      const candidates = pool.filter(anomaly => (ANOMALY_ANCHORS[anomaly.id] || []).some(anchorId => {
+        const region = ROOM_ANCHORS[anchorId]?.region;
+        return region && !recentAnchorRegions.includes(region) && !usedRegions.includes(region);
+      }));
+      const source = candidates.length ? candidates : (pool.length ? pool : fallbackPool);
+      const choice = source[Math.floor(Math.random() * source.length)];
+      const anchorIds = ANOMALY_ANCHORS[choice.id] || [];
+      const anchorCandidates = anchorIds.filter(anchorId => {
+        const region = ROOM_ANCHORS[anchorId]?.region;
+        return region && !recentAnchorRegions.includes(region) && !usedRegions.includes(region);
+      });
+      const anchorId = random(anchorCandidates.length ? anchorCandidates : anchorIds);
+      const anchor = ROOM_ANCHORS[anchorId] || { u: choice.target[0], v: choice.target[1], radius: choice.target[2], scale: 1, region: 'unknown' };
+      const selected = { ...choice, target: [anchor.u, anchor.v, anchor.radius], artSize: choice.artSize * anchor.scale };
+      currentAnomalies.push(selected);
+      usedRegions.push(anchor.region);
+      const poolIndex = pool.indexOf(choice);
+      if (poolIndex >= 0) pool.splice(poolIndex, 1);
+      const fallbackIndex = fallbackPool.indexOf(choice);
+      if (fallbackIndex >= 0) fallbackPool.splice(fallbackIndex, 1);
     }
+    recentAnomalyIds = [...recentAnomalyIds, ...currentAnomalies.map(anomaly => anomaly.id)].slice(-4);
+    recentAnchorRegions = [...recentAnchorRegions, ...currentAnomalies.map(anomaly => {
+      const anchorId = Object.keys(ROOM_ANCHORS).find(id => ROOM_ANCHORS[id].u === anomaly.target[0] && ROOM_ANCHORS[id].v === anomaly.target[1]);
+      return ROOM_ANCHORS[anchorId]?.region || 'unknown';
+    })].slice(-4);
     currentAnomaly = currentAnomalies[0] || null;
     currentIsAnomaly = currentAnomalies.length > 0 || currentAudioOnly;
     currentPresence = currentAudioOnly ? null : (Math.random() < pataskalaChance() ? pataskalaPose() : null);
@@ -452,7 +529,7 @@
       ? true
       : currentIsAnomaly
       ? Math.random() < tier.realTellChance
-      : Boolean(currentPresence || falseAlertPoint);
+      : Boolean(falseAlertPoint);
   }
 
   function currentPoint([u, v]) { return [plate.x + u * plate.w, plate.y + v * plate.h]; }
@@ -482,6 +559,26 @@
     list.forEach(drawAnomaly);
   }
 
+  function drawPataskalaThreat() {
+    if (!pataskalaThreat) return;
+    const pose = pataskalaThreat.pose;
+    const art = pataskalaArt[pose.id];
+    if (!imageReady(art)) return;
+    const sourceWidth = art.naturalWidth || 512;
+    const sourceHeight = art.naturalHeight || 768;
+    const maxDimension = Math.max(42, plate.w * (.12 + pataskalaThreat.stage * .16));
+    const scale = maxDimension / Math.max(sourceWidth, sourceHeight);
+    const drawWidth = sourceWidth * scale;
+    const drawHeight = sourceHeight * scale;
+    const inheritedAlpha = ctx.globalAlpha;
+    ctx.save();
+    ctx.globalAlpha = inheritedAlpha * (.32 + pataskalaThreat.stage * .58);
+    ctx.shadowColor = 'rgba(219,230,218,.28)';
+    ctx.shadowBlur = Math.max(8, maxDimension * .14);
+    ctx.drawImage(art, pataskalaThreat.x - drawWidth / 2, pataskalaThreat.y - drawHeight / 2, drawWidth, drawHeight);
+    ctx.restore();
+  }
+
   function imageReady(image) {
     return Boolean(image?.complete && image.naturalWidth > 0 && image.naturalHeight > 0);
   }
@@ -503,20 +600,21 @@
     }
     moveBooha();
     updateWrongMarkHazard(time);
+    updatePataskalaThreat(time);
     if (imageReady(baseImage)) {
       // Keep the room plate readable, then let Booha's lantern reveal only a
       // small moving circle at full brightness.
       ctx.save();
       ctx.globalAlpha = state === 'caught' ? .07 : .16;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
-      drawAnomalies(currentAnomalies); drawAnomaly(currentPresence);
+      drawAnomalies(currentAnomalies); drawPataskalaThreat();
       ctx.restore();
       const radius = lightRadius();
       ctx.save();
       ctx.beginPath(); ctx.arc(booha.x, booha.y, radius, 0, Math.PI * 2); ctx.clip();
       ctx.globalAlpha = state === 'caught' ? .24 : 1;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
-      drawAnomalies(currentAnomalies); drawAnomaly(currentPresence);
+      drawAnomalies(currentAnomalies); drawPataskalaThreat();
       const light = ctx.createRadialGradient(booha.x, booha.y, radius * .48, booha.x, booha.y, radius);
       light.addColorStop(0, 'rgba(0,0,0,0)');
       light.addColorStop(1, 'rgba(0,0,0,.84)');
@@ -525,7 +623,6 @@
       if (vignetteCanvas) ctx.drawImage(vignetteCanvas, 0, 0, width, height);
       const darkness = (1 - burnFraction(time)) * .12;
       if (darkness) { ctx.fillStyle = `rgba(0,0,0,${darkness})`; ctx.fillRect(0, 0, width, height); }
-      drawShojiDawn();
     }
     if (scanlineCanvas) ctx.drawImage(scanlineCanvas, 0, 0, width, height);
     if (!REDUCED_MOTION && state !== 'title') {
@@ -534,24 +631,6 @@
     drawWrongMarkHazard(time);
     drawMarks();
     if (state !== 'caught') drawBooha(time);
-  }
-
-  function drawShojiDawn() {
-    if (!progress) return;
-    const x = plate.x + plate.w * .57;
-    const y = plate.y + plate.h * .08;
-    const w = plate.w * .34;
-    const h = plate.h * .32;
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = .025 + (progress / CASE_ROUNDS) * .22;
-    const dawn = ctx.createLinearGradient(x, y + h, x + w, y);
-    dawn.addColorStop(0, 'rgba(170,180,174,.25)');
-    dawn.addColorStop(.55, 'rgba(224,220,194,.72)');
-    dawn.addColorStop(1, 'rgba(247,238,203,.9)');
-    ctx.fillStyle = dawn;
-    ctx.fillRect(x, y, w, h);
-    ctx.restore();
   }
 
   function drawFailureBooha(time) {
@@ -570,7 +649,8 @@
   function lightRadius() {
     const fraction = burnFraction();
     const minimum = REDUCED_MOTION ? .065 : .05;
-    return Math.min(width, height) * (minimum + (.26 - minimum) * fraction);
+    const lowLightFraction = fraction < .1 ? fraction * .45 : fraction;
+    return Math.min(width, height) * (minimum + (.26 - minimum) * lowLightFraction);
   }
 
   function moveBooha() {
@@ -706,15 +786,75 @@
     }
   }
 
+  function cancelMarkingForThreat() {
+    pendingMark = null;
+    markLocked = false;
+    keyboardMarkActive = false;
+    releasePointerInteraction();
+    hidePanel(markConfirmPanel);
+  }
+
+  function clearPataskalaThreat() {
+    pataskalaThreat = null;
+    markButton.disabled = false;
+  }
+
+  function beginPataskalaThreat() {
+    if (state !== 'playing' || !currentPresence || pataskalaThreat || wrongMarkHazard) return;
+    const fromRight = booha.x < width * .5;
+    const startX = fromRight ? width + Math.min(width, height) * .12 : -Math.min(width, height) * .12;
+    const startY = clamp(booha.y + (Math.random() - .5) * height * .24, height * .24, height * .76);
+    pataskalaThreat = {
+      pose: currentPresence,
+      x: startX,
+      y: startY,
+      startedAt: performance.now(),
+      lastTime: performance.now(),
+      startDistance: Math.max(1, Math.hypot(booha.x - startX, booha.y - startY)),
+      stage: 0,
+    };
+    cancelMarkingForThreat();
+    markButton.disabled = true;
+    setObservation('KEEP MOVING / FIND THE EXIT', 'うごきつづける / でぐちを さがす', { immediate: true });
+    tellPresence();
+    playSfx('move', AUDIO_LEVELS.move);
+  }
+
+  function updatePataskalaThreat(time) {
+    if (!pataskalaThreat || state !== 'playing') return;
+    const elapsed = Math.min(.05, Math.max(0, (time - pataskalaThreat.lastTime) / 1000));
+    pataskalaThreat.lastTime = time;
+    const dx = booha.x - pataskalaThreat.x;
+    const dy = booha.y - pataskalaThreat.y;
+    const distance = Math.hypot(dx, dy);
+    pataskalaThreat.stage = clamp(1 - distance / pataskalaThreat.startDistance, 0, 1);
+    if (distance <= Math.min(width, height) * PATA_CATCH_DISTANCE) {
+      beginFailure(UI_COPY.caseReset);
+      return;
+    }
+    if (time - pataskalaThreat.startedAt >= PATA_SURVIVAL_MS) {
+      clearPataskalaThreat();
+      currentPresence = null;
+      pataskalaCooldownRounds = PATA_COOLDOWN_ROUNDS;
+      updateHud();
+      return;
+    }
+    if (distance > 0) {
+      const speed = Math.min(width, height) * (.13 + pataskalaThreat.stage * .11);
+      const step = Math.min(distance, speed * elapsed);
+      pataskalaThreat.x += (dx / distance) * step;
+      pataskalaThreat.y += (dy / distance) * step;
+    }
+  }
+
   function alertTarget() {
     if (currentAnomaly) return currentAnomaly.target;
     if (falseAlertPoint) return [falseAlertPoint.u, falseAlertPoint.v, falseAlertPoint.radius];
-    if (currentPresence) return currentPresence.target;
     return null;
   }
 
   function isBoohaAlerting() {
-    const targets = [...currentAnomalies, ...(currentPresence ? [currentPresence] : [])].map(anomaly => anomaly.target);
+    const targets = currentAnomalies.map(anomaly => anomaly.target);
     if (falseAlertPoint) targets.push([falseAlertPoint.u, falseAlertPoint.v, falseAlertPoint.radius]);
     return targets.some(target => {
       const [tx, ty] = currentPoint(target);
@@ -782,6 +922,8 @@
     window.clearTimeout(failureJumpTimer); failureJumpTimer = 0;
     window.clearTimeout(failurePanelTimer); failurePanelTimer = 0;
     window.clearTimeout(studyCurtainTimer); studyCurtainTimer = 0;
+    window.clearTimeout(completionTimer); completionTimer = 0;
+    clearPataskalaThreat();
     transitionStarted = 0;
   }
   function clearMarkingUi() {
@@ -803,12 +945,15 @@
   function setControlsVisible(visible) {
     controls.classList.toggle('hidden', !visible);
     markButton.hidden = !visible;
+    if (!visible) markButton.disabled = true;
+    else if (!pataskalaThreat) markButton.disabled = false;
   }
 
   function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / TAP MARK TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / マークを おす'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
 
   function startRound() {
     clearRoundTimers();
+    pataskalaCooldownRounds = Math.max(0, pataskalaCooldownRounds - 1);
     roundToken += 1;
     state = 'playing'; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; setControlsVisible(true); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
   }
@@ -816,7 +961,7 @@
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
     clearRoundTimers();
-    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; currentAudioOnly = false; currentIsAnomaly = false;
+    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; pataskalaThreat = null; pataskalaCooldownRounds = 0; recentAnomalyIds = []; recentAnchorRegions = []; currentAudioOnly = false; currentIsAnomaly = false;
     state = 'study';
     curtain.className = '';
     setControlsVisible(false);
@@ -861,7 +1006,7 @@
 
   function scheduleTell() {
     window.clearTimeout(droneTellTimer);
-    schedulePataskalaMovement();
+    schedulePataskalaThreat();
     const shouldTell = tellAvailable;
     if (!shouldTell) return;
     droneTellTimer = window.setTimeout(() => { if (state === 'playing') { tellPresence(); playSfx('move', AUDIO_LEVELS.move); } }, 900 + Math.random() * 500);
@@ -876,34 +1021,24 @@
     ambientOscillator.frequency.setTargetAtTime(42, audioContext.currentTime + .5, .1);
   }
 
-  function schedulePataskalaMovement() {
+  function schedulePataskalaThreat() {
     window.clearTimeout(pataskalaMoveTimer); pataskalaMoveTimer = 0;
     if (!currentPresence) return;
     const token = roundToken;
     pataskalaMoveTimer = window.setTimeout(() => {
       pataskalaMoveTimer = 0;
       if (token !== roundToken || state !== 'playing' || !currentPresence) return;
-      const choices = PATASKALA_POSES.filter(pose => pose.id !== currentPresence.id);
-      currentPresence = random(choices.length ? choices : PATASKALA_POSES);
-      tellPresence();
-      playSfx('move', AUDIO_LEVELS.move);
-      setObservation('SOMETHING MOVED / KEEP LOOKING', 'なにかが うごいた / まだ さがす');
-    }, 5200 + Math.random() * 1800);
+      beginPataskalaThreat();
+    }, 2400 + Math.random() * 1800);
   }
 
   function markMatchesAnomaly(mark, anomaly) {
     const [tx, ty] = currentPoint(anomaly.target);
-    const targetRadius = anomaly.targetId === 'pataskala'
-      ? Math.max(mark.radius, plate.w * anomaly.target[2] * .72)
-      : mark.radius;
-    return Math.hypot(mark.x - tx, mark.y - ty) <= targetRadius;
+    return Math.hypot(mark.x - tx, mark.y - ty) <= mark.radius;
   }
 
   function reportTargets() {
-    return [
-      ...currentAnomalies,
-      ...(currentPresence?.targetId === 'pataskala' ? [currentPresence] : []),
-    ];
+    return [...currentAnomalies];
   }
 
   function reportIsCorrect() {
@@ -943,7 +1078,7 @@
   }
 
   function restartCase() {
-    clearRoundTimers(); hidePanel(messagePanel); round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = performance.now(); startRound();
+    clearRoundTimers(); hidePanel(messagePanel); round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; recentAnomalyIds = []; recentAnchorRegions = []; pataskalaCooldownRounds = 0; caseStarted = performance.now(); startRound();
   }
 
   function silenceDrone() {
@@ -988,8 +1123,8 @@
     booha.targetY = nextY;
     keyboardMarkActive = false;
     pointerActive = true;
-    if (wrongMarkHazard) {
-      setObservation('RUN TO THE EXIT', 'でぐちへ にげる', { immediate: true });
+    if (wrongMarkHazard || pataskalaThreat) {
+      setObservation(wrongMarkHazard ? 'RUN TO THE EXIT' : 'KEEP MOVING / FIND THE EXIT', wrongMarkHazard ? 'でぐちへ にげる' : 'うごきつづける / でぐちを さがす', { immediate: true });
       return;
     }
     if (startsHold || (!markLocked && movedBeyondDeadZone)) {
@@ -1026,7 +1161,7 @@
   }
 
   function startKeyboardMark() {
-    if (state !== 'playing' || markLocked || pendingMark || wrongMarkHazard) return;
+    if (state !== 'playing' || markLocked || pendingMark || wrongMarkHazard || pataskalaThreat) return;
     releasePointerInteraction();
     keyboardMarkActive = true;
     markHoldOrigin = [booha.targetX, booha.targetY];
@@ -1048,7 +1183,7 @@
   function lockMark() {
     markHoldTimer = 0;
     markHoldStartedAt = 0;
-    if (state !== 'playing' || wrongMarkHazard || (!pointerActive && !keyboardMarkActive)) return;
+    if (state !== 'playing' || wrongMarkHazard || pataskalaThreat || (!pointerActive && !keyboardMarkActive)) return;
     markLocked = true;
     pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
     showMarkConfirm();
@@ -1071,7 +1206,7 @@
   }
 
   function attemptMark() {
-    if (state !== 'playing' || pendingMark || wrongMarkHazard) return;
+    if (state !== 'playing' || pendingMark || wrongMarkHazard || pataskalaThreat) return;
     releasePointerInteraction();
     keyboardMarkActive = false;
     pendingMark = { x: booha.targetX, y: booha.targetY, radius: lightRadius() };
@@ -1179,7 +1314,7 @@
     const jpNotes = currentAnomalies.map(anomaly => anomaly.jp);
     if (currentAudioOnly) { enNotes.push(AUDIO_ONLY_CHANGE.en); jpNotes.push(AUDIO_ONLY_CHANGE.jp); }
     enqueueClue(enNotes.join(' / '), jpNotes.join(' / '));
-    setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった', { immediate: true });
+    setObservation('MARKS RETURNED TO THE LANTERN', 'しるしが あかりに もどった');
   }
 
   function showLightTipOnce() {
@@ -1238,7 +1373,24 @@
     document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: { saveId: SAVE_ID, score: marks, completed: true, time: performance.now() - caseStarted, recordEligible: true, recentRun: { marks, calls: correctCalls, tier: selectedTier } } }));
   }
 
-  function showComplete() { if (state === 'complete') return; clearRoundTimers(); state = 'complete'; setControlsVisible(false); clearMarkingUi(); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08); setObservation('EXIT FOUND', 'でぐちを みつけた'); completeTone(); submitResult(); stopLoop(); showMessage(UI_COPY.complete, exitGame); }
+  function showComplete() {
+    if (state === 'complete') return;
+    clearRoundTimers();
+    state = 'complete';
+    setControlsVisible(false);
+    clearMarkingUi();
+    if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(0, audioContext.currentTime, .08);
+    setObservation('THE ROOM IS QUIET', 'へやが しずかに なった', { immediate: true });
+    startLoop();
+    completionTimer = window.setTimeout(() => {
+      completionTimer = 0;
+      if (state !== 'complete') return;
+      completeTone();
+      submitResult();
+      stopLoop();
+      showMessage(UI_COPY.complete, exitGame);
+    }, COMPLETION_QUIET_MS);
+  }
 
   function exitGame() {
     try {
