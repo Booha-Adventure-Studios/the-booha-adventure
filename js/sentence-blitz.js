@@ -589,6 +589,7 @@ window.SentenceBlitz = (() => {
         <div class="sb-win-delta"  id="sb-win-delta"></div>
         <div class="sb-win-buttons">
           <button class="sb-win-btn" id="sb-play-again" type="button">もう一度</button>
+          <button class="sb-win-btn ghost records" id="sb-records" type="button">RECORDS / きろくを みる</button>
           <button class="sb-win-btn ghost" id="sb-win-close" type="button">もどる</button>
         </div>
       </div>
@@ -639,7 +640,7 @@ window.SentenceBlitz = (() => {
       timer: '#sb-timer', progress: '#sb-progress', jpWord: '#sb-jp-word', hira: '#sb-hira',
       options: '#sb-options', flash: '#sb-flash', scroll: '#sb-scroll', wrongPopup: '#sb-wrong-popup',
       win: '#sb-win', quit: '#sb-quit', wrongClose: '#sb-wrong-close',
-      playAgain: '#sb-play-again', winClose: '#sb-win-close',
+      playAgain: '#sb-play-again', winClose: '#sb-win-close', records: '#sb-records',
       wrongJp: '#sbwj', wrongHira: '#sbwh', wrongEn: '#sbwe',
       scoldJp: '#sbsj', scoldHira: '#sbsh', scoldEn: '#sbse',
       winName: '#sb-win-name', winScream: '#sb-win-scream', winJp: '#sb-win-jp',

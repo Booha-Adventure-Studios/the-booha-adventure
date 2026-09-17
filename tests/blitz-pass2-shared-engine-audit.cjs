@@ -54,8 +54,24 @@ for (const token of [
 
 const oldBytes = modes.reduce((total, mode) => total + fs.statSync(path.join(root, 'js', mode.file)).size, 0);
 assert(oldBytes < 100000, 'shared mode skins should remain below the previous three-file payload size');
-assert.match(fs.readFileSync(path.join(root, 'js', 'vocab-blitz.js'), 'utf8'),
-  /BoohaBlitzEngine\.getRecordScoreFor/,
-  'the fastest-player panel must read through shared score storage');
+assert.match(engine, /function openRecordsPanel\(ctx = \{\}\)/,
+  'the records panel must live in the shared engine');
+assert.match(engine, /getRecordScoreFor\(game\.id, RECORD_LEGACY_KEYS\[game\.id\], curr\)/,
+  'the records panel must read all-time scores through shared storage');
+assert.match(engine, /getWeeklyScoreFor\(game\.id, curr, weekId\)/,
+  'the records panel must read weekly scores through shared storage');
+const recordsPanel = engine.slice(engine.indexOf('function buildRecordsPanel'), engine.indexOf('function renderRecordsPanel'));
+assert.match(recordsPanel, /role', 'dialog'/,
+  'the shared records panel must expose dialog semantics');
+assert.match(recordsPanel, /data-record-scope="weekly"/,
+  'the records panel must expose the weekly/all-time switch');
+assert.match(recordsPanel, /repeat\(3, minmax\(0, 1fr\)\)/,
+  'the records panel must use three game columns');
+assert.doesNotMatch(recordsPanel, /backdrop-filter/,
+  'the records panel must not spend on full-screen blur passes');
+assert.match(engine, /event\.key === 'Escape'/,
+  'the records panel must close with Escape');
+assert.match(index, /BoohaBlitzEngine\.openRecordsPanel\(/,
+  'the HUB records action must use the shared panel API');
 
 console.log('Blitz Pass 2 shared-engine audit passed: all three public launch APIs, score namespaces, data paths, game-end IDs, and lifecycle ownership are aligned.');

@@ -587,6 +587,7 @@ window.QuestionBlitz = (() => {
         <div class="qb-win-delta"  id="qb-win-delta"></div>
         <div class="qb-win-buttons">
           <button class="qb-win-btn" id="qb-play-again" type="button">もう一度</button>
+          <button class="qb-win-btn ghost records" id="qb-records" type="button">RECORDS / きろくを みる</button>
           <button class="qb-win-btn ghost" id="qb-win-close" type="button">もどる</button>
         </div>
       </div>
@@ -637,7 +638,7 @@ window.QuestionBlitz = (() => {
       timer: '#qb-timer', progress: '#qb-progress', jpWord: '#qb-jp-word', hira: '#qb-hira',
       options: '#qb-options', flash: '#qb-flash', scroll: '#qb-scroll', wrongPopup: '#qb-wrong-popup',
       win: '#qb-win', quit: '#qb-quit', wrongClose: '#qb-wrong-close',
-      playAgain: '#qb-play-again', winClose: '#qb-win-close',
+      playAgain: '#qb-play-again', winClose: '#qb-win-close', records: '#qb-records',
       wrongJp: '#qbwj', wrongHira: '#qbwh', wrongEn: '#qbwe',
       scoldJp: '#qbsj', scoldHira: '#qbsh', scoldEn: '#qbse',
       winName: '#qb-win-name', winScream: '#qb-win-scream', winJp: '#qb-win-jp',
