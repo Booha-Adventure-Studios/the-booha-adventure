@@ -305,10 +305,9 @@ window.BoohaBlitzEngine = (() => {
     return `${s}.${String(cents).padStart(2, '0')}s`;
   }
 
-  function speedTargetFor(config, bestMs) {
+  function speedTargetFor(config) {
     const baseline = Number(config.speedTargetMs) > 0 ? Number(config.speedTargetMs) : 90000;
-    if (!Number.isFinite(bestMs) || bestMs <= 0) return Math.round(baseline);
-    return Math.max(10000, Math.round(bestMs * 0.9));
+    return Math.round(baseline);
   }
 
   function speedBandFor(ms, targetMs) {
@@ -1993,9 +1992,7 @@ window.BoohaBlitzEngine = (() => {
     title.textContent = `${getPlayerName()}, READY?`;
     const target = document.createElement('div');
     target.className = 'booha-blitz-start-target';
-    target.textContent = speedTarget.bestMs
-      ? `BEST ${fmtTime(speedTarget.bestMs)} · TARGET ${fmtTime(speedTarget.targetMs)}`
-      : `FIRST TARGET ${fmtTime(speedTarget.targetMs)}`;
+    target.textContent = `TARGET ${fmtTime(speedTarget.targetMs)} · YOUR BEST ${fmtTime(speedTarget.bestMs)}`;
     const copy = document.createElement('div');
     copy.className = 'booha-blitz-start-copy';
     copy.textContent = 'Tap to start the run · タップしてスタート';
@@ -2476,7 +2473,7 @@ window.BoohaBlitzEngine = (() => {
         : rewardColors;
       const finalCard = config.finalCard || {};
       const nameDelay = finalCard.nameDelay ?? 760;
-      const spectacleScale = speedBand === 'elite' ? 1.4 : speedBand === 'target' ? 1 : .4;
+      const spectacleScale = speedBand === 'elite' ? 1.4 : speedBand === 'target' ? 1 : .6;
       const nameCount = Math.max(8, Math.round((finalCard.nameCount ?? 34) * spectacleScale));
       const nameDuration = (finalCard.nameDuration ?? 3800) + (speedBand === 'elite' ? 800 : speedBand === 'target' ? 250 : 0);
       const particleEasing = palette.particleEasing || 'ease-out';
@@ -2769,7 +2766,7 @@ window.BoohaBlitzEngine = (() => {
       const previousBest = getBestScore(config.gameType, config.legacyKey, curr);
       const speedTarget = {
         bestMs: previousBest?.ms || null,
-        targetMs: speedTargetFor(config, previousBest?.ms),
+        targetMs: speedTargetFor(config),
       };
       const startCard = createStartCard(overlay, palette, speedTarget);
       let queue = shuffle(weekCards);
@@ -3401,11 +3398,11 @@ window.BoohaBlitzEngine = (() => {
         recordEl.classList.toggle('big', isRecord);
         if (isRecord) {
           recordEl.textContent = '🏆 NEW BOOHA RECORD';
-          bestEl.textContent = `PERSONAL BEST: ${fmtTime(ms)}`;
+          bestEl.textContent = `TARGET SPEED: ${fmtTime(speedTarget.targetMs)} · YOUR BEST: ${fmtTime(ms)}`;
           deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than previous best` : 'FIRST PERSONAL BEST';
         } else {
           recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST · #1' : 'PERFECT CLEAR';
-          bestEl.textContent = best ? `PERSONAL BEST: ${fmtTime(best.ms)}${best.name ? ` — ${best.name}` : ''}` : 'PERSONAL BEST: --';
+          bestEl.textContent = `TARGET SPEED: ${fmtTime(speedTarget.targetMs)} · YOUR BEST: ${best ? fmtTime(best.ms) : '--'}`;
           deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs previous best` : (weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}` : '');
         }
         finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
@@ -3523,6 +3520,8 @@ window.BoohaBlitzEngine = (() => {
       fmtTime,
       getWeeklyScore: (curr, weekId) => getWeeklyScore(config.gameType, curr, weekId),
       getBestScore: curr => getBestScore(config.gameType, config.legacyKey, curr),
+      getSpeedTarget: () => speedTargetFor(config),
+      getSpeedBand: ms => speedBandFor(ms, speedTargetFor(config)),
     };
   }
 

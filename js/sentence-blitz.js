@@ -617,7 +617,7 @@ window.SentenceBlitz = (() => {
     particleClass: 'sb-particle',
     particleAnimation: 'sbParticle',
     celebrationMode: 'sentence',
-    speedTargetMs: 90000,
+    speedTargetMs: 60000,
     finalCard: {
       badge: 'LINE LOCKED',
       detail: 'EVERY SENTENCE CONNECTED',
