@@ -117,6 +117,15 @@ assert.match(utsurobaSource, /roomId : 'room_05'[\s\S]*?x      : 364[\s\S]*?y   
   'Family Room must be placed in Utsuroba room_05 at the requested coordinates');
 assert.match(utsurobaSource, /function drawFamilyRoomPortal\(now\)/,
   'Utsuroba must draw the Family Room entrance portal');
+const familyRoomPortalStart = utsurobaSource.indexOf('function drawFamilyRoomPortal(now)');
+const familyRoomPortalEnd = utsurobaSource.indexOf('function drawDrifters(now)', familyRoomPortalStart);
+const familyRoomPortalDraw = utsurobaSource.slice(familyRoomPortalStart, familyRoomPortalEnd);
+assert.match(familyRoomPortalDraw, /const flashlightW = 85 \+ pulse \* 5;/,
+  'the Family Room portal flashlight must be reduced to the intended size');
+assert.doesNotMatch(familyRoomPortalDraw, /setLineDash\(/,
+  'the Family Room portal must not use a dashed ring around the flashlight');
+assert.match(familyRoomPortalDraw, /rgba\(186,255,69/,
+  'the Family Room portal flashlight must pulse with the window green');
 assert.match(utsurobaSource, /family-room\/flashlight\.webp/,
   'the Family Room portal must use the generated flashlight sprite');
 assert.match(utsurobaSource, /mix-blend-mode:[^;]*screen/,
