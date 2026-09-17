@@ -117,6 +117,8 @@ assert.match(utsurobaSource, /roomId : 'room_05'[\s\S]*?x      : 364[\s\S]*?y   
   'Family Room must be placed in Utsuroba room_05 at the requested coordinates');
 assert.match(utsurobaSource, /function drawFamilyRoomPortal\(now\)/,
   'Utsuroba must draw the Family Room entrance portal');
+assert.match(utsurobaSource, /const REDUCED_MOTION =/,
+  'Utsuroba must define the reduced-motion flag used by portal animation');
 const familyRoomPortalStart = utsurobaSource.indexOf('function drawFamilyRoomPortal(now)');
 const familyRoomPortalEnd = utsurobaSource.indexOf('function drawDrifters(now)', familyRoomPortalStart);
 const familyRoomPortalDraw = utsurobaSource.slice(familyRoomPortalStart, familyRoomPortalEnd);

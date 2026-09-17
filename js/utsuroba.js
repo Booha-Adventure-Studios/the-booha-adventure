@@ -40,9 +40,11 @@
   const TOUCH_MAX_DPR = Math.min(MAX_DPR, 1.5);
   let canvasDpr       = MAX_DPR;
 
+  const REDUCED_MOTION = typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LOW_POWER_HINT = Boolean(
     (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
-    || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    || REDUCED_MOTION
   );
   let perfTier       = LOW_POWER_HINT ? 'low' : 'high';
   let shadowsEnabled = perfTier !== 'low';
