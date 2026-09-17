@@ -968,12 +968,10 @@ window.BoohaBlitzEngine = (() => {
       .blitz-compositor.streak-tier-4 .booha-blitz-prompt,
       .blitz-compositor.streak-tier-4 .booha-blitz-answer {
         box-shadow: 0 0 54px var(--blitz-glow), 0 0 4px var(--blitz-accent);
-        animation: boohaBlitzChargedBreath 2.8s ease-in-out infinite;
       }
       .blitz-compositor.streak-tier-5 .booha-blitz-prompt,
       .blitz-compositor.streak-tier-5 .booha-blitz-answer {
         box-shadow: 0 0 66px var(--blitz-glow), 0 0 5px var(--blitz-accent);
-        animation: boohaBlitzChargedBreath 2.2s ease-in-out infinite;
       }
       .blitz-compositor.streak-tier-2 .booha-blitz-nameplate,
       .blitz-compositor.streak-tier-3 .booha-blitz-nameplate,
@@ -1079,11 +1077,15 @@ window.BoohaBlitzEngine = (() => {
       .blitz-feel-sleek .booha-blitz-streak-meter-fill {
         background: linear-gradient(90deg, #f0c96a, #dfeaff);
       }
-      .blitz-compositor.correct-impact { animation: boohaBlitzCorrectImpact 320ms ease-out both; }
-      @keyframes boohaBlitzCorrectImpact {
-        0% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
-        35% { box-shadow: inset 0 0 90px var(--blitz-glow); }
-        100% { box-shadow: inset 0 0 0 rgba(255,255,255,0); }
+      .blitz-compositor.correct-impact::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 80;
+        pointer-events: none;
+        background: radial-gradient(closest-side, transparent 55%, var(--blitz-glow) 100%);
+        opacity: 0;
+        animation: boohaBlitzCorrectImpactWash 320ms ease-out both;
       }
       .blitz-feel-sleek .booha-blitz-nameplate.streak-event-9 {
         letter-spacing: 2.4px;
@@ -1113,9 +1115,13 @@ window.BoohaBlitzEngine = (() => {
         20% { opacity: 1; }
         100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
       }
-      @keyframes boohaBlitzChargedBreath {
-        0%, 100% { filter: brightness(1); }
-        50% { filter: brightness(1.06); }
+      @keyframes boohaBlitzChargedWash {
+        0%, 100% { opacity: 0; }
+        50% { opacity: .22; }
+      }
+      @keyframes boohaBlitzCorrectImpactWash {
+        0%, 100% { opacity: 0; }
+        35% { opacity: .85; }
       }
       @keyframes boohaBlitzChargedNameplate {
         0%, 100% { filter: brightness(1); }
@@ -1686,7 +1692,7 @@ window.BoohaBlitzEngine = (() => {
         .blitz-compositor.streak-tier-3 .booha-blitz-nameplate,
         .blitz-compositor.streak-tier-4 .booha-blitz-nameplate,
         .blitz-compositor.streak-tier-5 .booha-blitz-nameplate { animation: none; }
-        .blitz-compositor.correct-impact { animation: none; box-shadow: inset 0 0 34px var(--blitz-glow); }
+        .blitz-compositor.correct-impact::after { animation: none !important; opacity: .65 !important; }
         .booha-blitz-streak-meter,
         .booha-blitz-streak-meter-fill { transition: none; }
         .booha-blitz-streak-spark { display: none; }
@@ -1887,6 +1893,8 @@ window.BoohaBlitzEngine = (() => {
           }
         }
         #${config.overlayId}.blitz-compositor .${config.optionClass} {
+          position: relative;
+          isolation: isolate;
           transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
         }
         #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-enter {
@@ -1932,6 +1940,24 @@ window.BoohaBlitzEngine = (() => {
           opacity: .78;
           transform: scale(1.04);
         }
+        #${config.overlayId}.blitz-compositor.streak-tier-4 .${config.optionClass}::after,
+        #${config.overlayId}.blitz-compositor.streak-tier-5 .${config.optionClass}::after {
+          background: linear-gradient(135deg, var(--streak-color, var(--blitz-accent)), transparent 72%);
+          opacity: 0;
+          transform: none;
+          animation: boohaBlitzChargedWash 2.8s ease-in-out infinite;
+        }
+        #${config.overlayId}.reduced-power .${config.optionClass}::after,
+        #${config.overlayId}.low-power .${config.optionClass}::after {
+          animation: none !important;
+          opacity: .18 !important;
+          transform: none !important;
+        }
+        #${config.overlayId}.reduced-power.blitz-compositor.correct-impact::after,
+        #${config.overlayId}.low-power.blitz-compositor.correct-impact::after {
+          animation: none !important;
+          opacity: .55 !important;
+        }
         #${config.overlayId}.blitz-compositor .${config.optionClass}.wrong {
           box-shadow: none !important;
           outline: 2px solid #ff1e1e;
@@ -1949,7 +1975,10 @@ window.BoohaBlitzEngine = (() => {
           outline-offset: 3px;
         }
         @media (prefers-reduced-motion: reduce) {
-          #${config.overlayId}.blitz-compositor .${config.optionClass}::after { transition: none; }
+          #${config.overlayId}.blitz-compositor .${config.optionClass}::after {
+            transition: none;
+            animation: none !important;
+          }
           #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-enter,
           #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-recover { animation: none !important; opacity: 1; transform: none; }
           #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win { animation: none; filter: none; }
@@ -2044,7 +2073,7 @@ window.BoohaBlitzEngine = (() => {
           const spark = document.createElement('span');
           const angle = (i / count) * Math.PI * 2 + Math.random() * 0.35;
           const distance = 24 + Math.random() * 32;
-          spark.className = `booha-blitz-streak-spark${threshold >= 8 && i === 0 ? ' booha-blitz-streak-spark-large' : ''}`;
+          spark.className = `booha-blitz-streak-spark${threshold >= 9 && i === 0 ? ' booha-blitz-streak-spark-large' : ''}`;
           spark.style.cssText = `--sx:${Math.cos(angle) * distance}px;--sy:${Math.sin(angle) * distance}px;--spark-delay:${Math.random() * 50}ms;`;
           spark.addEventListener('animationend', () => spark.remove(), { once: true });
           fragment.appendChild(spark);
@@ -2103,6 +2132,7 @@ window.BoohaBlitzEngine = (() => {
           streakMarkerEl.textContent = '';
           nameplate.style.setProperty('--streak-progress', '0%');
           nameplate.style.removeProperty('--streak-color');
+          overlay.style.removeProperty('--streak-color');
           nameplate.removeAttribute('data-streak');
           nameplate.classList.remove('streak-active');
           overlay.classList.remove(...tierClasses);
@@ -2121,7 +2151,10 @@ window.BoohaBlitzEngine = (() => {
         const colorIndex = eventThreshold
           ? Math.max(0, STREAK_EVENT_THRESHOLDS.indexOf(eventThreshold))
           : Math.min(streakColors.length - 1, Math.max(0, tier - 1));
-        if (streakColors[colorIndex]) nameplate.style.setProperty('--streak-color', streakColors[colorIndex]);
+        if (streakColors[colorIndex]) {
+          nameplate.style.setProperty('--streak-color', streakColors[colorIndex]);
+          overlay.style.setProperty('--streak-color', streakColors[colorIndex]);
+        }
         nameplate.style.setProperty('--streak-progress', `${Math.min(100, (streak / Math.max(1, runLength)) * 100)}%`);
         streakMarkerEl.textContent = marker;
         streakEl.textContent = `${label} ×${streak}`;
@@ -2600,13 +2633,26 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function bindPointerAction(button, handler) {
+        let downId = null;
+        let downX = 0;
+        let downY = 0;
         let suppressClickUntil = 0;
+        button.addEventListener('pointerdown', event => {
+          downId = event.pointerId;
+          downX = event.clientX;
+          downY = event.clientY;
+        });
         button.addEventListener('pointerup', event => {
+          const sameTouch = event.pointerId === downId;
+          const moved = Math.hypot(event.clientX - downX, event.clientY - downY) > 10;
+          downId = null;
+          if (!sameTouch || moved) return;
           event.preventDefault();
           event.stopPropagation();
           suppressClickUntil = performance.now() + 500;
           handler(event);
         }, { passive: false });
+        button.addEventListener('pointercancel', () => { downId = null; });
         button.addEventListener('click', event => {
           if (performance.now() < suppressClickUntil) {
             event.preventDefault();
@@ -3079,6 +3125,7 @@ window.BoohaBlitzEngine = (() => {
           runIsActive = true;
           feedbackState = 'playing';
           visibilityPaused = false;
+          locked = false;
           setAnswerInputEnabled(true);
           scheduleTimerTick(0);
           overlay._boohaBlitzPerformanceCleanup = monitorFramePerformance(
