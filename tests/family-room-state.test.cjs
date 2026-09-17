@@ -9,6 +9,7 @@ const vm = require('vm');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'family-room.js'), 'utf8');
 const markup = fs.readFileSync(path.join(root, 'family-room.html'), 'utf8');
+const styles = fs.readFileSync(path.join(root, 'family-room.css'), 'utf8');
 const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const registry = fs.readFileSync(path.join(root, 'js/core/game-registry.js'), 'utf8');
 assert(source.includes('const FAMILY_CHANGE_TYPES = Object.freeze') && ['ADD', 'REMOVE', 'MOVE', 'TURN', 'SWAP', 'COUNT', 'STATE', 'WRONG'].every(type => source.includes(`'${type}'`)), 'Pass 1 must lock the shared Family Room change vocabulary');
@@ -150,6 +151,7 @@ assert(!hazardStart.includes('setControlsVisible(false)'), 'wrong-mark hazards m
 assert(source.includes('const CLUE_DISPLAY_MS = 7600') && source.includes('function enqueueClue') && source.includes('clueQueue'), 'clue notifications must remain readable and queue instead of overwriting one another');
 assert(source.includes('const PATASKALA_SIZE_MULTIPLIER = 2.5') && source.includes('PATA_SPEED_FAR = .075') && source.includes('PATA_SPEED_NEAR = .14') && source.includes('showPriorityClue'), 'Pataskala must be enlarged, warned, and slowed enough to make the exit reachable');
 assert(markup.includes('id="clue-close"') && source.includes('function closeClueCard'), 'case notes must be dismissible');
+assert(styles.includes('.study-panel h2 > .jp') && styles.includes('white-space: nowrap'), 'the Study heading Japanese title must stay on one readable line');
 assert(source.includes("id: 'cup'", source.indexOf('const anomalies')) && source.includes('artSize: .075') && source.includes("id: 'futon'") && source.includes('artSize: .2'), 'the cup and futon art bounds must use their corrected room scale');
 assert(source.includes('const reportClueDelay = currentAnomalies.length || currentAudioOnly ? CLUE_DISPLAY_MS + PANEL_FADE_MS : 0'), 'a successful report must leave its clue visible before the next round begins');
 assert(source.includes('function releasePointerInteraction') && source.includes('hidePanel(markConfirmPanel)'), 'opening or cancelling a mark confirmation must release pointer capture and finish panel cleanup');
