@@ -12,8 +12,8 @@ assert.match(engine, /Tap to start the run · タップしてスタート/,
   'the start card must clearly tell the player how to begin');
 assert.match(engine, /START BLITZ →/,
   'the start card must expose a clear start action');
-assert.match(engine, /function speedTargetFor\(config, bestMs\)/,
-  'the start card target must be derived from a shared speed target');
+assert.match(engine, /function speedTargetFor\(config\)/,
+  'the start card target must use a fixed shared speed target');
 assert.match(engine, /booha-blitz-start-target/,
   'the start card must show the preparation target before the timer begins');
 assert.match(engine, /function speedBandFor\(ms, targetMs\)/,

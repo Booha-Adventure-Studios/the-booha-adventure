@@ -14,7 +14,7 @@ assert.match(engine, /booha-blitz-final-curriculum/,
   'the final card must identify its curriculum');
 assert.match(engine, /winScreen\.querySelector\(selector\('winName'\)\)\.textContent = playerName/,
   'the player name must remain the final-card hero');
-assert.match(engine, /PERSONAL BEST:/,
+assert.match(engine, /YOUR BEST:/,
   'the final card must label the personal best explicitly');
 assert.match(engine, /previous best/,
   'the final card must show the delta from the previous best');
