@@ -32,6 +32,9 @@ assert(opener.includes("document.getElementById('nuppi-pop-jp').innerHTML"), 'Nu
 assert(!opener.includes("document.getElementById('nuppi-pop-jp').textContent = jp"), 'Nuppi Japanese output must not discard furigana markup with textContent');
 assert(source.includes('function weeklyFamilyRoomState') && source.includes('function claimNuppiFlashlightCharge'), 'Nuppi must own the weekly flashlight-charge handoff');
 assert(source.includes('id="nuppi-flashlight-button"') && source.includes('nuppiChargeClaimed'), 'Nuppi must expose a once-per-week flashlight-charge reward');
+assert(source.includes('NUPPI_FLASHLIGHT_REWARD = 3') && source.includes('MAX_FLASHLIGHT_CHARGES = 5'), 'Nuppi must provide a useful weekly bundle with a safe inventory cap');
+assert(source.includes('nuppiChargeClaimable') && source.includes('rgba(185,221,255,0.52)'), 'Nuppi must show the blue Akiya glow when a charge is claimable');
+assert(source.includes('Deeper rooms may take more than one burst.'), 'Nuppi must explain that later Pataskala encounters can require multiple charges');
 assert(furigana.includes('function sentence(value, readings)'), 'shared furigana renderer must remain available');
 assert(page.includes('<script src="js/utsu-furigana.js"></script>'), 'Karasuki must load the furigana renderer before dialogue');
 
