@@ -61,7 +61,7 @@ const BoohaSaveFile = (() => {
 
       // ── Permanent (never reset) ──────────────────────────────────────────
       scores:      {},   // { [saveId]: { highScore, stars, completed, attempts, ... } }
-      unlocks:     {},   // { [itemId]: { unlockedAt } }  — achievements only
+      unlocks:     {},   // { [itemId]: { unlockedAt } }  — permanent achievements and cosmetics
       stats:       {},   // arbitrary permanent stat counters
       collectibles:{},   // { [id]: { found, foundAt } }
       pageState:   {},   // { [pageId]: { visited, spawnPoint, ... } }
@@ -84,6 +84,7 @@ const BoohaSaveFile = (() => {
         dayLog:         {},      // { "2026-07-22": { s, g } }  — accountability
         weekLog:        {},      // { "2026-w27": { adv, blitz, duel } }
         lastActivityTs: 0,
+        selectedBoohaSkin: null,
       },
 
       // ── Weekly — resets at each Sunday-started Tokyo occurrence ──────────
@@ -313,6 +314,7 @@ const BoohaSaveFile = (() => {
     if (typeof save.meta.lastWeeklyKey  !== 'string') save.meta.lastWeeklyKey  = '';
     if (typeof save.meta.allTimeStars   !== 'number') save.meta.allTimeStars   = 0;
     if (typeof save.meta.lastActivityTs !== 'number') save.meta.lastActivityTs = 0;
+    if (save.meta.selectedBoohaSkin !== null && typeof save.meta.selectedBoohaSkin !== 'string') save.meta.selectedBoohaSkin = null;
     if (!save.meta.dayLog)  save.meta.dayLog  = {};
     if (!save.meta.weekLog) save.meta.weekLog = {};
 
