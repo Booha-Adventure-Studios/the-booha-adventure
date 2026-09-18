@@ -436,14 +436,9 @@ const UTILS = {
       const list = document.createElement('ul');
       uniqueItems.slice(0, 6).forEach(item => {
         const row = document.createElement('li');
-        const jp = document.createElement('ruby');
+        const jp = document.createElement('span');
         jp.className = 'game-result-review-jp';
-        jp.appendChild(document.createTextNode(item.jp || item.en || '—'));
-        if (item.hira && item.hira !== item.jp) {
-          const rt = document.createElement('rt');
-          rt.textContent = item.hira;
-          jp.appendChild(rt);
-        }
+        jp.innerHTML = this.furiganaHTML(item.jp || item.en || '—', item.hira || '');
         const en = document.createElement('span');
         en.className = 'game-result-review-en';
         en.textContent = item.en || item.enDisplay || '';
@@ -464,6 +459,61 @@ const UTILS = {
       review.appendChild(empty);
     }
     details.appendChild(review);
+  },
+
+  /* Convert a flat card reading into ruby attached to each Kanji run. */
+  furiganaHTML(jp, hira) {
+    const text = String(jp == null ? '' : jp);
+    const rawReading = String(hira == null ? '' : hira);
+    const escape = value => String(value).replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    if (!text || !rawReading) return escape(text);
+
+    const toHiragana = value => String(value).replace(/[ァ-ヶ]/g, ch =>
+      String.fromCharCode(ch.charCodeAt(0) - 0x60));
+    const reading = toHiragana(rawReading).replace(/\s+/g, '');
+    const isKana = ch => /[\u3040-\u30ffー]/.test(ch);
+    let html = '';
+    let cursor = 0;
+    let index = 0;
+    while (index < text.length) {
+      if (isKana(text[index])) {
+        let end = index + 1;
+        while (end < text.length && isKana(text[end])) end++;
+        const kana = toHiragana(text.slice(index, end));
+        const position = reading.indexOf(kana, cursor);
+        if (position >= cursor) cursor = position + kana.length;
+        html += escape(text.slice(index, end));
+        index = end;
+        continue;
+      }
+
+      let end = index + 1;
+      while (end < text.length && !isKana(text[end])) end++;
+      const kanjiRun = text.slice(index, end);
+      let nextKana = '';
+      let lookahead = end;
+      while (lookahead < text.length && !isKana(text[lookahead])) lookahead++;
+      if (lookahead < text.length) {
+        let nextEnd = lookahead + 1;
+        while (nextEnd < text.length && isKana(text[nextEnd])) nextEnd++;
+        nextKana = toHiragana(text.slice(lookahead, nextEnd));
+      }
+      const nextPosition = nextKana ? reading.indexOf(nextKana, cursor) : -1;
+      const runReading = nextPosition >= cursor
+        ? reading.slice(cursor, nextPosition)
+        : (!nextKana ? reading.slice(cursor) : '');
+
+      if (runReading) {
+        html += `<ruby>${escape(kanjiRun)}<rt>${escape(runReading)}</rt></ruby>`;
+        cursor += runReading.length;
+      } else {
+        html += escape(kanjiRun);
+      }
+      index = end;
+    }
+    return html || escape(text);
   },
 
   /* ══════════════════════════════
