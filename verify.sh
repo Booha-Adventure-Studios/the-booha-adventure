@@ -86,10 +86,16 @@ fi
 echo "[4/36] Cache bump vs. changed files"
 if git rev-parse --git-dir >/dev/null 2>&1; then
   changed=$(git diff HEAD --name-only 2>/dev/null; git diff --cached --name-only 2>/dev/null)
-  cached_changed=$(echo "$changed" | grep -cE '\.(html|js|css|json)$' || true)
+  # JavaScript is served network-first with the asset cache only as an
+  # offline fallback. A JS-only change therefore does not require a cache
+  # version bump; keep the reminder for cache-first/content-sensitive files.
+  cached_changed=$(echo "$changed" | grep -cE '\.(html|css|json)$' || true)
+  network_first_js_changed=$(echo "$changed" | grep -cE '\.m?js$' || true)
   sw_bumped=$(echo "$changed" | grep -c '^sw\.js$' || true)
   if [ "$cached_changed" -gt 0 ] && [ "$sw_bumped" -eq 0 ]; then
     warn "$cached_changed cached file(s) changed but sw.js untouched — did you bump the cache version?"
+  elif [ "$network_first_js_changed" -gt 0 ] && [ "$sw_bumped" -eq 0 ]; then
+    ok "$network_first_js_changed network-first JavaScript file(s) changed; cache bump not required"
   else
     ok "no bump needed, or sw.js already touched"
   fi

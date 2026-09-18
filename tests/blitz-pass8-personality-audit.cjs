@@ -21,8 +21,8 @@ assert.match(engine, /secondary: 'hsl\(205, 48%, 15%\)'/,
 
 assert.match(engine, /function progressColorFor\(palette, percent\)/,
   'the shared engine must render the dead-to-alive progress color');
-assert.match(engine, /const hue = palette\.baseHue[\s\S]*?const lightness = Math\.round\(100 - 46 \* p\)/,
-  'theme backgrounds must move from white into a curriculum-colored live state');
+assert.match(engine, /const stops = palette\.aliveStops \|\|[\s\S]*?mixHex\(stops\[index\], stops\[index \+ 1\], localT\)/,
+  'theme backgrounds must move through curriculum-specific live color stops');
 assert.match(engine, /#vb-overlay\.blitz-feel-playful \.vb-opt/,
   'Pre-Boo must have a shared playful option treatment');
 assert.match(engine, /#sb-overlay\.blitz-feel-arcade \.sb-opt/,

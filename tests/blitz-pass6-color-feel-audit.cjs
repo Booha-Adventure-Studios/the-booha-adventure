@@ -17,8 +17,10 @@ for (const feel of ['playful', 'arcade', 'sleek']) {
 assert.match(engine, /rewardColors:/, 'shared themes must define colors distinct from live-game accents');
 assert.match(engine, /nameEasing:/, 'shared themes must define celebration motion character');
 
-assert.match(engine, /progressColorFor\(palette, percent\)/, 'curriculum palettes must control progress color');
-assert.match(engine, /const hue = palette\.baseHue/, 'curriculum palettes must control progress hue');
+assert.match(engine, /function hexToRgb\(hex\)/, 'curriculum progress colors must support palette hex stops');
+assert.match(engine, /function mixHex\(hexA, hexB, t\)/, 'curriculum progress colors must interpolate between stops');
+assert.match(engine, /const stops = palette\.aliveStops \|\|/, 'curriculum palettes must control the live color path');
+assert.match(engine, /function glowForPercent\(palette, percent\)/, 'curriculum glow must scale with progress');
 assert.match(engine, /palette\.particleEasing/, 'curriculum palettes must control particle motion easing');
 assert.match(engine, /palette\.rewardColors/, 'celebrations must use the separate reward palette');
 assert.match(engine, /nameDelay = finalCard\.nameDelay/, 'name rain must have its own delayed celebration beat');
