@@ -179,6 +179,7 @@
   const studyBackButton = document.getElementById('study-back-button');
   const flameEls = [...document.querySelectorAll('[data-flame]')];
   const tierButtons = [...document.querySelectorAll('[data-tier]')];
+  const tierNote = document.getElementById('tier-note');
 
   const FAMILY_DEFERRED_ASSETS = Object.freeze([
     ...Object.values(FAMILY_AUDIO),
@@ -457,12 +458,23 @@
   }
 
   function updateTierButtons() {
-    const unlocked = unlockedTiers();
+    const recommendation = recommendedTier();
     tierButtons.forEach(button => {
       const tier = button.dataset.tier;
-      button.disabled = !unlocked.includes(tier);
+      button.disabled = false;
       button.classList.toggle('selected', selectedTier === tier);
+      button.classList.toggle('recommended', recommendation === tier);
+      button.setAttribute('aria-pressed', String(selectedTier === tier));
     });
+    if (!tierNote) return;
+    const [vocab, sentence, question] = blitzTimes();
+    const fastestStamp = Math.max(vocab, sentence, question);
+    if (!Number.isFinite(fastestStamp)) {
+      tierNote.innerHTML = '<span>All room speeds are open. Blitz can suggest a starting point.</span><span class="jp" lang="ja">すべての はやさを えらべます。ブリッツは めやすです。</span>';
+      return;
+    }
+    const label = recommendation === 'lies' ? 'THE ROOM LIES TO YOU' : recommendation === 'quicker' ? 'THE ROOM IS QUICKER' : 'THE ROOM IS PATIENT';
+    tierNote.innerHTML = `<span>Blitz suggests ${label}; any room speed is still available.</span><span class="jp" lang="ja">ブリッツの めやすは ${label}。どの はやさも えらべます。</span>`;
   }
 
   function weekLog() {
@@ -482,12 +494,39 @@
     ));
   }
 
-  function unlockedTiers() {
+  function recommendedTier() {
     const [vocab, sentence, question] = blitzTimes();
-    const list = ['patient'];
-    if (Math.max(vocab, sentence, question) < 45000) list.push('quicker');
-    if (Math.max(vocab, sentence, question) < 30000) list.push('lies');
-    return list;
+    const fastestStamp = Math.max(vocab, sentence, question);
+    if (fastestStamp < 30000) return 'lies';
+    if (fastestStamp < 45000) return 'quicker';
+    return 'patient';
+  }
+
+  function readPreferredTier() {
+    try {
+      const data = window.BoohaAdventure?.save?.load?.() || {};
+      const weeklyTier = data.weekly?.worlds?.familyRoom?.preferredTier;
+      const lifetimeTier = data.familyRoom?.preferredTier;
+      return TIER_RULES[weeklyTier] ? weeklyTier : TIER_RULES[lifetimeTier] ? lifetimeTier : 'patient';
+    } catch (_) {
+      return 'patient';
+    }
+  }
+
+  function savePreferredTier() {
+    const save = window.BoohaAdventure?.save;
+    if (!save?.load || !save?.save || !TIER_RULES[selectedTier]) return;
+    try {
+      const data = save.load();
+      const weekly = data.weekly && typeof data.weekly === 'object' ? data.weekly : (data.weekly = {});
+      const worlds = weekly.worlds && typeof weekly.worlds === 'object' ? weekly.worlds : (weekly.worlds = {});
+      const familyRoom = worlds.familyRoom && typeof worlds.familyRoom === 'object' ? worlds.familyRoom : (worlds.familyRoom = {});
+      familyRoom.preferredTier = selectedTier;
+      if (data.familyRoom && typeof data.familyRoom === 'object') data.familyRoom.preferredTier = selectedTier;
+      save.save(data);
+    } catch (error) {
+      console.warn('[Family Room] preferred tier unavailable', error);
+    }
   }
 
   function currentTier() { return TIER_RULES[selectedTier] || TIER_RULES.patient; }
@@ -1647,7 +1686,7 @@
   soundToggle.addEventListener('click', toggleSound);
   clueCloseButton?.addEventListener('click', continueFromClue);
   flyAwayButton?.addEventListener('click', flyAwayToSafeRoom);
-  tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; updateTierButtons(); }));
+  tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; savePreferredTier(); updateTierButtons(); }));
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);
   window.visualViewport?.addEventListener('resize', scheduleResize);
@@ -1669,5 +1708,6 @@
   applyBoohaSkin();
   if (window.BOOHA_READY) applyBoohaSkin();
   else document.addEventListener('booha:ready', applyBoohaSkin, { once: true });
+  selectedTier = readPreferredTier();
   resize(); updateAndon(); updateTierButtons();
 })();

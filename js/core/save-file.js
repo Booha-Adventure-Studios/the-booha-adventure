@@ -148,6 +148,7 @@ const BoohaSaveFile = (() => {
         activeCaseId: 'chanoma',
         completedCases: {},
         bestTier: null,
+        preferredTier: 'patient',
         lastResult: null,
       },
     };
@@ -256,6 +257,7 @@ const BoohaSaveFile = (() => {
     if (typeof current.familyRoom.activeCaseId !== 'string') current.familyRoom.activeCaseId = 'chanoma';
     if (!current.familyRoom.completedCases || typeof current.familyRoom.completedCases !== 'object' || Array.isArray(current.familyRoom.completedCases)) current.familyRoom.completedCases = {};
     if (current.familyRoom.bestTier !== null && !['patient', 'quicker', 'lies'].includes(current.familyRoom.bestTier)) current.familyRoom.bestTier = null;
+    if (!['patient', 'quicker', 'lies'].includes(current.familyRoom.preferredTier)) current.familyRoom.preferredTier = 'patient';
     if (current.familyRoom.lastResult !== null && (typeof current.familyRoom.lastResult !== 'object' || Array.isArray(current.familyRoom.lastResult))) current.familyRoom.lastResult = null;
   }
 

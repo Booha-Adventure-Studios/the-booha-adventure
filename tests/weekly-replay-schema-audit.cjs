@@ -107,6 +107,7 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
     activeCaseId: 'chanoma',
     completedCases: {},
     bestTier: null,
+    preferredTier: 'patient',
     lastResult: null,
   },
 });
@@ -154,6 +155,7 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.familyRoom), {
   activeCaseId: 'chanoma',
   completedCases: {},
   bestTier: null,
+  preferredTier: 'patient',
   lastResult: null,
 });
 
