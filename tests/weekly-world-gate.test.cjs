@@ -113,6 +113,14 @@ assert.match(utsurobaSource, /if \(DEV_MODE\) window\.__devUtsuroba = true;/,
   'Utsuroba DEV mode must establish the test override');
 assert.match(utsurobaSource, /if \(DEV_MODE \|\| window\.__devUtsuroba\) return true;/,
   'Utsuroba DEV tools must be able to open the unfinished world');
+assert.match(utsurobaSource, /function isDrifterQuestActive\(quest = getCachedQuest\(\)\)/,
+  'Utsuroba must centralize the active-drifter-quest visibility rule');
+assert.match(utsurobaSource, /if \(!isDrifterQuestActive\(\)\) \{[\s\S]*?echoesTrackerEl\.style\.display = 'none';/,
+  'Three Echoes must hide when no drifter quest is active');
+assert.match(utsurobaSource, /function activateQuest\(id\)[\s\S]*?invalidateQuestCache\(\);[\s\S]*?renderEchoesTracker\(\);/,
+  'Three Echoes must appear immediately when a drifter quest is accepted');
+assert.match(utsurobaSource, /function clearQuest\(\)[\s\S]*?invalidateQuestCache\(\);[\s\S]*?renderEchoesTracker\(\);/,
+  'Three Echoes must hide immediately when a drifter quest is cancelled');
 assert.match(utsurobaSource, /roomId : 'room_05'[\s\S]*?x      : 364[\s\S]*?y      : 246/,
   'Family Room must be placed in Utsuroba room_05 at the requested coordinates');
 assert.match(utsurobaSource, /function drawFamilyRoomPortal\(now\)/,
