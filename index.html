@@ -1708,16 +1708,10 @@ function renderHub() {
 
   
 const thisWeek = getCurrentCurriculumWeek();
-  // Default to the player's own curriculum (same source of truth Daily Check
-  // uses), not always Pre-Boo -- read localStorage directly rather than via
-  // BoohaDailyCheck.knownCurr(), since js/daily-check.js loads later in this
-  // document than this inline script runs.
-  let activeTab = (() => {
-    try {
-      const c = localStorage.getItem('booha_last_curr');
-      return (c === 'pb' || c === 'br' || c === 'bc') ? c : 'pb';
-    } catch (e) { return 'pb'; }
-  })();
+  // The Hub always opens on Pre-Boo. Players can still choose another
+  // curriculum for this visit, but a previous selection must never replace
+  // the product's default first view.
+  let activeTab = 'pb';
 
   // jp values match CURR_TILES in daily-check.js — same three curricula,
   // same katakana, so a kid sees one consistent name for each track

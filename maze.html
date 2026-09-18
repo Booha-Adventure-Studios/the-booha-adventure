@@ -227,7 +227,11 @@
     #battyUnlockPopup .batty-kicker{ margin:0 0 7px; color:rgba(255,191,128,.82); font-size:11px; font-weight:900; letter-spacing:.25em; text-transform:uppercase; }
     #battyUnlockPopup h2{ margin:0; color:#fff3db; font-family:'Bowlby One',sans-serif; font-size:clamp(22px,5vw,34px); line-height:1.15; text-shadow:0 0 25px rgba(255,120,50,.42); }
     #battyUnlockPopup p{ margin:12px auto 18px; color:rgba(255,235,218,.72); font-size:14px; line-height:1.6; }
+    #battyUnlockPopup .batty-jp{ display:block; margin-top:7px; color:rgba(255,220,186,.86); font-size:.9em; font-weight:700; letter-spacing:.04em; }
+    #battyUnlockPopup ruby{ ruby-position:over; }
+    #battyUnlockPopup rt{ color:#ffd28f; font-size:.52em; font-weight:800; letter-spacing:0; }
     #battyUnlockPopup .batty-equip{ appearance:none; border:0; border-radius:999px; padding:11px 22px; color:#170913; font-weight:1000; cursor:pointer; background:linear-gradient(180deg,#ffd984,#ff9149); box-shadow:0 7px 28px rgba(255,120,40,.36); }
+    #battyUnlockPopup .batty-equip .batty-jp{ display:inline; margin-left:8px; color:rgba(23,9,19,.78); font-size:.9em; }
     #battyUnlockPopup .batty-equip:active{ transform:scale(.95); }
     #hwPrompt.show{ display:block; }
     #hwPrompt.visible{
@@ -1182,10 +1186,10 @@
     <button id="battyEquipButton" class="batty-equip-button" type="button" aria-label="Equip Batty Booha">
       <img class="batty-art" src="assets/skins/batty_booha/static.png" alt="Batty Booha" />
     </button>
-    <p class="batty-kicker">A NEW FRIEND HAS ARRIVED</p>
-    <h2 id="battyUnlockTitle">You Unlocked Batty Booha!</h2>
-    <p id="battyUnlockCopy">Tap Batty Booha to equip your new traveling friend.</p>
-    <button id="battyEquipTextButton" class="batty-equip" type="button">EQUIP BATTY BOOHA</button>
+    <p class="batty-kicker">A NEW FRIEND HAS ARRIVED<span class="batty-jp"><ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ</span></p>
+    <h2 id="battyUnlockTitle">You Unlocked Batty Booha!<span class="batty-jp">バッティー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！</span></h2>
+    <p id="battyUnlockCopy">Tap Batty Booha to equip your new traveling friend.<span class="batty-jp">バッティー・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。</span></p>
+    <button id="battyEquipTextButton" class="batty-equip" type="button">EQUIP BATTY BOOHA <span class="batty-jp">バッティー・ブーハーを <ruby>装備<rt>そうび</rt></ruby></span></button>
   </section>
   <div id="fade" aria-hidden="true"></div>
 
@@ -1745,6 +1749,8 @@ const extraGhostImgs = EXTRA_BOOHA_GHOSTS.map(src => {
 });
 
 let activeGhostIdx = 0;
+let equippedMazeImg = null;
+let equippedMazeImgSrc = '';
 
 function assignRandomGhost() {
   // Player can only be one of the five main Booha logo colors.
@@ -1755,6 +1761,16 @@ function assignRandomGhost() {
 function applyEquippedMazeSkin() {
   const skinSrc = window.BoohaSkins?.asset('maze');
   startGhost.src = skinSrc || GHOSTS[activeGhostIdx];
+  if (skinSrc !== equippedMazeImgSrc) {
+    equippedMazeImgSrc = skinSrc || '';
+    equippedMazeImg = skinSrc ? makeDeferredImage(skinSrc) : null;
+  }
+}
+
+function getActiveMazeGhostImage() {
+  return equippedMazeImg
+    ? ensureDeferredImage(equippedMazeImg)
+    : ensureDeferredImage(ghostImgs[activeGhostIdx]);
 }
 
 assignRandomGhost();
@@ -2327,7 +2343,7 @@ function drawFrame(now){
     ctx.globalAlpha=.20+pulseG*.10;const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,gR*2.0);ga.addColorStop(0,gcol1);ga.addColorStop(.5,gcol2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,gR*2.0,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=.14+pulseG*.06;const gs=ctx.createRadialGradient(gx,gy+gR*.7,0,gx,gy+gR*.7,gR*.85);gs.addColorStop(0,'rgba(0,0,0,.5)');gs.addColorStop(1,'transparent');ctx.fillStyle=gs;ctx.beginPath();ctx.arc(gx,gy+gR*.7,gR*.85,0,Math.PI*2);ctx.fill();
     ctx.restore();ctx.save();
-    const activeImg=ensureDeferredImage(ghostImgs[activeGhostIdx]);
+    const activeImg=getActiveMazeGhostImage();
     if(activeImg&&activeImg.complete&&activeImg.naturalWidth>0){
       const flightT=ghostT<1?ghostT:0;
       const flightBeat=Math.sin(flightT*Math.PI);
@@ -2365,7 +2381,7 @@ function startLoop(){scheduleMazeFrame();}
 worldPerf.enableOverlay(() => ({
   dpr: Math.min(window.devicePixelRatio || 1, mazeDprCap()),
   loadedRoomImageCount: mazeImg.complete && mazeImg.naturalWidth > 0 ? 1 : 0,
-  loadedCharacterImageCount: [...ghostImgs, ...extraGhostImgs, homeworkImg, karasuki1Img, karasuki2Img, jukuImg]
+  loadedCharacterImageCount: [...ghostImgs, ...extraGhostImgs, equippedMazeImg, homeworkImg, karasuki1Img, karasuki2Img, jukuImg]
     .filter(image => image && image.complete && image.naturalWidth > 0).length,
   decodedImageMemoryBytes: 0,
   wandererCacheUsageBytes: 0,
@@ -2813,6 +2829,12 @@ document.addEventListener('visibilitychange',()=>{
 // hit the locked/empty state, so wait for the boot signal.
 function onSaveReady(){
   personalizeMazeIntro();
+  // Batty is the permanent player companion once unlocked. Older saves may
+  // contain the unlock without the selected-skin field, so repair that state
+  // before the Maze starts rendering its active player sprite.
+  if (window.BoohaSkins?.isUnlocked('batty') && !window.BoohaSkins.selectedId()) {
+    window.BoohaSkins.equip('batty');
+  }
   applyEquippedMazeSkin();
   maybeShowBattyUnlockPopup();
   if (mazeStarted) buildWanderers();   // extra ghost count depends on the save
