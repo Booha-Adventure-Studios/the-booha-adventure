@@ -17,7 +17,8 @@ for (const feel of ['playful', 'arcade', 'sleek']) {
 assert.match(engine, /rewardColors:/, 'shared themes must define colors distinct from live-game accents');
 assert.match(engine, /nameEasing:/, 'shared themes must define celebration motion character');
 
-assert.match(engine, /palette\.hueStep/, 'curriculum palettes must control background hue movement');
+assert.match(engine, /progressColorFor\(palette, percent\)/, 'curriculum palettes must control progress color');
+assert.match(engine, /const hue = palette\.baseHue/, 'curriculum palettes must control progress hue');
 assert.match(engine, /palette\.particleEasing/, 'curriculum palettes must control particle motion easing');
 assert.match(engine, /palette\.rewardColors/, 'celebrations must use the separate reward palette');
 assert.match(engine, /nameDelay = finalCard\.nameDelay/, 'name rain must have its own delayed celebration beat');

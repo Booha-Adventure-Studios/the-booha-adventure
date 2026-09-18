@@ -18,12 +18,12 @@ assert.match(engine, /if \(HARDWARE_PERFORMANCE_TIER === 'minimal'\)/,
   'only genuinely minimal hardware should skip frame sampling');
 assert.match(engine, /function emitCorrectMicroBurst\(correctBtn, answerRect, overlayRect\) \{\s*if \(isMinimalPower\(\) \|\| REDUCED_MOTION\) return;/,
   'reduced-motion runs must skip moving particle nodes without losing other feedback');
-assert.match(engine, /correctBtn\.style\.background = palette\.correct\?\.color/,
-  'reduced-motion runs must retain the immediate correct-color snap');
+assert.match(engine, /correctBtn\.style\.background = stepColor/,
+  'reduced-motion runs must retain the immediate progress-color snap');
 assert.match(engine, /function playCorrectHit\(\)/,
   'reduced-motion runs must retain correct-answer audio');
-assert.match(engine, /flashEl\.style\.background = palette\.accent;\s*flashEl\.style\.opacity = '0\.45';[\s\S]*?flashEl\.style\.opacity = '0';/,
-  'reduced-motion runs must receive a short color/opacity pulse instead of a white flash');
+assert.match(engine, /flashEl\.style\.background = stepColor;\s*flashEl\.style\.opacity = '0\.45';[\s\S]*?flashEl\.style\.opacity = '0';/,
+  'reduced-motion runs must receive a short progress-color pulse instead of a white flash');
 assert.match(engine, /winScreen\.classList\.add\('show'\)/,
   'reduced-motion runs must still reach the static final card');
 
