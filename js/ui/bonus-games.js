@@ -42,7 +42,7 @@
     try {
       const data = window.BoohaAdventure?.save?.load?.() || {};
       const familyRoom = data.weekly?.worlds?.familyRoom;
-      const sealed = Boolean(familyRoom?.completedCases?.chanoma || data.weekly?.completedGames?.[game.saveId]);
+      const sealed = Boolean(Object.keys(familyRoom?.completedCases || {}).length || data.weekly?.completedGames?.[game.saveId]);
       return sealed ? (meta.statusCompleted || meta.status || 'Case file') : (meta.status || 'Case file');
     } catch (_) {
       return meta.status || 'Case file';

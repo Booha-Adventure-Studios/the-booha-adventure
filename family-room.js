@@ -54,7 +54,7 @@
   const FAMILY_CHANGE_TYPES = Object.freeze(['ADD', 'REMOVE', 'MOVE', 'TURN', 'SWAP', 'COUNT', 'STATE', 'WRONG']);
   const FAMILY_HOUSE_CASES = Object.freeze([
     Object.freeze({ number: 0, id: 'engawa', name: 'ENGAWA', jp: 'えんがわ', role: 'hub', light: 'purple lanterns', exit: 'garden steps', feel: 'safe' }),
-    Object.freeze({ number: 1, id: 'genkan', name: 'GENKAN', jp: 'げんかん', light: 'bare bulb and purple spill', exit: 'front door', feel: 'ordinary tutorial' }),
+    Object.freeze({ number: 1, id: 'genkan', name: 'GENKAN', jp: 'げんかん', light: 'bare bulb and purple spill', exit: 'front door', feel: 'ordinary tutorial', status: 'built', pataskalaCharges: 1 }),
     Object.freeze({ number: 2, id: 'chanoma', name: 'CHANOMA', jp: 'ちゃのま', light: 'andon', exit: 'engawa step', feel: 'reference case', status: 'built', pataskalaCharges: 1 }),
     Object.freeze({ number: 3, id: 'daidokoro', name: 'DAIDOKORO', jp: 'だいどころ', light: 'failing fluorescent tube', exit: 'corridor doorway', feel: 'drips, ticks, and a sink window' }),
     Object.freeze({ number: 4, id: 'roka', name: 'ROKA', jp: 'ろうか', light: 'moonlight through shoji', exit: 'far end', feel: 'mostly state changes' }),
@@ -71,16 +71,20 @@
     pataskala: Object.freeze({ role: 'threat', scoredTarget: false, markableTarget: false, risesWithCaseDepth: true, finalRoom: 'nando' }),
     production: Object.freeze({ masterOnly: true, canvas: '1024x1536', safeBand: [0.22, 0.78], exitEdgeRequired: true }),
   });
-  const ACTIVE_CASE_ID = 'chanoma';
-  const ACTIVE_CASE = FAMILY_HOUSE_CASES.find(entry => entry.id === ACTIVE_CASE_ID);
-  const ACTIVE_CASE_LABEL = String(ACTIVE_CASE.number).padStart(2, '0');
+  const DEFAULT_CASE_ID = 'chanoma';
+  let ACTIVE_CASE_ID = DEFAULT_CASE_ID;
+  let ACTIVE_CASE = FAMILY_HOUSE_CASES.find(entry => entry.id === ACTIVE_CASE_ID);
+  let ACTIVE_CASE_LABEL = String(ACTIVE_CASE.number).padStart(2, '0');
   const TIER_RANK = Object.freeze({ patient: 1, quicker: 2, lies: 3 });
 
-  const UI_COPY = Object.freeze({
-    caseReset: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / CASE RESET`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / じけんを はじめから`, title: 'THE ROOM SENT YOU BACK.', titleJp: 'へやが あなたを もどした。', copy: 'A mistake sends you back to the start of this case. The study room will not return. Try again when you are ready.', copyJp: 'まちがえると、この じけんの はじめに もどる。おぼえる へやは もう でてこない。じゅんびが できたら、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
-    lightLostReport: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / LIGHT LOST`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / あかりが きえた`, title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The case is not closed. Bring the light back and try the room again.', copyJp: 'じけんは おわっていない。あかりを もどして、もういちど へやを やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
-    complete: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / SEALED`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / ふういん`, title: 'THE ROOM LET GO.', titleJp: 'へやが はなした。', copy: 'You kept the room in view. Your notes are filed, and the door is where you left it.', copyJp: 'へやを みつづけた。きろくを のこした。ドアは おいた ばしょに ある。', button: 'RETURN TO THE PROFILE', buttonJp: 'プロフィールへ もどる' },
-  });
+  function buildUiCopy() {
+    return Object.freeze({
+      caseReset: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / CASE RESET`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / じけんを はじめから`, title: 'THE ROOM SENT YOU BACK.', titleJp: 'へやが あなたを もどした。', copy: 'A mistake sends you back to the start of this case. The study room will not return. Try again when you are ready.', copyJp: 'まちがえると、この じけんの はじめに もどる。おぼえる へやは もう でてこない。じゅんびが できたら、もういちど やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
+      lightLostReport: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / LIGHT LOST`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / あかりが きえた`, title: 'THE ROOM KEPT YOU.', titleJp: 'へやに つかまった。', copy: 'The case is not closed. Bring the light back and try the room again.', copyJp: 'じけんは おわっていない。あかりを もどして、もういちど へやを やってみよう。', button: 'RESTART THE CASE', buttonJp: 'じけんを やりなおす' },
+      complete: { kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / SEALED`, kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / ふういん`, title: 'THE ROOM LET GO.', titleJp: 'へやが はなした。', copy: 'You kept the room in view. Your notes are filed, and the door is where you left it.', copyJp: 'へやを みつづけた。きろくを のこした。ドアは おいた ばしょに ある。', button: 'RETURN TO THE PROFILE', buttonJp: 'プロフィールへ もどる' },
+    });
+  }
+  let UI_COPY = buildUiCopy();
 
   const PATASKALA_POSES = [
     { id: 'pataskala_far', target: [.7, .29, .22], artSize: .16, en: 'Something is far inside the room.', jp: 'なにかが へやの おくに いる。', kind: 'threat', character: 'pataskala', stage: 0 },
@@ -90,7 +94,7 @@
     { id: 'pataskala_catch', target: [.25, .47, .22], artSize: .34, en: 'The shadow is on you.', jp: 'かげが あなたに おいついた。', kind: 'threat', character: 'pataskala', stage: 1 },
   ];
 
-  const ROOM_ANCHORS = Object.freeze({
+  const CHANOMA_ROOM_ANCHORS = Object.freeze({
     tableLeft: Object.freeze({ u: .23, v: .48, radius: .09, scale: .94, region: 'middle-left' }),
     tableCenter: Object.freeze({ u: .35, v: .49, radius: .1, scale: 1, region: 'middle-center' }),
     tableRight: Object.freeze({ u: .45, v: .49, radius: .1, scale: .96, region: 'middle-right' }),
@@ -104,7 +108,7 @@
     tatamiNear: Object.freeze({ u: .55, v: .7, radius: .16, scale: 1.05, region: 'lower-center' }),
   });
 
-  const ANOMALY_ANCHORS = Object.freeze({
+  const CHANOMA_ANOMALY_ANCHORS = Object.freeze({
     bowl: ['tableRight', 'tableCenter'],
     cup: ['tableLeft', 'tableCenter', 'tableRight'],
     eyes: ['shojiLeft', 'shojiCenter', 'shojiRight'],
@@ -116,14 +120,14 @@
     teapot: ['tableLeft', 'tableCenter'],
     crescent: ['shojiLeft', 'shojiCenter', 'shojiRight'],
   });
-  const PATASKALA_SPAWN_ANCHORS = Object.freeze([
+  const CHANOMA_PATASKALA_SPAWN_ANCHORS = Object.freeze([
     Object.freeze({ id: 'rear-shoji', u: .52, v: .22, region: 'upper-center' }),
     Object.freeze({ id: 'rear-right', u: .75, v: .31, region: 'upper-right' }),
     Object.freeze({ id: 'left-alcove', u: .23, v: .28, region: 'upper-left' }),
     Object.freeze({ id: 'far-doorway', u: .58, v: .38, region: 'middle-center' }),
   ]);
 
-  const anomalies = [
+  const CHANOMA_ANOMALIES = [
     { id: 'bowl', target: [.74, .51, .09], artSize: .09, en: "The bowl wasn't there before.", jp: 'おわんが なかった。', labelEn: 'BOWL', labelJp: 'おわん', kind: 'added' },
     { id: 'cup', target: [.35, .49, .1], artSize: .075, en: 'There is one cup too many.', jp: 'コップが ひとつ おおい。', labelEn: 'CUP', labelJp: 'コップ', kind: 'duplicated' },
     { id: 'eyes', target: [.73, .25, .12], artSize: .08, en: 'Something is watching from the shoji.', jp: 'しょうじから だれかが みている。', labelEn: 'SHOJI', labelJp: 'しょうじ', kind: 'watching' },
@@ -136,6 +140,55 @@
     { id: 'crescent', target: [.77, .30, .1], artSize: .08, en: 'A small moon is inside the room.', jp: 'へやの なかに つきが ある。', labelEn: 'MOON', labelJp: 'つき', kind: 'added' },
   ];
   const AUDIO_ONLY_CHANGE = Object.freeze({ id: 'audio-only', en: 'The room made a sound it did not make before.', jp: 'へやが まえには しなかった おとを たてた。', labelEn: 'THE ROOM', labelJp: 'へや', kind: 'audio' });
+
+  const GENKAN_ROOM_ANCHORS = Object.freeze({
+    cabinetTop: Object.freeze({ u: .27, v: .41, radius: .11, scale: .95, region: 'upper-left' }),
+    cabinetFace: Object.freeze({ u: .27, v: .55, radius: .12, scale: 1, region: 'middle-left' }),
+    shoes: Object.freeze({ u: .35, v: .69, radius: .12, scale: .96, region: 'lower-left' }),
+    tileLeft: Object.freeze({ u: .39, v: .61, radius: .13, scale: .94, region: 'middle-left' }),
+    tileCenter: Object.freeze({ u: .53, v: .62, radius: .14, scale: 1, region: 'middle-center' }),
+    tileRight: Object.freeze({ u: .68, v: .61, radius: .14, scale: .98, region: 'middle-right' }),
+    threshold: Object.freeze({ u: .53, v: .8, radius: .1, scale: .92, region: 'lower-center' }),
+    doorLeft: Object.freeze({ u: .4, v: .39, radius: .12, scale: .94, region: 'upper-left' }),
+    doorOpen: Object.freeze({ u: .63, v: .4, radius: .15, scale: 1, region: 'upper-center' }),
+    doorRight: Object.freeze({ u: .74, v: .43, radius: .14, scale: .98, region: 'upper-right' }),
+    coatHook: Object.freeze({ u: .74, v: .33, radius: .12, scale: .9, region: 'upper-right' }),
+  });
+
+  const GENKAN_ANOMALY_ANCHORS = Object.freeze({
+    shoes_extra: ['shoes', 'tileLeft'],
+    umbrella_floor: ['tileRight', 'tileCenter'],
+    door_shadow: ['doorOpen', 'doorRight'],
+    coat_turn: ['coatHook'],
+    threshold_talisman: ['threshold'],
+    wet_footprints: ['tileCenter', 'threshold'],
+  });
+
+  const GENKAN_PATASKALA_SPAWN_ANCHORS = Object.freeze([
+    Object.freeze({ id: 'open-front-door', u: .63, v: .38, region: 'upper-center' }),
+    Object.freeze({ id: 'door-right', u: .74, v: .43, region: 'upper-right' }),
+    Object.freeze({ id: 'cabinet-shadow', u: .27, v: .48, region: 'middle-left' }),
+    Object.freeze({ id: 'threshold-edge', u: .53, v: .78, region: 'lower-center' }),
+  ]);
+
+  const GENKAN_ANOMALIES = [
+    { id: 'shoes_extra', target: [.35, .69, .12], artSize: .15, en: 'There is another pair of shoes.', jp: 'くつが もう ひとそろい ある。', labelEn: 'EXTRA SHOES', labelJp: 'もうひとそろいの くつ', kind: 'added' },
+    { id: 'umbrella_floor', target: [.68, .61, .14], artSize: .18, en: 'An umbrella is lying where nobody left it.', jp: 'だれも おいていない かさが おちている。', labelEn: 'FLOOR UMBRELLA', labelJp: 'ゆかの かさ', kind: 'added' },
+    { id: 'door_shadow', target: [.63, .4, .15], artSize: .2, en: 'A shadow is standing outside the open door.', jp: 'あいた ドアの そとに かげが たっている。', labelEn: 'DOOR SHADOW', labelJp: 'ドアの かげ', kind: 'watching' },
+    { id: 'coat_turn', target: [.74, .33, .12], artSize: .17, en: 'The hanging cloth is facing the wrong way.', jp: 'かかっている ぬのが ちがう ほうを むいている。', labelEn: 'COAT HOOK', labelJp: 'コートかけ', kind: 'state' },
+    { id: 'threshold_talisman', target: [.53, .8, .1], artSize: .11, en: 'A paper charm has appeared on the threshold.', jp: 'しきいに おふだが あらわれた。', labelEn: 'THRESHOLD CHARM', labelJp: 'しきいの おふだ', kind: 'added' },
+    { id: 'wet_footprints', target: [.53, .7, .14], artSize: .17, en: 'Wet footprints lead in from the garden.', jp: 'ぬれた あしあとが にわから つづいている。', labelEn: 'WET FOOTPRINTS', labelJp: 'ぬれた あしあと', kind: 'state' },
+  ];
+
+  const CASE_CONTENT = Object.freeze({
+    chanoma: Object.freeze({ base: 'assets/family-room/living_base.webp', roomAnchors: CHANOMA_ROOM_ANCHORS, anomalyAnchors: CHANOMA_ANOMALY_ANCHORS, pataskalaSpawnAnchors: CHANOMA_PATASKALA_SPAWN_ANCHORS, anomalies: CHANOMA_ANOMALIES }),
+    genkan: Object.freeze({ base: 'assets/family-room/genkan_base.webp', roomAnchors: GENKAN_ROOM_ANCHORS, anomalyAnchors: GENKAN_ANOMALY_ANCHORS, pataskalaSpawnAnchors: GENKAN_PATASKALA_SPAWN_ANCHORS, anomalies: GENKAN_ANOMALIES }),
+  });
+
+  let anomalies = CHANOMA_ANOMALIES;
+  let ROOM_ANCHORS = CHANOMA_ROOM_ANCHORS;
+  let ANOMALY_ANCHORS = CHANOMA_ANOMALY_ANCHORS;
+  let PATASKALA_SPAWN_ANCHORS = CHANOMA_PATASKALA_SPAWN_ANCHORS;
 
   const canvas = document.getElementById('room-canvas');
   const ctx = canvas.getContext('2d');
@@ -185,6 +238,11 @@
   const studyStartButton = document.getElementById('study-start-button');
   const studyBackButton = document.getElementById('study-back-button');
   const flameEls = [...document.querySelectorAll('[data-flame]')];
+  const caseButtons = [...document.querySelectorAll('[data-case]')];
+  const startCaseKickerEn = document.getElementById('start-case-kicker-en');
+  const startCaseKickerJp = document.getElementById('start-case-kicker-jp');
+  const studyCaseKickerEn = document.getElementById('study-case-kicker-en');
+  const studyCaseKickerJp = document.getElementById('study-case-kicker-jp');
   const tierButtons = [...document.querySelectorAll('[data-tier]')];
   const tierNote = document.getElementById('tier-note');
 
@@ -194,7 +252,6 @@
   ]);
 
   const baseImage = new Image();
-  baseImage.src = 'assets/family-room/living_base.webp';
   const idleBooha = new Image();
   idleBooha.src = 'assets/family-room/booha_idle.webp';
   const alertBooha = new Image();
@@ -203,11 +260,7 @@
     idleBooha.src = window.BoohaSkins?.asset('familyRoom') || 'assets/family-room/booha_idle.webp';
     alertBooha.src = window.BoohaSkins?.asset('marking') || 'assets/family-room/booha_alert.webp';
   }
-  const anomalyArt = Object.fromEntries(anomalies.map(anomaly => {
-    const image = new Image();
-    image.src = `assets/family-room/overlays/${anomaly.id}.webp`;
-    return [anomaly.id, image];
-  }));
+  let anomalyArt = {};
   const pataskalaArt = Object.fromEntries(PATASKALA_POSES.map(pose => {
     const image = new Image();
     image.src = `assets/family-room/pataskala/${pose.id}.webp`;
@@ -563,6 +616,68 @@
     } catch (_) {
       return 'patient';
     }
+  }
+
+  function readActiveCase() {
+    try {
+      const data = window.BoohaAdventure?.save?.load?.() || {};
+      const weeklyCase = data.weekly?.worlds?.familyRoom?.activeCaseId;
+      const lifetimeCase = data.familyRoom?.activeCaseId;
+      return CASE_CONTENT[weeklyCase] ? weeklyCase : CASE_CONTENT[lifetimeCase] ? lifetimeCase : DEFAULT_CASE_ID;
+    } catch (_) {
+      return DEFAULT_CASE_ID;
+    }
+  }
+
+  function saveActiveCase() {
+    const save = window.BoohaAdventure?.save;
+    if (!save?.load || !save?.save || !CASE_CONTENT[ACTIVE_CASE_ID]) return false;
+    try {
+      const data = save.load();
+      const weekly = data.weekly && typeof data.weekly === 'object' ? data.weekly : (data.weekly = {});
+      const worlds = weekly.worlds && typeof weekly.worlds === 'object' ? weekly.worlds : (weekly.worlds = {});
+      const familyRoom = worlds.familyRoom && typeof worlds.familyRoom === 'object' ? worlds.familyRoom : (worlds.familyRoom = {});
+      familyRoom.activeCaseId = ACTIVE_CASE_ID;
+      return save.save(data);
+    } catch (error) {
+      console.warn('[Family Room] active case unavailable', error);
+      return false;
+    }
+  }
+
+  function updateCasePresentation() {
+    const kicker = `CASE FILE ${ACTIVE_CASE_LABEL} / ${ACTIVE_CASE.name}`;
+    const kickerJp = `じけんファイル ${ACTIVE_CASE_LABEL} / ${ACTIVE_CASE.jp}`;
+    [startCaseKickerEn, studyCaseKickerEn].forEach(node => { if (node) node.textContent = kicker; });
+    [startCaseKickerJp, studyCaseKickerJp].forEach(node => { if (node) node.textContent = kickerJp; });
+    caseButtons.forEach(button => button.classList.toggle('selected', button.dataset.case === ACTIVE_CASE_ID));
+  }
+
+  function loadActiveCaseContent({ persist = false } = {}) {
+    const content = CASE_CONTENT[ACTIVE_CASE_ID] || CASE_CONTENT[DEFAULT_CASE_ID];
+    ROOM_ANCHORS = content.roomAnchors;
+    ANOMALY_ANCHORS = content.anomalyAnchors;
+    PATASKALA_SPAWN_ANCHORS = content.pataskalaSpawnAnchors;
+    anomalies = content.anomalies;
+    anomalyArt = Object.fromEntries(anomalies.map(anomaly => {
+      const image = new Image();
+      image.src = `assets/family-room/overlays/${anomaly.id}.webp`;
+      return [anomaly.id, image];
+    }));
+    baseImage.src = content.base;
+    ACTIVE_CASE = FAMILY_HOUSE_CASES.find(entry => entry.id === ACTIVE_CASE_ID) || FAMILY_HOUSE_CASES.find(entry => entry.id === DEFAULT_CASE_ID);
+    ACTIVE_CASE_ID = ACTIVE_CASE.id;
+    ACTIVE_CASE_LABEL = String(ACTIVE_CASE.number).padStart(2, '0');
+    UI_COPY = buildUiCopy();
+    updateCasePresentation();
+    if (persist) saveActiveCase();
+    if (typeof window.requestAnimationFrame === 'function') scheduleResize(); else resize();
+  }
+
+  function selectCase(caseId) {
+    if (state !== 'title' || !CASE_CONTENT[caseId]) return;
+    ACTIVE_CASE_ID = caseId;
+    loadActiveCaseContent({ persist: true });
   }
 
   function readFlashlightCharges() {
@@ -1343,7 +1458,9 @@
   function requestFamilyRuntimeCache() {
     const controller = window.navigator?.serviceWorker?.controller;
     if (!controller) return;
-    const urls = FAMILY_DEFERRED_ASSETS.map(url => new URL(url, window.location.href).pathname);
+    const caseContent = CASE_CONTENT[ACTIVE_CASE_ID] || CASE_CONTENT[DEFAULT_CASE_ID];
+    const caseAssets = [caseContent.base, ...caseContent.anomalies.map(anomaly => `assets/family-room/overlays/${anomaly.id}.webp`)];
+    const urls = [...FAMILY_DEFERRED_ASSETS, ...caseAssets].map(url => new URL(url, window.location.href).pathname);
     controller.postMessage({ type: 'CACHE_URLS', payload: urls });
   }
 
@@ -1868,6 +1985,7 @@
   clueCloseButton?.addEventListener('click', continueFromClue);
   flyAwayButton?.addEventListener('click', flyAwayToSafeRoom);
   flashlightButton?.addEventListener('click', useFlashlightCharge);
+  caseButtons.forEach(button => button.addEventListener('click', () => selectCase(button.dataset.case)));
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; savePreferredTier(); updateTierButtons(); }));
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);
@@ -1890,6 +2008,8 @@
   applyBoohaSkin();
   if (window.BOOHA_READY) applyBoohaSkin();
   else document.addEventListener('booha:ready', applyBoohaSkin, { once: true });
+  ACTIVE_CASE_ID = readActiveCase();
+  loadActiveCaseContent();
   selectedTier = readPreferredTier();
   flashlightCharges = readFlashlightCharges();
   resize(); updateAndon(); updateTierButtons();

@@ -14,12 +14,12 @@ const serviceWorker = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const registry = fs.readFileSync(path.join(root, 'js/core/game-registry.js'), 'utf8');
 assert(source.includes('const FAMILY_CHANGE_TYPES = Object.freeze') && ['ADD', 'REMOVE', 'MOVE', 'TURN', 'SWAP', 'COUNT', 'STATE', 'WRONG'].every(type => source.includes(`'${type}'`)), 'Pass 1 must lock the shared Family Room change vocabulary');
 assert(source.includes('const FAMILY_HOUSE_CASES = Object.freeze') && /number: 1, id: 'genkan'/.test(source) && /number: 2, id: 'chanoma'/.test(source) && /number: 8, id: 'nando'/.test(source), 'Pass 1 must lock the house case order');
-assert(source.includes("const ACTIVE_CASE_ID = 'chanoma'") && source.includes('ACTIVE_CASE_LABEL'), 'the built room must be explicitly registered as Case 02');
+assert(source.includes("const DEFAULT_CASE_ID = 'chanoma'") && source.includes('let ACTIVE_CASE_ID = DEFAULT_CASE_ID') && source.includes('ACTIVE_CASE_LABEL'), 'Chanoma must remain the default case while the active case is selectable');
 assert(source.includes("state = 'study'") && source.includes('function beginCaseFromStudy') && source.includes("if (state === 'study')"), 'Pass 2 must separate manual study from timed dark gameplay');
 assert(markup.includes('id="study-panel"') && markup.includes('START THE CASE') && markup.includes('No timer. Start when ready.'), 'the study panel must explain its unlimited manual phase');
 assert(source.includes('repeatOnCaseRestart: false') && source.includes('reviewFromHub: true'), 'study review and restart behavior must be explicit in the design lock');
 assert(source.includes("role: 'threat'") && source.includes('scoredTarget: false') && source.includes('markableTarget: false') && !source.includes("targetId: 'pataskala'"), 'Pataskala must remain a non-scored, non-markable threat');
-assert(markup.includes('CASE FILE 02 / CHANOMA') && !markup.includes('CASE FILE 07'), 'the built room label must be Case 02');
+assert(markup.includes('01 / GENKAN') && markup.includes('02 / CHANOMA') && markup.includes('id="case-picker"'), 'the entry panel must expose the built Genkan and Chanoma case files');
 assert(registry.includes("status: 'CASE FILE 02 / OPEN'") && registry.includes("statusCompleted: 'CASE FILE 02 / SEALED'"), 'the registered Family Room statuses must use the built case number');
 assert(!source.includes('round-number'), 'the case must not expose a round counter');
 assert(!source.includes('localStorage'), 'the room must use the shared save/event layer');
@@ -54,9 +54,11 @@ assert(source.includes('markHoldStartedAt') && source.includes('heldMs / MARK_HO
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
 assert(source.includes('function drawFailureBooha') && source.includes('if (time - failureStarted >= FAILURE_SILENCE_MS)'), 'Booha must glow alone after the silence');
-assert(source.includes('const anomalyArt = Object.fromEntries') && source.includes('assets/family-room/overlays/${anomaly.id}.webp'), 'anomalies must load authored room overlays');
+assert(source.includes('anomalyArt = Object.fromEntries') && source.includes('assets/family-room/overlays/${anomaly.id}.webp') && source.includes('function loadActiveCaseContent'), 'anomalies must load authored overlays for the selected room case');
 assert(source.includes('artSize') && source.includes('ctx.drawImage(art'), 'anomaly rendering must use real art instead of procedural doodles');
 assert(['bowl', 'cup', 'eyes', 'shadow', 'talisman', 'lantern', 'futon', 'seams', 'teapot', 'crescent'].every(id => serviceWorker.includes(`/assets/family-room/overlays/${id}.webp`)), 'all authored anomaly overlays must be precached');
+assert(source.includes('const caseAssets = [caseContent.base') && source.includes('...caseContent.anomalies.map'), 'Genkan master and overlays must be cached on room entry instead of inflating the install-time core cache');
+assert(['shoes_extra', 'umbrella_floor', 'door_shadow', 'coat_turn', 'threshold_talisman', 'wet_footprints'].every(id => source.includes(id)), 'Genkan must define a complete authored anomaly set');
 assert(source.includes('const PATASKALA_POSES = [') && source.includes("character: 'pataskala'"), 'Pataskala must have a named character threat set');
 assert(source.includes('assets/family-room/pataskala/${pose.id}.webp') && ['pataskala_far', 'pataskala_enter', 'pataskala_approach', 'pataskala_near', 'pataskala_catch'].every(id => fs.existsSync(path.join(root, `assets/family-room/pataskala/${id}.webp`))), 'the smallest Pataskala production set must load as authored transparent assets');
 assert(source.includes('function pataskalaChance') && source.includes('phase.pataskalaBaseChance') && source.includes('pataskalaCooldownRounds'), 'Pataskala must emerge progressively with a cooldown between threats');
@@ -83,17 +85,19 @@ assert(source.includes('if (boohaAtExit())') && source.includes('currentPresence
 assert(source.includes('wrongMarkHazard || pataskalaThreat') && source.includes('leaveButton.disabled = !visible || Boolean(pataskalaThreat)'), 'active Pataskala must disable reporting while leaving movement available');
 assert(source.includes('ensureAudio(); startBgm();') && source.includes('window.clearTimeout(pataskalaMoveTimer)'), 'BGM must start after the study handoff and Pataskala timers must be cleared on round cleanup');
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
-assert(anchorUs.length === 15 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
+assert(anchorUs.length === 21 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 assert(source.includes('function roomContains') && source.includes('clamp(booha.targetX + dx * step, plate.x, plate.x + plate.w)'), 'Booha movement must be contained by the displayed room plate');
 const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
 const portraitSourceRatios = {
   bowl: [512 / 512, 342 / 512], cup: [512 / 512, 468 / 512], eyes: [512 / 512, 256 / 512],
   shadow: [512 / 512, 768 / 512], talisman: [512 / 512, 768 / 512], lantern: [512 / 512, 342 / 512],
   futon: [512 / 512, 342 / 512], seams: [512 / 512, 171 / 512], teapot: [512 / 512, 342 / 512], crescent: [512 / 512, 468 / 512],
+  shoes_extra: [600 / 600, 400 / 600], umbrella_floor: [720 / 720, 660 / 720], door_shadow: [420 / 420, 700 / 420],
+  coat_turn: [460 / 460, 760 / 460], threshold_talisman: [460 / 460, 450 / 460], wet_footprints: [500 / 500, 650 / 500],
   pataskala_far: [512 / 768, 768 / 768], pataskala_enter: [512 / 768, 768 / 768],
   pataskala_approach: [512 / 768, 768 / 768], pataskala_near: [512 / 768, 768 / 768], pataskala_catch: [512 / 768, 768 / 768],
 };
-assert(portraitEntries.length === 15, 'portrait regression must cover every anomaly and Pataskala pose');
+assert(portraitEntries.length === 21, 'portrait regression must cover every anomaly and Pataskala pose in both built cases');
 const containedViewports = [[1920, 1080], [1366, 768], [1280, 800], [1366, 1024], [1024, 1366], [844, 390], [390, 844]];
 const roomAnchors = [...source.matchAll(/u:\s*(0?\.\d+),\s*v:\s*(0?\.\d+)/g)].map(([, u, v]) => [Number(u), Number(v)]);
 containedViewports.forEach(([viewportWidth, viewportHeight]) => {
