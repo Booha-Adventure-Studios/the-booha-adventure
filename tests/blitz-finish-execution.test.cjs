@@ -98,6 +98,7 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     getBestScore: () => ({ ms: 900, name: 'PLAYER' }),
     getWeeklyScore: () => ({ ms: 900 }),
     getPlayerName: () => 'PLAYER',
+    escapeHtml: value => String(value),
     progressColorFor: () => ({ css: '#ff6fb5', lightness: 54 }),
     fmtTime: ms => `${(ms / 1000).toFixed(2)}s`,
     speedBandFor: (ms, targetMs) => ms <= targetMs * 0.75 ? 'elite' : ms <= targetMs ? 'target' : 'clear',
@@ -124,7 +125,7 @@ assert.strictEqual(perfect.events[0].detail.mistakes, 0);
 assert.strictEqual(perfect.saveCalls, 1, 'perfect run must save its PB');
 
 const record = runFinish({ isRecord: true });
-assert.strictEqual(record.dom.winScreen.children.winRecord.textContent, 'NEW BEST TIME');
+assert.match(record.dom.winScreen.children.winRecord.innerHTML, /NEW.*BEST.*TIME/);
 
 const failed = runFinish({ perfect: false });
 assert(!failed.dom.winScreen.classList.contains('show'), 'failed run must not show a completion card');
