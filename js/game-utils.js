@@ -382,6 +382,90 @@ const UTILS = {
       <div class="game-result-best"><span>This run / こんかい</span> <b>${Math.round(numericScore)}%</b><span> · Best / ベスト</span> <b>${Math.round(best)}%</b></div>`;
   },
 
+  /* Add compact learning stats and an optional missed-item review drawer. */
+  renderResultDetails(container, { stats = [], reviewItems = [] } = {}) {
+    if (!container) return;
+
+    let details = container.querySelector('.game-result-details');
+    if (!details) {
+      details = document.createElement('div');
+      details.className = 'game-result-details';
+      const anchor = container.querySelector('.game-result-meta, .game-result-actions, .game-result-inner, .vs-res-actions, .ssp-res-actions, .aq-res-actions, .sas-res-actions, .stw-res-actions, .so-res-actions, .st-res-actions, .sw-res-actions, .vt-res-actions');
+      if (anchor) anchor.after(details);
+      else container.appendChild(details);
+    }
+    details.innerHTML = '';
+
+    const statList = Array.isArray(stats) ? stats.filter(item => item && item.label != null && item.value != null) : [];
+    if (statList.length) {
+      const statGrid = document.createElement('div');
+      statGrid.className = 'game-result-stats';
+      statList.slice(0, 4).forEach(({ label, value }) => {
+        const stat = document.createElement('div');
+        stat.className = 'game-result-stat';
+        const labelEl = document.createElement('span');
+        labelEl.className = 'game-result-stat-label';
+        labelEl.textContent = label;
+        const valueEl = document.createElement('b');
+        valueEl.className = 'game-result-stat-value';
+        valueEl.textContent = value;
+        stat.append(labelEl, valueEl);
+        statGrid.appendChild(stat);
+      });
+      details.appendChild(statGrid);
+    }
+
+    const uniqueItems = [];
+    const seen = new Set();
+    (Array.isArray(reviewItems) ? reviewItems : []).forEach(item => {
+      if (!item || typeof item !== 'object') return;
+      const key = `${item.jp || ''}|${item.en || item.enDisplay || ''}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      uniqueItems.push(item);
+    });
+
+    const review = document.createElement('details');
+    review.className = 'game-result-review';
+    const summary = document.createElement('summary');
+    summary.textContent = uniqueItems.length
+      ? `Review focus / ふくしゅう (${uniqueItems.length})`
+      : 'Review focus / ふくしゅう (clear run)';
+    review.appendChild(summary);
+    if (uniqueItems.length) {
+      const list = document.createElement('ul');
+      uniqueItems.slice(0, 6).forEach(item => {
+        const row = document.createElement('li');
+        const jp = document.createElement('ruby');
+        jp.className = 'game-result-review-jp';
+        jp.appendChild(document.createTextNode(item.jp || item.en || '—'));
+        if (item.hira && item.hira !== item.jp) {
+          const rt = document.createElement('rt');
+          rt.textContent = item.hira;
+          jp.appendChild(rt);
+        }
+        const en = document.createElement('span');
+        en.className = 'game-result-review-en';
+        en.textContent = item.en || item.enDisplay || '';
+        row.append(jp, en);
+        list.appendChild(row);
+      });
+      if (uniqueItems.length > 6) {
+        const more = document.createElement('li');
+        more.className = 'game-result-review-more';
+        more.textContent = `+${uniqueItems.length - 6} more to revisit`;
+        list.appendChild(more);
+      }
+      review.appendChild(list);
+    } else {
+      const empty = document.createElement('p');
+      empty.className = 'game-result-review-empty';
+      empty.textContent = 'No missed items recorded — nice work! / まちがいなし！';
+      review.appendChild(empty);
+    }
+    details.appendChild(review);
+  },
+
   /* ══════════════════════════════
      SAGE VOICE PLAYER
      ══════════════════════════════ */

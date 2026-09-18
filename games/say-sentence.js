@@ -349,6 +349,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.cl
 
 let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
+let missedItems = [];
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
 let showKanji = true;
 
@@ -455,7 +456,9 @@ function handleChoice(btn, card) {
     updateDots();
     playSuccessThenAdvance();
   } else {
-    firstTry = false; updateStreak(0);
+    firstTry = false;
+    if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
+    updateStreak(0);
     btn.classList.add('wrong');
     U.unlockAudio(); playSfx('fart');
     sasCard.classList.add('wrong-state');
@@ -504,6 +507,13 @@ function showResults() {
   document.getElementById('sas-rk').textContent = tier.kanji;
   document.getElementById('sas-rj').textContent = tier.jp;
   U.renderResultMeta(results, { gameId: `${CFG.curriculum}:say_sentence`, score: pct });
+  U.renderResultDetails(results, {
+    stats: [
+      { label: 'First-try correct / せいかい', value: `${score} / 15` },
+      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
+    ],
+    reviewItems: missedItems,
+  });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
   if (CFG.sfxBase && tier.sound) {
     const snd = new Audio(CFG.sfxBase + tier.sound);
@@ -516,6 +526,7 @@ function showResults() {
 document.getElementById('sas-replay').addEventListener('click', () => {
   results.classList.remove('show'); mainWrap.style.display = '';
   idx = 0; score = 0; streak = 0;
+  missedItems = [];
   scoreEl.textContent = '0';
   const se = document.getElementById('sas-streak'); if (se) se.textContent = '0';
   answered = false; firstTry = true; pickCooldown = false;

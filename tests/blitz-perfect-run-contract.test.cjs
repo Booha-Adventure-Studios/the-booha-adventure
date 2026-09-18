@@ -20,10 +20,16 @@ assert.match(utils, /renderResultMeta\(container,/,
   'shared game utilities must provide the Pass 1 result summary');
 assert.match(utils, /game-result-stars/,
   'Pass 1 result summary must include an accessible star row');
+assert.match(utils, /renderResultDetails\(container,/,
+  'shared game utilities must provide the Pass 2 learning summary');
+assert.match(utils, /game-result-review/,
+  'Pass 2 result summary must include a missed-item review drawer');
 
 for (const source of weeklyEngines) {
   assert.match(source, /U\.renderResultMeta\(/,
     'every weekly engine must render the shared score/best/star summary');
+  assert.match(source, /U\.renderResultDetails\(/,
+    'every weekly engine must render the Pass 2 learning summary');
 }
 
 for (const [source, prefix] of [[vocab, 'vs'], [sentence, 'ssp']]) {
@@ -41,6 +47,10 @@ for (const [source, prefix] of [[vocab, 'vs'], [sentence, 'ssp']]) {
     `${prefix} must submit through the paint-safe result helper`);
   assert.match(source, /mistakes\+\+;\s*setTimeout\(\(\) => \{ idx\+\+; renderQ\(\); \}/,
     `${prefix} must advance after a wrong or timed-out answer`);
+  assert.match(source, /score\+\+;/,
+    `${prefix} must count correct answers rather than using the question index as score`);
+  assert.doesNotMatch(source, /score\s*=\s*idx\s*\+\s*1/,
+    `${prefix} must not inflate score after a missed question`);
   assert.match(source, /function onTimeout\(\)\s*\{[\s\S]*?stopHeat\(\);/,
     `${prefix} must cancel the timer RAF when time expires`);
   assert.doesNotMatch(source, /One mistake resets the run\./,

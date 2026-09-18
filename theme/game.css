@@ -247,6 +247,50 @@ body {
 .game-result-stars-label { font-weight:900; color:var(--game-ink); }
 .game-result-best { text-align:center; }
 .game-result-best b { color:var(--game-ink); }
+.game-result-details {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin:0 auto 1.1rem;
+  max-width:440px;
+  text-align:left;
+}
+.game-result-stats {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+}
+.game-result-stat {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding:8px 10px;
+  border-radius:12px;
+  background:color-mix(in srgb, var(--game-primary) 6%, transparent);
+  border:1px solid color-mix(in srgb, var(--game-primary) 18%, transparent);
+}
+.game-result-stat-label { color:var(--game-muted); font-size:.78em; }
+.game-result-stat-value { color:var(--game-ink); font-size:1.05em; }
+.game-result-review {
+  border:1px solid color-mix(in srgb, var(--game-primary) 22%, transparent);
+  border-radius:13px;
+  background:color-mix(in srgb, var(--game-primary) 5%, transparent);
+  overflow:hidden;
+}
+.game-result-review summary {
+  cursor:pointer;
+  padding:9px 11px;
+  color:var(--game-ink);
+  font-weight:900;
+  font-size:.9em;
+}
+.game-result-review ul { margin:0; padding:0 11px 10px 27px; color:var(--game-muted); }
+.game-result-review li { padding:3px 0; }
+.game-result-review-jp { color:var(--game-ink); font-family:var(--game-font-jp); font-weight:800; margin-right:8px; }
+.game-result-review-jp rt { font-size:.58em; font-weight:700; }
+.game-result-review-en { font-size:.9em; }
+.game-result-review-more, .game-result-review-empty { color:var(--game-muted); font-size:.85em; }
+.game-result-review-empty { margin:0; padding:0 11px 10px; }
 .game-title {
   font-family: var(--game-font-title);
   font-size: clamp(20px, 5vw, 36px);

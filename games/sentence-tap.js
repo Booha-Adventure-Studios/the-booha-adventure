@@ -800,6 +800,7 @@ let score         = 0;
 let roundIdx      = 0;
 let roundCards    = [];
 let roundJpOrder  = [];   /* shuffled independently from EN */
+let missedItems   = [];
 let selectedEnKey = null;
 let pairs         = {};
 let globalLocked  = false;
@@ -985,6 +986,7 @@ async function gradeRound() {
       await new Promise(r => setTimeout(r, 700));
     } else {
       el.classList.add('slot-wrong');
+      if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
       U.playSFX('fart');
       flashWrong();
       await new Promise(r => setTimeout(r, 750));
@@ -1081,6 +1083,13 @@ U.emitGameEnd({
   document.getElementById('st-rj').textContent = tier.jp;
   document.getElementById('st-rk').textContent = tier.kanji;
   U.renderResultMeta(resEl, { gameId: `${CFG.curriculum}:sentence_tap`, score: pct });
+  U.renderResultDetails(resEl, {
+    stats: [
+      { label: 'Correct pairs / せいかい', value: `${score} / 15` },
+      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
+    ],
+    reviewItems: missedItems,
+  });
 
   /* Build colorful action buttons */
   resActions.innerHTML = '';
@@ -1101,6 +1110,7 @@ U.emitGameEnd({
     mainWrap.style.display = '';
     allCards = buildShuffledDeck();
     score    = 0;
+    missedItems = [];
     scoreEl.textContent   = '0';
     document.body.classList.remove('hira-mode');
     hiraMode              = false;
