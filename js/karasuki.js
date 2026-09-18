@@ -447,6 +447,70 @@ const HAPPY_HOUSE_PORTAL = {
     return data.weekly.worlds.utsuroba;
   }
 
+  function weeklyFamilyRoomState(data) {
+    if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
+    if (!data.weekly.worlds || typeof data.weekly.worlds !== 'object' || Array.isArray(data.weekly.worlds)) data.weekly.worlds = {};
+    if (!data.weekly.worlds.familyRoom || typeof data.weekly.worlds.familyRoom !== 'object' || Array.isArray(data.weekly.worlds.familyRoom)) data.weekly.worlds.familyRoom = {};
+    const familyRoom = data.weekly.worlds.familyRoom;
+    const charges = Number(familyRoom.flashlightCharges);
+    familyRoom.flashlightCharges = Number.isFinite(charges) ? Math.max(0, Math.min(3, Math.floor(charges))) : 0;
+    familyRoom.nuppiChargeClaimed = familyRoom.nuppiChargeClaimed === true;
+    return familyRoom;
+  }
+
+  function updateNuppiFlashlightUi(statusOverride = '') {
+    const status = document.getElementById('nuppi-flashlight-status');
+    const button = document.getElementById('nuppi-flashlight-button');
+    if (!status || !button) return;
+    try {
+      const data = BoohaAdventure?.save?.load?.();
+      const familyRoom = data ? weeklyFamilyRoomState(data) : null;
+      if (statusOverride) status.textContent = statusOverride;
+      else if (!familyRoom) status.textContent = 'The charge is waiting somewhere in the house.';
+      else if (familyRoom.nuppiChargeClaimed) status.textContent = 'Nuppi has already given Booha this week\'s charge.';
+      else if (familyRoom.flashlightCharges >= 3) status.textContent = 'Booha\'s charge pouch is full.';
+      else status.textContent = 'Nuppi can give Booha one charge for the Akiya room.';
+      button.disabled = Boolean(familyRoom?.nuppiChargeClaimed || familyRoom?.flashlightCharges >= 3);
+      button.textContent = familyRoom?.nuppiChargeClaimed ? 'CHARGE RECEIVED' : 'TAKE A FLASHLIGHT CHARGE';
+    } catch (_) {
+      status.textContent = statusOverride || 'The charge is waiting somewhere in the house.';
+      button.disabled = false;
+    }
+  }
+
+  function claimNuppiFlashlightCharge() {
+    const status = document.getElementById('nuppi-flashlight-status');
+    const button = document.getElementById('nuppi-flashlight-button');
+    try {
+      if (!BoohaAdventure?.save) return;
+      const data = BoohaAdventure.save.load();
+      const familyRoom = weeklyFamilyRoomState(data);
+      if (familyRoom.nuppiChargeClaimed) {
+        updateNuppiFlashlightUi('Nuppi has already given Booha this week\'s charge.');
+        return;
+      }
+      if (familyRoom.flashlightCharges >= 3) {
+        updateNuppiFlashlightUi('Booha\'s charge pouch is full.');
+        return;
+      }
+      const previousCharges = familyRoom.flashlightCharges;
+      familyRoom.flashlightCharges += 1;
+      familyRoom.nuppiChargeClaimed = true;
+      if (!BoohaAdventure.save.save(data)) {
+        familyRoom.flashlightCharges = previousCharges;
+        familyRoom.nuppiChargeClaimed = false;
+        updateNuppiFlashlightUi('Nuppi could not pass the charge right now.');
+        return;
+      }
+      if (window.BoohaSync) BoohaSync.checkpoint('adventure');
+      updateNuppiFlashlightUi('One flashlight charge is tucked into Booha\'s light.');
+      if (window.UtsuSfx && typeof window.UtsuSfx.buttonPress === 'function') window.UtsuSfx.buttonPress();
+    } catch (_) {
+      if (status) status.textContent = 'Nuppi could not pass the charge right now.';
+      if (button) button.disabled = false;
+    }
+  }
+
   function loadDrifterQuest() {
     const now = performance.now();
     if (_questCacheAt && (now - _questCacheAt) < QUEST_CACHE_MS) return _questCache;
@@ -5788,9 +5852,15 @@ const NUPPI_LINES = [
           color:rgba(255,209,236,0.78);margin:0;
           font-family:'Noto Sans JP',serif;letter-spacing:.06em;"></p>
         </div>
+        <div style="margin:18px 20px 0;padding:15px 16px;border:1px solid rgba(110,182,255,.52);border-radius:16px;background:rgba(21,55,91,.32);box-shadow:inset 0 0 18px rgba(110,182,255,.08);">
+          <p style="font-family:monospace;font-size:.68rem;font-weight:800;letter-spacing:.14em;color:#b9ddff;margin:0 0 7px;">NUPPI'S GIFT / ヌーピーの おくりもの</p>
+          <p id="nuppi-flashlight-status" aria-live="polite" style="font-family:system-ui,sans-serif;font-size:.76rem;line-height:1.5;color:rgba(220,238,255,.78);margin:0 0 11px;"></p>
+          <button id="nuppi-flashlight-button" type="button" style="min-height:42px;padding:9px 12px;border:1px solid rgba(185,221,255,.72);border-radius:8px;color:#06101b;background:#b9ddff;cursor:pointer;font:800 .68rem monospace;letter-spacing:.08em;">TAKE A FLASHLIGHT CHARGE</button>
+        </div>
       </div>`;
     document.body.appendChild(nuppiPopEl);
     document.getElementById('nuppi-pop-close').addEventListener('click', closeNuppiPop);
+    document.getElementById('nuppi-flashlight-button').addEventListener('click', claimNuppiFlashlightCharge);
     nuppiPopEl.addEventListener('click', e => { if (e.target === nuppiPopEl) closeNuppiPop(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && nuppiPopOpen) closeNuppiPop(); });
   }
@@ -5803,6 +5873,7 @@ const NUPPI_LINES = [
     const jp = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '').replace('{name}, ', '');
     document.getElementById('nuppi-pop-en').textContent = en;
     document.getElementById('nuppi-pop-jp').innerHTML = furi(jp, NUPPI_FURIGANA);
+    updateNuppiFlashlightUi();
     
     nuppiPopOpen              = true;
     nuppi.frozen              = true;
