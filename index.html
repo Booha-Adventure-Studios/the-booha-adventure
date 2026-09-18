@@ -1860,13 +1860,26 @@ const PILLS = [
     }
   });
 
-/* Blitz engines are loaded only after a game/rank action. */
+/* Pills render immediately with whatever is already known, but the
+   "done" star needs each game's getWeeklyScore(), which lives on the
+   lazy-loaded engine modules -- so without an eager load here, a fresh
+   visit always shows every pill as incomplete until the player clicks
+   into a game once. Load the engines in the background and re-render. */
   function initPillsWhenEnginesReady() {
     renderPills();
-    const _relight = () => renderPills();
-    if (window.VocabBlitz)    VocabBlitz._onClose    = _relight;
-    if (window.SentenceBlitz) SentenceBlitz._onClose = _relight;
-    if (window.QuestionBlitz) QuestionBlitz._onClose = _relight;
+    const wireRelight = () => {
+      const relight = () => renderPills();
+      if (window.VocabBlitz)    VocabBlitz._onClose    = relight;
+      if (window.SentenceBlitz) SentenceBlitz._onClose = relight;
+      if (window.QuestionBlitz) QuestionBlitz._onClose = relight;
+    };
+    wireRelight();
+    if (!blitzEnginesReady()) {
+      loadBlitzEngines().then(() => {
+        renderPills();
+        wireRelight();
+      }).catch(() => {});
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPillsWhenEnginesReady);
   else initPillsWhenEnginesReady();
