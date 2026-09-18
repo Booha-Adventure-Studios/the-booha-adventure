@@ -30,6 +30,8 @@ for (const term of ['名前', '影', '考え', '見つけた', '地図', '足音
 assert(opener.includes('furi(jp, NUPPI_FURIGANA)'), 'Nuppi Japanese output must pass through the shared furigana helper');
 assert(opener.includes("document.getElementById('nuppi-pop-jp').innerHTML"), 'Nuppi Japanese output must render ruby markup as HTML');
 assert(!opener.includes("document.getElementById('nuppi-pop-jp').textContent = jp"), 'Nuppi Japanese output must not discard furigana markup with textContent');
+assert(source.includes('function weeklyFamilyRoomState') && source.includes('function claimNuppiFlashlightCharge'), 'Nuppi must own the weekly flashlight-charge handoff');
+assert(source.includes('id="nuppi-flashlight-button"') && source.includes('nuppiChargeClaimed'), 'Nuppi must expose a once-per-week flashlight-charge reward');
 assert(furigana.includes('function sentence(value, readings)'), 'shared furigana renderer must remain available');
 assert(page.includes('<script src="js/utsu-furigana.js"></script>'), 'Karasuki must load the furigana renderer before dialogue');
 

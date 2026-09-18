@@ -89,6 +89,13 @@ button { font: inherit; }
 }
 .fly-away-button:hover, .fly-away-button:focus-visible { color: #fff; border-color: #d9c2ff; background: rgba(119,76,184,.7); outline: none; transform: translateY(-2px); }
 .fly-away-button .jp { color: rgba(241,233,255,.82); font-size: 11px; letter-spacing: .06em; }
+.flashlight-button { min-height: 62px; border-color: rgba(110,182,255,.78); color: #dceeff; background: rgba(31,84,135,.42); }
+.flashlight-button:hover, .flashlight-button:focus-visible { color: #fff; border-color: #b9ddff; background: rgba(48,116,181,.72); outline: none; transform: translateY(-2px); }
+.flashlight-button:disabled { cursor: not-allowed; opacity: .48; }
+.flashlight-icon { min-width: 24px; color: #b9ddff; font-size: 22px; text-align: center; text-shadow: 0 0 16px rgba(110,182,255,.88); }
+.flashlight-button .jp { color: rgba(220,238,255,.84); font-size: 11px; letter-spacing: .06em; }
+.flashlight-button small { color: rgba(220,238,255,.72); }
+[hidden] { display: none !important; }
 
 .panel {
   top: 50%; left: 50%; width: min(520px, calc(100% - 40px)); max-height: calc(100vh - 16px); overflow-y: auto; overscroll-behavior: contain; transform: translate(-50%, -50%); padding: clamp(16px, min(4vw, 4vh), 44px); text-align: center; border: 1px solid rgba(233,229,220,.24); background: var(--panel); box-shadow: 0 25px 100px rgba(0,0,0,.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s ease, visibility 0s linear .3s;
