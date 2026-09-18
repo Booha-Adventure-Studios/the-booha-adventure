@@ -438,7 +438,11 @@ const UTILS = {
         const row = document.createElement('li');
         const jp = document.createElement('span');
         jp.className = 'game-result-review-jp';
-        jp.innerHTML = this.furiganaHTML(item.jp || item.en || '—', item.hira || '');
+        jp.innerHTML = this.furiganaHTML(
+          item.jp || item.en || '—',
+          item.hira || '',
+          item.readings || item.furigana || item.readingMap || null,
+        );
         const en = document.createElement('span');
         en.className = 'game-result-review-en';
         en.textContent = item.en || item.enDisplay || '';
@@ -461,14 +465,33 @@ const UTILS = {
     details.appendChild(review);
   },
 
-  /* Convert a flat card reading into ruby attached to each Kanji run. */
-  furiganaHTML(jp, hira) {
+  /*
+   * Convert a card reading into ruby. Optional authored maps can override
+   * heuristic segmentation, e.g. { '今日': 'きょう', '明日': 'あした' }.
+   */
+  furiganaHTML(jp, hira, authoredReadings = null) {
     const text = String(jp == null ? '' : jp);
     const rawReading = String(hira == null ? '' : hira);
     const escape = value => String(value).replace(/&/g, '&amp;')
       .replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
     if (!text || !rawReading) return escape(text);
+
+    const map = authoredReadings && typeof authoredReadings === 'object' && !Array.isArray(authoredReadings)
+      ? authoredReadings : {};
+    const terms = Object.keys(map).filter(Boolean).sort((a, b) => b.length - a.length);
+    if (terms.length) {
+      const pattern = new RegExp(terms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+      let mapped = '';
+      let cursor = 0;
+      let match;
+      while ((match = pattern.exec(text))) {
+        mapped += escape(text.slice(cursor, match.index));
+        mapped += `<ruby>${escape(match[0])}<rt>${escape(map[match[0]])}</rt></ruby>`;
+        cursor = match.index + match[0].length;
+      }
+      if (cursor) return mapped + escape(text.slice(cursor));
+    }
 
     const toHiragana = value => String(value).replace(/[ァ-ヶ]/g, ch =>
       String.fromCharCode(ch.charCodeAt(0) - 0x60));
