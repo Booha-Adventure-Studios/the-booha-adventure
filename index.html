@@ -1708,7 +1708,16 @@ function renderHub() {
 
   
 const thisWeek = getCurrentCurriculumWeek();
-  let activeTab = 'pb';   // activeTab now holds the curriculum id
+  // Default to the player's own curriculum (same source of truth Daily Check
+  // uses), not always Pre-Boo -- read localStorage directly rather than via
+  // BoohaDailyCheck.knownCurr(), since js/daily-check.js loads later in this
+  // document than this inline script runs.
+  let activeTab = (() => {
+    try {
+      const c = localStorage.getItem('booha_last_curr');
+      return (c === 'pb' || c === 'br' || c === 'bc') ? c : 'pb';
+    } catch (e) { return 'pb'; }
+  })();
 
   // jp values match CURR_TILES in daily-check.js — same three curricula,
   // same katakana, so a kid sees one consistent name for each track
@@ -1843,6 +1852,7 @@ const PILLS = [
       BoohaBlitzEngine.openRecordsPanel({
         monthSlug: cw.monthSlug,
         weekNumber: cw.weekNumber,
+        curr: activeTab,
       });
     } catch (error) {
       console.error('Blitz load error:', error);
