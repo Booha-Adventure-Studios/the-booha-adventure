@@ -383,7 +383,7 @@ const UTILS = {
   },
 
   /* Add compact learning stats and an optional missed-item review drawer. */
-  renderResultDetails(container, { stats = [], reviewItems = [] } = {}) {
+  renderResultDetails(container, { stats = [], reviewItems = [], audioBase = '' } = {}) {
     if (!container) return;
 
     let details = container.querySelector('.game-result-details');
@@ -394,6 +394,7 @@ const UTILS = {
       if (anchor) anchor.after(details);
       else container.appendChild(details);
     }
+    this.stopReviewAudio();
     details.innerHTML = '';
 
     const statList = Array.isArray(stats) ? stats.filter(item => item && item.label != null && item.value != null) : [];
@@ -447,6 +448,18 @@ const UTILS = {
         en.className = 'game-result-review-en';
         en.textContent = item.en || item.enDisplay || '';
         row.append(jp, en);
+        if (item.mp3 && audioBase) {
+          const audioButton = document.createElement('button');
+          audioButton.type = 'button';
+          audioButton.className = 'game-result-review-audio';
+          audioButton.title = 'Play Japanese audio / おとをきく';
+          audioButton.setAttribute('aria-label', 'Play Japanese audio / おとをきく');
+          audioButton.textContent = '▶';
+          audioButton.addEventListener('click', () => {
+            this.playReviewAudio(audioBase, item.mp3, audioButton);
+          });
+          row.appendChild(audioButton);
+        }
         list.appendChild(row);
       });
       if (uniqueItems.length > 6) {
@@ -463,6 +476,40 @@ const UTILS = {
       review.appendChild(empty);
     }
     details.appendChild(review);
+  },
+
+  _reviewAudio: null,
+  _reviewAudioButton: null,
+
+  stopReviewAudio() {
+    if (this._reviewAudio) {
+      this._reviewAudio.pause();
+      this._reviewAudio = null;
+    }
+    if (this._reviewAudioButton) {
+      this._reviewAudioButton.classList.remove('is-playing');
+      this._reviewAudioButton.textContent = '▶';
+      this._reviewAudioButton = null;
+    }
+  },
+
+  playReviewAudio(audioBase, mp3, button) {
+    if (!audioBase || !mp3) return;
+    this.stopReviewAudio();
+    const audio = new Audio(audioBase + mp3);
+    audio.setAttribute('playsinline', '');
+    audio.setAttribute('webkit-playsinline', '');
+    const finish = () => {
+      if (this._reviewAudio !== audio) return;
+      this.stopReviewAudio();
+    };
+    audio.addEventListener('ended', finish, { once: true });
+    audio.addEventListener('error', finish, { once: true });
+    this._reviewAudio = audio;
+    this._reviewAudioButton = button;
+    button.classList.add('is-playing');
+    button.textContent = '■';
+    audio.play().catch(finish);
   },
 
   /*

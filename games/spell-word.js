@@ -1276,6 +1276,7 @@ function showResults() {
       { label: 'Boosts / ボーナス', value: String(recoveryBoostCount) },
     ],
     reviewItems: missedItems,
+    audioBase: CFG.audioBase,
   });
 
   /* Wire the hardcoded buttons already in the HTML */
