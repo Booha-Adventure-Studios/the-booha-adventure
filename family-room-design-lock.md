@@ -1,6 +1,6 @@
 # Family Room → The House: Pass 1 Design Lock
 
-This document records the decisions that later gameplay and image passes must consume. It does not change the current Chanoma gameplay loop by itself.
+This document records the decisions that later gameplay and image passes must consume. Genkan is now an authored, selectable case; Chanoma remains the reference case.
 
 ## House order
 
@@ -20,7 +20,7 @@ The house is entered through the Engawa hub. Cases unlock room by room:
 
 Case 07 is locked as Oshiire for the first children’s release. Butsuma remains a possible later alternative and is not active content yet.
 
-The current built room is Case 02, Chanoma. The save identity remains `bonus:family_room`; the case number is content metadata, not a new weekly bonus-game unlock.
+The reference room is Case 02, Chanoma, and Case 01 Genkan is now selectable from the Family Room entry panel. The save identity remains `bonus:family_room`; the case number is content metadata, not a new weekly bonus-game unlock.
 
 ## Locked behavior for later passes
 
@@ -80,8 +80,8 @@ Every future object record uses one or more of:
   `pataskala_enter.webp`, `pataskala_approach.webp`, `pataskala_near.webp`,
   and `pataskala_catch.webp`; these are deferred until room entry and reused
   left/center/right with canvas mirroring.
-- Do not generate new rooms until Chanoma’s revised loop has been playtested.
+- New rooms still require their own 1024×1536 master, aligned overlays, anchors, and a focused playtest before they are added to the case picker. The Chanoma revised loop has cleared the first live-playtest gate; Genkan is the first expansion case.
 
 ## Pass gate
 
-Pass 1 is complete when the case order, restart/study policy, Pataskala role, change vocabulary, and Case 02 label are stable. Pass 2 can now implement the Chanoma study flow without requiring new room art.
+Pass 1 is complete when the case order, restart/study policy, Pataskala role, change vocabulary, and Case 02 label are stable. The current implementation now includes the Genkan art/content case while keeping Chanoma as the default selection for existing players.

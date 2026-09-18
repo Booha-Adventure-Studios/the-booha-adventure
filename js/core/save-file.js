@@ -256,7 +256,7 @@ const BoohaSaveFile = (() => {
     if (current.grimmerglen.mariettaIntroSkipped === undefined) current.grimmerglen.mariettaIntroSkipped = false;
 
     if (!current.familyRoom || typeof current.familyRoom !== 'object' || Array.isArray(current.familyRoom)) current.familyRoom = {};
-    if (typeof current.familyRoom.activeCaseId !== 'string') current.familyRoom.activeCaseId = 'chanoma';
+    if (!['chanoma', 'genkan'].includes(current.familyRoom.activeCaseId)) current.familyRoom.activeCaseId = 'chanoma';
     if (!current.familyRoom.completedCases || typeof current.familyRoom.completedCases !== 'object' || Array.isArray(current.familyRoom.completedCases)) current.familyRoom.completedCases = {};
     if (current.familyRoom.bestTier !== null && !['patient', 'quicker', 'lies'].includes(current.familyRoom.bestTier)) current.familyRoom.bestTier = null;
     if (!['patient', 'quicker', 'lies'].includes(current.familyRoom.preferredTier)) current.familyRoom.preferredTier = 'patient';
