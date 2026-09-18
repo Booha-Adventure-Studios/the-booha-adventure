@@ -127,10 +127,12 @@ assert.strictEqual(perfect.saveCalls, 1, 'perfect run must save its PB');
 const record = runFinish({ isRecord: true });
 assert.match(record.dom.winScreen.children.winRecord.innerHTML, /NEW.*BEST.*TIME/);
 
-const failed = runFinish({ perfect: false });
-assert(!failed.dom.winScreen.classList.contains('show'), 'failed run must not show a completion card');
-assert.strictEqual(failed.events.length, 0, 'failed run must not emit completion');
-assert.strictEqual(failed.saveCalls, 0, 'failed run must not save a PB');
+const clear = runFinish({ perfect: false });
+assert(clear.dom.winScreen.classList.contains('show'), 'a normal completed run must show a completion card');
+assert.strictEqual(clear.events.length, 1, 'a normal completed run must emit completion');
+assert.strictEqual(clear.events[0].detail.completed, true);
+assert.strictEqual(clear.events[0].detail.clearTier, 'clear');
+assert.strictEqual(clear.saveCalls, 1, 'a normal completed run must save a weekly result');
 
 const fallback = runFinish({ dispatchError: true });
 for (const key of ['playAgain', 'winClose']) {
