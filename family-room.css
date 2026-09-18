@@ -142,7 +142,9 @@ kbd { border: 1px solid var(--line); padding: 3px 5px; color: var(--ink); }
 .tier-button b { font-size: 9px; letter-spacing: .1em; font-weight: 400; }
 .tier-button small { font-size: 8px; letter-spacing: .05em; opacity: .7; }
 .tier-button.selected { border-color: var(--amber); color: var(--ink); background: rgba(86,166,255,.12); }
+.tier-button.recommended { box-shadow: inset 3px 0 0 rgba(110,182,255,.72); }
 .tier-button:disabled { cursor: not-allowed; opacity: .32; }
+.tier-note { max-width: 390px; margin: -12px auto 18px; color: var(--muted); font-size: 8px; letter-spacing: .06em; line-height: 1.5; text-align: center; opacity: .78; }
 .clue-card { left: 50%; bottom: max(206px, calc(env(safe-area-inset-bottom) + 190px)); transform: translateX(-50%); display: grid; gap: 5px; width: min(360px, calc(100% - 36px)); padding: 12px 42px 12px 15px; border-left: 2px solid var(--amber); background: rgba(5,5,5,.88); box-shadow: 0 14px 50px rgba(0,0,0,.6); text-align: left; opacity: 1; transition: opacity .32s ease; }
 .clue-card.is-fading { opacity: 0; }
 .clue-close { position: absolute; top: 5px; right: 7px; width: 28px; height: 28px; padding: 0; border: 0; color: rgba(233,229,220,.62); background: transparent; cursor: pointer; font-family: system-ui, sans-serif; font-size: 22px; line-height: 1; }
