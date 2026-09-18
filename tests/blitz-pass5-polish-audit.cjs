@@ -7,7 +7,7 @@ const sentence = fs.readFileSync('js/sentence-blitz.js', 'utf8');
 const questions = fs.readFileSync('js/question-blitz.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /\.booha-blitz-feedback\s*\{[\s\S]*?flex: 0 0 clamp\(58px, 8vh, 86px\)/,
+assert.match(engine, /\.booha-blitz-feedback\s*\{[\s\S]*?flex-basis: clamp\(52px, 8vh, 72px\)/,
   'the player streak HUD must reserve a dedicated feedback rail below the timer');
 assert.match(engine, /streak-active/,
   'the streak HUD must have an explicit active state');
@@ -31,7 +31,7 @@ assert.match(engine, /hiraContainer\.hidden = false/,
   'the fail-screen furigana block must be visible when feedback opens');
 assert.match(engine, /function recordDateLabel\(value\)/,
   'the records panel must format saved record dates in the shared engine');
-assert.match(engine, /fmtTime\(item\.score\.ms\)/,
+assert.match(engine, /fmtTime\(score\.ms\)/,
   'the records panel must use the shared time formatter');
 assert.ok(!/\$\{fmtTime\(/.test(vocab),
   'the vocab skin must not call an undefined local fmtTime');

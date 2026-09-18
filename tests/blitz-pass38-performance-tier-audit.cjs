@@ -20,8 +20,8 @@ assert.match(engine, /const slowRatio = slowFrames \/ Math\.max\(1, frameCount\)
   'runtime measurement must require sustained frame-time degradation before downgrading');
 assert.match(engine, /RUNTIME_PERFORMANCE_TIER = null;[\s\S]*?const overlay = config\.buildOverlay\(\);[\s\S]*?applyPerformanceTier\(overlay\)/,
   'runtime tier state must reset for each Blitz launch');
-assert.match(engine, /if \(isMinimalPower\(\) && palette\.background\?\.main\) return palette\.background\.main;/,
-  'only minimal mode may replace the curriculum gradient with a solid background');
+assert.match(engine, /function progressColorFor\(palette, percent\)/,
+  'all performance tiers must share the lightweight progress-color background model');
 assert.match(engine, /#vb-overlay\.reduced-power[\s\S]*?backdrop-filter: blur\(8px\)/,
   'reduced mode must keep a lighter visual identity while reducing blur cost');
 assert.match(engine, /function enableRuntimeReducedPower\(overlay\)/,

@@ -3,19 +3,17 @@ const assert = require('assert');
 
 const engine = fs.readFileSync('js/blitz-engine.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
+const finalCardBuilder = engine.slice(
+  engine.indexOf('function ensureFinalCard'),
+  engine.indexOf('function closeGame', engine.indexOf('function ensureFinalCard')),
+);
 
-assert.match(engine, /booha-blitz-final-headline/,
-  'the final card must expose a personal curriculum headline');
-assert.match(engine, /\$\{playerName\} — \$\{String\(palette\.name \|\| 'BOOHA'\)\.toUpperCase\(\)\} BLITZ/,
-  'the final headline must combine the player name and curriculum identity');
-assert.match(engine, /booha-blitz-final-residual/,
-  'the final card must have a residual run-energy indicator');
-assert.match(engine, /STILL GLOWING/,
-  'the final card must communicate that the last chain energy carries into the clear');
+assert.doesNotMatch(finalCardBuilder, /booha-blitz-final-headline|booha-blitz-final-residual|STILL GLOWING/,
+  'the compact final card must not restore the retired stacked energy copy');
 assert.match(engine, /winScreen\.classList\.add\('residual-run'\)/,
   'the clear screen must retain residual run energy styling');
-assert.match(engine, /THIS WEEK’S FASTEST · #1/,
-  'weekly fastest clears must expose their first-place result');
+assert.doesNotMatch(engine, /THIS WEEK’S FASTEST · #1/,
+  'the compact final card must not restore the retired weekly-fastest headline');
 assert.match(engine, /function playFinalStinger\(isRecord, isPerfectRun\)/,
   'the final card must have a distinct completion stinger');
 assert.match(engine, /isRecord\s*\?\s*\[659, 831, 1047, 1319\]/,

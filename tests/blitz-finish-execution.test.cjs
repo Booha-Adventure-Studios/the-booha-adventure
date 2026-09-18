@@ -73,6 +73,9 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     mistakeCount: perfect ? 0 : 1,
     feedbackState: 'playing',
     runIsActive: true,
+    climaxTimer: null,
+    runEpoch: 1,
+    REDUCED_MOTION: false,
     visibilityPaused: false,
     monthSlug: 'january',
     weekNumber: 1,
@@ -95,10 +98,13 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     getBestScore: () => ({ ms: 900, name: 'PLAYER' }),
     getWeeklyScore: () => ({ ms: 900 }),
     getPlayerName: () => 'PLAYER',
+    progressColorFor: () => ({ css: '#ff6fb5', lightness: 54 }),
     fmtTime: ms => `${(ms / 1000).toFixed(2)}s`,
     speedBandFor: (ms, targetMs) => ms <= targetMs * 0.75 ? 'elite' : ms <= targetMs ? 'target' : 'clear',
     document: { dispatchEvent: event => { events.push(event); if (dispatchError) throw new Error('listener failure'); } },
     CustomEvent: function CustomEvent(type, init) { return { type, ...init }; },
+    setTimeout: () => 1,
+    clearTimeout: () => {},
     emitPerfectFlash: () => {}, emitFinishFlash: () => {}, playFinalStinger: () => {}, startFinalHold: () => {}, celebrate: () => {},
   };
   context.spotlight = { playerName: 'PLAYER', nameplate: new FakeElement(), announce: () => {} };
@@ -110,14 +116,15 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
 
 const perfect = runFinish();
 assert(perfect.dom.winScreen.classList.contains('show'), 'perfect finish screen must be visible');
-assert.strictEqual(perfect.dom.winScreen.children.winRecord.textContent, 'PERFECT CLEAR');
+assert.strictEqual(perfect.dom.winScreen.children.winRecord.textContent, '',
+  'a non-record clear must not show the NEW BEST TIME header');
 assert.strictEqual(perfect.events.length, 1, 'perfect run must emit one completion event');
 assert.strictEqual(perfect.events[0].detail.completed, true);
 assert.strictEqual(perfect.events[0].detail.mistakes, 0);
 assert.strictEqual(perfect.saveCalls, 1, 'perfect run must save its PB');
 
 const record = runFinish({ isRecord: true });
-assert.match(record.dom.winScreen.children.winRecord.textContent, /NEW BOOHA RECORD/);
+assert.strictEqual(record.dom.winScreen.children.winRecord.textContent, 'NEW BEST TIME');
 
 const failed = runFinish({ perfect: false });
 assert(!failed.dom.winScreen.classList.contains('show'), 'failed run must not show a completion card');

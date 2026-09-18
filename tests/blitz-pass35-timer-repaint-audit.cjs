@@ -16,12 +16,12 @@ assert.doesNotMatch(engine, /rafId = requestAnimationFrame\(tick\)/,
   'the gameplay timer must not use a continuous requestAnimationFrame loop');
 assert.match(engine, /let backgroundValue = '';/,
   'background rendering must remember the last applied value');
-assert.match(engine, /function setBackground\(streakValue = streak\)/,
+assert.match(engine, /function setBackground\(correctCount = 0\)/,
   'background updates must pass through a de-duplicating setter');
-assert.match(engine, /if \(next === backgroundValue\) return;/,
+assert.match(engine, /if \(css === backgroundValue\) return;/,
   'identical full-screen background values must not be reassigned');
-assert.match(engine, /if \(isMinimalPower\(\) && palette\.background\?\.main\) return palette\.background\.main;/,
-  'minimal-power mode must use the cheaper solid curriculum background');
+assert.match(engine, /overlay\.style\.background = css;/,
+  'the timer path must apply the de-duplicated solid progress color');
 assert.match(engine, /background: var\(--blitz-bg-main\) !important;/,
   'low-power mode must avoid animated full-screen gradient repainting');
 

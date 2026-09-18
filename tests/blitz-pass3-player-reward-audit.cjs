@@ -8,6 +8,10 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 const engine = fs.readFileSync(path.join(root, 'js', 'blitz-engine.js'), 'utf8');
 const modeFiles = ['vocab-blitz.js', 'sentence-blitz.js', 'question-blitz.js'];
+const finalCardBuilder = engine.slice(
+  engine.indexOf('function ensureFinalCard'),
+  engine.indexOf('function closeGame', engine.indexOf('function ensureFinalCard')),
+);
 
 assert.match(engine, /getPlayerName\(\)/, 'shared engine must resolve the current player name');
 assert.match(engine, /booha-blitz-nameplate/, 'shared engine must render a persistent player nameplate');
@@ -28,8 +32,8 @@ assert.match(engine, /button\.disabled = true;/,
   'final-card actions must be locked during the reveal');
 assert.match(engine, /YOUR MOMENT — READY/,
   'final card must explicitly announce when actions become available');
-assert.match(engine, /BEST STREAK ×\$\{bestStreak\}/,
-  'final card must preserve the player streak as part of the celebration');
+assert.doesNotMatch(finalCardBuilder, /booha-blitz-final-streak|booha-blitz-final-perfect|booha-blitz-final-headline|booha-blitz-final-residual/,
+  'the final card must not rebuild the retired stacked celebration copy');
 
 for (const file of modeFiles) {
   const source = fs.readFileSync(path.join(root, 'js', file), 'utf8');

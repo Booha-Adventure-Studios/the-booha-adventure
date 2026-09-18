@@ -8,8 +8,8 @@ assert.match(engine, /\.micro-win[\s\S]*animation: boohaBlitzCorrectPop 220ms/,
   'correct answers must have a brief card-pop animation');
 assert.match(engine, /45% \{ transform: scale\(1\.08\); \}/,
   'the correct-answer pop must peak at a restrained 1.08 scale');
-assert.match(engine, /correctBtn\.style\.background = palette\.correct\?\.color/,
-  'the correct card flash must use the curriculum correct-answer color');
+assert.match(engine, /correctBtn\.style\.background = stepColor/,
+  'the correct card flash must use the current progress color');
 assert.match(engine, /function emitCorrectMicroBurst\(correctBtn, answerRect, overlayRect\)/,
   'correct answers must emit a small immediate particle burst');
 assert.match(engine, /booha-blitz-correct-spark/,
