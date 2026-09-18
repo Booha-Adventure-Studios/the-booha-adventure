@@ -14,11 +14,11 @@ assert.doesNotMatch(engine, /function recoverFromWrong\(event\)[\s\S]*?queue\.sp
   'recovery must not create replay questions beyond the 15-card run');
 assert.match(engine, /function recoverFromWrong\(event\)[\s\S]*?startBGM\(\);[\s\S]*?scheduleTimerTick\(0\)/,
   'a restarted run must restart the timer and BGM');
-assert.match(engine, /function showWin\(ms\) \{[\s\S]*?if \(!isPerfectRun\) return;/,
-  'the result card must be unreachable unless the run is perfect');
+assert.doesNotMatch(engine, /function showWin\(ms\) \{[\s\S]*?if \(!isPerfectRun\) return;/,
+  'the result card must remain reachable for a normal completed run');
 assert.doesNotMatch(engine, /MASTERY CLEAR|CLEAN CLEAR/,
   'failed runs must not have alternate completion tiers');
 assert.match(verify, /tests\/blitz-pass30-mastery-retry-audit\.cjs/,
   'verify.sh must run the recovery audit');
 
-console.log('Blitz retry audit passed: failed runs restart at 0/15 and cannot become mastery or clean clears.');
+console.log('Blitz retry audit passed: failed attempts restart cleanly and completed attempts can clear normally.');
