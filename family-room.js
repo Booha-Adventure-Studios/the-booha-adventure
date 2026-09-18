@@ -93,6 +93,8 @@
     { id: 'pataskala_near', target: [.25, .47, .22], artSize: .28, en: 'Something is almost here.', jp: 'なにかが すぐ そこに いる。', kind: 'threat', character: 'pataskala', stage: .76 },
     { id: 'pataskala_catch', target: [.25, .47, .22], artSize: .34, en: 'The shadow is on you.', jp: 'かげが あなたに おいついた。', kind: 'threat', character: 'pataskala', stage: 1 },
   ];
+  const PATASKALA_ASSET_REV = '2026-09-18-v3';
+  const pataskalaAssetUrl = pose => `assets/family-room/pataskala/${pose.id}.webp?v=${PATASKALA_ASSET_REV}`;
 
   const CHANOMA_ROOM_ANCHORS = Object.freeze({
     tableLeft: Object.freeze({ u: .23, v: .48, radius: .09, scale: .94, region: 'middle-left' }),
@@ -246,9 +248,9 @@
   const tierButtons = [...document.querySelectorAll('[data-tier]')];
   const tierNote = document.getElementById('tier-note');
 
-  const FAMILY_DEFERRED_ASSETS = Object.freeze([
-    ...Object.values(FAMILY_AUDIO),
-    ...PATASKALA_POSES.map(pose => `assets/family-room/pataskala/${pose.id}.webp`),
+    const FAMILY_DEFERRED_ASSETS = Object.freeze([
+      ...Object.values(FAMILY_AUDIO),
+      ...PATASKALA_POSES.map(pataskalaAssetUrl),
   ]);
 
   const baseImage = new Image();
@@ -263,7 +265,7 @@
   let anomalyArt = {};
   const pataskalaArt = Object.fromEntries(PATASKALA_POSES.map(pose => {
     const image = new Image();
-    image.src = `assets/family-room/pataskala/${pose.id}.webp`;
+    image.src = pataskalaAssetUrl(pose);
     return [pose.id, image];
   }));
 
@@ -858,10 +860,7 @@
     ctx.fillStyle = '#020202'; ctx.fillRect(0, 0, width, height);
     if (state === 'caught' && failureStarted) {
       if (time - failureStarted >= FAILURE_SILENCE_MS) {
-        ctx.save();
-        ctx.translate(roomCamera.x, roomCamera.y);
-        drawFailureThreat(time);
-        ctx.restore();
+        drawFailureStatic(time);
         drawFailureBooha(time);
       }
       return;
@@ -929,18 +928,41 @@
     ctx.restore();
   }
 
-  function drawFailureThreat(time) {
-    if (!failureThreat) return;
-    const art = pataskalaArt.pataskala_catch;
-    if (!imageReady(art)) return;
-    const size = Math.max(180, Math.min(width, height) * .34 * PATASKALA_SIZE_MULTIPLIER);
+  function drawFailureStatic(time) {
+    const reduced = REDUCED_MOTION;
+    const block = reduced ? 5 : 3;
+    const columns = Math.ceil(width / block);
+    const rows = Math.ceil(height / block);
     ctx.save();
-    ctx.globalAlpha = .72;
-    ctx.shadowColor = 'rgba(12,12,12,.96)';
-    ctx.shadowBlur = 24 + Math.sin(time / 180) * 4;
-    ctx.translate(failureThreat.x, failureThreat.y);
-    ctx.scale(failureThreat.flip ? -1 : 1, 1);
-    ctx.drawImage(art, -size / 2, -size * .72, size, size * 1.5);
+    ctx.fillStyle = '#080b11';
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalAlpha = .62;
+    for (let row = 0; row < rows; row += 1) {
+      const band = .18 + ((row * 17) % 11) / 34;
+      ctx.fillStyle = row % 3 === 0 ? `rgba(186,208,226,${band})` : `rgba(88,112,134,${band * .7})`;
+      ctx.fillRect(0, row * block, width, block);
+    }
+    const flicker = Math.floor(time / (reduced ? 170 : 85));
+    ctx.globalAlpha = .82;
+    for (let index = 0; index < columns * rows; index += 1) {
+      const seed = Math.sin((index + 1) * 12.9898 + flicker * 78.233) * 43758.5453;
+      const noise = seed - Math.floor(seed);
+      if (noise < .46) continue;
+      const x = (index % columns) * block;
+      const y = Math.floor(index / columns) * block;
+      const size = noise > .9 ? block * 2 : block;
+      ctx.fillStyle = noise > .76 ? '#e6edf2' : noise > .58 ? '#96a9b7' : '#435564';
+      ctx.fillRect(x, y, size, block);
+    }
+    ctx.globalAlpha = .22;
+    ctx.fillStyle = '#d9e9f5';
+    for (let y = 0; y < height; y += 4) ctx.fillRect(0, y, width, 1);
+    const vignette = ctx.createRadialGradient(width / 2, height / 2, Math.min(width, height) * .18, width / 2, height / 2, Math.max(width, height) * .74);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,.78)');
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, width, height);
     ctx.restore();
   }
 
