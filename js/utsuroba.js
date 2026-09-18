@@ -1022,6 +1022,18 @@
     { img: danceSwayImg,   contentScale: 0.801, offsetX:  0.009, offsetY: -0.015 },
     { img: danceWaveImg,   contentScale: 0.811, offsetX:  0.009, offsetY: -0.009 },
   ];
+  function applyBoohaSkin() {
+    ghostImg.src = window.BoohaSkins?.asset('utsuroba') || './assets/img/booha_ghost.webp';
+    const danceSources = [
+      window.BoohaSkins?.asset('danceArmsUp') || './assets/img/booha_ghost_dance_arms_up.webp',
+      window.BoohaSkins?.asset('danceSway') || './assets/img/booha_ghost_dance_sway.webp',
+      window.BoohaSkins?.asset('danceWave') || './assets/img/booha_ghost_dance_wave.webp',
+    ];
+    DANCE_FRAMES.forEach((frame, index) => {
+      frame.img.src = danceSources[index];
+      frame.img.requested = false;
+    });
+  }
   let music = null;
   let booDance = null;
 
@@ -4049,6 +4061,7 @@
   ═══════════════════════════════════════════ */
   function init() {
     if (!worldGateOpen()) { showLockedWorld(); return; }
+    applyBoohaSkin();
     injectStyles();
     buildApp();
     restoreProfileRoom();

@@ -4318,6 +4318,9 @@ const HAPPY_HOUSE_PORTAL = {
 
   let pins = [], trail = [], ripples = [];
   const ghostImg = new Image(); ghostImg.src = "assets/img/booha_ghost.webp";
+  function applyBoohaSkin() {
+    ghostImg.src = window.BoohaSkins?.asset('karasuki') || 'assets/img/booha_ghost.webp';
+  }
   const memoryBoxImg = new Image(); memoryBoxImg.src = 'assets/img/memory_box.webp';
   const observerImg = new Image();
   observerImg.src = 'assets/img/karasuki/observer-1.webp';
@@ -5904,6 +5907,7 @@ function drawObserver(now) {
   ═══════════════════════════════════════════ */
   function init() {
     if (!guardWorldEntry()) return;
+    applyBoohaSkin();
     injectStyles(); buildApp(); injectTrailHud(); injectEchoesTracker(); KarasukiAtmos.init(stage);
     restoreProfileRoom();
     fitStage(); resizeCanvas();

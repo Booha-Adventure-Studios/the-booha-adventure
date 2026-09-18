@@ -213,6 +213,22 @@
       opacity:0;
       transition:opacity 480ms cubic-bezier(.22,1,.36,1), transform 520ms cubic-bezier(.34,1.42,.64,1);
     }
+
+    /* Permanent skin unlock — shown once after the qualifying Blitz run. */
+    #battyUnlockScrim{ position:fixed; inset:0; z-index:230; display:none; background:rgba(8,2,16,.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+    #battyUnlockScrim.show{ display:block; }
+    #battyUnlockPopup{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.82) translateY(16px); z-index:235; display:none; width:min(90vw,430px); max-height:90vh; overflow:auto; padding:28px 24px 24px; border:1px solid rgba(255,150,64,.42); border-radius:28px; text-align:center; background:radial-gradient(ellipse at 50% 0%,rgba(255,112,36,.18),transparent 58%),linear-gradient(155deg,rgba(30,8,32,.99),rgba(8,7,28,.99)); box-shadow:0 0 0 1px rgba(255,255,255,.06),0 48px 120px rgba(0,0,0,.95),0 0 100px rgba(255,80,30,.18); opacity:0; transition:opacity 420ms ease,transform 480ms cubic-bezier(.34,1.35,.64,1); }
+    #battyUnlockPopup.show{ display:block; }
+    #battyUnlockPopup.visible{ opacity:1; transform:translate(-50%,-50%) scale(1) translateY(0); }
+    #battyUnlockPopup .batty-bar{ width:58%; height:3px; margin:0 auto 18px; border-radius:99px; background:linear-gradient(90deg,#692e8f,#ff8a3d,#f6d36b,#ff8a3d,#692e8f); box-shadow:0 0 18px rgba(255,130,54,.65); }
+    #battyUnlockPopup .batty-art{ display:block; width:min(48vw,190px); height:min(48vw,190px); object-fit:contain; margin:0 auto 8px; filter:drop-shadow(0 12px 24px rgba(0,0,0,.7)); }
+    #battyUnlockPopup .batty-equip-button{ appearance:none; border:0; padding:0; margin:0; background:transparent; cursor:pointer; border-radius:24px; }
+    #battyUnlockPopup .batty-equip-button:focus-visible{ outline:3px solid #ffd984; outline-offset:5px; }
+    #battyUnlockPopup .batty-kicker{ margin:0 0 7px; color:rgba(255,191,128,.82); font-size:11px; font-weight:900; letter-spacing:.25em; text-transform:uppercase; }
+    #battyUnlockPopup h2{ margin:0; color:#fff3db; font-family:'Bowlby One',sans-serif; font-size:clamp(22px,5vw,34px); line-height:1.15; text-shadow:0 0 25px rgba(255,120,50,.42); }
+    #battyUnlockPopup p{ margin:12px auto 18px; color:rgba(255,235,218,.72); font-size:14px; line-height:1.6; }
+    #battyUnlockPopup .batty-equip{ appearance:none; border:0; border-radius:999px; padding:11px 22px; color:#170913; font-weight:1000; cursor:pointer; background:linear-gradient(180deg,#ffd984,#ff9149); box-shadow:0 7px 28px rgba(255,120,40,.36); }
+    #battyUnlockPopup .batty-equip:active{ transform:scale(.95); }
     #hwPrompt.show{ display:block; }
     #hwPrompt.visible{
       opacity:1;
@@ -1160,6 +1176,17 @@
     </div>
     <button id="cpCloseBtn" type="button">とじる ✕</button>
   </div>
+  <div id="battyUnlockScrim" aria-hidden="true"></div>
+  <section id="battyUnlockPopup" role="dialog" aria-modal="true" aria-labelledby="battyUnlockTitle" aria-describedby="battyUnlockCopy">
+    <div class="batty-bar" aria-hidden="true"></div>
+    <button id="battyEquipButton" class="batty-equip-button" type="button" aria-label="Equip Batty Booha">
+      <img class="batty-art" src="assets/skins/batty_booha/static.png" alt="Batty Booha" />
+    </button>
+    <p class="batty-kicker">A NEW FRIEND HAS ARRIVED</p>
+    <h2 id="battyUnlockTitle">You Unlocked Batty Booha!</h2>
+    <p id="battyUnlockCopy">Tap Batty Booha to equip your new traveling friend.</p>
+    <button id="battyEquipTextButton" class="batty-equip" type="button">EQUIP BATTY BOOHA</button>
+  </section>
   <div id="fade" aria-hidden="true"></div>
 
   <!-- HOMEWORK PROMPT -->
@@ -1277,7 +1304,8 @@
 
 <script src="./js/calendar.js"></script>
 <script src="./js/core/adventure-core.js"></script>
-<script src="./js/core/save-file.js"></script>
+    <script src="./js/core/save-file.js"></script>
+<script src="./js/core/booha-skins.js"></script>
 <script src="./js/sync-client.js"></script>
 <script src="./js/core/adventure-performance.js"></script>
 <script>
@@ -1463,7 +1491,13 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   krNoBtn=document.getElementById('krNoBtn'),
   krYesBtn=document.getElementById('krYesBtn'),
   krVideoWrap=document.getElementById('krVideoWrap'),
-  krVideo=document.getElementById('krVideo');
+  krVideo=document.getElementById('krVideo'),
+  battyUnlockScrim=document.getElementById('battyUnlockScrim'),
+  battyUnlockPopup=document.getElementById('battyUnlockPopup'),
+  battyEquipButton=document.getElementById('battyEquipButton'),
+  battyEquipTextButton=document.getElementById('battyEquipTextButton');
+
+let battyUnlockPopupShown = false;
 
 function loadMediaSource(media){
   if(!media||media.dataset.loaded==='1')return;
@@ -1479,7 +1513,7 @@ function playBgMusic(){
   return bgMusic.play();
 }
 
- function personalizeMazeIntro() {
+function personalizeMazeIntro() {
   const overlay = document.getElementById('overlay1');
   const name = getBoohaFirstName();
   if (!overlay) return;
@@ -1498,8 +1532,9 @@ function playBgMusic(){
     const blitz  = (save.meta || {}).blitz || {};
     const w      = blitz.weekly || {};
     if (blitz.weeklyKey === weekId) {
+      const curr = currentBlitzCurriculum();
       ['vocab', 'sentences', 'questions'].forEach(type => {
-        progress[type] = ['pb', 'br', 'bc'].some(c => !!(w[type] || {})[c]);
+        progress[type] = !!curr && !!(w[type] || {})[curr];
       });
     }
   } catch (e) {}
@@ -1570,6 +1605,49 @@ function playBgMusic(){
     const pip = document.querySelector(`[data-blitz-type="${type}"]`);
     if (pip) pip.classList.toggle('done', progress[type]);
   });
+}
+
+function currentBlitzCurriculum() {
+  try {
+    const curr = localStorage.getItem('booha_last_curr') || '';
+    return ['pb', 'br', 'bc'].includes(curr) ? curr : '';
+  } catch (_) { return ''; }
+}
+
+function blitzTripleCompleteForCurrentCurriculum() {
+  const curr = currentBlitzCurriculum();
+  if (!curr) return false;
+  try {
+    const cw = getCurrentCurriculumWeek();
+    const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
+      `${cw.monthSlug}:w${cw.weekNumber}`;
+    const save = window.BoohaAdventure?.save?.load?.() || {};
+    const blitz = save.meta?.blitz || {};
+    const weekly = blitz.weekly || {};
+    if (blitz.weeklyKey !== weekId) return false;
+    return ['vocab', 'sentences', 'questions'].every(type => !!weekly[type]?.[curr]);
+  } catch (_) { return false; }
+}
+
+function closeBattyUnlockPopup() {
+  battyUnlockPopup?.classList.remove('visible');
+  battyUnlockScrim?.classList.remove('show');
+  window.setTimeout(() => battyUnlockPopup?.classList.remove('show'), 440);
+}
+
+function equipBattyFromUnlockPopup() {
+  if (!window.BoohaSkins?.unlockAndEquip('batty')) return;
+  applyEquippedMazeSkin();
+  closeBattyUnlockPopup();
+}
+
+function maybeShowBattyUnlockPopup() {
+  if (battyUnlockPopupShown || !window.BoohaSkins) return;
+  if (BoohaSkins.isUnlocked('batty') || !blitzTripleCompleteForCurrentCurriculum()) return;
+  battyUnlockPopupShown = true;
+  battyUnlockScrim.classList.add('show');
+  battyUnlockPopup.classList.add('show');
+  requestAnimationFrame(() => requestAnimationFrame(() => battyUnlockPopup.classList.add('visible')));
 }
 
   
@@ -1678,7 +1756,14 @@ function assignRandomGhost() {
   startGhost.src = GHOSTS[activeGhostIdx];
 }
 
+function applyEquippedMazeSkin() {
+  const skinSrc = window.BoohaSkins?.asset('maze');
+  startGhost.src = skinSrc || GHOSTS[activeGhostIdx];
+}
+
 assignRandomGhost();
+battyEquipButton?.addEventListener('click', equipBattyFromUnlockPopup);
+battyEquipTextButton?.addEventListener('click', equipBattyFromUnlockPopup);
 
 function getWandererImage(w) {
   if (w.kind === 'extra') {
@@ -1763,7 +1848,7 @@ function restoreMazeFromCheckpoint(){
   sessionStorage.removeItem('booha_return_ix');
   sessionStorage.removeItem('booha_return_iy');
   sessionStorage.removeItem('booha_reopen_popup');
-  if(Number.isInteger(returnGhost)&&returnGhost>=0&&returnGhost<GHOSTS.length){activeGhostIdx=returnGhost;startGhost.src=GHOSTS[activeGhostIdx];}
+  if(Number.isInteger(returnGhost)&&returnGhost>=0&&returnGhost<GHOSTS.length){activeGhostIdx=returnGhost;applyEquippedMazeSkin();}
   if(Number.isInteger(returnWeek)&&returnWeek>=1&&returnWeek<=CHECKPOINTS.length)activeWeek=returnWeek;
   else activeWeek=CURRENT_WEEK;
   const cp=CHECKPOINTS.find(c=>c.w===activeWeek)||startCP;
@@ -1842,9 +1927,10 @@ function buildWanderers() {
   wanderers = [];
 
   // Always keep the cute original maze feeling:
-  // player ghost + 4 main Booha friends.
+  // With a custom skin, the player is no longer one of the five classic
+  // sprite slots, so keep all five classic friends visible.
   for (let gi = 0; gi < GHOSTS.length; gi++) {
-    if (gi === activeGhostIdx) continue;
+    if (!window.BoohaSkins?.asset('maze') && gi === activeGhostIdx) continue;
 
     const w = createWanderer(gi, wanderers.length * 1400);
     w.kind = 'main';
@@ -2731,6 +2817,8 @@ document.addEventListener('visibilitychange',()=>{
 // hit the locked/empty state, so wait for the boot signal.
 function onSaveReady(){
   personalizeMazeIntro();
+  applyEquippedMazeSkin();
+  maybeShowBattyUnlockPopup();
   if (mazeStarted) buildWanderers();   // extra ghost count depends on the save
 }
 if (window.BOOHA_READY) onSaveReady();
