@@ -16,11 +16,11 @@ assert.match(engine, /className = 'booha-blitz-final-card'/,
   'the clear result must use a dedicated final-card surface');
 assert.doesNotMatch(finalCardBuilder, /booha-blitz-final-curriculum/,
   'the compact final card must not restore the retired curriculum banner');
-assert.match(engine, /winScreen\.querySelector\(selector\('winName'\)\)\.textContent = `\$\{playerName\} is Awesome!!`/,
+assert.match(engine, /winNameEl\.innerHTML = `\$\{escapeHtml\(playerName\)\} <ruby>is<rt>/,
   'the player name must remain the final-card hero');
-assert.match(engine, /bestEl\.textContent = `Your best time:/,
+assert.match(engine, /bestEl\.innerHTML = `.*<ruby>best<rt>/,
   'the final card must show the personal best explicitly');
-assert.match(engine, /previous best/,
+assert.match(engine, /deltaEl\.innerHTML = oldRecord[\s\S]*<ruby>previous<rt>/,
   'the final card must show the delta from the previous best');
 assert.match(engine, /const isPerfectRun = current === initialQueueLength/,
   'the final card must require a full mistake-free run');

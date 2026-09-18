@@ -18,9 +18,9 @@ assert.match(engine, /let backgroundValue = '';/,
   'background rendering must remember the last applied value');
 assert.match(engine, /function setBackground\(correctCount = 0\)/,
   'background updates must pass through a de-duplicating setter');
-assert.match(engine, /if \(css === backgroundValue\) return;/,
+assert.match(engine, /if \(page\.css === backgroundValue\) return;/,
   'identical full-screen background values must not be reassigned');
-assert.match(engine, /overlay\.style\.background = css;/,
+assert.match(engine, /overlay\.style\.background = page\.css;/,
   'the timer path must apply the de-duplicated solid progress color');
 assert.match(engine, /background: var\(--blitz-bg-main\) !important;/,
   'low-power mode must avoid animated full-screen gradient repainting');
