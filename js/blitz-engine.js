@@ -276,13 +276,53 @@ window.BoohaBlitzEngine = (() => {
   // runs can finish in ~30s and a lingering animation would still be
   // resolving when the next correct answer lands. A wrong answer calls this
   // with 0 and snaps straight back to dead, before the run ends.
+  //
+  // Colors are interpolated across real stops taken from the curriculum's
+  // own palette (white -> its reward "cream" tone -> its accent2 -> its
+  // accent) rather than ramping one fixed hue's saturation -- a single-hue
+  // ramp was landing on an intense, slightly alarming rose/red instead of
+  // the curriculum's actual cute-pastel identity.
+  function hexToRgb(hex) {
+    const clean = String(hex).replace('#', '');
+    const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
+    const num = parseInt(full, 16) || 0;
+    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+  }
+  function mixHex(hexA, hexB, t) {
+    const a = hexToRgb(hexA);
+    const b = hexToRgb(hexB);
+    return {
+      r: Math.round(a.r + (b.r - a.r) * t),
+      g: Math.round(a.g + (b.g - a.g) * t),
+      b: Math.round(a.b + (b.b - a.b) * t),
+    };
+  }
+  // Perceptual (WCAG relative luminance) rather than raw HSL lightness --
+  // HSL lightness misjudges saturated colors like a bright cyan or hot pink,
+  // which read as brighter/darker to the eye than their HSL "L" implies.
+  function relativeLuminance(r, g, b) {
+    const toLinear = c => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  }
   function progressColorFor(palette, percent) {
     const p = Math.max(0, Math.min(100, Number(percent) || 0)) / 100;
-    if (p <= 0) return { css: '#ffffff', lightness: 100 };
-    const hue = palette.baseHue;
-    const saturation = Math.round(78 * p);
-    const lightness = Math.round(100 - 46 * p); // 100 (white) -> 54 (bold)
-    return { css: `hsl(${hue}, ${saturation}%, ${lightness}%)`, lightness };
+    const stops = palette.aliveStops || [
+      '#ffffff',
+      (palette.reward && palette.reward.colors && palette.reward.colors[0]) || palette.accent2 || palette.accent || '#ffe27a',
+      palette.accent2 || palette.accent || '#ffe27a',
+      palette.accent || '#ff6fb5',
+    ];
+    if (p <= 0) return { css: stops[0], lightness: 100 };
+    const segments = stops.length - 1;
+    const scaled = p * segments;
+    const index = Math.min(segments - 1, Math.floor(scaled));
+    const localT = scaled - index;
+    const { r, g, b } = mixHex(stops[index], stops[index + 1], localT);
+    const lightness = Math.round(relativeLuminance(r, g, b) * 100);
+    return { css: `rgb(${r}, ${g}, ${b})`, lightness };
   }
 
   // Text/UI ink flips from dark to light only once the background itself has
@@ -290,6 +330,22 @@ window.BoohaBlitzEngine = (() => {
   // stretch of a run, never during the mostly-pale early game.
   function inkFor(lightness) {
     return lightness < 58 ? '#ffffff' : '#14161c';
+  }
+
+  // Scales a palette's static glow color's alpha by progress percent, so the
+  // kanji's colored halo starts fully invisible at 0% (dead) and builds in
+  // alongside the background/border as the run progresses, instead of
+  // showing at full strength from the very first question.
+  function glowForPercent(palette, percent) {
+    const p = Math.max(0, Math.min(100, Number(percent) || 0)) / 100;
+    const glow = palette.glow || 'rgba(255,255,255,0)';
+    const match = glow.match(/rgba?\(([^)]+)\)/i);
+    if (!match) return glow;
+    const parts = match[1].split(',').map(s => s.trim());
+    const [r, g, b] = parts;
+    const baseAlpha = parts.length > 3 ? parseFloat(parts[3]) : 1;
+    const alpha = Math.round((baseAlpha * p) * 1000) / 1000;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
   function shuffle(arr) {
@@ -516,6 +572,24 @@ window.BoohaBlitzEngine = (() => {
         place-items: center;
         isolation: isolate;
         contain: layout style;
+      }
+      /* Slim, cheap, always-legible progress signal -- a single filled bar
+         at the very top of the screen, separate from the background color
+         wash, so how much of the run is done is never ambiguous. */
+      .booha-blitz-progress-meter {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        z-index: 6;
+        background: rgba(0, 0, 0, .08);
+        pointer-events: none;
+      }
+      .booha-blitz-progress-meter-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--blitz-accent, #ff6fb5);
+        box-shadow: 0 0 10px var(--blitz-accent, #ff6fb5);
+        transition: width 160ms ease;
       }
       .booha-blitz-performance-diagnostic {
         position: fixed;
@@ -1078,15 +1152,6 @@ window.BoohaBlitzEngine = (() => {
         border-width: 4px;
         box-shadow: 0 0 52px var(--streak-event-color), 0 0 108px var(--blitz-streak-glow);
       }
-      .blitz-compositor.streak-tier-1 .booha-blitz-answer { box-shadow: 0 0 24px var(--blitz-glow); }
-      .blitz-compositor.streak-tier-2 .booha-blitz-answer { box-shadow: 0 0 32px var(--blitz-glow), 0 0 2px var(--blitz-accent); }
-      .blitz-compositor.streak-tier-3 .booha-blitz-answer { box-shadow: 0 0 42px var(--blitz-glow), 0 0 3px var(--blitz-accent); }
-      .blitz-compositor.streak-tier-4 .booha-blitz-answer {
-        box-shadow: 0 0 54px var(--blitz-glow), 0 0 4px var(--blitz-accent);
-      }
-      .blitz-compositor.streak-tier-5 .booha-blitz-answer {
-        box-shadow: 0 0 66px var(--blitz-glow), 0 0 5px var(--blitz-accent);
-      }
       .blitz-compositor.streak-tier-1 { --blitz-word-glow: 40px; }
       .blitz-compositor.streak-tier-2 { --blitz-word-glow: 54px; }
       .blitz-compositor.streak-tier-3 { --blitz-word-glow: 70px; }
@@ -1102,9 +1167,6 @@ window.BoohaBlitzEngine = (() => {
       .blitz-compositor.streak-tier-5 .booha-blitz-nameplate::after { animation: boohaBlitzChargedNameplate 2.4s ease-in-out infinite; }
       .blitz-compositor.streak-tier-4 .booha-blitz-nameplate,
       .blitz-compositor.streak-tier-5 .booha-blitz-nameplate { font-size: clamp(12px, 3.2vw, 21px); }
-      .blitz-compositor.streak-tier-3 .booha-blitz-answer,
-      .blitz-compositor.streak-tier-4 .booha-blitz-answer,
-      .blitz-compositor.streak-tier-5 .booha-blitz-answer { border-color: var(--streak-color, var(--blitz-accent)); }
       .booha-blitz-streak-spark {
         position: absolute;
         left: 50%;
@@ -1688,10 +1750,10 @@ window.BoohaBlitzEngine = (() => {
       .booha-blitz-ruby-text ruby { ruby-position: over; }
       .booha-blitz-ruby-text rt {
         color: rgba(255, 190, 190, .9);
-        font-size: .34em;
+        font-size: .42em;
         font-weight: 700;
         letter-spacing: .08em;
-        line-height: 1;
+        line-height: 1.4;
       }
       .booha-blitz-celebration-layer {
         position: absolute;
@@ -2180,6 +2242,23 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.background = '#ffffff';
       const timer = overlay.querySelector(selector('timer'));
       if (timer) timer.style.color = 'var(--blitz-ink, #14161c)';
+    }
+
+    function createProgressMeter(overlay, palette) {
+      injectSharedStyles();
+      const meter = document.createElement('div');
+      meter.className = 'booha-blitz-progress-meter';
+      meter.setAttribute('aria-hidden', 'true');
+      const fill = document.createElement('div');
+      fill.className = 'booha-blitz-progress-meter-fill';
+      meter.appendChild(fill);
+      overlay.insertBefore(meter, overlay.firstChild);
+      return {
+        setPercent(percent) {
+          const clamped = Math.max(0, Math.min(100, Number(percent) || 0));
+          fill.style.width = `${clamped}%`;
+        },
+      };
     }
 
     function createPlayerSpotlight(overlay, palette) {
@@ -2746,6 +2825,7 @@ window.BoohaBlitzEngine = (() => {
       const wrongPopup = overlay.querySelector(selector('wrongPopup'));
       const winScreen = overlay.querySelector(selector('win'));
       const spotlight = createPlayerSpotlight(overlay, palette);
+      const progressMeter = createProgressMeter(overlay, palette);
       const finalCard = ensureFinalCard(winScreen, palette);
       const previousBest = getBestScore(config.gameType, config.legacyKey, curr);
       const speedTarget = {
@@ -2821,6 +2901,9 @@ window.BoohaBlitzEngine = (() => {
         const total = initialQueueLength || queue.length || 1;
         const percent = Math.max(0, Math.min(100, (correctCount / total) * 100));
         const { css, lightness } = progressColorFor(palette, percent);
+        progressMeter.setPercent(percent);
+        const glowColor = glowForPercent(palette, percent);
+        overlay.style.setProperty('--blitz-word-glow-color', glowColor);
         if (css === backgroundValue) return;
         backgroundValue = css;
         overlay.style.background = css;
@@ -2994,34 +3077,23 @@ window.BoohaBlitzEngine = (() => {
         correctBtn.style.transition = 'none';
         correctBtn.style.background = stepColor;
         emitCorrectMicroBurst(correctBtn, answerRect, overlayRect);
-        if (!REDUCED_MOTION) {
-          overlay.style.transform = 'scale(1.02)';
-          setTimeout(() => {
-            overlay.style.transition = 'transform 70ms ease';
-            overlay.style.transform = '';
-            setTimeout(() => { overlay.style.transition = ''; }, 70);
-          }, 55);
-        }
 
+        // One smooth, single-stage transition rather than a chain of an
+        // overlay-wide scale bump plus buttons flying off screen with
+        // rotation -- that layered choreography read as lag/jank, especially
+        // on older hardware across a 15-question run that can finish in ~30s.
         const allBtns = Array.from(optionsEl.querySelectorAll(`.${config.optionClass}`));
         if (!REDUCED_MOTION) {
           setTimeout(() => {
             allBtns.forEach(btn => {
               if (btn === correctBtn) return;
-              const angle = Math.random() * Math.PI * 2;
-              const dist = 200 + Math.random() * 160;
-              btn.style.transition = 'transform 260ms cubic-bezier(.4,0,1,1), opacity 200ms ease';
-              btn.style.transform = `translate(${Math.cos(angle) * dist}px,${Math.sin(angle) * dist}px) rotate(${(Math.random() - 0.5) * 480}deg) scale(0.15)`;
+              btn.style.transition = 'opacity 140ms ease';
               btn.style.opacity = '0';
             });
-          }, 70);
-        }
-
-        if (!REDUCED_MOTION) {
-          setTimeout(() => {
-            correctBtn.style.transition = 'transform 110ms ease, opacity 90ms ease';
-            correctBtn.style.transform = 'scale(1.25)';
+            correctBtn.style.transition = 'transform 140ms ease, opacity 140ms ease';
+            correctBtn.style.transform = 'scale(1.06)';
             correctBtn.style.opacity = '0';
+
             const r = answerRect || correctBtn.getBoundingClientRect();
             const ovr = overlayRect || overlay.getBoundingClientRect();
             const cx = r.left - ovr.left + r.width / 2;
@@ -3040,27 +3112,15 @@ window.BoohaBlitzEngine = (() => {
               particles.appendChild(p);
             }
             overlay.appendChild(particles);
-          }, 90);
+          }, 40);
         }
 
-        if (!REDUCED_MOTION) {
-          setTimeout(() => {
-            flashEl.style.background = stepColor;
-            flashEl.style.opacity = '0.45';
-            setTimeout(() => {
-              flashEl.style.background = '#ffffff';
-              flashEl.style.opacity = '0.75';
-              setTimeout(() => { flashEl.style.opacity = '0'; flashEl.style.background = ''; }, 55);
-            }, 35);
-          }, 110);
-        } else {
-          flashEl.style.background = stepColor;
-          flashEl.style.opacity = '0.45';
-          setTimeout(() => {
-            flashEl.style.opacity = '0';
-            flashEl.style.background = '';
-          }, 90);
-        }
+        flashEl.style.background = stepColor;
+        flashEl.style.opacity = '0.45';
+        setTimeout(() => {
+          flashEl.style.opacity = '0';
+          flashEl.style.background = '';
+        }, 90);
 
         const nextDelay = milestone
           ? Math.max(config.nextDelay || 200, milestone === 15 ? 620 : 560)
@@ -3378,7 +3438,9 @@ window.BoohaBlitzEngine = (() => {
         // Fixed scorecard copy -- content no longer branches on outcome
         // beyond the "NEW BEST TIME" header, per spec.
         winScreen.querySelector(selector('winName')).textContent = `${playerName} is Awesome!!`;
-        winScreen.querySelector(selector('winScream')).textContent = 'Booha is happy!!';
+        const screamEl = winScreen.querySelector(selector('winScream'));
+        screamEl.classList.add('booha-blitz-ruby-text');
+        screamEl.innerHTML = '<ruby>Booha<rt>ブーハー</rt></ruby> is happy!!';
         const jpLine = winScreen.querySelector(selector('winJp'));
         jpLine.classList.add('booha-blitz-ruby-text');
         jpLine.innerHTML = 'For you: It\u2019s <ruby>Booha<rt>\u30d6\u30fc\u30cf\u30fc</rt></ruby>';
@@ -3527,9 +3589,9 @@ window.BoohaBlitzEngine = (() => {
     questions: 'questionBlitz',
   });
   const RECORD_GAMES = Object.freeze([
-    Object.freeze({ id: 'vocab', label: 'VOCAB', jp: '単語' }),
-    Object.freeze({ id: 'sentences', label: 'SENTENCES', jp: '文章' }),
-    Object.freeze({ id: 'questions', label: 'QUESTIONS', jp: '問題' }),
+    Object.freeze({ id: 'vocab', label: 'VOCAB', jp: '単語', kana: 'たんご' }),
+    Object.freeze({ id: 'sentences', label: 'SENTENCES', jp: '文章', kana: 'ぶんしょう' }),
+    Object.freeze({ id: 'questions', label: 'QUESTIONS', jp: '問題', kana: 'もんだい' }),
   ]);
   const RECORD_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
 
@@ -3577,8 +3639,8 @@ window.BoohaBlitzEngine = (() => {
         </div>
         <div id="blitz-rec-awake" aria-live="polite">
           <div id="blitz-rec-awake-label">THIS WEEK</div>
-          <div id="blitz-rec-awake-pct">0%</div>
-          <div id="blitz-rec-awake-meta">DEAD — PLAY A BLITZ GAME TO WAKE IT UP</div>
+          <div id="blitz-rec-awake-pct">0% COMPLETE</div>
+          <div id="blitz-rec-awake-meta">PLAY A BLITZ GAME TO GET STARTED</div>
         </div>
         <div id="blitz-rec-list" aria-label="Blitz records list"></div>
       </section>
@@ -3732,11 +3794,11 @@ window.BoohaBlitzEngine = (() => {
       awake.style.setProperty('--rec-awake-bg', percent <= 0 ? '#ffffff' : css);
       awake.style.setProperty('--rec-awake-ink', inkFor(lightness));
       label.textContent = `${theme.name.toUpperCase()} · THIS WEEK`;
-      pctEl.textContent = `${percent}% AWAKE`;
+      pctEl.textContent = `${percent}% COMPLETE`;
       metaEl.textContent = percent === 0
-        ? 'DEAD — PLAY A BLITZ GAME TO WAKE IT UP'
+        ? 'PLAY A BLITZ GAME TO GET STARTED'
         : percent === 100
-          ? 'FULLY AWAKE — ALL THREE CLEARED'
+          ? 'ALL THREE CLEARED THIS WEEK'
           : `${clearedCount} OF 3 CLEARED THIS WEEK`;
     } else {
       awake.hidden = true;
@@ -3748,7 +3810,7 @@ window.BoohaBlitzEngine = (() => {
       row.className = `blitz-rec-row ${score ? 'is-cleared' : 'is-open'}`;
       const labelWrap = document.createElement('div');
       labelWrap.className = 'blitz-rec-row-label';
-      labelWrap.innerHTML = `${game.label}<span>${game.jp}</span>`;
+      labelWrap.innerHTML = `${game.label}<span class="booha-blitz-ruby-text"><ruby>${game.jp}<rt>${game.kana}</rt></ruby></span>`;
       const timeEl = document.createElement('div');
       timeEl.className = 'blitz-rec-row-time';
       timeEl.textContent = score ? fmtTime(score.ms) : '--';
