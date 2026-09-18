@@ -23,6 +23,8 @@
   const COMPLETION_QUIET_MS = 2400;
   const DEBUG_ROOM_COORDINATES = false;
   const EXIT_BAND_V = .86;
+  const MOBILE_ROOM_MAX_WIDTH = 620;
+  const MOBILE_GAMEPLAY_ZOOM = 1.55;
   const FAILURE_SILENCE_MS = 1200;
   const FAILURE_PANEL_DELAY_MS = 1800;
   const FAMILY_AUDIO = Object.freeze({
@@ -211,6 +213,7 @@
   let height = 0;
   let dpr = 1;
   let plate = { x: 0, y: 0, w: 0, h: 0 };
+  let roomCamera = { x: 0, y: 0 };
   let vignetteCanvas = null;
   let scanlineCanvas = null;
   let animationFrame = 0;
@@ -294,6 +297,40 @@
   function roomContains(x, y) { return x >= plate.x && x <= plate.x + plate.w && y >= plate.y && y <= plate.y + plate.h; }
   function roomMinDimension() { return Math.max(1, Math.min(plate.w, plate.h)); }
 
+  function roomZoom() {
+    const gameplay = state === 'playing' || state === 'transition' || state === 'caught';
+    return gameplay && width <= MOBILE_ROOM_MAX_WIDTH && height > width ? MOBILE_GAMEPLAY_ZOOM : 1;
+  }
+
+  function updateRoomCamera() {
+    if (roomZoom() === 1 || !plate.w || !plate.h) {
+      roomCamera = { x: 0, y: 0 };
+      return;
+    }
+    const minX = width - (plate.x + plate.w);
+    const maxX = -plate.x;
+    const minY = height - (plate.y + plate.h);
+    const maxY = -plate.y;
+    roomCamera = {
+      x: clamp(width / 2 - booha.x, minX, maxX),
+      y: clamp(height / 2 - booha.y, minY, maxY),
+    };
+  }
+
+  function setRoomView() {
+    const oldPlate = { ...plate };
+    const normalized = oldPlate.w && oldPlate.h ? {
+      position: roomCoordinates(booha.x, booha.y, oldPlate),
+      target: roomCoordinates(booha.targetX, booha.targetY, oldPlate),
+    } : null;
+    rebuildRoomPlate();
+    if (normalized) {
+      [booha.x, booha.y] = roomPointFromCoordinates(normalized.position);
+      [booha.targetX, booha.targetY] = roomPointFromCoordinates(normalized.target);
+    }
+    updateRoomCamera();
+  }
+
   function resize() {
     const oldWidth = width;
     const oldHeight = height;
@@ -328,6 +365,7 @@
         setObservation('SCREEN CHANGED / MARK AGAIN', 'がめんが かわった / もういちど しるし');
       }
     } else resetBooha();
+    updateRoomCamera();
     if (!document.hidden) drawRoom(performance.now());
   }
 
@@ -342,10 +380,7 @@
   }
 
   function rebuildOverlays() {
-    const iw = baseImage.naturalWidth || 1024;
-    const ih = baseImage.naturalHeight || 1536;
-    const scale = Math.min(width / iw, height / ih);
-    plate = { w: iw * scale, h: ih * scale, x: (width - iw * scale) / 2, y: (height - ih * scale) / 2 };
+    rebuildRoomPlate();
 
     vignetteCanvas = document.createElement('canvas');
     vignetteCanvas.width = Math.max(1, Math.floor(width * dpr));
@@ -375,6 +410,16 @@
     sctx.globalAlpha = .075;
     sctx.fillStyle = '#6eb6ff';
     for (let y = 0; y < height; y += 4) sctx.fillRect(0, y, width, 1);
+  }
+
+  function rebuildRoomPlate() {
+    const iw = baseImage.naturalWidth || 1024;
+    const ih = baseImage.naturalHeight || 1536;
+    const scale = Math.min(width / iw, height / ih);
+    const zoom = roomZoom();
+    const roomWidth = iw * scale * zoom;
+    const roomHeight = ih * scale * zoom;
+    plate = { w: roomWidth, h: roomHeight, x: (width - roomWidth) / 2, y: (height - roomHeight) / 2 };
   }
 
   function setBilingual(enNode, jpNode, en, jp) {
@@ -659,7 +704,10 @@
     ctx.fillStyle = '#020202'; ctx.fillRect(0, 0, width, height);
     if (state === 'caught' && failureStarted) {
       if (time - failureStarted >= FAILURE_SILENCE_MS) {
+        ctx.save();
+        ctx.translate(roomCamera.x, roomCamera.y);
         drawFailureThreat(time);
+        ctx.restore();
         drawFailureBooha(time);
       }
       return;
@@ -672,18 +720,21 @@
       return;
     }
     moveBooha();
+    updateRoomCamera();
     updateWrongMarkHazard(time);
     updatePataskalaThreat(time);
     if (imageReady(baseImage)) {
       // Keep the room plate readable, then let Booha's lantern reveal only a
       // small moving circle at full brightness.
       ctx.save();
+      ctx.translate(roomCamera.x, roomCamera.y);
       ctx.globalAlpha = state === 'caught' ? .07 : .16;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
       drawAnomalies(currentAnomalies); drawPataskalaThreat();
       ctx.restore();
       const radius = lightRadius();
       ctx.save();
+      ctx.translate(roomCamera.x, roomCamera.y);
       ctx.beginPath(); ctx.arc(booha.x, booha.y, radius, 0, Math.PI * 2); ctx.clip();
       ctx.globalAlpha = state === 'caught' ? .24 : 1;
       ctx.drawImage(baseImage, plate.x, plate.y, plate.w, plate.h);
@@ -701,10 +752,13 @@
     if (!REDUCED_MOTION && state !== 'title') {
       ctx.save(); ctx.globalAlpha = .035 + Math.sin(time / 260) * .012; ctx.fillStyle = '#fff'; ctx.fillRect(0, (time / 8) % height, width, 1); ctx.restore();
     }
+    ctx.save();
+    ctx.translate(roomCamera.x, roomCamera.y);
     drawWrongMarkHazard(time);
     drawMarks();
     drawRoomDebug();
     if (state !== 'caught') drawBooha(time);
+    ctx.restore();
   }
 
   function drawFailureBooha(time) {
@@ -1091,7 +1145,7 @@
     clearRoundTimers();
     pataskalaCooldownRounds = Math.max(0, pataskalaCooldownRounds - 1);
     roundToken += 1;
-    state = 'playing'; failureThreat = null; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; setControlsVisible(true); clearMarkingUi(); resetBooha(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
+    state = 'playing'; setRoomView(); failureThreat = null; burnoutHandled = false; failureStarted = 0; roundStarted = performance.now(); entryStarted = roundStarted; curtain.className = ''; setControlsVisible(true); clearMarkingUi(); resetBooha(); updateRoomCamera(); chooseRound(); updateHud(); updateAndon(); ensureAudio(); startBgm(); if (ambientGain && audioContext) ambientGain.gain.setTargetAtTime(audioEnabled ? .014 : 0, audioContext.currentTime, .12); if (bgmGain && audioContext) bgmGain.gain.setTargetAtTime(AUDIO_LEVELS.bgm, audioContext.currentTime, .18); scheduleTell(); ping(176 + round * 13, .028); startLoop();
   }
 
   function enterRoom() {
@@ -1297,9 +1351,9 @@
     const rect = canvas.getBoundingClientRect();
     const rawX = event.clientX - rect.left;
     const rawY = event.clientY - rect.top;
-    if (!roomContains(rawX, rawY)) return;
-    const nextX = rawX;
-    const nextY = rawY;
+    const nextX = rawX - roomCamera.x;
+    const nextY = rawY - roomCamera.y;
+    if (!roomContains(nextX, nextY)) return;
     canvas.setPointerCapture?.(event.pointerId);
     activePointerId = event.pointerId;
     const isPointerStart = options.start === true;
@@ -1308,6 +1362,7 @@
       && Math.hypot(nextX - markHoldOrigin[0], nextY - markHoldOrigin[1]) > MARK_DEAD_ZONE_PX;
     booha.targetX = nextX;
     booha.targetY = nextY;
+    updateRoomCamera();
     keyboardMarkActive = false;
     pointerActive = true;
     if (wrongMarkHazard || pataskalaThreat) {
