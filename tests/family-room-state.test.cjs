@@ -47,6 +47,9 @@ assert(!source.includes('function drawShojiDawn') && source.includes('const CASE
 assert(source.includes('const inheritedAlpha = ctx.globalAlpha') && source.includes('inheritedAlpha * (anomaly.character'), 'anomaly opacity must preserve the ambient shadow pass');
 assert(source.includes('width = viewportWidth') && source.includes('height = viewportHeight') && source.includes("canvas.style.margin = '0'"), 'the room canvas must fill the viewport while the complete portrait room is contained inside it');
 assert(source.includes('const scale = Math.min(width / iw, height / ih)') && !source.includes('const scale = Math.max(width / iw, height / ih)'), 'the room plate must use contain scaling rather than cover cropping');
+assert(source.includes('MOBILE_GAMEPLAY_ZOOM') && source.includes('function updateRoomCamera') && source.includes('ctx.translate(roomCamera.x, roomCamera.y)'), 'mobile gameplay must use a closer camera that follows Booha without changing room coordinates');
+assert(source.includes('const nextX = rawX - roomCamera.x') && source.includes('const nextY = rawY - roomCamera.y'), 'mobile pointer input must map the screen back into the room coordinate system');
+assert(markup.includes('Booha carries a closer view as you travel'), 'the study panel must explain the mobile close-view travel behavior');
 assert(source.includes('markHoldStartedAt') && source.includes('heldMs / MARK_HOLD_MS'), 'the hold-to-mark gesture must show visible progress');
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
@@ -187,7 +190,7 @@ const listeners = {};
 nodes['room-canvas'].getContext = () => ({
   setTransform() {}, clearRect() {}, fillRect() {}, drawImage() {}, save() {}, restore() {},
   createRadialGradient: () => ({ addColorStop() {} }), createLinearGradient: () => ({ addColorStop() {} }),
-  beginPath() {}, ellipse() {}, fill() {}, arc() {}, stroke() {}, moveTo() {}, lineTo() {}, quadraticCurveTo() {},
+  beginPath() {}, ellipse() {}, fill() {}, arc() {}, stroke() {}, moveTo() {}, lineTo() {}, quadraticCurveTo() {}, translate() {},
   fillText() {}, scale() {}, clip() {},
 });
 nodes['room-canvas'].getBoundingClientRect = () => ({ left: 0, top: 0 });
