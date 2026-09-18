@@ -53,7 +53,7 @@ assert(markup.includes('Booha carries a closer view as you travel'), 'the study 
 assert(source.includes('markHoldStartedAt') && source.includes('heldMs / MARK_HOLD_MS'), 'the hold-to-mark gesture must show visible progress');
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
-assert(source.includes('function drawFailureBooha') && source.includes('if (time - failureStarted >= FAILURE_SILENCE_MS)'), 'Booha must glow alone after the silence');
+assert(source.includes('function drawFailureBooha') && source.includes('function drawFailureStatic') && !source.includes('drawFailureThreat(time)') && source.includes('if (time - failureStarted >= FAILURE_SILENCE_MS)'), 'the caught beat must use TV static and let Booha glow alone after the silence');
 assert(source.includes('anomalyArt = Object.fromEntries') && source.includes('assets/family-room/overlays/${anomaly.id}.webp') && source.includes('function loadActiveCaseContent'), 'anomalies must load authored overlays for the selected room case');
 assert(source.includes('artSize') && source.includes('ctx.drawImage(art'), 'anomaly rendering must use real art instead of procedural doodles');
 assert(['bowl', 'cup', 'eyes', 'shadow', 'talisman', 'lantern', 'futon', 'seams', 'teapot', 'crescent'].every(id => serviceWorker.includes(`/assets/family-room/overlays/${id}.webp`)), 'all authored anomaly overlays must be precached');
