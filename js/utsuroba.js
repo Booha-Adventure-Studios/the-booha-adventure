@@ -594,7 +594,7 @@
     }
     return _cachedQuest;
   }
-  function invalidateQuestCache() { _cachedQuestTime = 0; }
+  function invalidateQuestCache() { _cachedQuest = null; _cachedQuestTime = -Infinity; }
 
   /* ═══════════════════════════════════════════
      DRIFTER SYSTEM
@@ -814,6 +814,7 @@
     invalidateQuestCache();
     if (ok) invalidateDrifterStateCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
+    renderEchoesTracker();
     return ok ? world.drifterQuest : null;
   }
 
@@ -939,6 +940,7 @@
     invalidateQuestCache();
     if (ok) invalidateDrifterStateCache();
     if (ok && window.BoohaSync) BoohaSync.checkpoint('adventure');
+    renderEchoesTracker();
     return ok;
   }
 
@@ -947,6 +949,7 @@
     ensureWeeklyUtsuroba(data).drifterQuest = null;
     const ok = writeSave(data); invalidateQuestCache();
     if (ok) invalidateDrifterStateCache();
+    renderEchoesTracker();
   }
 
   /* The first completion of the final required convergence drifter gets a
@@ -1959,8 +1962,19 @@
   // not a new event, so it should never animate.
   let lastLitEchoIds = null;
 
+  function isDrifterQuestActive(quest = getCachedQuest()) {
+    return !!(quest && quest.active && ['accepted', 'collected', 'reading'].includes(quest.state));
+  }
+
   function renderEchoesTracker() {
     if (!echoesTrackerEl) return;
+    /* The tracker is quest context, not permanent world chrome. Keeping it
+       hidden until a drifter quest is actually underway leaves room for
+       landmarks such as the Akiya flashlight, especially on phones. */
+    if (!isDrifterQuestActive()) {
+      echoesTrackerEl.style.display = 'none';
+      return;
+    }
     const convergence = DATA.readingConvergence;
     const requiredIds = convergence?.requiredDrifterIds;
     const episodeDrifters = Array.isArray(requiredIds) && requiredIds.length
