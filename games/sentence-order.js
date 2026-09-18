@@ -889,6 +889,7 @@ let recoveryBoostReady = false;
 let recoveredCount = 0;
 let recoveryBoostCount = 0;
 const recoveredItems = new Set();
+let missedItems = [];
 let lastCheckAt = 0;
 const CHECK_DEBOUNCE = 700;
 
@@ -1149,6 +1150,7 @@ function resolveCorrect(chips) {
 function resolveWrong() {
   locked = true;
   updateAnswerControls();
+  if (currentCard && !missedItems.some(item => item.jp === currentCard.jp)) missedItems.push(currentCard);
   const isFinalAttempt = recoveryActive;
   wrongCount++;
 
@@ -1319,6 +1321,14 @@ function showResults() {
   document.getElementById('so-rj').textContent = tier.jp;
   document.getElementById('so-rk').textContent = tier.kanji;
   U.renderResultMeta(results, { gameId: `${CFG.curriculum}:sentence_order`, score: pct });
+  U.renderResultDetails(results, {
+    stats: [
+      { label: 'Score / スコア', value: `${formatScore(score)} / ${total}` },
+      { label: 'Recovered / かいふく', value: String(recoveredCount) },
+      { label: 'Boosts / ボーナス', value: String(recoveryBoostCount) },
+    ],
+    reviewItems: missedItems,
+  });
 
   /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('so-replay');
@@ -1345,6 +1355,7 @@ function showResults() {
     recoveryBoostReady = false;
     recoveredCount = 0;
     recoveryBoostCount = 0;
+    missedItems = [];
     recoveredItems.clear();
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');

@@ -350,6 +350,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.cl
 /* ═══ STATE ═══ */
 let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
+let missedItems = [];
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
 let showKanji = true; // toggle state — persists for entire game
 
@@ -479,6 +480,7 @@ function handleChoice(btn, card) {
     playSuccessThenAdvance(null);
   } else {
     firstTry = false;
+    if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     updateStreak(0);
     btn.classList.add('wrong');
     U.unlockAudio(); playSfx('fart');
@@ -539,6 +541,13 @@ function showResults() {
   document.getElementById('aq-rk').textContent = tier.kanji;
   document.getElementById('aq-rj').textContent = tier.jp;
   U.renderResultMeta(results, { gameId: `${CFG.curriculum}:ask_question`, score: pct });
+  U.renderResultDetails(results, {
+    stats: [
+      { label: 'First-try correct / せいかい', value: `${score} / 15` },
+      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
+    ],
+    reviewItems: missedItems,
+  });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
   if (CFG.sfxBase && tier.sound) {
     const snd = new Audio(CFG.sfxBase + tier.sound);
@@ -552,6 +561,7 @@ document.getElementById('aq-replay').addEventListener('click', () => {
   results.classList.remove('show');
   mainWrap.style.display = '';
   idx = 0; score = 0; streak = 0;
+  missedItems = [];
   scoreEl.textContent = '0';
   const se = document.getElementById('aq-streak'); if (se) se.textContent = '0';
   answered = false; firstTry = true; pickCooldown = false;

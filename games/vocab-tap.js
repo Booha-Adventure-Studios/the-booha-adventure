@@ -1012,6 +1012,7 @@ let score         = 0;
 let roundIdx      = 0;
 let roundCards    = [];
 let roundJpOrder  = [];   /* shuffled JP order, separate from EN order */
+let missedItems   = [];
 let selectedEnKey = null;
 let pairs         = {};
 let globalLocked  = false;
@@ -1204,6 +1205,7 @@ async function gradeRound() {
       await new Promise(r => setTimeout(r, 700));
     } else {
       el.classList.add('slot-wrong');
+      if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
       const fartClone = SFX['fart'] ? SFX['fart'].cloneNode() : null;
       if (fartClone) { fartClone.setAttribute('playsinline',''); fartClone.setAttribute('webkit-playsinline',''); fartClone.play().catch(()=>{}); }
        
@@ -1306,6 +1308,13 @@ function showResults() {
   document.getElementById('vt-rj').textContent = tier.jp;
   document.getElementById('vt-rk').textContent = tier.kanji;
   U.renderResultMeta(resEl, { gameId: `${CFG.curriculum}:vocab_tap`, score: pct });
+  U.renderResultDetails(resEl, {
+    stats: [
+      { label: 'Correct pairs / せいかい', value: `${score} / 15` },
+      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
+    ],
+    reviewItems: missedItems,
+  });
 
   /* Build colorful action buttons */
   resActions.innerHTML = '';
@@ -1327,6 +1336,7 @@ function showResults() {
     /* Re-shuffle everything on replay */
     allCards = buildShuffledDeck();
     score    = 0;
+    missedItems = [];
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');
     hiraMode            = false;

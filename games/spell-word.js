@@ -834,6 +834,7 @@ let recoveryBoostReady = false;
 let recoveredCount = 0;
 let recoveryBoostCount = 0;
 const recoveredItems = new Set();
+let missedItems = [];
 let lastCheckAt = 0;
 const CHECK_DEBOUNCE = 700;
 
@@ -1097,6 +1098,7 @@ function resolveCorrect(card, slotEls) {
 function resolveWrong(card, slotEls) {
   locked = true;
   updateAnswerControls();
+  if (card && !missedItems.some(item => item.jp === card.jp)) missedItems.push(card);
   const isFinalAttempt = recoveryActive;
   wrongCount++;
   if (isFinalAttempt) {
@@ -1267,6 +1269,14 @@ function showResults() {
   document.getElementById('sw-rj').textContent = tier.jp;
   document.getElementById('sw-rk').textContent = tier.kanji;
   U.renderResultMeta(results, { gameId: `${CFG.curriculum}:spell_word`, score: pct });
+  U.renderResultDetails(results, {
+    stats: [
+      { label: 'Score / スコア', value: `${formatScore(score)} / ${total}` },
+      { label: 'Recovered / かいふく', value: String(recoveredCount) },
+      { label: 'Boosts / ボーナス', value: String(recoveryBoostCount) },
+    ],
+    reviewItems: missedItems,
+  });
 
   /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('sw-replay');
@@ -1293,6 +1303,7 @@ function showResults() {
     recoveryBoostReady = false;
     recoveredCount = 0;
     recoveryBoostCount = 0;
+    missedItems = [];
     recoveredItems.clear();
     scoreEl.textContent = '0';
     allCards = U.shuffle(allCards);

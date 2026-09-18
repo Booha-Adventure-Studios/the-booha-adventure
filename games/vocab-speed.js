@@ -1225,6 +1225,7 @@ let runStartedAt = 0;
 let feedbackState = 'awaiting-start';
 let recoveryPending = false;
 let mistakes = 0;
+let missedItems = [];
 let finalClimaxTimer = null;
 let resultFxTimers = [];
 let resultAudio = null;
@@ -1434,7 +1435,7 @@ function handlePick(btn, en) {
     btn.classList.add('vs-correct');
     U.playSFX('ding');
 
-    score = idx + 1;
+    score++;
     streak++;
 
     scoreEl.textContent = score;
@@ -1450,6 +1451,7 @@ function handlePick(btn, en) {
 
   } else {
     btn.classList.add('vs-wrong');
+    if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     streak   = 0;
     updateStreakUI();
     updateStreakBanner();
@@ -1474,6 +1476,7 @@ function onTimeout() {
 
   Array.from(grid.children).forEach(b => b.classList.add('vs-locked'));
 
+  if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
   mistakes++;
   setTimeout(() => { idx++; renderQ(); }, 320);
 }
@@ -1592,6 +1595,14 @@ function revealResults(runTime) {
   document.getElementById('vs-rj').textContent = tier.jp;
   document.getElementById('vs-rk').textContent = tier.kanji;
   U.renderResultMeta(results, { gameId: `${CFG.curriculum}:vocab_speed`, score: pct });
+  U.renderResultDetails(results, {
+    stats: [
+      { label: 'Correct / せいかい', value: `${score} / 15` },
+      { label: 'Missed / まちがい', value: String(mistakes) },
+      { label: 'Run time / じかん', value: `${Math.round(runTime / 1000)}s` },
+    ],
+    reviewItems: missedItems,
+  });
 
   U.emitGameEnd({
     saveId:    `${CFG.curriculum}:vocab_speed`,
@@ -1629,6 +1640,7 @@ document.getElementById('vs-replay').addEventListener('click', () => {
   streakBanner.className = 'vs-streak-banner';
 
   idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
+  missedItems = [];
   feedbackState = 'playing';
   recoveryPending = false;
   runStartedAt = performance.now();
