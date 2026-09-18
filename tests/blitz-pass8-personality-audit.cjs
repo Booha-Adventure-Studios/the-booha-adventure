@@ -19,10 +19,10 @@ assert.match(engine, /baseHue: 222, bgSat: 46, bgLit: 10/,
 assert.match(engine, /secondary: 'hsl\(205, 48%, 15%\)'/,
   'Boo-continuum must use a cool blue premium secondary color');
 
-assert.match(engine, /function backgroundFor\(palette, index = 0\)/,
-  'the shared engine must render the theme background as a gradient');
-assert.match(engine, /radial-gradient\(70% 55% at 50% 40%, \$\{secondary\} 0%, transparent 72%\)[\s\S]*?linear-gradient\(145deg, \$\{main\} 0%, \$\{accent\} 100%\)/,
-  'theme backgrounds must use a visible radial secondary wash and main/accent gradient');
+assert.match(engine, /function progressColorFor\(palette, percent\)/,
+  'the shared engine must render the dead-to-alive progress color');
+assert.match(engine, /const hue = palette\.baseHue[\s\S]*?const lightness = Math\.round\(100 - 46 \* p\)/,
+  'theme backgrounds must move from white into a curriculum-colored live state');
 assert.match(engine, /#vb-overlay\.blitz-feel-playful \.vb-opt/,
   'Pre-Boo must have a shared playful option treatment');
 assert.match(engine, /#sb-overlay\.blitz-feel-arcade \.sb-opt/,

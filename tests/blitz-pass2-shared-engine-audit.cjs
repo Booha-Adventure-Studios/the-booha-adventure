@@ -65,8 +65,10 @@ assert.match(recordsPanel, /role', 'dialog'/,
   'the shared records panel must expose dialog semantics');
 assert.match(recordsPanel, /data-record-scope="weekly"/,
   'the records panel must expose the weekly/all-time switch');
-assert.match(recordsPanel, /repeat\(3, minmax\(0, 1fr\)\)/,
-  'the records panel must use three game columns');
+assert.match(recordsPanel, /#blitz-rec-list \{ display: flex; flex-direction: column;/,
+  'the records panel must use a compact vertical game list');
+assert.match(engine, /const rows = RECORD_GAMES\.map\(game => \(\{/,
+  'the records panel must render all three shared game records');
 assert.doesNotMatch(recordsPanel, /backdrop-filter/,
   'the records panel must not spend on full-screen blur passes');
 assert.match(engine, /event\.key === 'Escape'/,

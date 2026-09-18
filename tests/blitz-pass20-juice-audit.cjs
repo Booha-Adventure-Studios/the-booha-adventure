@@ -4,12 +4,12 @@ const assert = require('assert');
 const engine = fs.readFileSync('js/blitz-engine.js', 'utf8');
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /function backgroundFor\(palette, index = 0\)/,
-  'background energy must be derived from the active streak');
-assert.match(engine, /const energy = Math\.min\(15, Math\.max\(0, Number\(streak\) \|\| 0\)\)/,
-  'streak-driven background energy must be capped');
-assert.match(engine, /function setBackground\(streakValue = streak\)[\s\S]*?backgroundFor\(palette, bgIndex, streakValue\)/,
-  'the live play field must derive its background from the current streak');
+assert.match(engine, /function progressColorFor\(palette, percent\)/,
+  'background energy must be derived from cumulative correct progress');
+assert.match(engine, /const p = Math\.max\(0, Math\.min\(100, Number\(percent\) \|\| 0\)\) \/ 100/,
+  'progress color must be capped to the run range');
+assert.match(engine, /function setBackground\(correctCount = 0\)[\s\S]*?progressColorFor\(palette, percent\)/,
+  'the live play field must derive its background from correct answers');
 assert.match(engine, /setBackground\(streak\)/,
   'question rendering must apply the current streak background energy');
 assert.match(engine, /function clearAnnouncement\(\)/,
