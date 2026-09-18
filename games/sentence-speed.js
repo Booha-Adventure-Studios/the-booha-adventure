@@ -1100,6 +1100,7 @@ let runStartedAt = 0;
 let feedbackState = 'awaiting-start';
 let recoveryPending = false;
 let mistakes = 0;
+let missedItems = [];
 let finalClimaxTimer = null;
 let resultFxTimers = [];
 let resultAudio = null;
@@ -1326,6 +1327,7 @@ function handlePick(btn, en) {
 
   } else {
     btn.classList.add('ssp-wrong');
+    if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     streak   = 0;
     updateStreakUI();
     updateStreakBanner();
@@ -1350,6 +1352,7 @@ function onTimeout() {
 
   Array.from(grid.children).forEach(b => b.classList.add('ssp-locked'));
 
+  if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
   mistakes++;
   setTimeout(() => { idx++; renderQ(); }, 340);
 }
@@ -1495,6 +1498,14 @@ function revealResults(runTime) {
   document.getElementById('ssp-rj').textContent = tier.jp;
   document.getElementById('ssp-rk').textContent = tier.kanji;
   U.renderResultMeta(results, { gameId: `${CFG.curriculum}:sentence_speed`, score: pct });
+  U.renderResultDetails(results, {
+    stats: [
+      { label: 'Correct / せいかい', value: `${score} / 15` },
+      { label: 'Missed / まちがい', value: String(mistakes) },
+      { label: 'Run time / じかん', value: `${Math.round(runTime / 1000)}s` },
+    ],
+    reviewItems: missedItems,
+  });
 
   U.emitGameEnd({
       saveId:    `${CFG.curriculum}:sentence_speed`,
@@ -1535,6 +1546,7 @@ document.getElementById('ssp-replay').addEventListener('click', () => {
 
   streakBanner.className = 'ssp-streak-banner';
   idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
+  missedItems = [];
   feedbackState = 'playing';
   recoveryPending = false;
   runStartedAt = performance.now();
