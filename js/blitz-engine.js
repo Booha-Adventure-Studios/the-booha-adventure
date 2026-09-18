@@ -270,23 +270,26 @@ window.BoohaBlitzEngine = (() => {
     return stop;
   }
 
-  function backgroundFor(palette, index = 0) {
-    const streak = arguments.length > 2 ? arguments[2] : 0;
-    const energy = Math.min(15, Math.max(0, Number(streak) || 0));
-    if (isMinimalPower() && palette.background?.main) return palette.background.main;
-    const hue = (palette.baseHue + index * (palette.hueStep || 51) + energy * (palette.feel === 'sleek' ? 1 : 2)) % 360;
-    const saturation = Math.min(100, palette.bgSat + energy * (palette.feel === 'arcade' ? 0.7 : 0.45));
-    const lightness = Math.min(42, palette.bgLit + energy * (palette.feel === 'playful' ? 0.4 : 0.25));
-    const main = index === 0 && energy === 0 && palette.background?.main
-      ? palette.background.main
-      : `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-    const secondaryHue = (hue + (palette.hueStep || 51) * 1.4 + energy * 2) % 360;
-    const secondary = energy === 0 && palette.background?.secondary
-      ? palette.background.secondary
-      : `hsl(${secondaryHue}, ${Math.min(100, saturation + 10)}%, ${Math.min(52, lightness + 14)}%)`;
-    const accent = `hsl(${(hue + 180) % 360}, ${Math.min(100, saturation)}%, ${Math.min(30, lightness + 4)}%)`;
-    return `radial-gradient(70% 55% at 50% 40%, ${secondary} 0%, transparent 72%),` +
-      `linear-gradient(145deg, ${main} 0%, ${accent} 100%)`;
+  // Dead/alive color model: 0% is flat white (the game hasn't "turned on"
+  // yet); each correct answer steps the color straight to its new cumulative
+  // percentage (correctCount / totalItemsInRun) -- no easing settle, since
+  // runs can finish in ~30s and a lingering animation would still be
+  // resolving when the next correct answer lands. A wrong answer calls this
+  // with 0 and snaps straight back to dead, before the run ends.
+  function progressColorFor(palette, percent) {
+    const p = Math.max(0, Math.min(100, Number(percent) || 0)) / 100;
+    if (p <= 0) return { css: '#ffffff', lightness: 100 };
+    const hue = palette.baseHue;
+    const saturation = Math.round(78 * p);
+    const lightness = Math.round(100 - 46 * p); // 100 (white) -> 54 (bold)
+    return { css: `hsl(${hue}, ${saturation}%, ${lightness}%)`, lightness };
+  }
+
+  // Text/UI ink flips from dark to light only once the background itself has
+  // gotten dark/saturated enough to need it -- true for roughly the last
+  // stretch of a run, never during the mostly-pale early game.
+  function inkFor(lightness) {
+    return lightness < 58 ? '#ffffff' : '#14161c';
   }
 
   function shuffle(arr) {
@@ -2154,8 +2157,10 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-glow', palette.glow);
       overlay.style.setProperty('--blitz-reward-glow', palette.rewardGlow || palette.glow);
       overlay.style.setProperty('--blitz-name-ease', palette.nameEasing || 'ease-out');
-      overlay.style.setProperty('--blitz-bg-main', palette.background?.main || `hsl(${palette.baseHue}, ${palette.bgSat}%, ${palette.bgLit}%)`);
-      overlay.style.setProperty('--blitz-bg-secondary', palette.background?.secondary || 'rgba(255,255,255,.08)');
+      overlay.style.setProperty('--blitz-bg-main', '#ffffff');
+      overlay.style.setProperty('--blitz-bg-secondary', 'rgba(0,0,0,.03)');
+      overlay.style.setProperty('--blitz-ink', '#14161c');
+      overlay.style.setProperty('--blitz-progress-color', '#14161c');
       overlay.style.setProperty('--blitz-correct', palette.correct?.color || '#00ff64');
       overlay.style.setProperty('--blitz-wrong', palette.wrong?.color || '#ff1e1e');
       overlay.style.setProperty('--blitz-popup-bg', palette.popup?.background || 'rgba(0,0,0,.92)');
@@ -2172,9 +2177,9 @@ window.BoohaBlitzEngine = (() => {
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
         overlay.style.setProperty(name, typeof value === 'function' ? value(palette) : value);
       });
-      overlay.style.background = backgroundFor(palette);
+      overlay.style.background = '#ffffff';
       const timer = overlay.querySelector(selector('timer'));
-      if (timer) timer.style.color = palette.timerColor;
+      if (timer) timer.style.color = 'var(--blitz-ink, #14161c)';
     }
 
     function createPlayerSpotlight(overlay, palette) {
@@ -2398,17 +2403,15 @@ window.BoohaBlitzEngine = (() => {
       setTimeout(() => wallpaper.remove(), REDUCED_MOTION ? 520 : 1450);
     }
 
+    // Scorecard-only final card: no curriculum banner, no headline, no
+    // residual-energy line, no badge/flourish/streak/perfect stack -- those
+    // were most of the "too much info" on the old completion screen. All
+    // that's kept here is the anti-skip hold countdown; every other line on
+    // the card is one of the plain winScreen fields populated in showWin().
     function ensureFinalCard(winScreen, palette) {
-      const existing = winScreen.querySelector('.booha-blitz-final-summary');
+      const existing = winScreen.querySelector('.booha-blitz-final-card');
       if (existing) {
-        return {
-          summary: existing,
-          streak: existing.querySelector('.booha-blitz-final-streak'),
-          perfect: existing.querySelector('.booha-blitz-final-perfect'),
-          headline: winScreen.querySelector('.booha-blitz-final-headline'),
-          residual: winScreen.querySelector('.booha-blitz-final-residual'),
-          hold: winScreen.querySelector('.booha-blitz-final-hold'),
-        };
+        return { hold: existing.querySelector('.booha-blitz-final-hold') };
       }
 
       const card = document.createElement('section');
@@ -2417,38 +2420,11 @@ window.BoohaBlitzEngine = (() => {
       while (winScreen.firstChild) card.appendChild(winScreen.firstChild);
       winScreen.appendChild(card);
 
-      const curriculum = document.createElement('div');
-      curriculum.className = 'booha-blitz-final-curriculum';
-      curriculum.textContent = `${palette?.name || 'BOOHA BLITZ'} · ${palette?.nameJp || ''}`.trim();
-      card.prepend(curriculum);
-
-      const headline = document.createElement('div');
-      headline.className = 'booha-blitz-final-headline';
-      headline.setAttribute('aria-live', 'polite');
-      const originalName = winScreen.querySelector(selector('winName'));
-      card.insertBefore(headline, originalName || null);
-
-      const residual = document.createElement('div');
-      residual.className = 'booha-blitz-final-residual';
-      residual.setAttribute('aria-live', 'polite');
-      residual.textContent = 'RUN ENERGY CARRIED INTO THE CLEAR';
-      card.insertBefore(residual, originalName || null);
-
-      const summary = document.createElement('div');
-      summary.className = 'booha-blitz-final-summary';
-      const badge = document.createElement('div');
-      badge.className = 'booha-blitz-final-badge';
-      badge.textContent = config.finalCard?.badge || 'FULL CLEAR';
-      const flourish = document.createElement('div');
-      flourish.className = 'booha-blitz-final-flourish';
-      flourish.textContent = config.finalCard?.detail || 'EVERY ANSWER LANDED';
-      const streak = document.createElement('div');
-      streak.className = 'booha-blitz-final-streak';
-      streak.textContent = 'BEST STREAK ×0';
-      const perfect = document.createElement('div');
-      perfect.className = 'booha-blitz-final-perfect';
-      perfect.hidden = true;
-      summary.append(badge, flourish, streak, perfect);
+      // The +/- delta line is a quiet, obvious-once-you-see-it detail, not a
+      // headline -- move it to the very bottom of the card, below the
+      // buttons, rather than where it sat in the old stacked layout.
+      const deltaNode = winScreen.querySelector(selector('winDelta'));
+      if (deltaNode) card.appendChild(deltaNode);
 
       const hold = document.createElement('div');
       hold.className = 'booha-blitz-final-hold';
@@ -2457,13 +2433,9 @@ window.BoohaBlitzEngine = (() => {
 
       const playAgain = winScreen.querySelector(selector('playAgain'));
       const buttonGroup = playAgain && playAgain.parentElement;
-      if (buttonGroup) {
-        card.insertBefore(summary, buttonGroup);
-        card.insertBefore(hold, buttonGroup);
-      } else {
-        card.append(summary, hold);
-      }
-      return { summary, streak, perfect, headline, residual, hold };
+      if (buttonGroup) card.insertBefore(hold, buttonGroup);
+      else card.append(hold);
+      return { hold };
     }
 
     function closeGame(overlay, stopTimer, stopBGM) {
@@ -2503,7 +2475,7 @@ window.BoohaBlitzEngine = (() => {
 
       if (mode === 'vocab') {
         const crumbs = ['#ffdca8', '#ffc46b', '#fff1d6', palette.accent, '#ffffff'];
-        for (let i = 0; i < effectCount(isRecord ? 70 : 46); i++) {
+        for (let i = 0; i < effectCount(isRecord ? 42 : 28); i++) {
           const p = document.createElement('div');
           const angle = Math.random() * Math.PI * 2;
           const dist = 70 + Math.random() * (isRecord ? 360 : 240);
@@ -2514,7 +2486,7 @@ window.BoohaBlitzEngine = (() => {
           p.addEventListener('animationend', () => p.remove());
           fragment.appendChild(p);
         }
-        for (let i = 0; i < effectCount(isRecord ? nameCount + 14 : nameCount); i++) {
+        for (let i = 0; i < effectCount(isRecord ? nameCount + 6 : nameCount); i++) {
           const d = document.createElement('div');
           const color = colors[Math.floor(Math.random() * colors.length)];
           d.className = 'vb-name-drop';
@@ -2525,7 +2497,7 @@ window.BoohaBlitzEngine = (() => {
         }
       } else if (mode === 'sentence') {
         const rubble = ['#9aa0a8', '#c7ccd4', '#6d737c', palette.accent, '#ffffff'];
-        for (let i = 0; i < effectCount(isRecord ? 40 : 26); i++) {
+        for (let i = 0; i < effectCount(isRecord ? 26 : 18); i++) {
           const d = document.createElement('div');
           const color = colors[Math.floor(Math.random() * colors.length)];
           d.className = 'sb-name-drop';
@@ -2534,7 +2506,7 @@ window.BoohaBlitzEngine = (() => {
           d.addEventListener('animationend', () => d.remove());
           fragment.appendChild(d);
         }
-        for (let i = 0; i < effectCount(isRecord ? 60 : 40); i++) {
+        for (let i = 0; i < effectCount(isRecord ? 36 : 24); i++) {
           const p = document.createElement('div');
           const angle = -Math.PI * (0.15 + Math.random() * 0.7);
           const dist = 80 + Math.random() * (isRecord ? 340 : 240);
@@ -2545,7 +2517,7 @@ window.BoohaBlitzEngine = (() => {
           fragment.appendChild(p);
         }
         if (finalCard.celebrationKind === 'lines') {
-          for (let i = 0; i < effectCount(isRecord ? 18 : 12); i++) {
+          for (let i = 0; i < effectCount(isRecord ? 12 : 8); i++) {
             const line = document.createElement('div');
             const color = colors[Math.floor(Math.random() * colors.length)];
             line.className = 'booha-blitz-structure-line';
@@ -2555,7 +2527,7 @@ window.BoohaBlitzEngine = (() => {
           }
         }
       } else {
-        for (let i = 0; i < effectCount(isRecord ? nameCount + 12 : nameCount); i++) {
+        for (let i = 0; i < effectCount(isRecord ? nameCount + 6 : nameCount); i++) {
           const d = document.createElement('div');
           const color = colors[Math.floor(Math.random() * colors.length)];
           const toLeft = i % 2 === 1;
@@ -2565,7 +2537,7 @@ window.BoohaBlitzEngine = (() => {
           d.addEventListener('animationend', () => d.remove());
           fragment.appendChild(d);
         }
-        for (let i = 0; i < effectCount(isRecord ? 34 : 22); i++) {
+        for (let i = 0; i < effectCount(isRecord ? 22 : 14); i++) {
           const line = document.createElement('div');
           const color = colors[Math.floor(Math.random() * colors.length)];
           const toLeft = i % 2 === 0;
@@ -2788,7 +2760,6 @@ window.BoohaBlitzEngine = (() => {
       let clearElapsed = null;
       let timerId = null;
       let locked = false;
-      let bgIndex = 0;
       let backgroundValue = '';
       let lastTimerPaint = -Infinity;
       let gameStarted = false;
@@ -2846,11 +2817,16 @@ window.BoohaBlitzEngine = (() => {
         });
       }
 
-      function setBackground(streakValue = streak) {
-        const next = backgroundFor(palette, bgIndex, streakValue);
-        if (next === backgroundValue) return;
-        backgroundValue = next;
-        overlay.style.background = next;
+      function setBackground(correctCount = 0) {
+        const total = initialQueueLength || queue.length || 1;
+        const percent = Math.max(0, Math.min(100, (correctCount / total) * 100));
+        const { css, lightness } = progressColorFor(palette, percent);
+        if (css === backgroundValue) return;
+        backgroundValue = css;
+        overlay.style.background = css;
+        overlay.style.setProperty('--blitz-bg-main', css);
+        overlay.style.setProperty('--blitz-ink', inkFor(lightness));
+        overlay.style.setProperty('--blitz-progress-color', percent <= 0 ? '#14161c' : css);
       }
 
       function scheduleTimerTick(delay = 0) {
@@ -3002,6 +2978,10 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function correctDetonate(correctBtn, answerRect, overlayRect, milestone = 0) {
+        // Color this answer's burst with the level the run is stepping up
+        // to -- the firework itself should look like part of the same
+        // dead-to-alive build-up, not a fixed palette color.
+        const stepColor = progressColorFor(palette, (streak / (initialQueueLength || 1)) * 100).css;
         overlay.classList.remove('correct-impact');
         void overlay.offsetWidth;
         overlay.classList.add('correct-impact');
@@ -3012,7 +2992,7 @@ window.BoohaBlitzEngine = (() => {
         }, 340);
         correctBtn.classList.add('micro-win');
         correctBtn.style.transition = 'none';
-        correctBtn.style.background = palette.correct?.color || '#00ff64';
+        correctBtn.style.background = stepColor;
         emitCorrectMicroBurst(correctBtn, answerRect, overlayRect);
         if (!REDUCED_MOTION) {
           overlay.style.transform = 'scale(1.02)';
@@ -3046,7 +3026,7 @@ window.BoohaBlitzEngine = (() => {
             const ovr = overlayRect || overlay.getBoundingClientRect();
             const cx = r.left - ovr.left + r.width / 2;
             const cy = r.top - ovr.top + r.height / 2;
-            const colors = [palette.accent, palette.accent2, '#ffffff', '#00ff64'];
+            const colors = [stepColor, '#ffffff', stepColor, '#ffd54f'];
             const particles = document.createDocumentFragment();
             const count = config.correctParticles || 20;
             for (let i = 0; i < effectCount(count); i++) {
@@ -3065,7 +3045,7 @@ window.BoohaBlitzEngine = (() => {
 
         if (!REDUCED_MOTION) {
           setTimeout(() => {
-            flashEl.style.background = palette.accent;
+            flashEl.style.background = stepColor;
             flashEl.style.opacity = '0.45';
             setTimeout(() => {
               flashEl.style.background = '#ffffff';
@@ -3074,7 +3054,7 @@ window.BoohaBlitzEngine = (() => {
             }, 35);
           }, 110);
         } else {
-          flashEl.style.background = palette.accent;
+          flashEl.style.background = stepColor;
           flashEl.style.opacity = '0.45';
           setTimeout(() => {
             flashEl.style.opacity = '0';
@@ -3260,7 +3240,6 @@ window.BoohaBlitzEngine = (() => {
         locked = true;
         setAnswerInputEnabled(false);
         const card = queue[current];
-        bgIndex++;
         setBackground(streak);
         jpWordEl.style.animation = 'none';
         hiraEl.style.animation = 'none';
@@ -3382,53 +3361,49 @@ window.BoohaBlitzEngine = (() => {
         }));
 
         const best = getBestScore(config.gameType, config.legacyKey, curr);
-        const weekly = getWeeklyScore(config.gameType, curr, weekId);
         const playerName = getPlayerName();
         const isRecord = result.isAllTimeRecord;
         const oldRecord = result.oldRecord;
+        const aliveColor = progressColorFor(palette, 100).css;
         winScreen.classList.toggle('record-mode', isRecord);
         winScreen.classList.add('blitz-finish');
         winScreen.classList.add('residual-run');
-        winScreen.style.setProperty('--blitz-finish-accent', isRecord ? '#ffd700' : (palette.rewardColors?.[1] || palette.accent));
+        winScreen.style.setProperty('--blitz-finish-accent', isRecord ? '#ffd700' : aliveColor);
         winScreen.style.setProperty('--blitz-finish-glow', isRecord ? 'rgba(255, 215, 0, .34)' : (palette.rewardGlow || palette.glow));
         const finishGradient = palette.rewardColors?.length
           ? palette.rewardColors.join(', ')
           : `${palette.accent}, ${palette.accent2}, #ffffff`;
         winScreen.style.setProperty('--blitz-finish-gradient', `linear-gradient(90deg, ${finishGradient})`);
-        winScreen.querySelector(selector('winName')).textContent = playerName;
-        winScreen.querySelector(selector('winScream')).textContent = isRecord ? config.winCopy.record : config.winCopy.clear;
-        winScreen.querySelector(selector('winJp')).textContent = isRecord ? config.winCopy.jp : 'クリア。';
+
+        // Fixed scorecard copy -- content no longer branches on outcome
+        // beyond the "NEW BEST TIME" header, per spec.
+        winScreen.querySelector(selector('winName')).textContent = `${playerName} is Awesome!!`;
+        winScreen.querySelector(selector('winScream')).textContent = 'Booha is happy!!';
+        const jpLine = winScreen.querySelector(selector('winJp'));
+        jpLine.classList.add('booha-blitz-ruby-text');
+        jpLine.innerHTML = 'For you: It\u2019s <ruby>Booha<rt>\u30d6\u30fc\u30cf\u30fc</rt></ruby>';
         const timeEl = winScreen.querySelector(selector('winTime'));
         timeEl.textContent = fmtTime(ms);
-        timeEl.style.color = isRecord ? '#ffd700' : palette.timerColor;
+        timeEl.style.color = isRecord ? '#ffd700' : aliveColor;
         timeEl.style.textShadow = isRecord
           ? '0 0 28px rgba(255,215,0,1), 0 0 70px rgba(255,90,0,0.75)'
           : `0 0 32px ${palette.glow}, 0 0 64px ${palette.glow}`;
         const recordEl = winScreen.querySelector(selector('winRecord'));
         const bestEl = winScreen.querySelector(selector('winBest'));
         const deltaEl = winScreen.querySelector(selector('winDelta'));
+        // "NEW BEST TIME" only appears when this run set the all-time best --
+        // otherwise the header is skipped entirely, per spec.
+        recordEl.hidden = !isRecord;
         recordEl.classList.toggle('big', isRecord);
+        recordEl.textContent = isRecord ? 'NEW BEST TIME' : '';
+        bestEl.textContent = `Your best time: ${fmtTime(isRecord ? ms : (best ? best.ms : ms))}`;
+        // Kept, per spec ("there is already a built-in +/- time, just have
+        // this on the bottom") -- markup order puts it after the buttons.
         if (isRecord) {
-          recordEl.textContent = '🏆 NEW BOOHA RECORD';
-          bestEl.textContent = `TARGET SPEED: ${fmtTime(speedTarget.targetMs)} · YOUR BEST: ${fmtTime(ms)}`;
-          deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than previous best` : 'FIRST PERSONAL BEST';
+          deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than your previous best` : 'Your first record!';
         } else {
-          recordEl.textContent = result.isWeeklyRecord ? 'THIS WEEK’S FASTEST · #1' : 'PERFECT CLEAR';
-          bestEl.textContent = `TARGET SPEED: ${fmtTime(speedTarget.targetMs)} · YOUR BEST: ${best ? fmtTime(best.ms) : '--'}`;
-          deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs previous best` : (weekly ? `THIS WEEK: ${fmtTime(weekly.ms)}` : '');
+          deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs. your best` : '';
         }
-        finalCard.streak.textContent = `BEST STREAK ×${bestStreak}`;
-        if (finalCard.headline) {
-          finalCard.headline.textContent = `${playerName} — ${String(palette.name || 'BOOHA').toUpperCase()} BLITZ`;
-        }
-        if (finalCard.residual) {
-          const speedLabel = speedBand === 'elite'
-            ? 'ELITE SPEED'
-            : speedBand === 'target' ? 'TARGET SPEED' : 'PERFECT CLEAR';
-          finalCard.residual.textContent = `${speedLabel} · ${palette.streak?.label || 'STREAK'} ENERGY ×${bestStreak} — STILL GLOWING`;
-        }
-        finalCard.perfect.hidden = false;
-        finalCard.perfect.textContent = `PERFECT RUN · ${initialQueueLength}/${initialQueueLength}`;
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         winScreen.classList.toggle('speed-target-mode', speedBand === 'target');
         winScreen.classList.toggle('speed-elite-mode', speedBand === 'elite');
@@ -3496,6 +3471,7 @@ window.BoohaBlitzEngine = (() => {
         openRecordsPanel({
           monthSlug,
           weekNumber,
+          curr,
           returnFocus: event.currentTarget,
         });
       });
@@ -3599,13 +3575,12 @@ window.BoohaBlitzEngine = (() => {
           <button type="button" data-record-scope="weekly" aria-pressed="true">今週 <span>THIS WEEK</span></button>
           <button type="button" data-record-scope="alltime" aria-pressed="false">これまで <span>ALL TIME</span></button>
         </div>
-        <div id="blitz-rec-hero" aria-live="polite">
-          <div id="blitz-rec-hero-label">FASTEST EVER</div>
-          <div id="blitz-rec-hero-time">--</div>
-          <div id="blitz-rec-hero-meta">YOUR FIRST RECORD STARTS HERE</div>
+        <div id="blitz-rec-awake" aria-live="polite">
+          <div id="blitz-rec-awake-label">THIS WEEK</div>
+          <div id="blitz-rec-awake-pct">0%</div>
+          <div id="blitz-rec-awake-meta">DEAD — PLAY A BLITZ GAME TO WAKE IT UP</div>
         </div>
-        <div id="blitz-rec-board" aria-label="Blitz records board"></div>
-        <div id="blitz-rec-progress" aria-live="polite"></div>
+        <div id="blitz-rec-list" aria-label="Blitz records list"></div>
       </section>
     `;
 
@@ -3657,39 +3632,27 @@ window.BoohaBlitzEngine = (() => {
           color: #15101e; border-color: #ffe27a; background: #ffe27a;
           box-shadow: 0 0 20px rgba(255,226,122,.42);
         }
-        #blitz-rec-hero {
-          margin: 0 20px 16px; padding: 15px 16px 17px; text-align: center;
-          border: 1px solid rgba(255,226,122,.62); border-radius: 18px;
-          background: linear-gradient(135deg, rgba(255,226,122,.17), rgba(255,111,181,.14));
-          box-shadow: 0 0 24px rgba(255,226,122,.12);
+        #blitz-rec-awake {
+          margin: 0 20px 16px; padding: 20px 16px; text-align: center;
+          border-radius: 18px; border: 2px solid var(--rec-accent, rgba(255,255,255,.3));
+          background: var(--rec-awake-bg, #ffffff);
+          transition: background 300ms ease, border-color 300ms ease;
         }
-        #blitz-rec-hero-label { color: #ffe27a; font-size: 11px; font-weight: 1000; letter-spacing: 2px; }
-        #blitz-rec-hero-time { margin: 1px 0 0; font-size: clamp(52px,13vw,76px); font-weight: 1000; line-height: .98; letter-spacing: -2px; font-variant-numeric: tabular-nums; text-shadow: 0 0 22px rgba(255,226,122,.55); }
-        #blitz-rec-hero-meta { color: rgba(255,255,255,.8); font-size: clamp(10px,2.4vw,13px); font-weight: 800; letter-spacing: .8px; }
-        #blitz-rec-board { display: grid; grid-template-columns: minmax(74px, .7fr) repeat(3, minmax(0, 1fr)); gap: 7px; padding: 0 20px; }
-        .blitz-rec-corner { min-height: 20px; }
-        .blitz-rec-game-head { padding: 5px 2px 7px; text-align: center; color: rgba(255,255,255,.76); font-size: clamp(8px,2vw,11px); font-weight: 1000; letter-spacing: .7px; }
-        .blitz-rec-game-head span { display: block; color: rgba(255,255,255,.52); font-size: 10px; letter-spacing: 1px; }
-        .blitz-rec-curr-head { display: flex; flex-direction: column; justify-content: center; padding: 8px 4px; color: #fff; font-size: clamp(10px,2.4vw,13px); font-weight: 1000; line-height: 1.1; }
-        .blitz-rec-curr-head span { margin-top: 4px; color: rgba(255,255,255,.55); font-size: 9px; letter-spacing: .5px; }
-        .blitz-rec-cell { min-height: 103px; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 8px 9px; border: 1px solid var(--rec-accent); border-radius: 14px; background: linear-gradient(145deg, color-mix(in srgb, var(--rec-accent) 22%, transparent), rgba(0,0,0,.2)); box-shadow: 0 0 15px color-mix(in srgb, var(--rec-accent) 24%, transparent); }
-        .blitz-rec-cell.is-open { border-style: dashed; background: rgba(0,0,0,.16); box-shadow: none; }
-        .blitz-rec-cell-top { display: flex; justify-content: flex-end; min-height: 15px; }
-        .blitz-rec-medal { padding: 3px 5px; border-radius: 999px; font-size: 8px; font-weight: 1000; letter-spacing: .7px; color: #18111e; background: var(--rec-accent); }
-        .blitz-rec-cell.is-open .blitz-rec-medal { color: rgba(255,255,255,.62); background: rgba(255,255,255,.1); }
-        .blitz-rec-time { align-self: center; font-size: clamp(17px,4vw,25px); font-weight: 1000; font-variant-numeric: tabular-nums; line-height: 1; }
-        .blitz-rec-cell.is-open .blitz-rec-time { color: rgba(255,255,255,.58); font-size: clamp(14px,3vw,18px); }
-        .blitz-rec-target { align-self: center; color: rgba(255,255,255,.58); font-size: 8px; font-weight: 900; letter-spacing: .8px; }
-        #blitz-rec-progress { display: flex; align-items: center; gap: 9px; padding: 16px 20px 19px; color: rgba(255,255,255,.78); font-size: 10px; font-weight: 1000; letter-spacing: 1px; }
-        #blitz-rec-progress-segments { display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px; flex: 1; }
-        .blitz-rec-progress-segment { height: 7px; border-radius: 99px; background: rgba(255,255,255,.16); }
-        .blitz-rec-progress-segment.is-cleared { background: var(--rec-accent); box-shadow: 0 0 9px var(--rec-accent); }
+        #blitz-rec-awake[hidden] { display: none; }
+        #blitz-rec-awake-label { font-size: 11px; font-weight: 1000; letter-spacing: 2px; color: var(--rec-awake-ink, #14161c); }
+        #blitz-rec-awake-pct { margin: 4px 0; font-size: clamp(40px,11vw,58px); font-weight: 1000; line-height: 1; color: var(--rec-awake-ink, #14161c); }
+        #blitz-rec-awake-meta { font-size: clamp(10px,2.4vw,13px); font-weight: 800; letter-spacing: .5px; color: var(--rec-awake-ink, #14161c); }
+        #blitz-rec-list { display: flex; flex-direction: column; gap: 8px; padding: 0 20px 20px; }
+        .blitz-rec-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.18); }
+        .blitz-rec-row.is-cleared { border-color: var(--rec-accent); background: color-mix(in srgb, var(--rec-accent) 18%, transparent); }
+        .blitz-rec-row-label { font-weight: 900; font-size: clamp(12px,3vw,15px); color: #fff; }
+        .blitz-rec-row-label span { display: block; font-size: 10px; color: rgba(255,255,255,.55); letter-spacing: .5px; margin-top: 2px; }
+        .blitz-rec-row-time { font-weight: 1000; font-variant-numeric: tabular-nums; font-size: clamp(14px,3.4vw,18px); color: #fff; }
+        .blitz-rec-row.is-open .blitz-rec-row-time { color: rgba(255,255,255,.4); font-weight: 800; }
         @media (max-width: 430px) {
           #blitz-rec-inner { border-radius: 20px; }
-          #blitz-rec-top, #blitz-rec-toggle, #blitz-rec-board, #blitz-rec-progress { padding-left: 12px; padding-right: 12px; }
-          #blitz-rec-hero { margin-left: 12px; margin-right: 12px; }
-          .blitz-rec-cell { min-height: 92px; padding-left: 5px; padding-right: 5px; }
-          #blitz-rec-board { gap: 4px; }
+          #blitz-rec-top, #blitz-rec-toggle, #blitz-rec-list { padding-left: 12px; padding-right: 12px; }
+          #blitz-rec-awake { margin-left: 12px; margin-right: 12px; }
         }
       `;
       document.head.appendChild(style);
@@ -3740,88 +3703,58 @@ window.BoohaBlitzEngine = (() => {
   function renderRecordsPanel(panel) {
     const scope = panel._recordsScope || 'weekly';
     const weekId = panel._recordsWeekId;
-    const board = panel.querySelector('#blitz-rec-board');
-    const scores = [];
-    RECORD_CURRICULA.forEach(curr => RECORD_GAMES.forEach(game => {
-      const score = scope === 'weekly'
-        ? getWeeklyScoreFor(game.id, curr, weekId)
-        : getRecordScoreFor(game.id, RECORD_LEGACY_KEYS[game.id], curr);
-      scores.push({ game, curr, score });
-    }));
+    const curr = panel._recordsCurr || 'pb';
+    const theme = THEMES[curr] || THEMES.pb;
+    panel.style.setProperty('--rec-accent', theme.accent);
 
-    const hero = RECORD_CURRICULA.flatMap(curr => RECORD_GAMES.map(game => ({
-      curr,
-      game,
-      score: getRecordScoreFor(game.id, RECORD_LEGACY_KEYS[game.id], curr),
-    }))).filter(item => item.score).sort((a, b) => a.score.ms - b.score.ms)[0];
-    panel.querySelector('#blitz-rec-hero-time').textContent = hero ? fmtTime(hero.score.ms) : '--';
-    panel.querySelector('#blitz-rec-hero-meta').textContent = hero
-      ? `${hero.score.name && hero.score.name !== 'UNKNOWN' ? hero.score.name : 'PLAYER 1'} · ${recordDateLabel(hero.score.date)} · ${hero.game.label} / ${THEMES[hero.curr].name}`
-      : 'YOUR FIRST RECORD STARTS HERE';
+    const list = panel.querySelector('#blitz-rec-list');
+    const awake = panel.querySelector('#blitz-rec-awake');
+    const label = panel.querySelector('#blitz-rec-awake-label');
+    const pctEl = panel.querySelector('#blitz-rec-awake-pct');
+    const metaEl = panel.querySelector('#blitz-rec-awake-meta');
+
     panel.querySelectorAll('[data-record-scope]').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.recordScope === scope));
     });
 
-    board.innerHTML = '';
-    const corner = document.createElement('div');
-    corner.className = 'blitz-rec-corner';
-    board.appendChild(corner);
-    RECORD_GAMES.forEach(game => {
-      const heading = document.createElement('div');
-      heading.className = 'blitz-rec-game-head';
-      heading.innerHTML = `${game.label}<span>${game.jp}</span>`;
-      board.appendChild(heading);
-    });
-    RECORD_CURRICULA.forEach(curr => {
-      const theme = THEMES[curr];
-      const row = document.createElement('div');
-      row.className = 'blitz-rec-curr-head';
-      row.textContent = theme.name;
-      const jp = document.createElement('span');
-      jp.textContent = theme.nameJp;
-      row.appendChild(jp);
-      board.appendChild(row);
-      RECORD_GAMES.forEach(game => {
-        const item = scores.find(entry => entry.curr === curr && entry.game.id === game.id);
-        const target = speedTargetForGame(game.id);
-        const band = item.score ? speedBandFor(item.score.ms, target) : null;
-        const cell = document.createElement('div');
-        cell.className = `blitz-rec-cell ${item.score ? `band-${band}` : 'is-open'}`;
-        cell.style.setProperty('--rec-accent', theme.accent);
-        cell.setAttribute('aria-label', item.score
-          ? `${theme.name} ${game.label}: ${fmtTime(item.score.ms)}, ${band}`
-          : `${theme.name} ${game.label}: target ${fmtTime(target)}`);
-        const top = document.createElement('div');
-        top.className = 'blitz-rec-cell-top';
-        const medal = document.createElement('span');
-        medal.className = 'blitz-rec-medal';
-        medal.textContent = item.score ? band.toUpperCase() : 'TARGET';
-        top.appendChild(medal);
-        const time = document.createElement('div');
-        time.className = 'blitz-rec-time';
-        time.textContent = item.score ? fmtTime(item.score.ms) : fmtTime(target);
-        const targetLabel = document.createElement('div');
-        targetLabel.className = 'blitz-rec-target';
-        targetLabel.textContent = item.score ? 'PERSONAL RECORD' : 'FIRST CLEAR GOAL';
-        cell.append(top, time, targetLabel);
-        board.appendChild(cell);
-      });
-    });
+    const rows = RECORD_GAMES.map(game => ({
+      game,
+      score: scope === 'weekly'
+        ? getWeeklyScoreFor(game.id, curr, weekId)
+        : getRecordScoreFor(game.id, RECORD_LEGACY_KEYS[game.id], curr),
+    }));
 
-    const cleared = scores.filter(item => item.score).length;
-    const progress = panel.querySelector('#blitz-rec-progress');
-    progress.innerHTML = '';
-    const segments = document.createElement('div');
-    segments.id = 'blitz-rec-progress-segments';
-    scores.forEach(item => {
-      const segment = document.createElement('span');
-      segment.className = `blitz-rec-progress-segment ${item.score ? 'is-cleared' : ''}`;
-      segment.style.setProperty('--rec-accent', THEMES[item.curr].accent);
-      segments.appendChild(segment);
+    if (scope === 'weekly') {
+      awake.hidden = false;
+      const clearedCount = rows.filter(r => r.score).length;
+      const percent = clearedCount === 0 ? 0 : clearedCount === 1 ? 33 : clearedCount === 2 ? 66 : 100;
+      const { css, lightness } = progressColorFor(theme, percent);
+      awake.style.setProperty('--rec-awake-bg', percent <= 0 ? '#ffffff' : css);
+      awake.style.setProperty('--rec-awake-ink', inkFor(lightness));
+      label.textContent = `${theme.name.toUpperCase()} · THIS WEEK`;
+      pctEl.textContent = `${percent}% AWAKE`;
+      metaEl.textContent = percent === 0
+        ? 'DEAD — PLAY A BLITZ GAME TO WAKE IT UP'
+        : percent === 100
+          ? 'FULLY AWAKE — ALL THREE CLEARED'
+          : `${clearedCount} OF 3 CLEARED THIS WEEK`;
+    } else {
+      awake.hidden = true;
+    }
+
+    list.innerHTML = '';
+    rows.forEach(({ game, score }) => {
+      const row = document.createElement('div');
+      row.className = `blitz-rec-row ${score ? 'is-cleared' : 'is-open'}`;
+      const labelWrap = document.createElement('div');
+      labelWrap.className = 'blitz-rec-row-label';
+      labelWrap.innerHTML = `${game.label}<span>${game.jp}</span>`;
+      const timeEl = document.createElement('div');
+      timeEl.className = 'blitz-rec-row-time';
+      timeEl.textContent = score ? fmtTime(score.ms) : '--';
+      row.append(labelWrap, timeEl);
+      list.appendChild(row);
     });
-    const label = document.createElement('span');
-    label.textContent = `${cleared}/9 ${scope === 'weekly' ? 'CLEARED THIS WEEK' : 'ALL-TIME RECORDS'}`;
-    progress.append(segments, label);
   }
 
   function openRecordsPanel(ctx = {}) {
@@ -3829,6 +3762,14 @@ window.BoohaBlitzEngine = (() => {
     if (!panel) panel = buildRecordsPanel();
     panel._recordsWeekId = resolveRecordsWeek(ctx);
     panel._recordsScope = ctx.scope === 'alltime' ? 'alltime' : 'weekly';
+    panel._recordsCurr = (ctx.curr === 'pb' || ctx.curr === 'br' || ctx.curr === 'bc')
+      ? ctx.curr
+      : (() => {
+          try {
+            const c = localStorage.getItem('booha_last_curr');
+            return (c === 'pb' || c === 'br' || c === 'bc') ? c : 'pb';
+          } catch (e) { return 'pb'; }
+        })();
     panel._recordsReturnFocus = ctx.returnFocus || document.activeElement;
     renderRecordsPanel(panel);
     panel.classList.add('show');

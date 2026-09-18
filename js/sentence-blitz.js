@@ -178,7 +178,7 @@ window.SentenceBlitz = (() => {
         font-weight: 900;
         line-height: 1.3;
         text-align: center;
-        color: #fff;
+        color: var(--blitz-ink, #14161c);
         text-shadow:
           0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--sb-glow),
           0 0 var(--blitz-word-glow, 64px) var(--sb-glow),
@@ -193,7 +193,8 @@ window.SentenceBlitz = (() => {
 
       #sb-hira {
         font-size: clamp(12px,min(2.5vw,2.5vh),18px);
-        color: var(--sb-hira-color);
+        color: var(--blitz-ink, #14161c);
+        opacity: .7;
         text-align: center;
         letter-spacing: 1.5px;
         line-height: 1.6;
@@ -218,12 +219,12 @@ window.SentenceBlitz = (() => {
         padding: clamp(12px,min(2.5vw,2.2vh),18px) clamp(14px,2.5vw,20px);
         font-size: clamp(13px,min(2.5vw,2.5vh),17px);
         font-weight: 700;
-        color: #fff;
+        color: var(--blitz-ink, #14161c);
         cursor: pointer;
         text-align: left;
         line-height: 1.4;
-        background: var(--sb-opt-bg);
-        border: 2px solid var(--sb-opt-border);
+        background: rgba(255,255,255,.78);
+        border: 2px solid var(--blitz-progress-color, #14161c);
         box-shadow: 0 6px 18px rgba(0,0,0,0.35),
           inset 0 1px 0 rgba(255,255,255,0.08);
         transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
@@ -290,7 +291,7 @@ window.SentenceBlitz = (() => {
       }
 
       .sb-opt:hover {
-        background: var(--sb-opt-hover);
+        background: rgba(0,0,0,.05);
         box-shadow: 0 0 16px 4px var(--sb-glow), 0 10px 24px rgba(0,0,0,0.45),
           inset 0 1px 0 rgba(255,255,255,0.14);
         transform: translateX(4px);
@@ -582,7 +583,7 @@ window.SentenceBlitz = (() => {
         <div class="sb-win-name"   id="sb-win-name"></div>
         <div class="sb-win-scream" id="sb-win-scream"></div>
         <div class="sb-win-jp"     id="sb-win-jp"></div>
-        <div class="sb-win-label">FINAL TIME</div>
+        <div class="sb-win-label">This Time:</div>
         <div class="sb-win-time"   id="sb-win-time-val"></div>
         <div class="sb-win-record" id="sb-win-record-msg"></div>
         <div class="sb-win-best"   id="sb-win-best-val"></div>

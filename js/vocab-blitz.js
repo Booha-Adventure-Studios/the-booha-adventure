@@ -172,7 +172,7 @@ const SCOLDS = [
         font-weight: 900;
         line-height: 1;
         text-align: center;
-        color: #fff;
+        color: var(--blitz-ink, #14161c);
         text-shadow:
           0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--vb-glow),
           0 0 var(--blitz-word-glow, 64px) var(--vb-glow),
@@ -186,7 +186,8 @@ const SCOLDS = [
 
       #vb-hira {
         font-size: clamp(16px,min(4vw,4vh),28px);
-        color: var(--vb-hira-color);
+        color: var(--blitz-ink, #14161c);
+        opacity: .7;
         text-align: center;
         letter-spacing: 2px;
         text-shadow: 0 0 calc(var(--blitz-word-glow, 64px) * .28) var(--vb-glow);
@@ -211,13 +212,13 @@ const SCOLDS = [
         padding: clamp(14px,min(3.5vw,2.8vh),24px) clamp(10px,2vw,16px);
         font-size: clamp(14px,min(3.5vw,3vh),22px);
         font-weight: 900;
-        color: #fff;
+        color: var(--blitz-ink, #14161c);
         cursor: pointer;
         text-align: center;
         letter-spacing: 0.3px;
         line-height: 1.2;
-        background: var(--vb-opt-bg);
-        border: 2px solid var(--vb-opt-border);
+        background: rgba(255,255,255,.78);
+        border: 2px solid var(--blitz-progress-color, #14161c);
         box-shadow:
           0 0 0 0 var(--vb-glow),
           0 8px 24px rgba(0,0,0,0.4),
@@ -241,7 +242,7 @@ const SCOLDS = [
       .vb-opt:nth-child(6) { --opt-delay: 240ms; }
 
       .vb-opt:hover {
-        background: var(--vb-opt-hover);
+        background: rgba(0,0,0,.05);
         box-shadow:
           0 0 18px 4px var(--vb-glow),
           0 12px 28px rgba(0,0,0,0.5),
@@ -620,7 +621,7 @@ const SCOLDS = [
         <div class="vb-win-name"   id="vb-win-name"></div>
         <div class="vb-win-scream" id="vb-win-scream"></div>
         <div class="vb-win-jp"     id="vb-win-jp"></div>
-        <div class="vb-win-label">FINAL TIME</div>
+        <div class="vb-win-label">This Time:</div>
         <div class="vb-win-time"   id="vb-win-time-val"></div>
         <div class="vb-win-record" id="vb-win-record-msg"></div>
         <div class="vb-win-best"   id="vb-win-best-val"></div>
