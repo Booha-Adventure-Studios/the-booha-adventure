@@ -174,9 +174,9 @@ const SCOLDS = [
         text-align: center;
         color: var(--blitz-ink, #14161c);
         text-shadow:
-          0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--vb-glow),
-          0 0 var(--blitz-word-glow, 64px) var(--vb-glow),
-          0 0 calc(var(--blitz-word-glow, 64px) * 1.5) var(--vb-glow);
+          0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--blitz-word-glow-color, var(--vb-glow)),
+          0 0 var(--blitz-word-glow, 64px) var(--blitz-word-glow-color, var(--vb-glow)),
+          0 0 calc(var(--blitz-word-glow, 64px) * 1.5) var(--blitz-word-glow-color, var(--vb-glow));
         animation: vbWordPop 300ms cubic-bezier(.34,1.56,.64,1) both;
       }
       @keyframes vbWordPop {
@@ -190,7 +190,7 @@ const SCOLDS = [
         opacity: .7;
         text-align: center;
         letter-spacing: 2px;
-        text-shadow: 0 0 calc(var(--blitz-word-glow, 64px) * .28) var(--vb-glow);
+        text-shadow: 0 0 calc(var(--blitz-word-glow, 64px) * .28) var(--blitz-word-glow-color, var(--vb-glow));
         animation: vbWordPop 300ms 60ms cubic-bezier(.34,1.56,.64,1) both;
       }
 
@@ -332,19 +332,17 @@ const SCOLDS = [
 
       /* ── Wrong popup ── */
       #vb-wrong-popup {
-        position: absolute; inset: 0; z-index: 20;
+        /* Positioning, sizing, background and overflow now come entirely
+           from the shared ".blitz-wrong-feedback" rule in blitz-engine.js
+           (higher specificity, id+class) -- this rule used to duplicate and
+           conflict with it, producing a broken hybrid layout. Only the
+           flexbox alignment below isn't set anywhere else. */
+        z-index: 20;
         display: none;
         flex-direction: column;
         align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.88);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        box-sizing: border-box;
-        padding: clamp(18px, 4vw, 42px) 18px;
         text-align: center;
-        gap: 10px;
       }
-      #vb-wrong-popup.show { display: flex; }
 
       .vb-wrong-kanji {
         font-size: clamp(34px, 9vw, 78px);
@@ -485,12 +483,18 @@ const SCOLDS = [
 
       /* ── Mega win screen ── */
       .vb-win-name {
-        font-size: clamp(42px, 13vw, 108px);
+        /* Holds a full sentence ("(Name) is Awesome!!"), not a single mega
+           slam word -- the old 42-108px sizing with overflow-wrap:anywhere
+           broke mid-word ("Awesom" / "e!!"). Sized and wrapped for a
+           sentence instead. */
+        font-size: clamp(22px, 6vw, 40px);
         font-weight: 1000;
-        line-height: 0.9;
+        line-height: 1.15;
         color: #fff;
-        letter-spacing: 2px;
-        overflow-wrap: anywhere;
+        letter-spacing: 1px;
+        max-width: 100%;
+        overflow-wrap: break-word;
+        word-break: normal;
         text-shadow: 0 0 18px #fff, 0 0 34px var(--vb-glow), 0 0 70px var(--vb-glow);
         animation: vbWinSlam 520ms cubic-bezier(.12,1.7,.34,1) both;
       }

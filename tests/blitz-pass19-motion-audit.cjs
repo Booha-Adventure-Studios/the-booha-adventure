@@ -15,7 +15,7 @@ assert.match(engine, /btn\.classList\.add\('blitz-enter'\)/, 'fresh questions mu
 assert.match(engine, /--blitz-enter-delay.*optionStaggerMs/, 'answer options must use a short stagger rather than a long pause');
 assert.match(engine, /if \(!REDUCED_MOTION\) \{\n\s+overlay\.classList\.add\('shake'\)/, 'celebration shake must be skipped for reduced motion');
 assert.match(engine, /#\$\{config\.overlayId\}\.shake \{ animation: none !important; \}/, 'reduced motion must disable the shared screen-shake hook');
-assert.match(engine, /if \(!REDUCED_MOTION\) \{\n\s+setTimeout\(\(\) => \{\n\s+correctBtn\.style\.transition/, 'correct-answer ejection must be skipped for reduced motion');
+assert.match(engine, /if \(!REDUCED_MOTION\) \{[\s\S]*?correctBtn\.style\.transition = 'transform 140ms ease, opacity 140ms ease';/, 'correct-answer ejection must be skipped for reduced motion');
 assert.match(engine, /#\$\{config\.overlayId\}\.blitz-compositor \.\$\{config\.optionClass\}\.blitz-enter,[\s\S]*?animation: none !important/, 'reduced motion must disable fresh option animation');
 assert.match(verify, /tests\/blitz-pass19-motion-audit\.cjs/, 'verify.sh must run the Pass 7 motion audit');
 
