@@ -1494,6 +1494,7 @@ function revealResults(runTime) {
   document.getElementById('ssp-re').textContent = tier.en;
   document.getElementById('ssp-rj').textContent = tier.jp;
   document.getElementById('ssp-rk').textContent = tier.kanji;
+  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:sentence_speed`, score: pct });
 
   U.emitGameEnd({
       saveId:    `${CFG.curriculum}:sentence_speed`,

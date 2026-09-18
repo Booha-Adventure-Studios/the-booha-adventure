@@ -341,6 +341,47 @@ const UTILS = {
     setTimeout(send, 0);
   },
 
+  /* Add the shared Pass 1 result summary to any engine scorecard. */
+  renderResultMeta(container, { gameId, score, bestScore = null } = {}) {
+    if (!container) return;
+
+    const numericScore = Math.max(0, Math.min(100, Number(score) || 0));
+    let priorBest = Number.isFinite(bestScore) ? bestScore : null;
+    if (priorBest === null) {
+      try {
+        const scores = window.BoohaAdventure && window.BoohaAdventure.scores;
+        if (scores && typeof scores.getHighScore === 'function') {
+          priorBest = Number(scores.getHighScore(gameId));
+        }
+      } catch (_) {}
+    }
+    const best = Math.max(numericScore, Number.isFinite(priorBest) ? priorBest : 0);
+    const registry = window.BoohaGameRegistry;
+    const fallbackThresholds = String(gameId || '').includes('speed')
+      ? [30, 60, 90] : [40, 70, 90];
+    const starsFor = value => {
+      if (registry && typeof registry.starsForScore === 'function') {
+        return registry.starsForScore(gameId, value);
+      }
+      return fallbackThresholds.reduce((stars, threshold) => stars + (value >= threshold ? 1 : 0), 0);
+    };
+    const earned = starsFor(numericScore);
+    const bestStars = starsFor(best);
+    let meta = container.querySelector('.game-result-meta');
+    if (!meta) {
+      meta = document.createElement('div');
+      meta.className = 'game-result-meta';
+      container.querySelector('.game-result-actions, .game-result-inner, .vs-res-actions, .ssp-res-actions, .aq-res-actions, .sas-res-actions, .stw-res-actions, .so-res-actions, .st-res-actions, .sw-res-actions, .vt-res-actions')?.before(meta);
+      if (!meta.parentNode) container.appendChild(meta);
+    }
+    meta.innerHTML = `
+      <div class="game-result-stars" role="img" aria-label="${earned} of 3 stars this run; ${bestStars} of 3 stars best">
+        <span class="game-result-stars-current">${'★'.repeat(earned)}${'☆'.repeat(3 - earned)}</span>
+        <span class="game-result-stars-label">${earned}/3 stars</span>
+      </div>
+      <div class="game-result-best"><span>This run / こんかい</span> <b>${Math.round(numericScore)}%</b><span> · Best / ベスト</span> <b>${Math.round(best)}%</b></div>`;
+  },
+
   /* ══════════════════════════════
      SAGE VOICE PLAYER
      ══════════════════════════════ */
