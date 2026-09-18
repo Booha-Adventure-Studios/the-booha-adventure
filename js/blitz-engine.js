@@ -1014,7 +1014,48 @@ window.BoohaBlitzEngine = (() => {
         font-weight: 1000;
         letter-spacing: clamp(.5px, .35vw, 3px);
         line-height: .98;
+        -webkit-text-stroke: clamp(1px, .28vw, 3px) rgba(35, 16, 38, .42);
+        paint-order: stroke fill;
         text-shadow: 0 0 18px #fff, 0 0 42px var(--blitz-start-glow, var(--blitz-glow));
+      }
+      .booha-blitz-start-exit {
+        position: absolute;
+        top: max(env(safe-area-inset-top, 0px) + 16px, 16px);
+        right: max(env(safe-area-inset-right, 0px) + 16px, 16px);
+        z-index: 3;
+        appearance: none;
+        border: 1px solid rgba(35, 16, 38, .32);
+        border-radius: 999px;
+        padding: 8px 15px;
+        color: rgba(35, 16, 38, .78);
+        background: rgba(255,255,255,.68);
+        box-shadow: 0 4px 16px rgba(35,16,38,.16);
+        font-size: 12px;
+        font-weight: 950;
+        letter-spacing: 1px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .booha-blitz-start-exit:active { transform: scale(.96); }
+      #vb-quit,
+      #sb-quit,
+      #qb-quit {
+        color: #241b2a;
+        background: rgba(255,255,255,.9);
+        border-color: rgba(36,27,42,.34);
+        box-shadow: 0 3px 14px rgba(0,0,0,.2);
+        text-shadow: none;
+      }
+      #vb-quit:hover,
+      #sb-quit:hover,
+      #qb-quit:hover,
+      #vb-quit:focus-visible,
+      #sb-quit:focus-visible,
+      #qb-quit:focus-visible {
+        background: #fff;
+        border-color: rgba(36,27,42,.62);
+        outline: 2px solid var(--blitz-accent, #ff6fb5);
+        outline-offset: 2px;
       }
       .booha-blitz-start-copy {
         color: rgba(255,255,255,.76);
@@ -2125,7 +2166,14 @@ window.BoohaBlitzEngine = (() => {
     button.className = 'booha-blitz-start-button';
     button.type = 'button';
     button.textContent = 'START BLITZ →';
-    card.append(kicker, title, target, copy, button);
+    const exitButton = document.createElement('button');
+    exitButton.className = 'booha-blitz-start-exit';
+    exitButton.type = 'button';
+    exitButton.textContent = 'EXIT / やめる';
+    exitButton.addEventListener('click', () => {
+      overlay.querySelector('#vb-quit, #sb-quit, #qb-quit')?.click();
+    });
+    card.append(kicker, title, target, copy, button, exitButton);
     overlay.classList.add('blitz-awaiting-start');
     overlay.appendChild(card);
     return { card, button };
@@ -3428,14 +3476,13 @@ window.BoohaBlitzEngine = (() => {
 
       function showWin(ms) {
         const isPerfectRun = current === initialQueueLength && streak === initialQueueLength && bestStreak === initialQueueLength && mistakeCount === 0;
-        if (!isPerfectRun) return;
         const speedBand = speedBandFor(ms, speedTarget.targetMs);
         feedbackState = 'complete';
         runIsActive = false;
         visibilityPaused = false;
         const weekId = makeWeekId(monthSlug, weekNumber);
         const recordEligible = true;
-        const clearTier = 'perfect';
+        const clearTier = isPerfectRun ? 'perfect' : 'clear';
         const revealFinishFallback = () => {
           try {
             winScreen.classList.add('show');
@@ -3460,7 +3507,7 @@ window.BoohaBlitzEngine = (() => {
         const result = recordEligible
           ? saveBestTime(config.gameType, config.legacyKey, curr, ms, weekId, {
             clearTier,
-            mistakes: 0,
+            mistakes: mistakeCount,
           })
           : {
             isWeeklyRecord: false,

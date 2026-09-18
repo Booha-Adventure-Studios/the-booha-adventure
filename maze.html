@@ -1521,26 +1521,11 @@ function personalizeMazeIntro() {
   /* ── Weekly Blitz progress ──────────────────────────────
      Routed through BoohaSaveFile. Each of the three game types gets its
      own visual pip, while the complete state still requires all three. */
-  const progress = { vocab: false, sentences: false, questions: false };
-  try {
-    const cw     = getCurrentCurriculumWeek();
-    const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
-      `${cw.monthSlug}:w${cw.weekNumber}`;
-    const save   = (window.BoohaAdventure && BoohaAdventure.save)
-      ? BoohaAdventure.save.load()
-      : {};
-    const blitz  = (save.meta || {}).blitz || {};
-    const w      = blitz.weekly || {};
-    if (blitz.weeklyKey === weekId) {
-      const curr = currentBlitzCurriculum();
-      ['vocab', 'sentences', 'questions'].forEach(type => {
-        progress[type] = !!curr && !!(w[type] || {})[curr];
-      });
-    }
-  } catch (e) {}
+  const blitzState = readBlitzCompletionState();
+  const progress = blitzState.progress;
 
   const completedCount = Object.values(progress).filter(Boolean).length;
-  const blitzDone = completedCount === 3;
+  const blitzDone = !!blitzState.completedCurriculum;
   overlay.classList.toggle('blitz-complete', blitzDone);
   overlay.classList.toggle('blitz-incomplete', !blitzDone);
 
@@ -1610,13 +1595,12 @@ function personalizeMazeIntro() {
 function currentBlitzCurriculum() {
   try {
     const curr = localStorage.getItem('booha_last_curr') || '';
-    return ['pb', 'br', 'bc'].includes(curr) ? curr : '';
-  } catch (_) { return ''; }
+    return ['pb', 'br', 'bc'].includes(curr) ? curr : 'pb';
+  } catch (_) { return 'pb'; }
 }
 
-function blitzTripleCompleteForCurrentCurriculum() {
-  const curr = currentBlitzCurriculum();
-  if (!curr) return false;
+function readBlitzCompletionState() {
+  const state = { progress: { vocab: false, sentences: false, questions: false }, completedCurriculum: null };
   try {
     const cw = getCurrentCurriculumWeek();
     const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
@@ -1624,9 +1608,21 @@ function blitzTripleCompleteForCurrentCurriculum() {
     const save = window.BoohaAdventure?.save?.load?.() || {};
     const blitz = save.meta?.blitz || {};
     const weekly = blitz.weekly || {};
-    if (blitz.weeklyKey !== weekId) return false;
-    return ['vocab', 'sentences', 'questions'].every(type => !!weekly[type]?.[curr]);
-  } catch (_) { return false; }
+    if (blitz.weeklyKey !== weekId) return state;
+    const curricula = ['pb', 'br', 'bc'];
+    state.completedCurriculum = curricula.find(curr =>
+      ['vocab', 'sentences', 'questions'].every(type => !!weekly[type]?.[curr])
+    ) || null;
+    const displayCurriculum = state.completedCurriculum || currentBlitzCurriculum();
+    ['vocab', 'sentences', 'questions'].forEach(type => {
+      state.progress[type] = !!weekly[type]?.[displayCurriculum];
+    });
+  } catch (_) {}
+  return state;
+}
+
+function blitzTripleCompleteForAnyCurriculum() {
+  return !!readBlitzCompletionState().completedCurriculum;
 }
 
 function closeBattyUnlockPopup() {
@@ -1643,7 +1639,7 @@ function equipBattyFromUnlockPopup() {
 
 function maybeShowBattyUnlockPopup() {
   if (battyUnlockPopupShown || !window.BoohaSkins) return;
-  if (BoohaSkins.isUnlocked('batty') || !blitzTripleCompleteForCurrentCurriculum()) return;
+  if (BoohaSkins.isUnlocked('batty') || !blitzTripleCompleteForAnyCurriculum()) return;
   battyUnlockPopupShown = true;
   battyUnlockScrim.classList.add('show');
   battyUnlockPopup.classList.add('show');
