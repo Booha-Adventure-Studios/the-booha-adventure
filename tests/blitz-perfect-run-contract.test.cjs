@@ -1,5 +1,6 @@
 const fs = require('fs');
 const assert = require('assert');
+const vm = require('vm');
 
 // The weekly curriculum speed games are timed practice, not all-or-nothing
 // perfect-run tests. A completed 15-card pass must submit its real score so
@@ -24,10 +25,35 @@ assert.match(utils, /renderResultDetails\(container,/,
   'shared game utilities must provide the Pass 2 learning summary');
 assert.match(utils, /game-result-review/,
   'Pass 2 result summary must include a missed-item review drawer');
-assert.match(utils, /furiganaHTML\(jp, hira\)/,
-  'Pass 3 must provide structured Furigana rendering for review items');
+assert.match(utils, /furiganaHTML\(jp, hira, authoredReadings/,
+  'Pass 4 must support authored Furigana maps for review items');
+assert.match(utils, /item\.readings \|\| item\.furigana \|\| item\.readingMap/,
+  'Pass 4 must accept the documented reading-map aliases from content cards');
 assert.match(utils, /<ruby>\$\{escape\(kanjiRun\)\}/,
   'Pass 3 Furigana must attach readings to Kanji runs');
+
+const furiganaSandbox = {
+  window: {},
+  document: {},
+  navigator: { userAgent: '', platform: '', maxTouchPoints: 0 },
+  console,
+  setTimeout,
+  clearTimeout,
+  requestAnimationFrame: () => 0,
+  cancelAnimationFrame: () => {},
+};
+vm.runInNewContext(utils, furiganaSandbox);
+const furigana = furiganaSandbox.window.GAME_UTILS.furiganaHTML;
+assert.equal(
+  furigana('今日', 'きょう', { 今日: 'きょう' }),
+  '<ruby>今日<rt>きょう</rt></ruby>',
+  'authored reading maps must override heuristic segmentation',
+);
+assert.match(
+  furigana('これは私の机です。', 'これ は わたし の つくえ です'),
+  /<ruby>私<rt>わたし<\/rt><\/ruby>[の].*<ruby>机<rt>つくえ<\/rt><\/ruby>/,
+  'flat readings must still render separate ruby runs for sentences',
+);
 
 for (const source of weeklyEngines) {
   assert.match(source, /U\.renderResultMeta\(/,

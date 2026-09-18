@@ -138,7 +138,7 @@ window.GAME_CONFIG = {
   monthShort,
   monthFull,
   jsonType,
-  cards:      weekCards,   // 15 items [{id,en,jp,hira,mp3}, ...]
+  cards:      weekCards,   // 15 items [{id,en,jp,hira,mp3,readings?}, ...]
   audioBase,               // R2 URL prefix for content audio
   sfxBase,                 // /assets/audio/ for ding/fart/results
   navTarget:  reg.navTarget,
