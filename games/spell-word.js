@@ -1266,6 +1266,7 @@ function showResults() {
   document.getElementById('sw-re').textContent = tier.en;
   document.getElementById('sw-rj').textContent = tier.jp;
   document.getElementById('sw-rk').textContent = tier.kanji;
+  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:spell_word`, score: pct });
 
   /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('sw-replay');

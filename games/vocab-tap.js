@@ -1305,6 +1305,7 @@ function showResults() {
   document.getElementById('vt-re').textContent = tier.en;
   document.getElementById('vt-rj').textContent = tier.jp;
   document.getElementById('vt-rk').textContent = tier.kanji;
+  U.renderResultMeta(resEl, { gameId: `${CFG.curriculum}:vocab_tap`, score: pct });
 
   /* Build colorful action buttons */
   resActions.innerHTML = '';

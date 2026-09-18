@@ -503,6 +503,7 @@ function showResults() {
   document.getElementById('stw-re').textContent = tier.en;
   document.getElementById('stw-rk').textContent = tier.kanji;
   document.getElementById('stw-rj').textContent = tier.jp;
+  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:say_word`, score: pct });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
   if (CFG.sfxBase && tier.sound) {
     const snd = new Audio(CFG.sfxBase + tier.sound);

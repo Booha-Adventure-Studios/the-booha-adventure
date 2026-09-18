@@ -1591,6 +1591,7 @@ function revealResults(runTime) {
   document.getElementById('vs-re').textContent = tier.en;
   document.getElementById('vs-rj').textContent = tier.jp;
   document.getElementById('vs-rk').textContent = tier.kanji;
+  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:vocab_speed`, score: pct });
 
   U.emitGameEnd({
     saveId:    `${CFG.curriculum}:vocab_speed`,
