@@ -24,6 +24,10 @@ assert.match(utils, /renderResultDetails\(container,/,
   'shared game utilities must provide the Pass 2 learning summary');
 assert.match(utils, /game-result-review/,
   'Pass 2 result summary must include a missed-item review drawer');
+assert.match(utils, /furiganaHTML\(jp, hira\)/,
+  'Pass 3 must provide structured Furigana rendering for review items');
+assert.match(utils, /<ruby>\$\{escape\(kanjiRun\)\}/,
+  'Pass 3 Furigana must attach readings to Kanji runs');
 
 for (const source of weeklyEngines) {
   assert.match(source, /U\.renderResultMeta\(/,
