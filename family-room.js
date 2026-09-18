@@ -20,6 +20,9 @@
   const PATA_SPEED_NEAR = .14;
   const PATA_COOLDOWN_ROUNDS = 2;
   const PATA_CATCH_DISTANCE = .065;
+  const PATASKALA_RECOIL_DISTANCE = .16;
+  const FLASHLIGHT_BURST_MS = 560;
+  const MAX_FLASHLIGHT_CHARGES = 5;
   const COMPLETION_QUIET_MS = 2400;
   const DEBUG_ROOM_COORDINATES = false;
   const EXIT_BAND_V = .86;
@@ -52,7 +55,7 @@
   const FAMILY_HOUSE_CASES = Object.freeze([
     Object.freeze({ number: 0, id: 'engawa', name: 'ENGAWA', jp: 'えんがわ', role: 'hub', light: 'purple lanterns', exit: 'garden steps', feel: 'safe' }),
     Object.freeze({ number: 1, id: 'genkan', name: 'GENKAN', jp: 'げんかん', light: 'bare bulb and purple spill', exit: 'front door', feel: 'ordinary tutorial' }),
-    Object.freeze({ number: 2, id: 'chanoma', name: 'CHANOMA', jp: 'ちゃのま', light: 'andon', exit: 'engawa step', feel: 'reference case', status: 'built' }),
+    Object.freeze({ number: 2, id: 'chanoma', name: 'CHANOMA', jp: 'ちゃのま', light: 'andon', exit: 'engawa step', feel: 'reference case', status: 'built', pataskalaCharges: 1 }),
     Object.freeze({ number: 3, id: 'daidokoro', name: 'DAIDOKORO', jp: 'だいどころ', light: 'failing fluorescent tube', exit: 'corridor doorway', feel: 'drips, ticks, and a sink window' }),
     Object.freeze({ number: 4, id: 'roka', name: 'ROKA', jp: 'ろうか', light: 'moonlight through shoji', exit: 'far end', feel: 'mostly state changes' }),
     Object.freeze({ number: 5, id: 'kodomo-beya', name: 'KODOMO-BEYA', jp: 'こどもべや', light: 'small night light', exit: 'door', feel: 'cute vocabulary room' }),
@@ -233,6 +236,7 @@
   let currentPresence = null;
   let pataskalaThreat = null;
   let flashlightCharges = 0;
+  let flashlightBurst = null;
   let failureThreat = null;
   let pataskalaCooldownRounds = 0;
   let currentAudioOnly = false;
@@ -567,7 +571,7 @@
       const weeklyCharges = data.weekly?.worlds?.familyRoom?.flashlightCharges;
       const lifetimeCharges = data.familyRoom?.flashlightCharges;
       const charges = Number.isFinite(weeklyCharges) ? weeklyCharges : lifetimeCharges;
-      return Number.isFinite(charges) ? clamp(Math.floor(charges), 0, 3) : 0;
+      return Number.isFinite(charges) ? clamp(Math.floor(charges), 0, MAX_FLASHLIGHT_CHARGES) : 0;
     } catch (_) {
       return 0;
     }
@@ -581,7 +585,7 @@
       const weekly = data.weekly && typeof data.weekly === 'object' ? data.weekly : (data.weekly = {});
       const worlds = weekly.worlds && typeof weekly.worlds === 'object' ? weekly.worlds : (weekly.worlds = {});
       const familyRoom = worlds.familyRoom && typeof worlds.familyRoom === 'object' ? worlds.familyRoom : (worlds.familyRoom = {});
-      familyRoom.flashlightCharges = clamp(Math.floor(flashlightCharges), 0, 3);
+      familyRoom.flashlightCharges = clamp(Math.floor(flashlightCharges), 0, MAX_FLASHLIGHT_CHARGES);
       return save.save(data);
     } catch (error) {
       console.warn('[Family Room] flashlight charge unavailable', error);
@@ -606,6 +610,10 @@
   }
 
   function currentTier() { return TIER_RULES[selectedTier] || TIER_RULES.patient; }
+
+  function pataskalaChargeRequirement() {
+    return Math.max(1, Number(ACTIVE_CASE?.pataskalaCharges) || 1);
+  }
 
   function currentPhase() {
     let elapsed = 0;
@@ -786,6 +794,7 @@
     ctx.save();
     ctx.translate(roomCamera.x, roomCamera.y);
     drawWrongMarkHazard(time);
+    drawFlashlightBurst(time);
     drawMarks();
     drawRoomDebug();
     if (state !== 'caught') drawBooha(time);
@@ -927,6 +936,41 @@
     ctx.restore();
   }
 
+  function drawFlashlightBurst(time) {
+    if (!flashlightBurst) return;
+    const progress = clamp((time - flashlightBurst.startedAt) / FLASHLIGHT_BURST_MS, 0, 1);
+    if (progress >= 1) {
+      flashlightBurst = null;
+      return;
+    }
+    const eased = 1 - Math.pow(1 - progress, 2);
+    const radius = lightRadius() * (1.05 + eased * 2.9);
+    const alpha = (1 - progress) * .92;
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const burst = ctx.createRadialGradient(flashlightBurst.x, flashlightBurst.y, 1, flashlightBurst.x, flashlightBurst.y, radius);
+    burst.addColorStop(0, `rgba(255,255,255,${alpha})`);
+    burst.addColorStop(.18, `rgba(185,221,255,${alpha * .94})`);
+    burst.addColorStop(.62, `rgba(74,154,255,${alpha * .42})`);
+    burst.addColorStop(1, 'rgba(50,120,255,0)');
+    ctx.fillStyle = burst;
+    ctx.beginPath(); ctx.arc(flashlightBurst.x, flashlightBurst.y, radius, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = alpha * .82;
+    ctx.strokeStyle = '#b9ddff';
+    ctx.lineWidth = Math.max(2, radius * .035);
+    ctx.beginPath(); ctx.arc(flashlightBurst.x, flashlightBurst.y, radius * (.52 + progress * .42), 0, Math.PI * 2); ctx.stroke();
+    for (let index = 0; index < 8; index += 1) {
+      const angle = (Math.PI * 2 * index) / 8 + progress * .18;
+      const inner = radius * .58;
+      const outer = radius * (1.05 + Math.sin(index * 1.7) * .08);
+      ctx.beginPath();
+      ctx.moveTo(flashlightBurst.x + Math.cos(angle) * inner, flashlightBurst.y + Math.sin(angle) * inner);
+      ctx.lineTo(flashlightBurst.x + Math.cos(angle) * outer, flashlightBurst.y + Math.sin(angle) * outer);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function drawRoomDebug() {
     if (!DEBUG_ROOM_COORDINATES) return;
     ctx.save();
@@ -1005,7 +1049,8 @@
     flashlightButton.disabled = !active || flashlightCharges < 1;
     if (!flashlightChargeCopy) return;
     if (flashlightCharges > 0) {
-      flashlightChargeCopy.innerHTML = `<span>${flashlightCharges} charge${flashlightCharges === 1 ? '' : 's'} · pushes Pataskala back</span><span class="jp" lang="ja">${flashlightCharges}つ · パタスカラを おしもどす</span>`;
+      const hitsNeeded = pataskalaThreat?.chargesRemaining || pataskalaChargeRequirement();
+      flashlightChargeCopy.innerHTML = `<span>${flashlightCharges} charge${flashlightCharges === 1 ? '' : 's'} · ${hitsNeeded} hit${hitsNeeded === 1 ? '' : 's'} to repel</span><span class="jp" lang="ja">${flashlightCharges}つ · あと ${hitsNeeded}かいで パタスカラを おしもどす</span>`;
     } else {
       flashlightChargeCopy.innerHTML = '<span>no charges · find Nuppi in Karasuki</span><span class="jp" lang="ja">チャージなし · からすきで ヌーピーを さがす</span>';
     }
@@ -1017,13 +1062,29 @@
     saveFlashlightCharges();
     window.clearTimeout(pataskalaMoveTimer);
     pataskalaMoveTimer = 0;
-    clearPataskalaThreat();
-    currentPresence = null;
-    tellAvailable = false;
-    pataskalaCooldownRounds = Math.max(pataskalaCooldownRounds, PATA_COOLDOWN_ROUNDS + 1);
+    flashlightBurst = { x: booha.x, y: booha.y, startedAt: performance.now() };
+    pataskalaThreat.chargesRemaining = Math.max(0, pataskalaThreat.chargesRemaining - 1);
+    const pushedThreat = pataskalaThreat;
+    if (pushedThreat.chargesRemaining <= 0) {
+      clearPataskalaThreat();
+      currentPresence = null;
+      tellAvailable = false;
+      pataskalaCooldownRounds = Math.max(pataskalaCooldownRounds, PATA_COOLDOWN_ROUNDS + 1);
+      showPriorityClue('FLASHLIGHT CHARGE / PATASKALA RECOILS', 'フラッシュライト / パタスカラが さがる');
+      setObservation('PATASKALA PUSHED BACK / KEEP SEARCHING', 'パタスカラを おしもどした / まだ さがす', { immediate: true });
+    } else {
+      const dx = pushedThreat.x - booha.x;
+      const dy = pushedThreat.y - booha.y;
+      const distance = Math.hypot(dx, dy) || 1;
+      pushedThreat.x = clamp(pushedThreat.x + (dx / distance) * roomMinDimension() * PATASKALA_RECOIL_DISTANCE, plate.x, plate.x + plate.w);
+      pushedThreat.y = clamp(pushedThreat.y + (dy / distance) * roomMinDimension() * PATASKALA_RECOIL_DISTANCE, plate.y, plate.y + plate.h);
+      pushedThreat.startDistance = Math.max(pushedThreat.startDistance, Math.hypot(booha.x - pushedThreat.x, booha.y - pushedThreat.y));
+      pushedThreat.lastTime = performance.now();
+      pushedThreat.discoveryUntil = performance.now() + 500;
+      showPriorityClue(`FLASHLIGHT HIT / ${pushedThreat.chargesRemaining} MORE`, `フラッシュライト / あと ${pushedThreat.chargesRemaining}かい`);
+      setObservation('PATASKALA RECOILS / HIT IT AGAIN', 'パタスカラが さがる / もういちど あてる', { immediate: true });
+    }
     setControlsVisible(true);
-    showPriorityClue('FLASHLIGHT CHARGE / PATASKALA RECOILS', 'フラッシュライト / パタスカラが さがる');
-    setObservation('PATASKALA PUSHED BACK / KEEP SEARCHING', 'パタスカラを おしもどした / まだ さがす', { immediate: true });
     playSfx('move', AUDIO_LEVELS.move);
     ping(660, .05);
   }
@@ -1047,6 +1108,7 @@
       lastTime: performance.now(),
       startDistance: Math.max(1, Math.hypot(booha.x - startX, booha.y - startY)),
       stage: 0,
+      chargesRemaining: pataskalaChargeRequirement(),
     };
     cancelMarkingForThreat();
     setControlsVisible(true);

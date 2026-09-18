@@ -453,9 +453,19 @@ const HAPPY_HOUSE_PORTAL = {
     if (!data.weekly.worlds.familyRoom || typeof data.weekly.worlds.familyRoom !== 'object' || Array.isArray(data.weekly.worlds.familyRoom)) data.weekly.worlds.familyRoom = {};
     const familyRoom = data.weekly.worlds.familyRoom;
     const charges = Number(familyRoom.flashlightCharges);
-    familyRoom.flashlightCharges = Number.isFinite(charges) ? Math.max(0, Math.min(3, Math.floor(charges))) : 0;
+    familyRoom.flashlightCharges = Number.isFinite(charges) ? Math.max(0, Math.min(MAX_FLASHLIGHT_CHARGES, Math.floor(charges))) : 0;
     familyRoom.nuppiChargeClaimed = familyRoom.nuppiChargeClaimed === true;
     return familyRoom;
+  }
+
+  function refreshNuppiChargeState() {
+    try {
+      const data = BoohaAdventure?.save?.load?.();
+      const familyRoom = data ? weeklyFamilyRoomState(data) : null;
+      nuppiChargeClaimable = Boolean(familyRoom && !familyRoom.nuppiChargeClaimed && familyRoom.flashlightCharges < MAX_FLASHLIGHT_CHARGES);
+    } catch (_) {
+      nuppiChargeClaimable = false;
+    }
   }
 
   function updateNuppiFlashlightUi(statusOverride = '') {
@@ -467,11 +477,12 @@ const HAPPY_HOUSE_PORTAL = {
       const familyRoom = data ? weeklyFamilyRoomState(data) : null;
       if (statusOverride) status.textContent = statusOverride;
       else if (!familyRoom) status.textContent = 'The charge is waiting somewhere in the house.';
-      else if (familyRoom.nuppiChargeClaimed) status.textContent = 'Nuppi has already given Booha this week\'s charge.';
-      else if (familyRoom.flashlightCharges >= 3) status.textContent = 'Booha\'s charge pouch is full.';
-      else status.textContent = 'Nuppi can give Booha one charge for the Akiya room.';
-      button.disabled = Boolean(familyRoom?.nuppiChargeClaimed || familyRoom?.flashlightCharges >= 3);
-      button.textContent = familyRoom?.nuppiChargeClaimed ? 'CHARGE RECEIVED' : 'TAKE A FLASHLIGHT CHARGE';
+      else if (familyRoom.nuppiChargeClaimed) status.textContent = 'Nuppi has already given Booha this week\'s charges.';
+      else if (familyRoom.flashlightCharges >= MAX_FLASHLIGHT_CHARGES) status.textContent = 'Booha\'s charge pouch is full.';
+      else status.textContent = `Nuppi can give Booha ${NUPPI_FLASHLIGHT_REWARD} charges for the Akiya room.`;
+      button.disabled = Boolean(familyRoom?.nuppiChargeClaimed || familyRoom?.flashlightCharges >= MAX_FLASHLIGHT_CHARGES);
+      button.textContent = familyRoom?.nuppiChargeClaimed ? 'CHARGES RECEIVED' : `TAKE ${NUPPI_FLASHLIGHT_REWARD} FLASHLIGHT CHARGES`;
+      nuppiChargeClaimable = Boolean(familyRoom && !familyRoom.nuppiChargeClaimed && familyRoom.flashlightCharges < MAX_FLASHLIGHT_CHARGES);
     } catch (_) {
       status.textContent = statusOverride || 'The charge is waiting somewhere in the house.';
       button.disabled = false;
@@ -489,12 +500,12 @@ const HAPPY_HOUSE_PORTAL = {
         updateNuppiFlashlightUi('Nuppi has already given Booha this week\'s charge.');
         return;
       }
-      if (familyRoom.flashlightCharges >= 3) {
+      if (familyRoom.flashlightCharges >= MAX_FLASHLIGHT_CHARGES) {
         updateNuppiFlashlightUi('Booha\'s charge pouch is full.');
         return;
       }
       const previousCharges = familyRoom.flashlightCharges;
-      familyRoom.flashlightCharges += 1;
+      familyRoom.flashlightCharges = Math.min(MAX_FLASHLIGHT_CHARGES, familyRoom.flashlightCharges + NUPPI_FLASHLIGHT_REWARD);
       familyRoom.nuppiChargeClaimed = true;
       if (!BoohaAdventure.save.save(data)) {
         familyRoom.flashlightCharges = previousCharges;
@@ -503,7 +514,7 @@ const HAPPY_HOUSE_PORTAL = {
         return;
       }
       if (window.BoohaSync) BoohaSync.checkpoint('adventure');
-      updateNuppiFlashlightUi('One flashlight charge is tucked into Booha\'s light.');
+      updateNuppiFlashlightUi(`${familyRoom.flashlightCharges - previousCharges} flashlight charges are tucked into Booha\'s light.`);
       if (window.UtsuSfx && typeof window.UtsuSfx.buttonPress === 'function') window.UtsuSfx.buttonPress();
     } catch (_) {
       if (status) status.textContent = 'Nuppi could not pass the charge right now.';
@@ -5432,6 +5443,9 @@ function clickCheckObserver(worldX, worldY) {
   const NUPPI_EXIT_DIST   = 60;
   const NUPPI_IDLE_DRIFT  = 0.18;
   const NUPPI_GLOW_R      = 90;
+  const NUPPI_FLASHLIGHT_REWARD = 3;
+  const MAX_FLASHLIGHT_CHARGES = 5;
+  let nuppiChargeClaimable = false;
  
  /* ── Nuppi dialogue ── */
 const NUPPI_LINES = [
@@ -5690,6 +5704,7 @@ const NUPPI_LINES = [
   function initNuppi() {
     nuppiPlaceInRoom(nuppiRandomRoom(state.roomId));
     injectNuppiPop();
+    refreshNuppiChargeState();
   }
  
   function onRoomChangedNuppi() {
@@ -5759,7 +5774,19 @@ const NUPPI_LINES = [
 
     ctx.save();
 
-   
+    if (nuppiChargeClaimable) {
+      const chargeHalo = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R * 1.85);
+      chargeHalo.addColorStop(0, 'rgba(255,255,255,0.62)');
+      chargeHalo.addColorStop(.22, 'rgba(185,221,255,0.52)');
+      chargeHalo.addColorStop(.62, 'rgba(74,154,255,0.22)');
+      chargeHalo.addColorStop(1, 'rgba(50,120,255,0)');
+      ctx.globalAlpha = 0.72 + pulse * 0.2;
+      ctx.fillStyle = chargeHalo;
+      ctx.beginPath();
+      ctx.arc(nx, ny, NUPPI_GLOW_R * 1.85, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
    // Outer soft halo — drawn before sprite so it sits underneath
     const halo = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R * 1.4);
     halo.addColorStop(0,   'rgba(255,180,220,0.38)');
@@ -5852,6 +5879,8 @@ const NUPPI_LINES = [
           color:rgba(255,209,236,0.78);margin:0;
           font-family:'Noto Sans JP',serif;letter-spacing:.06em;"></p>
         </div>
+        <p style="margin:15px 24px 0;color:rgba(220,238,255,.78);font:600 .76rem/1.55 system-ui,sans-serif;">When Pataskala enters the Akiya room, use a flashlight charge to drive it back. Deeper rooms may take more than one burst.</p>
+        <p style="margin:6px 24px 0;color:rgba(185,221,255,.62);font:500 .72rem/1.55 system-ui,sans-serif;">パタスカラが あきやに はいったら、フラッシュライトを つかって おしもどす。おくの へやでは なんども ひつよう。</p>
         <div style="margin:18px 20px 0;padding:15px 16px;border:1px solid rgba(110,182,255,.52);border-radius:16px;background:rgba(21,55,91,.32);box-shadow:inset 0 0 18px rgba(110,182,255,.08);">
           <p style="font-family:monospace;font-size:.68rem;font-weight:800;letter-spacing:.14em;color:#b9ddff;margin:0 0 7px;">NUPPI'S GIFT / ヌーピーの おくりもの</p>
           <p id="nuppi-flashlight-status" aria-live="polite" style="font-family:system-ui,sans-serif;font-size:.76rem;line-height:1.5;color:rgba(220,238,255,.78);margin:0 0 11px;"></p>
