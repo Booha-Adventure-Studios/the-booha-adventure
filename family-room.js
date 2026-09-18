@@ -191,6 +191,10 @@
   idleBooha.src = 'assets/family-room/booha_idle.webp';
   const alertBooha = new Image();
   alertBooha.src = 'assets/family-room/booha_alert.webp';
+  function applyBoohaSkin() {
+    idleBooha.src = window.BoohaSkins?.asset('familyRoom') || 'assets/family-room/booha_idle.webp';
+    alertBooha.src = window.BoohaSkins?.asset('marking') || 'assets/family-room/booha_alert.webp';
+  }
   const anomalyArt = Object.fromEntries(anomalies.map(anomaly => {
     const image = new Image();
     image.src = `assets/family-room/overlays/${anomaly.id}.webp`;
@@ -706,7 +710,7 @@
   }
 
   function drawBooha(time) {
-    const image = isBoohaAlerting() ? alertBooha : idleBooha;
+    const image = (isBoohaAlerting() || pendingMark || markHoldOrigin) ? alertBooha : idleBooha;
     if (!imageReady(image)) return;
     const size = clamp(Math.min(width, height) * .1, 52, 92);
     const bob = REDUCED_MOTION ? 0 : Math.sin(time / 410) * 3;
@@ -1662,5 +1666,8 @@
   });
   window.addEventListener('keyup', event => { if (event.key === ' ' || event.key === 'Spacebar') releaseKeyboardMark(); });
 
+  applyBoohaSkin();
+  if (window.BOOHA_READY) applyBoohaSkin();
+  else document.addEventListener('booha:ready', applyBoohaSkin, { once: true });
   resize(); updateAndon(); updateTierButtons();
 })();

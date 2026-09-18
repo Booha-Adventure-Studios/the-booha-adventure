@@ -158,6 +158,9 @@
   const boohaImg = new Image();
   boohaImg.decoding = 'async';
   boohaImg.src = 'assets/img/booha_ghost.webp';
+  function applyBoohaSkin() {
+    boohaImg.src = window.BoohaSkins?.asset('grimmerglen') || 'assets/img/booha_ghost.webp';
+  }
 
   // Booha's Grimmerglen sprite -- swapped in after the player accepts the
   // entry-change prompt (see triggerBoohaTransformIfNeeded()/playBoohaTransform()
@@ -3108,6 +3111,7 @@
       showLockedWorld();
       return;
     }
+    applyBoohaSkin();
     // The weekly quest is the source of truth for the live entry lock. Keep
     // both runtime flags in sync before the room/transform path starts so a
     // reload in room_01 does not require Marietta's Help button again.
