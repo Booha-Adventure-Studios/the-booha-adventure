@@ -149,6 +149,8 @@ const BoohaSaveFile = (() => {
         completedCases: {},
         bestTier: null,
         preferredTier: 'patient',
+        flashlightCharges: 0,
+        nuppiChargeClaimed: false,
         lastResult: null,
       },
     };
@@ -258,6 +260,9 @@ const BoohaSaveFile = (() => {
     if (!current.familyRoom.completedCases || typeof current.familyRoom.completedCases !== 'object' || Array.isArray(current.familyRoom.completedCases)) current.familyRoom.completedCases = {};
     if (current.familyRoom.bestTier !== null && !['patient', 'quicker', 'lies'].includes(current.familyRoom.bestTier)) current.familyRoom.bestTier = null;
     if (!['patient', 'quicker', 'lies'].includes(current.familyRoom.preferredTier)) current.familyRoom.preferredTier = 'patient';
+    if (!Number.isFinite(current.familyRoom.flashlightCharges)) current.familyRoom.flashlightCharges = 0;
+    current.familyRoom.flashlightCharges = Math.max(0, Math.min(3, Math.floor(current.familyRoom.flashlightCharges)));
+    current.familyRoom.nuppiChargeClaimed = current.familyRoom.nuppiChargeClaimed === true;
     if (current.familyRoom.lastResult !== null && (typeof current.familyRoom.lastResult !== 'object' || Array.isArray(current.familyRoom.lastResult))) current.familyRoom.lastResult = null;
   }
 

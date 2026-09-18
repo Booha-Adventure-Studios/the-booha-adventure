@@ -108,6 +108,8 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
     completedCases: {},
     bestTier: null,
     preferredTier: 'patient',
+    flashlightCharges: 0,
+    nuppiChargeClaimed: false,
     lastResult: null,
   },
 });
@@ -156,6 +158,8 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.familyRoom), {
   completedCases: {},
   bestTier: null,
   preferredTier: 'patient',
+  flashlightCharges: 0,
+  nuppiChargeClaimed: false,
   lastResult: null,
 });
 

@@ -176,6 +176,8 @@
   const markYesButton = document.getElementById('mark-yes-button');
   const markNoButton = document.getElementById('mark-no-button');
   const flyAwayButton = document.getElementById('fly-away-button');
+  const flashlightButton = document.getElementById('flashlight-button');
+  const flashlightChargeCopy = document.getElementById('flashlight-charge-copy');
   const backButton = document.getElementById('back-button');
   const studyStartButton = document.getElementById('study-start-button');
   const studyBackButton = document.getElementById('study-back-button');
@@ -230,6 +232,7 @@
   let recentAnchorRegions = [];
   let currentPresence = null;
   let pataskalaThreat = null;
+  let flashlightCharges = 0;
   let failureThreat = null;
   let pataskalaCooldownRounds = 0;
   let currentAudioOnly = false;
@@ -555,6 +558,34 @@
       return TIER_RULES[weeklyTier] ? weeklyTier : TIER_RULES[lifetimeTier] ? lifetimeTier : 'patient';
     } catch (_) {
       return 'patient';
+    }
+  }
+
+  function readFlashlightCharges() {
+    try {
+      const data = window.BoohaAdventure?.save?.load?.() || {};
+      const weeklyCharges = data.weekly?.worlds?.familyRoom?.flashlightCharges;
+      const lifetimeCharges = data.familyRoom?.flashlightCharges;
+      const charges = Number.isFinite(weeklyCharges) ? weeklyCharges : lifetimeCharges;
+      return Number.isFinite(charges) ? clamp(Math.floor(charges), 0, 3) : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  function saveFlashlightCharges() {
+    const save = window.BoohaAdventure?.save;
+    if (!save?.load || !save?.save) return false;
+    try {
+      const data = save.load();
+      const weekly = data.weekly && typeof data.weekly === 'object' ? data.weekly : (data.weekly = {});
+      const worlds = weekly.worlds && typeof weekly.worlds === 'object' ? weekly.worlds : (weekly.worlds = {});
+      const familyRoom = worlds.familyRoom && typeof worlds.familyRoom === 'object' ? worlds.familyRoom : (worlds.familyRoom = {});
+      familyRoom.flashlightCharges = clamp(Math.floor(flashlightCharges), 0, 3);
+      return save.save(data);
+    } catch (error) {
+      console.warn('[Family Room] flashlight charge unavailable', error);
+      return false;
     }
   }
 
@@ -963,6 +994,38 @@
 
   function clearPataskalaThreat() {
     pataskalaThreat = null;
+    updateFlashlightUi();
+  }
+
+  function updateFlashlightUi() {
+    if (!flashlightButton) return;
+    const visible = !controls.classList.contains('hidden');
+    const active = visible && Boolean(pataskalaThreat);
+    flashlightButton.hidden = !active;
+    flashlightButton.disabled = !active || flashlightCharges < 1;
+    if (!flashlightChargeCopy) return;
+    if (flashlightCharges > 0) {
+      flashlightChargeCopy.innerHTML = `<span>${flashlightCharges} charge${flashlightCharges === 1 ? '' : 's'} · pushes Pataskala back</span><span class="jp" lang="ja">${flashlightCharges}つ · パタスカラを おしもどす</span>`;
+    } else {
+      flashlightChargeCopy.innerHTML = '<span>no charges · find Nuppi in Karasuki</span><span class="jp" lang="ja">チャージなし · からすきで ヌーピーを さがす</span>';
+    }
+  }
+
+  function useFlashlightCharge() {
+    if (state !== 'playing' || !pataskalaThreat || flashlightCharges < 1) return;
+    flashlightCharges -= 1;
+    saveFlashlightCharges();
+    window.clearTimeout(pataskalaMoveTimer);
+    pataskalaMoveTimer = 0;
+    clearPataskalaThreat();
+    currentPresence = null;
+    tellAvailable = false;
+    pataskalaCooldownRounds = Math.max(pataskalaCooldownRounds, PATA_COOLDOWN_ROUNDS + 1);
+    setControlsVisible(true);
+    showPriorityClue('FLASHLIGHT CHARGE / PATASKALA RECOILS', 'フラッシュライト / パタスカラが さがる');
+    setObservation('PATASKALA PUSHED BACK / KEEP SEARCHING', 'パタスカラを おしもどした / まだ さがす', { immediate: true });
+    playSfx('move', AUDIO_LEVELS.move);
+    ping(660, .05);
   }
 
   function beginPataskalaThreat() {
@@ -1137,6 +1200,7 @@
     controls.classList.toggle('hidden', !visible);
     leaveButton.disabled = !visible || Boolean(pataskalaThreat);
     undoButton.disabled = !visible || Boolean(pataskalaThreat);
+    updateFlashlightUi();
   }
 
   function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / HOLD TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / じっと させる'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
@@ -1741,6 +1805,7 @@
   soundToggle.addEventListener('click', toggleSound);
   clueCloseButton?.addEventListener('click', continueFromClue);
   flyAwayButton?.addEventListener('click', flyAwayToSafeRoom);
+  flashlightButton?.addEventListener('click', useFlashlightCharge);
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; savePreferredTier(); updateTierButtons(); }));
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);
@@ -1764,5 +1829,6 @@
   if (window.BOOHA_READY) applyBoohaSkin();
   else document.addEventListener('booha:ready', applyBoohaSkin, { once: true });
   selectedTier = readPreferredTier();
+  flashlightCharges = readFlashlightCharges();
   resize(); updateAndon(); updateTierButtons();
 })();
