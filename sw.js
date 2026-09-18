@@ -197,7 +197,8 @@ const CURRENT_CACHES = {
   // the existing network-first page/script path.
   // Family Room Pass 3: the andon/light-pressure rules are script-only; no new
   // install-time media is required.
-  assets: 'booha-assets-2026-566',
+  // Batty Booha photoreal static-sprite refresh (2026-09-18).
+  assets: 'booha-assets-2026-567',
   decks:  'booha-decks-2026-310',
 };
 
