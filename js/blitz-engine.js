@@ -297,6 +297,18 @@ window.BoohaBlitzEngine = (() => {
       b: Math.round(a.b + (b.b - a.b) * t),
     };
   }
+  // Blends a color toward white by t (0 = unchanged, 1 = full white) --
+  // used to derive the option-button fill (barely washed, so the
+  // progression color reads at close to full strength where players are
+  // actually looking) and the page wash (washed hard, so the full-bleed
+  // background stays ambient instead of competing with it).
+  function mixRgbTowardWhite(r, g, b, t) {
+    return {
+      r: Math.round(r + (255 - r) * t),
+      g: Math.round(g + (255 - g) * t),
+      b: Math.round(b + (255 - b) * t),
+    };
+  }
   // Perceptual (WCAG relative luminance) rather than raw HSL lightness --
   // HSL lightness misjudges saturated colors like a bright cyan or hot pink,
   // which read as brighter/darker to the eye than their HSL "L" implies.
@@ -315,14 +327,36 @@ window.BoohaBlitzEngine = (() => {
       palette.accent2 || palette.accent || '#ffe27a',
       palette.accent || '#ff6fb5',
     ];
-    if (p <= 0) return { css: stops[0], lightness: 100 };
+    if (p <= 0) {
+      const { r, g, b } = hexToRgb(stops[0]);
+      return { css: stops[0], lightness: 100, r, g, b };
+    }
     const segments = stops.length - 1;
     const scaled = p * segments;
     const index = Math.min(segments - 1, Math.floor(scaled));
     const localT = scaled - index;
     const { r, g, b } = mixHex(stops[index], stops[index + 1], localT);
     const lightness = Math.round(relativeLuminance(r, g, b) * 100);
-    return { css: `rgb(${r}, ${g}, ${b})`, lightness };
+    return { css: `rgb(${r}, ${g}, ${b})`, lightness, r, g, b };
+  }
+
+  // Players spend the whole run looking at the kanji and the answer
+  // options, not the streak meter or the page edges -- so the option
+  // buttons now carry the primary color signal at close to full strength,
+  // while the full-bleed page background is pulled back toward white so it
+  // reads as ambient light instead of competing for attention.
+  function optionSurfaceFor(palette, percent) {
+    const { r, g, b } = progressColorFor(palette, percent);
+    const washed = mixRgbTowardWhite(r, g, b, 0.12);
+    const lightness = Math.round(relativeLuminance(washed.r, washed.g, washed.b) * 100);
+    return { css: `rgb(${washed.r}, ${washed.g}, ${washed.b})`, lightness };
+  }
+
+  function pageWashFor(palette, percent) {
+    const { r, g, b } = progressColorFor(palette, percent);
+    const washed = mixRgbTowardWhite(r, g, b, 0.55);
+    const lightness = Math.round(relativeLuminance(washed.r, washed.g, washed.b) * 100);
+    return { css: `rgb(${washed.r}, ${washed.g}, ${washed.b})`, lightness };
   }
 
   // Text/UI ink flips from dark to light only once the background itself has
@@ -330,6 +364,13 @@ window.BoohaBlitzEngine = (() => {
   // stretch of a run, never during the mostly-pale early game.
   function inkFor(lightness) {
     return lightness < 58 ? '#ffffff' : '#14161c';
+  }
+
+  // A crisp outline only matters once the ink itself has flipped pale/white
+  // -- dark ink already reads fine against these light-to-mid pastel
+  // surfaces on its own and doesn't need one.
+  function inkOutlineFor(lightness) {
+    return lightness < 58 ? 'rgba(20, 22, 28, .55)' : 'transparent';
   }
 
   // Scales a palette's static glow color's alpha by progress percent, so the
@@ -1387,7 +1428,14 @@ window.BoohaBlitzEngine = (() => {
       }
       .booha-blitz-fire-name {
         position: absolute;
-        color: rgba(255, 236, 142, .34);
+        /* Was a translucent pale-yellow fill (alpha .34) riding on top of an
+           animation that ALSO fades opacity -- the two multiplied together
+           left it nearly invisible. Solid cream fill + a real dark outline
+           reads at every step of the animation, against both the fire
+           wallpaper's own dark gradient and the lighter pastel page behind it. */
+        color: #fff8e6;
+        -webkit-text-stroke: 1.5px rgba(90, 6, 0, .75);
+        paint-order: stroke fill;
         font-family: Impact, Haettenschweiler, "Arial Black", system-ui, sans-serif;
         font-size: clamp(28px, 6vw, 86px);
         font-weight: 1000;
@@ -1412,7 +1460,7 @@ window.BoohaBlitzEngine = (() => {
       @keyframes boohaBlitzFireName {
         0% { opacity: 0; transform: rotate(-12deg) scale(.82) translateY(18px); }
         18% { opacity: 1; transform: rotate(-12deg) scale(1.02) translateY(0); }
-        68% { opacity: .72; transform: rotate(-12deg) scale(1) translateY(-4px); }
+        68% { opacity: .88; transform: rotate(-12deg) scale(1) translateY(-4px); }
         100% { opacity: 0; transform: rotate(-12deg) scale(1.08) translateY(-18px); }
       }
       .booha-blitz-callout.combo {
@@ -2222,7 +2270,11 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-bg-main', '#ffffff');
       overlay.style.setProperty('--blitz-bg-secondary', 'rgba(0,0,0,.03)');
       overlay.style.setProperty('--blitz-ink', '#14161c');
+      overlay.style.setProperty('--blitz-ink-outline', 'transparent');
       overlay.style.setProperty('--blitz-progress-color', '#14161c');
+      overlay.style.setProperty('--blitz-option-fill', 'rgba(255,255,255,.78)');
+      overlay.style.setProperty('--blitz-option-ink', '#14161c');
+      overlay.style.setProperty('--blitz-option-ink-outline', 'transparent');
       overlay.style.setProperty('--blitz-correct', palette.correct?.color || '#00ff64');
       overlay.style.setProperty('--blitz-wrong', palette.wrong?.color || '#ff1e1e');
       overlay.style.setProperty('--blitz-popup-bg', palette.popup?.background || 'rgba(0,0,0,.92)');
@@ -2900,16 +2952,24 @@ window.BoohaBlitzEngine = (() => {
       function setBackground(correctCount = 0) {
         const total = initialQueueLength || queue.length || 1;
         const percent = Math.max(0, Math.min(100, (correctCount / total) * 100));
-        const { css, lightness } = progressColorFor(palette, percent);
+        const vivid = progressColorFor(palette, percent);
+        const page = pageWashFor(palette, percent);
+        const option = optionSurfaceFor(palette, percent);
         progressMeter.setPercent(percent);
         const glowColor = glowForPercent(palette, percent);
         overlay.style.setProperty('--blitz-word-glow-color', glowColor);
-        if (css === backgroundValue) return;
-        backgroundValue = css;
-        overlay.style.background = css;
-        overlay.style.setProperty('--blitz-bg-main', css);
-        overlay.style.setProperty('--blitz-ink', inkFor(lightness));
-        overlay.style.setProperty('--blitz-progress-color', percent <= 0 ? '#14161c' : css);
+        overlay.style.setProperty('--blitz-progress-color', percent <= 0 ? '#14161c' : vivid.css);
+        // Options carry the main color signal now -- update every tick
+        // regardless of whether the page wash itself changed.
+        overlay.style.setProperty('--blitz-option-fill', option.css);
+        overlay.style.setProperty('--blitz-option-ink', inkFor(option.lightness));
+        overlay.style.setProperty('--blitz-option-ink-outline', inkOutlineFor(option.lightness));
+        if (page.css === backgroundValue) return;
+        backgroundValue = page.css;
+        overlay.style.background = page.css;
+        overlay.style.setProperty('--blitz-bg-main', page.css);
+        overlay.style.setProperty('--blitz-ink', inkFor(page.lightness));
+        overlay.style.setProperty('--blitz-ink-outline', inkOutlineFor(page.lightness));
       }
 
       function scheduleTimerTick(delay = 0) {
@@ -3183,11 +3243,14 @@ window.BoohaBlitzEngine = (() => {
         overlay.querySelector(selector('wrongEn')).textContent = correct.en;
         overlay.querySelector(selector('scoldEn')).textContent = scold.en;
         const statusByFeel = {
-          playful: `${spotlight.playerName}, BUMP! LET'S BOUNCE BACK.`,
-          arcade: `${spotlight.playerName}, CHAIN BROKEN — RELOAD!`,
-          sleek: `${spotlight.playerName}, LINK LOST — TRY AGAIN.`,
+          playful: `${escapeHtml(spotlight.playerName)}, <ruby>BUMP!<rt>\u30d0\u30f3\u30d7!</rt></ruby> <ruby>LET'S<rt>\u30ec\u30c3\u30c4</rt></ruby> <ruby>BOUNCE<rt>\u30d0\u30a6\u30f3\u30b9</rt></ruby> <ruby>BACK.<rt>\u30d0\u30c3\u30af</rt></ruby>`,
+          arcade: `${escapeHtml(spotlight.playerName)}, <ruby>CHAIN<rt>\u30c1\u30a7\u30fc\u30f3</rt></ruby> <ruby>BROKEN<rt>\u30d6\u30ed\u30fc\u30af\u30f3</rt></ruby> \u2014 <ruby>RELOAD!<rt>\u30ea\u30ed\u30fc\u30c9!</rt></ruby>`,
+          sleek: `${escapeHtml(spotlight.playerName)}, <ruby>LINK<rt>\u30ea\u30f3\u30af</rt></ruby> <ruby>LOST<rt>\u30ed\u30b9\u30c8</rt></ruby> \u2014 <ruby>TRY<rt>\u30c8\u30e9\u30a4</rt></ruby> <ruby>AGAIN.<rt>\u30a2\u30b2\u30a4\u30f3</rt></ruby>`,
         };
-        if (status) status.textContent = statusByFeel[palette.feel] || statusByFeel.playful;
+        if (status) {
+          status.classList.add('booha-blitz-ruby-text');
+          status.innerHTML = statusByFeel[palette.feel] || statusByFeel.playful;
+        }
         wrongPopup.classList.remove('wrong-feel-playful', 'wrong-feel-arcade', 'wrong-feel-sleek');
         wrongPopup.classList.add(`wrong-feel-${palette.feel || 'playful'}`);
         overlay.classList.add('wrong-active');
@@ -3437,13 +3500,15 @@ window.BoohaBlitzEngine = (() => {
 
         // Fixed scorecard copy -- content no longer branches on outcome
         // beyond the "NEW BEST TIME" header, per spec.
-        winScreen.querySelector(selector('winName')).textContent = `${playerName} is Awesome!!`;
+        const winNameEl = winScreen.querySelector(selector('winName'));
+        winNameEl.classList.add('booha-blitz-ruby-text');
+        winNameEl.innerHTML = `${escapeHtml(playerName)} <ruby>is<rt>\u30a4\u30ba</rt></ruby> <ruby>Awesome!!<rt>\u30a2\u30a6\u30b5\u30e0!!</rt></ruby>`;
         const screamEl = winScreen.querySelector(selector('winScream'));
         screamEl.classList.add('booha-blitz-ruby-text');
-        screamEl.innerHTML = '<ruby>Booha<rt>ブーハー</rt></ruby> is happy!!';
+        screamEl.innerHTML = '<ruby>Booha<rt>\u30d6\u30fc\u30cf\u30fc</rt></ruby> <ruby>is<rt>\u30a4\u30ba</rt></ruby> <ruby>happy!!<rt>\u30cf\u30c3\u30d4\u30fc!!</rt></ruby>';
         const jpLine = winScreen.querySelector(selector('winJp'));
         jpLine.classList.add('booha-blitz-ruby-text');
-        jpLine.innerHTML = 'For you: It\u2019s <ruby>Booha<rt>\u30d6\u30fc\u30cf\u30fc</rt></ruby>';
+        jpLine.innerHTML = '<ruby>For<rt>\u30d5\u30a9\u30fc</rt></ruby> <ruby>you:<rt>\u30e6\u30fc</rt></ruby> <ruby>It\u2019s<rt>\u30a4\u30c3\u30c4</rt></ruby> <ruby>Booha<rt>\u30d6\u30fc\u30cf\u30fc</rt></ruby>';
         const timeEl = winScreen.querySelector(selector('winTime'));
         timeEl.textContent = fmtTime(ms);
         timeEl.style.color = isRecord ? '#ffd700' : aliveColor;
@@ -3457,14 +3522,23 @@ window.BoohaBlitzEngine = (() => {
         // otherwise the header is skipped entirely, per spec.
         recordEl.hidden = !isRecord;
         recordEl.classList.toggle('big', isRecord);
-        recordEl.textContent = isRecord ? 'NEW BEST TIME' : '';
-        bestEl.textContent = `Your best time: ${fmtTime(isRecord ? ms : (best ? best.ms : ms))}`;
+        recordEl.classList.add('booha-blitz-ruby-text');
+        recordEl.innerHTML = isRecord
+          ? '<ruby>NEW<rt>\u30cb\u30e5\u30fc</rt></ruby> <ruby>BEST<rt>\u30d9\u30b9\u30c8</rt></ruby> <ruby>TIME<rt>\u30bf\u30a4\u30e0</rt></ruby>'
+          : '';
+        bestEl.classList.add('booha-blitz-ruby-text');
+        bestEl.innerHTML = `<ruby>Your<rt>\u30e6\u30a2</rt></ruby> <ruby>best<rt>\u30d9\u30b9\u30c8</rt></ruby> <ruby>time:<rt>\u30bf\u30a4\u30e0</rt></ruby> ${fmtTime(isRecord ? ms : (best ? best.ms : ms))}`;
         // Kept, per spec ("there is already a built-in +/- time, just have
         // this on the bottom") -- markup order puts it after the buttons.
+        deltaEl.classList.add('booha-blitz-ruby-text');
         if (isRecord) {
-          deltaEl.textContent = oldRecord ? `-${fmtTime(oldRecord.ms - ms)} faster than your previous best` : 'Your first record!';
+          deltaEl.innerHTML = oldRecord
+            ? `-${fmtTime(oldRecord.ms - ms)} <ruby>faster<rt>\u30d5\u30a1\u30b9\u30bf\u30fc</rt></ruby> <ruby>than<rt>\u30b6\u30f3</rt></ruby> <ruby>your<rt>\u30e6\u30a2</rt></ruby> <ruby>previous<rt>\u30d7\u30ea\u30d3\u30a2\u30b9</rt></ruby> <ruby>best!<rt>\u30d9\u30b9\u30c8!</rt></ruby>`
+            : '<ruby>Your<rt>\u30e6\u30a2</rt></ruby> <ruby>first<rt>\u30d5\u30a1\u30fc\u30b9\u30c8</rt></ruby> <ruby>record!<rt>\u30ec\u30b3\u30fc\u30c9!</rt></ruby>';
         } else {
-          deltaEl.textContent = oldRecord ? `+${fmtTime(ms - oldRecord.ms)} vs. your best` : '';
+          deltaEl.innerHTML = oldRecord
+            ? `+${fmtTime(ms - oldRecord.ms)} <ruby>vs.<rt>\u30d0\u30fc\u30b5\u30b9</rt></ruby> <ruby>your<rt>\u30e6\u30a2</rt></ruby> <ruby>best<rt>\u30d9\u30b9\u30c8</rt></ruby>`
+            : '';
         }
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         winScreen.classList.toggle('speed-target-mode', speedBand === 'target');
