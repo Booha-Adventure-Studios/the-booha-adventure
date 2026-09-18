@@ -24,9 +24,9 @@ const CURRENT_CACHES = {
   // anomaly rounds, and gives Pataskala a late within-round movement cue.
   // Family Room entrance pass replaces the lime orb with the photoreal
   // flashlight sprite and adds the bilingual enter/closed popup in Utsuroba.
-  // Blitz completion/Maze gate pass (2026-09-18): invalidate the precached
-  // Maze shell so returning iPads receive the any-curriculum completion fix.
-  pages:  'booha-pages-2026-412',
+  // Hub default-curriculum and Batty Maze-render pass (2026-09-18):
+  // invalidate the precached shells for returning iPads.
+  pages:  'booha-pages-2026-413',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

@@ -14,7 +14,7 @@ assert(maze.includes('function makeDeferredImage(src)'), 'Maze must define a def
 assert(maze.includes('function ensureDeferredImage(image)'), 'Maze must define a deferred image request helper');
 assert(maze.includes('const ghostImgs = GHOSTS.map(src => {\n  return makeDeferredImage(src);\n});'), 'main ghost images must not request at boot');
 assert(maze.includes('const extraGhostImgs = EXTRA_BOOHA_GHOSTS.map(src => {\n  return makeDeferredImage(src);\n});'), 'extra ghost images must not request at boot');
-assert(maze.includes('const activeImg=ensureDeferredImage(ghostImgs[activeGhostIdx]);'), 'active Booha must request its canvas image when visible');
+assert(maze.includes('function getActiveMazeGhostImage()') && maze.includes('const activeImg=getActiveMazeGhostImage();'), 'active Booha must request its equipped canvas image when visible');
 assert(maze.includes('function requestMazeVisuals()'), 'Maze must define a scene-art request boundary');
 assert(maze.includes('requestMazeVisuals();\n  resizeCanvas();buildWanderers();startLoop();'), 'scene art must request when Maze starts or restores');
 
@@ -25,7 +25,7 @@ assert(maze.includes('requestMazeVisuals();\n  resizeCanvas();buildWanderers();s
 
 assert(!/const (homeworkImg|karasuki1Img|karasuki2Img|jukuImg)=new Image\(\);[^\n]*\.src=/.test(maze), 'tree art must not assign src at declaration');
 assert(!/const i = new Image\(\);\s*i\.src = src;/.test(maze), 'ghost preloads must not assign src inside the map');
-assert(sw.includes('booha-pages-2026-412'), 'service-worker page cache must include the current page bump');
+assert(sw.includes('booha-pages-2026-413'), 'service-worker page cache must include the current page bump');
 assert(sw.includes('booha-assets-2026-566'), 'service-worker asset cache must include the current Muenba canonical target bump');
 
 console.log('Maze 23B image-loading audit passed: ghost, tree, and popup art requests are deferred until needed.');
