@@ -20,7 +20,7 @@
     { "n": 15, "en": "build", "jp": "作る", "hira": "つくる", "mp3": "pb_v15_build.mp3" },
 
     { "n": 16, "en": "draw", "jp": "絵を描く", "hira": "え を かく", "mp3": "pb_v16_draw.mp3" },
-    { "n": 17, "en": "sing", "jp": "歌う", "hira": "うたう", "mp3": "pb_v17_sing.mp3" },
+    { "n": 17, "en": "sing", "jp": "歌う", "hira": "うたう", "readings": { "歌": "うた" }, "mp3": "pb_v17_sing.mp3" },
     { "n": 18, "en": "dance", "jp": "踊る", "hira": "おどる", "mp3": "pb_v18_dance.mp3" },
     { "n": 19, "en": "play", "jp": "遊ぶ", "hira": "あそぶ", "mp3": "pb_v19_play.mp3" },
     { "n": 20, "en": "read", "jp": "読む", "hira": "よむ", "mp3": "pb_v20_read.mp3" },
