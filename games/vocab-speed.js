@@ -1602,6 +1602,7 @@ function revealResults(runTime) {
       { label: 'Run time / じかん', value: `${Math.round(runTime / 1000)}s` },
     ],
     reviewItems: missedItems,
+    audioBase: CFG.audioBase,
   });
 
   U.emitGameEnd({
