@@ -55,6 +55,39 @@ assert.match(
   'flat readings must still render separate ruby runs for sentences',
 );
 
+function listContentFiles(dir) {
+  const files = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) files.push(...listContentFiles(full));
+    else if (/(vocab|sentences|questions)\.json$/.test(full)) files.push(full);
+  }
+  return files;
+}
+
+const furiganaContentProblems = [];
+for (const file of listContentFiles('content')) {
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  for (const card of data.cards || []) {
+    const jp = String(card.jp || '');
+    const hira = String(card.hira || '');
+    const hasKanji = /[一-龯々]/.test(jp);
+    if (hasKanji && !hira) furiganaContentProblems.push(`${file}: ${jp} has no hira`);
+    const map = card.readings || card.furigana || card.readingMap || null;
+    if (map && typeof map === 'object') {
+      for (const [term, reading] of Object.entries(map)) {
+        if (!jp.includes(term) || !String(reading || '').trim()) {
+          furiganaContentProblems.push(`${file}: invalid map for ${jp}`);
+        }
+      }
+    }
+    if (hasKanji && hira && !/<ruby>/.test(furigana(jp, hira, map))) {
+      furiganaContentProblems.push(`${file}: no ruby output for ${jp}`);
+    }
+  }
+}
+assert.deepEqual(furiganaContentProblems, [], 'content Furigana audit found invalid or unreadable cards');
+
 for (const source of weeklyEngines) {
   assert.match(source, /U\.renderResultMeta\(/,
     'every weekly engine must render the shared score/best/star summary');
