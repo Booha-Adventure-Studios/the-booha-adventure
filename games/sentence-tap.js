@@ -1080,6 +1080,7 @@ U.emitGameEnd({
   document.getElementById('st-re').textContent = tier.en;
   document.getElementById('st-rj').textContent = tier.jp;
   document.getElementById('st-rk').textContent = tier.kanji;
+  U.renderResultMeta(resEl, { gameId: `${CFG.curriculum}:sentence_tap`, score: pct });
 
   /* Build colorful action buttons */
   resActions.innerHTML = '';

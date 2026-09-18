@@ -1318,6 +1318,7 @@ function showResults() {
   document.getElementById('so-re').textContent = tier.en;
   document.getElementById('so-rj').textContent = tier.jp;
   document.getElementById('so-rk').textContent = tier.kanji;
+  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:sentence_order`, score: pct });
 
   /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('so-replay');

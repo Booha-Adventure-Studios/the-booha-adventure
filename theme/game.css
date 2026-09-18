@@ -220,6 +220,33 @@ body {
   text-align: center;
   padding: 1.4rem 3.5rem 0.5rem;
 }
+
+/* ── Shared result summary ── */
+.game-result-meta {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  margin:0 auto 1.1rem;
+  padding:10px 14px 9px;
+  border:1px solid color-mix(in srgb, var(--game-primary) 28%, transparent);
+  border-radius:16px;
+  background:color-mix(in srgb, var(--game-primary) 7%, transparent);
+  color:var(--game-muted);
+  font-size:clamp(11px,2vw,14px);
+  line-height:1.35;
+}
+.game-result-stars { display:flex; align-items:center; gap:8px; }
+.game-result-stars-current {
+  color:var(--game-amber);
+  font-size:clamp(20px,4vw,28px);
+  letter-spacing:.08em;
+  line-height:1;
+  text-shadow:0 0 12px color-mix(in srgb, var(--game-amber) 55%, transparent);
+}
+.game-result-stars-label { font-weight:900; color:var(--game-ink); }
+.game-result-best { text-align:center; }
+.game-result-best b { color:var(--game-ink); }
 .game-title {
   font-family: var(--game-font-title);
   font-size: clamp(20px, 5vw, 36px);

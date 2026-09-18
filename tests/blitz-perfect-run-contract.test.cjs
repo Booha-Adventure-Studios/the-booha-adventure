@@ -7,10 +7,24 @@ const assert = require('assert');
 const vocab = fs.readFileSync('games/vocab-speed.js', 'utf8');
 const sentence = fs.readFileSync('games/sentence-speed.js', 'utf8');
 const utils = fs.readFileSync('js/game-utils.js', 'utf8');
+const weeklyEngines = [
+  'ask-question.js', 'say-sentence.js', 'say-word.js',
+  'sentence-order.js', 'sentence-speed.js', 'sentence-tap.js',
+  'spell-word.js', 'vocab-speed.js', 'vocab-tap.js',
+].map(file => fs.readFileSync(`games/${file}`, 'utf8'));
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
 assert.match(utils, /emitGameEnd\(detail\)/,
   'shared game utilities must provide guarded result submission');
+assert.match(utils, /renderResultMeta\(container,/,
+  'shared game utilities must provide the Pass 1 result summary');
+assert.match(utils, /game-result-stars/,
+  'Pass 1 result summary must include an accessible star row');
+
+for (const source of weeklyEngines) {
+  assert.match(source, /U\.renderResultMeta\(/,
+    'every weekly engine must render the shared score/best/star summary');
+}
 
 for (const [source, prefix] of [[vocab, 'vs'], [sentence, 'ssp']]) {
   assert.match(source, /U\.shuffle\(CFG\.cards\.slice\(0, 15\)\)/,
