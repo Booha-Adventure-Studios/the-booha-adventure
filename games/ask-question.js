@@ -547,6 +547,7 @@ function showResults() {
       { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
     ],
     reviewItems: missedItems,
+    audioBase: CFG.audioBase,
   });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
   if (CFG.sfxBase && tier.sound) {

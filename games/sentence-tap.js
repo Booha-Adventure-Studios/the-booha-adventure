@@ -1089,6 +1089,7 @@ U.emitGameEnd({
       { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
     ],
     reviewItems: missedItems,
+    audioBase: CFG.audioBase,
   });
 
   /* Build colorful action buttons */

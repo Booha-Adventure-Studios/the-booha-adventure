@@ -285,10 +285,24 @@ body {
   font-size:.9em;
 }
 .game-result-review ul { margin:0; padding:0 11px 10px 27px; color:var(--game-muted); }
-.game-result-review li { padding:3px 0; }
+.game-result-review li { display:flex; align-items:center; gap:7px; padding:3px 0; }
 .game-result-review-jp { color:var(--game-ink); font-family:var(--game-font-jp); font-weight:800; margin-right:8px; }
 .game-result-review-jp rt { font-size:.58em; font-weight:700; }
-.game-result-review-en { font-size:.9em; }
+.game-result-review-en { font-size:.9em; flex:1; }
+.game-result-review-audio {
+  flex:0 0 auto;
+  width:32px;
+  height:32px;
+  padding:0;
+  border:1px solid color-mix(in srgb, var(--game-primary) 35%, transparent);
+  border-radius:50%;
+  background:color-mix(in srgb, var(--game-primary) 10%, transparent);
+  color:var(--game-primary);
+  font-size:12px;
+  cursor:pointer;
+}
+.game-result-review-audio:hover, .game-result-review-audio:focus-visible { transform:scale(1.06); }
+.game-result-review-audio.is-playing { color:var(--game-amber); border-color:var(--game-amber); }
 .game-result-review-more, .game-result-review-empty { color:var(--game-muted); font-size:.85em; }
 .game-result-review-empty { margin:0; padding:0 11px 10px; }
 .game-title {

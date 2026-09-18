@@ -29,6 +29,10 @@ assert.match(utils, /furiganaHTML\(jp, hira, authoredReadings/,
   'Pass 4 must support authored Furigana maps for review items');
 assert.match(utils, /item\.readings \|\| item\.furigana \|\| item\.readingMap/,
   'Pass 4 must accept the documented reading-map aliases from content cards');
+assert.match(utils, /playReviewAudio\(audioBase, mp3, button\)/,
+  'Pass 6 must provide a playable review-audio action');
+assert.match(utils, /game-result-review-audio/,
+  'Pass 6 review audio must use the shared touch-friendly control');
 assert.match(utils, /<ruby>\$\{escape\(kanjiRun\)\}/,
   'Pass 3 Furigana must attach readings to Kanji runs');
 
@@ -93,6 +97,8 @@ for (const source of weeklyEngines) {
     'every weekly engine must render the shared score/best/star summary');
   assert.match(source, /U\.renderResultDetails\(/,
     'every weekly engine must render the Pass 2 learning summary');
+  assert.match(source, /audioBase:\s*CFG\.audioBase/,
+    'every weekly engine must pass its content audio base to the review drawer');
 }
 
 for (const [source, prefix] of [[vocab, 'vs'], [sentence, 'ssp']]) {
