@@ -175,6 +175,8 @@ window.QuestionBlitz = (() => {
         font-size: clamp(20px, min(4.5vw, 5vh), 40px);
         font-weight: 900; line-height: 1.35;
         text-align: center; color: var(--blitz-ink, #14161c);
+        -webkit-text-stroke: 1px var(--blitz-ink-outline, transparent);
+        paint-order: stroke fill;
         text-shadow:
           0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--blitz-word-glow-color, var(--qb-glow)),
           0 0 var(--blitz-word-glow, 64px) var(--blitz-word-glow-color, var(--qb-glow)),
@@ -190,6 +192,8 @@ window.QuestionBlitz = (() => {
       #qb-hira {
         font-size: clamp(11px,min(2.2vw,2.4vh),16px);
         color: var(--blitz-ink, #14161c);
+        -webkit-text-stroke: 1px var(--blitz-ink-outline, transparent);
+        paint-order: stroke fill;
         opacity: .7;
         text-align: center; letter-spacing: 1.5px;
         line-height: 1.6;
@@ -212,10 +216,12 @@ window.QuestionBlitz = (() => {
         border-radius: clamp(12px,2vw,18px);
         padding: clamp(12px,min(2.5vw,2.2vh),18px) clamp(14px,2.5vw,20px);
         font-size: clamp(13px,min(2.5vw,2.5vh),17px);
-        font-weight: 700; color: var(--blitz-ink, #14161c);
+        font-weight: 700; color: var(--blitz-option-ink, var(--blitz-ink, #14161c));
+        -webkit-text-stroke: 1px var(--blitz-option-ink-outline, transparent);
+        paint-order: stroke fill;
         cursor: pointer; text-align: left;
         line-height: 1.4;
-        background: rgba(255,255,255,.78);
+        background: var(--blitz-option-fill, rgba(255,255,255,.78));
         border: 2px solid var(--blitz-progress-color, #14161c);
         box-shadow: 0 6px 18px rgba(0,0,0,0.4),
           inset 0 1px 0 rgba(255,255,255,0.07);
@@ -586,7 +592,7 @@ window.QuestionBlitz = (() => {
         <div class="qb-win-name"   id="qb-win-name"></div>
         <div class="qb-win-scream" id="qb-win-scream"></div>
         <div class="qb-win-jp"     id="qb-win-jp"></div>
-        <div class="qb-win-label">This Time:</div>
+        <div class="qb-win-label booha-blitz-ruby-text"><ruby>This<rt>\u30c7\u30a3\u30b9</rt></ruby> <ruby>Time:<rt>\u30bf\u30a4\u30e0</rt></ruby></div>
         <div class="qb-win-time"   id="qb-win-time-val"></div>
         <div class="qb-win-record" id="qb-win-record-msg"></div>
         <div class="qb-win-best"   id="qb-win-best-val"></div>
