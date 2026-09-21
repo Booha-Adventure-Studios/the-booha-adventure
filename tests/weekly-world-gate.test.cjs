@@ -154,6 +154,18 @@ assert.doesNotMatch(utsurobaSource, /CASE FILE 02 \/ OPEN|じけんファイル 
   'the Family Room popup must omit the unnecessary open case-file eyebrow');
 assert.match(utsurobaSource, /data-family-room-enter/,
   'the open popup must offer an explicit enter action');
+const familyRoomCloseStart = utsurobaSource.indexOf('function closeFamilyRoomPopup()');
+const familyRoomCloseEnd = utsurobaSource.indexOf('function doExitToKarasuki()', familyRoomCloseStart);
+const familyRoomClose = utsurobaSource.slice(familyRoomCloseStart, familyRoomCloseEnd);
+assert.doesNotMatch(familyRoomClose, /if \(!familyRoomPopOverlay \|\| !familyRoomPopOpen\) return;/,
+  'Akiya popup close must recover even when BFCache leaves a stale open overlay flag');
+const familyRoomEnterStart = utsurobaSource.indexOf('function enterFamilyRoom()');
+const familyRoomEnterEnd = utsurobaSource.indexOf('/* ═══════════════════════════════════════════', familyRoomEnterStart);
+const familyRoomEnter = utsurobaSource.slice(familyRoomEnterStart, familyRoomEnterEnd);
+assert.match(familyRoomEnter, /closeFamilyRoomPopup\(\);/,
+  'entering Akiya must close and unlock the Utsuroba popup before navigation');
+assert.strictEqual((familyRoomEnter.match(/window\.location\.href = FAMILY_ROOM_PORTAL\.href;/g) || []).length, 1,
+  'entering Akiya must perform one navigation instead of stacking duplicate assignments');
 assert.match(utsurobaSource, /family-room-pop-title-en\">AKIYA/,
   'the Family Room popup must display the player-facing Akiya name');
 assert.doesNotMatch(utsurobaSource, /The Family Room|THE FAMILY ROOM|かぞくの へや/,
