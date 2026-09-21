@@ -1095,6 +1095,13 @@ else
   bad "Weekly rollover audit failed"
 fi
 
+echo "[weekly] Batty Booha weekly unlock audit"
+if node tests/batty-booha-weekly-audit.cjs >/dev/null 2>&1; then
+  ok "Batty Booha unlocks, relocks, and can be earned again each week"
+else
+  bad "Batty Booha weekly unlock audit failed"
+fi
+
 echo "[97/98] Weekly occurrence consumer audit"
 if node tests/weekly-occurrence-consumers-audit.cjs >/dev/null 2>&1; then
   ok "All weekly consumers distinguish repeated Week 4 occurrences"
