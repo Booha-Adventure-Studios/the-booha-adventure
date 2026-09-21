@@ -9,10 +9,18 @@ const BoohaSkins = (() => {
   'use strict';
 
   const BASE = 'assets/img/booha_ghost.webp';
+  const CURRENT_SEASON_ID = 'halloween';
+  const POSE_KEYS = Object.freeze([
+    'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
+    'marking', 'hiding', 'danceArmsUp', 'danceSway', 'danceWave',
+  ]);
   const SKINS = Object.freeze({
     batty: Object.freeze({
       id: 'batty',
+      seasonId: 'halloween',
+      enabled: true,
       name: 'Batty Booha',
+      nameJp: 'バッティー・ブーハー',
       unlockId: 'booha_skin_batty',
       assets: Object.freeze({
         maze: 'assets/skins/batty_booha/static.png',
@@ -28,24 +36,79 @@ const BoohaSkins = (() => {
         danceWave: 'assets/skins/batty_booha/dance_wave.png',
       }),
     }),
+    // Placeholder entry for the next Halloween character. Keep its stable id
+    // and display copy now, but do not expose it to rotation or unlocking
+    // until every shared pose asset has been added.
+    mummington: Object.freeze({
+      id: 'mummington',
+      seasonId: 'halloween',
+      enabled: false,
+      placeholder: true,
+      name: 'Mummington Booha',
+      nameJp: 'マミングトン ブーハー',
+      unlockId: 'booha_skin_mummington',
+      assets: Object.freeze({}),
+    }),
+  });
+
+  const SEASONS = Object.freeze({
+    halloween: Object.freeze({
+      id: 'halloween',
+      name: 'Halloween',
+      characterIds: Object.freeze(['batty', 'mummington']),
+    }),
   });
 
   function save() {
     return window.BoohaAdventure && BoohaAdventure.save;
   }
 
+  function get(id) {
+    return SKINS[id] || null;
+  }
+
+  function getSeason(id = CURRENT_SEASON_ID) {
+    return SEASONS[id] || null;
+  }
+
+  function hasCompleteAssetSet(id) {
+    const skin = get(id);
+    return !!skin && POSE_KEYS.every(key => typeof skin.assets[key] === 'string' && skin.assets[key]);
+  }
+
+  function isAvailable(id) {
+    const skin = get(id);
+    return !!skin && skin.enabled === true && hasCompleteAssetSet(id);
+  }
+
+  function seasonCharacters(seasonId = CURRENT_SEASON_ID) {
+    const season = getSeason(seasonId);
+    if (!season) return [];
+    return season.characterIds.map(id => get(id)).filter(Boolean);
+  }
+
+  function availableCharacters(seasonId = CURRENT_SEASON_ID) {
+    return seasonCharacters(seasonId).filter(skin => isAvailable(skin.id));
+  }
+
+  function nextAvailableId(id, seasonId = CURRENT_SEASON_ID) {
+    const characters = availableCharacters(seasonId);
+    if (!characters.length) return null;
+    const index = characters.findIndex(skin => skin.id === id);
+    return characters[(index + 1 + characters.length) % characters.length].id;
+  }
+
   function isUnlocked(id) {
-    const skin = SKINS[id];
-    if (!skin) return false;
+    if (!get(id)) return false;
     try {
-      return !!(save()?.load()?.weekly?.unlockedBoohaSkins || {})[skin.id];
+      return !!(save()?.load()?.weekly?.unlockedBoohaSkins || {})[id];
     } catch (_) { return false; }
   }
 
   function selectedId() {
     try {
       const id = save()?.load()?.meta?.selectedBoohaSkin;
-      return SKINS[id] && isUnlocked(id) ? id : null;
+      return isAvailable(id) && isUnlocked(id) ? id : null;
     } catch (_) { return null; }
   }
 
@@ -57,9 +120,9 @@ const BoohaSkins = (() => {
   }
 
   function unlockAndEquip(id) {
-    const skin = SKINS[id];
+    const skin = get(id);
     const saveFile = save();
-    if (!skin || !saveFile) return false;
+    if (!skin || !isAvailable(id) || !saveFile) return false;
     const data = saveFile.load();
     if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
     if (!data.weekly.unlockedBoohaSkins || typeof data.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(data.weekly.unlockedBoohaSkins)) {
@@ -88,7 +151,25 @@ const BoohaSkins = (() => {
     return saveFile.patch('meta', { selectedBoohaSkin: id });
   }
 
-  return Object.freeze({ BASE, SKINS, isUnlocked, selectedId, asset, unlockAndEquip, equip });
+  return Object.freeze({
+    BASE,
+    CURRENT_SEASON_ID,
+    POSE_KEYS,
+    SKINS,
+    SEASONS,
+    get,
+    getSeason,
+    hasCompleteAssetSet,
+    isAvailable,
+    seasonCharacters,
+    availableCharacters,
+    nextAvailableId,
+    isUnlocked,
+    selectedId,
+    asset,
+    unlockAndEquip,
+    equip,
+  });
 })();
 
 window.BoohaSkins = BoohaSkins;
