@@ -211,7 +211,7 @@ window.BoohaSync = (() => {
       if (tierProgress && (hasEntries(tierProgress.objects) || hasEntries(tierProgress.objectSlots) ||
           tierProgress.activeTargetType || tierProgress.carriedObjectId)) return false;
     }
-    if (w.worlds?.familyRoom?.activeCaseId && w.worlds.familyRoom.activeCaseId !== 'chanoma') return false;
+    if (w.worlds?.familyRoom?.activeCaseId && w.worlds.familyRoom.activeCaseId !== 'genkan') return false;
     if (w.worlds?.familyRoom?.completedCases && Object.keys(w.worlds.familyRoom.completedCases).length) return false;
     if (w.worlds?.familyRoom?.bestTier) return false;
     if (w.worlds?.familyRoom?.lastResult) return false;

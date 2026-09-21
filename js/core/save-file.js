@@ -146,7 +146,7 @@ const BoohaSaveFile = (() => {
         // The current case is a routing pointer, not a round counter. Case
         // completion is kept as a small weekly record so the profile can say
         // whether the file is still open without exposing a score.
-        activeCaseId: 'chanoma',
+        activeCaseId: 'genkan',
         completedCases: {},
         bestTier: null,
         preferredTier: 'patient',
@@ -257,8 +257,9 @@ const BoohaSaveFile = (() => {
     if (current.grimmerglen.mariettaIntroSkipped === undefined) current.grimmerglen.mariettaIntroSkipped = false;
 
     if (!current.familyRoom || typeof current.familyRoom !== 'object' || Array.isArray(current.familyRoom)) current.familyRoom = {};
-    if (!['chanoma', 'genkan'].includes(current.familyRoom.activeCaseId)) current.familyRoom.activeCaseId = 'chanoma';
+    if (!['chanoma', 'genkan'].includes(current.familyRoom.activeCaseId)) current.familyRoom.activeCaseId = 'genkan';
     if (!current.familyRoom.completedCases || typeof current.familyRoom.completedCases !== 'object' || Array.isArray(current.familyRoom.completedCases)) current.familyRoom.completedCases = {};
+    if (Object.keys(current.familyRoom.completedCases).length === 0) current.familyRoom.activeCaseId = 'genkan';
     if (current.familyRoom.bestTier !== null && !['patient', 'quicker', 'lies'].includes(current.familyRoom.bestTier)) current.familyRoom.bestTier = null;
     if (!['patient', 'quicker', 'lies'].includes(current.familyRoom.preferredTier)) current.familyRoom.preferredTier = 'patient';
     if (!Number.isFinite(current.familyRoom.flashlightCharges)) current.familyRoom.flashlightCharges = 0;
