@@ -1675,7 +1675,7 @@
   }
 
   function closeFamilyRoomPopup() {
-    if (!familyRoomPopOverlay || !familyRoomPopOpen) return;
+    if (!familyRoomPopOverlay) return;
     familyRoomPopOpen = false;
     familyRoomPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
     familyRoomPopOverlay.classList.remove('is-open');
@@ -1708,10 +1708,9 @@
 
   function enterFamilyRoom() {
     if (!familyRoomOpen() || state.exitingToKarasuki) return;
-    familyRoomPopOpen = false;
-    state.inputLocked = true;
     state.clickTarget = null;
     state.moving = false;
+    closeFamilyRoomPopup();
     window.location.href = FAMILY_ROOM_PORTAL.href;
   }
 
