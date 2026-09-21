@@ -34,6 +34,9 @@ assert(source.includes('function weeklyFamilyRoomState') && source.includes('fun
 assert(source.includes('id="nuppi-flashlight-button"') && source.includes('nuppiChargeClaimed'), 'Nuppi must expose a once-per-week flashlight-charge reward');
 assert(source.includes('NUPPI_FLASHLIGHT_REWARD = 3') && source.includes('MAX_FLASHLIGHT_CHARGES = 5'), 'Nuppi must provide a useful weekly bundle with a safe inventory cap');
 assert(source.includes('nuppiChargeClaimable') && source.includes('rgba(185,221,255,0.52)'), 'Nuppi must show the blue Akiya glow when a charge is claimable');
+const nuppiDraw = sourceSection('function drawNuppi(now)', 'function clickCheckNuppi');
+assert(nuppiDraw.includes("nuppiChargeClaimable ? 'rgba(225,248,255,0.62)'"), 'claimable Nuppi must use a blue-dominant outer halo instead of the normal pink halo');
+assert(nuppiDraw.includes("ctx.strokeStyle = 'rgba(185,221,255,0.92)'"), 'claimable Nuppi must carry a visible pulsing blue ring while traveling');
 assert(source.includes('Deeper rooms may take more than one burst.'), 'Nuppi must explain that later Pataskala encounters can require multiple charges');
 assert(furigana.includes('function sentence(value, readings)'), 'shared furigana renderer must remain available');
 assert(page.includes('<script src="js/utsu-furigana.js"></script>'), 'Karasuki must load the furigana renderer before dialogue');
