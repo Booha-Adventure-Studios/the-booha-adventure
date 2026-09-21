@@ -14,10 +14,14 @@ const key = 'booha_save:v3:rollover-student';
 let stored = {
   version: 2,
   scores: { 'bc:vocab_tap': { completed: true, stars: 3 } },
-  unlocks: { first_game: { unlockedAt: 1 } },
+  unlocks: {
+    first_game: { unlockedAt: 1 },
+    booha_skin_batty: { unlockedAt: 2 },
+  },
   meta: {
     lastWeeklyKey: '2026-08-23|august-w4',
     allTimeStars: 3,
+    selectedBoohaSkin: 'batty',
     blitz: {
       weeklyKey: 'august:w4',
       weekly: { vocab: { bc: { ms: 1000 } } },
@@ -106,6 +110,7 @@ assert.deepStrictEqual(stored.weekly.completedGames, {});
 assert.deepStrictEqual(stored.weekly.gameScores, {});
 assert.deepStrictEqual(stored.weekly.gameStars, {});
 assert.deepStrictEqual(stored.weekly.unlockedBonusGames, {});
+assert.deepStrictEqual(stored.weekly.unlockedBoohaSkins, {});
 assert.deepStrictEqual(stored.weekly.wanderers, []);
 assert.deepStrictEqual(stored.meta.blitz.weekly, {});
 assert.strictEqual(stored.meta.blitz.weeklyKey, '2026-08-30|august-w4');
@@ -116,6 +121,7 @@ assert.strictEqual(stored.muenba.huntGhostOrderWeek, '2026-08-30|august-w4');
 
 assert.deepStrictEqual(stored.scores, { 'bc:vocab_tap': { completed: true, stars: 3 } });
 assert.deepStrictEqual(stored.unlocks, { first_game: { unlockedAt: 1 } });
+assert.strictEqual(stored.meta.selectedBoohaSkin, null);
 assert.strictEqual(stored.meta.allTimeStars, 3);
 assert.deepStrictEqual(stored.meta.blitz.records, { vocab: { bc: { ms: 900 } } });
 assert.deepStrictEqual(stored.muenba.ghostsFound, { ghost_lifetime: true });

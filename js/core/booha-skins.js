@@ -1,5 +1,5 @@
 /**
- * Booha Adventure — permanent Booha skin registry.
+ * Booha Adventure — weekly Booha skin registry.
  *
  * World scripts ask this registry for an asset instead of knowing where a
  * skin's files live. Unknown, locked, or malformed selections fall back to
@@ -37,7 +37,9 @@ const BoohaSkins = (() => {
   function isUnlocked(id) {
     const skin = SKINS[id];
     if (!skin) return false;
-    try { return !!(save()?.load()?.unlocks || {})[skin.unlockId]; } catch (_) { return false; }
+    try {
+      return !!(save()?.load()?.weekly?.unlockedBoohaSkins || {})[skin.id];
+    } catch (_) { return false; }
   }
 
   function selectedId() {
@@ -59,8 +61,16 @@ const BoohaSkins = (() => {
     const saveFile = save();
     if (!skin || !saveFile) return false;
     const data = saveFile.load();
-    if (!data.unlocks || typeof data.unlocks !== 'object') data.unlocks = {};
-    if (!data.unlocks[skin.unlockId]) data.unlocks[skin.unlockId] = { unlockedAt: Date.now() };
+    if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
+    if (!data.weekly.unlockedBoohaSkins || typeof data.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(data.weekly.unlockedBoohaSkins)) {
+      data.weekly.unlockedBoohaSkins = {};
+    }
+    if (!data.weekly.unlockedBoohaSkins[skin.id]) {
+      data.weekly.unlockedBoohaSkins[skin.id] = { unlockedAt: Date.now() };
+    }
+    // Remove the pre-weekly storage key if an older save was loaded without
+    // passing through the current save-file migration first.
+    if (data.unlocks && typeof data.unlocks === 'object') delete data.unlocks[skin.unlockId];
     if (!data.meta || typeof data.meta !== 'object') data.meta = {};
     data.meta.selectedBoohaSkin = skin.id;
     const ok = saveFile.save(data);

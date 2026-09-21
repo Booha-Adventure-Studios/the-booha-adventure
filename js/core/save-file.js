@@ -61,7 +61,7 @@ const BoohaSaveFile = (() => {
 
       // ── Permanent (never reset) ──────────────────────────────────────────
       scores:      {},   // { [saveId]: { highScore, stars, completed, attempts, ... } }
-      unlocks:     {},   // { [itemId]: { unlockedAt } }  — permanent achievements and cosmetics
+      unlocks:     {},   // { [itemId]: { unlockedAt } }  — permanent achievements
       stats:       {},   // arbitrary permanent stat counters
       collectibles:{},   // { [id]: { found, foundAt } }
       pageState:   {},   // { [pageId]: { visited, spawnPoint, ... } }
@@ -93,6 +93,7 @@ const BoohaSaveFile = (() => {
         gameScores:        {},   // { [saveId]: highScore this week }
         gameStars:         {},   // { [saveId]: stars this week }
         unlockedBonusGames:{},   // { booha_invaders: true, booha_blocks: true, ... }
+        unlockedBoohaSkins:{},   // { batty: { unlockedAt } } — temporary cosmetic unlocks
         wanderers:         [],   // [ wandererId, ... ] unlocked this week (index = order)
         worlds:            _defaultWeeklyWorlds(),
       },
@@ -331,9 +332,23 @@ const BoohaSaveFile = (() => {
         gameScores:         {},
         gameStars:          {},
         unlockedBonusGames: {},
+        unlockedBoohaSkins: {},
         wanderers:          [],
         worlds:             _defaultWeeklyWorlds(),
       };
+    }
+    if (!save.weekly.unlockedBoohaSkins || typeof save.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(save.weekly.unlockedBoohaSkins)) {
+      save.weekly.unlockedBoohaSkins = {};
+    }
+
+    // Batty Booha was originally introduced as a permanent unlock. Move that
+    // legacy record into the current week's cosmetic bucket so existing
+    // players keep access until the next normal weekly rollover.
+    if (save.unlocks && save.unlocks.booha_skin_batty) {
+      if (!save.weekly.unlockedBoohaSkins.batty) {
+        save.weekly.unlockedBoohaSkins.batty = save.unlocks.booha_skin_batty;
+      }
+      delete save.unlocks.booha_skin_batty;
     }
     _ensureWeeklyWorlds(save);
     _ensureGrimmerglenLifetime(save);
@@ -440,7 +455,8 @@ const BoohaSaveFile = (() => {
   // ── Weekly reset ──────────────────────────────────────────────────────────
   /**
    * Clears all weekly data. Called by adventure-core on occurrence change.
-   * Does NOT touch scores, unlocks, meta.allTimeStars, or collection.
+   * Does NOT touch scores, permanent achievement unlocks, meta.allTimeStars,
+   * or collection. Weekly cosmetic unlocks are cleared with the weekly data.
    */
   function resetWeekly(occurrenceKey) {
     const data = load();
@@ -449,10 +465,20 @@ const BoohaSaveFile = (() => {
       gameScores:         {},
       gameStars:          {},
       unlockedBonusGames: {},
+      unlockedBoohaSkins:{},
       wanderers:          [],
       worlds:             _defaultWeeklyWorlds(),
     };
     data.weekly.worlds.occurrenceKey = occurrenceKey || '';
+
+    // Batty Booha is earned again by completing all three Blitz games in the
+    // new week. Do not leave the previous week's companion equipped.
+    if (data.meta && data.meta.selectedBoohaSkin === 'batty') {
+      data.meta.selectedBoohaSkin = null;
+    }
+    if (data.unlocks && typeof data.unlocks === 'object') {
+      delete data.unlocks.booha_skin_batty;
+    }
 
     // Blitz keeps its weekly bucket inside meta for historical reasons, so it
     // must be cleared alongside the top-level weekly section.
