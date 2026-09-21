@@ -155,6 +155,14 @@ assert(source.includes('function startKeyboardMark') && source.includes('スペ�
 assert(markup.includes("<span>DON'T BLINK.</span>") && !markup.includes('class="case-title"'), 'the entry panel must show only the bilingual Don\'t Blink title');
 assert(markup.includes('id="fly-away-button"') && source.includes('#6eb6ff') && source.includes('rgba(105,182,255'), 'the canvas marking glow must use the blue palette');
 assert(source.includes('function shiftGameplayClocks') && source.includes('roundStarted += delta') && source.includes('failureStarted += delta'), 'hidden time must be removed from active gameplay clocks');
+assert(source.includes('function pauseMarkConfirmClock') && source.includes('function resumeMarkConfirmClock') && source.includes('markConfirmMoveRemainingMs'), 'mark confirmation must pause and resume timed gameplay clocks');
+const pataskalaBeginBlock = source.slice(source.indexOf('function beginPataskalaThreat'), source.indexOf('function updatePataskalaThreat'));
+const pataskalaUpdateBlock = source.slice(source.indexOf('function updatePataskalaThreat'), source.indexOf('function markMatchesAnomaly'));
+assert(pataskalaBeginBlock.includes("state !== 'playing' || pendingMark") && pataskalaUpdateBlock.includes("state !== 'playing' || pendingMark"), 'Pataskala must pause while a mark confirmation is open');
+const burnoutBlock = source.slice(source.indexOf('function handleBurnout'), source.indexOf('function handleWrong'));
+assert(burnoutBlock.includes('pendingMark') && burnoutBlock.includes('beginFailure(UI_COPY.lightLostReport)'), 'light burnout must pause during confirmation and use the dedicated light-lost copy');
+const keydownBlock = source.slice(source.indexOf("window.addEventListener('keydown'"), source.indexOf("window.addEventListener('keyup'"));
+assert(keydownBlock.includes('if (pendingMark)') && keydownBlock.includes("event.key === 'Escape'") && keydownBlock.includes('cancelMark();'), 'keyboard confirmation must preserve native button activation and support Escape cancellation');
 assert(source.includes('function pauseForVisibility') && source.includes('function resumeFromVisibility') && source.includes("window.addEventListener('pagehide'"), 'visibility and BFCache lifecycle must pause and resume the room');
 assert(source.includes('roomCoordinates(booha.x, booha.y, oldPlate)') && source.includes('roomPointFromCoordinates(normalized.position)') && source.includes("setObservation('SCREEN CHANGED / MARK AGAIN'"), 'resize must preserve Booha position in plate coordinates and invalidate stale marks');
 assert(source.includes('function imageReady(image)') && source.includes('image.naturalWidth > 0 && image.naturalHeight > 0'), 'canvas image draws must require a successful natural image size');

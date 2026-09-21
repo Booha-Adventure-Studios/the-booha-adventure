@@ -318,6 +318,10 @@
   let droneTellTimer = 0;
   let studyCurtainTimer = 0;
   let pataskalaMoveTimer = 0;
+  let pataskalaMoveDueAt = 0;
+  let markConfirmPausedAt = 0;
+  let markConfirmMoveWasScheduled = false;
+  let markConfirmMoveRemainingMs = 0;
   let clueTimer = 0;
   let clueFadeTimer = 0;
   let clueQueue = [];
@@ -1226,7 +1230,7 @@
   }
 
   function beginPataskalaThreat() {
-    if (state !== 'playing' || !currentPresence || pataskalaThreat || wrongMarkHazard) return;
+    if (state !== 'playing' || pendingMark || !currentPresence || pataskalaThreat || wrongMarkHazard) return;
     const distances = PATASKALA_SPAWN_ANCHORS.map(anchor => ({ anchor, distance: Math.hypot(booha.x - roomPoint([anchor.u, anchor.v])[0], booha.y - roomPoint([anchor.u, anchor.v])[1]) }));
     distances.sort((a, b) => b.distance - a.distance);
     const spawn = distances[Math.floor(Math.random() * Math.min(2, distances.length))].anchor;
@@ -1252,7 +1256,7 @@
   }
 
   function updatePataskalaThreat(time) {
-    if (!pataskalaThreat || state !== 'playing') return;
+    if (!pataskalaThreat || state !== 'playing' || pendingMark) return;
     const elapsed = Math.min(.05, Math.max(0, (time - pataskalaThreat.lastTime) / 1000));
     pataskalaThreat.lastTime = time;
     const dx = booha.x - pataskalaThreat.x;
@@ -1328,6 +1332,38 @@
     if (caseStarted) caseStarted += delta;
     if (transitionStarted) transitionStarted += delta;
     if (failureStarted) failureStarted += delta;
+    if (pataskalaThreat) {
+      pataskalaThreat.startedAt += delta;
+      pataskalaThreat.lastTime += delta;
+      pataskalaThreat.discoveryUntil += delta;
+    }
+  }
+
+  function pauseMarkConfirmClock() {
+    if (markConfirmPausedAt || state !== 'playing') return;
+    const now = performance.now();
+    markConfirmPausedAt = now;
+    markConfirmMoveWasScheduled = Boolean(pataskalaMoveTimer);
+    if (markConfirmMoveWasScheduled) {
+      markConfirmMoveRemainingMs = Math.max(0, pataskalaMoveDueAt - now);
+      window.clearTimeout(pataskalaMoveTimer);
+      pataskalaMoveTimer = 0;
+      pataskalaMoveDueAt = 0;
+    }
+  }
+
+  function resumeMarkConfirmClock() {
+    if (!markConfirmPausedAt) return;
+    const resumedAt = performance.now();
+    shiftGameplayClocks(Math.max(0, resumedAt - markConfirmPausedAt));
+    markConfirmPausedAt = 0;
+    const shouldResumePataskalaTimer = markConfirmMoveWasScheduled;
+    const remainingMs = markConfirmMoveRemainingMs;
+    markConfirmMoveWasScheduled = false;
+    markConfirmMoveRemainingMs = 0;
+    if (shouldResumePataskalaTimer && state === 'playing' && currentPresence && !pataskalaThreat && !wrongMarkHazard && !pendingMark) {
+      schedulePataskalaThreat(remainingMs);
+    }
   }
 
   function pauseForVisibility() {
@@ -1398,7 +1434,7 @@
   }
   function clearRoundTimers() {
     window.clearTimeout(droneTellTimer); droneTellTimer = 0;
-    window.clearTimeout(pataskalaMoveTimer); pataskalaMoveTimer = 0;
+    window.clearTimeout(pataskalaMoveTimer); pataskalaMoveTimer = 0; pataskalaMoveDueAt = 0;
     window.clearTimeout(transitionTimer); transitionTimer = 0;
     window.clearTimeout(failureJumpTimer); failureJumpTimer = 0;
     window.clearTimeout(failurePanelTimer); failurePanelTimer = 0;
@@ -1406,6 +1442,9 @@
     window.clearTimeout(completionTimer); completionTimer = 0;
     clearPataskalaThreat();
     transitionStarted = 0;
+    markConfirmPausedAt = 0;
+    markConfirmMoveWasScheduled = false;
+    markConfirmMoveRemainingMs = 0;
   }
   function clearMarkingUi() {
     closeClueCard();
@@ -1541,15 +1580,17 @@
     ambientOscillator.frequency.setTargetAtTime(42, audioContext.currentTime + .5, .1);
   }
 
-  function schedulePataskalaThreat() {
-    window.clearTimeout(pataskalaMoveTimer); pataskalaMoveTimer = 0;
-    if (!currentPresence) return;
+  function schedulePataskalaThreat(delayMs = null) {
+    window.clearTimeout(pataskalaMoveTimer); pataskalaMoveTimer = 0; pataskalaMoveDueAt = 0;
+    if (!currentPresence || pendingMark) return;
     const token = roundToken;
+    const delay = Number.isFinite(delayMs) ? Math.max(0, delayMs) : 2400 + Math.random() * 1800;
+    pataskalaMoveDueAt = performance.now() + delay;
     pataskalaMoveTimer = window.setTimeout(() => {
-      pataskalaMoveTimer = 0;
-      if (token !== roundToken || state !== 'playing' || !currentPresence) return;
+      pataskalaMoveTimer = 0; pataskalaMoveDueAt = 0;
+      if (token !== roundToken || state !== 'playing' || pendingMark || !currentPresence) return;
       beginPataskalaThreat();
-    }, 2400 + Math.random() * 1800);
+    }, delay);
   }
 
   function markMatchesAnomaly(mark, anomaly) {
@@ -1584,12 +1625,12 @@
   }
 
   function handleBurnout(time) {
-    if (state !== 'playing' || burnoutHandled || time - roundStarted < currentTier().burnMs) return;
+    if (state !== 'playing' || pendingMark || burnoutHandled || time - roundStarted < currentTier().burnMs) return;
     burnoutHandled = true;
     clearRoundTimers();
     wrongTone();
     updateAndon(time);
-    beginFailure(UI_COPY.caseReset);
+    beginFailure(UI_COPY.lightLostReport);
   }
 
   function handleWrong() {
@@ -1732,6 +1773,7 @@
   function showMarkConfirm() {
     releasePointerInteraction();
     keyboardMarkActive = false;
+    pauseMarkConfirmClock();
     const nearbyChange = reportTargets()
       .map(anomaly => ({ anomaly, distance: Math.hypot(pendingMark.x - currentPoint(anomaly.target)[0], pendingMark.y - currentPoint(anomaly.target)[1]) }))
       .filter(entry => markMatchesAnomaly(pendingMark, entry.anomaly))
@@ -1765,6 +1807,7 @@
     if (state !== 'playing' || !pendingMark) return;
     const mark = pendingMark;
     pendingMark = null;
+    resumeMarkConfirmClock();
     markLocked = false;
     pointerActive = false;
     keyboardMarkActive = false;
@@ -1785,6 +1828,7 @@
   function cancelMark() {
     if (state !== 'playing' || !pendingMark) return;
     pendingMark = null;
+    resumeMarkConfirmClock();
     markLocked = false;
     releasePointerInteraction();
     keyboardMarkActive = false;
@@ -2051,6 +2095,10 @@
     if (event.key === 'Enter' && state === 'title') { event.preventDefault?.(); enterRoom(); return; }
     if (event.key === 'Enter' && state === 'study') { event.preventDefault?.(); beginCaseFromStudy(); return; }
     if (state !== 'playing') return;
+    if (pendingMark) {
+      if (event.key === 'Escape' && !event.repeat) { event.preventDefault?.(); cancelMark(); }
+      return;
+    }
     const key = event.key.toLowerCase();
     const movement = { arrowup: [0, -1], w: [0, -1], arrowdown: [0, 1], s: [0, 1], arrowleft: [-1, 0], a: [-1, 0], arrowright: [1, 0], d: [1, 0] }[key];
     if (movement) { event.preventDefault?.(); moveBoohaByKeyboard(...movement); return; }
