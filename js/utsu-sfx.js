@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    UTSU SFX — shared sound palette
-   Round 2, Pass 3 (see claude/utsuroba-audit-and-pass-plan.md)
+   Round 2, Pass 3
 
    Before this pass the entire non-music sound identity across Utsuroba
    and Karasuki was two sounds: the typewriter tick (a WebAudio
