@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
    UTSU CARD — shared "parchment card" popup component
-   Round 2, Pass 1 (see claude/utsuroba-audit-and-pass-plan.md)
+   Round 2, Pass 1
 
    Before this pass, four separate popups each hand-copied the same
    cream/tan parchment recipe via inline style.cssText: the drifter

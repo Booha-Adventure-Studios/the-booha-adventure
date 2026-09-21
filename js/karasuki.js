@@ -951,7 +951,7 @@ const HAPPY_HOUSE_PORTAL = {
      js/utsu-card.js — one definition, and this panel now accents to the
      orb's own motif color (candy/lantern/reflection/thorn/ribbon)
      instead of a fixed gold, the same color language the orb itself and
-     its glow trail already use. See claude/utsuroba-audit-and-pass-plan.md. */
+     its glow trail already use. */
   /* Round 2 Pass 17 ("massive!"): switched to the same .is-floating
      treatment the drifter drawer uses — a centered, width/height-capped
      card — instead of a full-bleed bar stretching edge to edge with a
