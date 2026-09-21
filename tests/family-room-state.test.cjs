@@ -195,7 +195,7 @@ function element(id) {
   };
 }
 
-const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-close', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'fly-away-button', 'leave-button', 'leave-en', 'leave-jp', 'undo-button', 'mark-confirm-panel', 'mark-confirm-title-en', 'mark-confirm-title-jp', 'mark-confirm-object-en', 'mark-confirm-object-jp', 'mark-yes-button', 'mark-no-button'];
+const ids = ['room-canvas', 'controls', 'start-panel', 'study-panel', 'study-title', 'study-start-button', 'study-back-button', 'message-panel', 'message-kicker', 'message-title', 'message-copy', 'message-button', 'message-kicker-en', 'message-kicker-jp', 'message-title-en', 'message-title-jp', 'message-copy-en', 'message-copy-jp', 'message-button-en', 'message-button-jp', 'transition-curtain', 'observation-note', 'observation-en', 'observation-jp', 'andon', 'clue-card', 'clue-close', 'clue-en', 'clue-jp', 'sound-toggle', 'sound-state', 'sound-state-jp', 'start-button', 'back-button', 'fly-away-button', 'leave-button', 'leave-en', 'leave-jp', 'undo-button', 'mark-confirm-panel', 'mark-confirm-title-en', 'mark-confirm-title-jp', 'mark-confirm-object-en', 'mark-confirm-object-jp', 'mark-yes-button', 'mark-no-button', 'start-case-kicker-en', 'start-case-kicker-jp', 'study-case-kicker-en', 'study-case-kicker-jp'];
 const nodes = Object.fromEntries(ids.map(id => [id, element(id)]));
 nodes['andon'].style.setProperty = (name, value) => { nodes['andon'].style[name] = value; };
 const listeners = {};
@@ -211,6 +211,9 @@ function canvasElement() {
 }
 
 const events = [];
+let savedData = {
+  weekly: { worlds: { familyRoom: { activeCaseId: 'chanoma', completedCases: {} } } },
+};
 const deterministicMath = Object.create(Math);
 deterministicMath.random = () => 0.2;
 const document = {
@@ -227,6 +230,12 @@ const context = {
   window: {
     innerWidth: 1024, innerHeight: 1536, devicePixelRatio: 1,
     location: { origin: 'https://example.test', href: 'https://example.test/family-room.html' },
+    BoohaAdventure: {
+      save: {
+        load: () => savedData,
+        save: data => { savedData = data; return true; },
+      },
+    },
     matchMedia: () => ({ matches: false }),
     addEventListener(type, handler) { listeners[`window:${type}`] = handler; },
     setTimeout: fn => { fn(); return 1; }, clearTimeout() {}, history: { back() {} },
@@ -250,4 +259,23 @@ assert.strictEqual(events.length, 1, 'a complete case must emit one game-end eve
 assert.strictEqual(events[0].saveId, 'bonus:family_room');
 assert.strictEqual(events[0].completed, true);
 assert.strictEqual(events[0].score, 0, 'the submitted score must be marked changes, not elapsed time');
-console.log('Family Room state-machine audit passed: hidden progression, lantern recovery, marking, and gameEnd contract work.');
+assert.strictEqual(nodes['start-case-kicker-en'].textContent, 'CASE FILE 01 / GENKAN', 'a fresh or stale route must begin at Genkan');
+assert(savedData.weekly.worlds.familyRoom.completedCases.genkan, 'completing Genkan must seal its weekly case record');
+assert.strictEqual(savedData.weekly.worlds.familyRoom.activeCaseId, 'chanoma', 'completing Genkan must advance the route pointer to Chanoma');
+assert.strictEqual(nodes['message-button-en'].textContent, 'ENTER CHANOMA', 'Genkan completion must offer the next built room');
+
+nodes['message-button'].onclick();
+assert.strictEqual(nodes['start-case-kicker-en'].textContent, 'CASE FILE 02 / CHANOMA', 'the next-room action must load Chanoma');
+nodes['start-button'].onclick();
+nodes['study-start-button'].onclick();
+for (let index = 0; index < 11; index += 1) {
+  nodes['leave-button'].onclick();
+}
+
+assert.strictEqual(events.length, 2, 'the second built case must emit one additional game-end event');
+assert(savedData.weekly.worlds.familyRoom.completedCases.chanoma, 'completing Chanoma must seal its weekly case record');
+assert.strictEqual(savedData.weekly.worlds.familyRoom.activeCaseId, 'chanoma', 'the final built room must remain the saved route pointer after the house is complete');
+assert.strictEqual(nodes['message-button-en'].textContent, 'RETURN TO THE PROFILE', 'the final built room must return to the profile');
+nodes['message-button'].onclick();
+assert.strictEqual(context.window.location.href, 'adventure-profile.html', 'the final route action must leave the Family Room');
+console.log('Family Room state-machine audit passed: Genkan start, sequential room routing, final profile handoff, hidden progression, lantern recovery, marking, and gameEnd contract work.');
