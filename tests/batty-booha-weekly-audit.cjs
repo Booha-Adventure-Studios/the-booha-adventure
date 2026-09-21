@@ -43,6 +43,23 @@ vm.createContext(context);
 vm.runInContext(source, context, { filename: 'js/core/booha-skins.js' });
 const skins = context.window.BoohaSkins;
 
+assert.strictEqual(skins.CURRENT_SEASON_ID, 'halloween');
+const mummington = skins.get('mummington');
+assert.strictEqual(mummington.id, 'mummington');
+assert.strictEqual(mummington.seasonId, 'halloween');
+assert.strictEqual(mummington.enabled, false);
+assert.strictEqual(mummington.placeholder, true);
+assert.strictEqual(mummington.name, 'Mummington Booha');
+assert.strictEqual(mummington.nameJp, 'マミングトン ブーハー');
+assert.strictEqual(mummington.unlockId, 'booha_skin_mummington');
+assert.deepStrictEqual(Object.keys(mummington.assets), []);
+assert.strictEqual(skins.isAvailable('mummington'), false,
+  'Mummington must stay out of rotation until its pose set exists');
+assert.strictEqual(skins.availableCharacters().map(skin => skin.id).join(','), 'batty');
+assert.strictEqual(skins.nextAvailableId('batty'), 'batty');
+assert.strictEqual(skins.unlockAndEquip('mummington'), false,
+  'placeholder characters must not be unlockable');
+
 assert.strictEqual(skins.isUnlocked('batty'), false);
 assert.strictEqual(skins.unlockAndEquip('batty'), true);
 assert.ok(stored.weekly.unlockedBoohaSkins.batty);
