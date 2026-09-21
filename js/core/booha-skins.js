@@ -14,6 +14,8 @@ const BoohaSkins = (() => {
     'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
     'marking', 'hiding', 'danceArmsUp', 'danceSway', 'danceWave',
   ]);
+  const BLITZ_GAME_TYPES = Object.freeze(['vocab', 'sentences', 'questions']);
+  const BLITZ_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
   const SKINS = Object.freeze({
     batty: Object.freeze({
       id: 'batty',
@@ -63,6 +65,25 @@ const BoohaSkins = (() => {
     return window.BoohaAdventure && BoohaAdventure.save;
   }
 
+  function currentWeekKey() {
+    try {
+      const calendar = window.CALENDAR;
+      const week = calendar?.getCurrentCurriculumWeek?.();
+      return calendar?.getCurriculumWeekOccurrenceKey?.(week) || week?.occurrenceKey || '';
+    } catch (_) { return ''; }
+  }
+
+  function hasCurrentBlitzTriple(data) {
+    const blitz = data?.meta?.blitz;
+    const weekKey = currentWeekKey();
+    if (!blitz || typeof blitz !== 'object' || !weekKey || blitz.weeklyKey !== weekKey) return false;
+    const weekly = blitz.weekly;
+    if (!weekly || typeof weekly !== 'object' || Array.isArray(weekly)) return false;
+    return BLITZ_CURRICULA.some(curriculum =>
+      BLITZ_GAME_TYPES.every(type => !!weekly[type]?.[curriculum])
+    );
+  }
+
   function get(id) {
     return SKINS[id] || null;
   }
@@ -99,9 +120,11 @@ const BoohaSkins = (() => {
   }
 
   function isUnlocked(id) {
-    if (!get(id)) return false;
+    const skin = get(id);
+    if (!skin) return false;
     try {
-      return !!(save()?.load()?.weekly?.unlockedBoohaSkins || {})[id];
+      const data = save()?.load();
+      return !!(data?.weekly?.unlockedBoohaSkins || {})[id] && hasCurrentBlitzTriple(data);
     } catch (_) { return false; }
   }
 
@@ -124,6 +147,7 @@ const BoohaSkins = (() => {
     const saveFile = save();
     if (!skin || !isAvailable(id) || !saveFile) return false;
     const data = saveFile.load();
+    if (!hasCurrentBlitzTriple(data)) return false;
     if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
     if (!data.weekly.unlockedBoohaSkins || typeof data.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(data.weekly.unlockedBoohaSkins)) {
       data.weekly.unlockedBoohaSkins = {};
@@ -155,6 +179,7 @@ const BoohaSkins = (() => {
     BASE,
     CURRENT_SEASON_ID,
     POSE_KEYS,
+    hasCurrentBlitzTriple,
     SKINS,
     SEASONS,
     get,
