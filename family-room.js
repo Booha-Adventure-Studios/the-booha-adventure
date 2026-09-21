@@ -1375,15 +1375,15 @@
   }
 
   function resumeFromVisibility() {
-    if (!pauseStartedAt) return;
     const resumedAt = performance.now();
-    shiftGameplayClocks(Math.max(0, resumedAt - pauseStartedAt));
-    pauseStartedAt = 0;
-    if (!document.hidden) {
-      if (audioContext?.state === 'suspended' && audioEnabled) audioContext.resume().catch(() => {});
-      updateAndon(resumedAt);
-      startLoop();
+    if (pauseStartedAt) {
+      shiftGameplayClocks(Math.max(0, resumedAt - pauseStartedAt));
+      pauseStartedAt = 0;
     }
+    if (document.hidden) return;
+    if (audioContext?.state === 'suspended' && audioEnabled) audioContext.resume().catch(() => {});
+    updateAndon(resumedAt);
+    startLoop();
   }
 
   function showMessage(message, handler) {
