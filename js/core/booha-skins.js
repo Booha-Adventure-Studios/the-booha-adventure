@@ -38,18 +38,26 @@ const BoohaSkins = (() => {
         danceWave: 'assets/skins/batty_booha/dance_wave.png',
       }),
     }),
-    // Placeholder entry for the next Halloween character. Keep its stable id
-    // and display copy now, but do not expose it to rotation or unlocking
-    // until every shared pose asset has been added.
     mummington: Object.freeze({
       id: 'mummington',
       seasonId: 'halloween',
-      enabled: false,
-      placeholder: true,
+      enabled: true,
       name: 'Mummington Booha',
       nameJp: 'マミングトン ブーハー',
       unlockId: 'booha_skin_mummington',
-      assets: Object.freeze({}),
+      assets: Object.freeze({
+        maze: 'assets/skins/mummington_booha/static.png',
+        karasuki: 'assets/skins/mummington_booha/static.png',
+        grimmerglen: 'assets/skins/mummington_booha/static.png',
+        utsuroba: 'assets/skins/mummington_booha/static.png',
+        muenba: 'assets/skins/mummington_booha/static.png',
+        familyRoom: 'assets/skins/mummington_booha/static.png',
+        marking: 'assets/skins/mummington_booha/marking.png',
+        hiding: 'assets/skins/mummington_booha/hiding.png',
+        danceArmsUp: 'assets/skins/mummington_booha/dance_arms_up.png',
+        danceSway: 'assets/skins/mummington_booha/dance_sway.png',
+        danceWave: 'assets/skins/mummington_booha/dance_wave.png',
+      }),
     }),
   });
 
@@ -57,6 +65,7 @@ const BoohaSkins = (() => {
     halloween: Object.freeze({
       id: 'halloween',
       name: 'Halloween',
+      rotationStartOccurrenceKey: '2026-09-20|september-w4',
       characterIds: Object.freeze(['batty', 'mummington']),
     }),
   });
@@ -71,6 +80,20 @@ const BoohaSkins = (() => {
       const week = calendar?.getCurrentCurriculumWeek?.();
       return calendar?.getCurriculumWeekOccurrenceKey?.(week) || week?.occurrenceKey || '';
     } catch (_) { return ''; }
+  }
+
+  function rotationCharacterId(seasonId = CURRENT_SEASON_ID, occurrenceKey = currentWeekKey()) {
+    const season = getSeason(seasonId);
+    if (!season || !season.characterIds.length) return null;
+    const anchor = String(season.rotationStartOccurrenceKey || '').split('|')[0];
+    const current = String(occurrenceKey || '').split('|')[0];
+    const anchorMs = Date.parse(`${anchor}T00:00:00Z`);
+    const currentMs = Date.parse(`${current}T00:00:00Z`);
+    if (!Number.isFinite(anchorMs) || !Number.isFinite(currentMs) || currentMs < anchorMs) {
+      return season.characterIds[0];
+    }
+    const weekIndex = Math.floor((currentMs - anchorMs) / (7 * 24 * 60 * 60 * 1000));
+    return season.characterIds[weekIndex % season.characterIds.length];
   }
 
   function hasCurrentBlitzTriple(data) {
@@ -124,7 +147,8 @@ const BoohaSkins = (() => {
     if (!skin) return false;
     try {
       const data = save()?.load();
-      return !!(data?.weekly?.unlockedBoohaSkins || {})[id] && hasCurrentBlitzTriple(data);
+      return rotationCharacterId(skin.seasonId) === id &&
+        !!(data?.weekly?.unlockedBoohaSkins || {})[id] && hasCurrentBlitzTriple(data);
     } catch (_) { return false; }
   }
 
@@ -147,7 +171,7 @@ const BoohaSkins = (() => {
     const saveFile = save();
     if (!skin || !isAvailable(id) || !saveFile) return false;
     const data = saveFile.load();
-    if (!hasCurrentBlitzTriple(data)) return false;
+    if (rotationCharacterId(skin.seasonId) !== id || !hasCurrentBlitzTriple(data)) return false;
     if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
     if (!data.weekly.unlockedBoohaSkins || typeof data.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(data.weekly.unlockedBoohaSkins)) {
       data.weekly.unlockedBoohaSkins = {};
@@ -189,6 +213,7 @@ const BoohaSkins = (() => {
     seasonCharacters,
     availableCharacters,
     nextAvailableId,
+    rotationCharacterId,
     isUnlocked,
     selectedId,
     asset,

@@ -1499,9 +1499,34 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   battyUnlockScrim=document.getElementById('battyUnlockScrim'),
   battyUnlockPopup=document.getElementById('battyUnlockPopup'),
   battyEquipButton=document.getElementById('battyEquipButton'),
-  battyEquipTextButton=document.getElementById('battyEquipTextButton');
+  battyEquipTextButton=document.getElementById('battyEquipTextButton'),
+  battyUnlockArt=battyEquipButton?.querySelector('.batty-art');
 
 let battyUnlockPopupShown = false;
+let seasonalUnlockId = null;
+
+const SEASONAL_UNLOCK_COPY = Object.freeze({
+  batty: Object.freeze({
+    kickerEn: 'A NEW FRIEND HAS ARRIVED',
+    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
+    titleEn: 'You Unlocked Batty Booha!',
+    titleJp: 'バッティー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+    copyEn: 'Tap Batty Booha to equip your new traveling friend.',
+    copyJp: 'バッティー・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
+    buttonEn: 'EQUIP BATTY BOOHA',
+    buttonJp: 'バッティー・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+  }),
+  mummington: Object.freeze({
+    kickerEn: 'A NEW FRIEND HAS ARRIVED',
+    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
+    titleEn: 'You Unlocked Mummington Booha!',
+    titleJp: 'マミングトン ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+    copyEn: 'Tap Mummington Booha to equip your new traveling friend.',
+    copyJp: 'マミングトン ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
+    buttonEn: 'EQUIP MUMMINGTON BOOHA',
+    buttonJp: 'マミングトン ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+  }),
+});
 
 function loadMediaSource(media){
   if(!media||media.dataset.loaded==='1')return;
@@ -1629,21 +1654,56 @@ function blitzTripleCompleteForAnyCurriculum() {
   return !!readBlitzCompletionState().completedCurriculum;
 }
 
-function closeBattyUnlockPopup() {
+function closeSeasonalUnlockPopup() {
   battyUnlockPopup?.classList.remove('visible');
   battyUnlockScrim?.classList.remove('show');
   window.setTimeout(() => battyUnlockPopup?.classList.remove('show'), 440);
 }
 
-function equipBattyFromUnlockPopup() {
-  if (!window.BoohaSkins?.unlockAndEquip('batty')) return;
-  applyEquippedMazeSkin();
-  closeBattyUnlockPopup();
+function prepareSeasonalUnlockPopup(id) {
+  const copy = SEASONAL_UNLOCK_COPY[id];
+  const skin = window.BoohaSkins?.get(id);
+  if (!copy || !skin || !battyUnlockPopup) return false;
+  const setLeadText = (selector, value) => {
+    const el = battyUnlockPopup.querySelector(selector);
+    if (!el) return;
+    const jp = el.querySelector('.batty-jp');
+    el.textContent = value;
+    if (jp) el.appendChild(jp);
+  };
+  const setHTML = (selector, value) => {
+    const el = battyUnlockPopup.querySelector(selector);
+    if (el) el.innerHTML = value;
+  };
+  setLeadText('.batty-kicker', copy.kickerEn);
+  setHTML('.batty-kicker .batty-jp', copy.kickerJp);
+  setLeadText('#battyUnlockTitle', copy.titleEn);
+  setHTML('#battyUnlockTitle .batty-jp', copy.titleJp);
+  setLeadText('#battyUnlockCopy', copy.copyEn);
+  setHTML('#battyUnlockCopy .batty-jp', copy.copyJp);
+  setLeadText('#battyEquipTextButton', copy.buttonEn);
+  setHTML('#battyEquipTextButton .batty-jp', copy.buttonJp);
+  if (battyUnlockArt) {
+    battyUnlockArt.src = skin.assets.maze;
+    battyUnlockArt.alt = skin.name;
+  }
+  battyEquipButton?.setAttribute('aria-label', `Equip ${skin.name}`);
+  battyUnlockPopup.dataset.skinId = id;
+  return true;
 }
 
-function maybeShowBattyUnlockPopup() {
+function equipSeasonalFromUnlockPopup() {
+  if (!seasonalUnlockId || !window.BoohaSkins?.unlockAndEquip(seasonalUnlockId)) return;
+  applyEquippedMazeSkin();
+  closeSeasonalUnlockPopup();
+}
+
+function maybeShowSeasonalUnlockPopup() {
   if (battyUnlockPopupShown || !window.BoohaSkins) return;
-  if (BoohaSkins.isUnlocked('batty') || !blitzTripleCompleteForAnyCurriculum()) return;
+  const id = BoohaSkins.rotationCharacterId?.();
+  if (!id || BoohaSkins.isUnlocked(id) || !blitzTripleCompleteForAnyCurriculum()) return;
+  if (!prepareSeasonalUnlockPopup(id)) return;
+  seasonalUnlockId = id;
   battyUnlockPopupShown = true;
   battyUnlockScrim.classList.add('show');
   battyUnlockPopup.classList.add('show');
@@ -1774,8 +1834,8 @@ function getActiveMazeGhostImage() {
 }
 
 assignRandomGhost();
-battyEquipButton?.addEventListener('click', equipBattyFromUnlockPopup);
-battyEquipTextButton?.addEventListener('click', equipBattyFromUnlockPopup);
+battyEquipButton?.addEventListener('click', equipSeasonalFromUnlockPopup);
+battyEquipTextButton?.addEventListener('click', equipSeasonalFromUnlockPopup);
 
 function getWandererImage(w) {
   if (w.kind === 'extra') {
@@ -2829,19 +2889,26 @@ document.addEventListener('visibilitychange',()=>{
 // hit the locked/empty state, so wait for the boot signal.
 function onSaveReady(){
   personalizeMazeIntro();
-  // Batty is the player's companion for the current week once unlocked.
+  // The scheduled Halloween character is the player's companion for the
+  // current week once unlocked.
+  const scheduledSkinId = window.BoohaSkins?.rotationCharacterId?.();
   // Older saves may contain the unlock without the selected-skin field, so
   // repair that state before the Maze starts rendering its active player sprite.
-  if (window.BoohaSkins?.isUnlocked('batty') && !window.BoohaSkins.selectedId()) {
-    window.BoohaSkins.equip('batty');
+  if (scheduledSkinId && window.BoohaSkins?.isUnlocked(scheduledSkinId) && !window.BoohaSkins.selectedId()) {
+    window.BoohaSkins.equip(scheduledSkinId);
   }
   applyEquippedMazeSkin();
-  maybeShowBattyUnlockPopup();
+  maybeShowSeasonalUnlockPopup();
   if (mazeStarted) buildWanderers();   // extra ghost count depends on the save
 }
 if (window.BOOHA_READY) onSaveReady();
 else document.addEventListener('booha:ready', onSaveReady, { once: true });
-document.addEventListener('booha:weeklyReset', onSaveReady);
+document.addEventListener('booha:weeklyReset', () => {
+  battyUnlockPopupShown = false;
+  seasonalUnlockId = null;
+  closeSeasonalUnlockPopup();
+  onSaveReady();
+});
 
 if(sessionStorage.getItem('booha_return_to_checkpoint')==='1')restoreMazeFromCheckpoint();
 else resizeCanvas();
