@@ -5787,13 +5787,16 @@ const NUPPI_LINES = [
       ctx.fill();
     }
 
-   // Outer soft halo — drawn before sprite so it sits underneath
+    // Outer soft halo — drawn before sprite so it sits underneath. When a
+    // charge is waiting, the blue reward state must be stronger than Nuppi's
+    // normal pink mood glow so the player can discover the interaction while
+    // she is moving through the rooms.
     const halo = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R * 1.4);
-    halo.addColorStop(0,   'rgba(255,180,220,0.38)');
-    halo.addColorStop(0.4, 'rgba(220,140,200,0.18)');
-    halo.addColorStop(0.8, 'rgba(180,100,200,0.06)');
+    halo.addColorStop(0,   nuppiChargeClaimable ? 'rgba(225,248,255,0.62)' : 'rgba(255,180,220,0.38)');
+    halo.addColorStop(0.4, nuppiChargeClaimable ? 'rgba(130,204,255,0.34)' : 'rgba(220,140,200,0.18)');
+    halo.addColorStop(0.8, nuppiChargeClaimable ? 'rgba(74,154,255,0.16)' : 'rgba(180,100,200,0.06)');
     halo.addColorStop(1,   'transparent');
-    ctx.globalAlpha = 0.7 + pulse * 0.25;
+    ctx.globalAlpha = nuppiChargeClaimable ? 0.86 + pulse * 0.14 : 0.7 + pulse * 0.25;
     ctx.fillStyle   = halo;
     ctx.beginPath();
     ctx.arc(nx, ny, NUPPI_GLOW_R * 1.4, 0, Math.PI * 2);
@@ -5801,14 +5804,23 @@ const NUPPI_LINES = [
 
     // Inner pink core glow
     const core = ctx.createRadialGradient(nx, ny, 0, nx, ny, NUPPI_GLOW_R * 0.55);
-    core.addColorStop(0,   'rgba(255,200,240,0.55)');
-    core.addColorStop(0.5, 'rgba(255,140,200,0.28)');
+    core.addColorStop(0,   nuppiChargeClaimable ? 'rgba(235,252,255,0.76)' : 'rgba(255,200,240,0.55)');
+    core.addColorStop(0.5, nuppiChargeClaimable ? 'rgba(120,201,255,0.42)' : 'rgba(255,140,200,0.28)');
     core.addColorStop(1,   'transparent');
-    ctx.globalAlpha = 0.55 + pulse * 0.35;
+    ctx.globalAlpha = nuppiChargeClaimable ? 0.72 + pulse * 0.28 : 0.55 + pulse * 0.35;
     ctx.fillStyle   = core;
     ctx.beginPath();
     ctx.arc(nx, ny, NUPPI_GLOW_R * 0.55, 0, Math.PI * 2);
     ctx.fill();
+
+    if (nuppiChargeClaimable) {
+      ctx.globalAlpha = 0.72 + pulse * 0.28;
+      ctx.strokeStyle = 'rgba(185,221,255,0.92)';
+      ctx.lineWidth = 2.5 + pulse * 2;
+      ctx.beginPath();
+      ctx.arc(nx, ny, NUPPI_GLOW_R * (1.05 + pulse * 0.12), 0, Math.PI * 2);
+      ctx.stroke();
+    }
 
     // Sprite drawn last — sits on top of glow
     if (nuppiImg1.complete && nuppiImg1.naturalWidth > 0) {
@@ -6034,6 +6046,7 @@ function drawObserver(now) {
       shouldRender: now => worldPerf.shouldRender(now),
     });
     document.addEventListener('booha:weeklyReset', () => {
+      refreshNuppiChargeState();
       lastLitEchoIds = null;
       renderEchoesTracker();
     });
