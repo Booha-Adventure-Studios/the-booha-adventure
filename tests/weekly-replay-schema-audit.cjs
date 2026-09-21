@@ -104,7 +104,7 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
     mariettaIntroSkipped: false,
   },
   familyRoom: {
-    activeCaseId: 'chanoma',
+    activeCaseId: 'genkan',
     completedCases: {},
     bestTier: null,
     preferredTier: 'patient',
@@ -154,7 +154,7 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.grimmerglen), {
   mariettaIntroSkipped: false,
 });
 assert.deepStrictEqual(plain(stored.weekly.worlds.familyRoom), {
-  activeCaseId: 'chanoma',
+  activeCaseId: 'genkan',
   completedCases: {},
   bestTier: null,
   preferredTier: 'patient',

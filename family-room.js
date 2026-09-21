@@ -71,7 +71,7 @@
     pataskala: Object.freeze({ role: 'threat', scoredTarget: false, markableTarget: false, risesWithCaseDepth: true, finalRoom: 'nando' }),
     production: Object.freeze({ masterOnly: true, canvas: '1024x1536', safeBand: [0.22, 0.78], exitEdgeRequired: true }),
   });
-  const DEFAULT_CASE_ID = 'chanoma';
+  const DEFAULT_CASE_ID = 'genkan';
   let ACTIVE_CASE_ID = DEFAULT_CASE_ID;
   let ACTIVE_CASE = FAMILY_HOUSE_CASES.find(entry => entry.id === ACTIVE_CASE_ID);
   let ACTIVE_CASE_LABEL = String(ACTIVE_CASE.number).padStart(2, '0');
@@ -186,6 +186,7 @@
     chanoma: Object.freeze({ base: 'assets/family-room/living_base.webp', roomAnchors: CHANOMA_ROOM_ANCHORS, anomalyAnchors: CHANOMA_ANOMALY_ANCHORS, pataskalaSpawnAnchors: CHANOMA_PATASKALA_SPAWN_ANCHORS, anomalies: CHANOMA_ANOMALIES }),
     genkan: Object.freeze({ base: 'assets/family-room/genkan_base.webp', roomAnchors: GENKAN_ROOM_ANCHORS, anomalyAnchors: GENKAN_ANOMALY_ANCHORS, pataskalaSpawnAnchors: GENKAN_PATASKALA_SPAWN_ANCHORS, anomalies: GENKAN_ANOMALIES }),
   });
+  const BUILT_CASE_IDS = Object.freeze(['genkan', 'chanoma']);
 
   let anomalies = CHANOMA_ANOMALIES;
   let ROOM_ANCHORS = CHANOMA_ROOM_ANCHORS;
@@ -242,7 +243,6 @@
   const studyStartButton = document.getElementById('study-start-button');
   const studyBackButton = document.getElementById('study-back-button');
   const flameEls = [...document.querySelectorAll('[data-flame]')];
-  const caseButtons = [...document.querySelectorAll('[data-case]')];
   const startCaseKickerEn = document.getElementById('start-case-kicker-en');
   const startCaseKickerJp = document.getElementById('start-case-kicker-jp');
   const studyCaseKickerEn = document.getElementById('study-case-kicker-en');
@@ -344,6 +344,7 @@
   let clueVersion = 0;
   let roundToken = 0;
   let completionSubmitted = false;
+  let nextCaseId = null;
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   const easeOut = value => 1 - Math.pow(1 - clamp(value, 0, 1), 3);
@@ -625,9 +626,12 @@
   function readActiveCase() {
     try {
       const data = window.BoohaAdventure?.save?.load?.() || {};
-      const weeklyCase = data.weekly?.worlds?.familyRoom?.activeCaseId;
-      const lifetimeCase = data.familyRoom?.activeCaseId;
-      return CASE_CONTENT[weeklyCase] ? weeklyCase : CASE_CONTENT[lifetimeCase] ? lifetimeCase : DEFAULT_CASE_ID;
+      const completedCases = data.weekly?.worlds?.familyRoom?.completedCases;
+      if (completedCases && typeof completedCases === 'object' && !Array.isArray(completedCases)) {
+        const nextCase = BUILT_CASE_IDS.find(caseId => !completedCases[caseId]);
+        if (nextCase) return nextCase;
+      }
+      return DEFAULT_CASE_ID;
     } catch (_) {
       return DEFAULT_CASE_ID;
     }
@@ -654,7 +658,6 @@
     const kickerJp = `じけんファイル ${ACTIVE_CASE_LABEL} / ${ACTIVE_CASE.jp}`;
     [startCaseKickerEn, studyCaseKickerEn].forEach(node => { if (node) node.textContent = kicker; });
     [startCaseKickerJp, studyCaseKickerJp].forEach(node => { if (node) node.textContent = kickerJp; });
-    caseButtons.forEach(button => button.classList.toggle('selected', button.dataset.case === ACTIVE_CASE_ID));
   }
 
   function loadActiveCaseContent({ persist = false } = {}) {
@@ -676,12 +679,6 @@
     updateCasePresentation();
     if (persist) saveActiveCase();
     if (typeof window.requestAnimationFrame === 'function') scheduleResize(); else resize();
-  }
-
-  function selectCase(caseId) {
-    if (state !== 'title' || !CASE_CONTENT[caseId]) return;
-    ACTIVE_CASE_ID = caseId;
-    loadActiveCaseContent({ persist: true });
   }
 
   function readFlashlightCharges() {
@@ -1362,6 +1359,38 @@
     showPanel(messagePanel);
   }
 
+  function buildNextCaseCopy() {
+    const nextCase = FAMILY_HOUSE_CASES.find(entry => entry.id === nextCaseId);
+    if (!nextCase) return UI_COPY.complete;
+    return {
+      kicker: `CASE FILE ${ACTIVE_CASE_LABEL} / SEALED`,
+      kickerJp: `じけんファイル ${ACTIVE_CASE_LABEL} / ふういん`,
+      title: 'THE HOUSE OPENS DEEPER.',
+      titleJp: 'いえの おくが ひらいた。',
+      copy: `Your notes are filed. ${nextCase.name} is waiting beyond this room.`,
+      copyJp: `きろくを のこした。つぎは ${nextCase.jp} です。`,
+      button: `ENTER ${nextCase.name}`,
+      buttonJp: `${nextCase.jp}へ はいる`,
+    };
+  }
+
+  function enterNextCase() {
+    if (!nextCaseId || !CASE_CONTENT[nextCaseId]) { exitGame(); return; }
+    ACTIVE_CASE_ID = nextCaseId;
+    nextCaseId = null;
+    loadActiveCaseContent({ persist: true });
+    state = 'title';
+    clearRoundTimers();
+    clearMarkingUi();
+    setControlsVisible(false);
+    hidePanel(messagePanel);
+    showPanel(startPanel);
+    setObservation('NEXT ROOM / STUDY THE HOUSE', 'つぎの へや / いえを おぼえる');
+    updateAndon();
+    document.getElementById('start-button')?.focus?.();
+    startLoop();
+  }
+
   function hidePanels() {
     hidePanel(startPanel);
     hidePanel(studyPanel);
@@ -1416,7 +1445,7 @@
   function enterRoom() {
     selectedTier = tierButtons.find(button => button.classList.contains('selected'))?.dataset.tier || 'patient';
     clearRoundTimers();
-    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; pataskalaThreat = null; failureThreat = null; pataskalaCooldownRounds = 0; recentAnomalyIds = []; recentAnchorRegions = []; currentAudioOnly = false; currentIsAnomaly = false;
+    round = 0; progress = 0; marks = 0; correctCalls = 0; completionSubmitted = false; nextCaseId = null; caseStarted = 0; currentAnomaly = null; currentAnomalies = []; currentPresence = null; pataskalaThreat = null; failureThreat = null; pataskalaCooldownRounds = 0; recentAnomalyIds = []; recentAnchorRegions = []; currentAudioOnly = false; currentIsAnomaly = false;
     state = 'study';
     curtain.className = '';
     setControlsVisible(false);
@@ -1877,9 +1906,11 @@
         sealedAt: Number(prior.sealedAt) || Date.now(),
         bestTier,
       };
+      nextCaseId = BUILT_CASE_IDS.find(caseId => !completedCases[caseId]) || null;
       // This is deliberately score-free. The shared gameEnd event remains the
       // one place that records hidden marks for existing arcade compatibility.
-      familyRoom.lastResult = { caseId: ACTIVE_CASE_ID, tier: selectedTier, completedAt: Date.now() };
+      familyRoom.activeCaseId = nextCaseId || ACTIVE_CASE_ID;
+      familyRoom.lastResult = { caseId: ACTIVE_CASE_ID, nextCaseId, tier: selectedTier, completedAt: Date.now() };
       return save.save(data);
     } catch (error) {
       console.warn('[Family Room] weekly case record unavailable', error);
@@ -1909,7 +1940,7 @@
       completeTone();
       submitResult();
       stopLoop();
-      showMessage(UI_COPY.complete, exitGame);
+      showMessage(nextCaseId ? buildNextCaseCopy() : UI_COPY.complete, nextCaseId ? enterNextCase : exitGame);
     }, COMPLETION_QUIET_MS);
   }
 
@@ -2009,7 +2040,6 @@
   clueCloseButton?.addEventListener('click', continueFromClue);
   flyAwayButton?.addEventListener('click', flyAwayToSafeRoom);
   flashlightButton?.addEventListener('click', useFlashlightCharge);
-  caseButtons.forEach(button => button.addEventListener('click', () => selectCase(button.dataset.case)));
   tierButtons.forEach(button => button.addEventListener('click', () => { if (button.disabled) return; selectedTier = button.dataset.tier; savePreferredTier(); updateTierButtons(); }));
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);

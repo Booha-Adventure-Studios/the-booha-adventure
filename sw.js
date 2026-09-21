@@ -10,7 +10,8 @@ const CURRENT_CACHES = {
   // Profile consolidation Pass 1: ship the canonical progress page and its
   // moved progress renderer to returning players.
   // Grimmerglen Pass 2 changes the lifetime-counter profile markup.
-  // Family Room Pass 1 locks the house registry and Case 02 label. The room
+  // Family Room Pass 2 makes Genkan the mandatory entry and routes the house
+  // in order. The room scripts remain network-first.
   // scripts are network-first; keep the established page cache version so
   // historical cache-contract audits remain compatible.
   // Family Room Pass 4 adds explicit mark confirmation, persistent marks, and
@@ -28,7 +29,7 @@ const CURRENT_CACHES = {
   // invalidate the precached shells for returning iPads.
   // Halloween Booha rotation pass (2026-09-21): invalidate maze.html so
   // scheduled Batty/Mummington popups reach returning clients.
-  pages:  'booha-pages-2026-415',
+  pages:  'booha-pages-2026-416',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
