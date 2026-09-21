@@ -54,18 +54,15 @@ assert.strictEqual(skins.CURRENT_SEASON_ID, 'halloween');
 const mummington = skins.get('mummington');
 assert.strictEqual(mummington.id, 'mummington');
 assert.strictEqual(mummington.seasonId, 'halloween');
-assert.strictEqual(mummington.enabled, false);
-assert.strictEqual(mummington.placeholder, true);
+assert.strictEqual(mummington.enabled, true);
 assert.strictEqual(mummington.name, 'Mummington Booha');
 assert.strictEqual(mummington.nameJp, 'マミングトン ブーハー');
 assert.strictEqual(mummington.unlockId, 'booha_skin_mummington');
-assert.deepStrictEqual(Object.keys(mummington.assets), []);
-assert.strictEqual(skins.isAvailable('mummington'), false,
-  'Mummington must stay out of rotation until its pose set exists');
-assert.strictEqual(skins.availableCharacters().map(skin => skin.id).join(','), 'batty');
-assert.strictEqual(skins.nextAvailableId('batty'), 'batty');
-assert.strictEqual(skins.unlockAndEquip('mummington'), false,
-  'placeholder characters must not be unlockable');
+assert.strictEqual(skins.isAvailable('mummington'), true);
+assert.strictEqual(skins.availableCharacters().map(skin => skin.id).join(','), 'batty,mummington');
+assert.strictEqual(skins.nextAvailableId('batty'), 'mummington');
+assert.strictEqual(skins.nextAvailableId('mummington'), 'batty');
+assert.strictEqual(skins.rotationCharacterId(), 'batty');
 
 // A stale bucket entry must not keep Batty active before this week's Blitz
 // trio is complete.
@@ -103,14 +100,30 @@ assert.strictEqual(skins.isUnlocked('batty'), false);
 assert.strictEqual(skins.selectedId(), null);
 assert.strictEqual(skins.unlockAndEquip('batty'), false);
 
-// The same trio in a prior week must not unlock the current week.
-stored.meta.blitz.weeklyKey = '2026-09-13|september-w3';
+// The next calendar week schedules Mummington. Batty cannot be unlocked
+// there even when the current week's Blitz trio is complete.
+currentWeek.occurrenceKey = '2026-09-27|september-w5';
+stored.meta.blitz.weeklyKey = currentWeek.occurrenceKey;
 stored.meta.blitz.weekly = {
   vocab: { pb: { ms: 1000 } },
   sentences: { pb: { ms: 1000 } },
   questions: { pb: { ms: 1000 } },
 };
-stored.weekly.unlockedBoohaSkins.batty = { unlockedAt: Date.now() };
+stored.weekly.unlockedBoohaSkins = {};
+stored.meta.selectedBoohaSkin = null;
+assert.strictEqual(skins.rotationCharacterId(), 'mummington');
 assert.strictEqual(skins.isUnlocked('batty'), false);
+assert.strictEqual(skins.unlockAndEquip('batty'), false);
+assert.strictEqual(skins.unlockAndEquip('mummington'), true);
+assert.strictEqual(skins.selectedId(), 'mummington');
 
-console.log('Batty Booha weekly audit passed: seasonal skins require the current week\'s complete Blitz trio and fall back cleanly before unlock.');
+// With two characters, the third week rotates back to Batty.
+currentWeek.occurrenceKey = '2026-10-04|october-w1';
+stored.meta.blitz.weeklyKey = currentWeek.occurrenceKey;
+stored.meta.blitz.weekly = {};
+stored.weekly.unlockedBoohaSkins = {};
+stored.meta.selectedBoohaSkin = null;
+assert.strictEqual(skins.rotationCharacterId(), 'batty');
+assert.strictEqual(skins.selectedId(), null);
+
+console.log('Batty/Mummington rotation audit passed: current-week Blitz completion unlocks the scheduled character and two-character rotation alternates correctly.');

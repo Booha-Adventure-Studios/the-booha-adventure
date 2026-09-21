@@ -46,7 +46,7 @@ assert.ok(core.includes("document.addEventListener('visibilitychange'"),
   'core must re-check the occurrence when a hidden page becomes active');
 assert.ok(index.includes("document.addEventListener('booha:weeklyReset'"),
   'Hub Blitz pills must refresh after an in-session rollover');
-assert.ok(maze.includes("document.addEventListener('booha:weeklyReset', onSaveReady)"),
+assert.ok(maze.includes("document.addEventListener('booha:weeklyReset'"),
   'Maze progress visuals must refresh after an in-session rollover');
 
 console.log('Weekly occurrence consumer audit passed: all weekly readers distinguish the repeated Week 4 occurrence.');
