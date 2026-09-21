@@ -14,6 +14,7 @@ let stored = {
   meta: { selectedBoohaSkin: null },
   weekly: { unlockedBoohaSkins: {} },
 };
+const currentWeek = { occurrenceKey: '2026-09-20|september-w4' };
 const events = [];
 const save = {
   load() { return stored; },
@@ -31,7 +32,13 @@ class CustomEvent {
 }
 const BoohaAdventure = { save };
 const context = {
-  window: { BoohaAdventure },
+  window: {
+    BoohaAdventure,
+    CALENDAR: {
+      getCurrentCurriculumWeek() { return currentWeek; },
+      getCurriculumWeekOccurrenceKey(week) { return week.occurrenceKey; },
+    },
+  },
   BoohaAdventure,
   document,
   CustomEvent,
@@ -60,6 +67,23 @@ assert.strictEqual(skins.nextAvailableId('batty'), 'batty');
 assert.strictEqual(skins.unlockAndEquip('mummington'), false,
   'placeholder characters must not be unlockable');
 
+// A stale bucket entry must not keep Batty active before this week's Blitz
+// trio is complete.
+stored.weekly.unlockedBoohaSkins.batty = { unlockedAt: Date.now() };
+assert.strictEqual(skins.isUnlocked('batty'), false);
+assert.strictEqual(skins.selectedId(), null);
+assert.strictEqual(skins.unlockAndEquip('batty'), false);
+
+stored.meta.blitz = {
+  weeklyKey: currentWeek.occurrenceKey,
+  weekly: {
+    vocab: { pb: { ms: 1000 } },
+    sentences: { pb: { ms: 1000 } },
+    questions: { pb: { ms: 1000 } },
+  },
+};
+stored.weekly.unlockedBoohaSkins = {};
+
 assert.strictEqual(skins.isUnlocked('batty'), false);
 assert.strictEqual(skins.unlockAndEquip('batty'), true);
 assert.ok(stored.weekly.unlockedBoohaSkins.batty);
@@ -74,9 +98,19 @@ assert.ok(events.includes('booha:skinChanged'));
 // the next qualifying Blitz completion can call unlockAndEquip again.
 stored.weekly.unlockedBoohaSkins = {};
 stored.meta.selectedBoohaSkin = null;
+stored.meta.blitz.weekly = {};
 assert.strictEqual(skins.isUnlocked('batty'), false);
 assert.strictEqual(skins.selectedId(), null);
-assert.strictEqual(skins.unlockAndEquip('batty'), true);
-assert.strictEqual(skins.isUnlocked('batty'), true);
+assert.strictEqual(skins.unlockAndEquip('batty'), false);
 
-console.log('Batty Booha weekly audit passed: the skin unlock is scoped to the weekly bucket and can be earned again.');
+// The same trio in a prior week must not unlock the current week.
+stored.meta.blitz.weeklyKey = '2026-09-13|september-w3';
+stored.meta.blitz.weekly = {
+  vocab: { pb: { ms: 1000 } },
+  sentences: { pb: { ms: 1000 } },
+  questions: { pb: { ms: 1000 } },
+};
+stored.weekly.unlockedBoohaSkins.batty = { unlockedAt: Date.now() };
+assert.strictEqual(skins.isUnlocked('batty'), false);
+
+console.log('Batty Booha weekly audit passed: seasonal skins require the current week\'s complete Blitz trio and fall back cleanly before unlock.');

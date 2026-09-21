@@ -341,13 +341,10 @@ const BoohaSaveFile = (() => {
       save.weekly.unlockedBoohaSkins = {};
     }
 
-    // Batty Booha was originally introduced as a permanent unlock. Move that
-    // legacy record into the current week's cosmetic bucket so existing
-    // players keep access until the next normal weekly rollover.
+    // Batty Booha was originally introduced as a permanent unlock. Do not
+    // migrate that record into the weekly bucket: seasonal skins now require
+    // the current week's three Blitz completions.
     if (save.unlocks && save.unlocks.booha_skin_batty) {
-      if (!save.weekly.unlockedBoohaSkins.batty) {
-        save.weekly.unlockedBoohaSkins.batty = save.unlocks.booha_skin_batty;
-      }
       delete save.unlocks.booha_skin_batty;
     }
     _ensureWeeklyWorlds(save);
@@ -471,9 +468,9 @@ const BoohaSaveFile = (() => {
     };
     data.weekly.worlds.occurrenceKey = occurrenceKey || '';
 
-    // Batty Booha is earned again by completing all three Blitz games in the
-    // new week. Do not leave the previous week's companion equipped.
-    if (data.meta && data.meta.selectedBoohaSkin === 'batty') {
+    // Seasonal Booha skins are earned again by completing all three Blitz
+    // games in the new week. Do not leave the previous week's skin equipped.
+    if (data.meta && data.meta.selectedBoohaSkin) {
       data.meta.selectedBoohaSkin = null;
     }
     if (data.unlocks && typeof data.unlocks === 'object') {
