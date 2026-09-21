@@ -1446,8 +1446,7 @@
          the .dp-* content classes) has moved into js/utsu-card.js, the
          shared "parchment card" component now also used by the orb
          panel, thank-you panel, and wrong-memory toast. That file also
-         fixes the old mobile-bigger-than-desktop max-height bug. See
-         claude/utsuroba-audit-and-pass-plan.md, Round 2. */
+         fixes the old mobile-bigger-than-desktop max-height bug. */
       /* Thank-you panel: was the default edge-to-edge bottom sheet
          (.utsu-card with no .is-floating), which read as huge next to
          the compact centered orb reading panel. .ty-panel reuses
@@ -1936,8 +1935,7 @@
     echoLayer.appendChild(utsuProfilePortal);
   }
 
-  /* Persistent "Three Echoes" tracker — Pass 1 (see
-     claude/utsuroba-audit-and-pass-plan.md). Unlike the room-scoped
+  /* Persistent "Three Echoes" tracker — Pass 1. Unlike the room-scoped
      echo buttons above, this is visible from anywhere in Utsuroba so a
      kid always knows how many of the three convergence memories they
      have, without needing to stand in the right room to see it. */
@@ -1945,8 +1943,8 @@
     if (echoesTrackerEl) return;
     echoesTrackerEl = document.createElement('div');
     echoesTrackerEl.id = 'utsu-echoes-tracker';
-    /* Round 2 Pass 2: was its own bordered-rectangle "food label" box
-       (see claude/utsuroba-audit-and-pass-plan.md); now built on the
+    /* Round 2 Pass 2: was its own bordered-rectangle "food label" box;
+       now built on the
        shared .utsu-hud-chip shape/layout from js/utsu-card.js, same as
        Karasuki's mirror tracker and the Memory Trail hint. */
     echoesTrackerEl.className = 'utsu-hud-chip is-left';
