@@ -214,7 +214,7 @@
       transition:opacity 480ms cubic-bezier(.22,1,.36,1), transform 520ms cubic-bezier(.34,1.42,.64,1);
     }
 
-    /* Permanent skin unlock — shown once after the qualifying Blitz run. */
+    /* Weekly skin unlock — shown once after the qualifying Blitz run. */
     #battyUnlockScrim{ position:fixed; inset:0; z-index:230; display:none; background:rgba(8,2,16,.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
     #battyUnlockScrim.show{ display:block; }
     #battyUnlockPopup{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.82) translateY(16px); z-index:235; display:none; width:min(90vw,430px); max-height:90vh; overflow:auto; padding:28px 24px 24px; border:1px solid rgba(255,150,64,.42); border-radius:28px; text-align:center; background:radial-gradient(ellipse at 50% 0%,rgba(255,112,36,.18),transparent 58%),linear-gradient(155deg,rgba(30,8,32,.99),rgba(8,7,28,.99)); box-shadow:0 0 0 1px rgba(255,255,255,.06),0 48px 120px rgba(0,0,0,.95),0 0 100px rgba(255,80,30,.18); opacity:0; transition:opacity 420ms ease,transform 480ms cubic-bezier(.34,1.35,.64,1); }
@@ -2829,9 +2829,9 @@ document.addEventListener('visibilitychange',()=>{
 // hit the locked/empty state, so wait for the boot signal.
 function onSaveReady(){
   personalizeMazeIntro();
-  // Batty is the permanent player companion once unlocked. Older saves may
-  // contain the unlock without the selected-skin field, so repair that state
-  // before the Maze starts rendering its active player sprite.
+  // Batty is the player's companion for the current week once unlocked.
+  // Older saves may contain the unlock without the selected-skin field, so
+  // repair that state before the Maze starts rendering its active player sprite.
   if (window.BoohaSkins?.isUnlocked('batty') && !window.BoohaSkins.selectedId()) {
     window.BoohaSkins.equip('batty');
   }

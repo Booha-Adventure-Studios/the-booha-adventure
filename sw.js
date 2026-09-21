@@ -26,7 +26,9 @@ const CURRENT_CACHES = {
   // flashlight sprite and adds the bilingual enter/closed popup in Utsuroba.
   // Hub default-curriculum and Batty Maze-render pass (2026-09-18):
   // invalidate the precached shells for returning iPads.
-  pages:  'booha-pages-2026-413',
+  // Batty weekly-unlock pass (2026-09-21): invalidate maze.html so the
+  // weekly cosmetic reset reaches returning clients.
+  pages:  'booha-pages-2026-414',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
