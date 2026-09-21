@@ -174,12 +174,12 @@
   ]);
 
   const GENKAN_ANOMALIES = [
-    { id: 'shoes_extra', target: [.35, .69, .12], artSize: .15, en: 'There is another pair of shoes.', jp: 'くつが もう ひとそろい ある。', labelEn: 'EXTRA SHOES', labelJp: 'もうひとそろいの くつ', kind: 'added' },
-    { id: 'umbrella_floor', target: [.68, .61, .14], artSize: .18, en: 'An umbrella is lying where nobody left it.', jp: 'だれも おいていない かさが おちている。', labelEn: 'FLOOR UMBRELLA', labelJp: 'ゆかの かさ', kind: 'added' },
-    { id: 'door_shadow', target: [.63, .4, .15], artSize: .2, en: 'A shadow is standing outside the open door.', jp: 'あいた ドアの そとに かげが たっている。', labelEn: 'DOOR SHADOW', labelJp: 'ドアの かげ', kind: 'watching' },
-    { id: 'coat_turn', target: [.74, .33, .12], artSize: .17, en: 'The hanging cloth is facing the wrong way.', jp: 'かかっている ぬのが ちがう ほうを むいている。', labelEn: 'COAT HOOK', labelJp: 'コートかけ', kind: 'state' },
-    { id: 'threshold_talisman', target: [.53, .8, .1], artSize: .11, en: 'A paper charm has appeared on the threshold.', jp: 'しきいに おふだが あらわれた。', labelEn: 'THRESHOLD CHARM', labelJp: 'しきいの おふだ', kind: 'added' },
-    { id: 'wet_footprints', target: [.53, .7, .14], artSize: .17, en: 'Wet footprints lead in from the garden.', jp: 'ぬれた あしあとが にわから つづいている。', labelEn: 'WET FOOTPRINTS', labelJp: 'ぬれた あしあと', kind: 'state' },
+    { id: 'shoes_extra', assetId: 'genkan_shoes_extra', target: [.35, .69, .12], artSize: .15, en: 'There is another pair of shoes.', jp: 'くつが もう ひとそろい ある。', labelEn: 'EXTRA SHOES', labelJp: 'もうひとそろいの くつ', kind: 'added' },
+    { id: 'umbrella_floor', assetId: 'genkan_umbrella_floor', target: [.68, .61, .14], artSize: .18, en: 'An umbrella is lying where nobody left it.', jp: 'だれも おいていない かさが おちている。', labelEn: 'FLOOR UMBRELLA', labelJp: 'ゆかの かさ', kind: 'added' },
+    { id: 'door_shadow', assetId: 'genkan_door_shadow', target: [.63, .4, .15], artSize: .2, en: 'A shadow is standing outside the open door.', jp: 'あいた ドアの そとに かげが たっている。', labelEn: 'DOOR SHADOW', labelJp: 'ドアの かげ', kind: 'watching' },
+    { id: 'coat_turn', assetId: 'genkan_coat_turn', target: [.74, .33, .12], artSize: .17, en: 'The hanging cloth is facing the wrong way.', jp: 'かかっている ぬのが ちがう ほうを むいている。', labelEn: 'COAT HOOK', labelJp: 'コートかけ', kind: 'state' },
+    { id: 'threshold_talisman', assetId: 'genkan_threshold_talisman', target: [.53, .8, .1], artSize: .11, en: 'A paper charm has appeared on the threshold.', jp: 'しきいに おふだが あらわれた。', labelEn: 'THRESHOLD CHARM', labelJp: 'しきいの おふだ', kind: 'added' },
+    { id: 'wet_footprints', assetId: 'genkan_wet_footprints', target: [.53, .7, .14], artSize: .17, en: 'Wet footprints lead in from the garden.', jp: 'ぬれた あしあとが にわから つづいている。', labelEn: 'WET FOOTPRINTS', labelJp: 'ぬれた あしあと', kind: 'state' },
   ];
 
   const CASE_CONTENT = Object.freeze({
@@ -191,6 +191,8 @@
   let ROOM_ANCHORS = CHANOMA_ROOM_ANCHORS;
   let ANOMALY_ANCHORS = CHANOMA_ANOMALY_ANCHORS;
   let PATASKALA_SPAWN_ANCHORS = CHANOMA_PATASKALA_SPAWN_ANCHORS;
+
+  const overlayAssetUrl = anomaly => `assets/family-room/overlays/${anomaly.assetId || anomaly.id}.webp`;
 
   const canvas = document.getElementById('room-canvas');
   const ctx = canvas.getContext('2d');
@@ -663,7 +665,7 @@
     anomalies = content.anomalies;
     anomalyArt = Object.fromEntries(anomalies.map(anomaly => {
       const image = new Image();
-      image.src = `assets/family-room/overlays/${anomaly.id}.webp`;
+      image.src = overlayAssetUrl(anomaly);
       return [anomaly.id, image];
     }));
     baseImage.src = content.base;
@@ -1481,7 +1483,7 @@
     const controller = window.navigator?.serviceWorker?.controller;
     if (!controller) return;
     const caseContent = CASE_CONTENT[ACTIVE_CASE_ID] || CASE_CONTENT[DEFAULT_CASE_ID];
-    const caseAssets = [caseContent.base, ...caseContent.anomalies.map(anomaly => `assets/family-room/overlays/${anomaly.id}.webp`)];
+    const caseAssets = [caseContent.base, ...caseContent.anomalies.map(overlayAssetUrl)];
     const urls = [...FAMILY_DEFERRED_ASSETS, ...caseAssets].map(url => new URL(url, window.location.href).pathname);
     controller.postMessage({ type: 'CACHE_URLS', payload: urls });
   }
