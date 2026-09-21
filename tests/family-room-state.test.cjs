@@ -54,11 +54,14 @@ assert(source.includes('markHoldStartedAt') && source.includes('heldMs / MARK_HO
 assert(source.includes('FAILURE_SILENCE_MS = 1200') && source.includes('function beginFailure'), 'lantern failure must include a silent beat before the panel');
 assert(source.includes('function silenceDrone') && source.includes('setValueAtTime(0'), 'the failure beat must stop the drone immediately');
 assert(source.includes('function drawFailureBooha') && source.includes('function drawFailureStatic') && !source.includes('drawFailureThreat(time)') && source.includes('if (time - failureStarted >= FAILURE_SILENCE_MS)'), 'the caught beat must use TV static and let Booha glow alone after the silence');
-assert(source.includes('anomalyArt = Object.fromEntries') && source.includes('assets/family-room/overlays/${anomaly.id}.webp') && source.includes('function loadActiveCaseContent'), 'anomalies must load authored overlays for the selected room case');
+assert(source.includes('anomalyArt = Object.fromEntries') && source.includes('const overlayAssetUrl = anomaly =>') && source.includes('image.src = overlayAssetUrl(anomaly)') && source.includes('function loadActiveCaseContent'), 'anomalies must load authored overlays for the selected room case');
 assert(source.includes('artSize') && source.includes('ctx.drawImage(art'), 'anomaly rendering must use real art instead of procedural doodles');
 assert(['bowl', 'cup', 'eyes', 'shadow', 'talisman', 'lantern', 'futon', 'seams', 'teapot', 'crescent'].every(id => serviceWorker.includes(`/assets/family-room/overlays/${id}.webp`)), 'all authored anomaly overlays must be precached');
 assert(source.includes('const caseAssets = [caseContent.base') && source.includes('...caseContent.anomalies.map'), 'Genkan master and overlays must be cached on room entry instead of inflating the install-time core cache');
 assert(['shoes_extra', 'umbrella_floor', 'door_shadow', 'coat_turn', 'threshold_talisman', 'wet_footprints'].every(id => source.includes(id)), 'Genkan must define a complete authored anomaly set');
+const genkanOverlayFiles = ['genkan_shoes_extra', 'genkan_umbrella_floor', 'genkan_door_shadow', 'genkan_coat_turn', 'genkan_threshold_talisman', 'genkan_wet_footprints'];
+assert(genkanOverlayFiles.every(id => fs.existsSync(path.join(root, 'assets/family-room/overlays', `${id}.webp`))), 'all Genkan anomaly overlay files must exist');
+assert(genkanOverlayFiles.every(id => source.includes(`assetId: '${id}'`)), 'each Genkan anomaly must map to its authored overlay filename');
 assert(source.includes('const PATASKALA_POSES = [') && source.includes("character: 'pataskala'"), 'Pataskala must have a named character threat set');
 assert(source.includes('assets/family-room/pataskala/${pose.id}.webp') && ['pataskala_far', 'pataskala_enter', 'pataskala_approach', 'pataskala_near', 'pataskala_catch'].every(id => fs.existsSync(path.join(root, `assets/family-room/pataskala/${id}.webp`))), 'the smallest Pataskala production set must load as authored transparent assets');
 assert(source.includes('function pataskalaChance') && source.includes('phase.pataskalaBaseChance') && source.includes('pataskalaCooldownRounds'), 'Pataskala must emerge progressively with a cooldown between threats');
@@ -87,7 +90,7 @@ assert(source.includes('ensureAudio(); startBgm();') && source.includes('window.
 const anchorUs = [...source.matchAll(/target:\s*\[\s*(0?\.\d+)/g)].map(match => Number(match[1]));
 assert(anchorUs.length === 21 && anchorUs.every(value => value >= .22 && value <= .78), 'all environmental and Pataskala anchors must stay inside the portrait-safe band');
 assert(source.includes('function roomContains') && source.includes('clamp(booha.targetX + dx * step, plate.x, plate.x + plate.w)'), 'Booha movement must be contained by the displayed room plate');
-const portraitEntries = [...source.matchAll(/id:\s*'([^']+)', target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
+const portraitEntries = [...source.matchAll(/id:\s*'([^']+)',\s*(?:assetId:\s*'[^']+',\s*)?target:\s*\[\s*(0?\.\d+),\s*(0?\.\d+),[^\]]+\], artSize:\s*(0?\.\d+)/g)];
 const portraitSourceRatios = {
   bowl: [512 / 512, 342 / 512], cup: [512 / 512, 468 / 512], eyes: [512 / 512, 256 / 512],
   shadow: [512 / 512, 768 / 512], talisman: [512 / 512, 768 / 512], lantern: [512 / 512, 342 / 512],
