@@ -203,7 +203,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-570',
+  assets: 'booha-assets-2026-571',
   decks:  'booha-decks-2026-310',
 };
 
