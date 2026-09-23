@@ -91,6 +91,6 @@ collectFiles(skinRoot).filter((file) => file.endsWith('.webp')).forEach((file) =
   assert.strictEqual(pngs.length, 0, `${directory} must not retain unused PNG masters`);
 });
 
-assert(sw.includes('booha-assets-2026-571'), 'Pass 3 asset changes must bump the asset cache');
+assert(sw.includes('booha-assets-2026-572'), 'Pass 3 asset changes must bump the asset cache');
 
 console.log('Pass 3 asset-weight audit passed: dead masters are absent, long-form audio is 128 kbps, and active room and skin WebPs fit their size budgets.');
