@@ -448,14 +448,15 @@ window.BoohaBlitzEngine = (() => {
   }
 
   // Weekly bucket is keyed off the exact curriculum-week occurrence. A fifth
-  // Sunday occurrence keeps Week 4's content, but gets a fresh bucket.
+  // Sunday occurrence keeps Week 4's content, but gets a fresh bucket. Read
+  // the live week at save time so a run that crosses Sunday midnight lands in
+  // the week the player actually completed, rather than an obsolete launch
+  // fallback such as september:w4.
   function makeWeekId(monthSlug, weekNumber) {
     try {
       const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
-      if (cw && cw.monthSlug === monthSlug && cw.weekNumber === weekNumber) {
-        const key = window.CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey;
-        if (key) return key;
-      }
+      const key = window.CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || (cw && cw.occurrenceKey);
+      if (key) return key;
     } catch (_) {}
     return `${monthSlug}:w${weekNumber}`;
   }

@@ -70,6 +70,27 @@ for (let i = 1; i <= 9; i += 1) {
   assert(dimensions[0] === 1536 && dimensions[1] === 1024, `${relative} dimensions must remain 1536x1024`);
 }
 
-assert(sw.includes('booha-assets-2026-569'), 'Pass 3 asset changes must bump the asset cache');
+function collectFiles(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolute = path.join(directory, entry.name);
+    return entry.isDirectory() ? collectFiles(absolute) : [absolute];
+  });
+}
 
-console.log('Pass 3 asset-weight audit passed: dead masters are absent, long-form audio is 128 kbps, and Grimmerglen room WebPs fit the size budget.');
+const skinRoot = path.join(root, 'assets/skins');
+collectFiles(skinRoot).filter((file) => file.endsWith('.webp')).forEach((file) => {
+  const bytes = fs.readFileSync(file);
+  const relative = path.relative(root, file);
+  assert(bytes.subarray(0, 4).toString('ascii') === 'RIFF', `${relative} must remain a WebP file`);
+  assert(bytes.subarray(8, 12).toString('ascii') === 'WEBP', `${relative} must have a WebP signature`);
+  assert(bytes.length <= 700 * 1024, `${relative} must stay at or below the 700 KiB skin budget`);
+});
+
+['batty_booha', 'hazel_booha', 'mister_happy_booha'].forEach((directory) => {
+  const pngs = collectFiles(path.join(skinRoot, directory)).filter((file) => file.endsWith('.png'));
+  assert.strictEqual(pngs.length, 0, `${directory} must not retain unused PNG masters`);
+});
+
+assert(sw.includes('booha-assets-2026-570'), 'Pass 3 asset changes must bump the asset cache');
+
+console.log('Pass 3 asset-weight audit passed: dead masters are absent, long-form audio is 128 kbps, and active room and skin WebPs fit their size budgets.');
