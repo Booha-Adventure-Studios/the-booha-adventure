@@ -67,6 +67,7 @@ assert.strictEqual(skins.menuCharacterId('halloween', '2026-09-20'), null);
 assert.strictEqual(skins.menuCharacterId('halloween', '2026-09-27'), 'batty');
 assert.strictEqual(skins.menuCharacterId('halloween', '2026-10-31'), 'batty');
 assert.strictEqual(skins.menuCharacterId('halloween', '2026-11-01'), null);
+assert.strictEqual(skins.rotationCharacterId('halloween', '2026-11-01|november-w1'), null);
 
 // A stale bucket entry must not keep Batty active before this week's Blitz
 // trio is complete.

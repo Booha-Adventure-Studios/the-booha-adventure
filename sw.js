@@ -298,7 +298,7 @@ const CORE_ASSETS = [
   `${BASE}/assets/img/boo-tree.webp`,
   `${BASE}/assets/img/cont-tree.webp`,
   `${BASE}/js/core/booha-skins.js`,
-  `${BASE}/assets/skins/batty_booha/static.png`,
+  `${BASE}/assets/skins/batty_booha/static.webp`,
 ];
 
 // ── Asset folder prefixes (matched at runtime) ───────────────

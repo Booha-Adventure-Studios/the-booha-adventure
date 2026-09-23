@@ -25,17 +25,17 @@ const BoohaSkins = (() => {
       nameJp: 'バッティー・ブーハー',
       unlockId: 'booha_skin_batty',
       assets: Object.freeze({
-        maze: 'assets/skins/batty_booha/static.png',
-        karasuki: 'assets/skins/batty_booha/static.png',
-        grimmerglen: 'assets/skins/batty_booha/static.png',
-        utsuroba: 'assets/skins/batty_booha/static.png',
-        muenba: 'assets/skins/batty_booha/static.png',
-        familyRoom: 'assets/skins/batty_booha/static.png',
-        marking: 'assets/skins/batty_booha/marking.png',
-        hiding: 'assets/skins/batty_booha/hiding.png',
-        danceArmsUp: 'assets/skins/batty_booha/dance_arms_up.png',
-        danceSway: 'assets/skins/batty_booha/dance_sway.png',
-        danceWave: 'assets/skins/batty_booha/dance_wave.png',
+        maze: 'assets/skins/batty_booha/static.webp',
+        karasuki: 'assets/skins/batty_booha/static.webp',
+        grimmerglen: 'assets/skins/batty_booha/static.webp',
+        utsuroba: 'assets/skins/batty_booha/static.webp',
+        muenba: 'assets/skins/batty_booha/static.webp',
+        familyRoom: 'assets/skins/batty_booha/static.webp',
+        marking: 'assets/skins/batty_booha/marking.webp',
+        hiding: 'assets/skins/batty_booha/hiding.webp',
+        danceArmsUp: 'assets/skins/batty_booha/dance_arms_up.webp',
+        danceSway: 'assets/skins/batty_booha/dance_sway.webp',
+        danceWave: 'assets/skins/batty_booha/dance_wave.webp',
       }),
     }),
     mummington: Object.freeze({
@@ -151,6 +151,8 @@ const BoohaSkins = (() => {
       name: 'Halloween',
       // Halloween unlocks are assigned to the six Sunday-started occurrences
       // from September 20 through October 25, 2026.
+      startDate: '2026-09-20',
+      endDate: '2026-10-31',
       rotationStartOccurrenceKey: '2026-09-20|september-w3',
       characterIds: Object.freeze([
         'batty', 'mummington', 'mortisa', 'doomlet', 'hazel', 'mister_happy',
@@ -195,6 +197,16 @@ const BoohaSkins = (() => {
     } catch (_) { return ''; }
   }
 
+  function seasonIdForDate(dateKey = currentDateKey()) {
+    const date = String(dateKey || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+    return Object.keys(SEASONS).find((id) => {
+      const season = SEASONS[id];
+      return (!season.startDate || date >= season.startDate) &&
+        (!season.endDate || date <= season.endDate);
+    }) || null;
+  }
+
   function rotationCharacterId(seasonId = CURRENT_SEASON_ID, occurrenceKey = currentWeekKey()) {
     const season = getSeason(seasonId);
     if (!season || !season.characterIds.length) return null;
@@ -202,9 +214,12 @@ const BoohaSkins = (() => {
     const current = String(occurrenceKey || '').split('|')[0];
     const anchorMs = Date.parse(`${anchor}T00:00:00Z`);
     const currentMs = Date.parse(`${current}T00:00:00Z`);
-    if (!Number.isFinite(anchorMs) || !Number.isFinite(currentMs) || currentMs < anchorMs) {
+    if (!Number.isFinite(anchorMs) || !Number.isFinite(currentMs)) {
       return season.characterIds[0];
     }
+    if (season.startDate && current < season.startDate) return null;
+    if (season.endDate && current > season.endDate) return null;
+    if (currentMs < anchorMs) return null;
     const scheduledId = season.weeklyCharacterIds?.[current];
     if (scheduledId && season.characterIds.includes(scheduledId)) return scheduledId;
     const weekIndex = Math.floor((currentMs - anchorMs) / (7 * 24 * 60 * 60 * 1000));
@@ -344,6 +359,7 @@ const BoohaSkins = (() => {
     seasonCharacters,
     availableCharacters,
     nextAvailableId,
+    seasonIdForDate,
     rotationCharacterId,
     menuCharacterId,
     unlock,
