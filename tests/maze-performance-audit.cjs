@@ -33,7 +33,7 @@ assets.forEach((name) => {
 });
 
 assert(!sw.includes('${BASE}/assets/img/juku-tree.png'), 'service worker must not precache the retired Maze tree path');
-assert(sw.includes('booha-pages-2026-421'), 'performance-pass markup must bump the page cache');
+assert(sw.includes('booha-pages-2026-422'), 'performance-pass markup must bump the page cache');
 assert(sw.includes('booha-assets-2026-572'), 'Muenba canonical target release must bump the asset cache');
 
 console.log('Maze visual asset audit passed: 19 WebP files are present and all retired PNG sources are absent.');
