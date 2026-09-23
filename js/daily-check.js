@@ -366,7 +366,21 @@ window.BoohaDailyCheck = (function () {
     html[data-season="halloween"] .dc-ghost{filter:drop-shadow(0 8px 24px rgba(255,138,42,.4));}
     html[data-season="halloween"] .dc-streak{background:rgba(74,31,69,.5);border-color:rgba(255,170,75,.4);color:#ffc46d;}
     html[data-season="halloween"] .dc-btn.ghost{border-color:rgba(202,185,207,.55);}
-    html[data-season="halloween"] .dc-start-ready::after{content:none;}
+    html[data-season="halloween"] .dc-btn:not(.ghost),
+    html[data-season="halloween"] .dc-audio{box-shadow:0 8px 22px rgba(232,115,31,.42);}
+    @media (prefers-reduced-motion: no-preference){
+      html[data-season="halloween"] .dc-btn.dc-start-ready{animation-name:dcStartGlowHalloween;}
+    }
+    @media (prefers-reduced-motion: reduce){
+      html[data-season="halloween"] .dc-btn.dc-start-ready{box-shadow:0 8px 26px rgba(232,115,31,.68),0 0 0 4px rgba(255,180,90,.18),0 0 28px rgba(232,115,31,.45);}
+    }
+    @keyframes dcStartGlowHalloween{
+      0%,100%{box-shadow:0 8px 22px rgba(232,115,31,.42),0 0 0 0 rgba(255,180,90,0);}
+      50%{box-shadow:0 8px 26px rgba(232,115,31,.68),0 0 0 7px rgba(255,180,90,.18),0 0 34px rgba(232,115,31,.5);}
+    }
+    @media (orientation:landscape) and (max-height:600px){
+      html[data-season="halloween"] .dc-ghost{filter:none;}
+    }
     @media (orientation:landscape) and (max-height:600px){
       .dc-root{padding-top:calc(8px + var(--safe-top,0px));
         padding-bottom:calc(8px + var(--safe-bottom,0px));}
