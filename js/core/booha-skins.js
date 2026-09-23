@@ -66,10 +66,14 @@ const BoohaSkins = (() => {
       id: 'halloween',
       name: 'Halloween',
       // Batty launched in the September 13 occurrence; the following week
-      // therefore belongs to Mummington, then the two-character rotation
-      // continues from there.
+      // therefore belongs to Mummington. Explicit weekly entries can replace
+      // the temporary two-character fallback as October characters arrive.
       rotationStartOccurrenceKey: '2026-09-13|september-w3',
       characterIds: Object.freeze(['batty', 'mummington']),
+      weeklyCharacterIds: Object.freeze({
+        '2026-09-20': 'mummington',
+        '2026-09-27': 'batty',
+      }),
     }),
   });
 
@@ -95,6 +99,8 @@ const BoohaSkins = (() => {
     if (!Number.isFinite(anchorMs) || !Number.isFinite(currentMs) || currentMs < anchorMs) {
       return season.characterIds[0];
     }
+    const scheduledId = season.weeklyCharacterIds?.[current];
+    if (scheduledId && season.characterIds.includes(scheduledId)) return scheduledId;
     const weekIndex = Math.floor((currentMs - anchorMs) / (7 * 24 * 60 * 60 * 1000));
     return season.characterIds[weekIndex % season.characterIds.length];
   }
