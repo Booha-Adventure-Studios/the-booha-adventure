@@ -65,7 +65,10 @@ const BoohaSkins = (() => {
     halloween: Object.freeze({
       id: 'halloween',
       name: 'Halloween',
-      rotationStartOccurrenceKey: '2026-09-20|september-w4',
+      // Batty launched in the September 13 occurrence; the following week
+      // therefore belongs to Mummington, then the two-character rotation
+      // continues from there.
+      rotationStartOccurrenceKey: '2026-09-13|september-w3',
       characterIds: Object.freeze(['batty', 'mummington']),
     }),
   });
@@ -166,7 +169,7 @@ const BoohaSkins = (() => {
     return skin.assets[key] || null;
   }
 
-  function unlockAndEquip(id) {
+  function unlock(id) {
     const skin = get(id);
     const saveFile = save();
     if (!skin || !isAvailable(id) || !saveFile) return false;
@@ -182,6 +185,15 @@ const BoohaSkins = (() => {
     // Remove the pre-weekly storage key if an older save was loaded without
     // passing through the current save-file migration first.
     if (data.unlocks && typeof data.unlocks === 'object') delete data.unlocks[skin.unlockId];
+    if (!data.meta || typeof data.meta !== 'object') data.meta = {};
+    return saveFile.save(data);
+  }
+
+  function unlockAndEquip(id) {
+    const skin = get(id);
+    const saveFile = save();
+    if (!skin || !unlock(id) || !saveFile) return false;
+    const data = saveFile.load();
     if (!data.meta || typeof data.meta !== 'object') data.meta = {};
     data.meta.selectedBoohaSkin = skin.id;
     const ok = saveFile.save(data);
@@ -214,6 +226,7 @@ const BoohaSkins = (() => {
     availableCharacters,
     nextAvailableId,
     rotationCharacterId,
+    unlock,
     isUnlocked,
     selectedId,
     asset,

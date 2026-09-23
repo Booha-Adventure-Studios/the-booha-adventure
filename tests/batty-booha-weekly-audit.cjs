@@ -14,7 +14,7 @@ let stored = {
   meta: { selectedBoohaSkin: null },
   weekly: { unlockedBoohaSkins: {} },
 };
-const currentWeek = { occurrenceKey: '2026-09-20|september-w4' };
+const currentWeek = { occurrenceKey: '2026-09-13|september-w3' };
 const events = [];
 const save = {
   load() { return stored; },
@@ -102,7 +102,7 @@ assert.strictEqual(skins.unlockAndEquip('batty'), false);
 
 // The next calendar week schedules Mummington. Batty cannot be unlocked
 // there even when the current week's Blitz trio is complete.
-currentWeek.occurrenceKey = '2026-09-27|september-w5';
+currentWeek.occurrenceKey = '2026-09-20|september-w4';
 stored.meta.blitz.weeklyKey = currentWeek.occurrenceKey;
 stored.meta.blitz.weekly = {
   vocab: { pb: { ms: 1000 } },
@@ -118,7 +118,7 @@ assert.strictEqual(skins.unlockAndEquip('mummington'), true);
 assert.strictEqual(skins.selectedId(), 'mummington');
 
 // With two characters, the third week rotates back to Batty.
-currentWeek.occurrenceKey = '2026-10-04|october-w1';
+currentWeek.occurrenceKey = '2026-09-27|september-w5';
 stored.meta.blitz.weeklyKey = currentWeek.occurrenceKey;
 stored.meta.blitz.weekly = {};
 stored.weekly.unlockedBoohaSkins = {};
