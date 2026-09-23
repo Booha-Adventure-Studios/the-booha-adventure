@@ -201,7 +201,9 @@ const CURRENT_CACHES = {
   // Family Room Pass 3: the andon/light-pressure rules are script-only; no new
   // install-time media is required.
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
-  assets: 'booha-assets-2026-567',
+  // Seasonal Booha rotation correction and once-per-week unlock popup pass
+  // (2026-09-23): invalidate cached skin-registry/runtime assets.
+  assets: 'booha-assets-2026-568',
   decks:  'booha-decks-2026-310',
 };
 

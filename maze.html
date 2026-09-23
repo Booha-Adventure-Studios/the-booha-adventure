@@ -1703,6 +1703,10 @@ function maybeShowSeasonalUnlockPopup() {
   const id = BoohaSkins.rotationCharacterId?.();
   if (!id || BoohaSkins.isUnlocked(id) || !blitzTripleCompleteForAnyCurriculum()) return;
   if (!prepareSeasonalUnlockPopup(id)) return;
+  // Award the scheduled skin when the weekly Blitz trio is complete. The
+  // popup is the once-per-week announcement/equip moment; persisting the
+  // unlock prevents it from returning on reload after the announcement.
+  if (typeof BoohaSkins.unlock !== 'function' || !BoohaSkins.unlock(id)) return;
   seasonalUnlockId = id;
   battyUnlockPopupShown = true;
   battyUnlockScrim.classList.add('show');
@@ -2448,7 +2452,7 @@ worldPerf.enableOverlay(() => ({
   wandererCacheBudgetBytes: 0,
   roomLoadDecodeMs: 0,
   activeAudioBufferCount: 0,
-  serviceWorkerCacheVersion: 'booha-assets-2026-509',
+  serviceWorkerCacheVersion: 'booha-assets-2026-568',
   averageFps: worldPerf.metrics().windowFps,
 }));
 
