@@ -7932,7 +7932,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: [rhythmHitAudioBuffer, rhythmMissAudioBuffer].filter(Boolean).length,
-      serviceWorkerCacheVersion: 'booha-assets-2026-570',
+      serviceWorkerCacheVersion: 'booha-assets-2026-571',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleMuenbaFrame();
