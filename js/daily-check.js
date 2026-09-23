@@ -357,6 +357,16 @@ window.BoohaDailyCheck = (function () {
       font-weight:800;font-size:1rem;}
     .dc-burst{position:absolute;width:9px;height:9px;border-radius:50%;pointer-events:none;
       will-change:transform,opacity;}
+    html[data-season="halloween"] .dc-root{
+      --pink:#e8731f;--pink2:#ffb45a;
+      background:
+        radial-gradient(ellipse at 50% 30%,rgba(10,14,34,.55) 0%,rgba(4,6,16,.84) 62%,rgba(2,2,8,.95) 100%),
+        var(--bg,#000) url('assets/img/background-1.webp') center/cover no-repeat;}
+    html[data-season="halloween"] .dc-card{background:rgba(14,10,26,.78);border-color:rgba(255,170,75,.32);}
+    html[data-season="halloween"] .dc-ghost{filter:drop-shadow(0 8px 24px rgba(255,138,42,.4));}
+    html[data-season="halloween"] .dc-streak{background:rgba(74,31,69,.5);border-color:rgba(255,170,75,.4);color:#ffc46d;}
+    html[data-season="halloween"] .dc-btn.ghost{border-color:rgba(202,185,207,.55);}
+    html[data-season="halloween"] .dc-start-ready::after{content:none;}
     @media (orientation:landscape) and (max-height:600px){
       .dc-root{padding-top:calc(8px + var(--safe-top,0px));
         padding-bottom:calc(8px + var(--safe-bottom,0px));}
@@ -393,7 +403,9 @@ window.BoohaDailyCheck = (function () {
 
   function burst(root, x, y) {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const colors = ['#ff3bbd', '#ff79d7', '#ffd36e', '#7ef0ff', '#a6ff7e'];
+    const colors = document.documentElement.dataset.season === 'halloween'
+      ? ['#ff8a2a', '#ffb45a', '#ffd36e', '#9b63e8', '#c9a6ff']
+      : ['#ff3bbd', '#ff79d7', '#ffd36e', '#7ef0ff', '#a6ff7e'];
     for (let i = 0; i < 12; i++) {
       const d = document.createElement('div');
       d.className = 'dc-burst';
@@ -457,7 +469,11 @@ window.BoohaDailyCheck = (function () {
     }
     function ghost() {
       const g = document.createElement('img');
-      g.className = 'dc-ghost'; g.src = 'assets/img/booha_ghost.webp'; g.alt = 'Booha';
+      const id = window.BoohaSkins?.menuCharacterId?.();
+      const skin = id ? window.BoohaSkins.get(id) : null;
+      g.className = 'dc-ghost';
+      g.src = skin?.assets?.maze || 'assets/img/booha_ghost.webp';
+      g.alt = skin?.name || 'Booha';
       return g;
     }
 
@@ -687,7 +703,10 @@ window.BoohaDailyCheck = (function () {
           sub.textContent = `${pct}%  ·  ${content.curr.toUpperCase()}`; root.appendChild(sub);
 
           const streakEl = document.createElement('div'); streakEl.className = 'dc-streak';
-          streakEl.textContent = `🔥 ${st}日`; root.appendChild(streakEl);
+          streakEl.textContent = document.documentElement.dataset.season === 'halloween'
+            ? `キャンディ ${st}個`
+            : `✓ ${st}日`;
+          root.appendChild(streakEl);
 
           const b = document.createElement('button');
           b.className = 'dc-btn'; b.type = 'button'; b.textContent = doneLabel;

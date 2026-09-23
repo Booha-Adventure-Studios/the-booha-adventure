@@ -6037,7 +6037,7 @@ function drawObserver(now) {
         wandererCacheOverBudget: cache.overBudget,
         roomLoadDecodeMs,
         activeAudioBufferCount: 0,
-        serviceWorkerCacheVersion: 'booha-assets-2026-570',
+        serviceWorkerCacheVersion: 'booha-assets-2026-571',
         averageFps: worldPerf.metrics().averageFps,
       };
     });
