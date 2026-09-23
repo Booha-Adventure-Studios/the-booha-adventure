@@ -283,6 +283,11 @@
         radial-gradient(ellipse at 50% 110%, rgba(131,59,161,.18), transparent 52%);
       animation: halloweenFog 14s ease-in-out infinite alternate;
     }
+    html[data-season="halloween"] #startScene {
+      background:
+        radial-gradient(ellipse at 50% 38%, rgba(10,14,34,.55) 0%, rgba(4,6,16,.82) 60%, rgba(2,2,8,.94) 100%),
+        linear-gradient(180deg, rgba(8,12,30,.6) 0%, rgba(2,2,8,.85) 100%);
+    }
     html[data-season="halloween"] #startScene::after {
       content: '';
       position: absolute;
@@ -371,7 +376,7 @@
     html.halloween-opening #startScene > .dcStamp,
     html.halloween-opening #startScene > .startBtns { opacity: 0; }
     html.halloween-revealed #startScene > .ghostOuter { animation: halloweenGhostDrop 820ms cubic-bezier(.16,.92,.25,1.15) both; }
-    html.halloween-revealed #startScene > .dcStamp { animation: halloweenReveal 420ms ease 360ms both; }
+    html.halloween-revealed #startScene > .dcStamp.show { animation: halloweenReveal 420ms ease 360ms both; }
     html.halloween-revealed #startScene > .startBtns { animation: halloweenReveal 480ms ease 520ms both; }
     @keyframes halloweenGhostDrop {
       from { opacity: 0; transform: translate3d(0,-42vh,0) rotate(-10deg) scale(.72); }
