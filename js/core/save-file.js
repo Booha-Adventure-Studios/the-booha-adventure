@@ -481,8 +481,14 @@ const BoohaSaveFile = (() => {
     // Blitz keeps its weekly bucket inside meta for historical reasons, so it
     // must be cleared alongside the top-level weekly section.
     if (data.meta && data.meta.blitz && typeof data.meta.blitz === 'object') {
-      data.meta.blitz.weekly = {};
-      data.meta.blitz.weeklyKey = occurrenceKey || '';
+      const nextBlitzWeek = occurrenceKey || '';
+      // A Blitz run can finish just after Sunday midnight. Its completion is
+      // saved under the new occurrence before the live page notices the
+      // rollover, so preserve that matching bucket instead of erasing it.
+      if (data.meta.blitz.weeklyKey !== nextBlitzWeek) {
+        data.meta.blitz.weekly = {};
+        data.meta.blitz.weeklyKey = nextBlitzWeek;
+      }
     }
 
     // Clear legacy Muenba weekly fields too. The live hunt now uses
