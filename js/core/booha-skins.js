@@ -153,6 +153,10 @@ const BoohaSkins = (() => {
       // from September 20 through October 25, 2026.
       startDate: '2026-09-20',
       endDate: '2026-10-31',
+      // The atmosphere may begin with the unlock season. The landing/menu
+      // character switches to Batty one week later.
+      landingStart: '2026-09-27',
+      landingEnd: '2026-10-31',
       rotationStartOccurrenceKey: '2026-09-20|september-w3',
       characterIds: Object.freeze([
         'batty', 'mummington', 'mortisa', 'doomlet', 'hazel', 'mister_happy',
@@ -204,6 +208,16 @@ const BoohaSkins = (() => {
       const season = SEASONS[id];
       return (!season.startDate || date >= season.startDate) &&
         (!season.endDate || date <= season.endDate);
+    }) || null;
+  }
+
+  function landingSeasonIdForDate(dateKey = currentDateKey()) {
+    const date = String(dateKey || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+    return Object.keys(SEASONS).find((id) => {
+      const season = SEASONS[id];
+      return season.landingStart && date >= season.landingStart &&
+        date <= season.landingEnd;
     }) || null;
   }
 
@@ -360,6 +374,7 @@ const BoohaSkins = (() => {
     availableCharacters,
     nextAvailableId,
     seasonIdForDate,
+    landingSeasonIdForDate,
     rotationCharacterId,
     menuCharacterId,
     unlock,

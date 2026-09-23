@@ -55,17 +55,18 @@
     var season = window.BoohaSkins && window.BoohaSkins.seasonIdForDate
       ? window.BoohaSkins.seasonIdForDate()
       : null;
+    var landingSeason = window.BoohaSkins && window.BoohaSkins.landingSeasonIdForDate
+      ? window.BoohaSkins.landingSeasonIdForDate()
+      : null;
     if (season) document.documentElement.dataset.season = season;
+    if (landingSeason) document.documentElement.dataset.landingSeason = landingSeason;
     if (season !== 'halloween') return;
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var lowPowerHint = navigator.connection && navigator.connection.saveData;
     var dateKey = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
     }).format(new Date());
-    var openingKey = 'booha:halloween-opening:' + dateKey;
-    var alreadyShown = false;
-    try { alreadyShown = localStorage.getItem(openingKey) === '1'; } catch (_) {}
-    if (!reduced && !lowPowerHint && !alreadyShown) {
+    if (!reduced && !lowPowerHint) {
       document.documentElement.classList.add('halloween-opening');
     }
     if (navigator.getBattery) {
@@ -76,7 +77,7 @@
         }
       }).catch(function () {});
     }
-    window.__boohaHalloweenOpeningKey = openingKey;
+    window.__boohaHalloweenDateKey = dateKey;
   })();
 </script>
 <!-- ═══════════════════════════════════════════════════════ -->
@@ -286,7 +287,7 @@
         radial-gradient(ellipse at 50% 110%, rgba(131,59,161,.18), transparent 52%);
       animation: halloweenFog 14s ease-in-out infinite alternate;
     }
-    html[data-season="halloween"] #app::after {
+    html[data-season="halloween"] #startScene::after {
       content: '';
       position: absolute;
       inset: 0;
@@ -294,6 +295,8 @@
       pointer-events: none;
       background: radial-gradient(ellipse at center, transparent 46%, rgba(4,1,10,.56) 100%);
     }
+    html.token-checking #halloweenOpening,
+    html.token-checking #halloweenOpening * { animation-play-state: paused; }
     html[data-season="halloween"] .sp {
       background: #ff9b38;
       box-shadow: 0 0 4px 1px rgba(255,206,120,.95), 0 0 12px 3px rgba(132,66,190,.72);
@@ -1420,7 +1423,7 @@
         <button id="dailyCheckBtn" class="btn btnGold" type="button">スタート</button>
       </div>
       <div class="btnGroup">
-        <div class="btnLabel muted"><span class="halloweenLabel">THE DOOR</span><span>あとで</span><span class="defaultLabel">Continue anyway</span></div>
+        <div class="btnLabel muted"><span class="halloweenLabel">ENTER ANYWAY</span><span>あとで</span><span class="defaultLabel">Enter anyway</span></div>
         <button id="startBtn" class="btn btnGhost" type="button">つづける</button>
       </div>
     </div>
@@ -2205,14 +2208,19 @@ const dailyCheckBtn = document.getElementById('dailyCheckBtn');
   const root = document.documentElement;
   const opening = document.getElementById('halloweenOpening');
   if (!opening || !root.classList.contains('halloween-opening')) return;
+  const dateKey = window.__boohaHalloweenDateKey || new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(new Date());
   let finished = false;
-  opening.setAttribute('aria-hidden', 'false');
-  opening.setAttribute('tabindex', '0');
+  let timer = null;
+  let observer = null;
+  let openingKey = '';
   const finish = () => {
     if (finished) return;
     finished = true;
+    if (observer) observer.disconnect();
     try {
-      if (window.__boohaHalloweenOpeningKey) localStorage.setItem(window.__boohaHalloweenOpeningKey, '1');
+      if (openingKey) localStorage.setItem(openingKey, '1');
     } catch (_) {}
     root.classList.remove('halloween-opening');
     root.classList.add('halloween-revealed');
@@ -2220,17 +2228,52 @@ const dailyCheckBtn = document.getElementById('dailyCheckBtn');
     opening.setAttribute('tabindex', '-1');
     window.setTimeout(() => { opening.hidden = true; }, 700);
   };
-  const timer = window.setTimeout(finish, 1500);
-  opening.addEventListener('pointerdown', () => { window.clearTimeout(timer); finish(); }, { once: true });
+  const startTimer = () => {
+    if (finished || timer !== null) return;
+    timer = window.setTimeout(finish, 1500);
+  };
+
+  const prepareForStudent = () => {
+    if (finished) return;
+    let identity = 'anonymous';
+    try {
+      identity = localStorage.getItem('booha_userid') || localStorage.getItem('booha_token') || identity;
+    } catch (_) {}
+    openingKey = `booha:halloween-opening:${dateKey}:${encodeURIComponent(identity)}`;
+    try {
+      if (localStorage.getItem(openingKey) === '1') {
+        finished = true;
+        root.classList.remove('halloween-opening');
+        return;
+      }
+    } catch (_) {}
+    window.__boohaHalloweenOpeningKey = openingKey;
+    opening.setAttribute('aria-hidden', 'false');
+    opening.setAttribute('tabindex', '0');
+    startTimer();
+  };
+  if (!root.classList.contains('token-checking')) {
+    prepareForStudent();
+  } else {
+    observer = new MutationObserver((_, obs) => {
+      if (!root.classList.contains('token-checking')) {
+        obs.disconnect();
+        observer = null;
+        prepareForStudent();
+      }
+    });
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+  }
+  opening.addEventListener('pointerdown', () => { if (timer !== null) window.clearTimeout(timer); finish(); }, { once: true });
   opening.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      window.clearTimeout(timer);
+      if (timer !== null) window.clearTimeout(timer);
       finish();
     }
   });
   document.addEventListener('booha:halloweenLowPower', () => {
-    window.clearTimeout(timer);
+    if (timer !== null) window.clearTimeout(timer);
     finish();
   }, { once: true });
 })();

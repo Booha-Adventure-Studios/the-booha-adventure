@@ -129,4 +129,11 @@ assert.deepStrictEqual(stored.muenba.caseRecords, { case_lifetime: { completed: 
 assert.ok(events.includes('booha:weeklyReset'));
 assert.ok(events.includes('booha:newWeek'));
 
+// A run that finished just after the boundary is already stored in the new
+// Blitz occurrence. A later reset check must preserve that matching bucket.
+stored.meta.blitz.weeklyKey = '2026-08-30|august-w4';
+stored.meta.blitz.weekly = { questions: { bc: { ms: 777 } } };
+context.window.BoohaAdventure.save.resetWeekly('2026-08-30|august-w4');
+assert.deepStrictEqual(stored.meta.blitz.weekly, { questions: { bc: { ms: 777 } } });
+
 console.log('Weekly rollover audit passed: the fifth occurrence resets weekly state while preserving permanent progress.');
