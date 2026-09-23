@@ -55,11 +55,7 @@
     var season = window.BoohaSkins && window.BoohaSkins.seasonIdForDate
       ? window.BoohaSkins.seasonIdForDate()
       : null;
-    var landingSeason = window.BoohaSkins && window.BoohaSkins.landingSeasonIdForDate
-      ? window.BoohaSkins.landingSeasonIdForDate()
-      : null;
     if (season) document.documentElement.dataset.season = season;
-    if (landingSeason) document.documentElement.dataset.landingSeason = landingSeason;
     if (season !== 'halloween') return;
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var lowPowerHint = navigator.connection && navigator.connection.saveData;
@@ -2239,7 +2235,7 @@ const dailyCheckBtn = document.getElementById('dailyCheckBtn');
     if (finished) return;
     let identity = 'anonymous';
     try {
-      identity = localStorage.getItem('booha_userid') || localStorage.getItem('booha_token') || identity;
+      identity = localStorage.getItem('booha_userid') || identity;
     } catch (_) {}
     openingKey = `booha:halloween-opening:${dateKey}:${encodeURIComponent(identity)}`;
     try {
