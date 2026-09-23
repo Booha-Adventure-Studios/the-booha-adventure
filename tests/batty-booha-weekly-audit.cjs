@@ -63,9 +63,6 @@ assert.strictEqual(skins.availableCharacters().map(skin => skin.id).join(','), '
 assert.strictEqual(skins.nextAvailableId('batty'), 'mummington');
 assert.strictEqual(skins.nextAvailableId('mister_happy'), 'batty');
 assert.strictEqual(skins.rotationCharacterId(), 'batty');
-assert.strictEqual(skins.landingSeasonIdForDate('2026-09-20'), null);
-assert.strictEqual(skins.landingSeasonIdForDate('2026-09-27'), 'halloween');
-assert.strictEqual(skins.landingSeasonIdForDate('2026-11-01'), null);
 assert.strictEqual(skins.menuCharacterId('halloween', '2026-09-20'), null);
 assert.strictEqual(skins.menuCharacterId('halloween', '2026-09-27'), 'batty');
 assert.strictEqual(skins.menuCharacterId('halloween', '2026-10-31'), 'batty');

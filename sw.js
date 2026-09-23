@@ -29,7 +29,7 @@ const CURRENT_CACHES = {
   // invalidate the precached shells for returning iPads.
   // Halloween Booha rotation pass (2026-09-21): invalidate maze.html so
   // scheduled Batty/Mummington popups reach returning clients.
-  pages:  'booha-pages-2026-418',
+  pages:  'booha-pages-2026-419',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
