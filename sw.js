@@ -29,7 +29,7 @@ const CURRENT_CACHES = {
   // invalidate the precached shells for returning iPads.
   // Halloween Booha rotation pass (2026-09-21): invalidate maze.html so
   // scheduled Batty/Mummington popups reach returning clients.
-  pages:  'booha-pages-2026-416',
+  pages:  'booha-pages-2026-417',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -201,9 +201,9 @@ const CURRENT_CACHES = {
   // Family Room Pass 3: the andon/light-pressure rules are script-only; no new
   // install-time media is required.
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
-  // Seasonal Booha rotation correction and once-per-week unlock popup pass
-  // (2026-09-23): invalidate cached skin-registry/runtime assets.
-  assets: 'booha-assets-2026-569',
+  // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
+  // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
+  assets: 'booha-assets-2026-570',
   decks:  'booha-decks-2026-310',
 };
 
@@ -297,6 +297,8 @@ const CORE_ASSETS = [
   `${BASE}/assets/img/pre-boo.webp`,
   `${BASE}/assets/img/boo-tree.webp`,
   `${BASE}/assets/img/cont-tree.webp`,
+  `${BASE}/js/core/booha-skins.js`,
+  `${BASE}/assets/skins/batty_booha/static.png`,
 ];
 
 // ── Asset folder prefixes (matched at runtime) ───────────────
