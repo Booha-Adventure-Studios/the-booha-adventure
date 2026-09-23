@@ -1412,6 +1412,7 @@
 </div>
 
 <script src="./js/calendar.js"></script>
+<script src="./js/core/booha-skins.js"></script>
 <script>
 
 function playIndexSfx(name) {
@@ -1421,6 +1422,18 @@ function playIndexSfx(name) {
 }
   
 const { getCurrentCurriculumWeek } = window.CALENDAR;
+
+function applySeasonalLandingSkin() {
+  const image = document.getElementById('boohaGhost');
+  const id = window.BoohaSkins?.menuCharacterId?.();
+  const skin = id ? window.BoohaSkins.get(id) : null;
+  if (!image || !skin || !skin.assets?.maze) return;
+  image.src = skin.assets.maze;
+  image.alt = skin.name;
+}
+
+applySeasonalLandingSkin();
+document.addEventListener('booha:weeklyReset', applySeasonalLandingSkin);
 
 function getBoohaFirstName() {
   const directFirst =

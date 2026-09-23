@@ -14,7 +14,7 @@ let stored = {
   meta: { selectedBoohaSkin: null },
   weekly: { unlockedBoohaSkins: {} },
 };
-const currentWeek = { occurrenceKey: '2026-09-13|september-w3' };
+const currentWeek = { occurrenceKey: '2026-09-20|september-w3' };
 const events = [];
 const save = {
   load() { return stored; },
@@ -59,10 +59,14 @@ assert.strictEqual(mummington.name, 'Mummington Booha');
 assert.strictEqual(mummington.nameJp, 'マミングトン ブーハー');
 assert.strictEqual(mummington.unlockId, 'booha_skin_mummington');
 assert.strictEqual(skins.isAvailable('mummington'), true);
-assert.strictEqual(skins.availableCharacters().map(skin => skin.id).join(','), 'batty,mummington');
+assert.strictEqual(skins.availableCharacters().map(skin => skin.id).join(','), 'batty,mummington,mortisa,doomlet,hazel,mister_happy');
 assert.strictEqual(skins.nextAvailableId('batty'), 'mummington');
-assert.strictEqual(skins.nextAvailableId('mummington'), 'batty');
+assert.strictEqual(skins.nextAvailableId('mister_happy'), 'batty');
 assert.strictEqual(skins.rotationCharacterId(), 'batty');
+assert.strictEqual(skins.menuCharacterId('halloween', '2026-09-20'), null);
+assert.strictEqual(skins.menuCharacterId('halloween', '2026-09-27'), 'batty');
+assert.strictEqual(skins.menuCharacterId('halloween', '2026-10-31'), 'batty');
+assert.strictEqual(skins.menuCharacterId('halloween', '2026-11-01'), null);
 
 // A stale bucket entry must not keep Batty active before this week's Blitz
 // trio is complete.
@@ -102,7 +106,7 @@ assert.strictEqual(skins.unlockAndEquip('batty'), false);
 
 // The next calendar week schedules Mummington. Batty cannot be unlocked
 // there even when the current week's Blitz trio is complete.
-currentWeek.occurrenceKey = '2026-09-20|september-w4';
+currentWeek.occurrenceKey = '2026-09-27|september-w4';
 stored.meta.blitz.weeklyKey = currentWeek.occurrenceKey;
 stored.meta.blitz.weekly = {
   vocab: { pb: { ms: 1000 } },
@@ -114,16 +118,24 @@ stored.meta.selectedBoohaSkin = null;
 assert.strictEqual(skins.rotationCharacterId(), 'mummington');
 assert.strictEqual(skins.isUnlocked('batty'), false);
 assert.strictEqual(skins.unlockAndEquip('batty'), false);
+assert.strictEqual(skins.rotationCharacterId(), 'mummington');
 assert.strictEqual(skins.unlockAndEquip('mummington'), true);
 assert.strictEqual(skins.selectedId(), 'mummington');
 
-// With two characters, the third week rotates back to Batty.
-currentWeek.occurrenceKey = '2026-09-27|september-w5';
-stored.meta.blitz.weeklyKey = currentWeek.occurrenceKey;
-stored.meta.blitz.weekly = {};
-stored.weekly.unlockedBoohaSkins = {};
-stored.meta.selectedBoohaSkin = null;
-assert.strictEqual(skins.rotationCharacterId(), 'batty');
-assert.strictEqual(skins.selectedId(), null);
+// Every October occurrence has its own scheduled Halloween character.
+[
+  ['2026-10-04|october-w1', 'mortisa'],
+  ['2026-10-11|october-w2', 'doomlet'],
+  ['2026-10-18|october-w3', 'hazel'],
+  ['2026-10-25|october-w4', 'mister_happy'],
+].forEach(([occurrenceKey, id]) => {
+  currentWeek.occurrenceKey = occurrenceKey;
+  stored.meta.blitz.weeklyKey = occurrenceKey;
+  stored.meta.blitz.weekly = {};
+  stored.weekly.unlockedBoohaSkins = {};
+  stored.meta.selectedBoohaSkin = null;
+  assert.strictEqual(skins.rotationCharacterId(), id);
+  assert.strictEqual(skins.unlockAndEquip(id), false);
+});
 
-console.log('Batty/Mummington rotation audit passed: current-week Blitz completion unlocks the scheduled character and two-character rotation alternates correctly.');
+console.log('Halloween skin schedule audit passed: six weekly characters, a gated unlock path, and a Batty landing-menu schedule are wired correctly.');

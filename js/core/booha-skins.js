@@ -59,21 +59,116 @@ const BoohaSkins = (() => {
         danceWave: 'assets/skins/mummington_booha/dance_wave.webp',
       }),
     }),
+    mortisa: Object.freeze({
+      id: 'mortisa',
+      seasonId: 'halloween',
+      enabled: true,
+      name: 'Mortisa Booha',
+      nameJp: 'モーティサ・ブーハー',
+      unlockId: 'booha_skin_mortisa',
+      assets: Object.freeze({
+        maze: 'assets/skins/mortisa_booha/static.webp',
+        karasuki: 'assets/skins/mortisa_booha/static.webp',
+        grimmerglen: 'assets/skins/mortisa_booha/static.webp',
+        utsuroba: 'assets/skins/mortisa_booha/static.webp',
+        muenba: 'assets/skins/mortisa_booha/static.webp',
+        familyRoom: 'assets/skins/mortisa_booha/static.webp',
+        marking: 'assets/skins/mortisa_booha/marking.webp',
+        hiding: 'assets/skins/mortisa_booha/hiding.webp',
+        danceArmsUp: 'assets/skins/mortisa_booha/dance_arms_up.webp',
+        danceSway: 'assets/skins/mortisa_booha/dance_sway.webp',
+        danceWave: 'assets/skins/mortisa_booha/dance_wave.webp',
+      }),
+    }),
+    doomlet: Object.freeze({
+      id: 'doomlet',
+      seasonId: 'halloween',
+      enabled: true,
+      name: 'Doomlet Booha',
+      nameJp: 'ドゥームレット・ブーハー',
+      unlockId: 'booha_skin_doomlet',
+      assets: Object.freeze({
+        maze: 'assets/skins/doomlet_booha/static.webp',
+        karasuki: 'assets/skins/doomlet_booha/static.webp',
+        grimmerglen: 'assets/skins/doomlet_booha/static.webp',
+        utsuroba: 'assets/skins/doomlet_booha/static.webp',
+        muenba: 'assets/skins/doomlet_booha/static.webp',
+        familyRoom: 'assets/skins/doomlet_booha/static.webp',
+        marking: 'assets/skins/doomlet_booha/marking.webp',
+        hiding: 'assets/skins/doomlet_booha/hiding.webp',
+        danceArmsUp: 'assets/skins/doomlet_booha/dance_arms_up.webp',
+        danceSway: 'assets/skins/doomlet_booha/dance_sway.webp',
+        danceWave: 'assets/skins/doomlet_booha/dance_wave.webp',
+      }),
+    }),
+    hazel: Object.freeze({
+      id: 'hazel',
+      seasonId: 'halloween',
+      enabled: true,
+      name: 'Hazel Booha',
+      nameJp: 'ヘイゼル・ブーハー',
+      unlockId: 'booha_skin_hazel',
+      assets: Object.freeze({
+        maze: 'assets/skins/hazel_booha/static.webp',
+        karasuki: 'assets/skins/hazel_booha/static.webp',
+        grimmerglen: 'assets/skins/hazel_booha/static.webp',
+        utsuroba: 'assets/skins/hazel_booha/static.webp',
+        muenba: 'assets/skins/hazel_booha/static.webp',
+        familyRoom: 'assets/skins/hazel_booha/static.webp',
+        marking: 'assets/skins/hazel_booha/marking.webp',
+        hiding: 'assets/skins/hazel_booha/hiding.webp',
+        danceArmsUp: 'assets/skins/hazel_booha/dance_arms_up.webp',
+        danceSway: 'assets/skins/hazel_booha/dance_sway.webp',
+        danceWave: 'assets/skins/hazel_booha/dance_wave.webp',
+      }),
+    }),
+    mister_happy: Object.freeze({
+      id: 'mister_happy',
+      seasonId: 'halloween',
+      enabled: true,
+      name: 'Mister Happy Booha',
+      nameJp: 'ミスター・ハッピー・ブーハー',
+      unlockId: 'booha_skin_mister_happy',
+      assets: Object.freeze({
+        maze: 'assets/skins/mister_happy_booha/static.webp',
+        karasuki: 'assets/skins/mister_happy_booha/static.webp',
+        grimmerglen: 'assets/skins/mister_happy_booha/static.webp',
+        utsuroba: 'assets/skins/mister_happy_booha/static.webp',
+        muenba: 'assets/skins/mister_happy_booha/static.webp',
+        familyRoom: 'assets/skins/mister_happy_booha/static.webp',
+        marking: 'assets/skins/mister_happy_booha/marking.webp',
+        hiding: 'assets/skins/mister_happy_booha/hiding.webp',
+        danceArmsUp: 'assets/skins/mister_happy_booha/dance_arms_up.webp',
+        danceSway: 'assets/skins/mister_happy_booha/dance_sway.webp',
+        danceWave: 'assets/skins/mister_happy_booha/dance_wave.webp',
+      }),
+    }),
   });
 
   const SEASONS = Object.freeze({
     halloween: Object.freeze({
       id: 'halloween',
       name: 'Halloween',
-      // Batty launched in the September 13 occurrence; the following week
-      // therefore belongs to Mummington. Explicit weekly entries can replace
-      // the temporary two-character fallback as October characters arrive.
-      rotationStartOccurrenceKey: '2026-09-13|september-w3',
-      characterIds: Object.freeze(['batty', 'mummington']),
+      // Halloween unlocks are assigned to the six Sunday-started occurrences
+      // from September 20 through October 25, 2026.
+      rotationStartOccurrenceKey: '2026-09-20|september-w3',
+      characterIds: Object.freeze([
+        'batty', 'mummington', 'mortisa', 'doomlet', 'hazel', 'mister_happy',
+      ]),
       weeklyCharacterIds: Object.freeze({
-        '2026-09-20': 'mummington',
-        '2026-09-27': 'batty',
+        '2026-09-20': 'batty',
+        '2026-09-27': 'mummington',
+        '2026-10-04': 'mortisa',
+        '2026-10-11': 'doomlet',
+        '2026-10-18': 'hazel',
+        '2026-10-25': 'mister_happy',
       }),
+      // The landing menu is seasonal decoration, not a reward gate. Batty
+      // appears there from September 27 through Halloween week even when the
+      // student has not completed the Blitz games.
+      menuSchedule: Object.freeze([
+        Object.freeze({ start: '2026-09-27', end: '2026-10-31', characterId: 'batty' }),
+      ]),
     }),
   });
 
@@ -86,6 +181,17 @@ const BoohaSkins = (() => {
       const calendar = window.CALENDAR;
       const week = calendar?.getCurrentCurriculumWeek?.();
       return calendar?.getCurriculumWeekOccurrenceKey?.(week) || week?.occurrenceKey || '';
+    } catch (_) { return ''; }
+  }
+
+  function currentDateKey() {
+    try {
+      if (typeof window.CALENDAR?.getTodayKey === 'function') return window.CALENDAR.getTodayKey();
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
+      }).formatToParts(new Date());
+      const values = Object.fromEntries(parts.filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
+      return `${values.year}-${values.month}-${values.day}`;
     } catch (_) { return ''; }
   }
 
@@ -103,6 +209,13 @@ const BoohaSkins = (() => {
     if (scheduledId && season.characterIds.includes(scheduledId)) return scheduledId;
     const weekIndex = Math.floor((currentMs - anchorMs) / (7 * 24 * 60 * 60 * 1000));
     return season.characterIds[weekIndex % season.characterIds.length];
+  }
+
+  function menuCharacterId(seasonId = CURRENT_SEASON_ID, dateKey = currentDateKey()) {
+    const season = getSeason(seasonId);
+    const date = String(dateKey || '').slice(0, 10);
+    const entry = (season?.menuSchedule || []).find(item => date >= item.start && date <= item.end);
+    return entry && isAvailable(entry.characterId) ? entry.characterId : null;
   }
 
   function hasCurrentBlitzTriple(data) {
@@ -232,6 +345,7 @@ const BoohaSkins = (() => {
     availableCharacters,
     nextAvailableId,
     rotationCharacterId,
+    menuCharacterId,
     unlock,
     isUnlocked,
     selectedId,
