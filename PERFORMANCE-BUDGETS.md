@@ -14,7 +14,7 @@ These are enforceable file/cache limits or runtime targets, not claims about eve
 | Root image-directory payload | 8 MiB |
 | Drifter image-directory payload | 1.8 MiB |
 | Grimmerglen image-directory payload | 12.9 MiB |
-| Family Room image-directory payload | 700 KiB |
+| Family Room image-directory payload | 3 MiB |
 | Karasuki image-directory payload | 3.5 MiB |
 | Muenba image-directory payload | 9.2 MiB |
 | Utsuroba image-directory payload | 5.75 MiB |
@@ -26,7 +26,8 @@ These are enforceable file/cache limits or runtime targets, not claims about eve
 | Acceptable long frame | under 100 ms during active play |
 
 Node audits enforce file sizes, WebP structure, references, dimensions, the
-explicit lossless allowlist, and the decoded Wanderer-cache model. Browser
+explicit lossless allowlist, Family Room assets outside `assets/img/`, and the
+decoded Wanderer-cache model. Browser
 runtime monitors measure actual frame windows and memory estimates.
 Representative-device testing is still required for Safari/iOS thermal
 behavior, page hide/resume, audio activity, and visual edge quality.

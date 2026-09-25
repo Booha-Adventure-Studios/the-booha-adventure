@@ -8,6 +8,7 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const imageRoot = path.join(root, 'assets', 'img');
+const familyRoomRoot = path.join(root, 'assets', 'family-room');
 const convertedRoots = [
   path.join(imageRoot, 'wanderers'),
   path.join(imageRoot, 'drifters'),
@@ -165,4 +166,33 @@ records.forEach(record => {
 
 const totalBytes = records.reduce((sum, record) => sum + record.bytes, 0);
 assert(totalBytes <= 50 * 1024 * 1024, `deployed image payload exceeds the 50 MiB performance budget (got ${totalBytes})`);
-console.log(`Asset budget audit passed: VP8L ${vp8l.length} files/${vp8l.reduce((s,r)=>s+r.bytes,0)} bytes; lossy ${lossy.length} files/${lossy.reduce((s,r)=>s+r.bytes,0)} bytes; explicit directory/file ceilings pass; deployed image payload ${totalBytes} bytes.`);
+
+// Family Room lives outside assets/img, but its images are deployed just the
+// same. Keep the six small authored Genkan overlays lossless for crisp alpha
+// edges; room bases and Pataskala poses must use the normal 700 KiB ceiling.
+const familyRoomFiles = files(familyRoomRoot);
+const familyRoomRecords = familyRoomFiles.map(file => ({ file, ...inspect(file) }));
+const familyLosslessAllowlist = new Set([
+  'family-room/overlays/genkan_coat_turn.webp',
+  'family-room/overlays/genkan_door_shadow.webp',
+  'family-room/overlays/genkan_shoes_extra.webp',
+  'family-room/overlays/genkan_threshold_talisman.webp',
+  'family-room/overlays/genkan_umbrella_floor.webp',
+  'family-room/overlays/genkan_wet_footprints.webp',
+]);
+const actualFamilyLossless = new Set(familyRoomRecords
+  .filter(record => record.vp8l)
+  .map(record => path.relative(path.join(root, 'assets'), record.file)));
+assert.deepStrictEqual(
+  [...actualFamilyLossless].sort(),
+  [...familyLosslessAllowlist].sort(),
+  'Family Room lossless WebPs must match the explicit overlay allowlist'
+);
+familyRoomRecords.forEach(record => {
+  const relative = path.relative(path.join(root, 'assets'), record.file);
+  assert(record.bytes <= 700 * 1024, `${relative} exceeds the 700 KiB Family Room image budget`);
+});
+const familyRoomBytes = familyRoomRecords.reduce((sum, record) => sum + record.bytes, 0);
+assert(familyRoomBytes <= 3 * 1024 * 1024,
+  `Family Room image payload exceeds the 3 MiB directory budget (got ${familyRoomBytes} bytes)`);
+console.log(`Asset budget audit passed: VP8L ${vp8l.length} files/${vp8l.reduce((s,r)=>s+r.bytes,0)} bytes; lossy ${lossy.length} files/${lossy.reduce((s,r)=>s+r.bytes,0)} bytes; assets/img and Family Room ceilings pass; deployed image payload ${totalBytes} bytes; Family Room ${familyRoomBytes} bytes.`);

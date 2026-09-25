@@ -251,6 +251,7 @@ const CORE_FILES = [
   `${BASE}/assets/img/juku-logo.png`,
   `${BASE}/js/core/adventure-performance.js`,
   `${BASE}/js/core/decoded-image-cache.js`,
+  `${BASE}/js/maze-seasonal-unlock.js`,
 ];
 
 // Static images are fetched from ASSET_CACHE, so these must be pre-cached

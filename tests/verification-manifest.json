@@ -131,6 +131,16 @@
       "reason": "Current Maze seasonal-unlock wiring, popup-once, stale-week, mixed-curriculum, and reset contract."
     },
     {
+      "path": "tests/daily-check-runtime.test.cjs",
+      "status": "verify",
+      "reason": "Current Daily Check content-loader, full runner, quiz completion, record, and sync-checkpoint runtime contract."
+    },
+    {
+      "path": "tests/login-runtime.test.cjs",
+      "status": "verify",
+      "reason": "Current token-gate login, identity storage, verification, rejection, and redirect runtime contract."
+    },
+    {
       "path": "tests/seasonal-date-gate.test.cjs",
       "status": "verify",
       "reason": "Pre-Sunday Tokyo seasonal date gate for the Sep 27 and Oct 4 switches and Nov 1 shutoff."
