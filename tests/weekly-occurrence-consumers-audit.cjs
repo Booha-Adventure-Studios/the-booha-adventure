@@ -30,10 +30,11 @@ for (const file of ['js/utsuroba.js', 'js/muenba.js', 'js/karasuki.js', 'js/core
 
 const index = read('index.html');
 const maze = read('maze.html');
+const mazeSeasonalUnlock = read('js/maze-seasonal-unlock.js');
 assert.ok(index.includes('const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw)'),
   'index Blitz progress must read the live occurrence key');
-assert.ok(maze.includes('const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw)'),
-  'Maze Blitz progress must read the live occurrence key');
+assert.ok(mazeSeasonalUnlock.includes('const weekId = calendar.getCurriculumWeekOccurrenceKey?.(cw)'),
+  'Maze Blitz progress controller must read the live occurrence key');
 
 const log = read('js/ui/adventure-log.js');
 assert.ok(log.includes('function formatPastWeekLabel'), 'profile log must format occurrence keys');

@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
-// Maze seasonal-unlock integration contract. The production decision and
-// popup path live in maze.html's inline script, so this test evaluates those
-// exact functions with an isolated DOM/save harness instead of duplicating
-// the rules in a second implementation.
+// The Maze seasonal-unlock controller is a real browser script now, so this
+// test loads that script directly rather than extracting functions from the
+// 3,000-line page with a second parser.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -12,59 +11,6 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
-const mazeSource = read('maze.html');
-
-function extractFunction(source, name) {
-  const start = source.indexOf(`function ${name}(`);
-  assert(start >= 0, `maze.html must define ${name}`);
-  const bodyStart = source.indexOf('{', start);
-  let depth = 0;
-  let quote = null;
-  let escaped = false;
-  for (let i = bodyStart; i < source.length; i += 1) {
-    const ch = source[i];
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (ch === '\\') escaped = true;
-      else if (ch === quote) quote = null;
-      continue;
-    }
-    if (ch === '"' || ch === "'" || ch === '`') {
-      quote = ch;
-      continue;
-    }
-    if (ch === '{') depth += 1;
-    if (ch === '}' && --depth === 0) return source.slice(start, i + 1);
-  }
-  throw new Error(`Could not extract ${name}`);
-}
-
-function extractSeasonalCopy(source) {
-  const start = source.indexOf('const SEASONAL_UNLOCK_COPY = ');
-  assert(start >= 0, 'maze.html must define seasonal unlock copy');
-  const objectStart = source.indexOf('{', start);
-  let depth = 0;
-  let quote = null;
-  let escaped = false;
-  for (let i = objectStart; i < source.length; i += 1) {
-    const ch = source[i];
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (ch === '\\') escaped = true;
-      else if (ch === quote) quote = null;
-      continue;
-    }
-    if (ch === '"' || ch === "'" || ch === '`') {
-      quote = ch;
-      continue;
-    }
-    if (ch === '{') depth += 1;
-    if (ch === '}' && --depth === 0) {
-      return source.slice(start, i + 2); // include the closing `);`
-    }
-  }
-  throw new Error('Could not extract SEASONAL_UNLOCK_COPY');
-}
 
 function popupElement() {
   const classes = new Set();
@@ -80,6 +26,7 @@ function popupElement() {
         textContent: '',
         querySelector() { return null; },
         appendChild() {},
+        set innerHTML(_) {},
       };
     },
     setAttribute() {},
@@ -103,11 +50,6 @@ function makeHarness(stored) {
   const context = {
     console,
     Date,
-    document: { dispatchEvent() {} },
-    CustomEvent: class CustomEvent {
-      constructor(type, init = {}) { this.type = type; this.detail = init.detail; }
-    },
-    requestAnimationFrame(callback) { callback(); },
     window: {
       BoohaAdventure: adventure,
       CALENDAR: {
@@ -117,38 +59,37 @@ function makeHarness(stored) {
         getCurriculumWeekOccurrenceKey(week) { return week.occurrenceKey; },
       },
       setTimeout(callback) { callback(); },
+      requestAnimationFrame(callback) { callback(); },
     },
-    CALENDAR: null,
-    BoohaAdventure: adventure,
     localStorage: { getItem() { return 'bc'; } },
-    battyUnlockPopupShown: false,
-    seasonalUnlockId: null,
-    battyUnlockPopup: popup,
-    battyUnlockScrim: scrim,
-    battyEquipButton: { querySelector() { return art; }, setAttribute() {} },
-    battyEquipTextButton: null,
-    battyUnlockArt: art,
-    applyEquippedMazeSkin() {},
+    document: { dispatchEvent() {} },
+    CustomEvent: class CustomEvent {
+      constructor(type, init = {}) { this.type = type; this.detail = init.detail; }
+    },
   };
+  context.window.localStorage = context.localStorage;
+  context.window.document = context.document;
+  context.window.CustomEvent = context.CustomEvent;
+  context.BoohaAdventure = adventure;
   context.CALENDAR = context.window.CALENDAR;
-  // maze.html calls this page-global rather than CALENDAR directly.
-  context.getCurrentCurriculumWeek = () => context.CALENDAR.getCurrentCurriculumWeek();
   vm.createContext(context);
 
   vm.runInContext(read('js/core/booha-skins.js'), context, { filename: 'js/core/booha-skins.js' });
   context.BoohaSkins = context.window.BoohaSkins;
+  vm.runInContext(read('js/maze-seasonal-unlock.js'), context, { filename: 'js/maze-seasonal-unlock.js' });
 
-  const functions = [
-    'currentBlitzCurriculum',
-    'readBlitzCompletionState',
-    'blitzTripleCompleteForAnyCurriculum',
-    'closeSeasonalUnlockPopup',
-    'prepareSeasonalUnlockPopup',
-    'equipSeasonalFromUnlockPopup',
-    'maybeShowSeasonalUnlockPopup',
-  ].map(name => extractFunction(mazeSource, name)).join('\n');
-  vm.runInContext(`${extractSeasonalCopy(mazeSource)}\n${functions}`, context, { filename: 'maze-seasonal-inline-harness.js' });
-  return { context, popup, scrim, stored };
+  const controller = context.window.MazeSeasonalUnlock.create({
+    calendar: context.window.CALENDAR,
+    getCurrentWeek: () => context.window.CALENDAR.getCurrentCurriculumWeek(),
+    storage: context.localStorage,
+    skins: context.window.BoohaSkins,
+    getSave: () => stored,
+    applyEquippedMazeSkin() {},
+    ui: { popup, scrim, art, equipButton: { setAttribute() {} } },
+    requestAnimationFrame(callback) { callback(); },
+    setTimeout(callback) { callback(); },
+  });
+  return { context, controller, popup, scrim, stored };
 }
 
 function baseSave(weekKey, weekly) {
@@ -168,7 +109,8 @@ const completeBc = {
 // Positive: a complete trio in any one curriculum (BC here, while the
 // student's last-selected curriculum is deliberately irrelevant).
 const positive = makeHarness(baseSave(currentKey, completeBc));
-positive.context.maybeShowSeasonalUnlockPopup();
+assert.deepStrictEqual(positive.controller.readBlitzCompletionState().completedCurriculum, 'bc');
+positive.controller.maybeShowSeasonalUnlockPopup();
 assert.ok(positive.stored.weekly.unlockedBoohaSkins.mummington,
   'a complete trio in one curriculum must unlock Mummington');
 assert.strictEqual(positive.popup.dataset.skinId, 'mummington');
@@ -178,22 +120,20 @@ assert.strictEqual(positive.scrim.classList.contains('show'), true,
   'Maze must show the seasonal popup scrim');
 
 // Same page: the once-only guard prevents a second popup.
-positive.context.maybeShowSeasonalUnlockPopup();
+positive.controller.maybeShowSeasonalUnlockPopup();
 assert.strictEqual(positive.popup.classList.contains('show'), true);
 
-positive.context.equipSeasonalFromUnlockPopup();
+positive.controller.equipSeasonalFromUnlockPopup();
 assert.strictEqual(positive.stored.meta.selectedBoohaSkin, 'mummington',
   'the popup equip path must select the scheduled character');
 assert.strictEqual(positive.popup.classList.contains('show'), false,
   'equipping from the popup must close it');
 
-// Reload: the in-memory guard is gone, but the persisted unlock suppresses a
-// second announcement.
-positive.context.battyUnlockPopupShown = false;
-positive.popup.classList.remove('show');
-positive.scrim.classList.remove('show');
-positive.context.maybeShowSeasonalUnlockPopup();
-assert.strictEqual(positive.popup.classList.contains('show'), false,
+// Reload: a fresh controller suppresses the announcement because the unlock
+// was persisted in the weekly save.
+const reloaded = makeHarness(positive.stored);
+reloaded.controller.maybeShowSeasonalUnlockPopup();
+assert.strictEqual(reloaded.popup.classList.contains('show'), false,
   'a reload must not show the same weekly popup again');
 
 // Negative: a trio spread across curricula is not sufficient.
@@ -202,38 +142,35 @@ const mixed = makeHarness(baseSave(currentKey, {
   sentences: { br: { ms: 1000 } },
   questions: { pb: { ms: 1000 } },
 }));
-mixed.context.maybeShowSeasonalUnlockPopup();
+mixed.controller.maybeShowSeasonalUnlockPopup();
 assert.deepStrictEqual(mixed.stored.weekly.unlockedBoohaSkins, {});
 assert.strictEqual(mixed.popup.classList.contains('show'), false,
   'mixed curricula must not unlock a seasonal character');
 
-// Negative: a complete trio from the previous occurrence is stale.
+// Negative: a trio from the previous occurrence is stale.
 const stale = makeHarness(baseSave('2026-09-20|september-w3', completeBc));
-stale.context.maybeShowSeasonalUnlockPopup();
+stale.controller.maybeShowSeasonalUnlockPopup();
 assert.deepStrictEqual(stale.stored.weekly.unlockedBoohaSkins, {});
 assert.strictEqual(stale.popup.classList.contains('show'), false,
   'last week\'s trio must not unlock this week\'s character');
 
-// Weekly reset: clearing the weekly bucket makes the scheduled character
-// unavailable again and the Maze check stays quiet.
+// Weekly reset clears the in-memory once-only state and keeps the old popup
+// closed when the weekly save no longer contains the completed trio.
 positive.stored.weekly = { unlockedBoohaSkins: {} };
 positive.stored.meta.blitz.weekly = {};
-positive.context.battyUnlockPopupShown = false;
-positive.popup.classList.remove('show');
-positive.scrim.classList.remove('show');
-positive.context.maybeShowSeasonalUnlockPopup();
+positive.controller.reset();
+positive.controller.maybeShowSeasonalUnlockPopup();
 assert.strictEqual(positive.context.BoohaSkins.isUnlocked('mummington'), false);
 assert.strictEqual(positive.popup.classList.contains('show'), false,
   'after Sunday reset the old seasonal popup must remain closed');
 
-// Keep the real inline wiring under test as well as the extracted decision.
-assert.match(mazeSource, /function onSaveReady\(\)[\s\S]*?maybeShowSeasonalUnlockPopup\(\);/,
-  'Maze save-ready boot must run the seasonal popup check');
+const mazeSource = read('maze.html');
+assert.match(mazeSource, /js\/maze-seasonal-unlock\.js/, 'Maze must load the extracted unlock controller');
+assert.doesNotMatch(mazeSource, /function readBlitzCompletionState\(/,
+  'Maze must not keep the seasonal decision logic inline');
+assert.match(mazeSource, /mazeSeasonalUnlock\.reset\(\)/,
+  'Maze weekly reset must reset the extracted controller');
 assert.match(mazeSource, /battyEquipButton\?\.addEventListener\('click', equipSeasonalFromUnlockPopup\)/,
-  'Maze must wire the image equip button');
-assert.match(mazeSource, /battyEquipTextButton\?\.addEventListener\('click', equipSeasonalFromUnlockPopup\)/,
-  'Maze must wire the text equip button');
-assert.match(mazeSource, /booha:weeklyReset[\s\S]*?onSaveReady\(\);/,
-  'Maze must re-check after weekly reset');
+  'the image equip button must use the extracted controller');
 
-console.log('Maze seasonal-unlock integration passed: any-curriculum completion, stale/mixed negatives, popup-once, reload, reset, and inline wiring hold.');
+console.log('Maze seasonal-unlock integration passed: direct controller execution, curriculum/stale negatives, popup-once, reload, equip, and reset hold.');

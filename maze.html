@@ -1313,6 +1313,7 @@
 <script src="./js/core/booha-skins.js"></script>
 <script src="./js/sync-client.js"></script>
 <script src="./js/core/adventure-performance.js"></script>
+<script src="./js/maze-seasonal-unlock.js"></script>
 <script>
 const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
 
@@ -1503,72 +1504,6 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   battyEquipTextButton=document.getElementById('battyEquipTextButton'),
   battyUnlockArt=battyEquipButton?.querySelector('.batty-art');
 
-let battyUnlockPopupShown = false;
-let seasonalUnlockId = null;
-
-const SEASONAL_UNLOCK_COPY = Object.freeze({
-  batty: Object.freeze({
-    kickerEn: 'A NEW FRIEND HAS ARRIVED',
-    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
-    titleEn: 'You Unlocked Batty Booha!',
-    titleJp: 'バッティー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
-    copyEn: 'Tap Batty Booha to equip your new traveling friend.',
-    copyJp: 'バッティー・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
-    buttonEn: 'EQUIP BATTY BOOHA',
-    buttonJp: 'バッティー・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
-  }),
-  mummington: Object.freeze({
-    kickerEn: 'A NEW FRIEND HAS ARRIVED',
-    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
-    titleEn: 'You Unlocked Mummington Booha!',
-    titleJp: 'マミングトン ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
-    copyEn: 'Tap Mummington Booha to equip your new traveling friend.',
-    copyJp: 'マミングトン ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
-    buttonEn: 'EQUIP MUMMINGTON BOOHA',
-    buttonJp: 'マミングトン ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
-  }),
-  mortisa: Object.freeze({
-    kickerEn: 'A NEW FRIEND HAS ARRIVED',
-    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
-    titleEn: 'You Unlocked Mortisa Booha!',
-    titleJp: 'モーティサ・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
-    copyEn: 'Tap Mortisa Booha to equip your new traveling friend.',
-    copyJp: 'モーティサ・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
-    buttonEn: 'EQUIP MORTISA BOOHA',
-    buttonJp: 'モーティサ・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
-  }),
-  doomlet: Object.freeze({
-    kickerEn: 'A NEW FRIEND HAS ARRIVED',
-    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
-    titleEn: 'You Unlocked Doomlet Booha!',
-    titleJp: 'ドゥームレット・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
-    copyEn: 'Tap Doomlet Booha to equip your new traveling friend.',
-    copyJp: 'ドゥームレット・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
-    buttonEn: 'EQUIP DOOMLET BOOHA',
-    buttonJp: 'ドゥームレット・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
-  }),
-  hazel: Object.freeze({
-    kickerEn: 'A NEW FRIEND HAS ARRIVED',
-    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
-    titleEn: 'You Unlocked Hazel Booha!',
-    titleJp: 'ヘイゼル・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
-    copyEn: 'Tap Hazel Booha to equip your new traveling friend.',
-    copyJp: 'ヘイゼル・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
-    buttonEn: 'EQUIP HAZEL BOOHA',
-    buttonJp: 'ヘイゼル・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
-  }),
-  mister_happy: Object.freeze({
-    kickerEn: 'A NEW FRIEND HAS ARRIVED',
-    kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
-    titleEn: 'You Unlocked Mister Happy Booha!',
-    titleJp: 'ミスター・ハッピー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
-    copyEn: 'Tap Mister Happy Booha to equip your new traveling friend.',
-    copyJp: 'ミスター・ハッピー・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。',
-    buttonEn: 'EQUIP MISTER HAPPY BOOHA',
-    buttonJp: 'ミスター・ハッピー・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
-  }),
-});
-
 function loadMediaSource(media){
   if(!media||media.dataset.loaded==='1')return;
   const src=media.dataset.src;
@@ -1662,98 +1597,27 @@ function personalizeMazeIntro() {
   });
 }
 
-function currentBlitzCurriculum() {
-  try {
-    const curr = localStorage.getItem('booha_last_curr') || '';
-    return ['pb', 'br', 'bc'].includes(curr) ? curr : 'pb';
-  } catch (_) { return 'pb'; }
-}
-
-function readBlitzCompletionState() {
-  const state = { progress: { vocab: false, sentences: false, questions: false }, completedCurriculum: null };
-  try {
-    const cw = getCurrentCurriculumWeek();
-    const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
-      `${cw.monthSlug}:w${cw.weekNumber}`;
-    const save = window.BoohaAdventure?.save?.load?.() || {};
-    const blitz = save.meta?.blitz || {};
-    const weekly = blitz.weekly || {};
-    if (blitz.weeklyKey !== weekId) return state;
-    const curricula = ['pb', 'br', 'bc'];
-    state.completedCurriculum = curricula.find(curr =>
-      ['vocab', 'sentences', 'questions'].every(type => !!weekly[type]?.[curr])
-    ) || null;
-    const displayCurriculum = state.completedCurriculum || currentBlitzCurriculum();
-    ['vocab', 'sentences', 'questions'].forEach(type => {
-      state.progress[type] = !!weekly[type]?.[displayCurriculum];
-    });
-  } catch (_) {}
-  return state;
-}
-
-function blitzTripleCompleteForAnyCurriculum() {
-  return !!readBlitzCompletionState().completedCurriculum;
-}
-
-function closeSeasonalUnlockPopup() {
-  battyUnlockPopup?.classList.remove('visible');
-  battyUnlockScrim?.classList.remove('show');
-  window.setTimeout(() => battyUnlockPopup?.classList.remove('show'), 440);
-}
-
-function prepareSeasonalUnlockPopup(id) {
-  const copy = SEASONAL_UNLOCK_COPY[id];
-  const skin = window.BoohaSkins?.get(id);
-  if (!copy || !skin || !battyUnlockPopup) return false;
-  const setLeadText = (selector, value) => {
-    const el = battyUnlockPopup.querySelector(selector);
-    if (!el) return;
-    const jp = el.querySelector('.batty-jp');
-    el.textContent = value;
-    if (jp) el.appendChild(jp);
-  };
-  const setHTML = (selector, value) => {
-    const el = battyUnlockPopup.querySelector(selector);
-    if (el) el.innerHTML = value;
-  };
-  setLeadText('.batty-kicker', copy.kickerEn);
-  setHTML('.batty-kicker .batty-jp', copy.kickerJp);
-  setLeadText('#battyUnlockTitle', copy.titleEn);
-  setHTML('#battyUnlockTitle .batty-jp', copy.titleJp);
-  setLeadText('#battyUnlockCopy', copy.copyEn);
-  setHTML('#battyUnlockCopy .batty-jp', copy.copyJp);
-  setLeadText('#battyEquipTextButton', copy.buttonEn);
-  setHTML('#battyEquipTextButton .batty-jp', copy.buttonJp);
-  if (battyUnlockArt) {
-    battyUnlockArt.src = skin.assets.maze;
-    battyUnlockArt.alt = skin.name;
-  }
-  battyEquipButton?.setAttribute('aria-label', `Equip ${skin.name}`);
-  battyUnlockPopup.dataset.skinId = id;
-  return true;
-}
-
-function equipSeasonalFromUnlockPopup() {
-  if (!seasonalUnlockId || !window.BoohaSkins?.unlockAndEquip(seasonalUnlockId)) return;
-  applyEquippedMazeSkin();
-  closeSeasonalUnlockPopup();
-}
-
-function maybeShowSeasonalUnlockPopup() {
-  if (battyUnlockPopupShown || !window.BoohaSkins) return;
-  const id = BoohaSkins.rotationCharacterId?.();
-  if (!id || BoohaSkins.isUnlocked(id) || !blitzTripleCompleteForAnyCurriculum()) return;
-  if (!prepareSeasonalUnlockPopup(id)) return;
-  // Award the scheduled skin when the weekly Blitz trio is complete. The
-  // popup is the once-per-week announcement/equip moment; persisting the
-  // unlock prevents it from returning on reload after the announcement.
-  if (typeof BoohaSkins.unlock !== 'function' || !BoohaSkins.unlock(id)) return;
-  seasonalUnlockId = id;
-  battyUnlockPopupShown = true;
-  battyUnlockScrim.classList.add('show');
-  battyUnlockPopup.classList.add('show');
-  requestAnimationFrame(() => requestAnimationFrame(() => battyUnlockPopup.classList.add('visible')));
-}
+const mazeSeasonalUnlock = window.MazeSeasonalUnlock.create({
+  calendar: window.CALENDAR,
+  getCurrentWeek: getCurrentCurriculumWeek,
+  storage: window.localStorage,
+  skins: window.BoohaSkins,
+  getSave: () => window.BoohaAdventure?.save?.load?.() || {},
+  applyEquippedMazeSkin,
+  ui: {
+    popup: battyUnlockPopup,
+    scrim: battyUnlockScrim,
+    art: battyUnlockArt,
+    equipButton: battyEquipButton,
+    equipTextButton: battyEquipTextButton,
+  },
+});
+const {
+  readBlitzCompletionState,
+  closeSeasonalUnlockPopup,
+  equipSeasonalFromUnlockPopup,
+  maybeShowSeasonalUnlockPopup,
+} = mazeSeasonalUnlock;
 
   
 const FADE_MS=520;
@@ -2949,9 +2813,7 @@ function onSaveReady(){
 if (window.BOOHA_READY) onSaveReady();
 else document.addEventListener('booha:ready', onSaveReady, { once: true });
 document.addEventListener('booha:weeklyReset', () => {
-  battyUnlockPopupShown = false;
-  seasonalUnlockId = null;
-  closeSeasonalUnlockPopup();
+  mazeSeasonalUnlock.reset();
   onSaveReady();
 });
 

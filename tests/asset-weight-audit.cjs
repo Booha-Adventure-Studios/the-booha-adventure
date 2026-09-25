@@ -13,6 +13,17 @@ const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const retiredMasters = [
   ...Array.from({ length: 9 }, (_, i) => `assets/img/grimmerglen/room_${String(i + 1).padStart(2, '0')}.jpg`),
   ...Array.from({ length: 5 }, (_, i) => `assets/img/grimmerglen/marietta/marietta_${String(i + 1).padStart(2, '0')}.png`),
+  'assets/family-room/genkan_base.png',
+  ...['approach', 'catch', 'enter', 'far', 'near'].flatMap((pose) => [
+    `assets/family-room/pataskala/pataskala_owl_${pose}_v3.png`,
+    `assets/family-room/pataskala/pataskala_owl_${pose}_v3.webp`,
+  ]),
+  ...['master', 'master_v2', 'master_v3'].flatMap((pose) => [
+    `assets/family-room/pataskala/pataskala_owl_${pose}.png`,
+    `assets/family-room/pataskala/pataskala_owl_${pose}.webp`,
+  ]),
+  ...['crouch', 'emerging', 'moving', 'standing'].map((pose) =>
+    `assets/family-room/pataskala/pataskala-${pose}.webp`),
 ];
 retiredMasters.forEach((relative) => {
   assert(!fs.existsSync(path.join(root, relative)), `${relative} must be removed as an unused master`);
