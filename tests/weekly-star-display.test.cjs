@@ -28,6 +28,7 @@ function runOverlay(file, selectedWeek, currentWeek) {
     classList: { add() {} },
   }];
   const window = {
+    location: { search: `?week=${selectedWeek}` },
     CALENDAR: { getCurrentCurriculumWeek() { return currentWeek; } },
     BoohaAdventure: {
       scores: { weeklyStarsForGame() { return 3; } },
@@ -44,7 +45,7 @@ function runOverlay(file, selectedWeek, currentWeek) {
     window,
     document,
     BoohaAdventure: window.BoohaAdventure,
-    week: selectedWeek,
+    URLSearchParams,
   };
   vm.createContext(context);
   vm.runInContext(overlaySource(file), context, { filename: file });

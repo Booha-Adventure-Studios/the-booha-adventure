@@ -515,6 +515,7 @@ document.getElementById('closeBtn').addEventListener('click', function(e) {
   'use strict';
   var CURR = 'bc';
   document.addEventListener('booha:ready', function () {
+    var week = new URLSearchParams(window.location.search).get('week') || '';
     /* The weekly bucket belongs to the live curriculum occurrence. A
        historical or future content page must not borrow those badges. */
     var current = window.CALENDAR && window.CALENDAR.getCurrentCurriculumWeek
