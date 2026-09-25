@@ -513,6 +513,15 @@ document.getElementById('closeBtn').addEventListener('click', function(e) {
   'use strict';
   var CURR = 'br';
   document.addEventListener('booha:ready', function () {
+    /* The weekly bucket belongs to the live curriculum occurrence. A
+       historical or future content page must not borrow those badges. */
+    var current = window.CALENDAR && window.CALENDAR.getCurrentCurriculumWeek
+      ? window.CALENDAR.getCurrentCurriculumWeek()
+      : null;
+    var currentWeek = current
+      ? CURR + '_' + current.monthSlug.slice(0, 3) + '_w' + current.weekNumber
+      : '';
+    if (week !== currentWeek) return;
     var scores = window.BoohaAdventure && BoohaAdventure.scores;
     if (!scores) return;
     document.querySelectorAll('.tile[data-game]').forEach(function (tile) {

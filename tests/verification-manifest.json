@@ -141,6 +141,11 @@
       "reason": "Current token-gate login, identity storage, verification, rejection, and redirect runtime contract."
     },
     {
+      "path": "tests/weekly-star-display.test.cjs",
+      "status": "verify",
+      "reason": "Current-week game star badges stay scoped to the selected live week."
+    },
+    {
       "path": "tests/seasonal-date-gate.test.cjs",
       "status": "verify",
       "reason": "Pre-Sunday Tokyo seasonal date gate for the Sep 27 and Oct 4 switches and Nov 1 shutoff."
