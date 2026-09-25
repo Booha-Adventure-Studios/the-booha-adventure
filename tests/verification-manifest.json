@@ -126,6 +126,16 @@
       "reason": "Current weekly Output-world gate contract."
     },
     {
+      "path": "tests/maze-seasonal-unlock-integration.test.cjs",
+      "status": "verify",
+      "reason": "Current Maze seasonal-unlock wiring, popup-once, stale-week, mixed-curriculum, and reset contract."
+    },
+    {
+      "path": "tests/seasonal-date-gate.test.cjs",
+      "status": "verify",
+      "reason": "Pre-Sunday Tokyo seasonal date gate for the Sep 27 and Oct 4 switches and Nov 1 shutoff."
+    },
+    {
       "path": "tests/invaders-pass10.test.cjs",
       "status": "superseded",
       "reason": "Mute behavior assertion expects candy-SFX stopping that the current engine does not implement."
