@@ -148,8 +148,8 @@ assert.match(utsurobaSource, /function injectFamilyRoomPopup\(\)/,
   'Utsuroba must provide a dedicated Family Room popup');
 assert.match(utsurobaSource, /This is a horror puzzle game!/,
   'the Family Room popup must warn students that the game is horror');
-assert.match(utsurobaSource, /Complete nine games this week/,
-  'the closed popup must explain the weekly unlock');
+assert.match(utsurobaSource, /Earn at least 2 stars on each of the 9 Maze games this week/,
+  'the closed popup must explain the two-star weekly unlock');
 assert.doesNotMatch(utsurobaSource, /CASE FILE 02 \/ OPEN|じけんファイル 02 \/ あいている/,
   'the Family Room popup must omit the unnecessary open case-file eyebrow');
 assert.match(utsurobaSource, /data-family-room-enter/,
