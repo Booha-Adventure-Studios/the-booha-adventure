@@ -615,6 +615,28 @@
     .games-acc-card { border-radius: var(--radius-lg); overflow: hidden; position: relative; }
     .games-acc-card { padding:1.15rem; }
     .games-acc-card .accordion-body .accordion-inner { padding: 0 1rem 1rem; }
+    .bonus-games-requirement {
+      margin:0 0 .95rem;
+      padding:.72rem .82rem;
+      border:1px solid #c8b8ff2b;
+      border-radius:var(--radius);
+      background:linear-gradient(135deg,#c8b8ff0d,#66bbff08);
+      color:#f4efff;
+      font:700 .72rem/1.5 var(--font-ui);
+      overflow-wrap:anywhere;
+      text-wrap:pretty;
+    }
+    .bonus-games-requirement-en,
+    .bonus-games-requirement-jp { display:block; }
+    .bonus-games-requirement-jp {
+      margin-top:.28rem;
+      color:var(--spectral-cyan);
+      font-family:var(--font-jp);
+      font-size:.94em;
+      font-weight:800;
+    }
+    .bonus-games-requirement ruby { ruby-position:over; }
+    .bonus-games-requirement rt { font-size:.52em; letter-spacing:0; }
     .games-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:.6rem; }
 
     .g-chip {
@@ -975,6 +997,10 @@
       <div class="ey-line"></div>
     </div>
     <div class="games-acc-card glass">
+      <p class="bonus-games-requirement" id="bonus-games-requirement" role="note">
+        <span class="bonus-games-requirement-en">Earn at least 2 stars on each of the 9 Maze games this week to unlock the bonus games.</span>
+        <span class="bonus-games-requirement-jp"><ruby>今週<rt>こんしゅう</rt></ruby>、<ruby>迷路<rt>めいろ</rt></ruby>の9つのゲームで、それぞれ<ruby>星<rt>ほし</rt></ruby>を2つ<ruby>以上<rt>いじょう</rt></ruby><ruby>集<rt>あつ</rt></ruby>めると、ボーナスゲームが<ruby>開<rt>ひら</rt></ruby>きます。</span>
+      </p>
       <div class="games-grid" id="games-grid" aria-live="polite"></div>
     </div>
   </section>

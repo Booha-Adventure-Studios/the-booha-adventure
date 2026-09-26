@@ -1211,7 +1211,9 @@
       #family-room-pop-overlay .family-room-pop-icon.is-closed img{filter:grayscale(.8) brightness(.34) drop-shadow(0 0 3px rgba(155,103,255,.42));}
       #family-room-pop-overlay .family-room-pop-title{color:#f0e5ff;text-shadow:0 0 16px rgba(155,103,255,.48);}
       #family-room-pop-overlay .family-room-pop-title-jp{color:rgba(225,210,255,.76);}
-      #family-room-pop-overlay .family-room-pop-copy{color:#f6f0ff;}
+      #family-room-pop-overlay .family-room-pop-copy{color:#f6f0ff;overflow-wrap:anywhere;text-wrap:pretty;}
+      #family-room-pop-overlay .family-room-pop-copy ruby{ruby-position:over;}
+      #family-room-pop-overlay .family-room-pop-copy rt{font-size:.52em;letter-spacing:0;}
       #family-room-pop-overlay .family-room-pop-warning{position:relative;margin:16px 0 0;padding:10px 12px;border:1px solid rgba(205,166,255,.5);border-radius:9px;background:rgba(145,92,220,.12);color:#eadcff;font:800 clamp(.7rem,2.3vw,.82rem)/1.35 system-ui,sans-serif;letter-spacing:.04em;}
       #family-room-pop-overlay .family-room-pop-warning small{display:block;margin-top:4px;color:rgba(225,210,255,.76);font:600 .82em/1.4 Georgia,serif;letter-spacing:.04em;}
       #family-room-pop-overlay .family-room-pop-actions button{border-color:rgba(188,139,255,.72);background:rgba(155,103,255,.14);color:#f0e5ff;}
@@ -1658,10 +1660,10 @@
     const copyJp = familyRoomPopOverlay.querySelector('#family-room-pop-copy-jp');
     copyEn.textContent = open
       ? 'Akiya is open. Enter if you are ready.'
-      : 'Akiya is closed. Complete nine games this week to open it.';
-    copyJp.textContent = open
+      : 'Akiya is closed. Earn at least 2 stars on each of the 9 Maze games this week to open it.';
+    copyJp.innerHTML = open
       ? 'あきやが あいている。じゅんびが できたら はいる。'
-      : 'あきやは しまっている。こんしゅう 9つの ゲームを おわると あく。';
+      : '<ruby>今週<rt>こんしゅう</rt></ruby>、<ruby>迷路<rt>めいろ</rt></ruby>の9つのゲームで、それぞれ<ruby>星<rt>ほし</rt></ruby>を2つ<ruby>以上<rt>いじょう</rt></ruby><ruby>集<rt>あつ</rt></ruby>めると、あきやが<ruby>開<rt>ひら</rt></ruby>きます。';
     const actions = familyRoomPopOverlay.querySelector('.family-room-pop-actions');
     actions.innerHTML = open
       ? '<button type="button" data-family-room-enter><span>ENTER</span><span>はいる</span></button><button type="button" data-family-room-stay><span>STAY HERE</span><span>ここに いる</span></button>'

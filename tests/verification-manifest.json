@@ -146,6 +146,11 @@
       "reason": "Current-week game star badges stay scoped to the selected live week."
     },
     {
+      "path": "tests/bonus-unlock-copy.test.cjs",
+      "status": "verify",
+      "reason": "Akiya and bonus-game shelf explain the shared two-star unlock requirement with responsive copy."
+    },
+    {
       "path": "tests/seasonal-date-gate.test.cjs",
       "status": "verify",
       "reason": "Pre-Sunday Tokyo seasonal date gate for the Sep 27 and Oct 4 switches and Nov 1 shutoff."
