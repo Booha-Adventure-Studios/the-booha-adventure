@@ -29,7 +29,7 @@ const CURRENT_CACHES = {
   // invalidate the precached shells for returning iPads.
   // Halloween Booha rotation pass (2026-09-21): invalidate maze.html so
   // scheduled Batty/Mummington popups reach returning clients.
-  pages:  'booha-pages-2026-436',
+  pages:  'booha-pages-2026-437',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -203,7 +203,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-572',
+  assets: 'booha-assets-2026-573',
   decks:  'booha-decks-2026-310',
 };
 
