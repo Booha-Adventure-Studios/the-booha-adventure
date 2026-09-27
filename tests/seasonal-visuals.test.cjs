@@ -108,6 +108,14 @@ assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ an
 const maze = read('maze.html');
 assert.match(maze, /html\[data-season="halloween"\] #mazeImg\{ filter:brightness\(1\.10\) saturate\(1\.08\); \}/,
   'Halloween Maze artwork must receive a modest brightness lift');
+assert.match(maze, /const hallowCP = halloween && getMonthIndexFromWeekNumber\(cp\.w\) === 9;/,
+  'Halloween checkpoint blending must be limited to October');
+assert.match(maze, /drawGlow\(x,y,glowR\*4\.9,HALLOWEEN_GLOW\.lime,alpha\*\(\.06\+pulse\*\.04\)\)/,
+  'October checkpoint lime halo must remain a restrained additive haze');
+assert.match(maze, /if\(hallowCP\) ctx\.globalCompositeOperation = 'source-over';/,
+  'checkpoint crisp layers must return to normal painting after the haze');
+assert.ok(!maze.includes("if(halloween) ctx.globalCompositeOperation = 'lighter';"),
+  'Halloween additive blending must not apply to every checkpoint');
 assert.deepStrictEqual(
   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(games => seasonalVisuals.extraVisitorCount(games, 10)),
   [0, 0, 1, 2, 3, 3, 4, 5, 6, 6],
