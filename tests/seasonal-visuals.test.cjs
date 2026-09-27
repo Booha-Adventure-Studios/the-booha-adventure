@@ -8,6 +8,10 @@ const vm = require('vm');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const seasonalContext = {};
+vm.createContext(seasonalContext);
+vm.runInContext(read('js/core/seasonal-visuals.js'), seasonalContext, { filename: 'js/core/seasonal-visuals.js' });
+const seasonalVisuals = seasonalContext.BoohaSeasonalVisuals;
 
 const cssVars = {};
 const context = {
@@ -31,6 +35,7 @@ vm.runInContext(read('js/core/booha-skins.js'), context, { filename: 'js/core/bo
 
 const skins = context.window.BoohaSkins;
 const palette = skins.SEASONS.halloween.palette;
+const glow = skins.SEASONS.halloween.glow;
 assert.deepStrictEqual(Object.keys(palette).sort(), ['black', 'lime', 'orange', 'purple']);
 assert.notStrictEqual(palette.lime, '#38e08a', 'season lime must not become Daily Check correct green');
 assert.notStrictEqual(palette.lime, '#ff5a7a', 'season lime must not become Daily Check wrong red');
@@ -39,9 +44,14 @@ assert.strictEqual(cssVars['--season-orange'], palette.orange);
 assert.strictEqual(cssVars['--season-purple'], palette.purple);
 assert.strictEqual(cssVars['--season-lime'], palette.lime);
 assert.strictEqual(cssVars['--season-black'], palette.black);
+assert.deepStrictEqual({ ...glow }, {
+  orange: '#ff7a00',
+  purple: '#b44dff',
+  lime: '#9dff3a',
+}, 'Halloween glow colors must be separate from the UI palette');
 
 assert.strictEqual(skins.MONTH_COLORS.length, 12, 'shared month table must cover all 12 months');
-assert.deepStrictEqual([...skins.monthColorsForWeek(37)], [palette.orange, palette.purple],
+assert.deepStrictEqual([...skins.monthColorsForWeek(37)], [glow.orange, glow.purple],
   'October must use the Halloween orange/purple pair');
 assert.deepStrictEqual([...skins.monthColorsForWeek(45)], ['#e53935', '#43d17b'],
   'December must have an explicit Christmas red/green pair');
@@ -51,11 +61,15 @@ assert.notStrictEqual(skins.monthColorsForWeek(13)[0], '#3bff8a',
 const seasonalVisitor = skins.seasonalVisitor('halloween');
 assert.strictEqual(seasonalVisitor.kind, 'bat');
 assert.strictEqual(seasonalVisitor.requires, 'blitz-triple');
-assert.strictEqual(seasonalVisitor.color, palette.lime);
+assert.strictEqual(seasonalVisitor.color, glow.lime);
 assert.strictEqual(seasonalVisitor.asset, 'assets/img/seasonal-bat.webp');
 assert.ok(fs.existsSync(path.join(root, seasonalVisitor.asset)), 'seasonal bat asset must exist');
 assert.ok(fs.statSync(path.join(root, seasonalVisitor.asset)).size < 100 * 1024,
   'seasonal bat asset must stay under the 100 KiB budget');
+assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, false), null,
+  'Halloween bats must stay gated until Blitz is complete');
+assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, 'pb'), seasonalVisitor,
+  'a complete Blitz curriculum must activate the Halloween visitor');
 
 const index = read('index.html');
 assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ animation: none; \}/,
@@ -64,18 +78,38 @@ assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ an
 const maze = read('maze.html');
 assert.match(maze, /html\[data-season="halloween"\] #mazeImg\{ filter:brightness\(1\.10\) saturate\(1\.08\); \}/,
   'Halloween Maze artwork must receive a modest brightness lift');
-assert.match(maze, /HALLOWEEN_LIME[\s\S]*drawGlow\(x,y,glowR\*4\.9,HALLOWEEN_LIME/,
-  'Halloween checkpoints must add a spectral-green outer atmosphere without replacing orange/purple cores');
-assert.match(maze, /function activeSeasonalVisitor\(\)[\s\S]*readBlitzCompletionState\(\)\.completedCurriculum/,
-  'seasonal Maze visitors must be gated by the current week Blitz completion');
-assert.match(maze, /if \(seasonalVisitor\)[\s\S]*Math\.min\(2, normalCount\)/,
-  'Halloween visitors must be reduced on the low performance tier');
-assert.match(maze, /function getExtraVisitorCount\(\)[\s\S]*Math\.floor\(games \* 0\.75\)/,
-  'Halloween visitors must use the existing extra-Booha weekly-game formula');
-assert.match(maze, /if \(!MAZE_REDUCED_MOTION\)[\s\S]*createSeasonalWanderer/,
-  'seasonal visitors must be skipped when reduced motion is enabled');
-assert.match(maze, /seasonalVisitorImgs/,
-  'seasonal visitors must use the deferred image cache');
+assert.deepStrictEqual(
+  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(games => seasonalVisuals.extraVisitorCount(games, 10)),
+  [0, 0, 1, 2, 3, 3, 4, 5, 6, 6],
+  'seasonal visitors must follow the existing weekly-game progression');
+assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ games: 9, availableCount: 10, performanceTier: 'low' }), 2);
+assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ games: 9, availableCount: 10, reducedMotion: true }), 0);
+assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ games: 9, availableCount: 10, forceAll: true }), 10);
+
+let canvasCreations = 0;
+const fakeContext = {
+  setTransform() {},
+  scale() {},
+  drawImage() {},
+  shadowColor: '',
+  shadowBlur: 0,
+};
+const getBatGlow = seasonalVisuals.createBatGlowCache({
+  createCanvas() {
+    canvasCreations += 1;
+    return { getContext() { return fakeContext; } };
+  },
+  getDevicePixelRatio: () => 2,
+});
+const imageA = { _boohaSrc: 'assets/img/seasonal-bat.webp' };
+const imageB = { _boohaSrc: 'assets/img/another-bat.webp' };
+const glowA1 = getBatGlow(imageA, 24, glow.lime);
+const glowA2 = getBatGlow(imageA, 24, glow.lime);
+assert.strictEqual(glowA1, glowA2, 'identical bat glow requests must reuse one cached canvas');
+assert.strictEqual(getBatGlow(imageB, 24, glow.lime) === glowA1, false,
+  'different bat sources must not collide in the glow cache');
+assert.strictEqual(canvasCreations, 2);
+assert.strictEqual(glowA1._boohaLogicalSize, 42, 'cached glow must expose its logical CSS size');
 
 ['maze.html', 'js/karasuki.js', 'js/utsuroba.js'].forEach(file => {
   const source = read(file);

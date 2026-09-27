@@ -1310,8 +1310,9 @@
 
 <script src="./js/calendar.js"></script>
 <script src="./js/core/adventure-core.js"></script>
-    <script src="./js/core/save-file.js"></script>
+<script src="./js/core/save-file.js"></script>
 <script src="./js/core/booha-skins.js"></script>
+<script src="./js/core/seasonal-visuals.js"></script>
 <script src="./js/sync-client.js"></script>
 <script src="./js/core/adventure-performance.js"></script>
 <script src="./js/maze-seasonal-unlock.js"></script>
@@ -1423,7 +1424,8 @@ const KR_TREE_IW = 78;
 const JUKU_TREE_IW = 78;
 
 const MONTH_COLORS = window.BoohaSkins.MONTH_COLORS;
-const HALLOWEEN_LIME = window.BoohaSkins.getSeason('halloween').palette.lime;
+const HALLOWEEN_GLOW = window.BoohaSkins.getSeason('halloween').glow;
+const SEASONAL_VISUALS = window.BoohaSeasonalVisuals;
 
 const CHECKPOINTS = [
   {w: 1, ix: 514, iy:355},{w: 2, ix:891, iy:402},{w: 3, ix:1156, iy:354},
@@ -1683,6 +1685,12 @@ function getGlowSprite(color){
   _glowSpriteCache.set(color,s);
   return s;
 }
+
+const getGlowingBat = SEASONAL_VISUALS.createBatGlowCache({
+  createCanvas: () => document.createElement('canvas'),
+  getDevicePixelRatio: () => window.devicePixelRatio || 1,
+});
+
 function drawGlow(x,y,radius,color,alpha){
   if(alpha<=0||radius<=0)return;
   ctx.globalAlpha=alpha;
@@ -1905,7 +1913,7 @@ function getGamesThisWeekForMaze() {
 
 function getExtraVisitorCount() {
   const games = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
-  return Math.min(EXTRA_BOOHA_GHOSTS.length, Math.floor(games * 0.75));
+  return SEASONAL_VISUALS.extraVisitorCount(games, EXTRA_BOOHA_GHOSTS.length);
 }
 
 function seededRandom(seed) {
@@ -1927,9 +1935,10 @@ function seededRandom(seed) {
 function activeSeasonalVisitor() {
   const seasonId = window.BoohaSkins?.seasonIdForDate?.();
   const visitor = seasonId ? window.BoohaSkins?.seasonalVisitor?.(seasonId) : null;
-  if (!visitor) return null;
-  if (visitor.requires === 'blitz-triple' && !readBlitzCompletionState().completedCurriculum) return null;
-  return visitor;
+  return SEASONAL_VISUALS.activeSeasonalVisitor(
+    visitor,
+    readBlitzCompletionState().completedCurriculum,
+  );
 }
 
 function shuffledExtraIndices() {
@@ -1962,13 +1971,16 @@ function buildWanderers() {
     // The completed Blitz reward replaces the ordinary extra Booha visitors.
     // Keep the exact same weekly-game count and visitor cap, but use one
     // repeatable bat sprite for every visitor slot.
-    if (!MAZE_REDUCED_MOTION) {
-      const normalCount = getExtraVisitorCount();
-      const count = mazePerfTier === 'low' ? Math.min(2, normalCount) : normalCount;
-      for (let i = 0; i < count; i++) {
-        const w = createSeasonalWanderer(i, i * 850, seasonalVisitor, 0);
-        wanderers.push(w);
-      }
+    const seasonalGames = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
+    const count = SEASONAL_VISUALS.seasonalVisitorCount({
+      games: seasonalGames,
+      availableCount: EXTRA_BOOHA_GHOSTS.length,
+      performanceTier: mazePerfTier,
+      reducedMotion: MAZE_REDUCED_MOTION,
+    });
+    for (let i = 0; i < count; i++) {
+      const w = createSeasonalWanderer(i, i * 850, seasonalVisitor, 0);
+      wanderers.push(w);
     }
     return;
   }
@@ -2040,7 +2052,7 @@ function createSeasonalWanderer(index, delayMs, visitor, cycle) {
   w.visitorSrc = visitor.asset;
   w.visitorIndex = index;
   w.visitorCycle = cycle;
-  w.visitorColor = visitor.color || HALLOWEEN_LIME;
+  w.visitorColor = visitor.color || HALLOWEEN_GLOW.lime;
   return w;
 }
 function tickWanderers(nowMs){
@@ -2059,7 +2071,7 @@ function tickWanderers(nowMs){
       // unlockable ghost reads as a consistent little character, not a
       // random smear.
       const col=w.kind==='seasonal'
-        ? [w.visitorColor || HALLOWEEN_LIME, w.visitorColor || HALLOWEEN_LIME]
+        ? [w.visitorColor || HALLOWEEN_GLOW.lime, w.visitorColor || HALLOWEEN_GLOW.lime]
         : _isExtra
           ? MONTH_COLORS[(GHOSTS.length+w.extraIdx)%MONTH_COLORS.length]
           : MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];
@@ -2153,16 +2165,15 @@ const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
 }
 
     if (w.kind === 'seasonal') {
-      // One bat sprite, multiplied into a small flock. The gentle vertical
-      // squash is a wing-flap suggestion without requiring another asset.
+      // One bat sprite, multiplied into a small flock. The glow is cached by
+      // source, size, color, and DPR; only opacity changes each frame.
       const flap = Math.sin(sec * 6.2 + w.wobblePhase) * .055;
-      ctx.globalAlpha = w.opacity;
-      ctx.shadowBlur = (10 + pulseG * 14) * _wScale;
-      ctx.shadowColor = w.visitorColor || HALLOWEEN_LIME;
+      const batSprite = getGlowingBat(img, drawR * 2, w.visitorColor || HALLOWEEN_GLOW.lime);
+      const batSize = batSprite?._boohaLogicalSize || drawR * 2;
+      ctx.globalAlpha = w.opacity * (.90 + pulseG * .10);
       ctx.translate(gx, gy);
       ctx.scale(1 + flap * .35, 1 - flap);
-      ctx.drawImage(img, -drawR, -drawR, drawR * 2, drawR * 2);
-      ctx.shadowBlur = 0;
+      ctx.drawImage(batSprite || img, -batSize / 2, -batSize / 2, batSize, batSize);
       ctx.restore();
       continue;
     }
@@ -2380,23 +2391,25 @@ function drawFrame(now){
     const pulse=.5+.5*Math.sin(sec*2.1+cp.w*.73),pulse2=.5+.5*Math.sin(sec*1.35+cp.w*.41+1.3);
     const baseR=7,glowR=baseR+pulse*3.5*(1+state.extra*.6),alpha=state.alpha;
     ctx.save();
-    if(document.documentElement.dataset.season==='halloween'){
-      drawGlow(x,y,glowR*4.9,HALLOWEEN_LIME,alpha*(.045+pulse*.025));
+    const halloween = document.documentElement.dataset.season === 'halloween';
+    if(halloween) ctx.globalCompositeOperation = 'lighter';
+    if(halloween){
+      drawGlow(x,y,glowR*4.9,HALLOWEEN_GLOW.lime,alpha*(.14+pulse*.08));
     }
     ctx.globalAlpha=alpha*(.14+pulse*.10);const hazeR=glowR*4.5,haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);haze.addColorStop(0,col1);haze.addColorStop(.5,col1);haze.addColorStop(1,'transparent');ctx.fillStyle=haze;ctx.beginPath();ctx.arc(x,y,hazeR,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.10+pulse2*.09);const haze2=ctx.createRadialGradient(x+glowR*.3,y-glowR*.2,0,x,y,hazeR*.8);haze2.addColorStop(0,col2);haze2.addColorStop(.5,col2);haze2.addColorStop(1,'transparent');ctx.fillStyle=haze2;ctx.beginPath();ctx.arc(x,y,hazeR*.8,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.48+pulse2*.22);const midR=glowR*2.0,midG=ctx.createRadialGradient(x,y,glowR*.28,x,y,midR);midG.addColorStop(0,'transparent');midG.addColorStop(.35,col1);midG.addColorStop(.65,col2);midG.addColorStop(1,'transparent');ctx.fillStyle=midG;ctx.beginPath();ctx.arc(x,y,midR,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=alpha*(.85+pulse*.15);const coronaR=glowR*1.10,corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);corona.addColorStop(0,'#fff');corona.addColorStop(.2,col1);corona.addColorStop(.62,col2);corona.addColorStop(1,'transparent');ctx.fillStyle=corona;ctx.beginPath();ctx.arc(x,y,coronaR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.85+pulse*.15);const coronaR=glowR*1.10,corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);corona.addColorStop(0,'#fff');corona.addColorStop(halloween ? .5 : .2,col1);corona.addColorStop(halloween ? .85 : .62,col2);corona.addColorStop(1,'transparent');ctx.fillStyle=corona;ctx.beginPath();ctx.arc(x,y,coronaR,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.95+pulse*.05);ctx.shadowBlur=24;ctx.shadowColor=col1;ctx.fillStyle=col1;ctx.beginPath();ctx.arc(x,y,glowR*.44,0,Math.PI*2);ctx.fill();ctx.shadowBlur=14;ctx.shadowColor=col2;ctx.fillStyle=col2;ctx.beginPath();ctx.arc(x,y,glowR*.26,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     ctx.globalAlpha=alpha;const coreG=ctx.createRadialGradient(x,y,0,x,y,glowR*.16);coreG.addColorStop(0,'rgba(255,255,255,1)');coreG.addColorStop(.7,'rgba(255,255,255,.75)');coreG.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=coreG;ctx.beginPath();ctx.arc(x,y,glowR*.16,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.42+pulse*.30);ctx.strokeStyle='rgba(255,255,255,0.95)';ctx.lineWidth=.9;ctx.shadowBlur=9;ctx.shadowColor=col1;
     const starLen=glowR*(.72+pulse*.28),dL=starLen*.38;
     ctx.beginPath();ctx.moveTo(x,y-starLen*.18);ctx.lineTo(x,y-starLen);ctx.moveTo(x,y+starLen*.18);ctx.lineTo(x,y+starLen);ctx.moveTo(x-starLen*.18,y);ctx.lineTo(x-starLen,y);ctx.moveTo(x+starLen*.18,y);ctx.lineTo(x+starLen,y);ctx.moveTo(x-dL*.1,y-dL*.1);ctx.lineTo(x-dL,y-dL);ctx.moveTo(x+dL*.1,y-dL*.1);ctx.lineTo(x+dL,y-dL);ctx.moveTo(x-dL*.1,y+dL*.1);ctx.lineTo(x-dL,y+dL);ctx.moveTo(x+dL*.1,y+dL*.1);ctx.lineTo(x+dL,y+dL);ctx.stroke();ctx.shadowBlur=0;
-    CP_FAIRIES[cpIdx].forEach(f=>{
+    CP_FAIRIES[cpIdx].forEach((f,fi)=>{
       const angle=f.angle+sec*f.speed,twinkle=.35+.65*Math.abs(Math.sin(sec*f.twinkleSpeed+f.twinklePhase));
       const r=f.orbit*coverScale*(.82+state.extra*.08)*(.92+.08*Math.sin(sec*1.1+f.phase));
       const fx=x+Math.cos(angle)*r,fy=y+Math.sin(angle)*r*.84;
-      const fColor=f.useSecondary?col2:col1,fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
+      const fColor=halloween?[HALLOWEEN_GLOW.orange,HALLOWEEN_GLOW.purple,HALLOWEEN_GLOW.lime][fi%3]:(f.useSecondary?col2:col1),fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
       drawGlow(fx,fy,fSize*3.2,fColor,fAlpha*.42);
       ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
       ctx.globalAlpha=fAlpha;ctx.fillStyle='#fff';ctx.shadowBlur=5;ctx.shadowColor=fColor;ctx.beginPath();ctx.arc(fx,fy,fSize*.48,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;

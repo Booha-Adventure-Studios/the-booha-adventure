@@ -16,6 +16,11 @@ const BoohaSkins = (() => {
     lime: '#a8e63d',
     black: '#070710',
   });
+  const HALLOWEEN_GLOW = Object.freeze({
+    orange: '#ff7a00',
+    purple: '#b44dff',
+    lime: '#9dff3a',
+  });
   // One shared table keeps the checkpoint/room atmosphere aligned across
   // Maze, Karasuki, and Utsuroba. October is the Halloween orange/purple
   // month; December has an explicit Christmas red/green pair instead of a fallback.
@@ -29,7 +34,7 @@ const BoohaSkins = (() => {
     Object.freeze(['#a03bff', '#d49aff']),
     Object.freeze(['#ff9f3b', '#ffd08a']),
     Object.freeze(['#3bffee', '#a8fff8']),
-    Object.freeze([HALLOWEEN_PALETTE.orange, HALLOWEEN_PALETTE.purple]),
+    Object.freeze([HALLOWEEN_GLOW.orange, HALLOWEEN_GLOW.purple]),
     Object.freeze(['#ff3b6f', '#ff85a1']),
     Object.freeze(['#e53935', '#43d17b']),
   ]);
@@ -195,10 +200,11 @@ const BoohaSkins = (() => {
         Object.freeze({ start: '2026-09-27', end: '2026-10-31', characterId: 'batty' }),
       ]),
       palette: HALLOWEEN_PALETTE,
+      glow: HALLOWEEN_GLOW,
       seasonalVisitor: Object.freeze({
         kind: 'bat',
         asset: 'assets/img/seasonal-bat.webp',
-        color: HALLOWEEN_PALETTE.lime,
+        color: HALLOWEEN_GLOW.lime,
         requires: 'blitz-triple',
       }),
     }),
