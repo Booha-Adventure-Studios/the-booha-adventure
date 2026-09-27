@@ -21,6 +21,67 @@ const BoohaSkins = (() => {
     purple: '#b44dff',
     lime: '#9dff3a',
   });
+  const HALLOWEEN_KARASUKI = Object.freeze({
+    kind: 'barba',
+    name: 'Barba',
+    nameJp: 'バルバ',
+    asset: 'assets/img/wanderers/barba.webp',
+    color: '#b44dff',
+    popupLabel: 'BARBA SAYS',
+    popupLabelJp: 'バルバからのひとこと',
+    lines: Object.freeze([
+      Object.freeze({
+        en: '{name}, hello! Did you know? West Virginia has stories about Mothman, a tall winged figure with red eyes.',
+        jp: '{name}、こんにちは！ しってる？ ウェストバージニアには、あかい 目と つばさを もつ、おおきな モスマンの おはなしが あるよ。',
+        furigana: Object.freeze({ '目': 'め' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? New Jersey legends tell of the Jersey Devil, a winged creature from the Pine Barrens.',
+        jp: '{name}、こんにちは！ しってる？ ニュージャージーには、パイン・バレンズに すむ、つばさの ある ジャージー・デビルの 伝説が あるよ。',
+        furigana: Object.freeze({ '伝説': 'でんせつ' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? A Tennessee legend tells of the Bell Witch, a spirit who spoke to the Bell family.',
+        jp: '{name}、こんにちは！ しってる？ テネシーには、ベル家の 人たちに 話しかけた、ベル・ウィッチの 伝説が あるよ。',
+        furigana: Object.freeze({ '家': 'いえ', '人': 'ひと', '話': 'はな', '伝説': 'でんせつ' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? In Appalachian campfire stories, a lonely hunter hears a creature ask for its tail back.',
+        jp: '{name}、こんにちは！ しってる？ アパラチアの たき火の おはなしでは、ひとりの かりゅうどが、しっぽを かえしてと いう けものに あうよ。',
+        furigana: Object.freeze({ '火': 'ひ' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Maryland folklore describes the Snallygaster as a sky monster with a sharp beak and tentacles.',
+        jp: '{name}、こんにちは！ しってる？ メリーランドの 伝説では、スナリーギャスターは、とがった くちばしと しょく手を もつ 空の かいぶつだよ。',
+        furigana: Object.freeze({ '伝説': 'でんせつ', '手': 'て', '空': 'そら' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Pennsylvania stories say the shy Squonk hides in the forest and dissolves into tears when caught.',
+        jp: '{name}、こんにちは！ しってる？ ペンシルベニアの おはなしでは、はずかしがりやの スクォンクは 森に かくれ、つかまると なみだに とけるよ。',
+        furigana: Object.freeze({ '森': 'もり' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Wisconsin has stories about a wolf-like creature seen along quiet country roads.',
+        jp: '{name}、こんにちは！ しってる？ ウィスコンシンには、しずかな 田舎道で 見られた、オオカミの ような けものの おはなしが あるよ。',
+        furigana: Object.freeze({ '田舎道': 'いなかみち', '見': 'み' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? West Virginia witnesses described the Flatwoods Monster as a tall figure with glowing yellow eyes.',
+        jp: '{name}、こんにちは！ しってる？ ウェストバージニアには、きいろく ひかる 目を もつ、おおきな フラットウッズ・モンスターの おはなしが あるよ。',
+        furigana: Object.freeze({ '目': 'め' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Wisconsin lumberjack tales describe the Hodag as a spiky monster with glowing green eyes.',
+        jp: '{name}、こんにちは！ しってる？ ウィスコンシンの きこりの おはなしには、みどりの 目と せなかの とげを もつ ホダグが でてくるよ。',
+        furigana: Object.freeze({ '目': 'め' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Arkansas and Missouri legends tell of the Ozark Howler, a horned beast with a chilling call.',
+        jp: '{name}、こんにちは！ しってる？ アーカンソーと ミズーリには、つのを もつ けものの おそろしい なきごえの 伝説が あるよ。',
+        furigana: Object.freeze({ '伝説': 'でんせつ' }),
+      }),
+    ]),
+  });
   // One shared table keeps the checkpoint/room atmosphere aligned across
   // Maze, Karasuki, and Utsuroba. October is the Halloween orange/purple
   // month; December has an explicit Christmas red/green pair instead of a fallback.
@@ -208,6 +269,7 @@ const BoohaSkins = (() => {
         color: HALLOWEEN_GLOW.lime,
         requires: 'blitz-triple',
       }),
+      seasonalKarasuki: HALLOWEEN_KARASUKI,
     }),
   });
 
@@ -299,6 +361,10 @@ const BoohaSkins = (() => {
 
   function seasonalVisitor(seasonId = seasonIdForDate()) {
     return getSeason(seasonId)?.seasonalVisitor || null;
+  }
+
+  function seasonalKarasuki(seasonId = seasonIdForDate()) {
+    return getSeason(seasonId)?.seasonalKarasuki || null;
   }
 
   function applySeasonTheme(seasonId = seasonIdForDate()) {
@@ -430,6 +496,7 @@ const BoohaSkins = (() => {
     menuCharacterId,
     monthColorsForWeek,
     seasonalVisitor,
+    seasonalKarasuki,
     applySeasonTheme,
     unlock,
     isUnlocked,
