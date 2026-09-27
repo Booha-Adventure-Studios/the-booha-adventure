@@ -11,12 +11,17 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const wandererDir = path.join(root, 'assets', 'img', 'wanderers');
 const karasuki = fs.readFileSync(path.join(root, 'js', 'karasuki.js'), 'utf8');
+const skins = fs.readFileSync(path.join(root, 'js', 'core', 'booha-skins.js'), 'utf8');
 const muenba = fs.readFileSync(path.join(root, 'js', 'muenba.js'), 'utf8');
 const collection = fs.readFileSync(path.join(root, 'js', 'ui', 'adventure-collection.js'), 'utf8');
 
 const expected = new Set(['nuppi-1.webp', 'nuppi-2.webp']);
-const framePattern = /frames:\['([^']+)',\s*'([^']+)'\]/g;
+const seasonalAssets = new Set();
+const seasonalAssetPattern = /asset:\s*'assets\/img\/wanderers\/([^']+)'/g;
 let match;
+while ((match = seasonalAssetPattern.exec(skins))) seasonalAssets.add(match[1]);
+seasonalAssets.forEach(asset => expected.add(asset));
+const framePattern = /frames:\['([^']+)',\s*'([^']+)'\]/g;
 let definitionCount = 0;
 while ((match = framePattern.exec(karasuki))) {
   definitionCount += 1;
@@ -25,7 +30,7 @@ while ((match = framePattern.exec(karasuki))) {
 }
 
 assert.strictEqual(definitionCount, 36, 'Karasuki should define all 36 wanderers');
-assert.strictEqual(expected.size, 74, 'Karasuki frames plus Nuppi should total 74 shared wanderer files');
+assert.strictEqual(expected.size, 74 + seasonalAssets.size, 'Karasuki frames, Nuppi, and seasonal visitor files should all be tracked');
 
 const webps = fs.readdirSync(wandererDir).filter((name) => /\.webp$/i.test(name)).sort();
 assert.deepStrictEqual(webps, [...expected].sort(), 'shared wanderer WebP set must match live definitions');

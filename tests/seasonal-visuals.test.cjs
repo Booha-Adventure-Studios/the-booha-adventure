@@ -67,6 +67,27 @@ assert.strictEqual(seasonalVisitor.asset, 'assets/img/seasonal-bat.webp');
 assert.ok(fs.existsSync(path.join(root, seasonalVisitor.asset)), 'seasonal bat asset must exist');
 assert.ok(fs.statSync(path.join(root, seasonalVisitor.asset)).size < 100 * 1024,
   'seasonal bat asset must stay under the 100 KiB budget');
+
+const seasonalKarasuki = skins.seasonalKarasuki('halloween');
+assert.strictEqual(seasonalKarasuki.kind, 'barba');
+assert.strictEqual(seasonalKarasuki.name, 'Barba');
+assert.strictEqual(seasonalKarasuki.nameJp, 'バルバ');
+assert.strictEqual(seasonalKarasuki.asset, 'assets/img/wanderers/barba.webp');
+assert.strictEqual(seasonalKarasuki.lines.length, 10, 'Barba must have one fact for each folklore entry');
+assert.ok(seasonalKarasuki.lines.every(line =>
+  line.en.includes('{name}') && line.jp.includes('{name}') && Object.keys(line.furigana).length > 0
+), 'every Barba fact must be bilingual, name-aware, and furigana-ready');
+assert.ok(fs.existsSync(path.join(root, seasonalKarasuki.asset)), 'Barba asset must exist');
+assert.ok(fs.statSync(path.join(root, seasonalKarasuki.asset)).size < 300 * 1024,
+  'Barba asset must stay under the wanderer sprite budget');
+
+const karasuki = read('js/karasuki.js');
+assert.match(karasuki, /function openBarbaPop\(\)/, 'Karasuki must wire the seasonal Barba popup');
+assert.match(karasuki, /function clickCheckBarba\(worldX, worldY\)/, 'Barba must be tappable');
+assert.match(karasuki, /drawBarba\(now\); drawNuppi\(now\)/, 'Barba must render beneath Nuppi');
+assert.match(karasuki, /line\.furigana \|\| \{\}/, 'Barba popup must render Japanese through furigana data');
+assert.ok(!/openBarbaPop[\s\S]{0,1200}recordWandererVisit/.test(karasuki),
+  'Barba must stay outside the collectible wanderer visit system');
 assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, false), null,
   'Halloween bats must stay gated until Blitz is complete');
 assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, 'pb'), seasonalVisitor,
