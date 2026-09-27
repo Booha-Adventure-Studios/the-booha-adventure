@@ -116,6 +116,11 @@
       "reason": "Current profile language and accessibility contract."
     },
     {
+      "path": "tests/profile-daily-check-season-audit.cjs",
+      "status": "verify",
+      "reason": "Profile-hosted Daily Check must receive the shared seasonal marker before its overlay loads."
+    },
+    {
       "path": "tests/utsuroba-dialogue.test.cjs",
       "status": "verify",
       "reason": "Current Utsuroba ambient-dialogue contract."
