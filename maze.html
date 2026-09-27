@@ -1891,6 +1891,7 @@ const GHOST_SIZE=48,WANDER_TRAIL_MAX=60;
 // at once vs. 4 mains. Cheap now that trails are sprite-based (drawImage),
 // not gradient-based, but still worth keeping proportionate.
 const EXTRA_TRAIL_MAX=20,EXTRA_TRAIL_CHANCE=.22;
+const SEASONAL_VISITOR_SLOTS=4;
 let wanderers=[];
 
 function getGamesThisWeekForMaze() {
@@ -1969,15 +1970,14 @@ function buildWanderers() {
 
   const seasonalVisitor = activeSeasonalVisitor();
   if (seasonalVisitor) {
-    // The completed Blitz reward replaces the ordinary extra Booha visitors.
-    // Keep the exact same weekly-game count and visitor cap, but use one
-    // repeatable bat sprite for every visitor slot.
-    const seasonalGames = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
+    // A completed Blitz trio replaces the ordinary extra Booha visitors.
+    // The reward is four copies of one seasonal sprite; performance and
+    // reduced-motion gates can still lower that count.
     const count = SEASONAL_VISUALS.seasonalVisitorCount({
-      games: seasonalGames,
-      availableCount: EXTRA_BOOHA_GHOSTS.length,
+      availableCount: SEASONAL_VISITOR_SLOTS,
       performanceTier: mazePerfTier,
       reducedMotion: MAZE_REDUCED_MOTION,
+      forceAll: true,
     });
     for (let i = 0; i < count; i++) {
       const w = createSeasonalWanderer(i, i * 850, seasonalVisitor, 0);

@@ -5938,6 +5938,8 @@ const NUPPI_LINES = [
   let barbaPopEl = null;
   let barbaPopOpen = false;
   let barbaPopCooldownUntil = 0;
+  let barbaLineBag = [];
+  let barbaLineBagKey = '';
 
   function seasonalKarasukiConfig() {
     return window.BoohaSkins?.seasonalKarasuki?.() || null;
@@ -6127,11 +6129,25 @@ const NUPPI_LINES = [
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && barbaPopOpen) closeBarbaPop(); });
   }
 
+  function nextBarbaLine(lines) {
+    if (!Array.isArray(lines) || !lines.length) return null;
+    const key = lines.map(line => line.en || '').join('\u0001');
+    if (key !== barbaLineBagKey || !barbaLineBag.length) {
+      barbaLineBag = lines.map((_, index) => index);
+      for (let i = barbaLineBag.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [barbaLineBag[i], barbaLineBag[j]] = [barbaLineBag[j], barbaLineBag[i]];
+      }
+      barbaLineBagKey = key;
+    }
+    return lines[barbaLineBag.shift()];
+  }
+
   function openBarbaPop() {
     const config = seasonalKarasukiConfig();
     const lines = config?.lines || [];
     if (!lines.length || !barbaPopEl) return;
-    const line = lines[Math.floor(Math.random() * lines.length)];
+    const line = nextBarbaLine(lines);
     const name = getBoohaFirstName();
     const en = name ? line.en.replace('{name}', name) : line.en.replace('{name}, ', '');
     const jp = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '');

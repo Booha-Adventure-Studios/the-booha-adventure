@@ -97,6 +97,10 @@ assert.match(karasuki, /const bob = Math\.sin\(barba\.wobbleT \* BARBA_WOBBLE_FR
   'Barba hit testing must use the same bob phase as drawing');
 assert.ok(!/openBarbaPop[\s\S]{0,1200}recordWandererVisit/.test(karasuki),
   'Barba must stay outside the collectible wanderer visit system');
+assert.match(karasuki, /function nextBarbaLine\(lines\)/,
+  'Barba must select dialogue through a persistent random shuffle bag');
+assert.match(karasuki, /const line = nextBarbaLine\(lines\);/,
+  'Barba popup must use the random shuffle bag rather than room order');
 assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, false), null,
   'Halloween bats must stay gated until Blitz is complete');
 assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, 'pb'), seasonalVisitor,
@@ -132,6 +136,17 @@ assert.deepStrictEqual(
 assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ games: 9, availableCount: 10, performanceTier: 'low' }), 2);
 assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ games: 9, availableCount: 10, reducedMotion: true }), 0);
 assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ games: 9, availableCount: 10, forceAll: true }), 10);
+assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ availableCount: 4, forceAll: true }), 4,
+  'a completed seasonal reward must create four visitor slots');
+assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ availableCount: 4, forceAll: true, performanceTier: 'low' }), 2,
+  'low-performance devices must cap seasonal visitors');
+assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ availableCount: 4, forceAll: true, reducedMotion: true }), 0,
+  'reduced motion must hide seasonal visitors');
+
+assert.match(maze, /const SEASONAL_VISITOR_SLOTS=4;/,
+  'the completed Blitz reward must reserve four seasonal visitor slots');
+assert.match(maze, /availableCount: SEASONAL_VISITOR_SLOTS,[\s\S]{0,180}forceAll: true,/,
+  'the seasonal visitor branch must use the completed-Blitz reward count instead of regular game progress');
 
 let canvasCreations = 0;
 const fakeContext = {
