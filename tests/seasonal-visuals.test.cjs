@@ -80,6 +80,10 @@ assert.ok(seasonalKarasuki.lines.every(line =>
 assert.ok(fs.existsSync(path.join(root, seasonalKarasuki.asset)), 'Barba asset must exist');
 assert.ok(fs.statSync(path.join(root, seasonalKarasuki.asset)).size < 300 * 1024,
   'Barba asset must stay under the wanderer sprite budget');
+assert.ok(seasonalKarasuki.lines.some(line => line.en.includes('Flatwoods Monster') && line.jp.includes('ひかる 目')),
+  'Flatwoods Japanese copy must match the softened English glowing-eyes description');
+assert.ok(seasonalKarasuki.lines.some(line => line.en.includes('Hodag') && line.jp.includes('ひかる 目')),
+  'Hodag Japanese copy must match the softened English glowing-eyes description');
 
 const karasuki = read('js/karasuki.js');
 assert.match(karasuki, /function openBarbaPop\(\)/, 'Karasuki must wire the seasonal Barba popup');
