@@ -1626,6 +1626,10 @@ const MAZE_LOW_POWER_HINT = Boolean(
   (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData)
   || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 );
+const MAZE_REDUCED_MOTION = Boolean(
+  typeof window.matchMedia === 'function'
+  && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+);
 let mazePerfTier = MAZE_LOW_POWER_HINT ? 'low' : 'high';
 let pageHidden = document.hidden;
 const worldPerf = window.BoohaPerformance.create({
@@ -1713,6 +1717,7 @@ const ghostImgs = GHOSTS.map(src => {
 const extraGhostImgs = EXTRA_BOOHA_GHOSTS.map(src => {
   return makeDeferredImage(src);
 });
+const seasonalVisitorImgs = new Map();
 
 let activeGhostIdx = 0;
 let equippedMazeImg = null;
@@ -1744,6 +1749,14 @@ battyEquipButton?.addEventListener('click', equipSeasonalFromUnlockPopup);
 battyEquipTextButton?.addEventListener('click', equipSeasonalFromUnlockPopup);
 
 function getWandererImage(w) {
+  if (w.kind === 'seasonal') {
+    let image = seasonalVisitorImgs.get(w.visitorSrc);
+    if (!image) {
+      image = makeDeferredImage(w.visitorSrc);
+      seasonalVisitorImgs.set(w.visitorSrc, image);
+    }
+    return ensureDeferredImage(image);
+  }
   if (w.kind === 'extra') {
     return ensureDeferredImage(extraGhostImgs[w.extraIdx]);
   }
@@ -1890,6 +1903,30 @@ function getGamesThisWeekForMaze() {
   }
 }
 
+function seededRandom(seed) {
+  let hash = 2166136261;
+  const text = String(seed || 'maze');
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return function () {
+    hash += 0x6D2B79F5;
+    let t = hash;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function activeSeasonalVisitor() {
+  const seasonId = window.BoohaSkins?.seasonIdForDate?.();
+  const visitor = seasonId ? window.BoohaSkins?.seasonalVisitor?.(seasonId) : null;
+  if (!visitor) return null;
+  if (visitor.requires === 'blitz-triple' && !readBlitzCompletionState().completedCurriculum) return null;
+  return visitor;
+}
+
 function shuffledExtraIndices() {
   const arr = EXTRA_BOOHA_GHOSTS.map((_, i) => i);
 
@@ -1915,6 +1952,23 @@ function buildWanderers() {
     wanderers.push(w);
   }
 
+  const seasonalVisitor = activeSeasonalVisitor();
+  if (seasonalVisitor) {
+    // The completed Blitz reward replaces the ordinary extra Booha visitors.
+    // Keep the same visitor slots and sprite scale, but make the four bats
+    // repeatable for this curriculum-week occurrence.
+    if (!MAZE_REDUCED_MOTION) {
+      const count = mazePerfTier === 'low'
+        ? Math.min(2, seasonalVisitor.count)
+        : seasonalVisitor.count;
+      for (let i = 0; i < count; i++) {
+        const w = createSeasonalWanderer(i, i * 850, seasonalVisitor, 0);
+        wanderers.push(w);
+      }
+    }
+    return;
+  }
+
   const games = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
 
   // Quiet atmospheric increase.
@@ -1933,14 +1987,18 @@ function buildWanderers() {
   }
 }
   
-function createWanderer(ghostIdx,delayMs){
-  const side=Math.floor(Math.random()*4);
+function createWanderer(ghostIdx,delayMs,random=Math.random,route=null){
+  const rand = typeof random === 'function' ? random : Math.random;
+  const side=Math.floor(rand()*4);
   let sx,sy;
-  switch(side){case 0:sx=Math.random()*window.innerWidth;sy=-GHOST_SIZE;break;case 1:sx=window.innerWidth+GHOST_SIZE;sy=Math.random()*window.innerHeight;break;case 2:sx=Math.random()*window.innerWidth;sy=window.innerHeight+GHOST_SIZE;break;default:sx=-GHOST_SIZE;sy=Math.random()*window.innerHeight;}
+  switch(side){case 0:sx=rand()*window.innerWidth;sy=-GHOST_SIZE;break;case 1:sx=window.innerWidth+GHOST_SIZE;sy=rand()*window.innerHeight;break;case 2:sx=rand()*window.innerWidth;sy=window.innerHeight+GHOST_SIZE;break;default:sx=-GHOST_SIZE;sy=rand()*window.innerHeight;}
   const exitSide=(side+2)%4;
   let tx,ty;
-  switch(exitSide){case 0:tx=Math.random()*window.innerWidth;ty=-GHOST_SIZE;break;case 1:tx=window.innerWidth+GHOST_SIZE;ty=Math.random()*window.innerHeight;break;case 2:tx=Math.random()*window.innerWidth;ty=window.innerHeight+GHOST_SIZE;break;default:tx=-GHOST_SIZE;ty=Math.random()*window.innerHeight;}
-  const dur=14000+Math.random()*12000;
+  switch(exitSide){case 0:tx=rand()*window.innerWidth;ty=-GHOST_SIZE;break;case 1:tx=window.innerWidth+GHOST_SIZE;ty=rand()*window.innerHeight;break;case 2:tx=rand()*window.innerWidth;ty=window.innerHeight+GHOST_SIZE;break;default:tx=-GHOST_SIZE;ty=rand()*window.innerHeight;}
+  const dur=14000+rand()*12000;
+  if (route) {
+    sx=route.sx; sy=route.sy; tx=route.tx; ty=route.ty;
+  }
   
   return {
   kind: 'main',
@@ -1953,11 +2011,11 @@ function createWanderer(ghostIdx,delayMs){
   startTime: null,
   delayMs,
   dur,
-  wobbleAmp: 18 + Math.random() * 24,
-  wobbleFreq: .25 + Math.random() * .35,
-  wobblePhase: Math.random() * Math.PI * 2,
-  bobAmp: 5 + Math.random() * 6,
-  bobFreq: 1.2 + Math.random() * .8,
+  wobbleAmp: 18 + rand() * 24,
+  wobbleFreq: .25 + rand() * .35,
+  wobblePhase: rand() * Math.PI * 2,
+  bobAmp: 5 + rand() * 6,
+  bobFreq: 1.2 + rand() * .8,
   trail: [],
   done: false,
   cx: sx,
@@ -1965,6 +2023,25 @@ function createWanderer(ghostIdx,delayMs){
   opacity: 0
 };
   
+}
+
+function createSeasonalWanderer(index, delayMs, visitor, cycle) {
+  const occurrence = CURRENT_WEEK_DATA.occurrenceKey || CURRENT_WEEK_DATA.weekId || CURRENT_WEEK;
+  const rand = seededRandom(`${occurrence}|${visitor.kind}|${index}|${cycle}`);
+  const direction = index % 2 === 0 ? 1 : -1;
+  const lane = Math.max(GHOST_SIZE * 1.8,
+    Math.min(window.innerHeight - GHOST_SIZE * 1.8,
+      window.innerHeight * (.22 + index * .16 + (rand() - .5) * .04)));
+  const route = direction > 0
+    ? { sx: -GHOST_SIZE, sy: lane, tx: window.innerWidth + GHOST_SIZE, ty: lane + (rand() - .5) * 44 }
+    : { sx: window.innerWidth + GHOST_SIZE, sy: lane, tx: -GHOST_SIZE, ty: lane + (rand() - .5) * 44 };
+  const w = createWanderer(0, delayMs, rand, route);
+  w.kind = 'seasonal';
+  w.visitorSrc = visitor.asset;
+  w.visitorIndex = index;
+  w.visitorCycle = cycle;
+  w.visitorColor = visitor.color || HALLOWEEN_LIME;
+  return w;
 }
 function tickWanderers(nowMs){
   for(let i=0;i<wanderers.length;i++){
@@ -1975,13 +2052,17 @@ function tickWanderers(nowMs){
     const sec=nowMs/1000,wob=Math.sin(sec*w.wobbleFreq*Math.PI*2+w.wobblePhase)*w.wobbleAmp,bob=Math.sin(sec*w.bobFreq*Math.PI*2)*w.bobAmp;
     const bx=w.sx+dx*et+nx*wob,by=w.sy+dy*et+ny*wob+bob;
     w.opacity=Math.min(t*6,1,(1-t)*6)*.82;
-    const _isExtra=w.kind==='extra';
+    const _isExtra=w.kind==='extra' || w.kind==='seasonal';
     if(Math.random()<(_isExtra?EXTRA_TRAIL_CHANCE:.35)){
       // Main ghosts keep their random rainbow trail; extras trail in their
       // OWN identity color (the same set their body-glow halo uses) so each
       // unlockable ghost reads as a consistent little character, not a
       // random smear.
-      const col=_isExtra?MONTH_COLORS[(GHOSTS.length+w.extraIdx)%MONTH_COLORS.length]:MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];
+      const col=w.kind==='seasonal'
+        ? [w.visitorColor || HALLOWEEN_LIME, w.visitorColor || HALLOWEEN_LIME]
+        : _isExtra
+          ? MONTH_COLORS[(GHOSTS.length+w.extraIdx)%MONTH_COLORS.length]
+          : MONTH_COLORS[Math.floor(Math.random()*MONTH_COLORS.length)];
       w.trail.push({x:bx,y:by,life:1,size:2+Math.random()*3.5,color:col[Math.random()<.5?0:1],dx:(Math.random()-.5)*.3,dy:-Math.random()*.4});
       if(w.trail.length>(_isExtra?EXTRA_TRAIL_MAX:WANDER_TRAIL_MAX))w.trail.shift();
     }
@@ -1993,9 +2074,17 @@ function tickWanderers(nowMs){
     const old = wanderers[i];
     const delay = performance.now() + 3000 + Math.random() * 8000;
 
-    const nw = createWanderer(old.ghostIdx, delay);
-    nw.kind = old.kind || 'main';
-    nw.extraIdx = Number.isInteger(old.extraIdx) ? old.extraIdx : -1;
+    let nw;
+    if (old.kind === 'seasonal') {
+      const visitor = activeSeasonalVisitor();
+      nw = visitor
+        ? createSeasonalWanderer(old.visitorIndex, delay, visitor, (old.visitorCycle || 0) + 1)
+        : createWanderer(old.ghostIdx, delay);
+    } else {
+      nw = createWanderer(old.ghostIdx, delay);
+      nw.kind = old.kind || 'main';
+      nw.extraIdx = Number.isInteger(old.extraIdx) ? old.extraIdx : -1;
+    }
     nw.startTime = null;
 
     wanderers[i] = nw;
@@ -2062,6 +2151,21 @@ const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
   ctx.restore();
   continue;
 }
+
+    if (w.kind === 'seasonal') {
+      // One bat sprite, multiplied into a small flock. The gentle vertical
+      // squash is a wing-flap suggestion without requiring another asset.
+      const flap = Math.sin(sec * 6.2 + w.wobblePhase) * .055;
+      ctx.globalAlpha = w.opacity;
+      ctx.shadowBlur = (10 + pulseG * 14) * _wScale;
+      ctx.shadowColor = w.visitorColor || HALLOWEEN_LIME;
+      ctx.translate(gx, gy);
+      ctx.scale(1 + flap * .35, 1 - flap);
+      ctx.drawImage(img, -drawR, -drawR, drawR * 2, drawR * 2);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+      continue;
+    }
 
     ctx.globalAlpha=w.opacity*(.18+pulseG*.09);const ga=ctx.createRadialGradient(gx,gy+3,0,gx,gy+3,drawR*2);ga.addColorStop(0,col1);ga.addColorStop(.5,col2);ga.addColorStop(1,'transparent');ctx.fillStyle=ga;ctx.beginPath();ctx.arc(gx,gy+3,drawR*2,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=w.opacity;ctx.drawImage(img,gx-drawR,gy-drawR,drawR*2,drawR*2);ctx.globalAlpha=1;ctx.restore();
@@ -2350,7 +2454,7 @@ function startLoop(){scheduleMazeFrame();}
 worldPerf.enableOverlay(() => ({
   dpr: Math.min(window.devicePixelRatio || 1, mazeDprCap()),
   loadedRoomImageCount: mazeImg.complete && mazeImg.naturalWidth > 0 ? 1 : 0,
-  loadedCharacterImageCount: [...ghostImgs, ...extraGhostImgs, equippedMazeImg, homeworkImg, karasuki1Img, karasuki2Img, jukuImg]
+  loadedCharacterImageCount: [...ghostImgs, ...extraGhostImgs, ...seasonalVisitorImgs.values(), equippedMazeImg, homeworkImg, karasuki1Img, karasuki2Img, jukuImg]
     .filter(image => image && image.complete && image.naturalWidth > 0).length,
   decodedImageMemoryBytes: 0,
   wandererCacheUsageBytes: 0,
@@ -2898,6 +3002,7 @@ activeWeek = cp.w;
     dev: true,
     playableGhosts: GHOSTS.length,
     extraGhostsAvailable: EXTRA_BOOHA_GHOSTS.length,
+    seasonalVisitor: window.BoohaSkins?.seasonalVisitor?.() || null,
     activeGhostIdx,
     activeGhostSrc: GHOSTS[activeGhostIdx],
     wanderers: wanderers.length,

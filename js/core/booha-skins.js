@@ -195,6 +195,13 @@ const BoohaSkins = (() => {
         Object.freeze({ start: '2026-09-27', end: '2026-10-31', characterId: 'batty' }),
       ]),
       palette: HALLOWEEN_PALETTE,
+      seasonalVisitor: Object.freeze({
+        kind: 'bat',
+        asset: 'assets/img/seasonal-bat.webp',
+        count: 4,
+        color: HALLOWEEN_PALETTE.lime,
+        requires: 'blitz-triple',
+      }),
     }),
   });
 
@@ -282,6 +289,10 @@ const BoohaSkins = (() => {
       ? Math.max(0, Math.min(11, Math.floor((week - 1) / 4)))
       : 0;
     return MONTH_COLORS[monthIndex];
+  }
+
+  function seasonalVisitor(seasonId = seasonIdForDate()) {
+    return getSeason(seasonId)?.seasonalVisitor || null;
   }
 
   function applySeasonTheme(seasonId = seasonIdForDate()) {
@@ -412,6 +423,7 @@ const BoohaSkins = (() => {
     rotationCharacterId,
     menuCharacterId,
     monthColorsForWeek,
+    seasonalVisitor,
     applySeasonTheme,
     unlock,
     isUnlocked,
