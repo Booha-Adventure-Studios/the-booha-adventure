@@ -301,8 +301,8 @@
     html.halloween-hold #halloweenOpening,
     html.halloween-hold #halloweenOpening * { animation-play-state: paused; }
     html[data-season="halloween"] .sp {
-      background: #ff9b38;
-      box-shadow: 0 0 4px 1px rgba(255,206,120,.95), 0 0 12px 3px rgba(132,66,190,.72);
+      background: var(--season-orange, #ff9b38);
+      box-shadow: 0 0 4px 1px var(--season-orange, #ffce78), 0 0 12px 3px var(--season-purple, #8442be);
     }
     @keyframes halloweenFog {
       from { transform: translateX(-1.5%) scale(1.02); opacity: .74; }
@@ -390,7 +390,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
     html[data-season="halloween"] .hubHeading {
-      background: linear-gradient(100deg, #fff 0%, #ffd28b 24%, #ff8b30 42%, #f8d0ff 64%, #9b63e8 82%, #fff 100%);
+      background: linear-gradient(100deg, #fff 0%, #ffd28b 24%, var(--season-orange, #ff8b30) 42%, #f8d0ff 64%, var(--season-purple, #9b63e8) 82%, #fff 100%);
       background-size: 260% 100%;
       -webkit-background-clip: text;
       background-clip: text;
@@ -431,6 +431,7 @@
     html[data-season="halloween"] .halloweenLabel { display: block !important; color: #ffbc65; text-shadow: 0 0 12px rgba(255,131,34,.56); }
     html[data-season="halloween"] .defaultLabel { display: none !important; }
     @media (prefers-reduced-motion: reduce) {
+      .sp { animation: none; }
       html[data-season="halloween"] #halloweenOpening,
       html[data-season="halloween"] #startScene::before,
       html[data-season="halloween"] .btnGold { animation: none; }
