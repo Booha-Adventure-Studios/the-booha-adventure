@@ -2393,15 +2393,18 @@ function drawFrame(now){
     const baseR=7,glowR=baseR+pulse*3.5*(1+state.extra*.6),alpha=state.alpha;
     ctx.save();
     const halloween = document.documentElement.dataset.season === 'halloween';
+    const hallowCP = halloween && getMonthIndexFromWeekNumber(cp.w) === 9;
+    const hk = hallowCP ? .55 : 1;
     const sparkColors = SEASONAL_VISUALS.checkpointSparkColors(HALLOWEEN_SEASON, cp.w, [col1, col2]);
-    if(halloween) ctx.globalCompositeOperation = 'lighter';
-    if(halloween){
-      drawGlow(x,y,glowR*4.9,HALLOWEEN_GLOW.lime,alpha*(.14+pulse*.08));
+    if(hallowCP){
+      ctx.globalCompositeOperation = 'lighter';
+      drawGlow(x,y,glowR*4.9,HALLOWEEN_GLOW.lime,alpha*(.06+pulse*.04));
     }
-    ctx.globalAlpha=alpha*(.14+pulse*.10);const hazeR=glowR*4.5,haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);haze.addColorStop(0,col1);haze.addColorStop(.5,col1);haze.addColorStop(1,'transparent');ctx.fillStyle=haze;ctx.beginPath();ctx.arc(x,y,hazeR,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=alpha*(.10+pulse2*.09);const haze2=ctx.createRadialGradient(x+glowR*.3,y-glowR*.2,0,x,y,hazeR*.8);haze2.addColorStop(0,col2);haze2.addColorStop(.5,col2);haze2.addColorStop(1,'transparent');ctx.fillStyle=haze2;ctx.beginPath();ctx.arc(x,y,hazeR*.8,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.14+pulse*.10)*hk;const hazeR=glowR*4.5,haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);haze.addColorStop(0,col1);haze.addColorStop(.5,col1);haze.addColorStop(1,'transparent');ctx.fillStyle=haze;ctx.beginPath();ctx.arc(x,y,hazeR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.10+pulse2*.09)*hk;const haze2=ctx.createRadialGradient(x+glowR*.3,y-glowR*.2,0,x,y,hazeR*.8);haze2.addColorStop(0,col2);haze2.addColorStop(.5,col2);haze2.addColorStop(1,'transparent');ctx.fillStyle=haze2;ctx.beginPath();ctx.arc(x,y,hazeR*.8,0,Math.PI*2);ctx.fill();
+    if(hallowCP) ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha=alpha*(.48+pulse2*.22);const midR=glowR*2.0,midG=ctx.createRadialGradient(x,y,glowR*.28,x,y,midR);midG.addColorStop(0,'transparent');midG.addColorStop(.35,col1);midG.addColorStop(.65,col2);midG.addColorStop(1,'transparent');ctx.fillStyle=midG;ctx.beginPath();ctx.arc(x,y,midR,0,Math.PI*2);ctx.fill();
-    ctx.globalAlpha=alpha*(.85+pulse*.15);const coronaR=glowR*1.10,corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);corona.addColorStop(0,'#fff');corona.addColorStop(halloween ? .5 : .2,col1);corona.addColorStop(halloween ? .85 : .62,col2);corona.addColorStop(1,'transparent');ctx.fillStyle=corona;ctx.beginPath();ctx.arc(x,y,coronaR,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=alpha*(.85+pulse*.15);const coronaR=glowR*1.10,corona=ctx.createRadialGradient(x,y,0,x,y,coronaR);corona.addColorStop(0,'#fff');corona.addColorStop(hallowCP ? .5 : .2,col1);corona.addColorStop(hallowCP ? .85 : .62,col2);corona.addColorStop(1,'transparent');ctx.fillStyle=corona;ctx.beginPath();ctx.arc(x,y,coronaR,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.95+pulse*.05);ctx.shadowBlur=24;ctx.shadowColor=col1;ctx.fillStyle=col1;ctx.beginPath();ctx.arc(x,y,glowR*.44,0,Math.PI*2);ctx.fill();ctx.shadowBlur=14;ctx.shadowColor=col2;ctx.fillStyle=col2;ctx.beginPath();ctx.arc(x,y,glowR*.26,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
     ctx.globalAlpha=alpha;const coreG=ctx.createRadialGradient(x,y,0,x,y,glowR*.16);coreG.addColorStop(0,'rgba(255,255,255,1)');coreG.addColorStop(.7,'rgba(255,255,255,.75)');coreG.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=coreG;ctx.beginPath();ctx.arc(x,y,glowR*.16,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.42+pulse*.30);ctx.strokeStyle='rgba(255,255,255,0.95)';ctx.lineWidth=.9;ctx.shadowBlur=9;ctx.shadowColor=col1;
@@ -2411,7 +2414,7 @@ function drawFrame(now){
       const angle=f.angle+sec*f.speed,twinkle=.35+.65*Math.abs(Math.sin(sec*f.twinkleSpeed+f.twinklePhase));
       const r=f.orbit*coverScale*(.82+state.extra*.08)*(.92+.08*Math.sin(sec*1.1+f.phase));
       const fx=x+Math.cos(angle)*r,fy=y+Math.sin(angle)*r*.84;
-      const fColor=halloween && sparkColors.length === 3 ? sparkColors[fi%3] : (f.useSecondary?col2:col1),fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
+      const fColor=hallowCP && sparkColors.length === 3 ? sparkColors[fi%3] : (f.useSecondary?col2:col1),fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
       drawGlow(fx,fy,fSize*3.2,fColor,fAlpha*.42);
       ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
       ctx.globalAlpha=fAlpha;ctx.fillStyle='#fff';ctx.shadowBlur=5;ctx.shadowColor=fColor;ctx.beginPath();ctx.arc(fx,fy,fSize*.48,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
