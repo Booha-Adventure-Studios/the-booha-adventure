@@ -123,6 +123,7 @@
     #mazeScene{ position:absolute; inset:0; background:#000; }
     #stage{ position:absolute; inset:0; overflow:hidden; }
     #mazeImg{ display:block; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center center; user-select:none; -webkit-user-drag:none; pointer-events:none; }
+    html[data-season="halloween"] #mazeImg{ filter:brightness(1.10) saturate(1.08); }
     #mazeCanvas{ position:absolute; left:0; top:0; z-index:6; cursor:default; }
     #mazeCanvas.bryan{ cursor:crosshair; }
     #mazeCanvas.locked{ cursor:not-allowed; pointer-events:none; }
@@ -1422,6 +1423,7 @@ const KR_TREE_IW = 78;
 const JUKU_TREE_IW = 78;
 
 const MONTH_COLORS = window.BoohaSkins.MONTH_COLORS;
+const HALLOWEEN_LIME = window.BoohaSkins.getSeason('halloween').palette.lime;
 
 const CHECKPOINTS = [
   {w: 1, ix: 514, iy:355},{w: 2, ix:891, iy:402},{w: 3, ix:1156, iy:354},
@@ -2274,6 +2276,9 @@ function drawFrame(now){
     const pulse=.5+.5*Math.sin(sec*2.1+cp.w*.73),pulse2=.5+.5*Math.sin(sec*1.35+cp.w*.41+1.3);
     const baseR=7,glowR=baseR+pulse*3.5*(1+state.extra*.6),alpha=state.alpha;
     ctx.save();
+    if(document.documentElement.dataset.season==='halloween'){
+      drawGlow(x,y,glowR*4.9,HALLOWEEN_LIME,alpha*(.045+pulse*.025));
+    }
     ctx.globalAlpha=alpha*(.14+pulse*.10);const hazeR=glowR*4.5,haze=ctx.createRadialGradient(x,y,0,x,y,hazeR);haze.addColorStop(0,col1);haze.addColorStop(.5,col1);haze.addColorStop(1,'transparent');ctx.fillStyle=haze;ctx.beginPath();ctx.arc(x,y,hazeR,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.10+pulse2*.09);const haze2=ctx.createRadialGradient(x+glowR*.3,y-glowR*.2,0,x,y,hazeR*.8);haze2.addColorStop(0,col2);haze2.addColorStop(.5,col2);haze2.addColorStop(1,'transparent');ctx.fillStyle=haze2;ctx.beginPath();ctx.arc(x,y,hazeR*.8,0,Math.PI*2);ctx.fill();
     ctx.globalAlpha=alpha*(.48+pulse2*.22);const midR=glowR*2.0,midG=ctx.createRadialGradient(x,y,glowR*.28,x,y,midR);midG.addColorStop(0,'transparent');midG.addColorStop(.35,col1);midG.addColorStop(.65,col2);midG.addColorStop(1,'transparent');ctx.fillStyle=midG;ctx.beginPath();ctx.arc(x,y,midR,0,Math.PI*2);ctx.fill();

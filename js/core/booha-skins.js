@@ -13,7 +13,7 @@ const BoohaSkins = (() => {
   const HALLOWEEN_PALETTE = Object.freeze({
     orange: '#e8731f',
     purple: '#9b63e8',
-    lime: '#c8ff3b',
+    lime: '#a8e63d',
     black: '#070710',
   });
   // One shared table keeps the checkpoint/room atmosphere aligned across
