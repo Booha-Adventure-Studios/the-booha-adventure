@@ -33,6 +33,14 @@
     return visitor;
   }
 
+  function checkpointSparkColors(season, week, baseColors) {
+    const fallback = Array.isArray(baseColors) ? baseColors : [];
+    const sparkWeeks = season?.checkpointSparkWeeks || [];
+    const glow = season?.glow;
+    if (!glow || !sparkWeeks.includes(Number(week))) return fallback;
+    return [glow.orange, glow.purple, glow.lime];
+  }
+
   function createBatGlowCache({ createCanvas, getDevicePixelRatio } = {}) {
     if (typeof createCanvas !== 'function') throw new TypeError('createCanvas is required');
     const cache = new Map();
@@ -78,6 +86,7 @@
     extraVisitorCount,
     seasonalVisitorCount,
     activeSeasonalVisitor,
+    checkpointSparkColors,
     createBatGlowCache,
   };
 });

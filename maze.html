@@ -1424,6 +1424,7 @@ const KR_TREE_IW = 78;
 const JUKU_TREE_IW = 78;
 
 const MONTH_COLORS = window.BoohaSkins.MONTH_COLORS;
+const HALLOWEEN_SEASON = window.BoohaSkins.getSeason('halloween');
 const HALLOWEEN_GLOW = window.BoohaSkins.getSeason('halloween').glow;
 const SEASONAL_VISUALS = window.BoohaSeasonalVisuals;
 
@@ -2392,6 +2393,7 @@ function drawFrame(now){
     const baseR=7,glowR=baseR+pulse*3.5*(1+state.extra*.6),alpha=state.alpha;
     ctx.save();
     const halloween = document.documentElement.dataset.season === 'halloween';
+    const sparkColors = SEASONAL_VISUALS.checkpointSparkColors(HALLOWEEN_SEASON, cp.w, [col1, col2]);
     if(halloween) ctx.globalCompositeOperation = 'lighter';
     if(halloween){
       drawGlow(x,y,glowR*4.9,HALLOWEEN_GLOW.lime,alpha*(.14+pulse*.08));
@@ -2409,7 +2411,7 @@ function drawFrame(now){
       const angle=f.angle+sec*f.speed,twinkle=.35+.65*Math.abs(Math.sin(sec*f.twinkleSpeed+f.twinklePhase));
       const r=f.orbit*coverScale*(.82+state.extra*.08)*(.92+.08*Math.sin(sec*1.1+f.phase));
       const fx=x+Math.cos(angle)*r,fy=y+Math.sin(angle)*r*.84;
-      const fColor=halloween?[HALLOWEEN_GLOW.orange,HALLOWEEN_GLOW.purple,HALLOWEEN_GLOW.lime][fi%3]:(f.useSecondary?col2:col1),fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
+      const fColor=halloween && sparkColors.length === 3 ? sparkColors[fi%3] : (f.useSecondary?col2:col1),fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
       drawGlow(fx,fy,fSize*3.2,fColor,fAlpha*.42);
       ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
       ctx.globalAlpha=fAlpha;ctx.fillStyle='#fff';ctx.shadowBlur=5;ctx.shadowColor=fColor;ctx.beginPath();ctx.arc(fx,fy,fSize*.48,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;

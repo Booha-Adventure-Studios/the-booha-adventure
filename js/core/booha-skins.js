@@ -201,6 +201,7 @@ const BoohaSkins = (() => {
       ]),
       palette: HALLOWEEN_PALETTE,
       glow: HALLOWEEN_GLOW,
+      checkpointSparkWeeks: Object.freeze([37, 38, 39, 40]),
       seasonalVisitor: Object.freeze({
         kind: 'bat',
         asset: 'assets/img/seasonal-bat.webp',
