@@ -1903,6 +1903,11 @@ function getGamesThisWeekForMaze() {
   }
 }
 
+function getExtraVisitorCount() {
+  const games = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
+  return Math.min(EXTRA_BOOHA_GHOSTS.length, Math.floor(games * 0.75));
+}
+
 function seededRandom(seed) {
   let hash = 2166136261;
   const text = String(seed || 'maze');
@@ -1955,12 +1960,11 @@ function buildWanderers() {
   const seasonalVisitor = activeSeasonalVisitor();
   if (seasonalVisitor) {
     // The completed Blitz reward replaces the ordinary extra Booha visitors.
-    // Keep the same visitor slots and sprite scale, but make the four bats
-    // repeatable for this curriculum-week occurrence.
+    // Keep the exact same weekly-game count and visitor cap, but use one
+    // repeatable bat sprite for every visitor slot.
     if (!MAZE_REDUCED_MOTION) {
-      const count = mazePerfTier === 'low'
-        ? Math.min(2, seasonalVisitor.count)
-        : seasonalVisitor.count;
+      const normalCount = getExtraVisitorCount();
+      const count = mazePerfTier === 'low' ? Math.min(2, normalCount) : normalCount;
       for (let i = 0; i < count; i++) {
         const w = createSeasonalWanderer(i, i * 850, seasonalVisitor, 0);
         wanderers.push(w);
@@ -1969,13 +1973,9 @@ function buildWanderers() {
     return;
   }
 
-  const games = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
-
   // Quiet atmospheric increase.
   // Not "one game = one obvious unlock."
-  const extraCount = window.__boohaExtraGhosts
-    ? EXTRA_BOOHA_GHOSTS.length
-    : Math.min(EXTRA_BOOHA_GHOSTS.length, Math.floor(games * 0.75));
+  const extraCount = getExtraVisitorCount();
 
   const extras = shuffledExtraIndices();
 
@@ -2928,7 +2928,7 @@ else resizeCanvas();
 window.addEventListener('pageshow',(e)=>{
   if(!e.persisted)return;
   if(rafHandle){cancelAnimationFrame(rafHandle);rafHandle=null;}
-  if(mazeStarted)startLoop();
+  if(mazeStarted){buildWanderers();startLoop();}
   bgMusic.loop=true;bgMusic.volume=.65;
   playBgMusic().catch(()=>{});
   ['click','touchstart','keydown','pointerdown'].forEach(ev=>{

@@ -50,7 +50,6 @@ assert.notStrictEqual(skins.monthColorsForWeek(13)[0], '#3bff8a',
 
 const seasonalVisitor = skins.seasonalVisitor('halloween');
 assert.strictEqual(seasonalVisitor.kind, 'bat');
-assert.strictEqual(seasonalVisitor.count, 4, 'Halloween Blitz completion must add four bats');
 assert.strictEqual(seasonalVisitor.requires, 'blitz-triple');
 assert.strictEqual(seasonalVisitor.color, palette.lime);
 assert.strictEqual(seasonalVisitor.asset, 'assets/img/seasonal-bat.webp');
@@ -69,8 +68,10 @@ assert.match(maze, /HALLOWEEN_LIME[\s\S]*drawGlow\(x,y,glowR\*4\.9,HALLOWEEN_LIM
   'Halloween checkpoints must add a spectral-green outer atmosphere without replacing orange/purple cores');
 assert.match(maze, /function activeSeasonalVisitor\(\)[\s\S]*readBlitzCompletionState\(\)\.completedCurriculum/,
   'seasonal Maze visitors must be gated by the current week Blitz completion');
-assert.match(maze, /if \(seasonalVisitor\)[\s\S]*Math\.min\(2, seasonalVisitor\.count\)/,
+assert.match(maze, /if \(seasonalVisitor\)[\s\S]*Math\.min\(2, normalCount\)/,
   'Halloween visitors must be reduced on the low performance tier');
+assert.match(maze, /function getExtraVisitorCount\(\)[\s\S]*Math\.floor\(games \* 0\.75\)/,
+  'Halloween visitors must use the existing extra-Booha weekly-game formula');
 assert.match(maze, /if \(!MAZE_REDUCED_MOTION\)[\s\S]*createSeasonalWanderer/,
   'seasonal visitors must be skipped when reduced motion is enabled');
 assert.match(maze, /seasonalVisitorImgs/,
