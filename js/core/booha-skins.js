@@ -67,12 +67,12 @@ const BoohaSkins = (() => {
       }),
       Object.freeze({
         en: '{name}, hello! Did you know? West Virginia witnesses described the Flatwoods Monster as a tall figure with glowing eyes.',
-        jp: '{name}、こんにちは！ しってる？ ウェストバージニアには、きいろく ひかる 目を もつ、おおきな フラットウッズ・モンスターの おはなしが あるよ。',
+        jp: '{name}、こんにちは！ しってる？ ウェストバージニアには、ひかる 目を もつ、おおきな フラットウッズ・モンスターの おはなしが あるよ。',
         furigana: Object.freeze({ '目': 'め' }),
       }),
       Object.freeze({
         en: '{name}, hello! Did you know? Wisconsin lumberjack tales describe the Hodag as a spiky monster with glowing eyes.',
-        jp: '{name}、こんにちは！ しってる？ ウィスコンシンの きこりの おはなしには、みどりの 目と せなかの とげを もつ ホダグが でてくるよ。',
+        jp: '{name}、こんにちは！ しってる？ ウィスコンシンの きこりの おはなしには、ひかる 目と せなかの とげを もつ ホダグが でてくるよ。',
         furigana: Object.freeze({ '目': 'め' }),
       }),
       Object.freeze({
