@@ -48,6 +48,16 @@ assert.deepStrictEqual([...skins.monthColorsForWeek(45)], ['#e53935', '#43d17b']
 assert.notStrictEqual(skins.monthColorsForWeek(13)[0], '#3bff8a',
   'April must not reuse the answer-like green that only existed in Maze');
 
+const seasonalVisitor = skins.seasonalVisitor('halloween');
+assert.strictEqual(seasonalVisitor.kind, 'bat');
+assert.strictEqual(seasonalVisitor.count, 4, 'Halloween Blitz completion must add four bats');
+assert.strictEqual(seasonalVisitor.requires, 'blitz-triple');
+assert.strictEqual(seasonalVisitor.color, palette.lime);
+assert.strictEqual(seasonalVisitor.asset, 'assets/img/seasonal-bat.webp');
+assert.ok(fs.existsSync(path.join(root, seasonalVisitor.asset)), 'seasonal bat asset must exist');
+assert.ok(fs.statSync(path.join(root, seasonalVisitor.asset)).size < 100 * 1024,
+  'seasonal bat asset must stay under the 100 KiB budget');
+
 const index = read('index.html');
 assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ animation: none; \}/,
   'index sparkles must stop under reduced motion');
@@ -57,6 +67,14 @@ assert.match(maze, /html\[data-season="halloween"\] #mazeImg\{ filter:brightness
   'Halloween Maze artwork must receive a modest brightness lift');
 assert.match(maze, /HALLOWEEN_LIME[\s\S]*drawGlow\(x,y,glowR\*4\.9,HALLOWEEN_LIME/,
   'Halloween checkpoints must add a spectral-green outer atmosphere without replacing orange/purple cores');
+assert.match(maze, /function activeSeasonalVisitor\(\)[\s\S]*readBlitzCompletionState\(\)\.completedCurriculum/,
+  'seasonal Maze visitors must be gated by the current week Blitz completion');
+assert.match(maze, /if \(seasonalVisitor\)[\s\S]*Math\.min\(2, seasonalVisitor\.count\)/,
+  'Halloween visitors must be reduced on the low performance tier');
+assert.match(maze, /if \(!MAZE_REDUCED_MOTION\)[\s\S]*createSeasonalWanderer/,
+  'seasonal visitors must be skipped when reduced motion is enabled');
+assert.match(maze, /seasonalVisitorImgs/,
+  'seasonal visitors must use the deferred image cache');
 
 ['maze.html', 'js/karasuki.js', 'js/utsuroba.js'].forEach(file => {
   const source = read(file);
