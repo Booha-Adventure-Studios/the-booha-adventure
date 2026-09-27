@@ -5430,7 +5430,6 @@ function clickCheckObserver(worldX, worldY) {
   const nuppiImg2 = new Image();
   nuppiImg2.src = 'assets/img/wanderers/nuppi-2.webp';
   const barbaImg = new Image();
-  barbaImg.src = 'assets/img/wanderers/barba.webp';
  
   /* ── Nuppi constants ── */
   const NUPPI_SIZE        = 52;
@@ -5958,6 +5957,7 @@ const NUPPI_LINES = [
   const BARBA_EXIT_DIST   = 60;
   const BARBA_IDLE_DRIFT  = 0.18;
   const BARBA_GLOW_R      = 94;
+  const BARBA_MIN_VISIBLE_MS = 10000;
   let barbaPopEl = null;
   let barbaPopOpen = false;
   let barbaPopCooldownUntil = 0;
@@ -5989,6 +5989,7 @@ const NUPPI_LINES = [
     barba.frozen = false;
     barba.idleAngle = Math.random() * Math.PI * 2;
     barba.idleTimer = 0;
+    barba.visibleSince = 0;
   }
 
   function barbaPickExit() {
@@ -6017,8 +6018,9 @@ const NUPPI_LINES = [
   function onRoomChangedBarba() {
     if (!barbaIsActive()) return;
     if (barba.roomId === state.roomId) {
-      barba.aware = true;
-      barba.exitTarget = barbaPickExit();
+      barba.aware = false;
+      barba.exitTarget = null;
+      barba.visibleSince = performance.now();
     }
   }
 
@@ -6034,7 +6036,10 @@ const NUPPI_LINES = [
       return;
     }
 
-    if (barba.aware && barba.exitTarget) {
+    if (!barba.visibleSince) barba.visibleSince = now;
+    const canLeave = now - barba.visibleSince >= BARBA_MIN_VISIBLE_MS;
+
+    if (canLeave && barba.aware && barba.exitTarget) {
       const dx = barba.exitTarget.x - barba.x;
       const dy = barba.exitTarget.y - barba.y;
       const dist = Math.hypot(dx, dy);
@@ -6045,7 +6050,7 @@ const NUPPI_LINES = [
       barba.x += (dx / dist) * BARBA_SPEED * dtScale;
       barba.y += (dy / dist) * BARBA_SPEED * dtScale;
     } else if (!barba.aware) {
-      if (Math.hypot(state.x - barba.x, state.y - barba.y) < BARBA_AWARE_DIST) {
+      if (canLeave && Math.hypot(state.x - barba.x, state.y - barba.y) < BARBA_AWARE_DIST) {
         barba.aware = true;
         barba.exitTarget = barbaPickExit();
       } else {
@@ -6080,8 +6085,8 @@ const NUPPI_LINES = [
     const color = config?.color || '#b44dff';
     ctx.save();
     const halo = ctx.createRadialGradient(bx, by, 0, bx, by, BARBA_GLOW_R * 1.45);
-    halo.addColorStop(0, 'rgba(180,77,255,0.42)');
-    halo.addColorStop(0.42, 'rgba(180,77,255,0.18)');
+    halo.addColorStop(0, 'rgba(196,102,255,0.52)');
+    halo.addColorStop(0.42, 'rgba(180,77,255,0.22)');
     halo.addColorStop(0.82, 'rgba(255,105,180,0.07)');
     halo.addColorStop(1, 'transparent');
     ctx.globalAlpha = 0.7 + pulse * 0.2;
@@ -6107,7 +6112,7 @@ const NUPPI_LINES = [
   function clickCheckBarba(worldX, worldY) {
     if (performance.now() < barbaPopCooldownUntil) return false;
     if (!barbaIsActive() || barba.roomId !== state.roomId) return false;
-    const bob = Math.sin(barba.wobbleT * BARBA_WOBBLE_FREQ * 1000) * BARBA_WOBBLE_AMP;
+    const bob = Math.sin(barba.wobbleT * BARBA_WOBBLE_FREQ) * BARBA_WOBBLE_AMP;
     if (Math.hypot(worldX - barba.x, worldY - (barba.y + bob)) <= BARBA_HIT_R) {
       openBarbaPop();
       return true;
@@ -6279,7 +6284,7 @@ function drawObserver(now) {
         wandererCacheOverBudget: cache.overBudget,
         roomLoadDecodeMs,
         activeAudioBufferCount: 0,
-        serviceWorkerCacheVersion: 'booha-assets-2026-572',
+        serviceWorkerCacheVersion: 'booha-assets-2026-573',
         averageFps: worldPerf.metrics().averageFps,
       };
     });

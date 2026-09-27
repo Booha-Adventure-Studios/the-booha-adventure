@@ -43,7 +43,7 @@ const BoohaSkins = (() => {
       Object.freeze({
         en: '{name}, hello! Did you know? A Tennessee legend tells of the Bell Witch, a spirit who spoke to the Bell family.',
         jp: '{name}、こんにちは！ しってる？ テネシーには、ベル家の 人たちに 話しかけた、ベル・ウィッチの 伝説が あるよ。',
-        furigana: Object.freeze({ '家': 'いえ', '人': 'ひと', '話': 'はな', '伝説': 'でんせつ' }),
+        furigana: Object.freeze({ '家': 'け', '人': 'ひと', '話': 'はな', '伝説': 'でんせつ' }),
       }),
       Object.freeze({
         en: '{name}, hello! Did you know? In Appalachian campfire stories, a lonely hunter hears a creature ask for its tail back.',
@@ -53,7 +53,7 @@ const BoohaSkins = (() => {
       Object.freeze({
         en: '{name}, hello! Did you know? Maryland folklore describes the Snallygaster as a sky monster with a sharp beak and tentacles.',
         jp: '{name}、こんにちは！ しってる？ メリーランドの 伝説では、スナリーギャスターは、とがった くちばしと しょく手を もつ 空の かいぶつだよ。',
-        furigana: Object.freeze({ '伝説': 'でんせつ', '手': 'て', '空': 'そら' }),
+        furigana: Object.freeze({ '伝説': 'でんせつ', '手': 'しゅ', '空': 'そら' }),
       }),
       Object.freeze({
         en: '{name}, hello! Did you know? Pennsylvania stories say the shy Squonk hides in the forest and dissolves into tears when caught.',
@@ -66,12 +66,12 @@ const BoohaSkins = (() => {
         furigana: Object.freeze({ '田舎道': 'いなかみち', '見': 'み' }),
       }),
       Object.freeze({
-        en: '{name}, hello! Did you know? West Virginia witnesses described the Flatwoods Monster as a tall figure with glowing yellow eyes.',
+        en: '{name}, hello! Did you know? West Virginia witnesses described the Flatwoods Monster as a tall figure with glowing eyes.',
         jp: '{name}、こんにちは！ しってる？ ウェストバージニアには、きいろく ひかる 目を もつ、おおきな フラットウッズ・モンスターの おはなしが あるよ。',
         furigana: Object.freeze({ '目': 'め' }),
       }),
       Object.freeze({
-        en: '{name}, hello! Did you know? Wisconsin lumberjack tales describe the Hodag as a spiky monster with glowing green eyes.',
+        en: '{name}, hello! Did you know? Wisconsin lumberjack tales describe the Hodag as a spiky monster with glowing eyes.',
         jp: '{name}、こんにちは！ しってる？ ウィスコンシンの きこりの おはなしには、みどりの 目と せなかの とげを もつ ホダグが でてくるよ。',
         furigana: Object.freeze({ '目': 'め' }),
       }),
