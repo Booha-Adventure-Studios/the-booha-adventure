@@ -1971,10 +1971,16 @@ function buildWanderers() {
   const seasonalVisitor = activeSeasonalVisitor();
   if (seasonalVisitor) {
     // A completed Blitz trio replaces the ordinary extra Booha visitors.
-    // The reward is four copies of one seasonal sprite; performance and
-    // reduced-motion gates can still lower that count.
+    // The reward starts with four copies of one seasonal sprite. Regular
+    // weekly Maze games then grow that flock using the old extra-visitor
+    // progression, while performance and reduced-motion gates still apply.
+    const seasonalGames = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
+    const seasonalGrowth = SEASONAL_VISUALS.extraVisitorCount(
+      seasonalGames,
+      EXTRA_BOOHA_GHOSTS.length - SEASONAL_VISITOR_SLOTS,
+    );
     const count = SEASONAL_VISUALS.seasonalVisitorCount({
-      availableCount: SEASONAL_VISITOR_SLOTS,
+      availableCount: SEASONAL_VISITOR_SLOTS + seasonalGrowth,
       performanceTier: mazePerfTier,
       reducedMotion: MAZE_REDUCED_MOTION,
       forceAll: true,

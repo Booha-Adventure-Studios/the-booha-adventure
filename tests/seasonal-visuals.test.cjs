@@ -142,11 +142,17 @@ assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ availableCount: 4, for
   'low-performance devices must cap seasonal visitors');
 assert.strictEqual(seasonalVisuals.seasonalVisitorCount({ availableCount: 4, forceAll: true, reducedMotion: true }), 0,
   'reduced motion must hide seasonal visitors');
+assert.deepStrictEqual(
+  [0, 1, 2, 3, 4].map(games => 4 + seasonalVisuals.extraVisitorCount(games, 6)),
+  [4, 4, 5, 6, 7],
+  'seasonal reward visitors must grow from four using the normal weekly-game progression');
 
 assert.match(maze, /const SEASONAL_VISITOR_SLOTS=4;/,
   'the completed Blitz reward must reserve four seasonal visitor slots');
-assert.match(maze, /availableCount: SEASONAL_VISITOR_SLOTS,[\s\S]{0,180}forceAll: true,/,
-  'the seasonal visitor branch must use the completed-Blitz reward count instead of regular game progress');
+assert.match(maze, /const seasonalGrowth = SEASONAL_VISUALS\.extraVisitorCount\(/,
+  'the seasonal visitor branch must grow from regular weekly game progress');
+assert.match(maze, /availableCount: SEASONAL_VISITOR_SLOTS \+ seasonalGrowth,[\s\S]{0,180}forceAll: true,/,
+  'the seasonal visitor branch must add growth to the completed-Blitz reward count');
 
 let canvasCreations = 0;
 const fakeContext = {
