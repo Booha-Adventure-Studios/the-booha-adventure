@@ -198,7 +198,6 @@ const BoohaSkins = (() => {
       seasonalVisitor: Object.freeze({
         kind: 'bat',
         asset: 'assets/img/seasonal-bat.webp',
-        count: 4,
         color: HALLOWEEN_PALETTE.lime,
         requires: 'blitz-triple',
       }),
