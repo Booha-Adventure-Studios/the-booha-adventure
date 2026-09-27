@@ -224,12 +224,7 @@
   /* ═══════════════════════════════════════════
      COLOURS
   ═══════════════════════════════════════════ */
-  const MONTH_COLORS = [
-    ['#ff3bbd','#ff79d7'],['#ff6b3b','#ffaa5e'],['#3bc8ff','#a8edff'],
-    ['#3bffee','#b2ffda'],['#ffd700','#fff176'],['#3b6fff','#90aaff'],
-    ['#a03bff','#d49aff'],['#ff9f3b','#ffd08a'],['#3bffee','#a8fff8'],
-    ['#c8ff3b','#e8ffaa'],['#ff3b6f','#ff85a1'],['#ff3bbd','#ff79d7'],
-  ];
+  const MONTH_COLORS = window.BoohaSkins.MONTH_COLORS;
   function roomColorPair(roomId) {
     const n = parseInt((roomId||'room_01').replace(/\D/g,''),10)||1;
     return MONTH_COLORS[(n-1)%MONTH_COLORS.length];

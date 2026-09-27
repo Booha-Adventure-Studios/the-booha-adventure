@@ -358,7 +358,7 @@ window.BoohaDailyCheck = (function () {
     .dc-burst{position:absolute;width:9px;height:9px;border-radius:50%;pointer-events:none;
       will-change:transform,opacity;}
     html[data-season="halloween"] .dc-root{
-      --pink:#e8731f;--pink2:#ffb45a;
+      --pink:var(--season-orange,#e8731f);--pink2:#ffb45a;
       background:
         radial-gradient(ellipse at 50% 30%,rgba(10,14,34,.55) 0%,rgba(4,6,16,.84) 62%,rgba(2,2,8,.95) 100%),
         var(--bg,#000) url('assets/img/background-1.webp') center/cover no-repeat;}

@@ -10,6 +10,29 @@ const BoohaSkins = (() => {
 
   const BASE = 'assets/img/booha_ghost.webp';
   const CURRENT_SEASON_ID = 'halloween';
+  const HALLOWEEN_PALETTE = Object.freeze({
+    orange: '#e8731f',
+    purple: '#9b63e8',
+    lime: '#c8ff3b',
+    black: '#070710',
+  });
+  // One shared table keeps the checkpoint/room atmosphere aligned across
+  // Maze, Karasuki, and Utsuroba. October is the Halloween orange/purple
+  // month; December has an explicit winter-blue pair instead of a fallback.
+  const MONTH_COLORS = Object.freeze([
+    Object.freeze(['#ff3bbd', '#ff79d7']),
+    Object.freeze(['#ff6b3b', '#ffaa5e']),
+    Object.freeze(['#3bc8ff', '#a8edff']),
+    Object.freeze(['#3bffee', '#b2ffda']),
+    Object.freeze(['#ffd700', '#fff176']),
+    Object.freeze(['#3b6fff', '#90aaff']),
+    Object.freeze(['#a03bff', '#d49aff']),
+    Object.freeze(['#ff9f3b', '#ffd08a']),
+    Object.freeze(['#3bffee', '#a8fff8']),
+    Object.freeze([HALLOWEEN_PALETTE.orange, HALLOWEEN_PALETTE.purple]),
+    Object.freeze(['#ff3b6f', '#ff85a1']),
+    Object.freeze(['#3b6fff', '#b8c9ff']),
+  ]);
   const POSE_KEYS = Object.freeze([
     'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
     'marking', 'hiding', 'danceArmsUp', 'danceSway', 'danceWave',
@@ -171,6 +194,7 @@ const BoohaSkins = (() => {
       menuSchedule: Object.freeze([
         Object.freeze({ start: '2026-09-27', end: '2026-10-31', characterId: 'batty' }),
       ]),
+      palette: HALLOWEEN_PALETTE,
     }),
   });
 
@@ -250,6 +274,30 @@ const BoohaSkins = (() => {
 
   function getSeason(id = CURRENT_SEASON_ID) {
     return SEASONS[id] || null;
+  }
+
+  function monthColorsForWeek(weekNumber) {
+    const week = Number(weekNumber);
+    const monthIndex = Number.isFinite(week)
+      ? Math.max(0, Math.min(11, Math.floor((week - 1) / 4)))
+      : 0;
+    return MONTH_COLORS[monthIndex];
+  }
+
+  function applySeasonTheme(seasonId = seasonIdForDate()) {
+    if (typeof document === 'undefined' || !document.documentElement) return null;
+    const season = getSeason(seasonId);
+    if (!season || !season.palette) return null;
+    const root = document.documentElement;
+    root.dataset.season = season.id;
+    const vars = {
+      orange: '--season-orange',
+      purple: '--season-purple',
+      lime: '--season-lime',
+      black: '--season-black',
+    };
+    Object.keys(vars).forEach(key => root.style.setProperty(vars[key], season.palette[key]));
+    return season.id;
   }
 
   function hasCompleteAssetSet(id) {
@@ -349,6 +397,7 @@ const BoohaSkins = (() => {
     BASE,
     CURRENT_SEASON_ID,
     POSE_KEYS,
+    MONTH_COLORS,
     hasCurrentBlitzTriple,
     SKINS,
     SEASONS,
@@ -362,6 +411,8 @@ const BoohaSkins = (() => {
     seasonIdForDate,
     rotationCharacterId,
     menuCharacterId,
+    monthColorsForWeek,
+    applySeasonTheme,
     unlock,
     isUnlocked,
     selectedId,
@@ -372,3 +423,4 @@ const BoohaSkins = (() => {
 })();
 
 window.BoohaSkins = BoohaSkins;
+BoohaSkins.applySeasonTheme();
