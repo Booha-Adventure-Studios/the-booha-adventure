@@ -2982,7 +2982,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function initWanderers() { refreshWanderersForRoom(); }
   
-  function onRoomChanged() { refreshWanderersForRoom(); onRoomChangedNuppi(); 
+  function onRoomChanged() { refreshWanderersForRoom(); onRoomChangedNuppi(); onRoomChangedBarba();
   KarasukiAtmos.setRoom(state.roomId, getObserverRoomId()); }
 
   function updateWanderers(now) {
@@ -5138,7 +5138,7 @@ const HAPPY_HOUSE_PORTAL = {
     }
     trail=trail.filter(p=>p.life>0);
     drawPortalOrb(now); drawMuenbaOrb(now); drawGrimmerglenPortal(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
-    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawNuppi(now);
+    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawBarba(now); drawNuppi(now);
     
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
     const bob=Math.sin(bobPhase)*HOVER_AMP; const wobble=Math.sin(bobPhase*2)*2.2;
@@ -5189,6 +5189,7 @@ const HAPPY_HOUSE_PORTAL = {
       isUtsuobaPopOpen()         ||
       isMuenbaPopupOpen()        ||
       isObserverPopOpen()        ||
+      isBarbaPopOpen()           ||
       isNuppiPopOpen()           ||
       isOrbPanelOpen()           ||
       isHappyHousePopOpen()
@@ -5203,7 +5204,7 @@ const HAPPY_HOUSE_PORTAL = {
   function staticFrameOverlayOpen() {
     return state.mazeExiting || state.muenbaExiting || isPortalOpen()
       || isBonusPopOpen() || isWandererPopOpen() || isUtsuobaPopOpen()
-      || isMuenbaPopupOpen() || isObserverPopOpen() || isNuppiPopOpen()
+      || isMuenbaPopupOpen() || isObserverPopOpen() || isBarbaPopOpen() || isNuppiPopOpen()
       || isOrbPanelOpen() || isHappyHousePopOpen() || isGrimmerglenPopupOpen()
       || state.grimmerglenExiting;
   }
@@ -5233,6 +5234,7 @@ function tick(now) {
     tickEntryDrift(now);
     handleClickMovement(now);
     updateWanderers(now);
+    updateBarba(now);
     updateNuppi(now);
 
     const driftDone = !isEntryDriftActive();
@@ -5427,6 +5429,8 @@ function clickCheckObserver(worldX, worldY) {
   nuppiImg1.src = 'assets/img/wanderers/nuppi-1.webp';
   const nuppiImg2 = new Image();
   nuppiImg2.src = 'assets/img/wanderers/nuppi-2.webp';
+  const barbaImg = new Image();
+  barbaImg.src = 'assets/img/wanderers/barba.webp';
  
   /* ── Nuppi constants ── */
   const NUPPI_SIZE        = 52;
@@ -5930,6 +5934,248 @@ const NUPPI_LINES = [
  
   function isNuppiPopOpen() { return nuppiPopOpen; }
 
+  /* ── Seasonal Karasuki visitor ──
+     This visitor is seasonal atmosphere, not a collectible wanderer. Keeping
+     the state separate means Barba never enters the profile, unlock count, or
+     weekly evidence systems used by the permanent wanderers. */
+  const barba = {
+    roomId: null,
+    x: 0,
+    y: 0,
+    wobbleT: 0,
+    aware: false,
+    exitTarget: null,
+    frozen: false,
+    idleAngle: Math.random() * Math.PI * 2,
+    idleTimer: 0,
+  };
+  const BARBA_SIZE        = 52;
+  const BARBA_HIT_R       = 80;
+  const BARBA_SPEED       = 0.55;
+  const BARBA_WOBBLE_AMP  = 6;
+  const BARBA_WOBBLE_FREQ = 0.0009;
+  const BARBA_AWARE_DIST  = 480;
+  const BARBA_EXIT_DIST   = 60;
+  const BARBA_IDLE_DRIFT  = 0.18;
+  const BARBA_GLOW_R      = 94;
+  let barbaPopEl = null;
+  let barbaPopOpen = false;
+  let barbaPopCooldownUntil = 0;
+
+  function seasonalKarasukiConfig() {
+    return window.BoohaSkins?.seasonalKarasuki?.() || null;
+  }
+
+  function barbaIsActive() {
+    return !!seasonalKarasukiConfig();
+  }
+
+  function barbaRandomRoom(exclude) {
+    let observerRoom = null;
+    try { observerRoom = getObserverRoomId(); } catch (_) {}
+    const blocked = new Set([exclude, nuppi.roomId, observerRoom]);
+    const pool = Object.keys(DATA.rooms).filter(roomId => !blocked.has(roomId));
+    const fallback = Object.keys(DATA.rooms).filter(roomId => roomId !== exclude);
+    const choices = pool.length ? pool : fallback;
+    return choices[Math.floor(Math.random() * choices.length)] || null;
+  }
+
+  function barbaPlaceInRoom(roomId) {
+    barba.roomId = roomId;
+    barba.x = WORLD_W / 2 + (Math.random() - 0.5) * 300;
+    barba.y = WORLD_H / 2 + (Math.random() - 0.5) * 180;
+    barba.aware = false;
+    barba.exitTarget = null;
+    barba.frozen = false;
+    barba.idleAngle = Math.random() * Math.PI * 2;
+    barba.idleTimer = 0;
+  }
+
+  function barbaPickExit() {
+    const exits = NPP[barba.roomId];
+    if (!exits || !exits.length) {
+      const edgeTargets = [
+        { x: 200, y: WORLD_H / 2 },
+        { x: WORLD_W - 200, y: WORLD_H / 2 },
+        { x: WORLD_W / 2, y: 200 },
+        { x: WORLD_W / 2, y: WORLD_H - 200 },
+      ];
+      return edgeTargets[Math.floor(Math.random() * edgeTargets.length)];
+    }
+    const exit = exits[Math.floor(Math.random() * exits.length)];
+    return { x: exit.x, y: exit.y };
+  }
+
+  function initBarba() {
+    const config = seasonalKarasukiConfig();
+    if (!config) return;
+    if (!barbaImg.getAttribute('src')) barbaImg.src = config.asset;
+    barbaPlaceInRoom(barbaRandomRoom(state.roomId));
+    injectBarbaPop();
+  }
+
+  function onRoomChangedBarba() {
+    if (!barbaIsActive()) return;
+    if (barba.roomId === state.roomId) {
+      barba.aware = true;
+      barba.exitTarget = barbaPickExit();
+    }
+  }
+
+  function updateBarba(now) {
+    if (!barbaIsActive() || barba.frozen || !barba.roomId) return;
+    const dt = Math.min(50, Math.max(8, now - (barba._lastNow || now)));
+    barba._lastNow = now;
+    const dtScale = dt / (1000 / 60);
+    barba.wobbleT += dt;
+
+    if (barba.roomId !== state.roomId) {
+      barbaIdleDrift(dtScale);
+      return;
+    }
+
+    if (barba.aware && barba.exitTarget) {
+      const dx = barba.exitTarget.x - barba.x;
+      const dy = barba.exitTarget.y - barba.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist <= BARBA_EXIT_DIST) {
+        barbaPlaceInRoom(barbaRandomRoom(state.roomId));
+        return;
+      }
+      barba.x += (dx / dist) * BARBA_SPEED * dtScale;
+      barba.y += (dy / dist) * BARBA_SPEED * dtScale;
+    } else if (!barba.aware) {
+      if (Math.hypot(state.x - barba.x, state.y - barba.y) < BARBA_AWARE_DIST) {
+        barba.aware = true;
+        barba.exitTarget = barbaPickExit();
+      } else {
+        barbaIdleDrift(dtScale);
+      }
+    }
+
+    barba.x = Math.max(120, Math.min(WORLD_W - 120, barba.x));
+    barba.y = Math.max(120, Math.min(WORLD_H - 120, barba.y));
+  }
+
+  function barbaIdleDrift(dtScale) {
+    barba.idleTimer -= 16 * dtScale;
+    if (barba.idleTimer <= 0) {
+      barba.idleAngle = Math.random() * Math.PI * 2;
+      barba.idleTimer = 2000 + Math.random() * 3000;
+    }
+    barba.x += Math.cos(barba.idleAngle) * BARBA_IDLE_DRIFT * dtScale;
+    barba.y += Math.sin(barba.idleAngle) * BARBA_IDLE_DRIFT * dtScale;
+    barba.x = Math.max(200, Math.min(WORLD_W - 200, barba.x));
+    barba.y = Math.max(200, Math.min(WORLD_H - 200, barba.y));
+  }
+
+  function drawBarba(now) {
+    if (!barbaIsActive() || barba.roomId !== state.roomId) return;
+    const config = seasonalKarasukiConfig();
+    const sec = now / 1000;
+    const bob = Math.sin(barba.wobbleT * BARBA_WOBBLE_FREQ) * BARBA_WOBBLE_AMP;
+    const pulse = 0.5 + 0.5 * Math.sin(sec * 1.3);
+    const bx = barba.x;
+    const by = barba.y + bob;
+    const color = config?.color || '#b44dff';
+    ctx.save();
+    const halo = ctx.createRadialGradient(bx, by, 0, bx, by, BARBA_GLOW_R * 1.45);
+    halo.addColorStop(0, 'rgba(180,77,255,0.42)');
+    halo.addColorStop(0.42, 'rgba(180,77,255,0.18)');
+    halo.addColorStop(0.82, 'rgba(255,105,180,0.07)');
+    halo.addColorStop(1, 'transparent');
+    ctx.globalAlpha = 0.7 + pulse * 0.2;
+    ctx.fillStyle = halo;
+    ctx.beginPath(); ctx.arc(bx, by, BARBA_GLOW_R * 1.45, 0, Math.PI * 2); ctx.fill();
+    if (barbaImg.complete && barbaImg.naturalWidth > 0) {
+      const ratio = barbaImg.naturalWidth / (barbaImg.naturalHeight || 1);
+      const dw = BARBA_SIZE * 2;
+      const dh = dw / ratio;
+      ctx.globalAlpha = 0.96;
+      ctx.shadowBlur = 14 + pulse * 8;
+      ctx.shadowColor = color;
+      ctx.drawImage(barbaImg, bx - dw / 2, by - dh / 2, dw, dh);
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.globalAlpha = 0.86;
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(bx, by, BARBA_SIZE * 0.7, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function clickCheckBarba(worldX, worldY) {
+    if (performance.now() < barbaPopCooldownUntil) return false;
+    if (!barbaIsActive() || barba.roomId !== state.roomId) return false;
+    const bob = Math.sin(barba.wobbleT * BARBA_WOBBLE_FREQ * 1000) * BARBA_WOBBLE_AMP;
+    if (Math.hypot(worldX - barba.x, worldY - (barba.y + bob)) <= BARBA_HIT_R) {
+      openBarbaPop();
+      return true;
+    }
+    return false;
+  }
+
+  function injectBarbaPop() {
+    if (barbaPopEl) return;
+    const config = seasonalKarasukiConfig() || {};
+    const asset = config.asset || 'assets/img/wanderers/barba.webp';
+    const name = config.name || 'Barba';
+    const label = config.popupLabel || `${name.toUpperCase()} SAYS ✦`;
+    const labelJp = config.popupLabelJp || `${config.nameJp || name}からの ひとこと`;
+    barbaPopEl = document.createElement('div');
+    barbaPopEl.id = 'barba-pop';
+    barbaPopEl.style.cssText = 'display:none;position:fixed;inset:0;z-index:9260;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background .3s ease;padding:12px;';
+    barbaPopEl.innerHTML = `
+      <div style="background:radial-gradient(circle at 50% 0%,rgba(180,77,255,.24),transparent 35%),linear-gradient(165deg,#10091c 0%,#08040d 58%,#030205 100%);border:2px solid rgba(180,77,255,.68);border-radius:24px;padding:0 0 24px;width:min(390px,92vw);max-height:min(90vh,650px);overflow-y:auto;text-align:center;font-family:'Georgia',serif;position:relative;box-shadow:0 0 0 1px rgba(255,209,236,.12),0 0 28px rgba(180,77,255,.52),0 0 74px rgba(255,20,147,.2),inset 0 0 34px rgba(180,77,255,.08);">
+        <div style="height:4px;margin:0 22% 5px;border-radius:99px;background:linear-gradient(90deg,transparent,#b44dff,#ffd1ec,#b44dff,transparent);box-shadow:0 0 16px rgba(180,77,255,.9);"></div>
+        <button id="barba-pop-close" type="button" aria-label="Close / 閉じる" style="position:absolute;top:12px;right:14px;background:transparent;border:none;cursor:pointer;font-size:1rem;color:rgba(255,209,236,.78);padding:6px 9px;border-radius:50%;">✕</button>
+        <div style="height:min(210px,31vh);padding:18px 0 4px;display:flex;align-items:center;justify-content:center;">
+          <img src="${asset}" alt="${name}" style="max-width:76%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 0 10px rgba(180,77,255,.9)) drop-shadow(0 0 28px rgba(255,20,147,.42));" />
+        </div>
+        <p style="font-family:monospace;font-size:clamp(.66rem,2.4vw,.8rem);font-weight:800;letter-spacing:.2em;color:#d19aff;margin:0 22px 6px;text-shadow:0 0 12px rgba(180,77,255,.8);">${label}</p>
+        <p style="font-family:'Noto Sans JP',serif;font-size:clamp(.72rem,2.8vw,.9rem);color:#ead6ff;margin:0 24px 16px;">${labelJp}</p>
+        <div style="position:relative;margin:0 20px;padding:18px 16px 16px;border:1px solid rgba(180,77,255,.58);border-radius:20px;background:linear-gradient(180deg,rgba(31,7,43,.92),rgba(7,3,10,.9));box-shadow:0 0 22px rgba(180,77,255,.24),inset 0 0 22px rgba(180,77,255,.06);">
+          <p id="barba-pop-en" style="font-size:clamp(.88rem,3.6vw,1.06rem);line-height:1.6;color:#fff0f8;margin:0 0 10px;letter-spacing:.02em;font-style:italic;text-shadow:0 0 10px rgba(180,77,255,.2);"></p>
+          <p id="barba-pop-jp" style="font-size:clamp(.8rem,3.2vw,.95rem);line-height:1.8;color:rgba(255,225,248,.84);margin:0;font-family:'Noto Sans JP',serif;letter-spacing:.04em;"></p>
+        </div>
+      </div>`;
+    document.body.appendChild(barbaPopEl);
+    document.getElementById('barba-pop-close').addEventListener('click', closeBarbaPop);
+    barbaPopEl.addEventListener('click', event => { if (event.target === barbaPopEl) closeBarbaPop(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && barbaPopOpen) closeBarbaPop(); });
+  }
+
+  function openBarbaPop() {
+    const config = seasonalKarasukiConfig();
+    const lines = config?.lines || [];
+    if (!lines.length || !barbaPopEl) return;
+    const line = lines[Math.floor(Math.random() * lines.length)];
+    const name = getBoohaFirstName();
+    const en = name ? line.en.replace('{name}', name) : line.en.replace('{name}, ', '');
+    const jp = name ? line.jp.replace('{name}', name) : line.jp.replace('{name}、', '');
+    document.getElementById('barba-pop-en').textContent = en;
+    document.getElementById('barba-pop-jp').innerHTML = furi(jp, line.furigana || {});
+    barbaPopOpen = true;
+    barba.frozen = true;
+    barbaPopEl.style.display = 'flex';
+    barbaPopEl.style.background = 'rgba(8,0,15,.92)';
+    state.clickTarget = null;
+    if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
+  }
+
+  function closeBarbaPop() {
+    barbaPopOpen = false;
+    barba.frozen = false;
+    if (window.UtsuSfx && typeof window.UtsuSfx.popupClose === 'function') window.UtsuSfx.popupClose();
+    if (barbaPopEl) {
+      barbaPopEl.style.background = 'rgba(0,0,0,0)';
+      setTimeout(() => { if (!barbaPopOpen) barbaPopEl.style.display = 'none'; }, 300);
+    }
+    barbaPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+  }
+
+  function isBarbaPopOpen() { return barbaPopOpen; }
+
 
   
 function drawObserver(now) {
@@ -5975,6 +6221,7 @@ function drawObserver(now) {
     if(clickCheckObserver(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckHappyHousePortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     
+    if(clickCheckBarba(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckNuppi(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
  
       // AFTER all the early returns, BEFORE the movement logic:
@@ -6018,7 +6265,7 @@ function drawObserver(now) {
     injectStyles(); buildApp(); injectTrailHud(); injectEchoesTracker(); KarasukiAtmos.init(stage);
     restoreProfileRoom();
     fitStage(); resizeCanvas();
-    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); bindInput();
+    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); initBarba(); bindInput();
     worldPerf.enableOverlay(() => {
       const cache = wandererImageCache.stats();
       return {
