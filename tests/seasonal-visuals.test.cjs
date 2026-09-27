@@ -52,6 +52,12 @@ const index = read('index.html');
 assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ animation: none; \}/,
   'index sparkles must stop under reduced motion');
 
+const maze = read('maze.html');
+assert.match(maze, /html\[data-season="halloween"\] #mazeImg\{ filter:brightness\(1\.10\) saturate\(1\.08\); \}/,
+  'Halloween Maze artwork must receive a modest brightness lift');
+assert.match(maze, /HALLOWEEN_LIME[\s\S]*drawGlow\(x,y,glowR\*4\.9,HALLOWEEN_LIME/,
+  'Halloween checkpoints must add a spectral-green outer atmosphere without replacing orange/purple cores');
+
 ['maze.html', 'js/karasuki.js', 'js/utsuroba.js'].forEach(file => {
   const source = read(file);
   assert.ok(source.includes('window.BoohaSkins.MONTH_COLORS'), `${file} must use the shared month table`);
