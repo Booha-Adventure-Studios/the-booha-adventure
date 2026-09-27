@@ -18,7 +18,7 @@ const BoohaSkins = (() => {
   });
   // One shared table keeps the checkpoint/room atmosphere aligned across
   // Maze, Karasuki, and Utsuroba. October is the Halloween orange/purple
-  // month; December has an explicit winter-blue pair instead of a fallback.
+  // month; December has an explicit Christmas red/green pair instead of a fallback.
   const MONTH_COLORS = Object.freeze([
     Object.freeze(['#ff3bbd', '#ff79d7']),
     Object.freeze(['#ff6b3b', '#ffaa5e']),
@@ -31,7 +31,7 @@ const BoohaSkins = (() => {
     Object.freeze(['#3bffee', '#a8fff8']),
     Object.freeze([HALLOWEEN_PALETTE.orange, HALLOWEEN_PALETTE.purple]),
     Object.freeze(['#ff3b6f', '#ff85a1']),
-    Object.freeze(['#3b6fff', '#b8c9ff']),
+    Object.freeze(['#e53935', '#43d17b']),
   ]);
   const POSE_KEYS = Object.freeze([
     'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
