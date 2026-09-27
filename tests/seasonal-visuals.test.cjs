@@ -86,6 +86,11 @@ assert.match(karasuki, /function openBarbaPop\(\)/, 'Karasuki must wire the seas
 assert.match(karasuki, /function clickCheckBarba\(worldX, worldY\)/, 'Barba must be tappable');
 assert.match(karasuki, /drawBarba\(now\); drawNuppi\(now\)/, 'Barba must render beneath Nuppi');
 assert.match(karasuki, /line\.furigana \|\| \{\}/, 'Barba popup must render Japanese through furigana data');
+assert.match(karasuki, /const BARBA_MIN_VISIBLE_MS = 10000;/, 'Barba must remain visible long enough to be found');
+assert.ok(!/const barbaImg = new Image\(\);\s*barbaImg\.src/.test(karasuki),
+  'Barba artwork must not load outside its active season');
+assert.match(karasuki, /const bob = Math\.sin\(barba\.wobbleT \* BARBA_WOBBLE_FREQ\)/,
+  'Barba hit testing must use the same bob phase as drawing');
 assert.ok(!/openBarbaPop[\s\S]{0,1200}recordWandererVisit/.test(karasuki),
   'Barba must stay outside the collectible wanderer visit system');
 assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, false), null,
