@@ -49,6 +49,7 @@ assert.deepStrictEqual({ ...glow }, {
   purple: '#b44dff',
   lime: '#9dff3a',
 }, 'Halloween glow colors must be separate from the UI palette');
+assert.deepStrictEqual([...skins.SEASONS.halloween.checkpointSparkWeeks], [37, 38, 39, 40]);
 
 assert.strictEqual(skins.MONTH_COLORS.length, 12, 'shared month table must cover all 12 months');
 assert.deepStrictEqual([...skins.monthColorsForWeek(37)], [glow.orange, glow.purple],
@@ -70,6 +71,14 @@ assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, false)
   'Halloween bats must stay gated until Blitz is complete');
 assert.strictEqual(seasonalVisuals.activeSeasonalVisitor(seasonalVisitor, 'pb'), seasonalVisitor,
   'a complete Blitz curriculum must activate the Halloween visitor');
+assert.deepStrictEqual(
+  [...seasonalVisuals.checkpointSparkColors(skins.SEASONS.halloween, 37, ['aqua', 'mint'])],
+  [glow.orange, glow.purple, glow.lime],
+  'October checkpoints must use the Halloween spark cycle');
+assert.deepStrictEqual(
+  [...seasonalVisuals.checkpointSparkColors(skins.SEASONS.halloween, 36, ['aqua', 'mint'])],
+  ['aqua', 'mint'],
+  'non-October checkpoints must retain their own spark colors');
 
 const index = read('index.html');
 assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ animation: none; \}/,
