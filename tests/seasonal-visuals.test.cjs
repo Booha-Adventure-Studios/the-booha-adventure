@@ -43,8 +43,8 @@ assert.strictEqual(cssVars['--season-black'], palette.black);
 assert.strictEqual(skins.MONTH_COLORS.length, 12, 'shared month table must cover all 12 months');
 assert.deepStrictEqual([...skins.monthColorsForWeek(37)], [palette.orange, palette.purple],
   'October must use the Halloween orange/purple pair');
-assert.deepStrictEqual([...skins.monthColorsForWeek(45)], ['#3b6fff', '#b8c9ff'],
-  'December must have an explicit winter pair');
+assert.deepStrictEqual([...skins.monthColorsForWeek(45)], ['#e53935', '#43d17b'],
+  'December must have an explicit Christmas red/green pair');
 assert.notStrictEqual(skins.monthColorsForWeek(13)[0], '#3bff8a',
   'April must not reuse the answer-like green that only existed in Maze');
 
