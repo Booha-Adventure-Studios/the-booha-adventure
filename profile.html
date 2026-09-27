@@ -30,6 +30,17 @@
   </style>
   <script>document.documentElement.classList.add('token-checking');</script>
   <script src="./js/token.js"></script>
+  <script src="./js/core/booha-skins.js"></script>
+  <script>
+    // The profile opens Daily Check in place, so it needs the same seasonal
+    // marker as index.html before daily-check.js builds its overlay.
+    (function () {
+      var season = window.BoohaSkins && window.BoohaSkins.seasonIdForDate
+        ? window.BoohaSkins.seasonIdForDate()
+        : null;
+      if (season) document.documentElement.dataset.season = season;
+    })();
+  </script>
   <!-- ═══════════════════════════════════════════════════════ -->
 
   <style>
