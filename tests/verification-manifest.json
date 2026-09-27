@@ -161,6 +161,11 @@
       "reason": "Pre-Sunday Tokyo seasonal date gate for the Sep 27 and Oct 4 switches and Nov 1 shutoff."
     },
     {
+      "path": "tests/seasonal-visuals.test.cjs",
+      "status": "verify",
+      "reason": "Shared seasonal palette, 12-month color table, canvas consumers, and reduced-motion sparkles."
+    },
+    {
       "path": "tests/invaders-pass10.test.cjs",
       "status": "superseded",
       "reason": "Mute behavior assertion expects candy-SFX stopping that the current engine does not implement."
