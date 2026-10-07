@@ -18,6 +18,7 @@ function section(startMarker, endMarker) {
 
 const modalGuard = section('function anyModalOpen()', 'function updatePerfTier');
 assert.match(modalGuard, /state\.grimmerglenExiting/, 'anyModalOpen must block while Grimmerglen is exiting');
+assert.match(modalGuard, /isGrimmerglenPopupOpen\(\)/, 'anyModalOpen must block world logic while the Grimmerglen popup is open');
 
 const frameGuard = section('function staticFrameOverlayOpen()', 'function scheduleKarasukiFrame');
 assert.match(frameGuard, /isGrimmerglenPopupOpen\(\)/, 'staticFrameOverlayOpen must freeze on the Grimmerglen popup');
