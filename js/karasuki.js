@@ -4171,12 +4171,12 @@ const HAPPY_HOUSE_PORTAL = {
     [{ ox: -11, a: 0.65 }, { ox: 4, a: 1.0 }].forEach(({ ox, a }) => {
       ctx.globalAlpha = a * (0.5 + pulse * 0.4);
       ctx.strokeStyle = arrowCol1; ctx.lineWidth = 3.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      ctx.shadowBlur = 20; ctx.shadowColor = arrowCol2;
+      ctx.shadowBlur = shadowsEnabled ? 20 : 0; ctx.shadowColor = arrowCol2;
       ctx.beginPath(); ctx.moveTo(ox - 7, -10); ctx.lineTo(ox + 7, 0); ctx.lineTo(ox - 7, 10); ctx.stroke();
       ctx.shadowBlur = 0;
     });
     ctx.globalAlpha = 0.7 + pulse * 0.3; ctx.fillStyle = '#fff';
-    ctx.shadowBlur = 22; ctx.shadowColor = arrowCol1;
+    ctx.shadowBlur = shadowsEnabled ? 22 : 0; ctx.shadowColor = arrowCol1;
     ctx.beginPath(); ctx.arc(0, 0, 6.5, 0, Math.PI * 2); ctx.fill();
     // Tiny rotating glints make the open doorway feel alive without making
     // the arrow itself larger or harder to read.
@@ -4190,7 +4190,7 @@ const HAPPY_HOUSE_PORTAL = {
       const shimmer = 0.28 + 0.72 * (0.5 + 0.5 * Math.sin(sec * 2.8 + glint.phase));
       ctx.globalAlpha = shimmer * (0.42 + pulse * 0.38);
       ctx.fillStyle = glint.phase % 2 > 1 ? arrowCol2 : '#fff';
-      ctx.shadowBlur = 13; ctx.shadowColor = arrowCol1;
+      ctx.shadowBlur = shadowsEnabled ? 13 : 0; ctx.shadowColor = arrowCol1;
       ctx.beginPath();
       ctx.moveTo(glint.x, glint.y - glint.size);
       ctx.lineTo(glint.x + glint.size * .42, glint.y);
@@ -4248,7 +4248,7 @@ const HAPPY_HOUSE_PORTAL = {
     wpopThemeBox('grimmerglen-pop', GRIMMERGLEN_THEME);
     // The sprite in this popup is Marietta, not a logo -- same as how the
     // wanderer popups show a portrait rather than an icon.
-    wpopSetIconImage('grimmerglen-pop', 'assets/img/grimmerglen/marietta/marietta_01.webp', 'Marietta', 'image-grimmerglen');
+    wpopSetIconImage('grimmerglen-pop', 'assets/img/grimmerglen/marietta/marietta_01_popup.webp', 'Marietta', 'image-grimmerglen');
     wpopSetText(document.getElementById('grimmerglen-pop-title-en'), '');
     wpopSetText(document.getElementById('grimmerglen-pop-title-jp'), '');
 
@@ -5192,7 +5192,8 @@ const HAPPY_HOUSE_PORTAL = {
       isBarbaPopOpen()           ||
       isNuppiPopOpen()           ||
       isOrbPanelOpen()           ||
-      isHappyHousePopOpen()
+      isHappyHousePopOpen()      ||
+      isGrimmerglenPopupOpen()
     );
   }
 
@@ -6277,7 +6278,7 @@ function drawObserver(now) {
         wandererCacheOverBudget: cache.overBudget,
         roomLoadDecodeMs,
         activeAudioBufferCount: 0,
-        serviceWorkerCacheVersion: 'booha-assets-2026-573',
+        serviceWorkerCacheVersion: 'booha-assets-2026-574',
         averageFps: worldPerf.metrics().averageFps,
       };
     });
