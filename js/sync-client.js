@@ -521,13 +521,13 @@ window.BoohaSync = (() => {
     el.style.cssText = [
       'position:fixed', 'top:14px', 'left:50%', 'transform:translateX(-50%)',
       'width:min(92vw,520px)', 'z-index:99996',
-      'background:#26345c', 'color:#fff', 'border:1px solid #6677b9',
+      'background:#6b3154', 'color:#fff', 'border:1px solid #e78bb8',
       'border-radius:12px', 'padding:11px 16px', 'text-align:center',
-      'box-shadow:0 8px 28px rgba(0,0,0,.45)',
+      'box-shadow:0 8px 28px rgba(229,116,170,.28)',
       'font:600 13px/1.45 system-ui,-apple-system,sans-serif'
     ].join(';');
-    el.textContent = `${names}: さいしんのオンラインきろくを もどしました。` +
-      ' / Latest online progress restored. The other copy was saved safely for your teacher.';
+    el.textContent = `${names}: あなたの さいしんの プライベートな きろくを もどしました。` +
+      ' / Your latest private progress is restored.';
     document.body.appendChild(el);
     setTimeout(() => { if (el.isConnected) el.remove(); }, 8000);
   }
