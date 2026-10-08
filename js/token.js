@@ -80,10 +80,8 @@
     }
   }
 
-  // Sticky while a failure is real, but not permanent after recovery. The
-  // previous banner remembered only that *something* had failed once, so a
-  // harmless identity race could leave "Not saving" on screen all lesson even
-  // after subsequent writes succeeded.
+  // Keep the status visible while saving is genuinely locked or unhealthy,
+  // but make the normal boot/restore lock feel like a calm Booha status.
   const saveHealth = {
     locked: false,
     adventure: false,
@@ -102,13 +100,18 @@
       el.id = 'booha-savefail-banner';
       el.style.cssText = [
         'position:fixed', 'bottom:0', 'left:0', 'right:0',
-        'background:#b00020', 'color:#fff',
+        'background:#6f3155', 'color:#ffe8f4',
+        'border-top:1px solid rgba(255,184,220,.65)',
         'text-align:center', 'padding:10px 16px',
+        'box-shadow:0 -4px 18px rgba(229,116,170,.2)',
         'font:600 14px/1.4 sans-serif', 'z-index:99999'
       ].join(';');
       document.body.appendChild(el);
     }
-    el.textContent = 'きろくできません / Not saving — tell your teacher.';
+    const preparing = saveHealth.locked && !saveHealth.adventure && !saveHealth.juku;
+    el.textContent = preparing
+      ? 'ブーハが じゅんびちゅう… / Booha is getting things ready…'
+      : 'ブーハが きろくを たしかめちゅう… / Booha is checking your saved progress…';
   }
 
   function noteSaveProblem(kind) {
