@@ -154,8 +154,8 @@
     }
     const preparing = saveHealth.locked && !saveHealth.adventure && !saveHealth.juku;
     el.textContent = preparing
-      ? 'ブーハが じゅんびちゅう… / Booha is getting things ready…'
-      : 'ブーハが きろくを たしかめちゅう… / Booha is checking your saved progress…';
+      ? 'ブーハーが じゅんびちゅう… / Booha is getting things ready…'
+      : 'ブーハーが きろくできません。せんせいに おしえてね / Booha can\'t save right now — please tell your teacher.';
   }
 
   function noteSaveProblem(kind) {
@@ -173,7 +173,7 @@
   document.addEventListener('juku:saveFailed',  () => noteSaveProblem('juku'));
 
   // Sync-ready proves the temporary no-identity lock has been resolved. A real
-  // storage failure remains red until that same storage engine successfully
+  // storage failure remains visible until that same storage engine successfully
   // writes again.
   document.addEventListener('booha:syncReady', () => clearSaveProblem('locked'));
   document.addEventListener('booha:saved', () => {
