@@ -1242,6 +1242,13 @@ else
   bad "Sync weekly-world audit failed"
 fi
 
+echo "[sync] Session restore audit"
+if node tests/sync-session-restore-audit.cjs >/dev/null 2>&1; then
+  ok "Bounded same-tab restore contracts pass"
+else
+  bad "Sync session-restore audit failed"
+fi
+
 echo "[service-worker] Pass 1 precache resilience audit"
 if node tests/service-worker-precache-audit.cjs >/dev/null 2>&1; then
   ok "Service-worker install and runtime precache resilience contracts pass"
