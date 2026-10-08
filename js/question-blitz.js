@@ -18,7 +18,7 @@ window.QuestionBlitz = (() => {
       en: 'There is no evidence that you practiced.'
     },
     {
-      jp: 'ブーハ、今ちょっと黙ったよ。',
+      jp: 'ブーハー、今ちょっと黙ったよ。',
       hira: 'ぶーは、いまちょっとだまったよ。',
       en: 'Booha just went quiet for a second.'
     },
@@ -58,7 +58,7 @@ window.QuestionBlitz = (() => {
       en: 'Flashcards are not an urban legend.'
     },
     {
-      jp: 'ブーハも二度見したよ。',
+      jp: 'ブーハーも二度見したよ。',
       hira: 'ぶーはもにどみしたよ。',
       en: 'Even Booha did a double take.'
     },
@@ -73,7 +73,7 @@ window.QuestionBlitz = (() => {
       en: 'Where did that answer come from?'
     },
     {
-      jp: 'ブーハの魂が少し抜けたよ。',
+      jp: 'ブーハーの魂が少し抜けたよ。',
       hira: 'ぶーはのたましいがすこしぬけたよ。',
       en: "A little bit of Booha's soul just left."
     },
@@ -88,7 +88,7 @@ window.QuestionBlitz = (() => {
       en: 'Do you know review? You two could be friends.'
     },
     {
-      jp: '今のはブーハの予想を下回りました。',
+      jp: '今のはブーハーの予想を下回りました。',
       hira: 'いまのはぶーはのよそうをしたまわりました。',
       en: "That was below Booha's expectations."
     }
@@ -98,7 +98,7 @@ window.QuestionBlitz = (() => {
   const WIN_COPY = {
     clear: 'ANSWERED TOO FAST',
     record: 'BROKE THE MACHINE',
-    jp: 'ブーハが覚えた。'
+    jp: 'ブーハーが覚えた。'
   };
 
   /* ── Inject styles once ──────────────────────────────────────── */

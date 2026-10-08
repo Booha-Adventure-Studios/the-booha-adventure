@@ -568,7 +568,7 @@
       andonFill.style.width = `${Math.round(fraction * 100)}%`;
       andonFill.setAttribute('aria-valuenow', String(Math.round(fraction * 100)));
     }
-    andon.setAttribute('aria-label', fraction < .22 ? "Booha's light is nearly gone / ブーハの あかりが きえそう" : "Booha's light is burning / ブーハの あかりが もえている");
+    andon.setAttribute('aria-label', fraction < .22 ? "Booha's light is nearly gone / ブーハーの あかりが きえそう" : "Booha's light is burning / ブーハーの あかりが もえている");
   }
 
   function updateTierButtons() {
@@ -1472,7 +1472,7 @@
     updateFlashlightUi();
   }
 
-  function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / HOLD TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハを ひっぱる / じっと させる'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
+  function updateHud() { if (state === 'playing') setObservation(pendingMark ? 'CONFIRM THE MARK' : markedPoints.length ? 'MARK ADDED / FIND ANOTHER OR REPORT' : 'DRAG BOOHA / HOLD TO CHECK', pendingMark ? 'しるしを かくにん' : markedPoints.length ? 'しるしを つけた / つぎを さがすか ほうこく' : 'ブーハーを ひっぱる / じっと させる'); else setObservation('LOOK / LISTEN / REMEMBER', 'みて / きいて / おぼえる'); setReportLabel(markedPoints.length > 0); }
 
   function startRound() {
     clearRoundTimers();
@@ -1737,7 +1737,7 @@
       markHoldStartedAt = performance.now();
       markHoldTimer = window.setTimeout(lockMark, MARK_HOLD_MS);
     } else {
-      setObservation('ARROWS MOVE BOOHA / SPACE MARKS', 'やじるしで ブーハを うごかす / スペースで しるし');
+      setObservation('ARROWS MOVE BOOHA / SPACE MARKS', 'やじるしで ブーハーを うごかす / スペースで しるし');
     }
   }
 
@@ -1922,7 +1922,7 @@
       if (!save.save(data)) return;
       enqueueClue(
         "Booha's light shrinks as it burns — keep it close to search the room.",
-        'ブーハの あかりは もえると ちいさくなる。そばで へやを さがそう。',
+        'ブーハーの あかりは もえると ちいさくなる。そばで へやを さがそう。',
       );
     } catch (error) {
       console.warn('[Family Room] light tip unavailable', error);

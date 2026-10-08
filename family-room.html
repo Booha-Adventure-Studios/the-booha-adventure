@@ -10,13 +10,13 @@
 </head>
 <body>
   <main id="game-shell" aria-label="Akiya observation game / あきや の かんさつゲーム">
-    <canvas id="room-canvas" aria-label="A dark, empty house. Drag Booha through the room and mark a change. くらい、からの いえで、ブーハを うごかして へんかに しるしを つけます。"></canvas>
+    <canvas id="room-canvas" aria-label="A dark, empty house. Drag Booha through the room and mark a change. くらい、からの いえで、ブーハーを うごかして へんかに しるしを つけます。"></canvas>
 
     <header class="hud">
       <div class="hud-brand">
-        <div id="andon" class="andon andon-primary" role="status" aria-label="Booha's light is burning / ブーハの あかりが もえている">
+        <div id="andon" class="andon andon-primary" role="status" aria-label="Booha's light is burning / ブーハーの あかりが もえている">
           <span class="andon-light" aria-hidden="true"></span>
-          <span class="andon-copy"><span>BOOHA'S LIGHT</span><span class="jp" lang="ja">ブーハの あかり</span></span>
+          <span class="andon-copy"><span>BOOHA'S LIGHT</span><span class="jp" lang="ja">ブーハーの あかり</span></span>
           <span class="andon-meter" role="progressbar" aria-label="Booha's light remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span id="andon-fill"></span></span>
         </div>
       </div>
@@ -58,7 +58,7 @@
     <section id="start-panel" class="panel visible" aria-labelledby="start-title">
       <p class="panel-kicker"><span id="start-case-kicker-en">CASE FILE 01 / GENKAN</span><span id="start-case-kicker-jp" class="jp" lang="ja">じけんファイル 01 / げんかん</span></p>
       <h1 id="start-title"><span>DON'T BLINK.</span><span class="jp" lang="ja">めを そらさないで。</span></h1>
-      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Move Booha to a change, then hold Booha still to mark it. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハを うごかし、じっと させて しるしを つける。しるしを かくにんして、へやを ほうこくする。</span></p>
+      <p class="panel-copy"><span>Open the room and study it in the light. When you are ready, the room will go dark. Move Booha to a change, then hold Booha still to mark it. Confirm each mark, then report the room.</span><span class="jp" lang="ja">へやを あけて、あかるい うちに おぼえる。じゅんびが できたら、へやが くらくなる。かわった ところへ ブーハーを うごかし、じっと させて しるしを つける。しるしを かくにんして、へやを ほうこくする。</span></p>
       <p class="panel-copy route-note"><span>The house opens one room at a time. Start at the front door.</span><span class="jp" lang="ja">いえは ひとつずつ ひらく。げんかんから はじめます。</span></p>
       <div id="tier-picker" class="tier-picker" aria-label="Choose how the room behaves / へやの うごきを えらぶ">
         <button class="tier-button selected" type="button" data-tier="patient"><b><span>THE ROOM IS PATIENT</span><span class="jp" lang="ja">へやは おだやか</span></b><small><span>the first case</span><span class="jp" lang="ja">はじめの じけん</span></small></button>
@@ -68,13 +68,13 @@
       <p id="tier-note" class="tier-note" aria-live="polite"><span>All room speeds are open. Blitz can suggest a starting point.</span><span class="jp" lang="ja">すべての はやさを えらべます。ブリッツは めやすです。</span></p>
       <button id="start-button" class="primary-button" type="button"><span>ENTER THE ROOM</span><span class="jp" lang="ja">へやに はいる</span><span class="button-arrow" aria-hidden="true">→</span></button>
       <button id="back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
-      <p class="panel-foot"><span>Enter opens the study · Follow the house in order · Drag or arrows move · Hold Booha still to mark · Enter reports</span><span class="jp" lang="ja">Enterで へやを おぼえる · いえの じゅんばんに すすむ · ひっぱるか やじるしで うごかす · ブーハを じっと させて しるし · Enterで ほうこく</span></p>
+      <p class="panel-foot"><span>Enter opens the study · Follow the house in order · Drag or arrows move · Hold Booha still to mark · Enter reports</span><span class="jp" lang="ja">Enterで へやを おぼえる · いえの じゅんばんに すすむ · ひっぱるか やじるしで うごかす · ブーハーを じっと させて しるし · Enterで ほうこく</span></p>
     </section>
 
     <section id="study-panel" class="panel study-panel" aria-labelledby="study-title" hidden>
       <p class="panel-kicker"><span id="study-case-kicker-en">CASE FILE 01 / GENKAN</span><span id="study-case-kicker-jp" class="jp" lang="ja">じけんファイル 01 / げんかん</span></p>
       <h2 id="study-title"><span>STUDY THE ROOM.</span><span class="jp" lang="ja">へやを おぼえる。</span></h2>
-      <p class="panel-copy"><span>Take as long as you need. Remember what belongs here and notice the way out. In the dark, Booha carries a closer view as you travel. Start when ready.</span><span class="jp" lang="ja">じぶんの ペースで みて、ものと でぐちを おぼえる。くらくなると、ブーハと いっしょに ちかい けしきで うごく。じゅんびが できたら はじめる。</span></p>
+      <p class="panel-copy"><span>Take as long as you need. Remember what belongs here and notice the way out. In the dark, Booha carries a closer view as you travel. Start when ready.</span><span class="jp" lang="ja">じぶんの ペースで みて、ものと でぐちを おぼえる。くらくなると、ブーハーと いっしょに ちかい けしきで うごく。じゅんびが できたら はじめる。</span></p>
       <button id="study-start-button" class="primary-button" type="button"><span>START THE CASE</span><span class="jp" lang="ja">じけんを はじめる</span><span class="button-arrow" aria-hidden="true">→</span></button>
       <button id="study-back-button" class="secondary-button" type="button"><span>BACK TO PROFILE</span><span class="jp" lang="ja">プロフィールへ もどる</span></button>
       <p class="panel-foot"><span>No timer. Start when ready.</span><span class="jp" lang="ja">じかんせいげんなし。じゅんびが できたら はじめる。</span></p>

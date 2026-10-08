@@ -1218,9 +1218,6 @@ window.BoohaSync = (() => {
       clearScreen();
       ready();
       refreshMeta();
-      blobs.forEach(blob => {
-        if (isEffectivelyDirty(blob, readLocal(blob))) schedulePush(blob);
-      });
       return;
     }
 
