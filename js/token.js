@@ -7,7 +7,10 @@
 
   const GATE_URL      = 'https://www.bryanharper.tokyo/booha-gate';
   const VERIFY_URL    = 'https://www.bryanharper.tokyo/_functions/verifyToken';
+  const VERIFY_AND_LOAD_URL = 'https://www.bryanharper.tokyo/_functions/verifyAndLoad';
   const GRACE_MS      = 12 * 60 * 60 * 1000; // 12 hours offline grace
+  const SESSION_RESTORE_KEY = 'booha_sync_session:v1';
+  const SESSION_RESTORE_TTL_MS = 15 * 60 * 1000;
 
   const KEY_TOKEN     = 'booha_token';
   const KEY_EXPIRES   = 'booha_token_expires';
@@ -49,6 +52,47 @@
 
   function unlock() {
     document.documentElement.classList.remove('token-checking');
+  }
+
+  function tokenFingerprint(value) {
+    let text;
+    try { text = JSON.stringify(String(value || '')); }
+    catch (e) { return ''; }
+    let hash = 2166136261;
+    for (let i = 0; i < text.length; i++) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `${text.length}:${(hash >>> 0).toString(36)}`;
+  }
+
+  function hasSyncClientScript() {
+    const scripts = document.scripts ? Array.from(document.scripts) : [];
+    return scripts.some(script =>
+      /(?:^|\/)sync-client\.js(?:[?#]|$)/.test(script.src || '')
+    );
+  }
+
+  function hasFreshSessionRestore(token) {
+    if (!hasSyncClientScript()) return false;
+    try {
+      const record = JSON.parse(
+        sessionStorage.getItem(SESSION_RESTORE_KEY) || 'null'
+      );
+      return !!record &&
+        record.tokenFingerprint === tokenFingerprint(token) &&
+        Number.isFinite(Number(record.restoredAt)) &&
+        Date.now() - Number(record.restoredAt) <= SESSION_RESTORE_TTL_MS;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function takeInitialSync(data, token) {
+    if (!data || data.ok !== true || !data.adventure || !data.juku) return;
+    window.BOOHA_INITIAL_SYNC = Object.assign({}, data, {
+      _tokenFingerprint: tokenFingerprint(token)
+    });
   }
 
   function handleOffline(token) {
@@ -322,10 +366,31 @@
     // students to reload past it.
     const slowTimer = setTimeout(showConnectingBanner, 4000);
 
+    // The first full page of a tab can combine identity verification and both
+    // save loads. Later hops still verify the token, while sync-client.js uses
+    // its own dirty/conflict-aware session shortcut for the save data.
+    const useCombinedBootstrap = hasSyncClientScript() &&
+      !hasFreshSessionRestore(token);
+
     // Validate with Wix
     let data;
     try {
-      const res = await fetch(`${VERIFY_URL}?token=${encodeURIComponent(token)}`);
+      let res;
+      if (useCombinedBootstrap) {
+        res = await fetch(VERIFY_AND_LOAD_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+
+        // Publish order can briefly leave the new frontend ahead of Wix. A
+        // missing route falls back to the established identity-only gate.
+        if (res.status === 404 || res.status === 405) {
+          res = await fetch(`${VERIFY_URL}?token=${encodeURIComponent(token)}`);
+        }
+      } else {
+        res = await fetch(`${VERIFY_URL}?token=${encodeURIComponent(token)}`);
+      }
       data = await res.json();
       
    } catch (err) {
@@ -363,6 +428,8 @@
       localStorage.removeItem(KEY_USER_ID);
       showIdentityBanner();
     }
+
+    takeInitialSync(data, token);
 
     signalIdentityReady();
 

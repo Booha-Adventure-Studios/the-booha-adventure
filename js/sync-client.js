@@ -607,6 +607,14 @@ window.BoohaSync = (() => {
     try { sessionStorage.removeItem(SESSION_RESTORE_KEY); } catch (e) {}
   }
 
+  function takeInitialSync() {
+    const initial = window.BOOHA_INITIAL_SYNC;
+    window.BOOHA_INITIAL_SYNC = null;
+    if (!initial || initial.ok !== true || initial.userId !== uid()) return null;
+    if (initial._tokenFingerprint !== sessionTokenFingerprint()) return null;
+    return initial;
+  }
+
   function pendingRecoveryKey(blob) {
     return `${META_BASE}:pending-recovery:${blob}:${uid()}`;
   }
@@ -1216,28 +1224,30 @@ window.BoohaSync = (() => {
       return;
     }
 
-    showRestoring();
+    let res = takeInitialSync();
+    if (!res) {
+      showRestoring();
 
-    if (!navigator.onLine) {
-      const hasAny = blobs.some(blob => {
-        const local = readLocal(blob);
-        return local && !isEmpty(blob, local);
-      });
-      if (!hasAny) { showOfflineBlocked(); _state = 'blocked'; return; }
-      console.warn('[sync] offline — playing from local, will push later.');
-      clearScreen();
-      ready();
-      return;
-    }
+      if (!navigator.onLine) {
+        const hasAny = blobs.some(blob => {
+          const local = readLocal(blob);
+          return local && !isEmpty(blob, local);
+        });
+        if (!hasAny) { showOfflineBlocked(); _state = 'blocked'; return; }
+        console.warn('[sync] offline — playing from local, will push later.');
+        clearScreen();
+        ready();
+        return;
+      }
 
-    let res;
-    try {
-      res = await post(LOAD_URL, { token: token() });
-    } catch (e) {
-      console.error('[sync] load failed:', e);
-      showFailed(() => restore());
-      _state = 'blocked';
-      return;
+      try {
+        res = await post(LOAD_URL, { token: token() });
+      } catch (e) {
+        console.error('[sync] load failed:', e);
+        showFailed(() => restore());
+        _state = 'blocked';
+        return;
+      }
     }
 
     if (!res || res.ok !== true) {
