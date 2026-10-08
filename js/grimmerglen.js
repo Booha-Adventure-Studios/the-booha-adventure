@@ -1437,7 +1437,7 @@
     { en: 'I forgot something important, and I finally remembered what it was.',
       jp: '大切なことを忘れていて、それが何だったのか、やっと思い出したの。' },
     { en: 'Will you help me? I need Booha to find the things from my daydreams.',
-      jp: '手伝ってくれる？わたしの夢の中にあるものを、ブーハに見つけてほしいの。' }
+      jp: '手伝ってくれる？わたしの夢の中にあるものを、ブーハーに見つけてほしいの。' }
   ];
 
   // Per-kanji-term reading map -- prose gets individual term readings
