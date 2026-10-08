@@ -311,13 +311,13 @@
         full: ['I drink a warm cup of Pamuri.', 'I make a warm cup of tea.', 'I carry a warm cup of cocoa.'], partial: ['I drink …', 'I make …', 'I carry …']
       },
       case: {
-        story: { en: 'I remember drinking warm Pamuri with Takachika while watching Booha dance.', jp: 'タカチカと温かいパムリを飲みながら、ブーハが踊るのを見たのを覚えている。', readings: { '温かい': 'あたたかい', '踊る': 'おどる', '見た': 'みた', '飲みながら': 'のみながら', '覚えている': 'おぼえている' } },
-        target: 'I drank warm Pamuri while watching Booha dance.', jp: 'ブーハが踊るのを見ながら、温かいパムリを飲んだ。', readings: { '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ' },
+        story: { en: 'I remember drinking warm Pamuri with Takachika while watching Booha dance.', jp: 'タカチカと温かいパムリを飲みながら、ブーハーが踊るのを見たのを覚えている。', readings: { '温かい': 'あたたかい', '踊る': 'おどる', '見た': 'みた', '飲みながら': 'のみながら', '覚えている': 'おぼえている' } },
+        target: 'I drank warm Pamuri while watching Booha dance.', jp: 'ブーハーが踊るのを見ながら、温かいパムリを飲んだ。', readings: { '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ' },
         full: ['I drank warm Pamuri while watching Booha dance.', 'I made warm Pamuri while watching Booha dance.', 'I carried warm Pamuri while watching Booha dance.'], partial: ['I drank warm Pamuri while …', 'I made warm Pamuri while …', 'I carried warm Pamuri while …']
       },
       deep: {
-        story: { en: 'I remember drinking warm Pamuri while watching Booha dance above the clouds at sunset in Karasuki.', jp: 'カラスキで、夕暮れに雲の上をブーハが踊るのを見ながら、温かいパムリを飲んだのを覚えている。', readings: { '夕暮れ': 'ゆうぐれ', '雲': 'くも', '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ', '覚えている': 'おぼえている' } },
-        target: 'I drank warm Pamuri while watching Booha dance above the clouds at sunset.', jp: '夕暮れに雲の上をブーハが踊るのを見ながら、温かいパムリを飲んだ。', readings: { '夕暮れ': 'ゆうぐれ', '雲': 'くも', '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ' },
+        story: { en: 'I remember drinking warm Pamuri while watching Booha dance above the clouds at sunset in Karasuki.', jp: 'カラスキで、夕暮れに雲の上をブーハーが踊るのを見ながら、温かいパムリを飲んだのを覚えている。', readings: { '夕暮れ': 'ゆうぐれ', '雲': 'くも', '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ', '覚えている': 'おぼえている' } },
+        target: 'I drank warm Pamuri while watching Booha dance above the clouds at sunset.', jp: '夕暮れに雲の上をブーハーが踊るのを見ながら、温かいパムリを飲んだ。', readings: { '夕暮れ': 'ゆうぐれ', '雲': 'くも', '踊る': 'おどる', '見ながら': 'みながら', '温かい': 'あたたかい', '飲んだ': 'のんだ' },
         full: ['I drank warm Pamuri while watching Booha dance above the clouds at sunset.', 'I made warm Pamuri while watching Booha dance above the clouds at sunset.', 'I carried warm Pamuri while watching Booha dance above the clouds at sunset.'], partial: ['I drank warm Pamuri while …', 'I made warm Pamuri while …', 'I carried warm Pamuri while …']
       }
     },
