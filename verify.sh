@@ -1715,6 +1715,11 @@ fi
 # ── Test inventory and manifest-wired current tests ─────────
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
+if node tests/status-message-audit.cjs >/dev/null 2>&1; then
+  ok "status message copy and pink status treatment pass"
+else
+  fail "status message copy and pink status treatment failed"
+fi
 if node tests/verification-script-audit.cjs >/dev/null 2>&1; then
   ok "verify.sh shebang, empty-JSON whitelist, and failure exit contracts pass"
 else
