@@ -27,6 +27,15 @@ assert.match(syncClient, /if \(canSkipSessionRestore\(blobs\)\)/,
 assert.match(syncClient, /markSessionRestored\(blobs\)/,
   'successful full restore must record the session shortcut');
 assert.match(syncClient, /invalidateSessionRestore\(\);/,
-  'new local work or a conflict must invalidate the shortcut');
+  'conflicts must invalidate the shortcut');
+const setDirtyBlock = syncClient.match(
+  /function setDirty\(blob\) \{[\s\S]*?\n  \}/
+);
+assert.ok(setDirtyBlock, 'sync must keep a dedicated setDirty function');
+assert.doesNotMatch(
+  setDirtyBlock[0],
+  /invalidateSessionRestore\(\);/,
+  'dirty local work must rely on the dirty check and preserve the session marker after a successful push'
+);
 
 console.log('Sync session-restore audit passed: the shortcut is bounded, identity-bound, and fail-safe for dirty/conflicted progress.');
