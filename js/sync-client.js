@@ -38,6 +38,8 @@ window.BoohaSync = (() => {
   const META_BASE  = 'booha_sync:v2';
   const DEVICE_KEY = 'booha_device:v1';
   const CHANNEL_NAME = 'booha-sync-tabs-v2';
+  const SESSION_RESTORE_KEY = 'booha_sync_session:v1';
+  const SESSION_RESTORE_TTL_MS = 15 * 60 * 1000;
 
   const DEBOUNCE_MS = 12000;   // dirty → background push
   const TIMEOUT_MS  = 15000;   // per request
@@ -548,6 +550,63 @@ window.BoohaSync = (() => {
     } catch (e) { return []; }
   }
 
+  /* ── same-tab restore shortcut ─────────────────────────
+     A successful online restore is sufficient for a short-lived navigation
+     session. This is only a performance hint: identity is still gated by
+     token.js, and any dirty or conflicted local blob forces the normal
+     cloud reconciliation path. The token is represented by a local digest,
+     never copied into sessionStorage. */
+
+  function sessionRestoreRecord() {
+    try {
+      const record = JSON.parse(sessionStorage.getItem(SESSION_RESTORE_KEY) || 'null');
+      return record && typeof record === 'object' ? record : null;
+    } catch (e) { return null; }
+  }
+
+  function sessionTokenFingerprint() {
+    return dataSignature(token());
+  }
+
+  function canSkipSessionRestore(blobs) {
+    const record = sessionRestoreRecord();
+    if (!record || record.userId !== uid() ||
+        record.tokenFingerprint !== sessionTokenFingerprint()) return false;
+    if (!Number.isFinite(Number(record.restoredAt)) ||
+        Date.now() - Number(record.restoredAt) > SESSION_RESTORE_TTL_MS) return false;
+
+    const restored = new Set(Array.isArray(record.blobs) ? record.blobs : []);
+    if (!blobs.every(blob => restored.has(blob))) return false;
+
+    refreshMeta();
+    if (_blockedByConflict || _meta.blocked || _meta.conflict) return false;
+    return blobs.every(blob => !isEffectivelyDirty(blob, readLocal(blob)));
+  }
+
+  function markSessionRestored(blobs) {
+    const current = sessionRestoreRecord();
+    const sameIdentity = current && current.userId === uid() &&
+      current.tokenFingerprint === sessionTokenFingerprint();
+    const restored = new Set(sameIdentity && Array.isArray(current.blobs)
+      ? current.blobs : []);
+    blobs.forEach(blob => restored.add(blob));
+    try {
+      sessionStorage.setItem(SESSION_RESTORE_KEY, JSON.stringify({
+        userId: uid(),
+        tokenFingerprint: sessionTokenFingerprint(),
+        restoredAt: Date.now(),
+        blobs: Array.from(restored)
+      }));
+    } catch (e) {
+      // sessionStorage is an optimization only; a quota/privacy failure must
+      // fall back to the existing full restore path.
+    }
+  }
+
+  function invalidateSessionRestore() {
+    try { sessionStorage.removeItem(SESSION_RESTORE_KEY); } catch (e) {}
+  }
+
   function pendingRecoveryKey(blob) {
     return `${META_BASE}:pending-recovery:${blob}:${uid()}`;
   }
@@ -765,6 +824,7 @@ window.BoohaSync = (() => {
   }
 
   function showConflict(info, notice) {
+    invalidateSessionRestore();
     if (!_blockedByConflict) {
       _conflictResolutionBaseline = Number(_meta && _meta.lastResolutionAt || 0);
     }
@@ -1142,10 +1202,21 @@ window.BoohaSync = (() => {
       m.blocked = false;
       m.conflict = null;
     }, 'restore');
-    showRestoring();
 
     const blobs = availableBlobs();
     if (!blobs.length) { block('no local storage engine'); return; }
+
+    if (canSkipSessionRestore(blobs)) {
+      clearScreen();
+      ready();
+      refreshMeta();
+      blobs.forEach(blob => {
+        if (isEffectivelyDirty(blob, readLocal(blob))) schedulePush(blob);
+      });
+      return;
+    }
+
+    showRestoring();
 
     if (!navigator.onLine) {
       const hasAny = blobs.some(blob => {
@@ -1222,6 +1293,7 @@ window.BoohaSync = (() => {
     }
 
     mutateMeta(m => { m.lastSyncAt = Date.now(); }, 'ready');
+    markSessionRestored(blobs);
     clearScreen();
     ready();
     const notices = Array.from(new Set(recoveredBlobs.concat(takeRecoveryNotices())));
@@ -1363,6 +1435,8 @@ window.BoohaSync = (() => {
         m.lastSyncAt = Date.now();
       }, 'revision', blob);
       clearStoredConflict(blob);
+      refreshMeta();
+      if (!isEffectivelyDirty(blob, readLocal(blob))) markSessionRestored([blob]);
       console.log(`[sync] ${blob}: pushed revision ${res.revision}`);
       return true;
     }
@@ -1414,6 +1488,7 @@ window.BoohaSync = (() => {
   /* ── dirty tracking ──────────────────────────────────── */
 
   function setDirty(blob) {
+    invalidateSessionRestore();
     const changeId = nextChangeId();
     mutateMeta(m => {
       m[blob + 'Dirty'] = true;
