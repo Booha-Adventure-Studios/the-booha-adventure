@@ -526,8 +526,8 @@ window.BoohaSync = (() => {
       'box-shadow:0 8px 28px rgba(229,116,170,.28)',
       'font:600 13px/1.45 system-ui,-apple-system,sans-serif'
     ].join(';');
-    el.textContent = `${names}: あなたの さいしんの プライベートな きろくを もどしました。` +
-      ' / Your latest private progress is restored.';
+    el.textContent = `${names}: さいしんのオンラインきろくを もどしました。` +
+      ' / Latest online progress restored. The other copy was saved safely for your teacher.';
     document.body.appendChild(el);
     setTimeout(() => { if (el.isConnected) el.remove(); }, 8000);
   }
@@ -1498,7 +1498,6 @@ window.BoohaSync = (() => {
   /* ── dirty tracking ──────────────────────────────────── */
 
   function setDirty(blob) {
-    invalidateSessionRestore();
     const changeId = nextChangeId();
     mutateMeta(m => {
       m[blob + 'Dirty'] = true;
