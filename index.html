@@ -597,6 +597,71 @@
       text-shadow: 0 1px 4px rgba(0,0,0,.8);
     }
 
+    .hubGreetingRow {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+      align-items: center;
+      width: 100%;
+      margin-top: 2px;
+    }
+    .hubGreetingRow .playerGreeting { grid-column: 2; }
+    .hubHomeworkBtn {
+      grid-column: 3;
+      justify-self: start;
+      margin-left: clamp(10px, 1.5vw, 22px);
+      appearance: none;
+      min-height: 44px;
+      padding: 8px 16px 7px;
+      border: 1px solid rgba(255,238,133,.95);
+      border-radius: 999px;
+      color: #100b00;
+      background: linear-gradient(180deg, #fff2a0 0%, #ffd45f 52%, #f5ae24 100%);
+      box-shadow:
+        0 5px 14px rgba(255,190,74,.34),
+        0 0 0 2px rgba(255,224,102,.16),
+        0 0 24px rgba(255,198,70,.55);
+      cursor: pointer;
+      font-size: clamp(10px, 1.2vw, 13px);
+      font-weight: 1000;
+      letter-spacing: 1px;
+      line-height: 1.05;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+      transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+    }
+    .hubHomeworkBtn span {
+      display: block;
+      margin-top: 3px;
+      font-size: .88em;
+      letter-spacing: .2px;
+    }
+    .hubHomeworkBtn:hover {
+      filter: brightness(1.08);
+      box-shadow:
+        0 7px 18px rgba(255,190,74,.40),
+        0 0 0 2px rgba(255,224,102,.22),
+        0 0 30px rgba(255,198,70,.72);
+    }
+    .hubHomeworkBtn:active { transform: scale(.97); }
+    .hubHomeworkBtn:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 4px;
+    }
+
+    @media (max-width: 760px) {
+      .hubGreetingRow {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .hubGreetingRow .playerGreeting { order: 1; }
+      .hubHomeworkBtn {
+        order: 2;
+        margin-left: 0;
+      }
+    }
+
 
     
     .hubRow {
@@ -615,7 +680,6 @@
         min-height: 60px;
         padding: 9px 14px 7px !important;
       }
-      .weekCard.currentWeek { min-height: 104px; }
     }
 
     /* ── Week card ──
@@ -656,8 +720,8 @@
     }
 
     /* The current week is the student's starting point, so it needs a clear
-       visual lead over the adjacent navigation cards. Keep the distinction
-       structural and calm: the next pass will add the homework action here. */
+       visual lead over the adjacent navigation cards. The homework action
+       lives beside the centered greeting, leaving this tile uncluttered. */
     .weekCard.currentWeek {
       z-index: 1;
       background: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,91,202,.18) 48%, rgba(123,92,255,.20));
@@ -806,33 +870,6 @@
       text-transform: uppercase;
     }
 
-    .weekHomeworkBtn {
-      appearance: none;
-      align-self: center;
-      border: 1px solid rgba(255,238,133,.78);
-      border-radius: 999px;
-      min-height: 40px;
-      padding: 6px 12px 5px;
-      color: #241200;
-      background: linear-gradient(180deg, #fff2a0, #ffc95b);
-      box-shadow: 0 4px 12px rgba(255,190,74,.32);
-      cursor: pointer;
-      font-size: clamp(8px,1vw,10px);
-      font-weight: 1000;
-      letter-spacing: .7px;
-      line-height: 1.05;
-      -webkit-tap-highlight-color: transparent;
-      white-space: nowrap;
-    }
-    .weekHomeworkBtn span {
-      display: block;
-      margin-top: 2px;
-      font-size: .9em;
-      letter-spacing: .2px;
-    }
-    .weekHomeworkBtn:hover { filter: brightness(1.08); }
-    .weekHomeworkBtn:active { transform: scale(.97); }
-    .weekHomeworkBtn:focus-visible,
     .homeworkTrackTab:focus-visible,
     .homeworkActionBtn:focus-visible,
     .ghostBtn:focus-visible {
@@ -1849,9 +1886,12 @@
           <div class="hubHeading">BOOHA ADVENTURE</div>
           <div class="hubHeadingJp">ブーハー・アドベンチャー</div>
         </div>
-        <div id="playerGreeting" class="playerGreeting">
-          <div class="greetingEn">WELCOME BACK, <span class="greetName" id="greetNameSlot">PLAYER</span></div>
-          <div class="greetingJp">おかえりなさい</div>
+        <div class="hubGreetingRow">
+          <div id="playerGreeting" class="playerGreeting">
+            <div class="greetingEn">WELCOME BACK, <span class="greetName" id="greetNameSlot">PLAYER</span></div>
+            <div class="greetingJp">おかえりなさい</div>
+          </div>
+          <button id="hubHomeworkBtn" class="hubHomeworkBtn" type="button">HOMEWORK <span>しゅくだい</span></button>
         </div>
         <div class="hubRow" id="weekCards"></div>
         <div class="hubBottom">
@@ -2551,20 +2591,9 @@ const PILLS = [
         </span>
         <span class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</span>
       </button>
-      ${wk.isCurrent ? '<button class="weekHomeworkBtn" type="button">HOMEWORK <span>しゅくだい</span></button>' : ''}`;
+      `;
     const openWeek = () => openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId);
-    card.addEventListener('click', event => {
-      if (event.target.closest('.weekHomeworkBtn')) return;
-      openWeek();
-    });
-    const homeworkBtn = card.querySelector('.weekHomeworkBtn');
-    if (homeworkBtn) {
-      homeworkBtn.addEventListener('click', event => {
-        event.stopPropagation();
-        openHomeworkList();
-      });
-      homeworkBtn.addEventListener('keydown', event => event.stopPropagation());
-    }
+    card.addEventListener('click', openWeek);
     container.appendChild(card);
   });
 }
@@ -2593,6 +2622,7 @@ const homeworkListContent = document.getElementById('homeworkListContent');
 const homeworkListClose   = document.getElementById('homeworkListClose');
 const homeworkCopyBtn     = document.getElementById('homeworkCopyBtn');
 const homeworkPrintBtn    = document.getElementById('homeworkPrintBtn');
+const hubHomeworkBtn      = document.getElementById('hubHomeworkBtn');
 const homeworkCache       = new Map();
 let homeworkRenderToken   = 0;
 let homeworkActiveCurr    = 'pb';
@@ -2609,9 +2639,13 @@ function homeworkWeekRange() {
 function homeworkWeekCards(data, week) {
   const first = (week.weekNumber - 1) * 15 + 1;
   const last  = week.weekNumber * 15;
-  return Array.isArray(data?.cards)
+  const cards = Array.isArray(data?.cards)
     ? data.cards.filter(card => Number(card.n) >= first && Number(card.n) <= last)
     : [];
+  // Curriculum files keep stable source IDs across the month (16–30 for
+  // Week 2, etc.). Homework is a weekly notebook list, so show local 1–15
+  // numbering without changing the underlying curriculum data.
+  return cards.map((card, index) => ({ ...card, n: index + 1 }));
 }
 
 function makeHomeworkRow(card) {
@@ -2791,6 +2825,9 @@ function closeHomeworkList() {
 }
 
 homeworkListClose.addEventListener('click', closeHomeworkList);
+hubHomeworkBtn.addEventListener('click', () => {
+  openHomeworkList();
+});
 homeworkCopyBtn.addEventListener('click', () => {
   playIndexSfx('buttonPress');
   copyHomeworkList();
