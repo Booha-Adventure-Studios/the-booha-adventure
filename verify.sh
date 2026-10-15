@@ -1683,6 +1683,13 @@ else
   bad "Current-week card audit failed"
 fi
 
+echo "[hub] Weekly homework list audit"
+if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
+  ok "Current-week homework action and readable list contracts pass"
+else
+  bad "Weekly homework list audit failed"
+fi
+
 echo "[profile/performance] Pass 6 hardening and budgets audit"
 if node tests/pass6-hardening-budget-audit.cjs >/dev/null 2>&1; then
   ok "Profile fail-soft rendering, day-record repaint, and performance budgets pass"
