@@ -20,7 +20,7 @@ assert.match(index, /weekCardOpen:focus-visible/, 'curriculum actions must expos
 assert.match(index, /prefers-reduced-motion: reduce[\s\S]*?weekCard\.currentWeek/, 'current-week emphasis must respect reduced motion');
 assert.match(index, /class="hubWeekLayout"[\s\S]*?id="hubPrevWeekBtn"[\s\S]*?id="weekCards" class="hubCurrentWeekMount"[\s\S]*?id="hubNextWeekBtn"/, 'the hub must place previous/current/next week surfaces in one responsive layout');
 assert.match(index, /hubWeeklyCompletedFor\(activeCurriculum\)/, 'the hero must read weekly completion for the saved curriculum');
-assert.match(index, /class="hubProgressSegment\$\{index < completed \? ' is-complete' : ''\}"/, 'the hero must render nine completion segments');
+assert.match(index, /class="hubProgressSegment\$\{index < cardCompleted \? ' is-complete' : ''\}"/, 'the hero must render nine completion segments');
 assert.match(index, /setHubWeekTab\('hubPrevWeekBtn'/, 'the previous-week tab must be wired');
 assert.match(index, /setHubWeekTab\('hubNextWeekBtn'/, 'the next-week tab must be wired');
 assert.match(index, /const heroActions = document\.querySelector\('\.hubHeroActions'\)[\s\S]*?card\.appendChild\(heroActions\)/,
