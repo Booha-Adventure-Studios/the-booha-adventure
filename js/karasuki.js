@@ -4242,6 +4242,7 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function openGrimmerglenPopup() {
+    if (isGrimmerglenPopupOpen()) return;
     if (!grimmerglenPopOverlay) injectGrimmerglenPopOverlay();
     const unlocked = grimmerglenUnlocked();
     if (!unlocked && window.UtsuSfx && typeof window.UtsuSfx.lockedRattle === 'function') window.UtsuSfx.lockedRattle();
@@ -6276,7 +6277,7 @@ function drawObserver(now) {
         wandererCacheOverBudget: cache.overBudget,
         roomLoadDecodeMs,
         activeAudioBufferCount: 0,
-        serviceWorkerCacheVersion: 'booha-assets-2026-574',
+        serviceWorkerCacheVersion: 'booha-assets-2026-575',
         averageFps: worldPerf.metrics().averageFps,
       };
     });
