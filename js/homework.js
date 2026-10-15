@@ -144,10 +144,10 @@ function renderWeekPicker(){
 
       <button class="choice-btn week-this"
       data-week="${thisW.monthSlug}|${thisW.weekNumber}"> 
-      <span class="small-label">${thisW.monthLabel} Week ${thisW.weekNumber}</span>
-      </button>
             THIS WEEK
       <span class="small-label">こんしゅう<br>今週</span>
+      <span class="small-label">${thisW.monthLabel} Week ${thisW.weekNumber}</span>
+      </button>
       
       <button class="choice-btn week-next"
       data-week="${next.monthSlug}|${next.weekNumber}">
