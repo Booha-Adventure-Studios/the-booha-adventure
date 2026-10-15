@@ -1746,6 +1746,13 @@ else
   bad "Curriculum state runtime test failed"
 fi
 
+echo "[hub] QA Pass 2 identity-scope runtime test"
+if node tests/curriculum-identity-scope-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Shared-tablet isolation, durable return, and second-device hydration contracts pass"
+else
+  bad "QA Pass 2 identity-scope runtime test failed"
+fi
+
 echo "[hub] Curriculum state source audit"
 if node tests/curriculum-state-audit.cjs >/dev/null 2>&1; then
   ok "Curriculum migration, login, picker, Blitz, and Homework contracts pass"
