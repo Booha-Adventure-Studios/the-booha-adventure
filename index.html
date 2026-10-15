@@ -1644,8 +1644,9 @@
    
 /* ══ BLITZ ARCADE ═══════════════════════════════════════════ */
 .blitzArcade {
-  width: min(820px, 96%);
-  padding: 12px 16px 14px;
+  width: min(820px, 100%);
+  margin: 0 auto;
+  padding: clamp(12px, 1.8vw, 18px) clamp(14px, 2vw, 22px);
   border-radius: 22px;
   text-align: center;
   background: rgba(0,0,0,.40);
@@ -1658,248 +1659,36 @@
   -webkit-backdrop-filter: blur(14px) saturate(140%);
 }
 
-.speedTitle {
-  font-size: clamp(12px, 1.8vw, 15px);
-  font-weight: 900;
-  letter-spacing: 4px;
-  color: #ffe66d;
-  text-shadow: 0 0 18px rgba(255,210,80,.45);
-  text-transform: uppercase;
+.blitzStripHeader { display: flex; align-items: baseline; gap: 8px; text-align: left; }
+.blitzStripTitle { color: #ffe66d; font-size: clamp(12px, 1.7vw, 16px); font-weight: 1000; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 18px rgba(255,210,80,.45); }
+.blitzStripSub { color: rgba(255,255,255,.55); font-size: clamp(8px, .95vw, 10px); font-weight: 800; letter-spacing: 1px; }
+.blitzMedals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: clamp(7px, 1vw, 11px); align-items: stretch; margin-top: 10px; }
+.blitzMedalItems { display: contents; }
+.blitzMedal,
+.blitzRecordsBtn { appearance: none; min-height: 58px; border-radius: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease; }
+.blitzMedal { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 10px; color: #fff; background: rgba(255,255,255,.04); border: 1px dashed rgba(255,255,255,.42); }
+.blitzMedal.is-record { color: #211707; background: linear-gradient(180deg, #fff2a0, #ffc943); border-style: solid; border-color: #ffe27a; box-shadow: 0 0 18px rgba(255,210,72,.42), inset 0 1px 0 rgba(255,255,255,.7); }
+.blitzMedal:hover, .blitzRecordsBtn:hover { filter: brightness(1.13); transform: translateY(-2px); }
+.blitzMedal:active, .blitzRecordsBtn:active { transform: scale(.97); }
+.blitzMedal:focus-visible, .blitzRecordsBtn:focus-visible { outline: 3px solid #fff3a8; outline-offset: 3px; }
+.blitzMedalIcon { font-size: 20px; line-height: 1; }
+.blitzMedalCopy { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.blitzMedalName { font-size: clamp(9px, 1.1vw, 12px); font-weight: 1000; letter-spacing: .4px; }
+.blitzMedalJp { color: rgba(255,255,255,.62); font-size: clamp(7px, .8vw, 9px); font-weight: 700; }
+.blitzMedal.is-record .blitzMedalJp { color: rgba(33,23,7,.68); }
+.blitzRecordsBtn { width: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #ffe88a; background: rgba(255,255,255,.04); border: 1px solid rgba(255,224,102,.72); box-shadow: 0 0 14px rgba(255,205,75,.18); }
+.blitzRecordsIcon { font-size: 19px; line-height: 1; }
+.blitzRecordsLabel { font-size: 7px; font-weight: 1000; letter-spacing: 1px; }
+
+@media (max-width: 600px) {
+  .blitzMedals { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .blitzRecordsBtn { grid-column: 1 / -1; width: 100%; min-height: 44px; flex-direction: row; }
+  .blitzMedal { min-height: 64px; padding: 7px 4px; flex-direction: column; gap: 3px; }
+  .blitzMedalCopy { align-items: center; }
 }
 
-.speedTitleJp {
-  margin-top: 1px;
-  font-size: clamp(7px, .95vw, 9px);
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: rgba(255,230,109,.55);
-}
-
-.speedSub {
-  margin-top: 3px;
-  font-size: clamp(8px, 1.1vw, 10px);
-  font-weight: 800;
-  letter-spacing: 2px;
-  color: rgba(255,255,255,.40);
-  text-transform: uppercase;
-}
-
-/* ── Tabs ──
-   Two-line now (EN + the katakana already established for these three
-   curricula on the daily-check screen — CURR_TILES in daily-check.js),
-   so the click handler below matches on tab.id via a data attribute
-   instead of comparing button textContent, which would otherwise now
-   include the Japanese line too. */
-.blitzTabs {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.blitzTabs button {
-  appearance: none; border: 0;
-  background: transparent;
-  display: flex; flex-direction: column; align-items: center; gap: 1px;
-  color: rgba(255,255,255,.35);
-  font-size: clamp(9px, 1.2vw, 11px);
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 5px 12px 6px;
-  border-radius: 999px;
-  cursor: pointer;
-  position: relative;
-  transition: color 180ms ease, background 180ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.blitzTabJp {
-  font-size: clamp(6px, .85vw, 8px);
-  font-weight: 700;
-  letter-spacing: .5px;
-  text-transform: none;
-  color: rgba(255,255,255,.55);
-}
-
-.blitzTabs button.active .blitzTabJp { color: rgba(26,20,8,.65); }
-
-.blitzTabs button.active {
-  color: #1a1408;
-  background: #ffe66d;
-  box-shadow: 0 0 12px rgba(255,220,80,.45);
-  transform: scale(1.06);
-}
-
-.blitzTabs button.soon {
-  color: rgba(255,255,255,.22);
-  cursor: default;
-}
-
-.blitzTabs button.soon::after {
-  content: 'SOON';
-  font-size: 7px;
-  letter-spacing: 1px;
-  color: rgba(255,255,255,.28);
-  background: rgba(255,255,255,.08);
-  border-radius: 999px;
-  padding: 1px 5px;
-  margin-left: 5px;
-  vertical-align: middle;
-  position: relative;
-  top: -1px;
-}
-
-.blitzTabs button:not(.soon):not(.active):hover {
-  color: rgba(255,255,255,.6);
-  background: rgba(255,255,255,.06);
-}
-
-/* ── Tab divider ── */
-.blitzDivider {
-  height: 1px;
-  background: rgba(255,255,255,.08);
-  margin: 10px 0 10px;
-}
-
-/* ── Game pills ── */
-.blitzGames {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  min-height: 38px;
-}
-
-@media (max-width: 480px) {
-  .blitzGames {
-    grid-template-columns: 1fr;
-  }
-  .blitzArcade {
-    width: 100%;
-    border-radius: 16px;
-  }
-}
-
-.blitzPill {
-  appearance: none; border: 0;
-  border-radius: 999px;
-  padding: 9px 10px;
-  font-weight: 900;
-  font-size: clamp(10px, 1.4vw, 12px);
-  letter-spacing: .4px;
-  color: #fff;
-  cursor: pointer;
-  background: rgba(255,255,255,.08);
-  transition: transform 140ms ease, background 140ms ease;
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-}
-.blitzPill:hover  { transform: translateY(-2px); background: rgba(255,255,255,.15); }
-    
-.blitzPill:active { transform: scale(.98); }
-
-.blitzPill.done{
-  box-shadow: inset 0 0 0 1px rgba(255,213,79,.85), 0 0 16px rgba(255,200,60,.45);
-  color:#ffd54f;
-}
-.blitzPill.done::after{ content:' ★'; }
-.blitzPill.done.speed-target {
-  background: rgba(255,213,79,.14);
-  box-shadow: inset 0 0 0 2px rgba(255,238,142,.95), 0 0 22px rgba(255,200,60,.62);
-  color: #fff2a8;
-}
-.blitzPill.done.speed-target::after { content:' ★'; }
-.blitzPill.done.speed-elite {
-  background: linear-gradient(100deg, rgba(255,235,114,.22), rgba(255,108,207,.22));
-  box-shadow: inset 0 0 0 2px rgba(255,255,255,.95), 0 0 28px rgba(255,95,206,.72), 0 0 52px rgba(255,210,77,.32);
-  color: #fff;
-  text-shadow: 0 0 12px #ff6dcb;
-}
-.blitzPill.done.speed-elite::after { content:' ★⚡'; }
-
-.blitz-pb { box-shadow: inset 0 0 0 1px rgba(255,70,230,.5), 0 0 14px rgba(255,70,230,.18); }
-.blitz-br { box-shadow: inset 0 0 0 1px rgba(0,240,230,.5), 0 0 14px rgba(0,240,230,.16); }
-.blitz-bc { box-shadow: inset 0 0 0 1px rgba(255,135,30,.5), 0 0 14px rgba(255,135,30,.18); }
-
-.blitzComingSoon {
-  grid-column: 1 / -1;
-  color: rgba(255,255,255,.25);
-  font-size: clamp(10px, 1.4vw, 12px);
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding: 8px 0;
-}
-
-/* ── Rank button ── */
-.blitzRankBtn {
-  appearance: none; border: 0;
-  margin-top: 10px;
-  border-radius: 999px;
-  padding: 7px 20px;
-  font-size: clamp(9px, 1.2vw, 11px);
-  font-weight: 900;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #1b1200;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #ffe88a 0%, #ffc928 50%, #f4a900 100%);
-  background-size: 200% 100%;
-  animation: goldShift 4s ease-in-out infinite;
-  box-shadow: 0 4px 14px rgba(255,190,40,.35), inset 0 1px 0 rgba(255,255,255,.45);
-  transition: transform 140ms ease, box-shadow 140ms ease;
-  -webkit-tap-highlight-color: transparent;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1.05;
-}
-.blitzRankBtn .blitzTabJp { color: rgba(27,18,0,.72); font-size: 9px; letter-spacing: 1px; }
-.blitzRankBtn::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -80%;
-  width: 60%; height: 100%;
-  background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,.45) 50%, transparent 100%);
-  transform: skewX(-15deg);
-  animation: goldGlimmer 3.5s ease-in-out infinite;
-}
-.blitzRankBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(255,190,40,.5), inset 0 1px 0 rgba(255,255,255,.5);
-}
-.blitzRankBtn:active { transform: scale(.98); }
-
-@keyframes goldShift {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-@keyframes goldGlimmer {
-  0%   { left: -80%; opacity: 0; }
-  20%  { opacity: 1; }
-  55%  { left: 130%; opacity: 0; }
-  100% { left: 130%; opacity: 0; }
-}
-
-    
-.blitzBtnName {
-  display: block;
-  font-size: clamp(12px, 2vw, 15px);
-  font-weight: 900;
-  letter-spacing: 0.3px;
-}
-
-.blitzBtnSub {
-  display: block;
-  font-size: clamp(9px, 1.2vw, 11px);
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  opacity: 0.65;
-  margin-top: 2px;
+@media (prefers-reduced-motion: reduce) {
+  .blitzMedal, .blitzRecordsBtn { transition: none; }
 }
 
 /* ══ MAZE CTA ═══════════════════════════════════════════════
@@ -1995,6 +1784,18 @@
 }
 .pwaIconBtn:hover { background: rgba(255,255,255,.16); }
 .pwaIconBtn:active { transform: scale(.92); }
+
+@keyframes goldShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes goldGlimmer {
+  0%   { left: -80%; opacity: 0; }
+  20%  { opacity: 1; }
+  55%  { left: 130%; opacity: 0; }
+  100% { left: 130%; opacity: 0; }
+}
     
     
 .btnGold {
@@ -2656,11 +2457,6 @@ function renderHub() {
   const container = document.getElementById('weekCards');
   container.innerHTML = '';
 
-  // Still needed here — used below in the Blitz Games arcade template
-  // ("${playerName}'S FAST CHALLENGES"). The greeting itself no longer
-  // reads this (see #playerGreeting in the HTML / showGreeting()), but
-  // this render still does.
-  const playerName = getBoohaFirstName();
   updateHubCurriculumButton();
 
   const existing = document.getElementById('blitzArcade');
@@ -2674,26 +2470,15 @@ function renderHub() {
   }
 
   
-const thisWeek = getCurrentCurriculumWeek();
   // The saved track is the hub's single active curriculum. Until the first
   // choice is made, keep the legacy visual default but let the picker claim
   // the student before a week is opened.
   let activeTab = window.BoohaCurriculum?.get?.() || 'pb';
 
-  // jp values match CURR_TILES in daily-check.js — same three curricula,
-  // same katakana, so a kid sees one consistent name for each track
-  // everywhere on the site rather than a second translation invented here.
-  const TABS = [
-  { id: 'pb', label: 'PRE-BOO',       jp: 'プレブー',           ready: true },
-  { id: 'br', label: 'BOO-RICULUM',   jp: 'ブーリキュラム',      ready: true },
-  { id: 'bc', label: 'BOO-CONTINUUM', jp: 'ブーコンティニュアム', ready: true },
-];
-
-  
 const PILLS = [
-    { type: 'vocab',     label: 'Vocab Blitz'    },
-    { type: 'sentences', label: 'Sentence Blitz' },
-    { type: 'questions', label: 'Question Blitz' },
+    { type: 'vocab',     label: 'Vocab',     jp: 'たんご', icon: '🏅' },
+    { type: 'sentences', label: 'Sentence',  jp: 'ぶんしょう', icon: '🏅' },
+    { type: 'questions', label: 'Question',  jp: 'しつもん', icon: '◇' },
   ];
 
   
@@ -2701,18 +2486,20 @@ const PILLS = [
   arcade.id = 'blitzArcade';
   arcade.className = 'blitzArcade';
   arcade.innerHTML = `
-    <div class="speedTitle">BLITZ GAMES</div>
-    <div class="speedTitleJp">ブリッツゲーム</div>
-    <div class="speedSub">${playerName}'S FAST CHALLENGES — THIS WEEK ONLY</div>
-
-    <div class="blitzTabs" id="blitzTabs"></div>
-    <div class="blitzDivider"></div>
-    <div class="blitzGames" id="blitzGames"></div>
-    <button class="blitzRankBtn" type="button"><span class="blitzTabEn">RECORDS</span><span class="blitzTabJp">きろく</span></button>
+    <div class="blitzStripHeader">
+      <span class="blitzStripTitle">BLITZ</span>
+      <span class="blitzStripSub">this week · ブリッツ</span>
+    </div>
+    <div class="blitzMedals">
+      <div id="blitzMedalItems" class="blitzMedalItems"></div>
+      <button class="blitzRecordsBtn" type="button" aria-label="Open Blitz records">
+        <span class="blitzRecordsIcon" aria-hidden="true">🏆</span>
+        <span class="blitzRecordsLabel">RECORDS</span>
+      </button>
+    </div>
   `;
 
-  const tabsEl  = arcade.querySelector('#blitzTabs');
-  const gamesEl = arcade.querySelector('#blitzGames');
+  const gamesEl = arcade.querySelector('#blitzMedalItems');
 
 
   
@@ -2725,20 +2512,18 @@ const PILLS = [
   const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
     `${cw.monthSlug}:w${cw.weekNumber}`;
 
-  PILLS.forEach(({ type, label }) => {
+  PILLS.forEach(({ type, label, jp, icon }) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `blitzPill blitz-${activeTab}`;
-    btn.textContent = label;
+    btn.className = 'blitzMedal';
+    btn.innerHTML = `<span class="blitzMedalIcon" aria-hidden="true">${icon}</span><span class="blitzMedalCopy"><span class="blitzMedalName">${label}</span><span class="blitzMedalJp">${jp}</span></span>`;
 
     /* Weekly completion — a time can only exist for a perfect run.
        getWeeklyScore self-guards against stale week buckets. */
     let done = null;
     try { done = ENGINES[type]?.getWeeklyScore?.(activeTab, weekId) || null; } catch (e) {}
     if (done) {
-      btn.classList.add('done');
-      const speedBand = ENGINES[type]?.getSpeedBand?.(done.ms);
-      if (speedBand) btn.classList.add(`speed-${speedBand}`);
+      btn.classList.add('is-record');
     }
 
     btn.addEventListener('click', async () => {
@@ -2783,28 +2568,7 @@ const PILLS = [
   document.addEventListener('booha:weeklyReset', hubEventHandlers.weeklyReset);
 
   
-  TABS.forEach(tab => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.dataset.tabId = tab.id; // matched on below — textContent now has two lines (EN + JP), so it can't double as the lookup key any more
-    // Both lines wrapped in their own span (not a bare text node) so the
-    // flex-column layout stacks them predictably.
-    btn.innerHTML = `<span class="blitzTabEn">${tab.label}</span><span class="blitzTabJp">${tab.jp}</span>`;
-    btn.className = tab.ready ? (tab.id === activeTab ? 'active' : '') : 'soon';
-    btn.addEventListener('click', () => {
-      if (!tab.ready) return;
-      playIndexSfx('buttonPress');
-      activeTab = tab.id;
-      tabsEl.querySelectorAll('button').forEach(b => {
-        const bTab = TABS.find(t => t.id === b.dataset.tabId);
-        b.className = bTab?.ready ? (bTab.id === activeTab ? 'active' : '') : 'soon';
-      });
-      renderPills();
-    });
-    tabsEl.appendChild(btn);
-  });
-
- arcade.querySelector('.blitzRankBtn').addEventListener('click', async () => {
+ arcade.querySelector('.blitzRecordsBtn').addEventListener('click', async () => {
     playIndexSfx('panelOpen');
     try {
       await loadBlitzEngines();

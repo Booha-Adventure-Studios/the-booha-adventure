@@ -1718,6 +1718,13 @@ else
   bad "Pass 16 hub shell audit failed"
 fi
 
+echo "[hub] Pass 18 Blitz strip audit"
+if node tests/index-blitz-strip-audit.cjs >/dev/null 2>&1; then
+  ok "Saved-track Blitz medals, dashed/gold states, Records, and mobile contracts pass"
+else
+  bad "Pass 18 Blitz strip audit failed"
+fi
+
 echo "[hub] Curriculum state runtime test"
 if node tests/curriculum-state-runtime.test.cjs >/dev/null 2>&1; then
   ok "Per-student curriculum save and mirror runtime contracts pass"
