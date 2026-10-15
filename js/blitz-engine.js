@@ -220,6 +220,11 @@ window.BoohaBlitzEngine = (() => {
     };
     const sample = now => {
       if (!active) return;
+      if (document.visibilityState === 'hidden' || document.hidden) {
+        previous = null;
+        rafId = requestAnimationFrame(sample);
+        return;
+      }
       if (now < settleUntil) {
         rafId = requestAnimationFrame(sample);
         return;
@@ -650,6 +655,15 @@ window.BoohaBlitzEngine = (() => {
         height: 100vh;
         height: var(--blitz-viewport-height, 100dvh);
         max-height: var(--blitz-viewport-height, 100dvh);
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      html.blitz-active,
+      html.blitz-active body {
+        overflow: hidden;
+        overscroll-behavior: none;
+        touch-action: none;
       }
       .blitz-compositor::before {
         content: '';
@@ -2147,6 +2161,28 @@ window.BoohaBlitzEngine = (() => {
     };
   }
 
+  function bindBlitzInteractionLock() {
+    const root = document.documentElement;
+    const body = document.body;
+    const gestureEvents = ['gesturestart', 'gesturechange', 'gestureend'];
+    const blockGesture = event => event.preventDefault();
+    const blockPinchTouch = event => {
+      if (event.touches && event.touches.length > 1) event.preventDefault();
+    };
+
+    root.classList.add('blitz-active');
+    body.classList.add('blitz-active');
+    gestureEvents.forEach(type => window.addEventListener(type, blockGesture, { passive: false }));
+    window.addEventListener('touchmove', blockPinchTouch, { passive: false });
+
+    return () => {
+      gestureEvents.forEach(type => window.removeEventListener(type, blockGesture));
+      window.removeEventListener('touchmove', blockPinchTouch);
+      root.classList.remove('blitz-active');
+      body.classList.remove('blitz-active');
+    };
+  }
+
   function createStartCard(overlay, palette, speedTarget) {
     const card = document.createElement('section');
     card.className = 'booha-blitz-start-card';
@@ -2628,6 +2664,7 @@ window.BoohaBlitzEngine = (() => {
       overlay._boohaBlitzPerformanceCleanup?.();
       overlay._boohaBlitzViewportCleanup?.();
       overlay._boohaBlitzVisibilityCleanup?.();
+      overlay._boohaBlitzInteractionCleanup?.();
       overlay.remove();
       const api = window[config.apiName];
       if (api && typeof api._onClose === 'function') api._onClose();
@@ -2751,11 +2788,13 @@ window.BoohaBlitzEngine = (() => {
         existing._boohaBlitzPerformanceCleanup?.();
         existing._boohaBlitzViewportCleanup?.();
         existing._boohaBlitzVisibilityCleanup?.();
+        existing._boohaBlitzInteractionCleanup?.();
         existing.remove();
       }
       RUNTIME_PERFORMANCE_TIER = null;
       RUNTIME_LOW_POWER = false;
       const overlay = config.buildOverlay();
+      overlay._boohaBlitzInteractionCleanup = bindBlitzInteractionLock();
       overlay._boohaBlitzViewportCleanup = bindViewportMetrics(overlay);
       applyPerformanceTier(overlay);
       overlay.classList.add('blitz-compositor');
@@ -3032,6 +3071,7 @@ window.BoohaBlitzEngine = (() => {
 
       function tick() {
         timerId = null;
+        if (document.visibilityState === 'hidden' || document.hidden) return;
         if (startTime === null) {
           scheduleTimerTick(TIMER_PAINT_INTERVAL_MS);
           return;
@@ -3649,6 +3689,7 @@ window.BoohaBlitzEngine = (() => {
         overlay._boohaBlitzPerformanceCleanup?.();
         overlay._boohaBlitzViewportCleanup?.();
         overlay._boohaBlitzVisibilityCleanup?.();
+        overlay._boohaBlitzInteractionCleanup?.();
         performanceDiagnostic?.destroy();
         overlay.remove();
         launch({ curr, monthSlug, weekNumber });
