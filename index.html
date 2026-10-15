@@ -2152,14 +2152,16 @@ console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());
 function navigateToCurriculum(weekId, curr) {
   let fullWeek = '';
   let url = '';
+  const codeMap = { preboo: 'pb', booriculum: 'br', boocontinuum: 'bc' };
+  const code = codeMap[curr] || curr;
 
-  if (curr === 'preboo') {
+  if (code === 'pb') {
     fullWeek = `pb_${weekId}`;
     url = `curriculum/pb/study-index.html?week=${encodeURIComponent(fullWeek)}`;
-  } else if (curr === 'booriculum') {
+  } else if (code === 'br') {
     fullWeek = `br_${weekId}`;
     url = `curriculum/br/study-index.html?week=${encodeURIComponent(fullWeek)}`;
-  } else if (curr === 'boocontinuum') {
+  } else if (code === 'bc') {
     fullWeek = `bc_${weekId}`;
     url = `curriculum/bc/study-index.html?week=${encodeURIComponent(fullWeek)}`;
   } else {
@@ -2401,10 +2403,10 @@ function renderHub() {
 
   
 const thisWeek = getCurrentCurriculumWeek();
-  // The Hub always opens on Pre-Boo. Players can still choose another
-  // curriculum for this visit, but a previous selection must never replace
-  // the product's default first view.
-  let activeTab = 'pb';
+  // The saved track is the hub's single active curriculum. Until the first
+  // choice is made, keep the legacy visual default but let the picker claim
+  // the student before a week is opened.
+  let activeTab = window.BoohaCurriculum?.get?.() || 'pb';
 
   // jp values match CURR_TILES in daily-check.js — same three curricula,
   // same katakana, so a kid sees one consistent name for each track
@@ -2592,7 +2594,11 @@ const PILLS = [
         <span class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</span>
       </button>
       `;
-    const openWeek = () => openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId);
+    const openWeek = () => {
+      const savedCurr = window.BoohaCurriculum?.get?.() || null;
+      if (savedCurr) navigateToCurriculum(wk.weekId, savedCurr);
+      else openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId, { mode: 'week' });
+    };
     card.addEventListener('click', openWeek);
     container.appendChild(card);
   });
@@ -2625,7 +2631,7 @@ const homeworkPrintBtn    = document.getElementById('homeworkPrintBtn');
 const hubHomeworkBtn      = document.getElementById('hubHomeworkBtn');
 const homeworkCache       = new Map();
 let homeworkRenderToken   = 0;
-let homeworkActiveCurr    = 'pb';
+let homeworkActiveCurr    = window.BoohaCurriculum?.get?.() || 'pb';
 let homeworkReturnFocus   = null;
 
 function homeworkWeekRange() {
@@ -2811,7 +2817,7 @@ function openHomeworkList() {
   homeworkList.setAttribute('aria-hidden', 'false');
   playIndexSfx('panelOpen');
   homeworkListClose.focus({ preventScroll: true });
-  renderHomeworkTrack('pb');
+  renderHomeworkTrack(window.BoohaCurriculum?.get?.() || 'pb');
 }
 
 function closeHomeworkList() {
@@ -2855,16 +2861,24 @@ const pickerDates = document.getElementById('pickerDates');
 const pickerClose = document.getElementById('pickerClose');
 
 let currentWeekId = '';
+let pickerMode = 'week';
 let pickerReturnFocus = null;
+let initialPickerShown = false;
 
-function openPicker(tagEn, tagJp, dates, weekId) {
-  if (!weekId) return;
+function openPicker(tagEn, tagJp, dates, weekId, options = {}) {
+  const mode = options.mode || (weekId ? 'week' : 'initial');
+  if (!weekId && !['initial', 'change'].includes(mode)) return;
   pickerReturnFocus = document.activeElement instanceof HTMLElement
     ? document.activeElement
     : null;
+  pickerMode = mode;
   currentWeekId = weekId;
-  pickerTitle.textContent = `${tagEn}（${tagJp}）`;
-  pickerDates.textContent = dates;
+  pickerTitle.textContent = mode === 'change'
+    ? 'Change your curriculum'
+    : mode === 'initial'
+      ? 'Choose your curriculum'
+      : `${tagEn}（${tagJp}）`;
+  pickerDates.textContent = mode === 'initial' || mode === 'change' ? '' : dates;
   const pickerSub2 = document.getElementById('pickerSub2');
   if (pickerSub2) pickerSub2.textContent = `${getBoohaFirstName()}, choose your curriculum`;
   picker.scrollTop = 0;
@@ -2901,16 +2915,32 @@ document.querySelectorAll('.pickTile').forEach(btn => {
     e.stopPropagation();
     playIndexSfx('hubSelect');
     const weekId = currentWeekId;
-    
-   const curr   = btn.dataset.curr;
-    try {
-      const map = { preboo:'pb', booriculum:'br', boocontinuum:'bc' };
-      if (map[curr]) localStorage.setItem('booha_last_curr', map[curr]);
-    } catch (e) {}
+    const curr = btn.dataset.curr;
+    const map = { preboo: 'pb', booriculum: 'br', boocontinuum: 'bc' };
+    const code = map[curr] || curr;
+    if (!['pb', 'br', 'bc'].includes(code)) return;
+    if (window.BoohaCurriculum?.set) BoohaCurriculum.set(code);
+    else {
+      try { localStorage.setItem('booha_last_curr', code); } catch (e) {}
+    }
     closePicker();
-    
-    navigateToCurriculum(weekId, curr);
+
+    if (pickerMode === 'week' && weekId) {
+      navigateToCurriculum(weekId, code);
+    } else if (pickerMode === 'change' || pickerMode === 'initial') {
+      try { renderHub(); } catch (error) { console.warn('Hub curriculum refresh failed:', error); }
+    }
   });
+});
+
+function maybeOpenInitialCurriculumPicker() {
+  if (initialPickerShown || window.BoohaCurriculum?.get?.()) return;
+  initialPickerShown = true;
+  openPicker('', '', '', '', { mode: 'initial' });
+}
+
+document.addEventListener('booha:syncReady', () => {
+  if (hubScene?.classList.contains('active')) maybeOpenInitialCurriculumPicker();
 });
 
 /* ════════════════════════════════════════════════════════════
@@ -3136,6 +3166,7 @@ async function goToHub() {
   requestAnimationFrame(() => {
     fadeToBlack(false);
     showGreeting();
+    maybeOpenInitialCurriculumPicker();
   });
 });
   
@@ -3170,6 +3201,7 @@ function jumpToHub() {
   try { renderHub(); hubRendered = true; } catch(e2) {}
   
   setTimeout(showGreeting, 250);
+  setTimeout(maybeOpenInitialCurriculumPicker, 300);
   sessionStorage.removeItem('booha_return_to_hub');
 
   /* Deep-link from maze: ブリッツへ scrolls to the arcade */
@@ -3203,6 +3235,7 @@ window.addEventListener('pageshow', ev => {
 <script src="pwa-init.js"></script>
 <script src="js/core/adventure-core.js"></script>
 <script src="js/core/save-file.js"></script>
+<script src="js/core/curriculum.js"></script>
 <script src="js/sync-client.js"></script>
 <script src="js/core/day-record.js"></script>
 <script src="js/daily-check.js"></script>  

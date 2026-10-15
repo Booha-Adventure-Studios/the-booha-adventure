@@ -86,7 +86,7 @@
 
     function currentBlitzCurriculum() {
       try {
-        const curr = storage.getItem('booha_last_curr') || '';
+        const curr = global.BoohaCurriculum?.get?.() || storage.getItem('booha_last_curr') || '';
         return ['pb', 'br', 'bc'].includes(curr) ? curr : 'pb';
       } catch (_) { return 'pb'; }
     }

@@ -18,6 +18,7 @@
   const KEY_FIRST     = 'booha_first_name';
   const KEY_JUKU      = 'booha_is_juku';
   const KEY_USER_ID   = 'booha_userid';
+  const KEY_CURRICULUM = 'booha_last_curr';
   // Older builds persisted the full display name. Scrub every known legacy
   // name key on the next valid boot so a shared tablet does not retain it.
   const LEGACY_NAME_KEYS = [
@@ -31,6 +32,7 @@
     localStorage.removeItem(KEY_FIRST);
     localStorage.removeItem(KEY_JUKU);
     localStorage.removeItem(KEY_USER_ID);
+    localStorage.removeItem(KEY_CURRICULUM);
     LEGACY_NAME_KEYS.forEach(key => localStorage.removeItem(key));
  }
 
@@ -180,6 +182,13 @@
   // storage failure remains visible until that same storage engine successfully
   // writes again.
   document.addEventListener('booha:syncReady', () => clearSaveProblem('locked'));
+  document.addEventListener('booha:syncReady', () => {
+    // The synced save is authoritative. A missing curriculum must remove the
+    // old device mirror so a shared tablet presents the picker to this student.
+    try { window.BoohaCurriculum?.hydrateMirror?.(); } catch (error) {
+      console.warn('[token] Curriculum mirror hydration failed:', error);
+    }
+  });
   document.addEventListener('booha:saved', () => {
     clearSaveProblem('locked');
     clearSaveProblem('adventure');
@@ -423,6 +432,7 @@
     // re-login or an old build from leaving PII behind.
     localStorage.removeItem(KEY_FIRST);
     LEGACY_NAME_KEYS.forEach(key => localStorage.removeItem(key));
+    localStorage.removeItem(KEY_CURRICULUM);
     if (data.displayName) {
       const firstName = String(data.displayName).trim().split(/\s+/)[0];
       if (firstName) localStorage.setItem(KEY_FIRST, firstName);

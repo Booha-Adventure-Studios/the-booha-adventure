@@ -1711,6 +1711,20 @@ else
   bad "Weekly homework list audit failed"
 fi
 
+echo "[hub] Curriculum state runtime test"
+if node tests/curriculum-state-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Per-student curriculum save and mirror runtime contracts pass"
+else
+  bad "Curriculum state runtime test failed"
+fi
+
+echo "[hub] Curriculum state source audit"
+if node tests/curriculum-state-audit.cjs >/dev/null 2>&1; then
+  ok "Curriculum migration, login, picker, Blitz, and Homework contracts pass"
+else
+  bad "Curriculum state source audit failed"
+fi
+
 echo "[profile/performance] Pass 6 hardening and budgets audit"
 if node tests/pass6-hardening-budget-audit.cjs >/dev/null 2>&1; then
   ok "Profile fail-soft rendering, day-record repaint, and performance budgets pass"

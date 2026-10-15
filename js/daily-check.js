@@ -179,11 +179,14 @@ window.BoohaDailyCheck = (function () {
   }
 
   /* ── Curriculum resolution ───────────────────────────────────────────── */
-  // Picker ids → content short codes. index.html stores booha_last_curr as
-  // the short code ('pb'|'br'|'bc') the moment a tile is tapped.
+  // The saved curriculum is canonical; the local key remains a compatibility
+  // mirror for older pages and is managed by BoohaCurriculum.
   function knownCurr() {
-    const c = localStorage.getItem('booha_last_curr');
-    return (c === 'pb' || c === 'br' || c === 'bc') ? c : null;
+    try {
+      return window.BoohaCurriculum?.get?.() || null;
+    } catch (_) {
+      return null;
+    }
   }
 
   /* ── Content load ────────────────────────────────────────────────────── */
@@ -591,7 +594,8 @@ window.BoohaDailyCheck = (function () {
       if (!selected) go.style.opacity = '.5';
       go.addEventListener('click', () => {
         if (!selected) return;
-        localStorage.setItem('booha_last_curr', selected);  // one source of truth
+        if (window.BoohaCurriculum?.set) BoohaCurriculum.set(selected);
+        else localStorage.setItem('booha_last_curr', selected);
         stepLoading(selected);
       });
       root.appendChild(go);
