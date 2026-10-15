@@ -1263,6 +1263,13 @@ else
   bad "Grimmerglen popup runtime test failed"
 fi
 
+echo "[popup] Karasuki Grimmerglen portal runtime test"
+if node tests/karasuki-grimmerglen-portal-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Karasuki Grimmerglen portal popup opens are deduplicated"
+else
+  bad "Karasuki Grimmerglen portal runtime test failed"
+fi
+
 echo "[service-worker] Pass 1 precache resilience audit"
 if node tests/service-worker-precache-audit.cjs >/dev/null 2>&1; then
   ok "Service-worker install and runtime precache resilience contracts pass"
@@ -1618,6 +1625,20 @@ if node tests/blitz-pass39-separate-furigana-popup-audit.cjs >/dev/null 2>&1; th
   ok "Blitz separate-furigana popup audit passed"
 else
   bad "Blitz separate-furigana popup audit failed"
+fi
+
+echo "[blitz] input-lock audit"
+if node tests/blitz-pass40-input-lock-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz input-lock audit passed"
+else
+  bad "Blitz input-lock audit failed"
+fi
+
+echo "[blitz] input-lock runtime test"
+if node tests/blitz-pass40-input-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Blitz input-lock runtime test passed"
+else
+  bad "Blitz input-lock runtime test failed"
 fi
 
 echo "[games] nine-engine audio polish audit"
