@@ -1655,12 +1655,28 @@
     }
 
     @media print {
+      html,
+      body {
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+      }
+      #app {
+        position: static !important;
+        inset: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        background: #fff !important;
+      }
       body * { visibility: hidden !important; }
       #homeworkList.show,
       #homeworkList.show * { visibility: visible !important; }
       #homeworkList.show {
         position: static;
         display: block !important;
+        min-height: 0;
+        overflow: visible;
         padding: 0;
         background: #fff;
         color: #111;
@@ -1694,12 +1710,15 @@
         background: #fff;
         box-shadow: none;
         break-inside: avoid;
+        page-break-inside: avoid;
       }
       #homeworkList.show .homeworkListRow {
         border-bottom: 1px solid #bbb;
         border-radius: 0;
         padding: 8px 0;
         background: #fff;
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
     }
 

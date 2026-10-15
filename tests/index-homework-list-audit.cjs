@@ -32,6 +32,9 @@ assert.match(index, /document\.execCommand\('copy'\)/, 'copy action must have a 
 assert.match(index, /id="homeworkPrintBtn"/, 'the list must provide a print/write action');
 assert.match(index, /homeworkPrintBtn\.addEventListener\('click',[\s\S]*?window\.print\(\)/, 'print/write action must open the browser print flow');
 assert.match(index, /@media print[\s\S]*?homeworkList\.show \.homeworkListRows \{ grid-template-columns: 1fr; \}/, 'print/write mode must make the list paper-friendly');
+assert.match(index, /@media print[\s\S]*?html,[\s\S]*?body[\s\S]*?overflow: visible !important/, 'print mode must restore document flow');
+assert.match(index, /@media print[\s\S]*?#app[\s\S]*?position: static !important[\s\S]*?overflow: visible !important/, 'print mode must release the fixed app shell');
+assert.match(index, /homeworkList\.show \.homeworkListSection[\s\S]*?page-break-inside: avoid/, 'print mode must keep homework sections together where possible');
 assert.match(index, /homeworkListClose\.focus\(\{ preventScroll: true \}\)/, 'opening the dialog must move focus to its close control');
 assert.match(index, /homeworkReturnFocus\?\.isConnected[\s\S]*?\.focus\(\{ preventScroll: true \}\)/, 'closing the dialog must restore focus to its opener');
 assert.match(index, /event\.key !== 'Escape'[\s\S]*?closeHomeworkList\(\)[\s\S]*?closePicker\(\)/, 'Escape must close the active homework or curriculum dialog');
