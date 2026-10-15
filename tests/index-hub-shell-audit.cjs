@@ -10,7 +10,9 @@ const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const verify = fs.readFileSync(path.join(root, 'verify.sh'), 'utf8');
 
 assert.match(index, /<header class="hubHeader">/, 'the hub needs a dedicated header shell');
-assert.match(index, /<div class="hubHeaderLeft">[\s\S]*?class="hubUtilityNav"/, 'greeting and utility links must share the header left column');
+assert.match(index, /<div class="hubHeaderLeft">[\s\S]*?class="hubUtilityNav"/, 'utility links must remain in the header left column');
+assert.match(index, /<div class="hubTitle">[\s\S]*?id="playerGreeting" class="playerGreeting"/, 'the greeting must sit beneath the centered title');
+assert.match(index, /grid-template-areas: "title title" "left curriculum"/, 'the header must use a centered title row and utility row');
 assert.match(index, /id="alog-icon-btn" class="hubUtilityBtn"/, 'Adventure Log must live in the header utility row');
 assert.match(index, /id="juku-icon-btn" class="hubUtilityBtn"/, 'Juku must live in the header utility row');
 assert.match(index, /id="hubCurriculumBtn" class="hubCurriculumBtn(?: [^"]+)?"/, 'the header needs a curriculum switcher');
