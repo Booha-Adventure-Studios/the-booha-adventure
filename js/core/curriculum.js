@@ -38,6 +38,17 @@ const BoohaCurriculum = (() => {
     return readSaveCurriculum() || readMirror();
   }
 
+  // Pre-Boo is the quiet first-run default. Only call this after the synced
+  // save has been loaded, so a remembered Boo-riculum/Boo-continuum choice
+  // can win before a blank student record is initialized.
+  const DEFAULT = 'pb';
+  function ensureDefault() {
+    const saved = readSaveCurriculum();
+    if (saved) return saved;
+    set(DEFAULT);
+    return DEFAULT;
+  }
+
   function set(code) {
     if (!isValid(code)) return false;
 
@@ -74,7 +85,7 @@ const BoohaCurriculum = (() => {
     return value;
   }
 
-  return Object.freeze({ VALID, isValid, get, set, clearMirror, hydrateMirror });
+  return Object.freeze({ VALID, isValid, get, set, clearMirror, hydrateMirror, ensureDefault });
 })();
 
 window.BoohaCurriculum = BoohaCurriculum;
