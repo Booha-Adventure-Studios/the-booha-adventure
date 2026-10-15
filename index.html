@@ -615,6 +615,7 @@
         min-height: 60px;
         padding: 9px 14px 7px !important;
       }
+      .weekCard.currentWeek { min-height: 94px; }
     }
 
     /* ── Week card ──
@@ -776,6 +777,32 @@
       color: rgba(255,255,255,.40);
       text-transform: uppercase;
     }
+
+    .weekHomeworkBtn {
+      appearance: none;
+      align-self: center;
+      border: 1px solid rgba(255,238,133,.78);
+      border-radius: 999px;
+      padding: 4px 10px 3px;
+      color: #241200;
+      background: linear-gradient(180deg, #fff2a0, #ffc95b);
+      box-shadow: 0 4px 12px rgba(255,190,74,.32);
+      cursor: pointer;
+      font-size: clamp(8px,1vw,10px);
+      font-weight: 1000;
+      letter-spacing: .7px;
+      line-height: 1.05;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+    .weekHomeworkBtn span {
+      display: block;
+      margin-top: 2px;
+      font-size: .9em;
+      letter-spacing: .2px;
+    }
+    .weekHomeworkBtn:hover { filter: brightness(1.08); }
+    .weekHomeworkBtn:active { transform: scale(.97); }
 
     .hubBottom {
       display: flex;
@@ -1021,6 +1048,203 @@
       color: rgba(255,255,255,.45);
       text-align: center;
       position: relative; z-index: 1;
+    }
+
+    /* ══════════════════════════════════════════
+       WEEKLY HOMEWORK LIST
+    ══════════════════════════════════════════ */
+    .homeworkList {
+      position: absolute; inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding:
+        calc(clamp(10px,2vw,16px) + var(--safe-top))
+        calc(clamp(10px,2vw,16px) + var(--safe-right))
+        calc(clamp(10px,2vw,16px) + var(--safe-bottom))
+        calc(clamp(10px,2vw,16px) + var(--safe-left));
+      background:
+        radial-gradient(ellipse at center,
+          rgba(0,0,0,.58) 0%,
+          rgba(0,0,0,.86) 68%,
+          rgba(0,0,0,.94) 100%);
+      backdrop-filter: blur(10px) saturate(130%);
+      -webkit-backdrop-filter: blur(10px) saturate(130%);
+      z-index: 61;
+    }
+    .homeworkList.show { display: flex; }
+
+    .homeworkListPanel {
+      position: relative;
+      width: min(760px, 96%);
+      max-height: 100%;
+      overflow-y: auto;
+      border-radius: clamp(20px,3vw,28px);
+      padding: clamp(14px,2.5vw,22px);
+      margin: auto;
+      background: rgba(25,12,47,.92);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.22),
+        0 26px 70px rgba(0,0,0,.78),
+        0 0 0 2px rgba(255,224,102,.82),
+        0 0 34px 8px rgba(255,111,181,.26);
+    }
+
+    .homeworkListTop {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .homeworkListKicker {
+      color: #fff3a8;
+      font-size: clamp(9px,1.3vw,12px);
+      font-weight: 900;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+    }
+
+    .homeworkListTitle {
+      margin: 3px 0 0;
+      font-family: 'Bowlby One', system-ui, sans-serif;
+      font-size: clamp(16px,2.8vw,26px);
+      letter-spacing: 1px;
+      line-height: 1.05;
+      text-shadow: 0 0 20px rgba(255,140,255,.42);
+    }
+
+    .homeworkListDates {
+      margin-top: 6px;
+      color: rgba(255,255,255,.68);
+      font-size: clamp(10px,1.5vw,14px);
+    }
+
+    .homeworkListIntro {
+      margin: 12px 0 0;
+      color: rgba(255,255,255,.72);
+      font-size: clamp(11px,1.5vw,14px);
+      line-height: 1.45;
+    }
+
+    .homeworkTrackTabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .homeworkTrackTab {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 12px;
+      padding: 9px 6px 8px;
+      color: rgba(255,255,255,.72);
+      background: rgba(0,0,0,.22);
+      cursor: pointer;
+      font-size: clamp(9px,1.3vw,12px);
+      font-weight: 900;
+      letter-spacing: .5px;
+      line-height: 1.1;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .homeworkTrackTab span {
+      display: block;
+      margin-top: 3px;
+      color: rgba(255,255,255,.48);
+      font-size: .9em;
+      font-weight: 700;
+    }
+    .homeworkTrackTab.active {
+      color: #fff;
+      border-color: rgba(255,224,102,.84);
+      background: linear-gradient(145deg, rgba(255,224,102,.22), rgba(255,91,202,.22));
+      box-shadow: 0 0 16px rgba(255,111,181,.22);
+    }
+
+    .homeworkListStatus {
+      min-height: 21px;
+      margin: 13px 2px 0;
+      color: rgba(255,255,255,.62);
+      font-size: clamp(10px,1.4vw,13px);
+    }
+    .homeworkListStatus.error { color: #ffb5cf; }
+
+    .homeworkListSection {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.07);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+
+    .homeworkListSectionTitle {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: #fff3a8;
+      font-size: clamp(11px,1.6vw,15px);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .homeworkListSectionTitle span {
+      color: rgba(255,255,255,.52);
+      font-size: .82em;
+      letter-spacing: .3px;
+      text-transform: none;
+    }
+
+    .homeworkListRows {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 6px 9px;
+    }
+
+    .homeworkListRow {
+      display: grid;
+      grid-template-columns: 25px minmax(0,1fr);
+      gap: 7px;
+      align-items: start;
+      min-width: 0;
+      padding: 7px 8px;
+      border-radius: 10px;
+      background: rgba(0,0,0,.18);
+    }
+    .homeworkListNumber {
+      color: rgba(255,255,255,.42);
+      font-size: 11px;
+      font-weight: 900;
+      text-align: right;
+    }
+    .homeworkListEn {
+      color: #fff;
+      font-size: clamp(11px,1.45vw,14px);
+      font-weight: 800;
+      line-height: 1.22;
+      overflow-wrap: anywhere;
+    }
+    .homeworkListJp,
+    .homeworkListHira {
+      display: block;
+      margin-top: 2px;
+      color: rgba(255,255,255,.72);
+      font-size: clamp(10px,1.3vw,12px);
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+    .homeworkListHira {
+      color: rgba(255,255,255,.46);
+      font-size: clamp(9px,1.15vw,11px);
+    }
+
+    @media (max-width: 560px) {
+      .homeworkListPanel { width: 100%; }
+      .homeworkListRows { grid-template-columns: 1fr; }
     }
 
     /* ══ REDUCED MOTION ══ */
@@ -1560,6 +1784,28 @@
       </div>
 
       <div class="pickerNote">※ 利用できる週のみリンクが有効です</div>
+    </div>
+  </div>
+
+  <!-- ── Current-week homework list ── -->
+  <div id="homeworkList" class="homeworkList" aria-hidden="true">
+    <div class="homeworkListPanel" role="dialog" aria-modal="true" aria-labelledby="homeworkListTitle">
+      <div class="homeworkListTop">
+        <div>
+          <div class="homeworkListKicker">THIS WEEK · HOMEWORK</div>
+          <h2 class="homeworkListTitle" id="homeworkListTitle">Weekly homework</h2>
+          <div class="homeworkListDates" id="homeworkListDates"></div>
+        </div>
+        <button id="homeworkListClose" class="ghostBtn" type="button">戻る</button>
+      </div>
+      <p class="homeworkListIntro">Choose your curriculum, then copy these words and sentences into your notebook.</p>
+      <div class="homeworkTrackTabs" role="tablist" aria-label="Choose curriculum for homework">
+        <button class="homeworkTrackTab active" type="button" role="tab" aria-selected="true" data-homework-curr="pb">PRE-BOO<span>プレブー</span></button>
+        <button class="homeworkTrackTab" type="button" role="tab" aria-selected="false" data-homework-curr="br">BOO-RICULUM<span>ブーリキュラム</span></button>
+        <button class="homeworkTrackTab" type="button" role="tab" aria-selected="false" data-homework-curr="bc">BOO-CONTINUUM<span>ブーコンティニュアム</span></button>
+      </div>
+      <div id="homeworkListStatus" class="homeworkListStatus" role="status" aria-live="polite"></div>
+      <div id="homeworkListContent"></div>
     </div>
   </div>
 
@@ -2165,14 +2411,15 @@ const PILLS = [
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
     if (wk.isCurrent) card.setAttribute('aria-current', 'date');
-    card.setAttribute('aria-label', `${wk.tagEn}: ${wk.title}. Open curriculum choices.`);
+    card.setAttribute('aria-label', `${wk.tagEn}: ${wk.title}. Open curriculum choices${wk.isCurrent ? ' or weekly homework' : ''}.`);
     card.innerHTML = `
       <div>
         <div class="weekTag">${wk.tagEn}<span>（${wk.tagJp}）</span></div>
         <div class="weekTitle">${wk.title}</div>
         <div class="weekDates">${wk.range}</div>
       </div>
-      <div class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</div>`;
+      <div class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</div>
+      ${wk.isCurrent ? '<button class="weekHomeworkBtn" type="button">HOMEWORK <span>しゅくだい</span></button>' : ''}`;
     const openWeek = () => openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId);
     card.addEventListener('click', openWeek);
     card.addEventListener('keydown', event => {
@@ -2180,10 +2427,189 @@ const PILLS = [
       event.preventDefault();
       openWeek();
     });
+    const homeworkBtn = card.querySelector('.weekHomeworkBtn');
+    if (homeworkBtn) {
+      homeworkBtn.addEventListener('click', event => {
+        event.stopPropagation();
+        openHomeworkList();
+      });
+      homeworkBtn.addEventListener('keydown', event => event.stopPropagation());
+    }
     container.appendChild(card);
   });
 }
-  
+
+/* ════════════════════════════════════════════════════════════
+   CURRENT-WEEK HOMEWORK LIST
+   The hub list is a read-only, handwriting-friendly view of the same
+   three content files used by the curriculum pages. It stays separate
+   from the interactive Homework tree so neither experience changes shape.
+════════════════════════════════════════════════════════════ */
+const HOMEWORK_TRACKS = {
+  pb: { label: 'PRE-BOO', jp: 'プレブー' },
+  br: { label: 'BOO-RICULUM', jp: 'ブーリキュラム' },
+  bc: { label: 'BOO-CONTINUUM', jp: 'ブーコンティニュアム' },
+};
+const HOMEWORK_SECTIONS = [
+  { key: 'vocab',     label: 'WORDS',     jp: 'たんご' },
+  { key: 'sentences', label: 'SENTENCES', jp: 'ぶんしょう' },
+  { key: 'questions', label: 'QUESTIONS', jp: 'しつもん' },
+];
+const homeworkList        = document.getElementById('homeworkList');
+const homeworkListTitle   = document.getElementById('homeworkListTitle');
+const homeworkListDates   = document.getElementById('homeworkListDates');
+const homeworkListStatus  = document.getElementById('homeworkListStatus');
+const homeworkListContent = document.getElementById('homeworkListContent');
+const homeworkListClose   = document.getElementById('homeworkListClose');
+const homeworkCache       = new Map();
+let homeworkRenderToken   = 0;
+
+function homeworkWeekRange() {
+  const week = getCurrentCurriculumWeek();
+  return {
+    ...week,
+    weekNumber: Math.min(Math.max(Number(week.weekNumber) || 1, 1), 4),
+  };
+}
+
+function homeworkWeekCards(data, week) {
+  const first = (week.weekNumber - 1) * 15 + 1;
+  const last  = week.weekNumber * 15;
+  return Array.isArray(data?.cards)
+    ? data.cards.filter(card => Number(card.n) >= first && Number(card.n) <= last)
+    : [];
+}
+
+function makeHomeworkRow(card) {
+  const row = document.createElement('div');
+  row.className = 'homeworkListRow';
+
+  const number = document.createElement('span');
+  number.className = 'homeworkListNumber';
+  number.textContent = String(card.n ?? '');
+
+  const words = document.createElement('div');
+  const en = document.createElement('div');
+  en.className = 'homeworkListEn';
+  en.textContent = card.en || '';
+  words.appendChild(en);
+
+  if (card.jp) {
+    const jp = document.createElement('span');
+    jp.className = 'homeworkListJp';
+    jp.textContent = card.jp;
+    words.appendChild(jp);
+  }
+  if (card.hira && card.hira !== card.jp) {
+    const hira = document.createElement('span');
+    hira.className = 'homeworkListHira';
+    hira.textContent = card.hira;
+    words.appendChild(hira);
+  }
+
+  row.append(number, words);
+  return row;
+}
+
+function makeHomeworkSection(section, cards) {
+  const wrapper = document.createElement('section');
+  wrapper.className = 'homeworkListSection';
+
+  const heading = document.createElement('div');
+  heading.className = 'homeworkListSectionTitle';
+  heading.textContent = section.label;
+  const jp = document.createElement('span');
+  jp.textContent = section.jp;
+  heading.appendChild(jp);
+  wrapper.appendChild(heading);
+
+  const rows = document.createElement('div');
+  rows.className = 'homeworkListRows';
+  cards.forEach(card => rows.appendChild(makeHomeworkRow(card)));
+  wrapper.appendChild(rows);
+  return wrapper;
+}
+
+function setHomeworkStatus(text, isError = false) {
+  homeworkListStatus.textContent = text;
+  homeworkListStatus.classList.toggle('error', isError);
+}
+
+async function loadHomeworkTrack(curr, week) {
+  const cacheKey = `${week.weekStart}:${curr}`;
+  if (homeworkCache.has(cacheKey)) return homeworkCache.get(cacheKey);
+
+  const payloads = await Promise.all(HOMEWORK_SECTIONS.map(async section => {
+    const url = `content/${curr}/${week.monthSlug}/${section.key}.json`;
+    const response = await fetch(url, { cache: 'no-cache' });
+    if (!response.ok) throw new Error(`Homework content unavailable: ${url}`);
+    return [section.key, await response.json()];
+  }));
+  const data = Object.fromEntries(payloads);
+  homeworkCache.set(cacheKey, data);
+  return data;
+}
+
+async function renderHomeworkTrack(curr) {
+  const track = HOMEWORK_TRACKS[curr];
+  if (!track) return;
+  const token = ++homeworkRenderToken;
+  const week = homeworkWeekRange();
+  document.querySelectorAll('[data-homework-curr]').forEach(button => {
+    const active = button.dataset.homeworkCurr === curr;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  homeworkListContent.innerHTML = '';
+  setHomeworkStatus(`Loading ${track.label}…`);
+
+  try {
+    const data = await loadHomeworkTrack(curr, week);
+    if (token !== homeworkRenderToken) return;
+    HOMEWORK_SECTIONS.forEach(section => {
+      homeworkListContent.appendChild(makeHomeworkSection(
+        section,
+        homeworkWeekCards(data[section.key], week),
+      ));
+    });
+    setHomeworkStatus(`${track.label} · ${week.monthLabel} Week ${week.weekNumber}`);
+  } catch (error) {
+    if (token !== homeworkRenderToken) return;
+    setHomeworkStatus('Homework is not ready yet. Please try again.', true);
+    console.warn('Weekly homework list could not load:', error);
+  }
+}
+
+function openHomeworkList() {
+  const week = homeworkWeekRange();
+  homeworkListTitle.textContent = `${week.monthLabel} Week ${week.weekNumber}`;
+  homeworkListDates.textContent = formatRangeFromIso(week.weekStart, week.weekEnd);
+  homeworkList.scrollTop = 0;
+  homeworkList.classList.add('show');
+  homeworkList.setAttribute('aria-hidden', 'false');
+  playIndexSfx('panelOpen');
+  renderHomeworkTrack('pb');
+}
+
+function closeHomeworkList() {
+  if (!homeworkList.classList.contains('show')) return;
+  homeworkRenderToken += 1;
+  playIndexSfx('panelClose');
+  homeworkList.classList.remove('show');
+  homeworkList.setAttribute('aria-hidden', 'true');
+}
+
+homeworkListClose.addEventListener('click', closeHomeworkList);
+homeworkList.addEventListener('click', event => {
+  if (event.target === homeworkList) closeHomeworkList();
+});
+document.querySelectorAll('[data-homework-curr]').forEach(button => {
+  button.addEventListener('click', () => {
+    playIndexSfx('buttonPress');
+    renderHomeworkTrack(button.dataset.homeworkCurr);
+  });
+});
+
 /* ════════════════════════════════════════════════════════════
    PICKER
 ════════════════════════════════════════════════════════════ */
