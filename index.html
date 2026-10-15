@@ -615,7 +615,13 @@
     .hubHeroActions .mazeCta { flex: 1 1 340px; }
     .hubHeroActions .hubHomeworkBtn { flex: 0 1 190px; margin: 0; }
     .hubHeroActions .pwaIconBtn { flex: 0 0 auto; }
-    .hubBlitzMount { width: 100%; min-width: 0; }
+    .hubBlitzMount {
+      display: grid;
+      grid-template-columns: minmax(108px, .42fr) minmax(0, 1.8fr) minmax(108px, .42fr);
+      gap: clamp(10px, 1.5vw, 18px);
+      width: 100%;
+      min-width: 0;
+    }
 
     @media (max-width: 600px) {
       .hubHeader { gap: 8px; }
@@ -1022,6 +1028,8 @@
       appearance: none;
       min-width: 0;
       min-height: 136px;
+      max-height: 240px;
+      align-self: center;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1076,6 +1084,7 @@
       .hubWeekTab { min-height: 82px; flex-direction: row; gap: 8px; }
       .hubWeekTabArrow { font-size: 24px; }
       .hubWeekTabCopy { align-items: flex-start; }
+      .hubBlitzMount { display: block; }
     }
     @media (max-width: 600px) {
       .hubWeekLayout { gap: 8px; }
@@ -1139,13 +1148,18 @@
     html.hub-reduced-motion .hub-glow-pink {
       animation: none !important;
     }
+    html.hub-low-power .mazeCta.is-complete,
+    html.hub-reduced-motion .mazeCta.is-complete {
+      animation: none !important;
+    }
     @media (prefers-reduced-motion: reduce) {
       .hub-glow-gold,
       .hub-glow-violet,
       .hub-glow-teal,
       .hub-glow-soft,
       .hub-glow-medal,
-      .hub-glow-pink { animation: none !important; }
+      .hub-glow-pink,
+      .mazeCta.is-complete { animation: none !important; }
     }
 
     .homeworkTrackTab:focus-visible,
@@ -1703,7 +1717,8 @@
    
 /* ══ BLITZ ARCADE ═══════════════════════════════════════════ */
 .blitzArcade {
-  width: min(820px, 100%);
+  grid-column: 2;
+  width: 100%;
   margin: 0 auto;
   padding: clamp(12px, 1.8vw, 18px) clamp(14px, 2vw, 22px);
   border-radius: 22px;
@@ -1792,18 +1807,22 @@
 }
 .mazeCta:active { transform: scale(.98) translateZ(0); }
 .mazeCta.is-complete {
-  background: linear-gradient(120deg, rgba(255,190,220,.82), rgba(255,220,176,.82));
+  background: linear-gradient(120deg, #d6ffe0 0%, #75eda0 45%, #20bd70 100%);
   background-size: 100% 100%;
+  color: #082619;
   box-shadow:
-    0 8px 18px rgba(255,155,190,.16),
-    0 0 0 2px rgba(255,255,255,.12);
-  animation: none;
+    0 10px 26px rgba(32,205,112,.34),
+    0 0 0 2px rgba(225,255,231,.34),
+    0 0 30px rgba(76,236,145,.38);
+  animation: mazeCtaCompleteGlow 3.4s ease-in-out infinite;
 }
 .mazeCta.is-complete:hover {
   box-shadow:
-    0 10px 22px rgba(255,155,190,.24),
-    0 0 0 2px rgba(255,255,255,.2);
+    0 12px 28px rgba(32,205,112,.44),
+    0 0 0 2px rgba(225,255,231,.48),
+    0 0 38px rgba(76,236,145,.5);
 }
+.mazeCta.is-complete .mazeCtaJp { color: rgba(8,38,25,.72); }
 
 .mazeCtaMain { display: flex; flex-direction: column; align-items: center; line-height: 1.25; }
 .mazeCtaEn {
@@ -1832,6 +1851,20 @@
       0 0 40px rgba(255,180,120,.44);
   }
 }
+@keyframes mazeCtaCompleteGlow {
+  0%, 100% {
+    box-shadow:
+      0 10px 26px rgba(32,205,112,.28),
+      0 0 0 2px rgba(225,255,231,.28),
+      0 0 24px rgba(76,236,145,.30);
+  }
+  50% {
+    box-shadow:
+      0 12px 30px rgba(32,205,112,.42),
+      0 0 0 2px rgba(225,255,231,.42),
+      0 0 42px rgba(76,236,145,.48);
+  }
+}
 @keyframes mazeCtaSheen {
   0%   { background-position: 0% 50%; }
   100% { background-position: 220% 50%; }
@@ -1842,6 +1875,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .mazeCta { animation: none; }
+  .mazeCta.is-complete { animation: none; }
   .mazeCtaArrow { animation: none; }
 }
 
@@ -2564,7 +2598,7 @@ function renderHub() {
     mazeButton.classList.toggle('is-complete', !mazeAvailable);
   }
 
-const MEDAL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l4 6 4-6"></path><circle cx="12" cy="15" r="6"></circle></svg>';
+const MEDAL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 2.5L11 9M15.5 2.5L13 9"></path><circle cx="12" cy="15" r="6"></circle></svg>';
 const PILLS = [
     { type: 'vocab',     label: 'Vocab',     jp: 'たんご', icon: MEDAL_SVG },
     { type: 'sentences', label: 'Sentence',  jp: 'ぶんしょう', icon: MEDAL_SVG },
