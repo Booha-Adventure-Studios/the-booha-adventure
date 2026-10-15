@@ -41,6 +41,7 @@ const viewportListeners = new Map();
 const visualViewport = {
   width: 1024,
   height: 700,
+  scale: 1,
   addEventListener(type, listener) { viewportListeners.set(type, listener); },
   removeEventListener(type, listener) {
     if (viewportListeners.get(type) === listener) viewportListeners.delete(type);
@@ -69,6 +70,18 @@ visualViewport.height = 560;
 viewportListeners.get('resize')();
 assert.strictEqual(values.get('--blitz-viewport-width'), '820px');
 assert.strictEqual(values.get('--blitz-viewport-height'), '560px');
+
+visualViewport.scale = 2;
+visualViewport.width = 410;
+visualViewport.height = 280;
+viewportListeners.get('resize')();
+assert.strictEqual(values.get('--blitz-viewport-width'), '820px', 'pinch zoom must not shrink the Blitz overlay');
+assert.strictEqual(values.get('--blitz-viewport-height'), '560px', 'pinch zoom must not squash the Blitz overlay');
+
+visualViewport.scale = 1;
+viewportListeners.get('resize')();
+assert.strictEqual(values.get('--blitz-viewport-width'), '410px', 'viewport metrics should refresh after zoom settles');
+assert.strictEqual(values.get('--blitz-viewport-height'), '280px', 'viewport height should refresh after zoom settles');
 
 unbind();
 assert.strictEqual(windowListeners.size, 0, 'viewport cleanup should remove window listeners');
