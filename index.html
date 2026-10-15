@@ -615,7 +615,7 @@
         min-height: 60px;
         padding: 9px 14px 7px !important;
       }
-      .weekCard.currentWeek { min-height: 94px; }
+      .weekCard.currentWeek { min-height: 104px; }
     }
 
     /* ── Week card ──
@@ -747,7 +747,33 @@
     .weekCard:active { transform: scale(.99) translateZ(0); }
     .weekCard.currentWeek:active { transform: translateY(-1px) scale(.995) translateZ(0); }
 
+    .weekCardOpen {
+      appearance: none;
+      align-self: stretch;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+      text-align: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .weekCardOpen:focus-visible {
+      outline: 3px solid #fff3a8;
+      outline-offset: 4px;
+      border-radius: 10px;
+    }
+
     .weekTag {
+      display: block;
       font-weight: 900; letter-spacing: 1.2px;
       font-size: clamp(8px,1.05vw,10px);
       text-transform: uppercase;
@@ -756,6 +782,7 @@
     .weekTag span { color: rgba(255,255,255,.9); margin-left: 4px; }
 
     .weekTitle {
+      display: block;
       font-size: clamp(11px, 1.7vw, 16px);
       font-weight: 900; letter-spacing: .3px;
       color: #fff;
@@ -765,6 +792,7 @@
     }
 
     .weekDates {
+      display: block;
       font-size: clamp(8px, 1.05vw, 10px);
       color: rgba(255,255,255,.65);
       margin-top: 2px;
@@ -783,7 +811,8 @@
       align-self: center;
       border: 1px solid rgba(255,238,133,.78);
       border-radius: 999px;
-      padding: 4px 10px 3px;
+      min-height: 40px;
+      padding: 6px 12px 5px;
       color: #241200;
       background: linear-gradient(180deg, #fff2a0, #ffc95b);
       box-shadow: 0 4px 12px rgba(255,190,74,.32);
@@ -803,6 +832,13 @@
     }
     .weekHomeworkBtn:hover { filter: brightness(1.08); }
     .weekHomeworkBtn:active { transform: scale(.97); }
+    .weekHomeworkBtn:focus-visible,
+    .homeworkTrackTab:focus-visible,
+    .homeworkActionBtn:focus-visible,
+    .ghostBtn:focus-visible {
+      outline: 3px solid #fff3a8;
+      outline-offset: 3px;
+    }
 
     .hubBottom {
       display: flex;
@@ -1140,6 +1176,7 @@
       appearance: none;
       border: 1px solid rgba(255,255,255,.18);
       border-radius: 12px;
+      min-height: 44px;
       padding: 9px 6px 8px;
       color: rgba(255,255,255,.72);
       background: rgba(0,0,0,.22);
@@ -1175,6 +1212,7 @@
       appearance: none;
       border: 1px solid rgba(255,255,255,.22);
       border-radius: 12px;
+      min-height: 44px;
       padding: 8px 7px 7px;
       color: #fff;
       background: rgba(255,255,255,.09);
@@ -1878,7 +1916,7 @@
 
   <!-- ── Current-week homework list ── -->
   <div id="homeworkList" class="homeworkList" aria-hidden="true">
-    <div class="homeworkListPanel" role="dialog" aria-modal="true" aria-labelledby="homeworkListTitle">
+    <div class="homeworkListPanel" role="dialog" aria-modal="true" aria-labelledby="homeworkListTitle" aria-describedby="homeworkListIntro">
       <div class="homeworkListTop">
         <div>
           <div class="homeworkListKicker">THIS WEEK · HOMEWORK</div>
@@ -1887,18 +1925,18 @@
         </div>
         <button id="homeworkListClose" class="ghostBtn" type="button">戻る</button>
       </div>
-      <p class="homeworkListIntro">Choose your curriculum, then copy these words and sentences into your notebook.</p>
-      <div class="homeworkTrackTabs" role="tablist" aria-label="Choose curriculum for homework">
-        <button class="homeworkTrackTab active" type="button" role="tab" aria-selected="true" data-homework-curr="pb">PRE-BOO<span>プレブー</span></button>
-        <button class="homeworkTrackTab" type="button" role="tab" aria-selected="false" data-homework-curr="br">BOO-RICULUM<span>ブーリキュラム</span></button>
-        <button class="homeworkTrackTab" type="button" role="tab" aria-selected="false" data-homework-curr="bc">BOO-CONTINUUM<span>ブーコンティニュアム</span></button>
+      <p class="homeworkListIntro" id="homeworkListIntro">Choose your curriculum, then copy these words and sentences into your notebook.</p>
+      <div class="homeworkTrackTabs" role="tablist" aria-label="Choose curriculum for homework" aria-orientation="horizontal">
+        <button id="homeworkTab-pb" class="homeworkTrackTab active" type="button" role="tab" aria-selected="true" aria-controls="homeworkListContent" data-homework-curr="pb">PRE-BOO<span>プレブー</span></button>
+        <button id="homeworkTab-br" class="homeworkTrackTab" type="button" role="tab" aria-selected="false" aria-controls="homeworkListContent" data-homework-curr="br">BOO-RICULUM<span>ブーリキュラム</span></button>
+        <button id="homeworkTab-bc" class="homeworkTrackTab" type="button" role="tab" aria-selected="false" aria-controls="homeworkListContent" data-homework-curr="bc">BOO-CONTINUUM<span>ブーコンティニュアム</span></button>
       </div>
       <div class="homeworkListActions" aria-label="Homework list actions">
         <button id="homeworkCopyBtn" class="homeworkActionBtn primary" type="button">COPY LIST<span>ノート用にコピー</span></button>
         <button id="homeworkPrintBtn" class="homeworkActionBtn" type="button">PRINT / WRITE<span>印刷して書こう</span></button>
       </div>
       <div id="homeworkListStatus" class="homeworkListStatus" role="status" aria-live="polite"></div>
-      <div id="homeworkListContent"></div>
+      <div id="homeworkListContent" role="tabpanel" aria-labelledby="homeworkTab-pb" tabindex="0"></div>
     </div>
   </div>
 
@@ -2501,23 +2539,22 @@ const PILLS = [
     const card = document.createElement('div');
     card.className      = `weekCard${wk.isCurrent ? ' currentWeek' : ''}`;
     card.dataset.weekId = wk.weekId;
-    card.setAttribute('role', 'button');
-    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'group');
     if (wk.isCurrent) card.setAttribute('aria-current', 'date');
-    card.setAttribute('aria-label', `${wk.tagEn}: ${wk.title}. Open curriculum choices${wk.isCurrent ? ' or weekly homework' : ''}.`);
+    card.setAttribute('aria-label', `${wk.tagEn}: ${wk.title}`);
     card.innerHTML = `
-      <div>
-        <div class="weekTag">${wk.tagEn}<span>（${wk.tagJp}）</span></div>
-        <div class="weekTitle">${wk.title}</div>
-        <div class="weekDates">${wk.range}</div>
-      </div>
-      <div class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</div>
+      <button class="weekCardOpen" type="button" aria-label="${wk.tagEn}: ${wk.title}. Open curriculum choices.">
+        <span>
+          <span class="weekTag">${wk.tagEn}<span>（${wk.tagJp}）</span></span>
+          <span class="weekTitle">${wk.title}</span>
+          <span class="weekDates">${wk.range}</span>
+        </span>
+        <span class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</span>
+      </button>
       ${wk.isCurrent ? '<button class="weekHomeworkBtn" type="button">HOMEWORK <span>しゅくだい</span></button>' : ''}`;
     const openWeek = () => openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId);
-    card.addEventListener('click', openWeek);
-    card.addEventListener('keydown', event => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      event.preventDefault();
+    card.addEventListener('click', event => {
+      if (event.target.closest('.weekHomeworkBtn')) return;
       openWeek();
     });
     const homeworkBtn = card.querySelector('.weekHomeworkBtn');
@@ -2559,6 +2596,7 @@ const homeworkPrintBtn    = document.getElementById('homeworkPrintBtn');
 const homeworkCache       = new Map();
 let homeworkRenderToken   = 0;
 let homeworkActiveCurr    = 'pb';
+let homeworkReturnFocus   = null;
 
 function homeworkWeekRange() {
   const week = getCurrentCurriculumWeek();
@@ -2657,6 +2695,7 @@ async function renderHomeworkTrack(curr) {
     button.classList.toggle('active', active);
     button.setAttribute('aria-selected', active ? 'true' : 'false');
   });
+  homeworkListContent.setAttribute('aria-labelledby', `homeworkTab-${curr}`);
   homeworkListContent.innerHTML = '';
   setHomeworkStatus(`Loading ${track.label}…`);
 
@@ -2728,12 +2767,16 @@ async function copyHomeworkList() {
 
 function openHomeworkList() {
   const week = homeworkWeekRange();
+  homeworkReturnFocus = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : null;
   homeworkListTitle.textContent = `${week.monthLabel} Week ${week.weekNumber}`;
   homeworkListDates.textContent = formatRangeFromIso(week.weekStart, week.weekEnd);
   homeworkList.scrollTop = 0;
   homeworkList.classList.add('show');
   homeworkList.setAttribute('aria-hidden', 'false');
   playIndexSfx('panelOpen');
+  homeworkListClose.focus({ preventScroll: true });
   renderHomeworkTrack('pb');
 }
 
@@ -2743,6 +2786,8 @@ function closeHomeworkList() {
   playIndexSfx('panelClose');
   homeworkList.classList.remove('show');
   homeworkList.setAttribute('aria-hidden', 'true');
+  if (homeworkReturnFocus?.isConnected) homeworkReturnFocus.focus({ preventScroll: true });
+  homeworkReturnFocus = null;
 }
 
 homeworkListClose.addEventListener('click', closeHomeworkList);
@@ -2773,9 +2818,13 @@ const pickerDates = document.getElementById('pickerDates');
 const pickerClose = document.getElementById('pickerClose');
 
 let currentWeekId = '';
+let pickerReturnFocus = null;
 
 function openPicker(tagEn, tagJp, dates, weekId) {
   if (!weekId) return;
+  pickerReturnFocus = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : null;
   currentWeekId = weekId;
   pickerTitle.textContent = `${tagEn}（${tagJp}）`;
   pickerDates.textContent = dates;
@@ -2785,6 +2834,7 @@ function openPicker(tagEn, tagJp, dates, weekId) {
   playIndexSfx('panelOpen');
   picker.classList.add('show');
   picker.setAttribute('aria-hidden', 'false');
+  pickerClose.focus({ preventScroll: true });
 }
 
 function closePicker() {
@@ -2792,10 +2842,22 @@ function closePicker() {
   playIndexSfx('panelClose');
   picker.classList.remove('show');
   picker.setAttribute('aria-hidden', 'true');
+  if (pickerReturnFocus?.isConnected) pickerReturnFocus.focus({ preventScroll: true });
+  pickerReturnFocus = null;
 }
 
 pickerClose.addEventListener('click', closePicker);
 picker.addEventListener('click', e => { if (e.target === picker) closePicker(); });
+document.addEventListener('keydown', event => {
+  if (event.key !== 'Escape') return;
+  if (homeworkList.classList.contains('show')) {
+    event.preventDefault();
+    closeHomeworkList();
+  } else if (picker.classList.contains('show')) {
+    event.preventDefault();
+    closePicker();
+  }
+});
 
 document.querySelectorAll('.pickTile').forEach(btn => {
   btn.addEventListener('click', e => {
