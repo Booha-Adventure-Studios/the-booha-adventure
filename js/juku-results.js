@@ -515,9 +515,7 @@
       </div>`;
 
     const student = host.querySelector('#jtr-student');
-    student.textContent =
-      localStorage.getItem('booha_user_name') ||
-      localStorage.getItem('booha_first_name') || 'Student';
+    student.textContent = localStorage.getItem('booha_first_name') || 'Student';
     const status = host.querySelector('#jtr-status');
     const approve = host.querySelector('#jtr-approve');
     let denyArmed = false;

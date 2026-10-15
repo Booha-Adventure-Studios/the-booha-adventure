@@ -436,9 +436,6 @@ window.BoohaBlitzEngine = (() => {
       }
       const raw =
         localStorage.getItem('booha_first_name') ||
-        localStorage.getItem('booha_user_name') ||
-        localStorage.getItem('booha_display_name') ||
-        localStorage.getItem('booha_name') ||
         'PLAYER 1';
       const first = String(raw).trim().split(/\s+/)[0] || 'PLAYER';
       return first.toUpperCase();

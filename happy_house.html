@@ -936,12 +936,7 @@ const LIAR_STORE = 'booha_liar_machine';
 const SNAP_STORE = 'booha_snap_test_records';
 
 function getP1Name() {
-  const directFirst = localStorage.getItem('booha_first_name') ||
-                      localStorage.getItem('boohaFirstName') || '';
-  const fullName = localStorage.getItem('booha_user_name') ||
-                   localStorage.getItem('boohaUserName') ||
-                   localStorage.getItem('booha_display_name') || '';
-  const raw = (directFirst || fullName.split(' ')[0] || '').trim();
+  const raw = (localStorage.getItem('booha_first_name') || '').trim();
   if (!raw) return 'PLAYER 1';
   return (raw.length > 12 ? raw.slice(0, 12) : raw).toUpperCase();
 }

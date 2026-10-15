@@ -6930,9 +6930,7 @@
     try {
       const direct = localStorage.getItem('booha_first_name');
       if (direct) return direct.charAt(0).toUpperCase() + direct.slice(1).toLowerCase().slice(0, 12);
-      const full = localStorage.getItem('booha_user_name') || '';
-      const first = full.split(' ')[0].slice(0, 12);
-      return first ? first.charAt(0).toUpperCase() + first.slice(1).toLowerCase() : '';
+      return '';
     } catch (_) {
       return '';
     }

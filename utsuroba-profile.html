@@ -344,8 +344,7 @@
 
       function getName() {
         try {
-          const raw = localStorage.getItem('booha_first_name') ||
-            (localStorage.getItem('booha_user_name') || '').split(/\s+/)[0];
+          const raw = localStorage.getItem('booha_first_name') || '';
           return raw ? raw.trim().slice(0, 12) : 'traveller';
         } catch (_) { return 'traveller'; }
       }
