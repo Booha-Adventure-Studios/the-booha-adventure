@@ -507,11 +507,12 @@
        contents of the hero and Blitz mount without moving the shell again. */
     .hubHeader {
       display: grid;
-      grid-template-columns: minmax(0,1fr) minmax(260px,1.35fr) minmax(0,1fr);
-      grid-template-areas: "left title curriculum";
+      grid-template-columns: minmax(0,1fr) auto;
+      grid-template-areas: "title title" "left curriculum";
       align-items: center;
       width: 100%;
       gap: clamp(10px, 2vw, 24px);
+      row-gap: clamp(10px, 1.6vw, 18px);
     }
     .hubHeaderLeft {
       grid-area: left;
@@ -522,11 +523,6 @@
       gap: clamp(4px, .8vw, 8px);
     }
     .hubHeader > .hubTitle { grid-area: title; }
-    .hubHeaderLeft .playerGreeting {
-      align-items: flex-start;
-      margin-top: 0;
-      padding: 0;
-    }
     .hubUtilityNav {
       display: flex;
       flex-wrap: wrap;
@@ -621,15 +617,9 @@
     .hubHeroActions .pwaIconBtn { flex: 0 0 auto; }
     .hubBlitzMount { width: 100%; min-width: 0; }
 
-    @media (max-width: 999px) {
-      .hubHeader { grid-template-columns: minmax(0,1fr) auto; grid-template-areas: "title title" "left curriculum"; }
-      .hubTitle { grid-area: title; }
-      .hubCurriculumBtn { justify-self: end; }
-    }
     @media (max-width: 600px) {
       .hubHeader { gap: 8px; }
       .hubHeaderLeft { gap: 5px; }
-      .hubHeaderLeft .playerGreeting .greetingEn { font-size: clamp(12px, 4vw, 16px); letter-spacing: 1.5px; }
       .hubCurriculumBtn { min-width: 142px; min-height: 48px; padding-right: 9px; }
       .hubCurriculumIcon { width: 28px; height: 28px; }
       .hubUtilityBtn { padding-right: 9px; }
@@ -642,6 +632,8 @@
     .hubTitle {
       position: relative;
       display: flex; flex-direction: column; align-items: center;
+      grid-area: title;
+      text-align: center;
       padding: 6px 20px 2px;
       opacity: 0; transform: translateY(10px) scale(.94);
       animation: hubTitleIn 900ms cubic-bezier(.18,.9,.2,1.15) 80ms forwards;
@@ -657,7 +649,7 @@
       position: relative; z-index: 1;
       text-align: center;
       font-family: 'Bowlby One', system-ui, sans-serif;
-      font-size: clamp(20px, 4.5vw, 48px);
+      font-size: clamp(34px, 5vw, 64px);
       font-weight: 400;
       letter-spacing: 3px;
       line-height: 1.1;
@@ -674,7 +666,6 @@
         drop-shadow(0 0 60px rgba(255,80,200,.28))
         drop-shadow(0 2px 8px rgba(0,0,0,.9));
       white-space: nowrap;
-      font-size: clamp(24px, 3.4vw, 46px);
     }
     @keyframes hubHeadingShimmer {
       0%   { background-position: 0% 50%; }
@@ -692,6 +683,21 @@
       letter-spacing: 2.5px;
       color: rgba(255,225,250,.72);
       text-shadow: 0 0 12px rgba(255,140,255,.35), 0 1px 4px rgba(0,0,0,.8);
+    }
+
+    .hubTitle .playerGreeting {
+      align-items: center;
+      padding: 0;
+      margin-top: clamp(6px, 1vh, 12px);
+    }
+    .hubTitle .playerGreeting .greetingEn {
+      font-size: clamp(14px, 1.6vw, 20px);
+      white-space: normal;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .hubHeading { font-size: clamp(24px, 8vw, 34px); letter-spacing: 2px; }
     }
 
     .playerGreeting {
@@ -1734,6 +1740,14 @@
 .blitzRecordsBtn { width: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #ffe88a; background: rgba(255,255,255,.04); border: 1px solid rgba(255,224,102,.72); box-shadow: 0 0 14px rgba(255,205,75,.18); }
 .blitzRecordsIcon { font-size: 19px; line-height: 1; }
 .blitzRecordsLabel { font-size: 7px; font-weight: 1000; letter-spacing: 1px; }
+.blitzArcade.is-perfect-week {
+  border-color: rgba(255,214,120,.85);
+  background: linear-gradient(145deg, rgba(60,44,8,.82), rgba(24,18,6,.80));
+}
+.blitzArcade.is-perfect-week .blitzStripSub::after {
+  content: " · PERFECT WEEK ✦";
+  color: #ffd875;
+}
 
 @media (max-width: 600px) {
   .blitzMedals { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1777,6 +1791,19 @@
     0 0 42px rgba(255,180,120,.5);
 }
 .mazeCta:active { transform: scale(.98) translateZ(0); }
+.mazeCta.is-complete {
+  background: linear-gradient(120deg, rgba(255,190,220,.82), rgba(255,220,176,.82));
+  background-size: 100% 100%;
+  box-shadow:
+    0 8px 18px rgba(255,155,190,.16),
+    0 0 0 2px rgba(255,255,255,.12);
+  animation: none;
+}
+.mazeCta.is-complete:hover {
+  box-shadow:
+    0 10px 22px rgba(255,155,190,.24),
+    0 0 0 2px rgba(255,255,255,.2);
+}
 
 .mazeCtaMain { display: flex; flex-direction: column; align-items: center; line-height: 1.25; }
 .mazeCtaEn {
@@ -1958,10 +1985,6 @@
       <div class="hub">
         <header class="hubHeader">
           <div class="hubHeaderLeft">
-            <div id="playerGreeting" class="playerGreeting">
-              <div class="greetingEn">WELCOME BACK, <span class="greetName" id="greetNameSlot">PLAYER</span></div>
-              <div class="greetingJp">おかえりなさい</div>
-            </div>
             <nav class="hubUtilityNav" aria-label="Adventure links">
               <a href="profile.html" id="alog-icon-btn" class="hubUtilityBtn" aria-label="ぼうけんログ / Adventure Log">
                 <img src="assets/img/profile.webp" alt="" decoding="async">
@@ -1977,6 +2000,10 @@
             <div class="sparkleField" aria-hidden="true"></div>
             <div class="hubHeading">BOOHA ADVENTURE</div>
             <div class="hubHeadingJp">ブーハー・アドベンチャー</div>
+            <div id="playerGreeting" class="playerGreeting">
+              <div class="greetingEn">WELCOME BACK, <span class="greetName" id="greetNameSlot">PLAYER</span></div>
+              <div class="greetingJp">おかえりなさい</div>
+            </div>
           </div>
           <button id="hubCurriculumBtn" class="hubCurriculumBtn hub-glow-gold" type="button" aria-label="Choose curriculum">
             <img id="hubCurriculumIcon" class="hubCurriculumIcon" src="assets/img/pre-boo.webp" alt="">
@@ -2008,7 +2035,7 @@
             </button>
           </div>
           <div class="hubHeroActions">
-          <button id="mazeBtn" class="mazeCta hub-glow-pink" type="button">
+          <button id="mazeBtn" class="mazeCta" type="button">
             <span class="mazeCtaMain">
               <span class="mazeCtaEn">Enter the Maze</span>
               <span class="mazeCtaJp">今日のゲームはここから</span>
@@ -2529,6 +2556,13 @@ function renderHub() {
   // finished, use the same quiet Pre-Boo visual default without opening a
   // picker or writing a possibly-stale value.
   let activeTab = window.BoohaCurriculum?.get?.() || 'pb';
+  const completed = hubWeeklyCompletedFor(activeTab);
+  const mazeButton = document.getElementById('mazeBtn');
+  if (mazeButton) {
+    const mazeAvailable = completed < 9;
+    mazeButton.classList.toggle('hub-glow-pink', mazeAvailable);
+    mazeButton.classList.toggle('is-complete', !mazeAvailable);
+  }
 
 const MEDAL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l4 6 4-6"></path><circle cx="12" cy="15" r="6"></circle></svg>';
 const PILLS = [
@@ -2568,6 +2602,7 @@ const PILLS = [
   const weekId = CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey ||
     `${cw.monthSlug}:w${cw.weekNumber}`;
 
+  let perfectCount = 0;
   PILLS.forEach(({ type, label, jp, icon }) => {
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -2580,6 +2615,7 @@ const PILLS = [
     try { done = ENGINES[type]?.getWeeklyScore?.(activeTab, weekId) || null; } catch (e) {}
     if (done) {
       btn.classList.add('is-record', 'hub-glow-medal');
+      perfectCount++;
     }
 
     btn.addEventListener('click', async () => {
@@ -2610,6 +2646,10 @@ const PILLS = [
 
     gamesEl.appendChild(btn);
   });
+  const perfectWeek = perfectCount === PILLS.length;
+  arcade.classList.toggle('is-perfect-week', perfectWeek);
+  arcade.classList.toggle('hub-glow-soft', !perfectWeek);
+  arcade.classList.toggle('hub-glow-gold', perfectWeek);
 }
 
   const hubEventHandlers = {
