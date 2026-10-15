@@ -654,6 +654,39 @@
       animation-delay: var(--rainbow-offset,0s);
     }
 
+    /* The current week is the student's starting point, so it needs a clear
+       visual lead over the adjacent navigation cards. Keep the distinction
+       structural and calm: the next pass will add the homework action here. */
+    .weekCard.currentWeek {
+      z-index: 1;
+      background: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,91,202,.18) 48%, rgba(123,92,255,.20));
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.42),
+        0 10px 30px rgba(0,0,0,.44),
+        0 0 0 3px rgba(255,224,102,.92),
+        0 0 26px 7px rgba(255,111,181,.42),
+        0 0 44px 8px rgba(184,164,255,.24);
+      transform: translateY(-2px) translateZ(0);
+    }
+
+    .weekCard.currentWeek .weekTag {
+      color: #fff3a8;
+      text-shadow: 0 0 10px rgba(255,224,102,.58);
+    }
+
+    .weekCard.currentWeek .weekTag span { color: #ffffff; }
+
+    .weekCard.currentWeek .weekTitle {
+      font-size: clamp(12px, 1.85vw, 17px);
+      text-shadow: 0 2px 14px rgba(0,0,0,.72), 0 0 12px rgba(255,159,194,.28);
+    }
+
+    .weekCard.currentWeek .weekHint {
+      color: #fff3b0;
+      font-weight: 900;
+      text-shadow: 0 0 10px rgba(255,224,102,.46);
+    }
+
     @property --hue {
       syntax: '<angle>';
       inherits: false;
@@ -701,7 +734,17 @@
         0 0 0 2px hsl(var(--hue,0deg) 90% 70% / .9),
         0 0 28px 6px hsl(var(--hue,0deg) 90% 65% / .45);
     }
+    .weekCard.currentWeek:hover {
+      transform: translateY(-5px) scale(1.02) translateZ(0);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.52),
+        0 14px 34px rgba(0,0,0,.48),
+        0 0 0 3px rgba(255,238,133,1),
+        0 0 32px 8px rgba(255,111,181,.52),
+        0 0 50px 10px rgba(184,164,255,.30);
+    }
     .weekCard:active { transform: scale(.99) translateZ(0); }
+    .weekCard.currentWeek:active { transform: translateY(-1px) scale(.995) translateZ(0); }
 
     .weekTag {
       font-weight: 900; letter-spacing: 1.2px;
@@ -986,6 +1029,9 @@
       #fade { transition: none; }
       .weekCard, .weekCard::before,
       .pickerPanel, .pickerPanel::before { animation: none; }
+      .weekCard.currentWeek,
+      .weekCard.currentWeek:hover,
+      .weekCard.currentWeek:active { transform: none; }
     }
 
    
@@ -1771,9 +1817,9 @@ function buildWeekData() {
   const last    = shiftCurriculumWeek(current, -1);
   const next    = shiftCurriculumWeek(current,  1);
   return [
-    { tagEn:'LAST WEEK', tagJp:'先週', title:`${last.monthLabel} Week ${last.weekNumber}`,       range: formatRangeFromIso(last.weekStart,    last.weekEnd),    weekId: makeWeekIdFromCalendarWeek(last)    },
-    { tagEn:'THIS WEEK', tagJp:'今週', title:`${current.monthLabel} Week ${current.weekNumber}`, range: formatRangeFromIso(current.weekStart, current.weekEnd), weekId: makeWeekIdFromCalendarWeek(current) },
-    { tagEn:'NEXT WEEK', tagJp:'来週', title:`${next.monthLabel} Week ${next.weekNumber}`,       range: formatRangeFromIso(next.weekStart,    next.weekEnd),    weekId: makeWeekIdFromCalendarWeek(next)    }
+    { tagEn:'LAST WEEK', tagJp:'先週', title:`${last.monthLabel} Week ${last.weekNumber}`,       range: formatRangeFromIso(last.weekStart,    last.weekEnd),    weekId: makeWeekIdFromCalendarWeek(last),    isCurrent:false },
+    { tagEn:'THIS WEEK', tagJp:'今週', title:`${current.monthLabel} Week ${current.weekNumber}`, range: formatRangeFromIso(current.weekStart, current.weekEnd), weekId: makeWeekIdFromCalendarWeek(current), isCurrent:true  },
+    { tagEn:'NEXT WEEK', tagJp:'来週', title:`${next.monthLabel} Week ${next.weekNumber}`,       range: formatRangeFromIso(next.weekStart,    next.weekEnd),    weekId: makeWeekIdFromCalendarWeek(next),    isCurrent:false }
   ];
 }
 
@@ -2114,17 +2160,26 @@ const PILLS = [
 
   buildWeekData().forEach(wk => {
     const card = document.createElement('div');
-    card.className      = 'weekCard';
+    card.className      = `weekCard${wk.isCurrent ? ' currentWeek' : ''}`;
     card.dataset.weekId = wk.weekId;
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    if (wk.isCurrent) card.setAttribute('aria-current', 'date');
+    card.setAttribute('aria-label', `${wk.tagEn}: ${wk.title}. Open curriculum choices.`);
     card.innerHTML = `
       <div>
         <div class="weekTag">${wk.tagEn}<span>（${wk.tagJp}）</span></div>
         <div class="weekTitle">${wk.title}</div>
         <div class="weekDates">${wk.range}</div>
       </div>
-      <div class="weekHint">TAP TO OPEN</div>`;
-    card.addEventListener('click', () =>
-      openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId));
+      <div class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</div>`;
+    const openWeek = () => openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId);
+    card.addEventListener('click', openWeek);
+    card.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openWeek();
+    });
     container.appendChild(card);
   });
 }
