@@ -9,9 +9,11 @@ const root = path.join(__dirname, '..');
 const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const verify = fs.readFileSync(path.join(root, 'verify.sh'), 'utf8');
 
-assert.match(index, /class="weekHomeworkBtn"/, 'the current-week card must expose a homework action');
-assert.match(index, /openHomeworkList\(\)/, 'the hub homework action must open the homework list');
-assert.match(index, /event\.stopPropagation\(\);\s*openHomeworkList\(\);/, 'homework action must not also open the curriculum picker');
+assert.match(index, /id="hubHomeworkBtn" class="hubHomeworkBtn"/, 'the hub must expose a separate homework action');
+assert.match(index, /hubHomeworkBtn\.addEventListener\('click',[\s\S]*?openHomeworkList\(\)/, 'the hub homework action must open the homework list');
+assert.doesNotMatch(index, /class="weekHomeworkBtn"/, 'the homework action must not sit inside the current-week tile');
+assert.match(index, /\.hubGreetingRow[\s\S]*?grid-template-columns: minmax\(0,1fr\) auto minmax\(0,1fr\)/, 'the greeting row must keep the welcome line centered');
+assert.match(index, /\.hubHomeworkBtn[\s\S]*?color: #100b00[\s\S]*?linear-gradient\(180deg, #fff2a0/, 'the hub homework action must be a glowing gold button with dark text');
 assert.match(index, /id="homeworkList" class="homeworkList"/, 'the homework list modal must exist');
 assert.match(index, /role="dialog" aria-modal="true" aria-labelledby="homeworkListTitle" aria-describedby="homeworkListIntro"/, 'the homework list dialog must expose its title and instructions');
 assert.match(index, /id="homeworkListContent"/, 'the modal must have a content region');
@@ -22,6 +24,7 @@ assert.match(index, /data-homework-curr="bc"/, 'Boo-continuum homework tab must 
 assert.match(index, /HOMEWORK_SECTIONS = \[[\s\S]*?vocab[\s\S]*?sentences[\s\S]*?questions/, 'the list must cover words, sentences, and questions');
 assert.match(index, /content\/\$\{curr\}\/\$\{week\.monthSlug\}\/\$\{section\.key\}\.json/, 'the list must load the selected curriculum and current month');
 assert.match(index, /homeworkWeekCards\(data\[section\.key\], week\)/, 'the list must restrict content to the current week');
+assert.match(index, /return cards\.map\(\(card, index\) => \(\{ \.\.\.card, n: index \+ 1 \}\)\)/, 'each weekly list must use local 1-15 numbering');
 assert.match(index, /fetch\(url, \{ cache: 'no-cache' \}\)/, 'homework content fetches must revalidate without bypassing the browser cache');
 assert.match(index, /id="homeworkCopyBtn"/, 'the list must provide a copy action');
 assert.match(index, /navigator\.clipboard\?\.writeText/, 'copy action must use the browser clipboard when available');
