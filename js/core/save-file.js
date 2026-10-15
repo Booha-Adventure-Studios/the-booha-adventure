@@ -85,6 +85,7 @@ const BoohaSaveFile = (() => {
         weekLog:        {},      // { "2026-w27": { adv, blitz, duel } }
         lastActivityTs: 0,
         selectedBoohaSkin: null,
+        curriculum:       null, // 'pb' | 'br' | 'bc' — student's saved track
       },
 
       // ── Weekly — resets at each Sunday-started Tokyo occurrence ──────────
@@ -324,6 +325,7 @@ const BoohaSaveFile = (() => {
     if (typeof save.meta.allTimeStars   !== 'number') save.meta.allTimeStars   = 0;
     if (typeof save.meta.lastActivityTs !== 'number') save.meta.lastActivityTs = 0;
     if (save.meta.selectedBoohaSkin !== null && typeof save.meta.selectedBoohaSkin !== 'string') save.meta.selectedBoohaSkin = null;
+    if (!['pb', 'br', 'bc'].includes(save.meta.curriculum)) save.meta.curriculum = null;
     if (!save.meta.dayLog)  save.meta.dayLog  = {};
     if (!save.meta.weekLog) save.meta.weekLog = {};
 

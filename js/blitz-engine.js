@@ -3995,7 +3995,7 @@ window.BoohaBlitzEngine = (() => {
       ? ctx.curr
       : (() => {
           try {
-            const c = localStorage.getItem('booha_last_curr');
+            const c = window.BoohaCurriculum?.get?.() || localStorage.getItem('booha_last_curr');
             return (c === 'pb' || c === 'br' || c === 'bc') ? c : 'pb';
           } catch (e) { return 'pb'; }
         })();
