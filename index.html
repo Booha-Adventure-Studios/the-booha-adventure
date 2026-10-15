@@ -1008,6 +1008,87 @@
       text-transform: uppercase;
     }
 
+    /* Pass 17: make the current week the hero, with quiet week navigation
+       on either side. The old card skin remains the visual vocabulary, but
+       the information hierarchy now matches the hub mockup. */
+    .hubWeekLayout {
+      display: grid;
+      grid-template-columns: minmax(108px, .42fr) minmax(0, 1.8fr) minmax(108px, .42fr);
+      grid-template-areas: "previous current next";
+      align-items: stretch;
+      gap: clamp(10px, 1.5vw, 18px);
+      width: 100%;
+    }
+    .hubCurrentWeekMount { grid-area: current; min-width: 0; }
+    .hubWeekTab {
+      appearance: none;
+      min-width: 0;
+      min-height: 136px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: clamp(10px, 1.4vw, 16px) clamp(7px, 1vw, 12px);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 20px;
+      color: #fff;
+      background: rgba(14, 8, 27, .58);
+      cursor: pointer;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.28);
+      transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #hubPrevWeekBtn { grid-area: previous; border-color: rgba(191,133,255,.86); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 22px rgba(165,101,255,.22); }
+    #hubNextWeekBtn { grid-area: next; border-color: rgba(64,229,207,.78); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 22px rgba(34,220,203,.2); }
+    .hubWeekTab:hover { filter: brightness(1.13); transform: translateY(-2px); }
+    .hubWeekTab:active { transform: translateY(0) scale(.98); }
+    .hubWeekTab:focus-visible { outline: 3px solid #fff3a8; outline-offset: 4px; }
+    .hubWeekTabArrow { font-size: clamp(20px, 2.8vw, 30px); line-height: .8; }
+    #hubPrevWeekBtn .hubWeekTabArrow { color: #d1a8ff; }
+    #hubNextWeekBtn .hubWeekTabArrow { color: #76ffe9; }
+    .hubWeekTabCopy { display: flex; flex-direction: column; align-items: center; min-width: 0; }
+    .hubWeekTabLabel { font-size: clamp(8px, .9vw, 11px); font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; }
+    .hubWeekTabTitle { margin-top: 4px; font-size: clamp(11px, 1.15vw, 14px); font-weight: 900; white-space: nowrap; }
+    .hubWeekTabDate { color: rgba(255,255,255,.66); font-size: clamp(8px, .85vw, 10px); line-height: 1.2; }
+
+    .hubCurrentWeekMount .weekCard {
+      min-height: clamp(232px, 22vw, 286px);
+      height: auto;
+      padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.8vw, 34px) clamp(16px, 2vw, 24px);
+      cursor: default;
+    }
+    .hubCurrentWeekMount .weekCardOpen { gap: clamp(8px, 1.2vw, 14px); }
+    .hubCurrentWeekMount .weekCardOpen > span:first-child { width: 100%; }
+    .hubCurrentWeekMount .weekCard.currentWeek .weekTag { font-size: clamp(9px, 1vw, 12px); }
+    .hubCurrentWeekMount .weekCard.currentWeek .weekTitle { font-size: clamp(25px, 4vw, 42px); margin-top: 10px; }
+    .hubCurrentWeekMount .weekCard.currentWeek .weekDates { font-size: clamp(10px, 1.15vw, 13px); margin-top: 7px; }
+    .hubMazeLabel { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: clamp(12px, 2vw, 22px); color: #fff; font-size: clamp(10px, 1.15vw, 13px); font-weight: 900; text-align: left; }
+    .hubMazeLabel span { color: rgba(255,255,255,.66); font-size: .9em; font-weight: 700; }
+    .hubProgressCount { color: #ffe477; font-size: clamp(12px, 1.3vw, 15px); font-weight: 1000; }
+    .hubProgress { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; width: 100%; margin-top: 8px; }
+    .hubProgressSegment { height: clamp(8px, 1vw, 11px); border-radius: 999px; background: rgba(255,255,255,.18); box-shadow: inset 0 1px 2px rgba(0,0,0,.34); }
+    .hubProgressSegment.is-complete { background: linear-gradient(180deg, #fff2a0, #ffc943); box-shadow: 0 0 10px rgba(255,214,88,.55); }
+    .hubProgressHint { display: block; margin-top: 8px; color: rgba(255,255,255,.68); font-size: clamp(8px, .9vw, 10px); line-height: 1.35; text-align: left; }
+    .hubCurrentWeekMount .weekHint { margin-top: auto; color: #fff3b0; font-size: clamp(8px, .9vw, 10px); }
+
+    @media (max-width: 999px) {
+      .hubWeekLayout { grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-areas: "current current" "previous next"; }
+      .hubWeekTab { min-height: 82px; flex-direction: row; gap: 8px; }
+      .hubWeekTabArrow { font-size: 24px; }
+      .hubWeekTabCopy { align-items: flex-start; }
+    }
+    @media (max-width: 600px) {
+      .hubWeekLayout { gap: 8px; }
+      .hubWeekTab { min-height: 76px; border-radius: 16px; padding: 8px 6px; }
+      .hubWeekTabLabel { letter-spacing: .8px; }
+      .hubWeekTabTitle { font-size: 11px; }
+      .hubWeekTabDate { font-size: 8px; }
+      .hubProgress { gap: 4px; }
+      .hubProgressHint { font-size: 8px; }
+    }
+
     .homeworkTrackTab:focus-visible,
     .homeworkActionBtn:focus-visible,
     .ghostBtn:focus-visible {
@@ -2051,7 +2132,25 @@
           </button>
         </header>
         <section class="hubHero" aria-label="Weekly adventure">
-          <div class="hubRow" id="weekCards"></div>
+          <div class="hubWeekLayout" aria-label="Week navigation">
+            <button id="hubPrevWeekBtn" class="hubWeekTab" type="button" aria-label="Open last week">
+              <span class="hubWeekTabArrow" aria-hidden="true">‹</span>
+              <span class="hubWeekTabCopy">
+                <span id="hubPrevWeekLabel" class="hubWeekTabLabel">LAST WEEK · 先週</span>
+                <span id="hubPrevWeekTitle" class="hubWeekTabTitle">—</span>
+                <span id="hubPrevWeekDate" class="hubWeekTabDate">—</span>
+              </span>
+            </button>
+            <div id="weekCards" class="hubCurrentWeekMount"></div>
+            <button id="hubNextWeekBtn" class="hubWeekTab" type="button" aria-label="Open next week">
+              <span class="hubWeekTabCopy">
+                <span id="hubNextWeekLabel" class="hubWeekTabLabel">NEXT WEEK · 来週</span>
+                <span id="hubNextWeekTitle" class="hubWeekTabTitle">—</span>
+                <span id="hubNextWeekDate" class="hubWeekTabDate">—</span>
+              </span>
+              <span class="hubWeekTabArrow" aria-hidden="true">›</span>
+            </button>
+          </div>
           <div class="hubHeroActions">
           <button id="mazeBtn" class="mazeCta" type="button">
             <span class="mazeCtaMain">
@@ -2525,6 +2624,34 @@ function loadBlitzEngines() {
   return blitzLoadPromise;
 }
 
+function hubWeeklyCompletedFor(curriculum) {
+  try {
+    const scores = window.BoohaAdventure?.scores;
+    if (scores && typeof scores.weeklyCompletedFor === 'function') {
+      return Math.max(0, Math.min(9, Number(scores.weeklyCompletedFor(curriculum)) || 0));
+    }
+    const completedGames = window.BoohaAdventure?.save?.load?.()?.weekly?.completedGames || {};
+    return Math.max(0, Math.min(9, Object.keys(completedGames).filter(id => id.startsWith(`${curriculum}:`)).length));
+  } catch (_) {
+    return 0;
+  }
+}
+
+function setHubWeekTab(buttonId, titleId, dateId, wk, direction) {
+  const button = document.getElementById(buttonId);
+  const title = document.getElementById(titleId);
+  const date = document.getElementById(dateId);
+  if (!button || !title || !date || !wk) return;
+  title.textContent = `${shortMonthKeyFromSlug(wk.monthSlug).toUpperCase()} · W${wk.weekNumber}`;
+  date.textContent = wk.range;
+  button.setAttribute('aria-label', `Open ${direction}: ${wk.title}, ${wk.range}`);
+  button.onclick = () => {
+    const savedCurr = window.BoohaCurriculum?.get?.() || null;
+    if (savedCurr) navigateToCurriculum(wk.weekId, savedCurr);
+    else openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId, { mode: 'week' });
+  };
+}
+
 function renderHub() {
   const container = document.getElementById('weekCards');
   container.innerHTML = '';
@@ -2724,31 +2851,41 @@ const PILLS = [
   if (blitzMount) blitzMount.appendChild(arcade);
   else weekCards.insertAdjacentElement('afterend', arcade);
 
-  buildWeekData().forEach(wk => {
-    const card = document.createElement('div');
-    card.className      = `weekCard${wk.isCurrent ? ' currentWeek' : ''}`;
-    card.dataset.weekId = wk.weekId;
-    card.setAttribute('role', 'group');
-    if (wk.isCurrent) card.setAttribute('aria-current', 'date');
-    card.setAttribute('aria-label', `${wk.tagEn}: ${wk.title}`);
-    card.innerHTML = `
-      <button class="weekCardOpen" type="button" aria-label="${wk.tagEn}: ${wk.title}. Open curriculum choices.">
-        <span>
-          <span class="weekTag">${wk.tagEn}<span>（${wk.tagJp}）</span></span>
-          <span class="weekTitle">${wk.title}</span>
-          <span class="weekDates">${wk.range}</span>
-        </span>
-        <span class="weekHint">${wk.isCurrent ? 'START HERE · THIS WEEK' : 'TAP TO OPEN'}</span>
-      </button>
-      `;
-    const openWeek = () => {
-      const savedCurr = window.BoohaCurriculum?.get?.() || null;
-      if (savedCurr) navigateToCurriculum(wk.weekId, savedCurr);
-      else openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId, { mode: 'week' });
-    };
-    card.addEventListener('click', openWeek);
-    container.appendChild(card);
-  });
+  const weekData = buildWeekData();
+  const currentWeek = weekData.find(wk => wk.isCurrent) || weekData[1];
+  const activeCurriculum = window.BoohaCurriculum?.get?.() || 'pb';
+  setHubWeekTab('hubPrevWeekBtn', 'hubPrevWeekTitle', 'hubPrevWeekDate', weekData[0], 'last week');
+  setHubWeekTab('hubNextWeekBtn', 'hubNextWeekTitle', 'hubNextWeekDate', weekData[2], 'next week');
+
+  const card = document.createElement('article');
+  card.className = 'weekCard currentWeek';
+  card.dataset.weekId = currentWeek.weekId;
+  card.setAttribute('role', 'group');
+  card.setAttribute('aria-current', 'date');
+  card.setAttribute('aria-label', `${currentWeek.tagEn}: ${currentWeek.title}`);
+  const completed = hubWeeklyCompletedFor(activeCurriculum);
+  const segments = Array.from({ length: 9 }, (_, index) =>
+    `<span class="hubProgressSegment${index < completed ? ' is-complete' : ''}" aria-hidden="true"></span>`
+  ).join('');
+  card.innerHTML = `
+    <button class="weekCardOpen" type="button" aria-label="${currentWeek.tagEn}: ${currentWeek.title}. Open curriculum choices.">
+      <span>
+        <span class="weekTag">${currentWeek.tagEn}<span>（${currentWeek.tagJp}）</span></span>
+        <span class="weekTitle">${currentWeek.title}</span>
+        <span class="weekDates">${currentWeek.range}</span>
+        <span class="hubMazeLabel"><span>Maze games <span>めいろのゲーム</span></span><span class="hubProgressCount">${completed} / 9</span></span>
+        <span class="hubProgress" role="progressbar" aria-label="${completed} of 9 maze games completed" aria-valuemin="0" aria-valuemax="9" aria-valuenow="${completed}">${segments}</span>
+        <span class="hubProgressHint">Finish all 9 to open the worlds this week · 9つで せかいが ひらく</span>
+      </span>
+      <span class="weekHint">START HERE · THIS WEEK</span>
+    </button>`;
+  const openCurrentWeek = () => {
+    const savedCurr = window.BoohaCurriculum?.get?.() || null;
+    if (savedCurr) navigateToCurriculum(currentWeek.weekId, savedCurr);
+    else openPicker(currentWeek.tagEn, currentWeek.tagJp, currentWeek.range, currentWeek.weekId, { mode: 'week' });
+  };
+  card.querySelector('.weekCardOpen')?.addEventListener('click', openCurrentWeek);
+  container.appendChild(card);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -3088,6 +3225,9 @@ function maybeOpenInitialCurriculumPicker() {
 
 document.addEventListener('booha:syncReady', () => {
   updateHubCurriculumButton();
+  if (hubScene?.classList.contains('active')) {
+    try { renderHub(); } catch (error) { console.warn('Hub sync refresh failed:', error); }
+  }
   if (hubScene?.classList.contains('active')) maybeOpenInitialCurriculumPicker();
 });
 
