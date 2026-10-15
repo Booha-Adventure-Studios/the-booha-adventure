@@ -56,9 +56,11 @@
       ? window.BoohaSkins.seasonIdForDate()
       : null;
     if (season) document.documentElement.dataset.season = season;
-    if (season !== 'halloween') return;
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var lowPowerHint = navigator.connection && navigator.connection.saveData;
+    if (reduced) document.documentElement.classList.add('hub-reduced-motion');
+    if (lowPowerHint) document.documentElement.classList.add('hub-low-power');
+    if (season !== 'halloween') return;
     var dateKey = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
     }).format(new Date());
@@ -71,6 +73,7 @@
           document.documentElement.classList.remove('halloween-opening');
           document.dispatchEvent(new Event('booha:halloweenLowPower'));
         }
+        if (battery.level <= 0.2) document.documentElement.classList.add('hub-low-power');
       }).catch(function () {});
     }
     window.__boohaHalloweenDateKey = dateKey;
@@ -1089,6 +1092,67 @@
       .hubProgressHint { font-size: 8px; }
     }
 
+    /* Pass 19 glow language: each hub surface gets one restrained color
+       role. The low-power class is set before first paint when possible, and
+       the reduced-motion media query remains the final safety net. */
+    .hub-glow-gold { animation: hubGlowGold 3.8s ease-in-out infinite; }
+    .hub-glow-violet { animation: hubGlowViolet 4.2s ease-in-out infinite; }
+    .hub-glow-teal { animation: hubGlowTeal 4.2s ease-in-out infinite; }
+    .hub-glow-soft { animation: hubGlowSoft 5.4s ease-in-out infinite; }
+    .hub-glow-medal { animation: hubGlowMedal 4.8s ease-in-out infinite; }
+    .hub-glow-pink {
+      animation-name: mazeCtaGlow, mazeCtaSheen, hubGlowPink;
+      animation-duration: 3.2s, 7s, 3.6s;
+      animation-timing-function: ease-in-out, linear, ease-in-out;
+      animation-iteration-count: infinite;
+    }
+    @keyframes hubGlowGold {
+      0%, 100% { box-shadow: 0 0 18px rgba(255,211,85,.22), inset 0 0 0 1px rgba(255,255,255,.08); }
+      50% { box-shadow: 0 0 30px rgba(255,211,85,.42), inset 0 0 0 1px rgba(255,255,255,.14); }
+    }
+    @keyframes hubGlowViolet {
+      0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 18px rgba(165,101,255,.2); }
+      50% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.13), 0 0 30px rgba(191,133,255,.42); }
+    }
+    @keyframes hubGlowTeal {
+      0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 18px rgba(34,220,203,.18); }
+      50% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.13), 0 0 30px rgba(64,229,207,.4); }
+    }
+    @keyframes hubGlowPink {
+      0%, 100% { filter: saturate(1); }
+      50% { filter: saturate(1.08) brightness(1.03); }
+    }
+    @keyframes hubGlowMedal {
+      0%, 100% { box-shadow: 0 0 0 rgba(255,210,72,0); }
+      50% { box-shadow: 0 0 16px rgba(255,210,72,.18); }
+    }
+    @keyframes hubGlowSoft {
+      0%, 100% { box-shadow: 0 12px 34px rgba(0,0,0,.36), 0 0 20px rgba(255,204,70,.08), inset 0 0 0 1px rgba(255,255,255,.08); }
+      50% { box-shadow: 0 12px 34px rgba(0,0,0,.36), 0 0 30px rgba(255,204,70,.16), inset 0 0 0 1px rgba(255,255,255,.1); }
+    }
+    html.hub-low-power .hub-glow-gold,
+    html.hub-low-power .hub-glow-violet,
+    html.hub-low-power .hub-glow-teal,
+    html.hub-low-power .hub-glow-soft,
+    html.hub-low-power .hub-glow-medal,
+    html.hub-low-power .hub-glow-pink,
+    html.hub-reduced-motion .hub-glow-gold,
+    html.hub-reduced-motion .hub-glow-violet,
+    html.hub-reduced-motion .hub-glow-teal,
+    html.hub-reduced-motion .hub-glow-soft,
+    html.hub-reduced-motion .hub-glow-medal,
+    html.hub-reduced-motion .hub-glow-pink {
+      animation: none !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hub-glow-gold,
+      .hub-glow-violet,
+      .hub-glow-teal,
+      .hub-glow-soft,
+      .hub-glow-medal,
+      .hub-glow-pink { animation: none !important; }
+    }
+
     .homeworkTrackTab:focus-visible,
     .homeworkActionBtn:focus-visible,
     .ghostBtn:focus-visible {
@@ -1923,7 +1987,7 @@
             <div class="hubHeading">BOOHA ADVENTURE</div>
             <div class="hubHeadingJp">ブーハー・アドベンチャー</div>
           </div>
-          <button id="hubCurriculumBtn" class="hubCurriculumBtn" type="button" aria-label="Choose curriculum">
+          <button id="hubCurriculumBtn" class="hubCurriculumBtn hub-glow-gold" type="button" aria-label="Choose curriculum">
             <img id="hubCurriculumIcon" class="hubCurriculumIcon" src="assets/img/pre-boo.webp" alt="">
             <span class="hubCurriculumCopy">
               <span id="hubCurriculumName" class="hubCurriculumName">Choose class</span>
@@ -1932,9 +1996,9 @@
             <span class="hubCurriculumChevron" aria-hidden="true">▾</span>
           </button>
         </header>
-        <section class="hubHero" aria-label="Weekly adventure">
+        <section class="hubHero hub-glow-soft" aria-label="Weekly adventure">
           <div class="hubWeekLayout" aria-label="Week navigation">
-            <button id="hubPrevWeekBtn" class="hubWeekTab" type="button" aria-label="Open last week">
+            <button id="hubPrevWeekBtn" class="hubWeekTab hub-glow-violet" type="button" aria-label="Open last week">
               <span class="hubWeekTabArrow" aria-hidden="true">‹</span>
               <span class="hubWeekTabCopy">
                 <span id="hubPrevWeekLabel" class="hubWeekTabLabel">LAST WEEK · 先週</span>
@@ -1943,7 +2007,7 @@
               </span>
             </button>
             <div id="weekCards" class="hubCurrentWeekMount"></div>
-            <button id="hubNextWeekBtn" class="hubWeekTab" type="button" aria-label="Open next week">
+            <button id="hubNextWeekBtn" class="hubWeekTab hub-glow-teal" type="button" aria-label="Open next week">
               <span class="hubWeekTabCopy">
                 <span id="hubNextWeekLabel" class="hubWeekTabLabel">NEXT WEEK · 来週</span>
                 <span id="hubNextWeekTitle" class="hubWeekTabTitle">—</span>
@@ -1953,7 +2017,7 @@
             </button>
           </div>
           <div class="hubHeroActions">
-          <button id="mazeBtn" class="mazeCta" type="button">
+          <button id="mazeBtn" class="mazeCta hub-glow-pink" type="button">
             <span class="mazeCtaMain">
               <span class="mazeCtaEn">Enter the Maze</span>
               <span class="mazeCtaJp">今日のゲームはここから</span>
@@ -2484,7 +2548,7 @@ const PILLS = [
   
   const arcade = document.createElement('div');
   arcade.id = 'blitzArcade';
-  arcade.className = 'blitzArcade';
+  arcade.className = 'blitzArcade hub-glow-soft';
   arcade.innerHTML = `
     <div class="blitzStripHeader">
       <span class="blitzStripTitle">BLITZ</span>
@@ -2515,7 +2579,7 @@ const PILLS = [
   PILLS.forEach(({ type, label, jp, icon }) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'blitzMedal';
+    btn.className = 'blitzMedal hub-glow-medal';
     btn.innerHTML = `<span class="blitzMedalIcon" aria-hidden="true">${icon}</span><span class="blitzMedalCopy"><span class="blitzMedalName">${label}</span><span class="blitzMedalJp">${jp}</span></span>`;
 
     /* Weekly completion — a time can only exist for a perfect run.
