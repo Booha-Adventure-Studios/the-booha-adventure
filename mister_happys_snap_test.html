@@ -745,12 +745,7 @@ function answerMs() { return STATE.mode === 'vocab' ? 4500 : 6000; }  // read+an
 const ARM_MIN = 600, ARM_RANGE = 800;  // random anti-mash delay before SNAP!
 
 function getP1Name() {
-  const directFirst = localStorage.getItem('booha_first_name') ||
-                      localStorage.getItem('boohaFirstName') || '';
-  const fullName = localStorage.getItem('booha_user_name') ||
-                   localStorage.getItem('boohaUserName') ||
-                   localStorage.getItem('booha_display_name') || '';
-  const raw = (directFirst || fullName.split(' ')[0] || '').trim();
+  const raw = (localStorage.getItem('booha_first_name') || '').trim();
   if (!raw) return 'PLAYER 1';
   return (raw.length > 12 ? raw.slice(0, 12) : raw).toUpperCase();
 }

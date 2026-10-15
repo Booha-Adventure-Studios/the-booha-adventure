@@ -467,8 +467,7 @@ const BoohaAdventureLog = (() => {
       const games = gamesFor(curr);
       let playerName = 'PLAYER';
       try {
-        const raw = localStorage.getItem('booha_first_name') ||
-                    (localStorage.getItem('booha_user_name') || '').split(/\s+/)[0];
+        const raw = localStorage.getItem('booha_first_name') || '';
         if (raw) playerName = raw.trim().slice(0, 12).toUpperCase();
       } catch (_) {}
 

@@ -144,7 +144,7 @@ const PROFILE_PREVIEW = `
   }
   localStorage.setItem('booha_userid', 'preview-profile');
   localStorage.setItem('booha_is_juku', '1');
-  localStorage.setItem('booha_user_name', 'Preview Student');
+  localStorage.setItem('booha_first_name', 'Preview');
   var key = JUKU.saveKey();
   var scores = {
     listeningWords: { missing:false, correct:7, total:8, percent:88 },

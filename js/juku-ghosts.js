@@ -94,14 +94,7 @@
   }
 
   function firstName() {
-    const direct =
-      localStorage.getItem('booha_first_name') ||
-      localStorage.getItem('boohaFirstName') || '';
-    const full =
-      localStorage.getItem('booha_user_name') ||
-      localStorage.getItem('boohaUserName') ||
-      localStorage.getItem('booha_display_name') || '';
-    const raw = (direct || full.split(' ')[0] || '').trim();
+    const raw = (localStorage.getItem('booha_first_name') || '').trim();
     if (!raw) return null;
     const capped = raw.length > 12 ? raw.slice(0, 12) : raw;
     return capped.charAt(0).toUpperCase() + capped.slice(1).toLowerCase();

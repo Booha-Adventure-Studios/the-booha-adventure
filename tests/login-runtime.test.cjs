@@ -19,8 +19,10 @@ class Storage {
   removeItem(key) { this.values.delete(key); }
 }
 
-function makeHarness({ token, verifyResponse, online = true }) {
-  const storage = new Storage(token ? { booha_token: token } : {});
+function makeHarness({ token, verifyResponse, online = true, legacyFullName = null }) {
+  const storage = new Storage(token
+    ? { booha_token: token, ...(legacyFullName ? { booha_user_name: legacyFullName } : {}) }
+    : {});
   const events = [];
   const redirects = [];
   const classes = new Set(['token-checking']);
@@ -104,6 +106,7 @@ async function bootCase(options) {
 
   const accepted = await bootCase({
     token: 'student token',
+    legacyFullName: 'Previous Student',
     verifyResponse: {
       ok: true,
       expiresAt: '2026-10-01T00:00:00.000Z',
@@ -116,7 +119,8 @@ async function bootCase(options) {
   assert.match(accepted.context.fetchUrl, /verifyToken\?token=student%20token$/);
   assert.strictEqual(accepted.storage.getItem('booha_userid'), 'student-42');
   assert.strictEqual(accepted.storage.getItem('booha_first_name'), 'Mina');
-  assert.strictEqual(accepted.storage.getItem('booha_user_name'), 'Mina Sato');
+  assert.strictEqual(accepted.storage.getItem('booha_user_name'), null,
+    'verified login must scrub the legacy full-name key');
   assert.strictEqual(accepted.storage.getItem('booha_is_juku'), '1');
   assert.ok(accepted.events.includes('booha:identityReady'));
   assert.strictEqual(accepted.redirects.length, 0);
