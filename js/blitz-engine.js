@@ -2118,6 +2118,13 @@ window.BoohaBlitzEngine = (() => {
   function bindViewportMetrics(overlay) {
     const visualViewport = window.visualViewport;
     const update = () => {
+      // During pinch zoom Safari reports the smaller visual viewport while
+      // the page layout is still using its pre-zoom dimensions. Applying
+      // those transient values to the full-screen Blitz overlay squashes the
+      // game. Wait until the zoom settles back to the normal scale, then
+      // refresh once with the real visible viewport.
+      const scale = Number(visualViewport?.scale);
+      if (Number.isFinite(scale) && Math.abs(scale - 1) > 0.01) return;
       const height = visualViewport?.height || window.innerHeight;
       const width = visualViewport?.width || window.innerWidth;
       if (Number.isFinite(height) && height > 0) {
