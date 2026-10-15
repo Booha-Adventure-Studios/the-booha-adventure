@@ -2257,6 +2257,8 @@ function updateHubCurriculumButton() {
 
 console.log('CURRENT CURRICULUM WEEK:', getCurrentCurriculumWeek());
 
+let hubCurriculumNavigationStarted = false;
+
 function navigateToCurriculum(weekId, curr) {
   let fullWeek = '';
   let url = '';
@@ -2276,6 +2278,8 @@ function navigateToCurriculum(weekId, curr) {
     alert('このコンテンツはまだ準備中です。\nThis content isn\'t available yet.');
     return;
   }
+  if (hubCurriculumNavigationStarted) return;
+  hubCurriculumNavigationStarted = true;
 
   // Tell index.html to jump straight to hub when we return
   sessionStorage.setItem('booha_return_to_hub', '1');
@@ -3068,7 +3072,10 @@ document.getElementById('hubCurriculumBtn')?.addEventListener('click', () => {
    MAZE BUTTON
 ════════════════════════════════════════════════════════════ */
 const mazeBtn = document.getElementById('mazeBtn');
+let hubMazeNavigationStarted = false;
 mazeBtn.addEventListener('click', () => {
+  if (hubMazeNavigationStarted) return;
+  hubMazeNavigationStarted = true;
   playIndexSfx('hubPrimary');
   sessionStorage.setItem('booha_return_to_hub', '1');
   fadeToBlack(true);
