@@ -16,9 +16,10 @@ assert.match(index, /class="hubCurriculumBtn hub-glow-gold"/, 'curriculum must u
 assert.match(index, /class="hubWeekTab hub-glow-violet"/, 'last week must use the violet glow role');
 assert.match(index, /class="hubWeekTab hub-glow-teal"/, 'next week must use the teal glow role');
 assert.match(index, /class="mazeCta hub-glow-pink"/, 'Maze must use the pink glow role');
-assert.match(index, /class="hubHero hub-glow-soft"/, 'the hero must use the soft glow role');
-assert.match(index, /className = 'blitzMedal hub-glow-medal'/, 'Blitz medals must use the medal glow role');
+assert.match(index, /<section class="hubHero" aria-label="Weekly adventure">/, 'the hero must remain an unboxed layout surface');
+assert.match(index, /className = 'blitzMedal'/, 'unfinished Blitz medals must remain visually neutral');
 assert.match(index, /className = 'blitzArcade hub-glow-soft'/, 'the Blitz strip must use the soft glow role');
+assert.match(index, /btn\.classList\.add\('is-record', 'hub-glow-medal'\)/, 'earned Blitz medals must receive the medal glow role');
 assert.match(index, /document\.documentElement\.classList\.add\('hub-low-power'\)/, 'low-power devices must disable animated hub glow');
 assert.match(index, /document\.documentElement\.classList\.add\('hub-reduced-motion'\)/, 'reduced-motion preference must be represented before paint');
 assert.match(index, /html\.hub-low-power[\s\S]*?animation: none !important/, 'low-power hub surfaces must stop animation');

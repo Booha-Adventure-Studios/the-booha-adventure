@@ -602,11 +602,10 @@
     .hubHero {
       width: 100%;
       min-width: 0;
-      padding: clamp(12px, 2vw, 22px);
-      border: 1px solid rgba(255,224,102,.56);
-      border-radius: clamp(18px, 2.4vw, 28px);
-      background: linear-gradient(145deg, rgba(8,18,18,.78), rgba(12,10,28,.68));
-      box-shadow: 0 12px 34px rgba(0,0,0,.36), 0 0 26px rgba(255,204,70,.12), inset 0 0 0 1px rgba(255,255,255,.08);
+      padding: 0;
+      border: 0;
+      background: none;
+      box-shadow: none;
     }
     .hubHeroActions {
       display: flex;
@@ -634,7 +633,7 @@
       .hubCurriculumBtn { min-width: 142px; min-height: 48px; padding-right: 9px; }
       .hubCurriculumIcon { width: 28px; height: 28px; }
       .hubUtilityBtn { padding-right: 9px; }
-      .hubHero { padding: 10px; border-radius: 20px; }
+      .hubHero { padding: 0; }
       .hubHeroActions { align-items: stretch; }
       .hubHeroActions .mazeCta,
       .hubHeroActions .hubHomeworkBtn { flex-basis: 100%; max-width: none; width: 100%; }
@@ -674,6 +673,8 @@
         drop-shadow(0 0 26px rgba(255,140,255,.6))
         drop-shadow(0 0 60px rgba(255,80,200,.28))
         drop-shadow(0 2px 8px rgba(0,0,0,.9));
+      white-space: nowrap;
+      font-size: clamp(24px, 3.4vw, 46px);
     }
     @keyframes hubHeadingShimmer {
       0%   { background-position: 0% 50%; }
@@ -723,6 +724,7 @@
         0 0 24px rgba(255,90,220,.70),
         0 0 54px rgba(255,40,190,.45),
         0 3px 10px rgba(0,0,0,.95);
+      white-space: nowrap;
     }
 
     .playerGreeting .greetName {
@@ -887,12 +889,6 @@
       text-shadow: 0 2px 14px rgba(0,0,0,.72), 0 0 12px rgba(255,159,194,.28);
     }
 
-    .weekCard.currentWeek .weekHint {
-      color: #fff3b0;
-      font-weight: 900;
-      text-shadow: 0 0 10px rgba(255,224,102,.46);
-    }
-
     @property --hue {
       syntax: '<angle>';
       inherits: false;
@@ -1004,13 +1000,6 @@
       line-height: 1.25;
     }
 
-    .weekHint {
-      font-size: clamp(7px,.9vw,9px);
-      letter-spacing: 1.2px;
-      color: rgba(255,255,255,.40);
-      text-transform: uppercase;
-    }
-
     /* Pass 17: make the current week the hero, with quiet week navigation
        on either side. The old card skin remains the visual vocabulary, but
        the information hierarchy now matches the hub mockup. */
@@ -1057,7 +1046,7 @@
     .hubWeekTabDate { color: rgba(255,255,255,.66); font-size: clamp(8px, .85vw, 10px); line-height: 1.2; }
 
     .hubCurrentWeekMount .weekCard {
-      min-height: clamp(232px, 22vw, 286px);
+      min-height: 0;
       height: auto;
       padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.8vw, 34px) clamp(16px, 2vw, 24px);
       cursor: default;
@@ -1074,7 +1063,7 @@
     .hubProgressSegment { height: clamp(8px, 1vw, 11px); border-radius: 999px; background: rgba(255,255,255,.18); box-shadow: inset 0 1px 2px rgba(0,0,0,.34); }
     .hubProgressSegment.is-complete { background: linear-gradient(180deg, #fff2a0, #ffc943); box-shadow: 0 0 10px rgba(255,214,88,.55); }
     .hubProgressHint { display: block; margin-top: 8px; color: rgba(255,255,255,.68); font-size: clamp(8px, .9vw, 10px); line-height: 1.35; text-align: left; }
-    .hubCurrentWeekMount .weekHint { margin-top: auto; color: #fff3b0; font-size: clamp(8px, .9vw, 10px); }
+    .hubCurrentWeekMount .hubHeroActions { margin-top: clamp(14px, 2vw, 22px); }
 
     @media (max-width: 999px) {
       .hubWeekLayout { grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-areas: "current current" "previous next"; }
@@ -1736,6 +1725,8 @@
 .blitzMedal:active, .blitzRecordsBtn:active { transform: scale(.97); }
 .blitzMedal:focus-visible, .blitzRecordsBtn:focus-visible { outline: 3px solid #fff3a8; outline-offset: 3px; }
 .blitzMedalIcon { font-size: 20px; line-height: 1; }
+.blitzMedalIcon svg { display: block; }
+.blitzMedal.is-record .blitzMedalIcon svg { fill: #ffcf5c; stroke: #8a5a00; }
 .blitzMedalCopy { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
 .blitzMedalName { font-size: clamp(9px, 1.1vw, 12px); font-weight: 1000; letter-spacing: .4px; }
 .blitzMedalJp { color: rgba(255,255,255,.62); font-size: clamp(7px, .8vw, 9px); font-weight: 700; }
@@ -1996,7 +1987,7 @@
             <span class="hubCurriculumChevron" aria-hidden="true">▾</span>
           </button>
         </header>
-        <section class="hubHero hub-glow-soft" aria-label="Weekly adventure">
+        <section class="hubHero" aria-label="Weekly adventure">
           <div class="hubWeekLayout" aria-label="Week navigation">
             <button id="hubPrevWeekBtn" class="hubWeekTab hub-glow-violet" type="button" aria-label="Open last week">
               <span class="hubWeekTabArrow" aria-hidden="true">‹</span>
@@ -2241,7 +2232,7 @@ function updateHubCurriculumButton() {
   const name = document.getElementById('hubCurriculumName');
   const jp = document.getElementById('hubCurriculumJp');
   if (!button || !icon || !name || !jp) return;
-  const code = window.BoohaCurriculum?.get?.() || null;
+  const code = window.BoohaCurriculum?.get?.() || 'pb';
   const copy = HUB_CURRICULUM_COPY[code] || {
     name: 'Choose class',
     jp: 'クラスをえらぶ',
@@ -2348,9 +2339,9 @@ function buildWeekData() {
   const last    = shiftCurriculumWeek(current, -1);
   const next    = shiftCurriculumWeek(current,  1);
   return [
-    { tagEn:'LAST WEEK', tagJp:'先週', title:`${last.monthLabel} Week ${last.weekNumber}`,       range: formatRangeFromIso(last.weekStart,    last.weekEnd),    weekId: makeWeekIdFromCalendarWeek(last),    isCurrent:false },
-    { tagEn:'THIS WEEK', tagJp:'今週', title:`${current.monthLabel} Week ${current.weekNumber}`, range: formatRangeFromIso(current.weekStart, current.weekEnd), weekId: makeWeekIdFromCalendarWeek(current), isCurrent:true  },
-    { tagEn:'NEXT WEEK', tagJp:'来週', title:`${next.monthLabel} Week ${next.weekNumber}`,       range: formatRangeFromIso(next.weekStart,    next.weekEnd),    weekId: makeWeekIdFromCalendarWeek(next),    isCurrent:false }
+    { tagEn:'LAST WEEK', tagJp:'先週', title:`${last.monthLabel} Week ${last.weekNumber}`,       range: formatRangeFromIso(last.weekStart,    last.weekEnd),    weekId: makeWeekIdFromCalendarWeek(last),    monthSlug: last.monthSlug,    weekNumber: last.weekNumber,    isCurrent:false },
+    { tagEn:'THIS WEEK', tagJp:'今週', title:`${current.monthLabel} Week ${current.weekNumber}`, range: formatRangeFromIso(current.weekStart, current.weekEnd), weekId: makeWeekIdFromCalendarWeek(current), monthSlug: current.monthSlug, weekNumber: current.weekNumber, isCurrent:true  },
+    { tagEn:'NEXT WEEK', tagJp:'来週', title:`${next.monthLabel} Week ${next.weekNumber}`,       range: formatRangeFromIso(next.weekStart,    next.weekEnd),    weekId: makeWeekIdFromCalendarWeek(next),    monthSlug: next.monthSlug,    weekNumber: next.weekNumber,    isCurrent:false }
   ];
 }
 
@@ -2495,10 +2486,6 @@ function loadBlitzEngines() {
 
 function hubWeeklyCompletedFor(curriculum) {
   try {
-    const scores = window.BoohaAdventure?.scores;
-    if (scores && typeof scores.weeklyCompletedFor === 'function') {
-      return Math.max(0, Math.min(9, Number(scores.weeklyCompletedFor(curriculum)) || 0));
-    }
     const completedGames = window.BoohaAdventure?.save?.load?.()?.weekly?.completedGames || {};
     return Math.max(0, Math.min(9, Object.keys(completedGames).filter(id => id.startsWith(`${curriculum}:`)).length));
   } catch (_) {
@@ -2512,17 +2499,17 @@ function setHubWeekTab(buttonId, titleId, dateId, wk, direction) {
   const date = document.getElementById(dateId);
   if (!button || !title || !date || !wk) return;
   title.textContent = `${shortMonthKeyFromSlug(wk.monthSlug).toUpperCase()} · W${wk.weekNumber}`;
-  date.textContent = wk.range;
+  date.textContent = String(wk.range || '').split('（')[0].trim();
   button.setAttribute('aria-label', `Open ${direction}: ${wk.title}, ${wk.range}`);
   button.onclick = () => {
-    const savedCurr = window.BoohaCurriculum?.get?.() || null;
-    if (savedCurr) navigateToCurriculum(wk.weekId, savedCurr);
-    else openPicker(wk.tagEn, wk.tagJp, wk.range, wk.weekId, { mode: 'week' });
+    const savedCurr = window.BoohaCurriculum?.get?.() || 'pb';
+    navigateToCurriculum(wk.weekId, savedCurr);
   };
 }
 
 function renderHub() {
   const container = document.getElementById('weekCards');
+  const heroActions = document.querySelector('.hubHeroActions');
   container.innerHTML = '';
 
   updateHubCurriculumButton();
@@ -2538,15 +2525,16 @@ function renderHub() {
   }
 
   
-  // The saved track is the hub's single active curriculum. Until the first
-  // choice is made, keep the legacy visual default but let the picker claim
-  // the student before a week is opened.
+  // The saved track is the hub's single active curriculum. Before sync has
+  // finished, use the same quiet Pre-Boo visual default without opening a
+  // picker or writing a possibly-stale value.
   let activeTab = window.BoohaCurriculum?.get?.() || 'pb';
 
+const MEDAL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l4 6 4-6"></path><circle cx="12" cy="15" r="6"></circle></svg>';
 const PILLS = [
-    { type: 'vocab',     label: 'Vocab',     jp: 'たんご', icon: '🏅' },
-    { type: 'sentences', label: 'Sentence',  jp: 'ぶんしょう', icon: '🏅' },
-    { type: 'questions', label: 'Question',  jp: 'しつもん', icon: '◇' },
+    { type: 'vocab',     label: 'Vocab',     jp: 'たんご', icon: MEDAL_SVG },
+    { type: 'sentences', label: 'Sentence',  jp: 'ぶんしょう', icon: MEDAL_SVG },
+    { type: 'questions', label: 'Question',  jp: 'しつもん', icon: MEDAL_SVG },
   ];
 
   
@@ -2583,7 +2571,7 @@ const PILLS = [
   PILLS.forEach(({ type, label, jp, icon }) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'blitzMedal hub-glow-medal';
+    btn.className = 'blitzMedal';
     btn.innerHTML = `<span class="blitzMedalIcon" aria-hidden="true">${icon}</span><span class="blitzMedalCopy"><span class="blitzMedalName">${label}</span><span class="blitzMedalJp">${jp}</span></span>`;
 
     /* Weekly completion — a time can only exist for a perfect run.
@@ -2591,7 +2579,7 @@ const PILLS = [
     let done = null;
     try { done = ENGINES[type]?.getWeeklyScore?.(activeTab, weekId) || null; } catch (e) {}
     if (done) {
-      btn.classList.add('is-record');
+      btn.classList.add('is-record', 'hub-glow-medal');
     }
 
     btn.addEventListener('click', async () => {
@@ -2709,15 +2697,14 @@ const PILLS = [
         <span class="hubProgress" role="progressbar" aria-label="${completed} of 9 maze games completed" aria-valuemin="0" aria-valuemax="9" aria-valuenow="${completed}">${segments}</span>
         <span class="hubProgressHint">Finish all 9 to open the worlds this week · 9つで せかいが ひらく</span>
       </span>
-      <span class="weekHint">START HERE · THIS WEEK</span>
     </button>`;
   const openCurrentWeek = () => {
-    const savedCurr = window.BoohaCurriculum?.get?.() || null;
-    if (savedCurr) navigateToCurriculum(currentWeek.weekId, savedCurr);
-    else openPicker(currentWeek.tagEn, currentWeek.tagJp, currentWeek.range, currentWeek.weekId, { mode: 'week' });
+    const savedCurr = window.BoohaCurriculum?.get?.() || 'pb';
+    navigateToCurriculum(currentWeek.weekId, savedCurr);
   };
   card.querySelector('.weekCardOpen')?.addEventListener('click', openCurrentWeek);
   container.appendChild(card);
+  if (heroActions) card.appendChild(heroActions);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -2979,11 +2966,9 @@ const pickerClose = document.getElementById('pickerClose');
 let currentWeekId = '';
 let pickerMode = 'week';
 let pickerReturnFocus = null;
-let initialPickerShown = false;
-
 function openPicker(tagEn, tagJp, dates, weekId, options = {}) {
-  const mode = options.mode || (weekId ? 'week' : 'initial');
-  if (!weekId && !['initial', 'change'].includes(mode)) return;
+  const mode = options.mode || (weekId ? 'week' : 'change');
+  if (!weekId && mode !== 'change') return;
   pickerReturnFocus = document.activeElement instanceof HTMLElement
     ? document.activeElement
     : null;
@@ -2991,10 +2976,8 @@ function openPicker(tagEn, tagJp, dates, weekId, options = {}) {
   currentWeekId = weekId;
   pickerTitle.textContent = mode === 'change'
     ? 'Change your curriculum'
-    : mode === 'initial'
-      ? 'Choose your curriculum'
-      : `${tagEn}（${tagJp}）`;
-  pickerDates.textContent = mode === 'initial' || mode === 'change' ? '' : dates;
+    : `${tagEn}（${tagJp}）`;
+  pickerDates.textContent = mode === 'change' ? '' : dates;
   const pickerSub2 = document.getElementById('pickerSub2');
   if (pickerSub2) pickerSub2.textContent = `${getBoohaFirstName()}, choose your curriculum`;
   picker.scrollTop = 0;
@@ -3043,24 +3026,17 @@ document.querySelectorAll('.pickTile').forEach(btn => {
 
     if (pickerMode === 'week' && weekId) {
       navigateToCurriculum(weekId, code);
-    } else if (pickerMode === 'change' || pickerMode === 'initial') {
+    } else if (pickerMode === 'change') {
       try { renderHub(); } catch (error) { console.warn('Hub curriculum refresh failed:', error); }
     }
   });
 });
-
-function maybeOpenInitialCurriculumPicker() {
-  if (initialPickerShown || window.BoohaCurriculum?.get?.()) return;
-  initialPickerShown = true;
-  openPicker('', '', '', '', { mode: 'initial' });
-}
 
 document.addEventListener('booha:syncReady', () => {
   updateHubCurriculumButton();
   if (hubScene?.classList.contains('active')) {
     try { renderHub(); } catch (error) { console.warn('Hub sync refresh failed:', error); }
   }
-  if (hubScene?.classList.contains('active')) maybeOpenInitialCurriculumPicker();
 });
 
 document.getElementById('hubCurriculumBtn')?.addEventListener('click', () => {
@@ -3294,7 +3270,6 @@ async function goToHub() {
   requestAnimationFrame(() => {
     fadeToBlack(false);
     showGreeting();
-    maybeOpenInitialCurriculumPicker();
   });
 });
   
@@ -3329,7 +3304,6 @@ function jumpToHub() {
   try { renderHub(); hubRendered = true; } catch(e2) {}
   
   setTimeout(showGreeting, 250);
-  setTimeout(maybeOpenInitialCurriculumPicker, 300);
   sessionStorage.removeItem('booha_return_to_hub');
 
   /* Deep-link from maze: ブリッツへ scrolls to the arcade */

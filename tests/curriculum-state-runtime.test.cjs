@@ -44,6 +44,9 @@ context.BoohaSaveFile.init();
 vm.runInContext(fs.readFileSync(path.join(root, 'js/core/curriculum.js'), 'utf8'), context);
 
 assert.strictEqual(context.BoohaCurriculum.get(), null, 'new saves begin without a curriculum');
+assert.strictEqual(context.BoohaCurriculum.ensureDefault(), 'pb', 'blank saves should quietly default to Pre-Boo');
+assert.strictEqual(context.BoohaSaveFile.load().meta.curriculum, 'pb', 'the quiet default should be durable');
+assert.strictEqual(storage.get('booha_last_curr'), 'pb', 'the quiet default should update the device mirror');
 assert.strictEqual(context.BoohaCurriculum.set('br'), true, 'valid curriculum should save');
 assert.strictEqual(context.BoohaSaveFile.load().meta.curriculum, 'br', 'curriculum belongs in meta');
 assert.strictEqual(storage.get('booha_last_curr'), 'br', 'save should update the compatibility mirror');
@@ -57,6 +60,8 @@ context.BoohaSaveFile.save(data);
 context.BoohaCurriculum.hydrateMirror();
 assert.strictEqual(storage.has('booha_last_curr'), false, 'missing saved curriculum must clear an old mirror');
 assert.strictEqual(context.BoohaCurriculum.get(), null, 'student without a saved curriculum must return null');
+assert.strictEqual(context.BoohaCurriculum.ensureDefault(), 'pb', 'a synced blank save should initialize Pre-Boo without a picker');
+assert.strictEqual(context.BoohaCurriculum.get(), 'pb', 'the default should be readable immediately');
 
 storage.set('booha_last_curr', 'bc');
 const invalid = context.BoohaSaveFile.load();
