@@ -1725,6 +1725,13 @@ else
   bad "Pass 18 Blitz strip audit failed"
 fi
 
+echo "[hub] Pass 19 visual polish audit"
+if node tests/index-hub-polish-audit.cjs >/dev/null 2>&1; then
+  ok "Hub glow roles, reduced-motion/low-power behavior, and responsive contracts pass"
+else
+  bad "Pass 19 visual polish audit failed"
+fi
+
 echo "[hub] Curriculum state runtime test"
 if node tests/curriculum-state-runtime.test.cjs >/dev/null 2>&1; then
   ok "Per-student curriculum save and mirror runtime contracts pass"

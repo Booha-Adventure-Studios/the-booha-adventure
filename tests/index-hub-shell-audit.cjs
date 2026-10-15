@@ -13,8 +13,8 @@ assert.match(index, /<header class="hubHeader">/, 'the hub needs a dedicated hea
 assert.match(index, /<div class="hubHeaderLeft">[\s\S]*?class="hubUtilityNav"/, 'greeting and utility links must share the header left column');
 assert.match(index, /id="alog-icon-btn" class="hubUtilityBtn"/, 'Adventure Log must live in the header utility row');
 assert.match(index, /id="juku-icon-btn" class="hubUtilityBtn"/, 'Juku must live in the header utility row');
-assert.match(index, /id="hubCurriculumBtn" class="hubCurriculumBtn"/, 'the header needs a curriculum switcher');
-assert.match(index, /<section class="hubHero" aria-label="Weekly adventure">[\s\S]*?id="weekCards"[\s\S]*?id="mazeBtn" class="mazeCta"[\s\S]*?id="hubHomeworkBtn" class="hubHomeworkBtn"/, 'the weekly card shell must own Maze and Homework actions');
+assert.match(index, /id="hubCurriculumBtn" class="hubCurriculumBtn(?: [^"]+)?"/, 'the header needs a curriculum switcher');
+assert.match(index, /<section class="hubHero(?: [^"]+)?" aria-label="Weekly adventure">[\s\S]*?id="weekCards"[\s\S]*?id="mazeBtn" class="mazeCta(?: [^"]+)?"[\s\S]*?id="hubHomeworkBtn" class="hubHomeworkBtn"/, 'the weekly card shell must own Maze and Homework actions');
 assert.match(index, /id="hubBlitzMount" class="hubBlitzMount"/, 'the page needs a stable Blitz mount below the hero');
 assert.match(index, /const blitzMount = document\.getElementById\('hubBlitzMount'\)[\s\S]*?blitzMount\.appendChild\(arcade\)/, 'Blitz must mount into the new page shell');
 assert.match(index, /function updateHubCurriculumButton\(\)[\s\S]*?BoohaCurriculum\?\.get/, 'the curriculum button must reflect the saved curriculum');
