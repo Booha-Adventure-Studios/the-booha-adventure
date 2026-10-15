@@ -21,6 +21,12 @@ assert.match(index, /HOMEWORK_SECTIONS = \[[\s\S]*?vocab[\s\S]*?sentences[\s\S]*
 assert.match(index, /content\/\$\{curr\}\/\$\{week\.monthSlug\}\/\$\{section\.key\}\.json/, 'the list must load the selected curriculum and current month');
 assert.match(index, /homeworkWeekCards\(data\[section\.key\], week\)/, 'the list must restrict content to the current week');
 assert.match(index, /fetch\(url, \{ cache: 'no-cache' \}\)/, 'homework content fetches must revalidate without bypassing the browser cache');
+assert.match(index, /id="homeworkCopyBtn"/, 'the list must provide a copy action');
+assert.match(index, /navigator\.clipboard\?\.writeText/, 'copy action must use the browser clipboard when available');
+assert.match(index, /document\.execCommand\('copy'\)/, 'copy action must have a local fallback');
+assert.match(index, /id="homeworkPrintBtn"/, 'the list must provide a print/write action');
+assert.match(index, /homeworkPrintBtn\.addEventListener\('click',[\s\S]*?window\.print\(\)/, 'print/write action must open the browser print flow');
+assert.match(index, /@media print[\s\S]*?homeworkList\.show \.homeworkListRows \{ grid-template-columns: 1fr; \}/, 'print/write mode must make the list paper-friendly');
 assert.match(index, /homeworkListStatus.*role="status"|role="status"[^>]*id="homeworkListStatus"/, 'loading and failure status must be announced');
 assert.match(index, /catch \(error\)[\s\S]*?Homework is not ready yet/, 'content failure must be fail-soft for students');
 assert.match(verify, /tests\/index-homework-list-audit\.cjs/, 'verify.sh must run the homework-list audit');
