@@ -1249,6 +1249,20 @@ else
   bad "Sync session-restore audit failed"
 fi
 
+echo "[sync] Session restore runtime test"
+if node tests/sync-session-restore-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Session restore keeps both blobs after successive marks"
+else
+  bad "Sync session-restore runtime test failed"
+fi
+
+echo "[popup] Grimmerglen popup runtime test"
+if node tests/grimmerglen-popup-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Repeated Grimmerglen popup opens are deduplicated"
+else
+  bad "Grimmerglen popup runtime test failed"
+fi
+
 echo "[service-worker] Pass 1 precache resilience audit"
 if node tests/service-worker-precache-audit.cjs >/dev/null 2>&1; then
   ok "Service-worker install and runtime precache resilience contracts pass"
@@ -1555,6 +1569,13 @@ if node tests/blitz-pass33-viewport-safe-area-audit.cjs >/dev/null 2>&1; then
   ok "Blitz viewport-safe-area audit passed"
 else
   bad "Blitz viewport-safe-area audit failed"
+fi
+
+echo "[blitz] viewport runtime test"
+if node tests/blitz-viewport-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Blitz viewport metrics update and clean up at runtime"
+else
+  bad "Blitz viewport runtime test failed"
 fi
 
 echo "[blitz] runtime-performance audit"
