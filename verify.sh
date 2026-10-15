@@ -1711,6 +1711,13 @@ else
   bad "Weekly homework list audit failed"
 fi
 
+echo "[hub] Pass 16 shell audit"
+if node tests/index-hub-shell-audit.cjs >/dev/null 2>&1; then
+  ok "New hub header, hero actions, curriculum control, and Blitz mount contracts pass"
+else
+  bad "Pass 16 hub shell audit failed"
+fi
+
 echo "[hub] Curriculum state runtime test"
 if node tests/curriculum-state-runtime.test.cjs >/dev/null 2>&1; then
   ok "Per-student curriculum save and mirror runtime contracts pass"
