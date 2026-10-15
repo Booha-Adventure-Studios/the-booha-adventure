@@ -39,6 +39,8 @@ window.BoohaDailyCheck = (function () {
   const PER_STEP = 5;      // items shown per section
   const QUIZ_LEN = 5;      // quiz questions
   const QUIZ_CHOICES = 4;  // options per quiz question
+  const SPACED_REVIEW_MIN_WEEKS = 3;
+  const SPACED_REVIEW_MAX_WEEKS = 8;
 
   /* ── Seeded RNG (mulberry32 over a string hash) — same as juku-engine ─── */
   function hashStr(str) {
@@ -188,6 +190,18 @@ window.BoohaDailyCheck = (function () {
   function weekInfo() {
     const cw = CALENDAR.getCurrentCurriculumWeek();
     const wk = Math.min(cw.weekNumber || 1, 4);       // week 5 clamps to 4
+    return {
+      monthSlug: cw.monthSlug,
+      weekNumber: wk,
+      weekId: cw.weekId,
+      weekStart: cw.weekStart
+    };
+  }
+  function weekInfoWeeksAgo(current, weeksAgo) {
+    const start = new Date(current.weekStart + 'T12:00:00Z');
+    start.setUTCDate(start.getUTCDate() - weeksAgo * 7);
+    const cw = CALENDAR.getCurrentCurriculumWeek(start);
+    const wk = Math.min(cw.weekNumber || 1, 4);
     return { monthSlug: cw.monthSlug, weekNumber: wk, weekId: cw.weekId };
   }
   function sliceForWeek(cards, wk) {
@@ -197,8 +211,29 @@ window.BoohaDailyCheck = (function () {
   function audioUrl(curr, type, mp3, monCode) {
     return `${AUDIO_ROOT}/${monCode}/${AUDIO_FOLDER[curr]}/${type}/${mp3}`;
   }
+  async function loadSpacedReview(curr, currentWeek) {
+    try {
+      const weeksAgo = SPACED_REVIEW_MIN_WEEKS + Math.floor(
+        rng(`${todayKey()}|${curr}|spaced-week`)() *
+        (SPACED_REVIEW_MAX_WEEKS - SPACED_REVIEW_MIN_WEEKS + 1)
+      );
+      const week = weekInfoWeeksAgo(currentWeek, weeksAgo);
+      const url = `content/${curr}/${week.monthSlug}/vocab.json`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`spaced vocab ${res.status}`);
+      const data = await res.json();
+      const cards = sliceForWeek(data.cards, week.weekNumber);
+      if (cards.length < QUIZ_CHOICES) return null;
+      const item = seededShuffle(cards, `${todayKey()}|${curr}|spaced-item`)[0];
+      return { item, cards, week, weeksAgo };
+    } catch (err) {
+      console.warn('[DailyCheck] spaced review unavailable:', err.message);
+      return null;
+    }
+  }
   async function loadContent(curr) {
     const wi = weekInfo();
+    const spacedReviewPromise = loadSpacedReview(curr, wi);
     const monCode = MON_CODE[wi.monthSlug] || 'jan';
     // These files are independent. Loading them in parallel changes the wait
     // from three network round trips to the slowest one, which matters on
@@ -212,7 +247,8 @@ window.BoohaDailyCheck = (function () {
     }));
     const out = {};
     entries.forEach(entry => { out[entry[0]] = entry[1]; });
-    return { curr, monCode, week: wi, sets: out };
+    const spacedReview = await spacedReviewPromise;
+    return { curr, monCode, week: wi, sets: out, spacedReview };
   }
 
   /* Build the day's picks: 5 of each type + a 5-item MIXED quiz drawn from
@@ -238,23 +274,42 @@ window.BoohaDailyCheck = (function () {
       pool.push(...chosen);
     }
 
-    // Quiz: 5 mixed items sampled from the 15 the student just saw.
-    const quizItems = seededShuffle(pool, seedBase + '|quiz').slice(0, QUIZ_LEN).map(item => {
-      const sameType = content.sets[item._type];
+    function makeQuizItem(item, sameType, type, seed) {
       const distractors = seededShuffle(
-        sameType.filter(c => c.n !== item.n), seedBase + '|d' + item._type + item.n
+        sameType.filter(c => c.n !== item.n), seed + '|d'
       ).slice(0, QUIZ_CHOICES - 1);
+      if (distractors.length < QUIZ_CHOICES - 1) return null;
       const choices = seededShuffle(
-        [item, ...distractors], seedBase + '|c' + item._type + item.n
+        [item, ...distractors], seed + '|c'
       ).map(c => ({ n: c.n, label: c.en }));
       return {
-        type: item._type,
+        type,
         prompt: item[promptKey] || item.jp || item.en, // Japanese shown
         mp3: item.mp3,
         answerN: item.n,
-        choices                                         // English options
+        choices,
       };
-    });
+    }
+
+    // Quiz: 5 mixed items sampled from the 15 the student just saw.
+    const quizItems = seededShuffle(pool, seedBase + '|quiz').slice(0, QUIZ_LEN).map(item =>
+      makeQuizItem(item, content.sets[item._type], item._type,
+        seedBase + '|quiz|' + item._type + item.n)
+    );
+
+    // Keep study time fixed: one quiz slot revisits an older vocabulary word
+    // instead of adding another card to the three review sections.
+    if (content.spacedReview) {
+      const review = content.spacedReview;
+      const spaced = makeQuizItem(review.item, review.cards, 'vocab',
+        seedBase + '|spaced|' + review.item.n);
+      if (spaced) {
+        spaced.isSpacedReview = true;
+        spaced.reviewWeeksAgo = review.weeksAgo;
+        const slot = Math.floor(rng(seedBase + '|spaced-slot')() * quizItems.length);
+        quizItems[slot] = spaced;
+      }
+    }
 
     return { picks: pick, quiz: quizItems, promptKey };
   }
@@ -821,6 +876,9 @@ window.BoohaDailyCheck = (function () {
     // runner
     run,
     // constants
-    _cfg: { PER_STEP, QUIZ_LEN, QUIZ_CHOICES, TYPES }
+    _cfg: {
+      PER_STEP, QUIZ_LEN, QUIZ_CHOICES, TYPES,
+      SPACED_REVIEW_MIN_WEEKS, SPACED_REVIEW_MAX_WEEKS
+    }
   };
 })();

@@ -117,6 +117,16 @@ function makeCards(prefix) {
   }));
 }
 
+function makeHistoricalCards(prefix) {
+  return Array.from({ length: 15 }, (_, index) => ({
+    n: index + 46,
+    en: `${prefix} old answer ${index + 1}`,
+    jp: `${prefix} old 日本語 ${index + 1}`,
+    hira: `${prefix} old ひらがな ${index + 1}`,
+    mp3: `${prefix}-old-${index + 1}.mp3`,
+  }));
+}
+
 const save = {
   meta: { checkIn: {} },
 };
@@ -149,6 +159,7 @@ for (const type of ['vocab', 'sentences', 'questions']) {
     async json() { return { cards: makeCards(type) }; },
   });
 }
+const historicalCards = makeHistoricalCards('historical-vocab');
 
 function findDescendant(root, predicate) {
   for (const child of root.children) {
@@ -166,8 +177,11 @@ const context = {
   localStorage: makeStorage(),
   fetch(url) {
     const response = contentResponses.get(url);
-    if (!response) return Promise.reject(new Error(`unexpected fetch: ${url}`));
-    return Promise.resolve(response);
+    if (response) return Promise.resolve(response);
+    if (/^content\/pb\/(august|july)\/vocab\.json$/.test(url)) {
+      return Promise.resolve({ ok: true, async json() { return { cards: historicalCards }; } });
+    }
+    return Promise.reject(new Error(`unexpected fetch: ${url}`));
   },
   setTimeout(callback) { callback(); return 1; },
   clearTimeout() {},
@@ -179,7 +193,10 @@ const context = {
   window: {},
   CALENDAR: {
     getTodayKey() { return '2026-09-25'; },
-    getCurrentCurriculumWeek() {
+    getCurrentCurriculumWeek(now) {
+      if (now) {
+        return { monthSlug: 'august', weekNumber: 4, weekId: 'august-w4', weekStart: '2026-08-23' };
+      }
       return { monthSlug: 'september', weekNumber: 1, weekId: 'september-w1', weekStart: '2026-09-20' };
     },
   },
@@ -199,6 +216,9 @@ const daily = context.window.BoohaDailyCheck;
   assert.strictEqual(content.sets.vocab.length, 15);
   assert.strictEqual(content.sets.sentences.length, 15);
   assert.strictEqual(content.sets.questions.length, 15);
+  assert.ok(content.spacedReview, 'Daily Check should load an optional spaced-review vocabulary item');
+  assert.ok(content.spacedReview.weeksAgo >= 3 && content.spacedReview.weeksAgo <= 8);
+  assert.ok(content.spacedReview.item.en.startsWith('historical-vocab old'));
 
   const day = daily.buildDay(content);
   assert.deepStrictEqual(Object.fromEntries(Object.entries(day.picks).map(([key, items]) => [key, items.length])), {
@@ -206,6 +226,9 @@ const daily = context.window.BoohaDailyCheck;
   });
   assert.strictEqual(day.quiz.length, 5);
   assert.ok(day.quiz.every(question => question.choices.length === 4));
+  assert.strictEqual(day.quiz.filter(question => question.isSpacedReview).length, 1,
+    'exactly one quiz item should come from spaced review');
+  assert.ok(day.quiz.find(question => question.isSpacedReview).reviewWeeksAgo >= 3);
 
   assert.strictEqual(daily.markSkip('pb'), true);
   assert.strictEqual(daily.todaySummary().st, 'skip');
