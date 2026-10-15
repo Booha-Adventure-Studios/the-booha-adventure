@@ -1704,6 +1704,13 @@ else
   bad "Current-week card audit failed"
 fi
 
+echo "[hub] Hub render runtime test"
+if node tests/index-hub-runtime.test.cjs >/dev/null 2>&1; then
+  ok "Hub week metadata, side-tab rendering, and default routing run without throwing"
+else
+  bad "Hub render runtime test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"

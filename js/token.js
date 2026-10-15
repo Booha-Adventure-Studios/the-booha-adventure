@@ -183,9 +183,11 @@
   // writes again.
   document.addEventListener('booha:syncReady', () => clearSaveProblem('locked'));
   document.addEventListener('booha:syncReady', () => {
-    // The synced save is authoritative. A missing curriculum must remove the
-    // old device mirror so a shared tablet presents the picker to this student.
-    try { window.BoohaCurriculum?.hydrateMirror?.(); } catch (error) {
+    // The synced save is authoritative. A missing curriculum gets the quiet
+    // Pre-Boo default instead of interrupting the student with a picker.
+    try {
+      window.BoohaCurriculum?.hydrateMirror?.() || window.BoohaCurriculum?.ensureDefault?.();
+    } catch (error) {
       console.warn('[token] Curriculum mirror hydration failed:', error);
     }
   });

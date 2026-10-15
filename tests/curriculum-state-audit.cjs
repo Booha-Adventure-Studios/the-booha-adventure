@@ -17,22 +17,22 @@ assert.match(save, /\['pb', 'br', 'bc'\]\.includes\(save\.meta\.curriculum\)/,
   'save migration must validate the curriculum enum');
 assert.match(helper, /function get\(\)/, 'curriculum helper must expose get');
 assert.match(helper, /function set\(code\)/, 'curriculum helper must expose set');
+assert.match(helper, /function ensureDefault\(\)/, 'curriculum helper must expose the quiet Pre-Boo default');
 assert.match(helper, /function hydrateMirror\(\)/, 'curriculum helper must hydrate after sync');
 assert.match(token, /KEY_CURRICULUM\s*=\s*'booha_last_curr'/,
   'token gate must own the local curriculum key');
 assert.match(token, /removeItem\(KEY_CURRICULUM\)/,
   'login cleanup must clear the local curriculum mirror');
-assert.match(token, /booha:syncReady[\s\S]*?hydrateMirror/,
-  'sync-ready must copy the saved curriculum back to the mirror');
+assert.match(token, /booha:syncReady[\s\S]*?hydrateMirror\?\.\(\) \|\| window\.BoohaCurriculum\?\.ensureDefault\?\.\(\)/,
+  'sync-ready must hydrate the saved curriculum or initialize Pre-Boo');
 assert.match(index, /js\/core\/curriculum\.js/, 'hub must load the curriculum helper');
 assert.match(index, /BoohaCurriculum\?\.get\?\.\(\) \|\| 'pb'/,
   'hub Blitz state must start from the saved curriculum');
-assert.match(index, /openPicker\(wk\.tagEn, wk\.tagJp, wk\.range, wk\.weekId, \{ mode: 'week' \}\)/,
-  'unsaved week taps must still open the picker');
-assert.match(index, /if \(savedCurr\) navigateToCurriculum\(wk\.weekId, savedCurr\)/,
-  'saved week taps must skip the picker');
+assert.match(index, /const savedCurr = window\.BoohaCurriculum\?\.get\?\.\(\) \|\| 'pb';[\s\S]*?navigateToCurriculum\(wk\.weekId, savedCurr\)/,
+  'week taps must use the remembered curriculum or quiet Pre-Boo default');
+assert.doesNotMatch(index, /maybeOpenInitialCurriculumPicker|mode: 'initial'/,
+  'first hub load must not interrupt students with a curriculum picker');
 assert.match(index, /mode === 'change'/, 'picker must support change mode');
-assert.match(index, /mode === 'initial'/, 'picker must support initial mode without a week');
 assert.match(index, /renderHomeworkTrack\(window\.BoohaCurriculum\?\.get\?\.\(\) \|\| 'pb'\)/,
   'homework must open on the saved curriculum');
 assert.match(daily, /BoohaCurriculum\?\.get/, 'daily check must read the saved curriculum');
