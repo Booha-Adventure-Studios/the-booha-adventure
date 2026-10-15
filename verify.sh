@@ -1732,6 +1732,13 @@ else
   bad "Pass 19 visual polish audit failed"
 fi
 
+echo "[hub] QA Pass 1 navigation guard audit"
+if node tests/hub-navigation-audit.cjs >/dev/null 2>&1; then
+  ok "Maze and curriculum redirects are idempotent under rapid taps"
+else
+  bad "QA Pass 1 navigation guard audit failed"
+fi
+
 echo "[hub] Curriculum state runtime test"
 if node tests/curriculum-state-runtime.test.cjs >/dev/null 2>&1; then
   ok "Per-student curriculum save and mirror runtime contracts pass"
