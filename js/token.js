@@ -14,20 +14,24 @@
 
   const KEY_TOKEN     = 'booha_token';
   const KEY_EXPIRES   = 'booha_token_expires';
-  const KEY_NAME      = 'booha_user_name';
   const KEY_VALIDATED = 'booha_last_validated_at';
   const KEY_FIRST     = 'booha_first_name';
   const KEY_JUKU      = 'booha_is_juku';
   const KEY_USER_ID   = 'booha_userid';
+  // Older builds persisted the full display name. Scrub every known legacy
+  // name key on the next valid boot so a shared tablet does not retain it.
+  const LEGACY_NAME_KEYS = [
+    'booha_user_name', 'boohaUserName', 'booha_display_name', 'booha_name'
+  ];
 
   function clearSession() {
     localStorage.removeItem(KEY_TOKEN);
     localStorage.removeItem(KEY_EXPIRES);
-    localStorage.removeItem(KEY_NAME);
     localStorage.removeItem(KEY_VALIDATED);
     localStorage.removeItem(KEY_FIRST);
     localStorage.removeItem(KEY_JUKU);
     localStorage.removeItem(KEY_USER_ID);
+    LEGACY_NAME_KEYS.forEach(key => localStorage.removeItem(key));
  }
 
  // ── Identity gate ─────────────────────────────────────────────────────────
@@ -413,9 +417,15 @@
     localStorage.setItem(KEY_VALIDATED, String(Date.now()));
     if (data.expiresAt) localStorage.setItem(KEY_EXPIRES, data.expiresAt);
     
-   if (data.displayName) {
-      localStorage.setItem(KEY_NAME, data.displayName);
-      localStorage.setItem(KEY_FIRST, data.displayName.split(' ')[0]);
+    // Shared classroom tablets only need a first-name greeting. Clear both
+    // the canonical value and every legacy full-name alias before writing the
+    // new identity, preventing a previous student's name from surviving a
+    // re-login or an old build from leaving PII behind.
+    localStorage.removeItem(KEY_FIRST);
+    LEGACY_NAME_KEYS.forEach(key => localStorage.removeItem(key));
+    if (data.displayName) {
+      const firstName = String(data.displayName).trim().split(/\s+/)[0];
+      if (firstName) localStorage.setItem(KEY_FIRST, firstName);
     }
     localStorage.setItem(KEY_JUKU, data.isJuku === true ? '1' : '0');
 
