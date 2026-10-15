@@ -2723,9 +2723,9 @@ const PILLS = [
   card.setAttribute('role', 'group');
   card.setAttribute('aria-current', 'date');
   card.setAttribute('aria-label', `${currentWeek.tagEn}: ${currentWeek.title}`);
-  const completed = hubWeeklyCompletedFor(activeCurriculum);
+  const cardCompleted = hubWeeklyCompletedFor(activeCurriculum);
   const segments = Array.from({ length: 9 }, (_, index) =>
-    `<span class="hubProgressSegment${index < completed ? ' is-complete' : ''}" aria-hidden="true"></span>`
+    `<span class="hubProgressSegment${index < cardCompleted ? ' is-complete' : ''}" aria-hidden="true"></span>`
   ).join('');
   card.innerHTML = `
     <button class="weekCardOpen" type="button" aria-label="${currentWeek.tagEn}: ${currentWeek.title}. Open curriculum choices.">
@@ -2733,8 +2733,8 @@ const PILLS = [
         <span class="weekTag">${currentWeek.tagEn}<span>（${currentWeek.tagJp}）</span></span>
         <span class="weekTitle">${currentWeek.title}</span>
         <span class="weekDates">${currentWeek.range}</span>
-        <span class="hubMazeLabel"><span>Maze games <span>めいろのゲーム</span></span><span class="hubProgressCount">${completed} / 9</span></span>
-        <span class="hubProgress" role="progressbar" aria-label="${completed} of 9 maze games completed" aria-valuemin="0" aria-valuemax="9" aria-valuenow="${completed}">${segments}</span>
+        <span class="hubMazeLabel"><span>Maze games <span>めいろのゲーム</span></span><span class="hubProgressCount">${cardCompleted} / 9</span></span>
+        <span class="hubProgress" role="progressbar" aria-label="${cardCompleted} of 9 maze games completed" aria-valuemin="0" aria-valuemax="9" aria-valuenow="${cardCompleted}">${segments}</span>
         <span class="hubProgressHint">Finish all 9 to open the worlds this week · 9つで せかいが ひらく</span>
       </span>
     </button>`;
