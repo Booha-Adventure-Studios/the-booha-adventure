@@ -71,6 +71,7 @@ window.BoohaBlitzEngine = (() => {
       label: 'CIRCUS TENT',
       image: BLITZ_SCENE_IMAGE_ROOT + 'vocab-circus' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '22% center' }),
+      sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bell', finish: 'fanfare' }),
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
     }),
     sentences: Object.freeze({
@@ -78,6 +79,7 @@ window.BoohaBlitzEngine = (() => {
       label: 'SPOOKY FOREST',
       image: BLITZ_SCENE_IMAGE_ROOT + 'sentence-spooky' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: 'center center' }),
+      sfx: Object.freeze({ start: 'wood-click', correct: 'wood-click', streak: 'chime', finish: 'chime' }),
       motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
     }),
     questions: Object.freeze({
@@ -85,6 +87,7 @@ window.BoohaBlitzEngine = (() => {
       label: 'FIREFLY GLADE',
       image: BLITZ_SCENE_IMAGE_ROOT + 'question-fireflies' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '78% center' }),
+      sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', finish: 'warm-pulse' }),
       motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, optionDurationMs: 260, optionStaggerMs: 30, optionX: '0px', optionY: '8px', optionScale: '.97' }),
     }),
   });
@@ -3132,6 +3135,43 @@ window.BoohaBlitzEngine = (() => {
         streakAudioCtx = null;
         try { ctx.close().catch(() => {}); } catch (_) {}
       }
+      function playSceneSfx(event, { threshold = 0, isRecord = false, isPerfectRun = false } = {}) {
+        const AudioCtor = window.AudioContext || window.webkitAudioContext;
+        const kind = scene.sfx?.[event];
+        if (!AudioCtor || !kind) return;
+        try {
+          if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
+          if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
+          const cues = {
+            pop: { notes: [660, 330], spacing: 0.018, duration: 0.11, type: 'triangle', peak: 0.028 },
+            bell: { notes: [784, 1175], spacing: 0.035, duration: 0.2, type: 'sine', peak: 0.026 },
+            fanfare: { notes: isRecord ? [659, 831, 1047, 1319] : isPerfectRun ? [523, 659, 784, 1047] : [392, 523, 659], spacing: 0.075, duration: 0.24, type: 'triangle', peak: 0.042 },
+            'wood-click': { notes: [180, 120], spacing: 0.035, duration: 0.12, type: 'triangle', peak: 0.022 },
+            chime: { notes: threshold >= 12 ? [659, 831, 1047, 1319] : [523, 659, 831], spacing: 0.09, duration: 0.24, type: 'sine', peak: 0.024 },
+            sparkle: { notes: [880, 1319, 1760], spacing: 0.045, duration: 0.16, type: 'sine', peak: 0.024 },
+            'warm-pulse': { notes: [330, 440, 660], spacing: 0.08, duration: 0.34, type: 'sine', peak: 0.026 },
+          }[kind];
+          if (!cues) return;
+          const now = streakAudioCtx.currentTime + 0.008;
+          const intensity = event === 'streak' ? Math.min(1.25, 0.8 + threshold / 30) : 1;
+          cues.notes.forEach((frequency, index) => {
+            const startAt = now + index * cues.spacing;
+            const oscillator = streakAudioCtx.createOscillator();
+            const gain = streakAudioCtx.createGain();
+            oscillator.type = cues.type;
+            oscillator.frequency.setValueAtTime(frequency, startAt);
+            gain.gain.setValueAtTime(0.0001, startAt);
+            gain.gain.exponentialRampToValueAtTime(cues.peak * intensity, startAt + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, startAt + cues.duration);
+            oscillator.connect(gain);
+            gain.connect(streakAudioCtx.destination);
+            oscillator.start(startAt);
+            oscillator.stop(startAt + cues.duration + 0.02);
+          });
+        } catch (_) {
+          // Scene SFX are optional and must never interrupt a run.
+        }
+      }
       function playCorrectHit() {
         const AudioCtor = window.AudioContext || window.webkitAudioContext;
         if (!AudioCtor) return;
@@ -3188,30 +3228,7 @@ window.BoohaBlitzEngine = (() => {
         }
       }
       function playStartSting() {
-        const AudioCtor = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtor) return;
-        try {
-          if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
-          if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
-          const notes = sceneFeel === 'arcade' ? [392, 587] : sceneFeel === 'sleek' ? [440, 659] : [523, 784];
-          const now = streakAudioCtx.currentTime + 0.01;
-          notes.forEach((frequency, index) => {
-            const startAt = now + index * 0.075;
-            const oscillator = streakAudioCtx.createOscillator();
-            const gain = streakAudioCtx.createGain();
-            oscillator.type = sceneFeel === 'sleek' ? 'sine' : 'triangle';
-            oscillator.frequency.setValueAtTime(frequency, startAt);
-            gain.gain.setValueAtTime(0.0001, startAt);
-            gain.gain.exponentialRampToValueAtTime(0.028, startAt + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.18);
-            oscillator.connect(gain);
-            gain.connect(streakAudioCtx.destination);
-            oscillator.start(startAt);
-            oscillator.stop(startAt + 0.2);
-          });
-        } catch (_) {
-          // Audio is optional first-impression feedback.
-        }
+        playSceneSfx('start');
       }
       function playWrongHit() {
         const AudioCtor = window.AudioContext || window.webkitAudioContext;
@@ -3420,7 +3437,10 @@ window.BoohaBlitzEngine = (() => {
         spotlight.setStreak(streak, eventThreshold, initialQueueLength);
         setBackground(streak);
         if (eventThreshold) {
-          if (!LEGACY_BLITZ_CELEBRATIONS_ENABLED) return eventThreshold;
+          if (!LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
+            playSceneSfx('streak', { threshold: eventThreshold });
+            return eventThreshold;
+          }
           playStreakBeat(eventThreshold);
           if (sceneFeel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
           const copy = {
@@ -3733,6 +3753,7 @@ window.BoohaBlitzEngine = (() => {
           btn.classList.add('correct');
           current++;
           const milestone = updateStreak();
+          playSceneSfx('correct');
           if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playCorrectHit();
           if (current >= queue.length) clearElapsed = performance.now() - startTime;
           correctDetonate(btn, answerRect, overlayRect, milestone);
@@ -3963,6 +3984,7 @@ window.BoohaBlitzEngine = (() => {
           winScreen.classList.remove('climax-awaiting');
           climaxTimer = null;
         }, REDUCED_MOTION ? 420 : 980);
+        playSceneSfx('finish', { isRecord, isPerfectRun });
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playFinalStinger(isRecord, isPerfectRun);
         startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) celebrate(overlay, palette, isRecord, speedBand);
