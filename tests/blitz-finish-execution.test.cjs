@@ -77,6 +77,7 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     runEpoch: 1,
     REDUCED_MOTION: false,
     LEGACY_BLITZ_CELEBRATIONS_ENABLED: false,
+    playSceneSfx: () => {},
     visibilityPaused: false,
     monthSlug: 'january',
     weekNumber: 1,
