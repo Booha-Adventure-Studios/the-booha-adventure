@@ -16,7 +16,7 @@ assert.doesNotMatch(engine, /rafId = requestAnimationFrame\(tick\)/,
   'the gameplay timer must not use a continuous requestAnimationFrame loop');
 assert.match(engine, /let backgroundValue = '';/,
   'background rendering must remember the last applied value');
-assert.match(engine, /function setBackground\(correctCount = 0\)/,
+assert.match(engine, /function setBackground\(correctCount = 0, fillOptions = \{\}\)/,
   'background updates must pass through a de-duplicating setter');
 assert.match(engine, /if \(page\.css === backgroundValue\) return;/,
   'identical full-screen background values must not be reassigned');

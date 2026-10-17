@@ -8,7 +8,7 @@ assert.match(engine, /function progressColorFor\(palette, percent\)/,
   'background energy must be derived from cumulative correct progress');
 assert.match(engine, /const p = Math\.max\(0, Math\.min\(100, Number\(percent\) \|\| 0\)\) \/ 100/,
   'progress color must be capped to the run range');
-assert.match(engine, /function setBackground\(correctCount = 0\)[\s\S]*?progressColorFor\(palette, percent\)/,
+assert.match(engine, /function setBackground\(correctCount = 0, fillOptions = \{\}\)[\s\S]*?progressColorFor\(palette, percent\)/,
   'the live play field must derive its background from correct answers');
 assert.match(engine, /setBackground\(current\)/,
   'question rendering must apply cumulative correct-answer background energy');
