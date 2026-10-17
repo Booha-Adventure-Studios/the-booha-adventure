@@ -577,7 +577,7 @@ window.SentenceBlitz = (() => {
       <div id="sb-timer-bar" class="booha-blitz-hud">
         <div id="sb-progress"></div>
         <div id="sb-timer">0.00s</div>
-        <button id="sb-quit" type="button">やめる</button>
+        <button id="sb-quit" type="button" aria-label="Exit Blitz">EXIT / やめる</button>
       </div>
       <div id="sb-scroll">
         <div id="sb-prompt" class="booha-blitz-prompt">
