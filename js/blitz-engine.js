@@ -73,9 +73,10 @@ window.BoohaBlitzEngine = (() => {
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '22% center' }),
       sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bell', wrong: 'soft-drop', finish: 'fanfare' }),
       fill: Object.freeze({ kind: 'circus-marquee', count: 15, positions: Object.freeze([
-        [34, 39], [42, 39], [50, 39], [58, 39], [66, 39],
-        [69, 47], [69, 56], [66, 65], [58, 65], [50, 65],
-        [42, 65], [34, 65], [31, 56], [31, 47], [34, 43],
+        // Percent of the marquee sign box, clockwise from its top-left corner.
+        [0, 0], [10, 0], [30, 0], [50, 0], [70, 0], [90, 0], [100, 0],
+        [100, 50], [100, 100], [80, 100], [60, 100], [40, 100], [20, 100],
+        [0, 100], [0, 50],
       ]) }),
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
     }),
@@ -833,13 +834,32 @@ window.BoohaBlitzEngine = (() => {
         pointer-events: none;
         overflow: hidden;
       }
+      .booha-blitz-marquee {
+        position: relative;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(6px, 1.4vw, 14px);
+        min-width: min(100%, 440px);
+        max-width: 100%;
+        min-height: clamp(150px, 24vh, 220px);
+        padding: clamp(18px, 3vh, 30px) clamp(28px, 4vw, 48px);
+      }
+      .booha-blitz-marquee > :not(.booha-blitz-scene-fill) {
+        position: relative;
+        z-index: 1;
+        max-width: 100%;
+      }
+      .booha-blitz-marquee > .blitz-scene-fill-circus {
+        z-index: 0;
+        overflow: visible;
+      }
       .blitz-scene-fill-circus::before {
         content: '';
         position: absolute;
-        left: 29%;
-        top: 35%;
-        width: 42%;
-        height: 31%;
+        inset: 0;
         border: 2px solid rgba(255, 226, 122, .58);
         border-radius: 24px;
         background: linear-gradient(180deg, rgba(7, 12, 25, .72), rgba(13, 13, 30, .56));
@@ -969,15 +989,6 @@ window.BoohaBlitzEngine = (() => {
       .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering,
       .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
         opacity: 0;
-      }
-      @media (orientation: portrait) {
-        .blitz-scene-fill-circus::before {
-          left: 9%;
-          top: 35%;
-          width: 82%;
-          height: 25%;
-          border-radius: 20px;
-        }
       }
       @media (prefers-reduced-motion: reduce) {
         .blitz-scene-fill-spooky::before,
@@ -1633,7 +1644,7 @@ window.BoohaBlitzEngine = (() => {
         text-shadow: 0 2px 6px rgba(3, 8, 16, .8);
       }
       #vb-options, #sb-options, #qb-options,
-      #sb-prompt, #qb-prompt {
+      #vb-stage, #sb-prompt, #qb-prompt {
         box-sizing: border-box;
       }
       .booha-blitz-start-copy {
@@ -3333,7 +3344,20 @@ window.BoohaBlitzEngine = (() => {
       fill.className = `booha-blitz-scene-fill blitz-scene-fill-${scene.id}`;
       fill.setAttribute('aria-hidden', 'true');
       fill.dataset.fillKind = fillConfig.kind || 'generic';
-      overlay.insertBefore(fill, overlay.querySelector('.booha-blitz-scene-backdrop')?.nextSibling || overlay.firstChild);
+      // The marquee belongs to the word, not the screen: wrap the prompt in a
+      // sign box so the frame and bulbs follow it in every layout and word length.
+      const word = fillConfig.kind === 'circus-marquee' ? overlay.querySelector(selector('jpWord')) : null;
+      if (word) {
+        const sign = document.createElement('div');
+        sign.className = 'booha-blitz-marquee';
+        const hira = overlay.querySelector(selector('hira'));
+        word.parentNode.insertBefore(sign, word);
+        sign.appendChild(word);
+        if (hira) sign.appendChild(hira);
+        sign.insertBefore(fill, sign.firstChild);
+      } else {
+        overlay.insertBefore(fill, overlay.querySelector('.booha-blitz-scene-backdrop')?.nextSibling || overlay.firstChild);
+      }
 
       const kind = fillConfig.kind || 'generic';
       if (kind === 'spooky-fog') {
