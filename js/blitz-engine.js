@@ -71,7 +71,11 @@ window.BoohaBlitzEngine = (() => {
       label: 'CIRCUS TENT',
       image: BLITZ_SCENE_IMAGE_ROOT + 'vocab-circus' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '22% center' }),
-      sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bell', finish: 'fanfare' }),
+      sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bell', wrong: 'soft-drop', finish: 'fanfare' }),
+      fill: Object.freeze({ kind: 'circus-bulbs', count: 15, positions: Object.freeze([
+        [12, 18], [17, 22], [22, 25], [28, 28], [34, 31], [40, 33], [46, 34], [52, 34],
+        [58, 33], [64, 31], [70, 28], [76, 25], [82, 22], [87, 18], [92, 15],
+      ]) }),
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
     }),
     sentences: Object.freeze({
@@ -79,7 +83,7 @@ window.BoohaBlitzEngine = (() => {
       label: 'SPOOKY FOREST',
       image: BLITZ_SCENE_IMAGE_ROOT + 'sentence-spooky' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: 'center center' }),
-      sfx: Object.freeze({ start: 'wood-click', correct: 'wood-click', streak: 'chime', finish: 'chime' }),
+      sfx: Object.freeze({ start: 'wood-click', correct: 'wood-click', streak: 'chime', wrong: 'wood-click', finish: 'chime' }),
       motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
     }),
     questions: Object.freeze({
@@ -87,7 +91,7 @@ window.BoohaBlitzEngine = (() => {
       label: 'FIREFLY GLADE',
       image: BLITZ_SCENE_IMAGE_ROOT + 'question-fireflies' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '78% center' }),
-      sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', finish: 'warm-pulse' }),
+      sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'warm-pulse', finish: 'warm-pulse' }),
       motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, optionDurationMs: 260, optionStaggerMs: 30, optionX: '0px', optionY: '8px', optionScale: '.97' }),
     }),
   });
@@ -806,12 +810,47 @@ window.BoohaBlitzEngine = (() => {
           linear-gradient(150deg, rgba(15,31,74,.24), rgba(25,61,78,.18));
         background-size: auto, auto, auto, auto, auto;
       }
+      .booha-blitz-scene-fill {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .booha-blitz-scene-fill-item {
+        position: absolute;
+        width: clamp(10px, 1.35vw, 22px);
+        aspect-ratio: 1;
+        border-radius: 50%;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.58);
+        transition: opacity 180ms ease, transform 180ms cubic-bezier(.2, 1.4, .3, 1);
+      }
+      .blitz-scene-fill-circus .booha-blitz-scene-fill-item {
+        background: radial-gradient(circle at 35% 30%, #fffbe1 0 15%, #ffe27a 34%, #ff9b52 68%, #ff6fb5 100%);
+        box-shadow: 0 0 9px 2px rgba(255, 226, 122, .82), 0 0 24px 7px rgba(255, 111, 181, .42);
+      }
+      .booha-blitz-scene-fill-item.is-lit {
+        opacity: .98;
+        transform: translate(-50%, -50%) scale(1);
+        animation: boohaBlitzSceneFillLight 420ms cubic-bezier(.2, 1.4, .3, 1) both;
+      }
+      @keyframes boohaBlitzSceneFillLight {
+        0% { filter: brightness(.8); transform: translate(-50%, -50%) scale(.58); }
+        55% { filter: brightness(1.6); transform: translate(-50%, -50%) scale(1.18); }
+        100% { filter: brightness(1); transform: translate(-50%, -50%) scale(1); }
+      }
       .blitz-compositor.low-power::before,
       .blitz-compositor.reduced-power::before,
       .blitz-compositor.low-power .booha-blitz-atmosphere,
       .blitz-compositor.reduced-power .booha-blitz-atmosphere {
         animation: none;
         opacity: .06;
+      }
+      .blitz-compositor.low-power .booha-blitz-scene-fill-item,
+      .blitz-compositor.reduced-power .booha-blitz-scene-fill-item {
+        animation: none;
+        transition: opacity 120ms ease;
       }
       @keyframes boohaBlitzAurora {
         from { opacity: .10; transform: translate3d(-1%, 1%, 0) scale(1); }
@@ -2896,6 +2935,33 @@ window.BoohaBlitzEngine = (() => {
       overlay.insertBefore(atmosphere, overlay.firstChild);
     }
 
+    function mountSceneFill(overlay, scene) {
+      const fillConfig = scene.fill;
+      if (!fillConfig?.positions?.length) {
+        return { setCount() {} };
+      }
+      const fill = document.createElement('div');
+      fill.className = `booha-blitz-scene-fill blitz-scene-fill-${scene.id}`;
+      fill.setAttribute('aria-hidden', 'true');
+      const items = fillConfig.positions.map(([left, top], index) => {
+        const item = document.createElement('span');
+        item.className = 'booha-blitz-scene-fill-item';
+        item.dataset.index = String(index);
+        item.style.left = `${left}%`;
+        item.style.top = `${top}%`;
+        fill.appendChild(item);
+        return item;
+      });
+      overlay.insertBefore(fill, overlay.querySelector('.booha-blitz-scene-backdrop')?.nextSibling || overlay.firstChild);
+      return {
+        setCount(correctCount = 0) {
+          const count = Math.max(0, Math.min(items.length, Number(correctCount) || 0));
+          items.forEach((item, index) => item.classList.toggle('is-lit', index < count));
+          fill.dataset.litCount = String(count);
+        },
+      };
+    }
+
     function emitFireWallpaper(overlay, playerName, threshold = 0) {
       if (isMinimalPower()) return;
       overlay.querySelector('.booha-blitz-fire-wallpaper')?.remove();
@@ -3098,13 +3164,16 @@ window.BoohaBlitzEngine = (() => {
       mountCurriculumLabel(overlay, palette);
       mountSceneBackdrop(overlay, scene);
       mountPersistentAtmosphere(overlay, palette, scene);
+      const sceneFill = mountSceneFill(overlay, scene);
       const performanceDiagnostic = createPerformanceDiagnostic(overlay);
       performanceDiagnostic?.update({ status: 'ready' });
 
       const bgm = new Audio('assets/audio/blitz.mp3');
       bgm.loop = true;
-      bgm.volume = 0.55;
+      const bgmBaseVolume = 0.55;
+      bgm.volume = bgmBaseVolume;
       let bgmStarted = false;
+      let bgmDuckTimer = null;
       const startBGM = () => {
         bgmStarted = true;
         if (!bgm.paused) return;
@@ -3112,8 +3181,20 @@ window.BoohaBlitzEngine = (() => {
         if (playback?.catch) playback.catch(() => {});
       };
       const stopBGM = () => {
+        if (bgmDuckTimer !== null) clearTimeout(bgmDuckTimer);
+        bgmDuckTimer = null;
+        bgm.volume = bgmBaseVolume;
         bgm.pause();
         bgm.currentTime = 0;
+      };
+      const duckBGM = (duration = 320) => {
+        if (!bgmStarted || bgm.paused) return;
+        bgm.volume = bgmBaseVolume * .58;
+        if (bgmDuckTimer !== null) clearTimeout(bgmDuckTimer);
+        bgmDuckTimer = setTimeout(() => {
+          bgm.volume = bgmBaseVolume;
+          bgmDuckTimer = null;
+        }, duration);
       };
       let streakAudioCtx = null;
       function playStreakBeat(threshold) {
@@ -3157,15 +3238,19 @@ window.BoohaBlitzEngine = (() => {
           if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
           if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
           const cues = {
-            pop: { notes: [660, 330], spacing: 0.018, duration: 0.11, type: 'triangle', peak: 0.028 },
-            bell: { notes: [784, 1175], spacing: 0.035, duration: 0.2, type: 'sine', peak: 0.026 },
-            fanfare: { notes: isRecord ? [659, 831, 1047, 1319] : isPerfectRun ? [523, 659, 784, 1047] : [392, 523, 659], spacing: 0.075, duration: 0.24, type: 'triangle', peak: 0.042 },
-            'wood-click': { notes: [180, 120], spacing: 0.035, duration: 0.12, type: 'triangle', peak: 0.022 },
-            chime: { notes: threshold >= 12 ? [659, 831, 1047, 1319] : [523, 659, 831], spacing: 0.09, duration: 0.24, type: 'sine', peak: 0.024 },
-            sparkle: { notes: [880, 1319, 1760], spacing: 0.045, duration: 0.16, type: 'sine', peak: 0.024 },
-            'warm-pulse': { notes: [330, 440, 660], spacing: 0.08, duration: 0.34, type: 'sine', peak: 0.026 },
+            pop: { notes: [660, 330], spacing: 0.018, duration: 0.11, type: 'triangle', peak: 0.085 },
+            bell: { notes: [784, 1175], spacing: 0.035, duration: 0.2, type: 'sine', peak: 0.08 },
+            fanfare: { notes: isRecord ? [659, 831, 1047, 1319] : isPerfectRun ? [523, 659, 784, 1047] : [392, 523, 659], spacing: 0.075, duration: 0.24, type: 'triangle', peak: 0.12 },
+            'soft-drop': { notes: [420, 315], spacing: 0.035, duration: 0.18, type: 'triangle', peak: 0.07 },
+            'wood-click': { notes: [420, 315], spacing: 0.035, duration: 0.12, type: 'triangle', peak: 0.075 },
+            chime: { notes: threshold >= 12 ? [659, 831, 1047, 1319] : [523, 659, 831], spacing: 0.09, duration: 0.24, type: 'sine', peak: 0.08 },
+            sparkle: { notes: [880, 1319, 1760], spacing: 0.045, duration: 0.16, type: 'sine', peak: 0.08 },
+            'warm-pulse': { notes: [330, 440, 660], spacing: 0.08, duration: 0.34, type: 'sine', peak: 0.085 },
           }[kind];
           if (!cues) return;
+          if (event === 'streak' || event === 'wrong' || event === 'finish') {
+            duckBGM(event === 'finish' ? 760 : 320);
+          }
           const now = streakAudioCtx.currentTime + 0.008;
           const intensity = event === 'streak' ? Math.min(1.25, 0.8 + threshold / 30) : 1;
           cues.notes.forEach((frequency, index) => {
@@ -3357,6 +3442,7 @@ window.BoohaBlitzEngine = (() => {
       function setBackground(correctCount = 0) {
         const total = initialQueueLength || queue.length || 1;
         const percent = Math.max(0, Math.min(100, (correctCount / total) * 100));
+        sceneFill.setCount(correctCount);
         const vivid = progressColorFor(palette, percent);
         const page = pageWashFor(palette, percent);
         const option = optionSurfaceFor(palette, percent);
@@ -3449,7 +3535,7 @@ window.BoohaBlitzEngine = (() => {
         const eventThreshold = STREAK_EVENT_THRESHOLDS.includes(streak) ? streak : 0;
         spotlight.clearAnnouncement();
         spotlight.setStreak(streak, eventThreshold, initialQueueLength);
-        setBackground(streak);
+        setBackground(current);
         if (eventThreshold) {
           if (!LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
             playSceneSfx('streak', { threshold: eventThreshold });
@@ -3787,7 +3873,8 @@ window.BoohaBlitzEngine = (() => {
           if (b.textContent === correct.en) b.classList.add('correct');
         });
         emitWrongMicroFeedback(btn, answerRect, overlayRect);
-        playWrongHit();
+        playSceneSfx('wrong');
+        if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playWrongHit();
         if (!REDUCED_MOTION) overlay.classList.add('shake');
         overlay.addEventListener('animationend', () => overlay.classList.remove('shake'), { once: true });
         stopTimer();
@@ -3802,7 +3889,7 @@ window.BoohaBlitzEngine = (() => {
         locked = true;
         setAnswerInputEnabled(false);
         const card = queue[current];
-        setBackground(streak);
+        setBackground(current);
         jpWordEl.style.animation = 'none';
         hiraEl.style.animation = 'none';
         requestAnimationFrame(() => {

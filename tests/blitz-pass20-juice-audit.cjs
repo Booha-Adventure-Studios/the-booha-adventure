@@ -10,8 +10,8 @@ assert.match(engine, /const p = Math\.max\(0, Math\.min\(100, Number\(percent\) 
   'progress color must be capped to the run range');
 assert.match(engine, /function setBackground\(correctCount = 0\)[\s\S]*?progressColorFor\(palette, percent\)/,
   'the live play field must derive its background from correct answers');
-assert.match(engine, /setBackground\(streak\)/,
-  'question rendering must apply the current streak background energy');
+assert.match(engine, /setBackground\(current\)/,
+  'question rendering must apply cumulative correct-answer background energy');
 assert.match(engine, /function clearAnnouncement\(\)/,
   'ordinary streak feedback must be clearable without leaving a floating callout');
 assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(streak, eventThreshold, initialQueueLength\);/,
