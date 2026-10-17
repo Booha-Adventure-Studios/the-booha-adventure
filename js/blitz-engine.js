@@ -72,12 +72,8 @@ window.BoohaBlitzEngine = (() => {
       image: BLITZ_SCENE_IMAGE_ROOT + 'vocab-circus' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '22% center' }),
       sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bell', wrong: 'soft-drop', finish: 'fanfare' }),
-      fill: Object.freeze({ kind: 'circus-marquee', count: 15, positions: Object.freeze([
-        // Percent of the marquee sign box, clockwise from its top-left corner.
-        [0, 0], [10, 0], [30, 0], [50, 0], [70, 0], [90, 0], [100, 0],
-        [100, 50], [100, 100], [80, 100], [60, 100], [40, 100], [20, 100],
-        [0, 100], [0, 50],
-      ]) }),
+      // Bulbs are spaced evenly around the sign at runtime (layoutMarquee).
+      fill: Object.freeze({ kind: 'circus-marquee', count: 15 }),
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
     }),
     sentences: Object.freeze({
@@ -920,9 +916,8 @@ window.BoohaBlitzEngine = (() => {
         mix-blend-mode: screen;
       }
       .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item {
-        left: 50%;
-        top: 50%;
         width: clamp(22px, 2.6vw, 38px);
+        transform: translate(-50%, -50%);
         z-index: 1;
         opacity: 0;
         background: radial-gradient(circle,
@@ -943,25 +938,20 @@ window.BoohaBlitzEngine = (() => {
         animation: boohaBlitzFireflyBlink var(--firefly-blink, 2.6s) ease-in-out var(--firefly-delay, 0ms) infinite;
       }
       .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit {
-        animation: boohaBlitzFireflyGather 720ms cubic-bezier(.2, .9, .25, 1) both;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+        animation: none;
       }
+      /* No delays here: each firefly starts its drift and glow from rest; the
+         different durations keep the swarm out of sync without a jump. */
       .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled {
-        left: var(--firefly-left);
-        top: var(--firefly-top);
         opacity: 1;
         animation:
-          boohaBlitzFireflyDrift var(--firefly-drift, 6s) ease-in-out var(--firefly-delay, 0ms) infinite alternate,
-          boohaBlitzFireflyGlow var(--firefly-blink, 2.6s) ease-in-out var(--firefly-delay, 0ms) infinite;
+          boohaBlitzFireflyDrift var(--firefly-drift, 6s) ease-in-out infinite alternate,
+          boohaBlitzFireflyGlow var(--firefly-blink, 2.6s) ease-in-out infinite;
       }
       .blitz-scene-fill-fireflies.all-lit .booha-blitz-scene-fill-item.firefly-settled {
-        animation: boohaBlitzFireflyRingPulse 1.8s ease-in-out var(--firefly-delay, 0ms) infinite alternate;
-      }
-      .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
-        animation: boohaBlitzFireflyScatter 420ms ease-out both;
-      }
-      @keyframes boohaBlitzFireflyGather {
-        from { left: 50%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(.18); }
-        to { left: var(--firefly-left); top: var(--firefly-top); opacity: .92; transform: translate(-50%, -50%) scale(1); }
+        animation: boohaBlitzFireflyRingPulse 1.8s ease-in-out infinite alternate;
       }
       @keyframes boohaBlitzFireflyDrift {
         0% { transform: translate(-50%, -50%) translate(0, 0); }
@@ -971,9 +961,8 @@ window.BoohaBlitzEngine = (() => {
       }
       /* Real fireflies fade almost out between flashes; bulbs never do. */
       @keyframes boohaBlitzFireflyGlow {
-        0%, 100% { opacity: .28; }
-        40% { opacity: 1; }
-        60% { opacity: .9; }
+        0%, 100% { opacity: 1; }
+        55% { opacity: .3; }
       }
       @keyframes boohaBlitzFireflyBlink {
         0%, 70%, 100% { opacity: 0; }
@@ -982,10 +971,6 @@ window.BoohaBlitzEngine = (() => {
       @keyframes boohaBlitzFireflyRingPulse {
         from { transform: translate(-50%, -50%) scale(.86); filter: brightness(.92); }
         to { transform: translate(-50%, -50%) scale(1.22); filter: brightness(1.5); }
-      }
-      @keyframes boohaBlitzFireflyScatter {
-        from { left: var(--firefly-left); top: var(--firefly-top); opacity: .92; transform: translate(-50%, -50%) scale(1); }
-        to { left: var(--scatter-left); top: var(--scatter-top); opacity: 0; transform: translate(-50%, -50%) scale(.35); }
       }
       .booha-blitz-scene-fill-item.is-lit {
         opacity: .98;
@@ -1013,14 +998,8 @@ window.BoohaBlitzEngine = (() => {
       .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit,
       .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled,
       .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled {
-        left: var(--firefly-left);
-        top: var(--firefly-top);
         opacity: .92;
         transform: translate(-50%, -50%);
-      }
-      .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering,
-      .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
-        opacity: 0;
       }
       .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item::after,
       .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item::after {
@@ -1037,15 +1016,9 @@ window.BoohaBlitzEngine = (() => {
         }
         .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit,
         .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled {
-          left: var(--firefly-left) !important;
-          top: var(--firefly-top) !important;
           opacity: .92;
           transform: translate(-50%, -50%);
           animation: none;
-        }
-        .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
-          animation: none;
-          opacity: 0;
         }
         .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item::after {
           animation: none;
@@ -3418,93 +3391,167 @@ window.BoohaBlitzEngine = (() => {
       }
 
       const positions = fillConfig.positions || [];
-      if (!positions.length) {
+      const total = fillConfig.count || positions.length;
+      if (!total) {
         return { setCount() {} };
       }
       const isFirefly = kind === 'firefly-swarm';
       // 15 distinct hues, spread so neighbouring fireflies never look alike.
       const fireflyHues = [52, 160, 200, 290, 330, 95, 25, 240, 180, 310, 70, 130, 220, 0, 270];
-      const items = positions.map(([left, top], index) => {
+      const items = Array.from({ length: total }, (_, index) => {
         const item = document.createElement('span');
         item.className = 'booha-blitz-scene-fill-item';
         item.dataset.index = String(index);
-        item.dataset.positionLeft = String(left);
-        item.dataset.positionTop = String(top);
         if (isFirefly) {
           item.style.setProperty('--firefly-color', `hsl(${fireflyHues[index % fireflyHues.length]} 100% 72%)`);
           item.style.setProperty('--firefly-drift', `${5.5 + (index * 7 % 11) * .45}s`);
           item.style.setProperty('--firefly-blink', `${2.1 + (index * 5 % 9) * .37}s`);
-          item.style.setProperty('--firefly-delay', `${-(index * 613 % 4000)}ms`);
+          item.style.setProperty('--firefly-delay', `${index * 613 % 4000}ms`);
           item.style.setProperty('--firefly-wx', `${(index * 29 % 41) - 20}px`);
           item.style.setProperty('--firefly-wy', `${(index * 17 % 33) - 16}px`);
-        } else {
-          item.style.left = `${left}%`;
-          item.style.top = `${top}%`;
         }
         fill.appendChild(item);
         return item;
       });
 
       let settleToken = 0;
-      const isPortrait = () => typeof window !== 'undefined'
-        && (window.innerHeight > window.innerWidth);
-      const getPositions = () => isFirefly && isPortrait() && fillConfig.portraitPositions?.length
-        ? fillConfig.portraitPositions
-        : positions;
-      const applyPositions = () => {
-        const activePositions = getPositions();
+      const quietMotion = () => REDUCED_MOTION
+        || overlay.classList.contains('low-power')
+        || overlay.classList.contains('reduced-power');
+
+      // Fireflies use one fixed spot each, selected per orientation. Reapply
+      // only when orientation changes, so a new answer never moves old lights.
+      let positionsArePortrait = null;
+      const applyFireflyPositions = () => {
+        const portrait = typeof window !== 'undefined' && window.innerHeight > window.innerWidth;
+        if (portrait === positionsArePortrait) return;
+        positionsArePortrait = portrait;
+        const active = portrait && fillConfig.portraitPositions?.length
+          ? fillConfig.portraitPositions
+          : positions;
         items.forEach((item, index) => {
-          const [left, top] = activePositions[index] || positions[index];
+          const [left, top] = active[index] || positions[index] || [50, 50];
+          item.style.left = `${left}%`;
+          item.style.top = `${top}%`;
           item.dataset.positionLeft = String(left);
           item.dataset.positionTop = String(top);
-          if (isFirefly) {
-            item.style.setProperty('--firefly-left', `${left}%`);
-            item.style.setProperty('--firefly-top', `${top}%`);
-          } else {
-            item.style.left = `${left}%`;
-            item.style.top = `${top}%`;
-          }
         });
       };
-      applyPositions();
 
-      const resetFireflyItem = (item) => {
-        item.classList.remove('is-lit', 'firefly-settled', 'is-scattering');
+      // Walk the sign's real perimeter so bulb spacing stays even when the
+      // prompt is wide, tall, or changes shape at a responsive breakpoint.
+      const layoutMarquee = () => {
+        const w = fill.offsetWidth;
+        const h = fill.offsetHeight;
+        if (!w || !h) return;
+        const step = (2 * (w + h)) / items.length;
+        items.forEach((item, index) => {
+          let distance = step * (index + 0.5);
+          let x;
+          let y;
+          if (distance < w) {
+            x = distance;
+            y = 0;
+          } else if ((distance -= w) < h) {
+            x = w;
+            y = distance;
+          } else if ((distance -= h) < w) {
+            x = w - distance;
+            y = h;
+          } else {
+            distance -= w;
+            x = 0;
+            y = h - distance;
+          }
+          item.style.left = `${(x / w) * 100}%`;
+          item.style.top = `${(y / h) * 100}%`;
+        });
       };
+
+      let marqueeObserver = null;
+      let orientationHandler = null;
+      if (isFirefly) {
+        applyFireflyPositions();
+        orientationHandler = () => applyFireflyPositions();
+        window.addEventListener('resize', orientationHandler, { passive: true });
+      } else {
+        layoutMarquee();
+        if (typeof ResizeObserver === 'function') {
+          marqueeObserver = new ResizeObserver(layoutMarquee);
+          marqueeObserver.observe(fill);
+        }
+      }
+
+      // Flight and scatter use plain pixel values through Web Animations API.
+      // Store one handle for both directions so a retry cannot leave stale
+      // motion fighting the next answer.
+      const cancelMotion = item => {
+        item._boohaMotion?.cancel();
+        item._boohaMotion = null;
+      };
+      const flyIn = item => {
+        cancelMotion(item);
+        item.classList.add('is-lit');
+        if (quietMotion() || typeof item.animate !== 'function') {
+          item.classList.add('firefly-settled');
+          return;
+        }
+        const box = fill.getBoundingClientRect();
+        const dx = box.width / 2 - (parseFloat(item.style.left) / 100) * box.width;
+        const dy = box.height / 2 - (parseFloat(item.style.top) / 100) * box.height;
+        const flight = item.animate([
+          { transform: `translate(-50%, -50%) translate(${dx}px, ${dy}px) scale(.2)`, opacity: 0 },
+          { transform: 'translate(-50%, -50%)', opacity: 1 },
+        ], { duration: 720, easing: 'cubic-bezier(.2, .9, .25, 1)' });
+        item._boohaMotion = flight;
+        flight.onfinish = () => {
+          if (item._boohaMotion === flight && item.classList.contains('is-lit')) {
+            item.classList.add('firefly-settled');
+            item._boohaMotion = null;
+          }
+        };
+      };
+      const putOut = (item, index, scatter) => {
+        cancelMotion(item);
+        item.classList.remove('is-lit', 'firefly-settled');
+        if (!scatter || quietMotion() || typeof item.animate !== 'function') return;
+        const box = fill.getBoundingClientRect();
+        const angle = index * 2.4;
+        const scatterMotion = item.animate([
+          { transform: 'translate(-50%, -50%)', opacity: 1 },
+          { transform: `translate(-50%, -50%) translate(${Math.cos(angle) * box.width * .35}px, ${Math.sin(angle) * box.height * .35}px) scale(.35)`, opacity: 0 },
+        ], { duration: 420 + (index % 4) * 34, easing: 'ease-out' });
+        item._boohaMotion = scatterMotion;
+        scatterMotion.onfinish = () => {
+          if (item._boohaMotion === scatterMotion) item._boohaMotion = null;
+        };
+      };
+
+      const destroy = () => {
+        marqueeObserver?.disconnect();
+        marqueeObserver = null;
+        if (orientationHandler) {
+          window.removeEventListener('resize', orientationHandler);
+          orientationHandler = null;
+        }
+        items.forEach(cancelMotion);
+      };
+
       return {
+        destroy,
         setCount(correctCount = 0, { setback = false } = {}) {
           const count = Math.max(0, Math.min(items.length, Number(correctCount) || 0));
-          applyPositions();
           const version = ++settleToken;
           fill.classList.toggle('all-lit', isFirefly && count === items.length);
           if (isFirefly) {
+            applyFireflyPositions();
             items.forEach((item, index) => {
-              const shouldBeLit = index < count;
-              if (setback && !shouldBeLit && (item.classList.contains('is-lit') || item.classList.contains('firefly-settled'))) {
-                item.classList.remove('firefly-settled');
-                item.classList.add('is-scattering');
-                item.style.setProperty('--scatter-left', `${8 + ((index * 23) % 84)}%`);
-                item.style.setProperty('--scatter-top', `${18 + ((index * 37) % 64)}%`);
-                const token = `${version}:${index}`;
-                item.dataset.settleToken = token;
-                setTimeout(() => {
-                  if (item.dataset.settleToken !== token) return;
-                  resetFireflyItem(item);
-                }, 440 + (index % 4) * 34);
+              if (index < count) {
+                if (!item.classList.contains('is-lit')) flyIn(item);
                 return;
               }
-              if (!shouldBeLit) {
-                resetFireflyItem(item);
-                return;
-              }
-              item.classList.remove('is-scattering');
-              item.classList.add('is-lit');
-              const token = `${version}:${index}`;
-              item.dataset.settleToken = token;
-              setTimeout(() => {
-                if (item.dataset.settleToken !== token || !item.classList.contains('is-lit')) return;
-                item.classList.add('firefly-settled');
-              }, 760);
+              if (item.classList.contains('is-lit')) putOut(item, index, setback);
+              else cancelMotion(item);
             });
           } else if (setback) {
             items.slice().reverse().forEach((item, reverseIndex) => {
@@ -3587,6 +3634,7 @@ window.BoohaBlitzEngine = (() => {
     function closeGame(overlay, stopTimer, stopBGM) {
       stopTimer();
       stopBGM();
+      overlay._boohaBlitzSceneFillCleanup?.();
       overlay._boohaBlitzPerformanceCleanup?.();
       overlay._boohaBlitzViewportCleanup?.();
       overlay._boohaBlitzVisibilityCleanup?.();
@@ -3713,6 +3761,7 @@ window.BoohaBlitzEngine = (() => {
 
       const existing = document.getElementById(config.overlayId);
       if (existing) {
+        existing._boohaBlitzSceneFillCleanup?.();
         existing._boohaBlitzPerformanceCleanup?.();
         existing._boohaBlitzViewportCleanup?.();
         existing._boohaBlitzVisibilityCleanup?.();
@@ -3731,6 +3780,7 @@ window.BoohaBlitzEngine = (() => {
       mountSceneBackdrop(overlay, scene);
       mountPersistentAtmosphere(overlay, palette, scene);
       const sceneFill = mountSceneFill(overlay, scene);
+      overlay._boohaBlitzSceneFillCleanup = sceneFill.destroy;
       const performanceDiagnostic = createPerformanceDiagnostic(overlay);
       performanceDiagnostic?.update({ status: 'ready' });
 
@@ -4692,6 +4742,7 @@ window.BoohaBlitzEngine = (() => {
         stopStreakBeat();
         stopTimer();
         stopBGM();
+        overlay._boohaBlitzSceneFillCleanup?.();
         overlay._boohaBlitzPerformanceCleanup?.();
         overlay._boohaBlitzViewportCleanup?.();
         overlay._boohaBlitzVisibilityCleanup?.();
