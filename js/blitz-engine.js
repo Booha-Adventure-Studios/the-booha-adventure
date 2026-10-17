@@ -72,9 +72,10 @@ window.BoohaBlitzEngine = (() => {
       image: BLITZ_SCENE_IMAGE_ROOT + 'vocab-circus' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '22% center' }),
       sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bell', wrong: 'soft-drop', finish: 'fanfare' }),
-      fill: Object.freeze({ kind: 'circus-bulbs', count: 15, positions: Object.freeze([
-        [12, 18], [17, 22], [22, 25], [28, 28], [34, 31], [40, 33], [46, 34], [52, 34],
-        [58, 33], [64, 31], [70, 28], [76, 25], [82, 22], [87, 18], [92, 15],
+      fill: Object.freeze({ kind: 'circus-marquee', count: 15, positions: Object.freeze([
+        [34, 39], [42, 39], [50, 39], [58, 39], [66, 39],
+        [69, 47], [69, 56], [66, 65], [58, 65], [50, 65],
+        [42, 65], [34, 65], [31, 56], [31, 47], [34, 43],
       ]) }),
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
     }),
@@ -84,6 +85,7 @@ window.BoohaBlitzEngine = (() => {
       image: BLITZ_SCENE_IMAGE_ROOT + 'sentence-spooky' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: 'center center' }),
       sfx: Object.freeze({ start: 'wood-click', correct: 'wood-click', streak: 'chime', wrong: 'wood-click', finish: 'chime' }),
+      fill: Object.freeze({ kind: 'spooky-fog', count: 15 }),
       motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
     }),
     questions: Object.freeze({
@@ -92,6 +94,20 @@ window.BoohaBlitzEngine = (() => {
       image: BLITZ_SCENE_IMAGE_ROOT + 'question-fireflies' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '78% center' }),
       sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'warm-pulse', finish: 'warm-pulse' }),
+      fill: Object.freeze({
+        kind: 'firefly-swarm',
+        count: 15,
+        positions: Object.freeze([
+          [19, 38], [25, 30], [33, 25], [42, 22], [52, 24],
+          [60, 29], [67, 38], [69, 49], [66, 61], [59, 70],
+          [50, 76], [40, 76], [31, 70], [24, 61], [19, 50],
+        ]),
+        portraitPositions: Object.freeze([
+          [24, 35], [32, 28], [42, 24], [52, 23], [62, 26],
+          [71, 33], [77, 43], [78, 54], [73, 65], [64, 73],
+          [52, 78], [41, 76], [31, 70], [24, 61], [21, 49],
+        ]),
+      }),
       motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, optionDurationMs: 260, optionStaggerMs: 30, optionX: '0px', optionY: '8px', optionScale: '.97' }),
     }),
   });
@@ -817,6 +833,18 @@ window.BoohaBlitzEngine = (() => {
         pointer-events: none;
         overflow: hidden;
       }
+      .blitz-scene-fill-circus::before {
+        content: '';
+        position: absolute;
+        left: 29%;
+        top: 35%;
+        width: 42%;
+        height: 31%;
+        border: 2px solid rgba(255, 226, 122, .58);
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(7, 12, 25, .72), rgba(13, 13, 30, .56));
+        box-shadow: 0 0 18px rgba(255, 111, 181, .24), inset 0 0 26px rgba(0, 0, 0, .32);
+      }
       .booha-blitz-scene-fill-item {
         position: absolute;
         width: clamp(10px, 1.35vw, 22px);
@@ -827,8 +855,85 @@ window.BoohaBlitzEngine = (() => {
         transition: opacity 180ms ease, transform 180ms cubic-bezier(.2, 1.4, .3, 1);
       }
       .blitz-scene-fill-circus .booha-blitz-scene-fill-item {
+        z-index: 1;
+        opacity: .72;
+        background: radial-gradient(circle at 35% 30%, #554d50 0 18%, #211e28 48%, #090b14 76%);
+        border: 1px solid rgba(255, 226, 122, .34);
+        box-shadow: 0 0 4px 1px rgba(255, 226, 122, .18), inset 0 1px 2px rgba(255,255,255,.18);
+      }
+      .blitz-scene-fill-circus .booha-blitz-scene-fill-item.is-lit {
         background: radial-gradient(circle at 35% 30%, #fffbe1 0 15%, #ffe27a 34%, #ff9b52 68%, #ff6fb5 100%);
+        border-color: #ffe27a;
         box-shadow: 0 0 9px 2px rgba(255, 226, 122, .82), 0 0 24px 7px rgba(255, 111, 181, .42);
+      }
+      .blitz-scene-fill-circus .booha-blitz-scene-fill-item.is-popping-out {
+        animation: boohaBlitzMarqueePopOut 180ms ease both;
+      }
+      @keyframes boohaBlitzMarqueePopOut {
+        from { opacity: .98; transform: translate(-50%, -50%) scale(1); filter: brightness(1.15); }
+        to { opacity: .72; transform: translate(-50%, -50%) scale(.74); filter: brightness(.62); }
+      }
+      .blitz-scene-fill-spooky {
+        --blitz-spooky-fog-opacity: .58;
+        --blitz-spooky-glow-top: 82%;
+        --blitz-spooky-glow-opacity: .14;
+      }
+      .blitz-scene-fill-spooky::before,
+      .blitz-scene-fill-spooky::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        transition: opacity 420ms ease, background-position 420ms ease;
+      }
+      .blitz-scene-fill-spooky::before {
+        background:
+          radial-gradient(ellipse at 50% 76%, rgba(142, 91, 180, .72), transparent 66%),
+          linear-gradient(180deg, rgba(79, 42, 118, .16), rgba(117, 62, 151, .72));
+        opacity: var(--blitz-spooky-fog-opacity);
+        mix-blend-mode: screen;
+      }
+      .blitz-scene-fill-spooky::after {
+        background: radial-gradient(ellipse 42% 30% at 52% var(--blitz-spooky-glow-top), rgba(255, 104, 172, .78), transparent 72%);
+        opacity: var(--blitz-spooky-glow-opacity);
+        mix-blend-mode: screen;
+      }
+      .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item {
+        width: clamp(7px, 1vw, 16px);
+        z-index: 1;
+        opacity: 0;
+        background: radial-gradient(circle at 34% 30%, #fffde6 0 16%, var(--firefly-color, #ffe98b) 42%, transparent 74%);
+        box-shadow: 0 0 8px 2px var(--firefly-color, #ffe98b), 0 0 22px 5px color-mix(in srgb, var(--firefly-color, #ffe98b) 58%, transparent);
+      }
+      .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit {
+        animation: boohaBlitzFireflyGather 720ms cubic-bezier(.2, .9, .25, 1) both;
+      }
+      .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled {
+        left: var(--firefly-left);
+        top: var(--firefly-top);
+        opacity: .92;
+        animation: boohaBlitzFireflyDrift var(--firefly-drift, 2.8s) ease-in-out var(--firefly-delay, 0ms) infinite alternate;
+      }
+      .blitz-scene-fill-fireflies.all-lit .booha-blitz-scene-fill-item.firefly-settled {
+        animation: boohaBlitzFireflyRingPulse 1.8s ease-in-out var(--firefly-delay, 0ms) infinite alternate;
+      }
+      .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
+        animation: boohaBlitzFireflyScatter 420ms ease-out both;
+      }
+      @keyframes boohaBlitzFireflyGather {
+        from { left: 50%; top: 50%; opacity: 0; transform: translate(-50%, -50%) scale(.18); }
+        to { left: var(--firefly-left); top: var(--firefly-top); opacity: .92; transform: translate(-50%, -50%) scale(1); }
+      }
+      @keyframes boohaBlitzFireflyDrift {
+        from { transform: translate(-50%, -50%) translate(-2px, 1px) scale(.88); filter: brightness(.9); }
+        to { transform: translate(-50%, -50%) translate(3px, -3px) scale(1.12); filter: brightness(1.3); }
+      }
+      @keyframes boohaBlitzFireflyRingPulse {
+        from { transform: translate(-50%, -50%) scale(.86); filter: brightness(.92); }
+        to { transform: translate(-50%, -50%) scale(1.22); filter: brightness(1.5); }
+      }
+      @keyframes boohaBlitzFireflyScatter {
+        from { left: var(--firefly-left); top: var(--firefly-top); opacity: .92; transform: translate(-50%, -50%) scale(1); }
+        to { left: var(--scatter-left); top: var(--scatter-top); opacity: 0; transform: translate(-50%, -50%) scale(.35); }
       }
       .booha-blitz-scene-fill-item.is-lit {
         opacity: .98;
@@ -851,6 +956,50 @@ window.BoohaBlitzEngine = (() => {
       .blitz-compositor.reduced-power .booha-blitz-scene-fill-item {
         animation: none;
         transition: opacity 120ms ease;
+      }
+      .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit,
+      .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit,
+      .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled,
+      .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled {
+        left: var(--firefly-left);
+        top: var(--firefly-top);
+        opacity: .92;
+        transform: translate(-50%, -50%);
+      }
+      .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering,
+      .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
+        opacity: 0;
+      }
+      @media (orientation: portrait) {
+        .blitz-scene-fill-circus::before {
+          left: 9%;
+          top: 35%;
+          width: 82%;
+          height: 25%;
+          border-radius: 20px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .blitz-scene-fill-spooky::before,
+        .blitz-scene-fill-spooky::after {
+          transition: none;
+        }
+        .blitz-scene-fill-circus .booha-blitz-scene-fill-item.is-lit,
+        .blitz-scene-fill-circus .booha-blitz-scene-fill-item.is-popping-out {
+          animation: none;
+        }
+        .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit,
+        .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled {
+          left: var(--firefly-left) !important;
+          top: var(--firefly-top) !important;
+          opacity: .92;
+          transform: translate(-50%, -50%);
+          animation: none;
+        }
+        .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
+          animation: none;
+          opacity: 0;
+        }
       }
       @keyframes boohaBlitzAurora {
         from { opacity: .10; transform: translate3d(-1%, 1%, 0) scale(1); }
@@ -3177,26 +3326,140 @@ window.BoohaBlitzEngine = (() => {
 
     function mountSceneFill(overlay, scene) {
       const fillConfig = scene.fill;
-      if (!fillConfig?.positions?.length) {
+      if (!fillConfig) {
         return { setCount() {} };
       }
       const fill = document.createElement('div');
       fill.className = `booha-blitz-scene-fill blitz-scene-fill-${scene.id}`;
       fill.setAttribute('aria-hidden', 'true');
-      const items = fillConfig.positions.map(([left, top], index) => {
+      fill.dataset.fillKind = fillConfig.kind || 'generic';
+      overlay.insertBefore(fill, overlay.querySelector('.booha-blitz-scene-backdrop')?.nextSibling || overlay.firstChild);
+
+      const kind = fillConfig.kind || 'generic';
+      if (kind === 'spooky-fog') {
+        return {
+          setCount(correctCount = 0) {
+            const total = fillConfig.count || 15;
+            const progress = Math.max(0, Math.min(1, (Number(correctCount) || 0) / total));
+            fill.style.setProperty('--blitz-spooky-fog-opacity', (0.58 - progress * 0.48).toFixed(3));
+            fill.style.setProperty('--blitz-spooky-glow-top', `${82 - progress * 42}%`);
+            fill.style.setProperty('--blitz-spooky-glow-opacity', (0.14 + progress * 0.34).toFixed(3));
+            fill.dataset.litCount = String(Math.round(progress * total));
+          },
+        };
+      }
+
+      const positions = fillConfig.positions || [];
+      if (!positions.length) {
+        return { setCount() {} };
+      }
+      const isFirefly = kind === 'firefly-swarm';
+      const colors = ['#ffe98b', '#8fffc4', '#8bd7ff', '#d9a7ff', '#ff9bcf', '#ffd27d'];
+      const items = positions.map(([left, top], index) => {
         const item = document.createElement('span');
         item.className = 'booha-blitz-scene-fill-item';
         item.dataset.index = String(index);
-        item.style.left = `${left}%`;
-        item.style.top = `${top}%`;
+        item.dataset.positionLeft = String(left);
+        item.dataset.positionTop = String(top);
+        if (isFirefly) {
+          item.style.left = '50%';
+          item.style.top = '50%';
+          item.style.setProperty('--firefly-color', colors[index % colors.length]);
+          item.style.setProperty('--firefly-drift', `${2.3 + (index % 4) * .35}s`);
+          item.style.setProperty('--firefly-delay', `${(index % 5) * 180}ms`);
+        } else {
+          item.style.left = `${left}%`;
+          item.style.top = `${top}%`;
+        }
         fill.appendChild(item);
         return item;
       });
-      overlay.insertBefore(fill, overlay.querySelector('.booha-blitz-scene-backdrop')?.nextSibling || overlay.firstChild);
+
+      let settleToken = 0;
+      const isPortrait = () => typeof window !== 'undefined'
+        && (window.innerHeight > window.innerWidth);
+      const getPositions = () => isFirefly && isPortrait() && fillConfig.portraitPositions?.length
+        ? fillConfig.portraitPositions
+        : positions;
+      const applyPositions = () => {
+        const activePositions = getPositions();
+        items.forEach((item, index) => {
+          const [left, top] = activePositions[index] || positions[index];
+          item.dataset.positionLeft = String(left);
+          item.dataset.positionTop = String(top);
+          if (isFirefly) {
+            item.style.setProperty('--firefly-left', `${left}%`);
+            item.style.setProperty('--firefly-top', `${top}%`);
+          } else {
+            item.style.left = `${left}%`;
+            item.style.top = `${top}%`;
+          }
+        });
+      };
+      applyPositions();
+
+      const resetFireflyItem = (item) => {
+        item.classList.remove('is-lit', 'firefly-settled', 'is-scattering');
+        item.style.left = '50%';
+        item.style.top = '50%';
+      };
       return {
-        setCount(correctCount = 0) {
+        setCount(correctCount = 0, { setback = false } = {}) {
           const count = Math.max(0, Math.min(items.length, Number(correctCount) || 0));
-          items.forEach((item, index) => item.classList.toggle('is-lit', index < count));
+          applyPositions();
+          const version = ++settleToken;
+          fill.classList.toggle('all-lit', isFirefly && count === items.length);
+          if (isFirefly) {
+            items.forEach((item, index) => {
+              const shouldBeLit = index < count;
+              if (setback && !shouldBeLit && (item.classList.contains('is-lit') || item.classList.contains('firefly-settled'))) {
+                item.classList.remove('firefly-settled');
+                item.classList.add('is-scattering');
+                item.style.setProperty('--scatter-left', `${8 + ((index * 23) % 84)}%`);
+                item.style.setProperty('--scatter-top', `${18 + ((index * 37) % 64)}%`);
+                const token = `${version}:${index}`;
+                item.dataset.settleToken = token;
+                setTimeout(() => {
+                  if (item.dataset.settleToken !== token) return;
+                  resetFireflyItem(item);
+                }, 440 + (index % 4) * 34);
+                return;
+              }
+              if (!shouldBeLit) {
+                resetFireflyItem(item);
+                return;
+              }
+              const wasLit = item.classList.contains('is-lit') || item.classList.contains('firefly-settled');
+              item.classList.remove('is-scattering');
+              item.classList.add('is-lit');
+              if (!wasLit) {
+                item.style.left = '50%';
+                item.style.top = '50%';
+              }
+              const token = `${version}:${index}`;
+              item.dataset.settleToken = token;
+              setTimeout(() => {
+                if (item.dataset.settleToken !== token || !item.classList.contains('is-lit')) return;
+                item.classList.add('firefly-settled');
+              }, 760);
+            });
+          } else if (setback) {
+            items.slice().reverse().forEach((item, reverseIndex) => {
+              if (!item.classList.contains('is-lit')) return;
+              item.classList.add('is-popping-out');
+              const token = `${version}:${reverseIndex}`;
+              item.dataset.settleToken = token;
+              setTimeout(() => {
+                if (item.dataset.settleToken !== token) return;
+                item.classList.remove('is-lit', 'is-popping-out');
+              }, reverseIndex * 24 + 190);
+            });
+          } else {
+            items.forEach((item, index) => {
+              item.classList.toggle('is-lit', index < count);
+              item.classList.remove('is-popping-out');
+            });
+          }
           fill.dataset.litCount = String(count);
         },
       };
@@ -3679,10 +3942,10 @@ window.BoohaBlitzEngine = (() => {
         });
       }
 
-      function setBackground(correctCount = 0) {
+      function setBackground(correctCount = 0, fillOptions = {}) {
         const total = initialQueueLength || queue.length || 1;
         const percent = Math.max(0, Math.min(100, (correctCount / total) * 100));
-        sceneFill.setCount(correctCount);
+        sceneFill.setCount(correctCount, fillOptions);
         const vivid = progressColorFor(palette, percent);
         const page = pageWashFor(palette, percent);
         const option = optionSurfaceFor(palette, percent);
@@ -4107,7 +4370,7 @@ window.BoohaBlitzEngine = (() => {
         mistakeCount++;
         elapsed = startTime === null ? elapsed : performance.now() - startTime;
         spotlight.resetStreak();
-        setBackground(0);
+        setBackground(0, { setback: true });
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
           if (b.textContent === correct.en) {
             b.classList.add('correct');
