@@ -89,6 +89,9 @@ window.BoohaBlitzEngine = (() => {
     }),
   });
   const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 6, 9, 12, 15]);
+  // Keep palette-era fields and hooks available while the engine transitions
+  // to scene-owned celebrations, but keep the legacy outputs disabled.
+  const LEGACY_BLITZ_CELEBRATIONS_ENABLED = false;
   const STREAK_EVENT_NOTES = Object.freeze({
     playful: Object.freeze({
       3: [523, 659], 6: [587, 740, 880], 9: [659, 784, 988],
@@ -2511,6 +2514,8 @@ window.BoohaBlitzEngine = (() => {
         #${config.overlayId}.blitz-compositor .${config.optionClass}.correct {
           box-shadow: none !important;
           outline: 2px solid #00ff64;
+          animation: none !important;
+          transform: none !important;
         }
         #${config.overlayId}.blitz-compositor .${config.optionClass}.micro-win {
           background: var(--blitz-correct) !important;
@@ -2802,9 +2807,11 @@ window.BoohaBlitzEngine = (() => {
         streakMarkerEl.textContent = marker;
         streakEl.textContent = `${label} ×${streak}`;
         nameplate.classList.remove('streak-pop');
-        void nameplate.offsetWidth;
-        nameplate.classList.add('streak-pop');
-        if (eventThreshold) showStreakEvent(eventThreshold);
+        if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
+          void nameplate.offsetWidth;
+          nameplate.classList.add('streak-pop');
+          if (eventThreshold) showStreakEvent(eventThreshold);
+        }
       }
 
       function resetStreak() {
@@ -3413,6 +3420,7 @@ window.BoohaBlitzEngine = (() => {
         spotlight.setStreak(streak, eventThreshold, initialQueueLength);
         setBackground(streak);
         if (eventThreshold) {
+          if (!LEGACY_BLITZ_CELEBRATIONS_ENABLED) return eventThreshold;
           playStreakBeat(eventThreshold);
           if (sceneFeel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
           const copy = {
@@ -3499,24 +3507,26 @@ window.BoohaBlitzEngine = (() => {
         // to -- the firework itself should look like part of the same
         // dead-to-alive build-up, not a fixed palette color.
         const stepColor = progressColorFor(palette, (streak / (initialQueueLength || 1)) * 100).css;
-        const impactRect = answerRect || correctBtn.getBoundingClientRect();
-        const impactOverlayRect = overlayRect || overlay.getBoundingClientRect();
-        if (impactRect && impactOverlayRect) {
-          overlay.style.setProperty('--blitz-impact-x', `${impactRect.left - impactOverlayRect.left + impactRect.width / 2}px`);
-          overlay.style.setProperty('--blitz-impact-y', `${impactRect.top - impactOverlayRect.top + impactRect.height / 2}px`);
-        }
-        overlay.classList.remove('correct-impact');
-        void overlay.offsetWidth;
-        overlay.classList.add('correct-impact');
-        if (impactTimer) clearTimeout(impactTimer);
-        impactTimer = setTimeout(() => {
-          overlay.classList.remove('correct-impact');
-          impactTimer = null;
-        }, 340);
-        correctBtn.classList.add('micro-win');
-        correctBtn.style.transition = 'none';
         correctBtn.style.background = stepColor;
-        emitCorrectMicroBurst(correctBtn, answerRect, overlayRect);
+        if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
+          const impactRect = answerRect || correctBtn.getBoundingClientRect();
+          const impactOverlayRect = overlayRect || overlay.getBoundingClientRect();
+          if (impactRect && impactOverlayRect) {
+            overlay.style.setProperty('--blitz-impact-x', `${impactRect.left - impactOverlayRect.left + impactRect.width / 2}px`);
+            overlay.style.setProperty('--blitz-impact-y', `${impactRect.top - impactOverlayRect.top + impactRect.height / 2}px`);
+          }
+          overlay.classList.remove('correct-impact');
+          void overlay.offsetWidth;
+          overlay.classList.add('correct-impact');
+          if (impactTimer) clearTimeout(impactTimer);
+          impactTimer = setTimeout(() => {
+            overlay.classList.remove('correct-impact');
+            impactTimer = null;
+          }, 340);
+          correctBtn.classList.add('micro-win');
+          correctBtn.style.transition = 'none';
+          emitCorrectMicroBurst(correctBtn, answerRect, overlayRect);
+        }
 
         // One smooth, single-stage transition rather than a chain of an
         // overlay-wide scale bump plus buttons flying off screen with
@@ -3530,28 +3540,34 @@ window.BoohaBlitzEngine = (() => {
               btn.style.transition = 'opacity 140ms ease';
               btn.style.opacity = '0';
             });
-            correctBtn.style.transition = 'transform 140ms ease, opacity 140ms ease';
-            correctBtn.style.transform = 'scale(1.06)';
+            if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
+              correctBtn.style.transition = 'transform 140ms ease, opacity 140ms ease';
+              correctBtn.style.transform = 'scale(1.06)';
+            } else {
+              correctBtn.style.transition = 'opacity 140ms ease';
+            }
             correctBtn.style.opacity = '0';
 
-            const r = answerRect || correctBtn.getBoundingClientRect();
-            const ovr = overlayRect || overlay.getBoundingClientRect();
-            const cx = r.left - ovr.left + r.width / 2;
-            const cy = r.top - ovr.top + r.height / 2;
-            const colors = [stepColor, '#ffffff', stepColor, '#ffd54f'];
-            const particles = document.createDocumentFragment();
-            const count = config.correctParticles || 20;
-            for (let i = 0; i < effectCount(count); i++) {
-              const p = document.createElement('div');
-              const angle = (i / count) * Math.PI * 2;
-              const dist = 50 + Math.random() * 100;
-              const size = 5 + Math.random() * 7;
-              p.className = config.particleClass;
-              p.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.5 ? '50%' : '3px'};background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:10;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${240 + Math.random() * 140}ms;--pdelay:${Math.random() * 30}ms;animation:${config.particleAnimation} var(--pdur) ease-out var(--pdelay) both;`;
-              p.addEventListener('animationend', () => p.remove());
-              particles.appendChild(p);
+            if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
+              const r = answerRect || correctBtn.getBoundingClientRect();
+              const ovr = overlayRect || overlay.getBoundingClientRect();
+              const cx = r.left - ovr.left + r.width / 2;
+              const cy = r.top - ovr.top + r.height / 2;
+              const colors = [stepColor, '#ffffff', stepColor, '#ffd54f'];
+              const particles = document.createDocumentFragment();
+              const count = config.correctParticles || 20;
+              for (let i = 0; i < effectCount(count); i++) {
+                const p = document.createElement('div');
+                const angle = (i / count) * Math.PI * 2;
+                const dist = 50 + Math.random() * 100;
+                const size = 5 + Math.random() * 7;
+                p.className = config.particleClass;
+                p.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;border-radius:${Math.random() > 0.5 ? '50%' : '3px'};background:${colors[Math.floor(Math.random() * colors.length)]};pointer-events:none;z-index:10;--px:${Math.cos(angle) * dist}px;--py:${Math.sin(angle) * dist}px;--pdur:${240 + Math.random() * 140}ms;--pdelay:${Math.random() * 30}ms;animation:${config.particleAnimation} var(--pdur) ease-out var(--pdelay) both;`;
+                p.addEventListener('animationend', () => p.remove());
+                particles.appendChild(p);
+              }
+              overlay.appendChild(particles);
             }
-            overlay.appendChild(particles);
           }, 40);
         }
 
@@ -3560,7 +3576,7 @@ window.BoohaBlitzEngine = (() => {
         // photoreal scene, especially on high-brightness tablet displays.
         // Reduced-motion runs keep one static color pulse for a clear,
         // non-animated confirmation without particle movement.
-        if (REDUCED_MOTION) {
+        if (LEGACY_BLITZ_CELEBRATIONS_ENABLED && REDUCED_MOTION) {
           flashEl.style.background = stepColor;
           flashEl.style.opacity = '0.45';
           setTimeout(() => {
@@ -3717,7 +3733,7 @@ window.BoohaBlitzEngine = (() => {
           btn.classList.add('correct');
           current++;
           const milestone = updateStreak();
-          playCorrectHit();
+          if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playCorrectHit();
           if (current >= queue.length) clearElapsed = performance.now() - startTime;
           correctDetonate(btn, answerRect, overlayRect, milestone);
           return;
@@ -3931,12 +3947,14 @@ window.BoohaBlitzEngine = (() => {
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         winScreen.classList.toggle('speed-target-mode', speedBand === 'target');
         winScreen.classList.toggle('speed-elite-mode', speedBand === 'elite');
-        spotlight.nameplate.classList.add('complete');
-        spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
-        if (isPerfectRun && speedBand === 'elite') emitFinishFlash(overlay, palette, playerName, 'speed');
-        else if (isPerfectRun && speedBand === 'target') emitPerfectFlash(overlay, palette, playerName);
-        else if (isPerfectRun) emitFinishFlash(overlay, palette, playerName, 'clear');
-        else if (isRecord) emitFinishFlash(overlay, palette, playerName, 'record');
+        if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
+          spotlight.nameplate.classList.add('complete');
+          spotlight.announce(`${spotlight.playerName}, YOU CLEARED IT!`, true);
+          if (isPerfectRun && speedBand === 'elite') emitFinishFlash(overlay, palette, playerName, 'speed');
+          else if (isPerfectRun && speedBand === 'target') emitPerfectFlash(overlay, palette, playerName);
+          else if (isPerfectRun) emitFinishFlash(overlay, palette, playerName, 'clear');
+          else if (isRecord) emitFinishFlash(overlay, palette, playerName, 'record');
+        }
         winScreen.classList.add('show', 'climax-awaiting');
         if (climaxTimer) clearTimeout(climaxTimer);
         const revealEpoch = runEpoch;
@@ -3945,9 +3963,9 @@ window.BoohaBlitzEngine = (() => {
           winScreen.classList.remove('climax-awaiting');
           climaxTimer = null;
         }, REDUCED_MOTION ? 420 : 980);
-        playFinalStinger(isRecord, isPerfectRun);
+        if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playFinalStinger(isRecord, isPerfectRun);
         startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
-        celebrate(overlay, palette, isRecord, speedBand);
+        if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) celebrate(overlay, palette, isRecord, speedBand);
         } catch (error) {
           console.error(`[${config.apiName}] Finish rendering failed:`, error);
           revealFinishFallback();

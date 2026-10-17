@@ -14,12 +14,18 @@ assert.match(engine, /function emitCorrectMicroBurst\(correctBtn, answerRect, ov
   'correct answers must emit a small immediate particle burst');
 assert.match(engine, /booha-blitz-correct-spark/,
   'the correct burst must use a shared lightweight spark surface');
+assert.match(engine, /const LEGACY_BLITZ_CELEBRATIONS_ENABLED = false;/,
+  'legacy celebration hooks must remain available but be disabled until scene-specific feedback replaces them');
+assert.match(engine, /if \(LEGACY_BLITZ_CELEBRATIONS_ENABLED\) \{[\s\S]*?correctBtn\.classList\.add\('micro-win'\)/,
+  'the legacy correct-answer pop must be compatibility-gated');
+assert.match(engine, /if \(LEGACY_BLITZ_CELEBRATIONS_ENABLED\) \{[\s\S]*?correctBtn\.style\.transition = 'transform 140ms ease, opacity 140ms ease';[\s\S]*?\} else \{[\s\S]*?correctBtn\.style\.transition = 'opacity 140ms ease';/,
+  'the active correct-answer transition must be a simple opacity fade');
 assert.match(engine, /blitz-compositor\.correct-impact::after[\s\S]*?radial-gradient\(circle at var\(--blitz-impact-x, 50%\) var\(--blitz-impact-y, 50%\)/,
   'correct feedback must use a local answer-anchored glow instead of a full-screen wash');
 assert.match(engine, /boohaBlitzCorrectImpactPulse 220ms ease-out/,
   'the answer-anchored glow must resolve quickly without a visible blink');
-assert.match(engine, /if \(REDUCED_MOTION\) \{[\s\S]*?flashEl\.style\.opacity = '0\.45'/,
-  'the full-screen pulse must be limited to the reduced-motion fallback');
+assert.match(engine, /if \(LEGACY_BLITZ_CELEBRATIONS_ENABLED && REDUCED_MOTION\) \{[\s\S]*?flashEl\.style\.opacity = '0\.45'/,
+  'the old full-screen pulse must remain disabled during this transition pass');
 assert.match(engine, /blitz-feel-playful \.booha-blitz-correct-spark[\s\S]*?border-radius: 50%/,
   'Pre-Boo correct feedback must use round particles');
 assert.match(engine, /blitz-feel-arcade \.booha-blitz-correct-spark[\s\S]*?border-radius: 2px/,
@@ -41,4 +47,4 @@ assert.match(engine, /\.booha-blitz-correct-spark \{ display: none; \}/,
 assert.match(verify, /tests\/blitz-pass14-correct-feedback-audit\.cjs/,
   'verify.sh must run the Pass 2 correct-feedback audit');
 
-console.log('Blitz Pass 2 correct-feedback audit passed: card pop, curriculum particles, layered pitch variation, pacing, and reduced-motion coverage are present.');
+console.log('Blitz Pass 2 correct-feedback audit passed: compatibility hooks remain gated while the active path uses a restrained transition.');
