@@ -172,10 +172,12 @@ const SCOLDS = [
         font-weight: 900;
         line-height: 1;
         text-align: center;
-        color: var(--blitz-ink, #14161c);
-        -webkit-text-stroke: 1px var(--blitz-ink-outline, transparent);
+        color: var(--blitz-prompt-ink, #fff7df);
+        -webkit-text-stroke: 1px var(--blitz-prompt-outline, rgba(3, 8, 16, .86));
         paint-order: stroke fill;
         text-shadow:
+          0 3px 0 rgba(3, 8, 16, .72),
+          0 6px 18px rgba(3, 8, 16, .74),
           0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--blitz-word-glow-color, var(--vb-glow)),
           0 0 var(--blitz-word-glow, 64px) var(--blitz-word-glow-color, var(--vb-glow)),
           0 0 calc(var(--blitz-word-glow, 64px) * 1.5) var(--blitz-word-glow-color, var(--vb-glow));
@@ -188,10 +190,10 @@ const SCOLDS = [
 
       #vb-hira {
         font-size: clamp(16px,min(4vw,4vh),28px);
-        color: var(--blitz-ink, #14161c);
-        -webkit-text-stroke: 1px var(--blitz-ink-outline, transparent);
+        color: var(--blitz-prompt-ink, #fff7df);
+        -webkit-text-stroke: 1px var(--blitz-prompt-outline, rgba(3, 8, 16, .86));
         paint-order: stroke fill;
-        opacity: .7;
+        opacity: .94;
         text-align: center;
         letter-spacing: 2px;
         text-shadow: 0 0 calc(var(--blitz-word-glow, 64px) * .28) var(--blitz-word-glow-color, var(--vb-glow));
