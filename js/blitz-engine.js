@@ -2529,6 +2529,8 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-bg-secondary', 'rgba(0,0,0,.03)');
       overlay.style.setProperty('--blitz-ink', '#14161c');
       overlay.style.setProperty('--blitz-ink-outline', 'transparent');
+      overlay.style.setProperty('--blitz-prompt-ink', '#fff7df');
+      overlay.style.setProperty('--blitz-prompt-outline', 'rgba(3, 8, 16, .86)');
       overlay.style.setProperty('--blitz-progress-color', '#14161c');
       overlay.style.setProperty('--blitz-option-fill', 'rgba(255,255,255,.78)');
       overlay.style.setProperty('--blitz-option-ink', '#14161c');
