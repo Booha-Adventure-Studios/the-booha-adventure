@@ -917,14 +917,15 @@ window.BoohaBlitzEngine = (() => {
         bottom: max(env(safe-area-inset-bottom, 0px) + 16px, 16px);
         left: 50%;
         width: min(680px, calc(100% - 32px));
-        max-height: min(76vh, 560px);
-        max-height: min(76dvh, 560px);
+        max-height: min(calc(100vh - 112px), 620px);
+        max-height: min(calc(100dvh - 112px), 620px);
         box-sizing: border-box;
         display: none;
         padding: clamp(18px, 3vw, 28px) clamp(16px, 4vw, 34px) clamp(16px, 3vw, 24px);
         gap: 8px;
         overflow-y: auto;
         overscroll-behavior: contain;
+        justify-content: flex-start;
         border: 1px solid var(--blitz-accent);
         border-top-width: 3px;
         border-radius: 28px;
@@ -947,6 +948,13 @@ window.BoohaBlitzEngine = (() => {
       #qb-wrong-popup.blitz-wrong-feedback.show.closing {
         animation: boohaBlitzWrongCardOut 180ms ease both;
         pointer-events: none;
+      }
+      .blitz-wrong-feedback > :first-child { margin-top: auto; }
+      .blitz-wrong-feedback > :last-child { margin-bottom: auto; }
+      #vb-wrong-close, #sb-wrong-close, #qb-wrong-close {
+        position: sticky;
+        bottom: 0;
+        flex: 0 0 auto;
       }
       #vb-wrong-popup.blitz-wrong-feedback #vb-wrong-close.is-pressed,
       #sb-wrong-popup.blitz-wrong-feedback #sb-wrong-close.is-pressed,

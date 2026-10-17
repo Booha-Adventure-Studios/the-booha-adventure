@@ -9,8 +9,8 @@ const verify = fs.readFileSync('verify.sh', 'utf8');
 
 assert.match(engine, /#vb-wrong-popup\.blitz-wrong-feedback,[\s\S]*?bottom: max\(env\(safe-area-inset-bottom/,
   'wrong feedback must be a contained bottom card rather than a full-screen layer');
-assert.match(engine, /max-height: min\(76vh, 560px\)/,
-  'wrong feedback must remain bounded while allowing long content to scroll');
+assert.match(engine, /max-height: min\(calc\(100vh - 112px\), 620px\)/,
+  'wrong feedback must remain bounded by the visible viewport while allowing long content to scroll');
 assert.match(engine, /var\(--blitz-popup-bg, rgba\(0,0,0,.92\)\)/,
   'wrong feedback must use the curriculum popup theme');
 assert.match(engine, /@keyframes boohaBlitzWrongCard/,
