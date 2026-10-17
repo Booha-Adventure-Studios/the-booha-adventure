@@ -2169,15 +2169,47 @@ window.BoohaBlitzEngine = (() => {
     const blockPinchTouch = event => {
       if (event.touches && event.touches.length > 1) event.preventDefault();
     };
+    // Reset any zoom that was already present before Blitz opened. Blocking
+    // gestures alone can trap a zoomed page because touch-action: none also
+    // prevents panning or pinching back out. The original viewport returns
+    // when Blitz closes so the hub remains zoomable.
+    const viewportMeta = document.querySelector?.('meta[name="viewport"]') || null;
+    const originalViewport = viewportMeta?.getAttribute('content') ?? null;
+    const lockedViewport = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover';
+    let snapVariant = false;
+    let lastSnapAt = -Infinity;
+    const snapZoom = () => {
+      if (!viewportMeta) return;
+      const scale = Number(window.visualViewport?.scale);
+      if (!Number.isFinite(scale) || scale <= 1.01) return;
+      const now = Date.now();
+      if (now - lastSnapAt < 400) return;
+      lastSnapAt = now;
+      // Safari may ignore an unchanged viewport string, so alternate the
+      // equivalent 1 / 1.0 spelling when reapplying the lock.
+      snapVariant = !snapVariant;
+      viewportMeta.setAttribute(
+        'content',
+        lockedViewport.replace('maximum-scale=1,', snapVariant ? 'maximum-scale=1.0,' : 'maximum-scale=1,')
+      );
+    };
 
     root.classList.add('blitz-active');
     body.classList.add('blitz-active');
     gestureEvents.forEach(type => window.addEventListener(type, blockGesture, { passive: false }));
     window.addEventListener('touchmove', blockPinchTouch, { passive: false });
+    window.visualViewport?.addEventListener('resize', snapZoom, { passive: true });
+    viewportMeta?.setAttribute('content', lockedViewport);
+    snapZoom();
 
     return () => {
       gestureEvents.forEach(type => window.removeEventListener(type, blockGesture));
       window.removeEventListener('touchmove', blockPinchTouch);
+      window.visualViewport?.removeEventListener('resize', snapZoom);
+      if (viewportMeta) {
+        if (originalViewport === null) viewportMeta.removeAttribute('content');
+        else viewportMeta.setAttribute('content', originalViewport);
+      }
       root.classList.remove('blitz-active');
       body.classList.remove('blitz-active');
     };
