@@ -1295,6 +1295,12 @@ window.BoohaBlitzEngine = (() => {
           background 180ms ease, box-shadow 180ms ease;
         will-change: transform, opacity;
       }
+      @media (min-width: 900px) and (orientation: landscape) {
+        .booha-blitz-nameplate {
+          left: 27vw;
+          width: min(440px, 46vw);
+        }
+      }
       .booha-blitz-nameplate::after {
         content: '';
         position: absolute;
