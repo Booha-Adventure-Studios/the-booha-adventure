@@ -1465,9 +1465,9 @@ window.BoohaBlitzEngine = (() => {
         inset: 0;
         z-index: 80;
         pointer-events: none;
-        background: radial-gradient(closest-side, transparent 55%, var(--blitz-glow) 100%);
+        background: radial-gradient(circle at var(--blitz-impact-x, 50%) var(--blitz-impact-y, 50%), var(--blitz-glow) 0%, transparent 22%, transparent 44%);
         opacity: 0;
-        animation: boohaBlitzCorrectImpactWash 320ms ease-out both;
+        animation: boohaBlitzCorrectImpactPulse 220ms ease-out both;
       }
       .blitz-feel-sleek .booha-blitz-nameplate.streak-event-9 {
         letter-spacing: 2.4px;
@@ -1501,9 +1501,9 @@ window.BoohaBlitzEngine = (() => {
         0%, 100% { opacity: .10; }
         50% { opacity: .30; }
       }
-      @keyframes boohaBlitzCorrectImpactWash {
+      @keyframes boohaBlitzCorrectImpactPulse {
         0%, 100% { opacity: 0; }
-        35% { opacity: .85; }
+        35% { opacity: .24; }
       }
       @keyframes boohaBlitzChargedNameplate {
         0%, 100% { opacity: .08; transform: scale(.94); }
@@ -3469,6 +3469,12 @@ window.BoohaBlitzEngine = (() => {
         // to -- the firework itself should look like part of the same
         // dead-to-alive build-up, not a fixed palette color.
         const stepColor = progressColorFor(palette, (streak / (initialQueueLength || 1)) * 100).css;
+        const impactRect = answerRect || correctBtn.getBoundingClientRect();
+        const impactOverlayRect = overlayRect || overlay.getBoundingClientRect();
+        if (impactRect && impactOverlayRect) {
+          overlay.style.setProperty('--blitz-impact-x', `${impactRect.left - impactOverlayRect.left + impactRect.width / 2}px`);
+          overlay.style.setProperty('--blitz-impact-y', `${impactRect.top - impactOverlayRect.top + impactRect.height / 2}px`);
+        }
         overlay.classList.remove('correct-impact');
         void overlay.offsetWidth;
         overlay.classList.add('correct-impact');
@@ -3519,12 +3525,19 @@ window.BoohaBlitzEngine = (() => {
           }, 40);
         }
 
-        flashEl.style.background = stepColor;
-        flashEl.style.opacity = '0.45';
-        setTimeout(() => {
-          flashEl.style.opacity = '0';
-          flashEl.style.background = '';
-        }, 90);
+        // Normal runs use the selected card and its local glow as the
+        // confirmation. A full-screen wash reads as a blink against the
+        // photoreal scene, especially on high-brightness tablet displays.
+        // Reduced-motion runs keep one static color pulse for a clear,
+        // non-animated confirmation without particle movement.
+        if (REDUCED_MOTION) {
+          flashEl.style.background = stepColor;
+          flashEl.style.opacity = '0.45';
+          setTimeout(() => {
+            flashEl.style.opacity = '0';
+            flashEl.style.background = '';
+          }, 90);
+        }
 
         const nextDelay = milestone
           ? Math.max(config.nextDelay || 200, milestone === 15 ? 620 : 560)
