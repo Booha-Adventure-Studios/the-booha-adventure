@@ -1641,6 +1641,13 @@ else
   bad "Blitz input-lock runtime test failed"
 fi
 
+echo "[blitz] scene-SFX audit"
+if node tests/blitz-scene-sfx-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz scene-SFX audit passed"
+else
+  bad "Blitz scene-SFX audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"
