@@ -6,8 +6,8 @@ const modes = ['js/vocab-blitz.js', 'js/sentence-blitz.js', 'js/question-blitz.j
   .map(file => fs.readFileSync(file, 'utf8'));
 const verify = fs.readFileSync('verify.sh', 'utf8');
 
-assert.match(engine, /max-height: min\(76dvh, 560px\)/,
-  'wrong feedback must use the dynamic viewport height when available');
+assert.match(engine, /max-height: min\(calc\(100dvh - 112px\), 620px\)/,
+  'wrong feedback must use the available dynamic viewport height');
 assert.match(engine, /line-height: 1\.55;/,
   'wrong Japanese content must use a generous line height');
 assert.match(engine, /overflow: visible;/,
@@ -22,6 +22,10 @@ assert.match(engine, /max-height: calc\(100dvh - 24px\)/,
   'short landscape wrong feedback must fit inside the visible viewport');
 assert.match(engine, /\.blitz-wrong-feedback > \*/,
   'wrong feedback children must not shrink away the retry control');
+assert.match(engine, /justify-content: flex-start;/,
+  'tall wrong feedback must open from the top instead of clipping its first child');
+assert.match(engine, /#vb-wrong-close, #sb-wrong-close, #qb-wrong-close \{\s*position: sticky;\s*bottom: 0;/,
+  'the Continue control must remain reachable while wrong feedback scrolls');
 
 for (const source of modes) {
   assert.match(source, /wrong-kanji|wrong-jp/,
