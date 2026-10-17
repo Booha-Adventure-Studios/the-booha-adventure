@@ -608,7 +608,7 @@ const SCOLDS = [
       <div id="vb-timer-bar" class="booha-blitz-hud">
         <div id="vb-progress"></div>
         <div id="vb-timer">0.00s</div>
-        <button id="vb-quit" type="button">やめる</button>
+        <button id="vb-quit" type="button" aria-label="Exit Blitz">EXIT / やめる</button>
       </div>
 
       <div id="vb-stage" class="booha-blitz-prompt">

@@ -575,7 +575,7 @@ window.QuestionBlitz = (() => {
       <div id="qb-timer-bar" class="booha-blitz-hud">
         <div id="qb-progress"></div>
         <div id="qb-timer">0.00s</div>
-        <button id="qb-quit" type="button">やめる</button>
+        <button id="qb-quit" type="button" aria-label="Exit Blitz">EXIT / やめる</button>
       </div>
       <div id="qb-scroll">
         <div id="qb-prompt" class="booha-blitz-prompt">

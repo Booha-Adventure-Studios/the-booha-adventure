@@ -1105,15 +1105,20 @@ window.BoohaBlitzEngine = (() => {
         right: max(env(safe-area-inset-right, 0px) + 16px, 16px);
         z-index: 3;
         appearance: none;
-        border: 1px solid rgba(35, 16, 38, .32);
+        min-width: 126px;
+        min-height: 44px;
+        box-sizing: border-box;
+        border: 2px solid rgba(35, 16, 38, .72);
         border-radius: 999px;
-        padding: 8px 15px;
-        color: rgba(35, 16, 38, .78);
-        background: rgba(255,255,255,.68);
-        box-shadow: 0 4px 16px rgba(35,16,38,.16);
-        font-size: 12px;
+        padding: 10px 16px;
+        color: #241b2a;
+        background: rgba(255,250,238,.97);
+        box-shadow: 0 4px 16px rgba(35,16,38,.34), 0 0 0 2px rgba(255,255,255,.22);
+        font-size: clamp(12px, 1.7vw, 16px);
         font-weight: 950;
         letter-spacing: 1px;
+        line-height: 1;
+        white-space: nowrap;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
       }
@@ -1121,10 +1126,18 @@ window.BoohaBlitzEngine = (() => {
       #vb-quit,
       #sb-quit,
       #qb-quit {
+        z-index: 8;
+        min-width: 96px;
+        min-height: 44px;
+        box-sizing: border-box;
+        padding: 10px 16px;
         color: #241b2a;
-        background: rgba(255,255,255,.9);
-        border-color: rgba(36,27,42,.34);
-        box-shadow: 0 3px 14px rgba(0,0,0,.2);
+        background: rgba(255,250,238,.97);
+        border: 2px solid rgba(36,27,42,.72);
+        box-shadow: 0 4px 16px rgba(0,0,0,.34), 0 0 0 2px rgba(255,255,255,.22);
+        font-size: clamp(12px, 1.7vw, 16px);
+        line-height: 1;
+        white-space: nowrap;
         text-shadow: none;
       }
       #vb-quit:hover,
