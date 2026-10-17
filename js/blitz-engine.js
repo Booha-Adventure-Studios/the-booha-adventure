@@ -3446,6 +3446,7 @@ window.BoohaBlitzEngine = (() => {
             startBGM();
             scheduleTimerTick(0);
             setAnswerInputEnabled(true);
+            if (document.visibilityState === 'hidden' || document.hidden) pauseForVisibility();
             requestAnimationFrame(() => optionsEl.querySelector(`.${config.optionClass}`)?.focus());
           }, 200);
         }, 180);
@@ -3545,6 +3546,7 @@ window.BoohaBlitzEngine = (() => {
           locked = false;
           setAnswerInputEnabled(true);
           scheduleTimerTick(0);
+          if (document.visibilityState === 'hidden' || document.hidden) pauseForVisibility();
           overlay._boohaBlitzPerformanceCleanup = monitorFramePerformance(
             overlay,
             ({ tier }) => {
