@@ -14,6 +14,16 @@ assert.match(engine, /sfx: Object\.freeze\(\{ start: 'sparkle', correct: 'sparkl
   'Firefly Glade must own sparkle and warm-pulse cues');
 assert.match(engine, /fill: Object\.freeze\(\{ kind: 'circus-marquee', count: 15, positions:/,
   'Circus must own a fifteen-step persistent marquee fill');
+assert.match(engine, /\[0, 0\], \[10, 0\], \[30, 0\], \[50, 0\], \[70, 0\], \[90, 0\], \[100, 0\]/,
+  'Circus marquee bulbs must be positioned relative to the sign edge');
+assert.match(engine, /\.booha-blitz-marquee \{[\s\S]*?min-width: min\(100%, 440px\);[\s\S]*?min-height: clamp\(150px, 24vh, 220px\);/,
+  'Circus must size a stable prompt-owned sign box');
+assert.match(engine, /sign\.insertBefore\(fill, sign\.firstChild\)/,
+  'Circus marquee fill must be mounted inside the prompt-owned sign');
+assert.match(engine, /#vb-stage, #sb-prompt, #qb-prompt \{\s*box-sizing: border-box;/,
+  'Vocab stage must include padding in its width on wide layouts');
+assert.doesNotMatch(engine, /@media \(orientation: portrait\) \{\s*\.blitz-scene-fill-circus::before/,
+  'Circus must not use a separate screen-positioned portrait frame');
 assert.match(engine, /fill: Object\.freeze\(\{ kind: 'spooky-fog', count: 15 \}\)/,
   'Spooky Forest must own a fifteen-step fog reveal');
 assert.match(engine, /kind: 'firefly-swarm',[\s\S]*?portraitPositions:/,
