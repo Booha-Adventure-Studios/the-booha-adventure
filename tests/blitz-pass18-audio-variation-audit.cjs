@@ -10,8 +10,8 @@ for (const functionName of ['playStartSting', 'playCorrectHit', 'playStreakBeat'
 }
 assert.match(engine, /let streakAudioCtx = null/,
   'Blitz audio must share one lazily-created context per run');
-assert.match(engine, /const notes = palette\.feel === 'arcade' \? \[196, 147\] : palette\.feel === 'sleek' \? \[330, 247\] : \[262, 196\]/,
-  'wrong feedback must use a soft curriculum-specific descending sound');
+assert.match(engine, /const notes = sceneFeel === 'arcade' \? \[196, 147\] : sceneFeel === 'sleek' \? \[330, 247\] : \[262, 196\]/,
+  'wrong feedback must use a soft scene-specific descending sound');
 assert.match(engine, /playWrongHit\(\);/,
   'the wrong-answer path must trigger its audio feedback');
 assert.match(engine, /const pitch = base \* \(1 \+ Math\.min\(streak, 12\) \* 0\.018\)/,

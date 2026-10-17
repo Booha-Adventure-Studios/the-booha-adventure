@@ -12,8 +12,8 @@ assert.match(engine, /name\.textContent = playerName/,
   'the wallpaper should repeat the current player name');
 assert.match(engine, /overlay\.insertBefore\(wallpaper, overlay\.firstChild\)/,
   'the wallpaper should sit behind the game content');
-assert.match(engine, /if \(palette\.feel === 'playful'\) emitFireWallpaper\(overlay, spotlight\.playerName, eventThreshold\)/,
-  'only playful fire milestones should trigger the fire wallpaper');
+assert.match(engine, /if \(sceneFeel === 'playful'\) emitFireWallpaper\(overlay, spotlight\.playerName, eventThreshold\)/,
+  'only playful scene milestones should trigger the fire wallpaper');
 assert.match(engine, /setTimeout\(\(\) => wallpaper\.remove\(\), REDUCED_MOTION \? 520 : 1450\)/,
   'the wallpaper should be short-lived and cleaned up');
 assert.match(engine, /\.booha-blitz-fire-wallpaper \{[\s\S]*?pointer-events: none;/,
