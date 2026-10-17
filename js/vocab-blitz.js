@@ -131,7 +131,7 @@ const SCOLDS = [
         font-weight: 900;
         letter-spacing: 2px;
         font-variant-numeric: tabular-nums;
-        text-shadow: 0 0 24px currentColor, 0 0 48px currentColor;
+        text-shadow: 0 0 24px var(--blitz-accent), 0 0 48px var(--blitz-glow);
         transition: color 600ms ease;
         line-height: 1;
       }
