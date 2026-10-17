@@ -3025,6 +3025,7 @@ window.BoohaBlitzEngine = (() => {
       let finalHoldInterval = null;
       let runIsActive = false;
       let visibilityPaused = false;
+      let hiddenAtWallClock = 0;
       let mistakeCount = 0;
       let questionOverlayRect = null;
       let feedbackState = 'awaiting-start';
@@ -3126,6 +3127,7 @@ window.BoohaBlitzEngine = (() => {
       function pauseForVisibility() {
         if (!runIsActive || visibilityPaused || startTime === null) return;
         elapsed = performance.now() - startTime;
+        hiddenAtWallClock = Date.now();
         stopTimer();
         stopBGM();
         visibilityPaused = true;
@@ -3133,6 +3135,11 @@ window.BoohaBlitzEngine = (() => {
 
       function resumeFromVisibility() {
         if (document.visibilityState === 'hidden' || document.hidden || !visibilityPaused || !runIsActive || startTime === null) return;
+        // Time away still counts. A paused clock lets a student leave on a
+        // hard word and return with free thinking time. Wall-clock time also
+        // covers a locked screen, where performance.now() can stop advancing
+        // on iOS.
+        elapsed += Math.max(0, Date.now() - hiddenAtWallClock);
         startTime = performance.now() - elapsed;
         lastTimerPaint = -Infinity;
         timerEl.textContent = fmtTime(elapsed);
