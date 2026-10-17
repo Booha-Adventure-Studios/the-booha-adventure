@@ -59,6 +59,14 @@ window.BoohaBlitzEngine = (() => {
       rewardColors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], rewardGlow: 'rgba(240,201,106,.72)',
     }),
   });
+  // Scenes belong to the game type; curricula provide the small accent and
+  // label layer on top. Keeping this mapping here means Vocab/Sentence/
+  // Question stay visually distinct even when the same curriculum is used.
+  const BLITZ_SCENES = Object.freeze({
+    vocab: Object.freeze({ id: 'circus', label: 'CIRCUS TENT' }),
+    sentences: Object.freeze({ id: 'spooky', label: 'SPOOKY FOREST' }),
+    questions: Object.freeze({ id: 'fireflies', label: 'FIREFLY GLADE' }),
+  });
   const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 6, 9, 12, 15]);
   const STREAK_EVENT_NOTES = Object.freeze({
     playful: Object.freeze({
@@ -635,6 +643,26 @@ window.BoohaBlitzEngine = (() => {
         box-shadow: 0 0 10px var(--blitz-accent, #ff6fb5);
         transition: width 160ms ease;
       }
+      .booha-blitz-curriculum-label {
+        position: absolute;
+        top: max(env(safe-area-inset-top, 0px) + 3px, 3px);
+        left: 50%;
+        z-index: 3;
+        max-width: min(58vw, 360px);
+        overflow: hidden;
+        color: var(--blitz-accent, #ff6fb5);
+        font-size: clamp(9px, 1.9vw, 12px);
+        font-weight: 950;
+        letter-spacing: clamp(1px, .28vw, 2px);
+        line-height: 1;
+        text-align: center;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        white-space: nowrap;
+        transform: translateX(-50%);
+        text-shadow: 0 0 10px color-mix(in srgb, var(--blitz-accent, #ff6fb5) 48%, transparent);
+        pointer-events: none;
+      }
       .booha-blitz-performance-diagnostic {
         position: fixed;
         top: max(env(safe-area-inset-top, 0px) + 8px, 8px);
@@ -701,6 +729,30 @@ window.BoohaBlitzEngine = (() => {
         background:
           linear-gradient(115deg, transparent 0 34%, rgba(240, 201, 106, .18) 42%, transparent 50%),
           linear-gradient(245deg, transparent 0 58%, rgba(223, 234, 255, .14) 66%, transparent 74%);
+      }
+      /* Scene atmosphere is intentionally lightweight until the approved
+         photoreal background assets are wired in. The class names are the
+         stable handoff point for those assets and future scene SFX. */
+      .blitz-atmosphere-scene-circus {
+        background:
+          repeating-conic-gradient(from 8deg at 50% 58%, rgba(255,111,181,.17) 0 8deg, transparent 8deg 24deg),
+          radial-gradient(circle at 50% 92%, rgba(255,226,122,.26), transparent 42%),
+          linear-gradient(155deg, rgba(115,24,78,.22), rgba(245,128,74,.12) 52%, rgba(23,34,70,.18));
+      }
+      .blitz-atmosphere-scene-spooky {
+        background:
+          radial-gradient(ellipse at 50% 10%, rgba(134,228,210,.18), transparent 38%),
+          radial-gradient(ellipse at 20% 82%, rgba(37,103,119,.24), transparent 46%),
+          linear-gradient(155deg, rgba(14,57,66,.24), rgba(38,24,73,.18) 58%, rgba(7,25,38,.22));
+      }
+      .blitz-atmosphere-scene-fireflies {
+        background:
+          radial-gradient(circle at 18% 28%, rgba(255,235,137,.28) 0 2px, transparent 3px),
+          radial-gradient(circle at 72% 22%, rgba(161,255,194,.24) 0 2px, transparent 3px),
+          radial-gradient(circle at 46% 74%, rgba(255,241,144,.22) 0 3px, transparent 4px),
+          radial-gradient(ellipse at 50% 58%, rgba(36,85,106,.24), transparent 62%),
+          linear-gradient(150deg, rgba(15,31,74,.24), rgba(25,61,78,.18));
+        background-size: auto, auto, auto, auto, auto;
       }
       .blitz-compositor.low-power::before,
       .blitz-compositor.reduced-power::before,
@@ -1967,6 +2019,73 @@ window.BoohaBlitzEngine = (() => {
         width: 100%;
         min-width: 0;
       }
+      /* The scene supplies the visual wonder; answer controls stay on one
+         calm, high-contrast surface and use the curriculum accent sparingly. */
+      .blitz-scene-circus .vb-opt,
+      .blitz-scene-spooky .vb-opt,
+      .blitz-scene-fireflies .vb-opt,
+      .blitz-scene-circus .sb-opt,
+      .blitz-scene-spooky .sb-opt,
+      .blitz-scene-fireflies .sb-opt,
+      .blitz-scene-circus .qb-opt,
+      .blitz-scene-spooky .qb-opt,
+      .blitz-scene-fireflies .qb-opt {
+        min-height: 48px;
+        color: #fff8dc !important;
+        -webkit-text-stroke-color: rgba(4, 18, 28, .74) !important;
+        border-color: var(--blitz-accent, #ff6fb5) !important;
+        background-color: rgba(9, 26, 39, .82) !important;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 10px 24px rgba(2,16,25,.30), inset 0 1px 0 rgba(255,255,255,.16);
+      }
+      .blitz-scene-circus .vb-opt:hover,
+      .blitz-scene-spooky .vb-opt:hover,
+      .blitz-scene-fireflies .vb-opt:hover,
+      .blitz-scene-circus .sb-opt:hover,
+      .blitz-scene-spooky .sb-opt:hover,
+      .blitz-scene-fireflies .sb-opt:hover,
+      .blitz-scene-circus .qb-opt:hover,
+      .blitz-scene-spooky .qb-opt:hover,
+      .blitz-scene-fireflies .qb-opt:hover,
+      .blitz-scene-circus .vb-opt:focus-visible,
+      .blitz-scene-spooky .vb-opt:focus-visible,
+      .blitz-scene-fireflies .vb-opt:focus-visible,
+      .blitz-scene-circus .sb-opt:focus-visible,
+      .blitz-scene-spooky .sb-opt:focus-visible,
+      .blitz-scene-fireflies .sb-opt:focus-visible,
+      .blitz-scene-circus .qb-opt:focus-visible,
+      .blitz-scene-spooky .qb-opt:focus-visible,
+      .blitz-scene-fireflies .qb-opt:focus-visible {
+        border-color: #fff3a6 !important;
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--blitz-accent, #ff6fb5) 32%, transparent), 0 0 20px color-mix(in srgb, var(--blitz-accent, #ff6fb5) 42%, transparent), inset 0 1px 0 rgba(255,255,255,.22);
+        transform: translateY(-2px);
+        outline: none;
+      }
+      .blitz-scene-circus .vb-opt.correct,
+      .blitz-scene-spooky .vb-opt.correct,
+      .blitz-scene-fireflies .vb-opt.correct,
+      .blitz-scene-circus .sb-opt.correct,
+      .blitz-scene-spooky .sb-opt.correct,
+      .blitz-scene-fireflies .sb-opt.correct,
+      .blitz-scene-circus .qb-opt.correct,
+      .blitz-scene-spooky .qb-opt.correct,
+      .blitz-scene-fireflies .qb-opt.correct {
+        background-color: var(--blitz-correct, #00ff64) !important;
+        border-color: var(--blitz-correct, #00ff64) !important;
+        color: #07131a !important;
+      }
+      .blitz-scene-circus .vb-opt.wrong,
+      .blitz-scene-spooky .vb-opt.wrong,
+      .blitz-scene-fireflies .vb-opt.wrong,
+      .blitz-scene-circus .sb-opt.wrong,
+      .blitz-scene-spooky .sb-opt.wrong,
+      .blitz-scene-fireflies .sb-opt.wrong,
+      .blitz-scene-circus .qb-opt.wrong,
+      .blitz-scene-spooky .qb-opt.wrong,
+      .blitz-scene-fireflies .qb-opt.wrong {
+        background-color: var(--blitz-wrong, #ff536d) !important;
+        border-color: var(--blitz-wrong, #ff536d) !important;
+        color: #210c16 !important;
+      }
       .booha-blitz-final-summary + .booha-blitz-final-hold + .vb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .sb-win-buttons,
       .booha-blitz-final-summary + .booha-blitz-final-hold + .qb-win-buttons { margin-top: 4px; }
@@ -2255,6 +2374,7 @@ window.BoohaBlitzEngine = (() => {
   function create(config) {
     const ids = config.ids;
     const selector = (key) => ids[key];
+    const scene = BLITZ_SCENES[config.gameType] || BLITZ_SCENES.vocab;
     let stylesInjected = false;
     let compositorStylesInjected = false;
 
@@ -2409,12 +2529,25 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-option-y', motion.optionY || '12px');
       overlay.style.setProperty('--blitz-option-scale', motion.optionScale || '.96');
       overlay.classList.add(`blitz-feel-${palette.feel || 'arcade'}`);
+      overlay.classList.add(`blitz-scene-${scene.id}`);
+      overlay.dataset.blitzScene = scene.id;
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
         overlay.style.setProperty(name, typeof value === 'function' ? value(palette) : value);
       });
       overlay.style.background = '#ffffff';
       const timer = overlay.querySelector(selector('timer'));
       if (timer) timer.style.color = 'var(--blitz-ink, #14161c)';
+    }
+
+    function mountCurriculumLabel(overlay, palette) {
+      const timer = overlay.querySelector(selector('timer'));
+      const hud = timer?.closest('.booha-blitz-hud');
+      if (!hud) return;
+      const label = document.createElement('div');
+      label.className = 'booha-blitz-curriculum-label';
+      label.textContent = palette.name || 'CURRICULUM';
+      label.setAttribute('aria-label', `Curriculum: ${palette.name || 'Curriculum'}`);
+      hud.appendChild(label);
     }
 
     function createProgressMeter(overlay, palette) {
@@ -2627,9 +2760,13 @@ window.BoohaBlitzEngine = (() => {
       emitFinishFlash(overlay, palette, playerName, 'perfect');
     }
 
-    function mountPersistentAtmosphere(overlay, palette) {
+    function mountPersistentAtmosphere(overlay, palette, scene) {
       const atmosphere = document.createElement('div');
-      atmosphere.className = `booha-blitz-atmosphere blitz-atmosphere-${palette.feel || 'arcade'}`;
+      atmosphere.className = [
+        'booha-blitz-atmosphere',
+        `blitz-atmosphere-${palette.feel || 'arcade'}`,
+        `blitz-atmosphere-scene-${scene.id}`,
+      ].join(' ');
       atmosphere.setAttribute('aria-hidden', 'true');
       overlay.insertBefore(atmosphere, overlay.firstChild);
     }
@@ -2831,7 +2968,8 @@ window.BoohaBlitzEngine = (() => {
       applyPerformanceTier(overlay);
       overlay.classList.add('blitz-compositor');
       applyPalette(overlay, palette);
-      mountPersistentAtmosphere(overlay, palette);
+      mountCurriculumLabel(overlay, palette);
+      mountPersistentAtmosphere(overlay, palette, scene);
       const performanceDiagnostic = createPerformanceDiagnostic(overlay);
       performanceDiagnostic?.update({ status: 'ready' });
 
