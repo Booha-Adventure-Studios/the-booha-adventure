@@ -12,10 +12,12 @@ assert.match(engine, /sfx: Object\.freeze\(\{ start: 'wood-click', correct: 'woo
   'Spooky Forest must own wood-click and chime cues');
 assert.match(engine, /sfx: Object\.freeze\(\{ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'warm-pulse', finish: 'warm-pulse' \}\)/,
   'Firefly Glade must own sparkle and warm-pulse cues');
-assert.match(engine, /fill: Object\.freeze\(\{ kind: 'circus-marquee', count: 15, positions:/,
+assert.match(engine, /fill: Object\.freeze\(\{ kind: 'circus-marquee', count: 15 \}\)/,
   'Circus must own a fifteen-step persistent marquee fill');
-assert.match(engine, /\[0, 0\], \[10, 0\], \[30, 0\], \[50, 0\], \[70, 0\], \[90, 0\], \[100, 0\]/,
-  'Circus marquee bulbs must be positioned relative to the sign edge');
+assert.match(engine, /const step = \(2 \* \(w \+ h\)\) \/ items\.length/,
+  'Circus marquee bulbs must be spaced from the sign perimeter, not hand-tuned percentages');
+assert.match(engine, /new ResizeObserver\(layoutMarquee\)/,
+  'Circus marquee must relayout when its prompt-owned sign resizes');
 assert.match(engine, /\.booha-blitz-marquee \{[\s\S]*?min-width: min\(100%, 440px\);[\s\S]*?min-height: clamp\(150px, 24vh, 220px\);/,
   'Circus must size a stable prompt-owned sign box');
 assert.match(engine, /sign\.insertBefore\(fill, sign\.firstChild\)/,
@@ -64,10 +66,18 @@ assert.match(engine, /setCount\(correctCount = 0, \{ setback = false \} = \{\}\)
   'scene fills must share a progress and setback contract');
 assert.match(engine, /--blitz-spooky-fog-opacity/,
   'Spooky Forest must express progress through fog opacity');
-assert.match(engine, /@keyframes boohaBlitzFireflyGather/,
-  'Firefly Glade must gather each light from the prompt area');
-assert.match(engine, /@keyframes boohaBlitzFireflyScatter/,
+assert.match(engine, /const flight = item\.animate\(\[/,
+  'Firefly Glade must fly each new light with a stable Web Animations API flight');
+assert.match(engine, /const scatterMotion = item\.animate\(\[/,
   'Firefly Glade must scatter lights on a setback');
+assert.match(engine, /item\._boohaMotion\?\.cancel\(\)/,
+  'Firefly motion must cancel stale flight or scatter animations before retrying');
+assert.doesNotMatch(engine, /@keyframes boohaBlitzFireflyGather|@keyframes boohaBlitzFireflyScatter/,
+  'Firefly movement must not depend on CSS keyframes that rewrite left/top');
+assert.doesNotMatch(engine, /left: var\(--firefly-left\)|top: var\(--firefly-top\)/,
+  'Firefly reduced-motion rules must not depend on mutable CSS position variables');
+assert.match(engine, /overlay\._boohaBlitzSceneFillCleanup = sceneFill\.destroy/,
+  'Scene fill observers and motion must be cleaned up with the game overlay');
 assert.match(engine, /blitz-scene-fill-fireflies\.all-lit/,
   'Firefly Glade must have a shared full-ring finish state');
 assert.match(engine, /@keyframes boohaBlitzMarqueePopOut/,
