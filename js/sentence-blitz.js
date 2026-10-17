@@ -178,15 +178,22 @@ window.SentenceBlitz = (() => {
         font-weight: 900;
         line-height: 1.3;
         text-align: center;
-        color: var(--blitz-ink, #14161c);
-        -webkit-text-stroke: 1px var(--blitz-ink-outline, transparent);
+        color: var(--blitz-prompt-ink, #fff7df);
+        -webkit-text-stroke: 1px var(--blitz-prompt-outline, rgba(3, 8, 16, .86));
         paint-order: stroke fill;
         text-shadow:
+          0 3px 0 rgba(3, 8, 16, .72),
+          0 6px 18px rgba(3, 8, 16, .74),
           0 0 calc(var(--blitz-word-glow, 64px) * .5) var(--blitz-word-glow-color, var(--sb-glow)),
           0 0 var(--blitz-word-glow, 64px) var(--blitz-word-glow-color, var(--sb-glow)),
           0 0 calc(var(--blitz-word-glow, 64px) * 1.5) var(--blitz-word-glow-color, var(--sb-glow));
         animation: sbWordPop 300ms cubic-bezier(.34,1.56,.64,1) both;
-        max-width: 680px; width: 100%;
+        max-width: min(680px, 100%); width: 100%;
+        box-sizing: border-box;
+        padding-inline: 8px;
+        overflow-wrap: anywhere;
+        white-space: normal;
+        text-wrap: balance;
       }
       @keyframes sbWordPop {
         from { transform: scale(0.85); opacity: 0; }
@@ -195,10 +202,10 @@ window.SentenceBlitz = (() => {
 
       #sb-hira {
         font-size: clamp(12px,min(2.5vw,2.5vh),18px);
-        color: var(--blitz-ink, #14161c);
-        -webkit-text-stroke: 1px var(--blitz-ink-outline, transparent);
+        color: var(--blitz-prompt-ink, #fff7df);
+        -webkit-text-stroke: 1px var(--blitz-prompt-outline, rgba(3, 8, 16, .86));
         paint-order: stroke fill;
-        opacity: .7;
+        opacity: .94;
         text-align: center;
         letter-spacing: 1.5px;
         line-height: 1.6;
@@ -277,7 +284,7 @@ window.SentenceBlitz = (() => {
           gap: clamp(14px, 1.6vw, 24px);
           padding: 0 clamp(24px, 4vw, 64px) clamp(24px, 4vh, 56px) 0;
         }
-        #sb-jp-word { font-size: clamp(34px, 4.2vw, 78px); }
+        #sb-jp-word { font-size: clamp(30px, 3.2vw, 58px); }
         #sb-hira { font-size: clamp(20px, 2.2vw, 34px); }
         .sb-opt {
           font-size: clamp(20px, 1.8vw, 32px);
