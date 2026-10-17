@@ -618,14 +618,15 @@ const SCOLDS = [
 
       <div id="vb-options" class="booha-blitz-answer"></div>
 
-      <div id="vb-wrong-popup" class="blitz-wrong-feedback">
+      <div id="vb-wrong-popup" class="blitz-wrong-feedback blitz-wrong-compact">
         <div class="vb-wrong-kanji" id="vwk"></div>
         <div class="vb-wrong-hira"  id="vwh"></div>
         <div class="vb-wrong-en"    id="vwe"></div>
-        <div class="vb-wrong-scold-jp"   id="vsj"></div>
-        <div class="vb-wrong-scold-hira" id="vsh"></div>
-        <div class="vb-wrong-scold-en"   id="vse"></div>
-        <div id="vb-wrong-status">READY FOR THE NEXT TRY</div>
+        <div class="blitz-wrong-joke" aria-live="polite">
+          <div class="vb-wrong-scold-jp"   id="vsj"></div>
+          <div class="vb-wrong-scold-hira" id="vsh"></div>
+          <div class="vb-wrong-scold-en"   id="vse"></div>
+        </div>
         <button id="vb-wrong-close" type="button">つぎへ / CONTINUE</button>
       </div>
 

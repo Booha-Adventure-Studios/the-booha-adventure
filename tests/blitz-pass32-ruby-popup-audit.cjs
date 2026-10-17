@@ -12,8 +12,8 @@ assert.match(engine, /line-height: 1\.55;/,
   'wrong Japanese content must use a generous line height');
 assert.match(engine, /overflow: visible;/,
   'wrong Japanese content must not clip long feedback text');
-assert.match(engine, /function renderSeparateReading\(jpContainer, hiraContainer, jp, hira\)/,
-  'wrong feedback must use separate Japanese and furigana blocks');
+assert.match(engine, /function renderRubyReading\(jpContainer, hiraContainer, jp, hira\)/,
+  'compact wrong feedback must use one Japanese line with inline ruby reading');
 assert.doesNotMatch(engine, /renderFurigana\(/,
   'wrong feedback must not rely on the old ruby renderer');
 assert.match(engine, /wrongPopup\.scrollTop = 0;[\s\S]*?wrongPopup\.classList\.add\('show'\)/,
@@ -35,4 +35,4 @@ for (const source of modes) {
 assert.match(verify, /tests\/blitz-pass32-ruby-popup-audit\.cjs/,
   'verify.sh must run the ruby popup audit');
 
-console.log('Blitz separate-reading popup audit passed: long Japanese feedback has safe spacing, scrolling, and retry reachability.');
+console.log('Blitz wrong-strip audit passed: feedback stays compact, readable, and retryable.');
