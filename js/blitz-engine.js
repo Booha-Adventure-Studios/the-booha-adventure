@@ -98,15 +98,17 @@ window.BoohaBlitzEngine = (() => {
       fill: Object.freeze({
         kind: 'firefly-swarm',
         count: 15,
+        // Loose, uneven scatter that stays clear of the answer column (landscape)
+        // and the answer block (portrait). Even spacing reads as bulbs.
         positions: Object.freeze([
-          [19, 38], [25, 30], [33, 25], [42, 22], [52, 24],
-          [60, 29], [67, 38], [69, 49], [66, 61], [59, 70],
-          [50, 76], [40, 76], [31, 70], [24, 61], [19, 50],
+          [9, 24], [21, 15], [34, 22], [46, 13], [14, 40],
+          [29, 33], [43, 36], [6, 58], [22, 70], [37, 76],
+          [49, 62], [12, 86], [27, 91], [44, 88], [51, 30],
         ]),
         portraitPositions: Object.freeze([
-          [24, 35], [32, 28], [42, 24], [52, 23], [62, 26],
-          [71, 33], [77, 43], [78, 54], [73, 65], [64, 73],
-          [52, 78], [41, 76], [31, 70], [24, 61], [21, 49],
+          [7, 72], [21, 79], [36, 71], [53, 80], [68, 73],
+          [85, 79], [94, 70], [13, 89], [29, 94], [46, 88],
+          [61, 95], [77, 90], [90, 86], [8, 15], [93, 18],
         ]),
       }),
       motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, optionDurationMs: 260, optionStaggerMs: 30, optionX: '0px', optionY: '8px', optionScale: '.97' }),
@@ -830,7 +832,7 @@ window.BoohaBlitzEngine = (() => {
       .booha-blitz-scene-fill {
         position: absolute;
         inset: 0;
-        z-index: 2;
+        z-index: 1;
         pointer-events: none;
         overflow: hidden;
       }
@@ -918,11 +920,27 @@ window.BoohaBlitzEngine = (() => {
         mix-blend-mode: screen;
       }
       .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item {
-        width: clamp(7px, 1vw, 16px);
+        left: 50%;
+        top: 50%;
+        width: clamp(22px, 2.6vw, 38px);
         z-index: 1;
         opacity: 0;
-        background: radial-gradient(circle at 34% 30%, #fffde6 0 16%, var(--firefly-color, #ffe98b) 42%, transparent 74%);
-        box-shadow: 0 0 8px 2px var(--firefly-color, #ffe98b), 0 0 22px 5px color-mix(in srgb, var(--firefly-color, #ffe98b) 58%, transparent);
+        background: radial-gradient(circle,
+          #ffffff 0 7%,
+          var(--firefly-color, #ffe98b) 14%,
+          color-mix(in srgb, var(--firefly-color, #ffe98b) 45%, transparent) 30%,
+          color-mix(in srgb, var(--firefly-color, #ffe98b) 14%, transparent) 50%,
+          transparent 70%);
+        mix-blend-mode: screen;
+      }
+      .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: inherit;
+        opacity: 0;
+        animation: boohaBlitzFireflyBlink var(--firefly-blink, 2.6s) ease-in-out var(--firefly-delay, 0ms) infinite;
       }
       .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit {
         animation: boohaBlitzFireflyGather 720ms cubic-bezier(.2, .9, .25, 1) both;
@@ -930,8 +948,10 @@ window.BoohaBlitzEngine = (() => {
       .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.firefly-settled {
         left: var(--firefly-left);
         top: var(--firefly-top);
-        opacity: .92;
-        animation: boohaBlitzFireflyDrift var(--firefly-drift, 2.8s) ease-in-out var(--firefly-delay, 0ms) infinite alternate;
+        opacity: 1;
+        animation:
+          boohaBlitzFireflyDrift var(--firefly-drift, 6s) ease-in-out var(--firefly-delay, 0ms) infinite alternate,
+          boohaBlitzFireflyGlow var(--firefly-blink, 2.6s) ease-in-out var(--firefly-delay, 0ms) infinite;
       }
       .blitz-scene-fill-fireflies.all-lit .booha-blitz-scene-fill-item.firefly-settled {
         animation: boohaBlitzFireflyRingPulse 1.8s ease-in-out var(--firefly-delay, 0ms) infinite alternate;
@@ -944,8 +964,20 @@ window.BoohaBlitzEngine = (() => {
         to { left: var(--firefly-left); top: var(--firefly-top); opacity: .92; transform: translate(-50%, -50%) scale(1); }
       }
       @keyframes boohaBlitzFireflyDrift {
-        from { transform: translate(-50%, -50%) translate(-2px, 1px) scale(.88); filter: brightness(.9); }
-        to { transform: translate(-50%, -50%) translate(3px, -3px) scale(1.12); filter: brightness(1.3); }
+        0% { transform: translate(-50%, -50%) translate(0, 0); }
+        35% { transform: translate(-50%, -50%) translate(calc(var(--firefly-wx, 12px) * .6), calc(var(--firefly-wy, -10px) * -.4)); }
+        70% { transform: translate(-50%, -50%) translate(calc(var(--firefly-wx, 12px) * -.3), var(--firefly-wy, -10px)); }
+        100% { transform: translate(-50%, -50%) translate(var(--firefly-wx, 12px), calc(var(--firefly-wy, -10px) * .5)); }
+      }
+      /* Real fireflies fade almost out between flashes; bulbs never do. */
+      @keyframes boohaBlitzFireflyGlow {
+        0%, 100% { opacity: .28; }
+        40% { opacity: 1; }
+        60% { opacity: .9; }
+      }
+      @keyframes boohaBlitzFireflyBlink {
+        0%, 70%, 100% { opacity: 0; }
+        42% { opacity: .9; }
       }
       @keyframes boohaBlitzFireflyRingPulse {
         from { transform: translate(-50%, -50%) scale(.86); filter: brightness(.92); }
@@ -990,6 +1022,10 @@ window.BoohaBlitzEngine = (() => {
       .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
         opacity: 0;
       }
+      .blitz-compositor.low-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item::after,
+      .blitz-compositor.reduced-power .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item::after {
+        animation: none;
+      }
       @media (prefers-reduced-motion: reduce) {
         .blitz-scene-fill-spooky::before,
         .blitz-scene-fill-spooky::after {
@@ -1010,6 +1046,9 @@ window.BoohaBlitzEngine = (() => {
         .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-scattering {
           animation: none;
           opacity: 0;
+        }
+        .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item::after {
+          animation: none;
         }
       }
       @keyframes boohaBlitzAurora {
@@ -1642,6 +1681,11 @@ window.BoohaBlitzEngine = (() => {
       #vb-progress, #sb-progress, #qb-progress {
         color: rgba(255, 247, 223, .82);
         text-shadow: 0 2px 6px rgba(3, 8, 16, .8);
+      }
+      #vb-options, #sb-options, #qb-options,
+      #vb-stage, #sb-prompt, #qb-prompt {
+        position: relative;
+        z-index: 3;
       }
       #vb-options, #sb-options, #qb-options,
       #vb-stage, #sb-prompt, #qb-prompt {
@@ -3378,7 +3422,8 @@ window.BoohaBlitzEngine = (() => {
         return { setCount() {} };
       }
       const isFirefly = kind === 'firefly-swarm';
-      const colors = ['#ffe98b', '#8fffc4', '#8bd7ff', '#d9a7ff', '#ff9bcf', '#ffd27d'];
+      // 15 distinct hues, spread so neighbouring fireflies never look alike.
+      const fireflyHues = [52, 160, 200, 290, 330, 95, 25, 240, 180, 310, 70, 130, 220, 0, 270];
       const items = positions.map(([left, top], index) => {
         const item = document.createElement('span');
         item.className = 'booha-blitz-scene-fill-item';
@@ -3386,11 +3431,12 @@ window.BoohaBlitzEngine = (() => {
         item.dataset.positionLeft = String(left);
         item.dataset.positionTop = String(top);
         if (isFirefly) {
-          item.style.left = '50%';
-          item.style.top = '50%';
-          item.style.setProperty('--firefly-color', colors[index % colors.length]);
-          item.style.setProperty('--firefly-drift', `${2.3 + (index % 4) * .35}s`);
-          item.style.setProperty('--firefly-delay', `${(index % 5) * 180}ms`);
+          item.style.setProperty('--firefly-color', `hsl(${fireflyHues[index % fireflyHues.length]} 100% 72%)`);
+          item.style.setProperty('--firefly-drift', `${5.5 + (index * 7 % 11) * .45}s`);
+          item.style.setProperty('--firefly-blink', `${2.1 + (index * 5 % 9) * .37}s`);
+          item.style.setProperty('--firefly-delay', `${-(index * 613 % 4000)}ms`);
+          item.style.setProperty('--firefly-wx', `${(index * 29 % 41) - 20}px`);
+          item.style.setProperty('--firefly-wy', `${(index * 17 % 33) - 16}px`);
         } else {
           item.style.left = `${left}%`;
           item.style.top = `${top}%`;
@@ -3424,8 +3470,6 @@ window.BoohaBlitzEngine = (() => {
 
       const resetFireflyItem = (item) => {
         item.classList.remove('is-lit', 'firefly-settled', 'is-scattering');
-        item.style.left = '50%';
-        item.style.top = '50%';
       };
       return {
         setCount(correctCount = 0, { setback = false } = {}) {
@@ -3453,13 +3497,8 @@ window.BoohaBlitzEngine = (() => {
                 resetFireflyItem(item);
                 return;
               }
-              const wasLit = item.classList.contains('is-lit') || item.classList.contains('firefly-settled');
               item.classList.remove('is-scattering');
               item.classList.add('is-lit');
-              if (!wasLit) {
-                item.style.left = '50%';
-                item.style.top = '50%';
-              }
               const token = `${version}:${index}`;
               item.dataset.settleToken = token;
               setTimeout(() => {
