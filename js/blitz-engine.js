@@ -2634,7 +2634,7 @@ window.BoohaBlitzEngine = (() => {
       });
       overlay.style.background = '#ffffff';
       const timer = overlay.querySelector(selector('timer'));
-      if (timer) timer.style.color = 'var(--blitz-ink, #14161c)';
+      if (timer) timer.style.color = 'var(--blitz-prompt-ink, #fff7df)';
     }
 
     function mountCurriculumLabel(overlay, palette) {
