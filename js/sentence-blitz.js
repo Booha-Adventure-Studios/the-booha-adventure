@@ -278,17 +278,19 @@ window.SentenceBlitz = (() => {
         #sb-options {
           grid-column: 2;
           grid-row: 2;
-          align-self: center;
+          align-self: safe center;
           width: 100%;
           max-width: none;
+          max-height: 100%;
+          overflow-y: auto;
           gap: clamp(14px, 1.6vw, 24px);
           padding: 0 clamp(24px, 4vw, 64px) clamp(24px, 4vh, 56px) 0;
         }
         #sb-jp-word { font-size: clamp(30px, 3.2vw, 58px); }
         #sb-hira { font-size: clamp(20px, 2.2vw, 34px); }
         .sb-opt {
-          font-size: clamp(20px, 1.8vw, 32px);
-          padding: clamp(18px, 2vh, 30px) clamp(16px, 1.6vw, 28px);
+          font-size: clamp(16px, 1.45vw, 24px);
+          padding: clamp(12px, 1.6vh, 22px) clamp(14px, 1.4vw, 24px);
           border-radius: clamp(16px, 1.6vw, 26px);
         }
       }

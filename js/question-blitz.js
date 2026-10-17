@@ -269,7 +269,7 @@ window.QuestionBlitz = (() => {
         #qb-options {
           grid-column: 2;
           grid-row: 2;
-          align-self: center;
+          align-self: safe center;
           width: 100%;
           max-width: none;
           gap: clamp(14px, 1.6vw, 24px);
