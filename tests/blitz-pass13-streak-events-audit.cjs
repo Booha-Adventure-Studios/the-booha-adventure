@@ -28,10 +28,12 @@ assert.match(engine, /function playStreakBeat\(threshold\)/,
   'threshold feedback must include a cached WebAudio beat');
 assert.match(engine, /window\.AudioContext \|\| window\.webkitAudioContext/,
   'audio must use a browser-native lightweight fallback path');
+assert.match(engine, /const sceneFeel = sceneMotion\.feel \|\| palette\.feel \|\| 'arcade'/,
+  'streak personality must resolve from the active game scene before the curriculum fallback');
 assert.match(engine, /STREAK_EVENT_THRESHOLDS\.includes\(streak\)/,
   'the answer flow must fire only on exact threshold hits');
-assert.match(engine, /spotlight\.announce\(copy\[palette\.feel\]\?\.\[eventThreshold\]/,
-  'each threshold must announce its curriculum-specific milestone copy');
+assert.match(engine, /spotlight\.announce\(copy\[sceneFeel\]\?\.\[eventThreshold\]/,
+  'each threshold must announce its scene-specific milestone copy');
 assert.match(engine, /const fullCount = \(\{ 3: 6, 6: 12, 9: 20, 12: 32, 15: 48 \}\)\[threshold\]/,
   'milestone particles must escalate across the unified ladder');
 assert.match(engine, /const holdMs = \(\{ 3: 900, 6: 1000, 9: 1120, 12: 1300, 15: 1500 \}\)\[threshold\]/,

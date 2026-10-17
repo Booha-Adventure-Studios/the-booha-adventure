@@ -20,6 +20,7 @@ window.BoohaBlitzEngine = (() => {
       streak: Object.freeze({ label: 'STREAK', marker: '★', colors: ['#ffffff', '#ffe66b', '#ffad55', '#ff6d78', '#ff6ccf'], glow: 'rgba(255,125,196,.62)' }),
       reward: Object.freeze({ colors: ['#fffbe1', '#ffe27a', '#ff8ec8', '#ffffff'], glow: 'rgba(255,184,72,.72)' }),
       shape: Object.freeze({ optionRadius: 'round', popupRadius: '28px', particle: 'round' }),
+      // Compatibility fallback; scene motion is the runtime source of truth.
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
       particleShape: 'round', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, feel: 'playful',
       rewardColors: ['#fffbe1', '#ffe27a', '#ff8ec8', '#ffffff'], rewardGlow: 'rgba(255,184,72,.72)',
@@ -65,9 +66,27 @@ window.BoohaBlitzEngine = (() => {
   const BLITZ_SCENE_IMAGE_ROOT = ['assets', 'img', 'blitz'].join('/') + '/';
   const BLITZ_SCENE_IMAGE_EXT = '.web' + 'p';
   const BLITZ_SCENES = Object.freeze({
-    vocab: Object.freeze({ id: 'circus', label: 'CIRCUS TENT', image: BLITZ_SCENE_IMAGE_ROOT + 'vocab-circus' + BLITZ_SCENE_IMAGE_EXT }),
-    sentences: Object.freeze({ id: 'spooky', label: 'SPOOKY FOREST', image: BLITZ_SCENE_IMAGE_ROOT + 'sentence-spooky' + BLITZ_SCENE_IMAGE_EXT }),
-    questions: Object.freeze({ id: 'fireflies', label: 'FIREFLY GLADE', image: BLITZ_SCENE_IMAGE_ROOT + 'question-fireflies' + BLITZ_SCENE_IMAGE_EXT }),
+    vocab: Object.freeze({
+      id: 'circus',
+      label: 'CIRCUS TENT',
+      image: BLITZ_SCENE_IMAGE_ROOT + 'vocab-circus' + BLITZ_SCENE_IMAGE_EXT,
+      backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '22% center' }),
+      motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
+    }),
+    sentences: Object.freeze({
+      id: 'spooky',
+      label: 'SPOOKY FOREST',
+      image: BLITZ_SCENE_IMAGE_ROOT + 'sentence-spooky' + BLITZ_SCENE_IMAGE_EXT,
+      backgroundPosition: Object.freeze({ landscape: 'center center', portrait: 'center center' }),
+      motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
+    }),
+    questions: Object.freeze({
+      id: 'fireflies',
+      label: 'FIREFLY GLADE',
+      image: BLITZ_SCENE_IMAGE_ROOT + 'question-fireflies' + BLITZ_SCENE_IMAGE_EXT,
+      backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '78% center' }),
+      motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, optionDurationMs: 260, optionStaggerMs: 30, optionX: '0px', optionY: '8px', optionScale: '.97' }),
+    }),
   });
   const STREAK_EVENT_THRESHOLDS = Object.freeze([3, 6, 9, 12, 15]);
   const STREAK_EVENT_NOTES = Object.freeze({
@@ -721,10 +740,15 @@ window.BoohaBlitzEngine = (() => {
         position: absolute;
         inset: 0;
         z-index: 0;
-        background-position: center;
+        background-position: var(--blitz-scene-position, center center);
         background-repeat: no-repeat;
         background-size: cover;
         pointer-events: none;
+      }
+      @media (orientation: portrait) {
+        .booha-blitz-scene-backdrop {
+          background-position: var(--blitz-scene-position-portrait, var(--blitz-scene-position, center center));
+        }
       }
       .booha-blitz-scene-backdrop::after {
         content: '';
@@ -747,9 +771,6 @@ window.BoohaBlitzEngine = (() => {
           linear-gradient(115deg, transparent 0 34%, rgba(240, 201, 106, .18) 42%, transparent 50%),
           linear-gradient(245deg, transparent 0 58%, rgba(223, 234, 255, .14) 66%, transparent 74%);
       }
-      /* Scene atmosphere is intentionally lightweight until the approved
-         photoreal background assets are wired in. The class names are the
-         stable handoff point for those assets and future scene SFX. */
       .blitz-atmosphere-scene-circus {
         background:
           repeating-conic-gradient(from 8deg at 50% 58%, rgba(255,111,181,.17) 0 8deg, transparent 8deg 24deg),
@@ -2405,6 +2426,12 @@ window.BoohaBlitzEngine = (() => {
     const ids = config.ids;
     const selector = (key) => ids[key];
     const scene = BLITZ_SCENES[config.gameType] || BLITZ_SCENES.vocab;
+    function motionFor(palette) {
+      return scene.motion || palette.motion || {};
+    }
+    function feelFor(palette) {
+      return motionFor(palette).feel || palette.feel || 'arcade';
+    }
     let stylesInjected = false;
     let compositorStylesInjected = false;
 
@@ -2534,10 +2561,12 @@ window.BoohaBlitzEngine = (() => {
     }
 
     function applyPalette(overlay, palette) {
+      const motion = motionFor(palette);
+      const feel = motion.feel || palette.feel || 'arcade';
       overlay.style.setProperty('--blitz-accent', palette.accent);
       overlay.style.setProperty('--blitz-glow', palette.glow);
       overlay.style.setProperty('--blitz-reward-glow', palette.rewardGlow || palette.glow);
-      overlay.style.setProperty('--blitz-name-ease', palette.nameEasing || 'ease-out');
+      overlay.style.setProperty('--blitz-name-ease', motion.nameEasing || palette.nameEasing || 'ease-out');
       overlay.style.setProperty('--blitz-bg-main', '#ffffff');
       overlay.style.setProperty('--blitz-bg-secondary', 'rgba(0,0,0,.03)');
       overlay.style.setProperty('--blitz-ink', '#14161c');
@@ -2553,14 +2582,13 @@ window.BoohaBlitzEngine = (() => {
       overlay.style.setProperty('--blitz-popup-bg', palette.popup?.background || 'rgba(0,0,0,.92)');
       overlay.style.setProperty('--blitz-streak-glow', palette.streak?.glow || palette.glow);
       overlay.style.setProperty('--blitz-option-bg', palette.optionBg || 'rgba(255,255,255,.14)');
-      const motion = palette.motion || {};
       overlay.style.setProperty('--blitz-motion-ease', motion.particleEasing || palette.particleEasing || 'ease-out');
       overlay.style.setProperty('--blitz-option-duration', `${motion.optionDurationMs || 320}ms`);
       overlay.style.setProperty('--blitz-option-stagger', `${motion.optionStaggerMs || 36}ms`);
       overlay.style.setProperty('--blitz-option-x', motion.optionX || '0px');
       overlay.style.setProperty('--blitz-option-y', motion.optionY || '12px');
       overlay.style.setProperty('--blitz-option-scale', motion.optionScale || '.96');
-      overlay.classList.add(`blitz-feel-${palette.feel || 'arcade'}`);
+      overlay.classList.add(`blitz-feel-${feel}`);
       overlay.classList.add(`blitz-scene-${scene.id}`);
       overlay.dataset.blitzScene = scene.id;
       Object.entries(config.cssVars || {}).forEach(([name, value]) => {
@@ -2797,6 +2825,8 @@ window.BoohaBlitzEngine = (() => {
       const backdrop = document.createElement('div');
       backdrop.className = 'booha-blitz-scene-backdrop';
       backdrop.style.backgroundImage = `url("${scene.image}")`;
+      backdrop.style.setProperty('--blitz-scene-position', scene.backgroundPosition?.landscape || 'center center');
+      backdrop.style.setProperty('--blitz-scene-position-portrait', scene.backgroundPosition?.portrait || scene.backgroundPosition?.landscape || 'center center');
       backdrop.setAttribute('aria-hidden', 'true');
       overlay.insertBefore(backdrop, overlay.firstChild);
     }
@@ -2805,7 +2835,7 @@ window.BoohaBlitzEngine = (() => {
       const atmosphere = document.createElement('div');
       atmosphere.className = [
         'booha-blitz-atmosphere',
-        `blitz-atmosphere-${palette.feel || 'arcade'}`,
+        `blitz-atmosphere-${feelFor(palette)}`,
         `blitz-atmosphere-scene-${scene.id}`,
       ].join(' ');
       atmosphere.setAttribute('aria-hidden', 'true');
@@ -2891,7 +2921,7 @@ window.BoohaBlitzEngine = (() => {
       const spectacleScale = speedBand === 'elite' ? 1.4 : speedBand === 'target' ? 1 : .6;
       const nameCount = Math.max(8, Math.round((finalCard.nameCount ?? 34) * spectacleScale));
       const nameDuration = (finalCard.nameDuration ?? 3800) + (speedBand === 'elite' ? 800 : speedBand === 'target' ? 250 : 0);
-      const particleEasing = palette.particleEasing || 'ease-out';
+      const particleEasing = motionFor(palette).particleEasing || palette.particleEasing || 'ease-out';
       const particleRadius = palette.particleShape === 'diamond' ? '2px' : palette.particleShape === 'round' ? '50%' : '3px';
       const W = window.innerWidth;
       const H = window.innerHeight;
@@ -2986,6 +3016,8 @@ window.BoohaBlitzEngine = (() => {
     }
 
     function startGame(allCards, curr, weekNumber, palette, monthSlug) {
+      const sceneMotion = motionFor(palette);
+      const sceneFeel = sceneMotion.feel || palette.feel || 'arcade';
       const offset = (weekNumber - 1) * 15;
       const weekCards = allCards.slice(offset, offset + 15);
       if (weekCards.length < 15) {
@@ -3036,17 +3068,17 @@ window.BoohaBlitzEngine = (() => {
         try {
           if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
           if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
-          const notes = STREAK_EVENT_NOTES[palette.feel]?.[threshold] || STREAK_EVENT_NOTES.playful[threshold];
+          const notes = STREAK_EVENT_NOTES[sceneFeel]?.[threshold] || STREAK_EVENT_NOTES.playful[threshold];
           const now = streakAudioCtx.currentTime + 0.01;
           notes.forEach((frequency, index) => {
             const startAt = now + index * 0.055;
             const oscillator = streakAudioCtx.createOscillator();
             const gain = streakAudioCtx.createGain();
-            oscillator.type = palette.feel === 'sleek' ? 'sine' : palette.feel === 'arcade' ? 'square' : 'triangle';
+            oscillator.type = sceneFeel === 'sleek' ? 'sine' : sceneFeel === 'arcade' ? 'square' : 'triangle';
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
             const peak = threshold >= 12 ? 0.065 : threshold >= 9 ? 0.055 : threshold >= 6 ? 0.045 : 0.035;
-            gain.gain.exponentialRampToValueAtTime(palette.feel === 'arcade' ? peak : peak * 0.82, startAt + 0.012);
+            gain.gain.exponentialRampToValueAtTime(sceneFeel === 'arcade' ? peak : peak * 0.82, startAt + 0.012);
             gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.14);
             oscillator.connect(gain);
             gain.connect(streakAudioCtx.destination);
@@ -3069,14 +3101,14 @@ window.BoohaBlitzEngine = (() => {
         try {
           if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
           if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
-          const base = palette.feel === 'arcade' ? 440 : palette.feel === 'sleek' ? 523 : 587;
+          const base = sceneFeel === 'arcade' ? 440 : sceneFeel === 'sleek' ? 523 : 587;
           const pitch = base * (1 + Math.min(streak, 12) * 0.018);
           const now = streakAudioCtx.currentTime + 0.005;
           [pitch, pitch * 1.5].forEach((frequency, index) => {
             const startAt = now + index * 0.018;
             const oscillator = streakAudioCtx.createOscillator();
             const gain = streakAudioCtx.createGain();
-            oscillator.type = palette.feel === 'sleek' ? 'sine' : 'triangle';
+            oscillator.type = sceneFeel === 'sleek' ? 'sine' : 'triangle';
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
             gain.gain.exponentialRampToValueAtTime(index ? 0.018 : 0.032, startAt + 0.008);
@@ -3104,7 +3136,7 @@ window.BoohaBlitzEngine = (() => {
             const startAt = now + index * 0.075;
             const oscillator = streakAudioCtx.createOscillator();
             const gain = streakAudioCtx.createGain();
-            oscillator.type = isRecord ? 'triangle' : palette.feel === 'sleek' ? 'sine' : 'triangle';
+            oscillator.type = isRecord ? 'triangle' : sceneFeel === 'sleek' ? 'sine' : 'triangle';
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
             gain.gain.exponentialRampToValueAtTime(isRecord ? 0.07 : isPerfectRun ? 0.06 : 0.035, startAt + 0.014);
@@ -3124,13 +3156,13 @@ window.BoohaBlitzEngine = (() => {
         try {
           if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
           if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
-          const notes = palette.feel === 'arcade' ? [392, 587] : palette.feel === 'sleek' ? [440, 659] : [523, 784];
+          const notes = sceneFeel === 'arcade' ? [392, 587] : sceneFeel === 'sleek' ? [440, 659] : [523, 784];
           const now = streakAudioCtx.currentTime + 0.01;
           notes.forEach((frequency, index) => {
             const startAt = now + index * 0.075;
             const oscillator = streakAudioCtx.createOscillator();
             const gain = streakAudioCtx.createGain();
-            oscillator.type = palette.feel === 'sleek' ? 'sine' : 'triangle';
+            oscillator.type = sceneFeel === 'sleek' ? 'sine' : 'triangle';
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
             gain.gain.exponentialRampToValueAtTime(0.028, startAt + 0.01);
@@ -3150,13 +3182,13 @@ window.BoohaBlitzEngine = (() => {
         try {
           if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
           if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
-          const notes = palette.feel === 'arcade' ? [196, 147] : palette.feel === 'sleek' ? [330, 247] : [262, 196];
+          const notes = sceneFeel === 'arcade' ? [196, 147] : sceneFeel === 'sleek' ? [330, 247] : [262, 196];
           const now = streakAudioCtx.currentTime + 0.005;
           notes.forEach((frequency, index) => {
             const startAt = now + index * 0.045;
             const oscillator = streakAudioCtx.createOscillator();
             const gain = streakAudioCtx.createGain();
-            oscillator.type = palette.feel === 'arcade' ? 'square' : 'triangle';
+            oscillator.type = sceneFeel === 'arcade' ? 'square' : 'triangle';
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
             gain.gain.exponentialRampToValueAtTime(0.018, startAt + 0.01);
@@ -3352,7 +3384,7 @@ window.BoohaBlitzEngine = (() => {
         setBackground(streak);
         if (eventThreshold) {
           playStreakBeat(eventThreshold);
-          if (palette.feel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
+          if (sceneFeel === 'playful') emitFireWallpaper(overlay, spotlight.playerName, eventThreshold);
           const copy = {
             playful: {
               3: '×3 — NICE!', 6: '×6 — HOT!', 9: '×9 — WILD!', 12: '×12 — RIDICULOUS!',
@@ -3367,8 +3399,8 @@ window.BoohaBlitzEngine = (() => {
               12: 'CHAIN ×12 — ASCENDANT', 15: `${spotlight.playerName} — UNBROKEN`,
             },
           };
-          const variant = palette.feel === 'arcade' ? 'combo' : palette.feel === 'sleek' ? 'chain' : 'fire';
-          spotlight.announce(copy[palette.feel]?.[eventThreshold] || `×${eventThreshold}`, eventThreshold === 15, variant);
+          const variant = sceneFeel === 'arcade' ? 'combo' : sceneFeel === 'sleek' ? 'chain' : 'fire';
+          spotlight.announce(copy[sceneFeel]?.[eventThreshold] || `×${eventThreshold}`, eventThreshold === 15, variant);
         }
         return eventThreshold;
       }
@@ -3561,10 +3593,10 @@ window.BoohaBlitzEngine = (() => {
         };
         if (status) {
           status.classList.add('booha-blitz-ruby-text');
-          status.innerHTML = statusByFeel[palette.feel] || statusByFeel.playful;
+          status.innerHTML = statusByFeel[sceneFeel] || statusByFeel.playful;
         }
         wrongPopup.classList.remove('wrong-feel-playful', 'wrong-feel-arcade', 'wrong-feel-sleek');
-        wrongPopup.classList.add(`wrong-feel-${palette.feel || 'playful'}`);
+        wrongPopup.classList.add(`wrong-feel-${sceneFeel || 'playful'}`);
         overlay.classList.add('wrong-active');
         setAnswerInputEnabled(false);
         wrongPopup.scrollTop = 0;
@@ -3697,7 +3729,7 @@ window.BoohaBlitzEngine = (() => {
             btn.style.setProperty('--recover-index', String(index));
           } else {
             btn.classList.add('blitz-enter');
-            btn.style.setProperty('--blitz-enter-delay', `${index * (palette.motion?.optionStaggerMs || 36)}ms`);
+            btn.style.setProperty('--blitz-enter-delay', `${index * (sceneMotion.optionStaggerMs || 36)}ms`);
           }
           btn.type = 'button';
           btn.textContent = opt.en;
