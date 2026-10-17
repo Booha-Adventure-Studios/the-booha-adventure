@@ -588,14 +588,15 @@ window.SentenceBlitz = (() => {
         </div>
         <div id="sb-options" class="booha-blitz-answer"></div>
       </div>
-      <div id="sb-wrong-popup" class="blitz-wrong-feedback">
+      <div id="sb-wrong-popup" class="blitz-wrong-feedback blitz-wrong-compact">
         <div class="sb-wrong-jp"   id="sbwj"></div>
         <div class="sb-wrong-hira" id="sbwh"></div>
         <div class="sb-wrong-en"   id="sbwe"></div>
-        <div class="sb-wrong-scold-jp"   id="sbsj"></div>
-        <div class="sb-wrong-scold-hira" id="sbsh"></div>
-        <div class="sb-wrong-scold-en"   id="sbse"></div>
-        <div id="sb-wrong-status">READY FOR THE NEXT TRY</div>
+        <div class="blitz-wrong-joke" aria-live="polite">
+          <div class="sb-wrong-scold-jp"   id="sbsj"></div>
+          <div class="sb-wrong-scold-hira" id="sbsh"></div>
+          <div class="sb-wrong-scold-en"   id="sbse"></div>
+        </div>
         <button id="sb-wrong-close" type="button">つぎへ / CONTINUE</button>
       </div>
       

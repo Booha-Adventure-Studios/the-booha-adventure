@@ -1648,6 +1648,13 @@ else
   bad "Blitz scene-SFX audit failed"
 fi
 
+echo "[blitz] wrong-answer strip audit"
+if node tests/blitz-wrong-strip-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz wrong-answer strip audit passed"
+else
+  bad "Blitz wrong-answer strip audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"

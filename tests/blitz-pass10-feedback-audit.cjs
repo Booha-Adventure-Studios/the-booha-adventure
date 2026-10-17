@@ -19,12 +19,12 @@ assert.match(engine, /@keyframes boohaBlitzWrongSheet/,
   'wrong feedback must have a mobile sheet treatment');
 assert.match(engine, /showWrongPopup\(correct\)/,
   'the existing wrong-answer flow must remain wired');
-assert.match(engine, /renderSeparateReading\(scoldJp, scoldHira, scold\.jp, scold\.hira\)/,
-  'the contained feedback must preserve the Booha scold content and reading');
+assert.match(engine, /renderRubyReading\(scoldJp, scoldHira, scold\.jp, scold\.hira\)/,
+  'the compact feedback must preserve the Booha joke with inline reading');
 
 for (const [source, prefix] of [[vocab, 'vb'], [sentence, 'sb'], [question, 'qb']]) {
-  assert.match(source, new RegExp(`id="${prefix}-wrong-popup" class="blitz-wrong-feedback"`),
-    `${prefix} wrong feedback must use the shared panel treatment`);
+  assert.match(source, new RegExp(`id="${prefix}-wrong-popup" class="blitz-wrong-feedback blitz-wrong-compact"`),
+    `${prefix} wrong feedback must use the shared compact strip treatment`);
   assert.doesNotMatch(source, new RegExp(`#${prefix}-overlay\\.low-power #${prefix}-wrong-popup`),
     `${prefix} low-power mode must not restore a full-screen error blackout`);
 }
