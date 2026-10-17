@@ -1083,6 +1083,238 @@ window.BoohaBlitzEngine = (() => {
         border-radius: 14px;
         border-top-width: 2px;
       }
+      /* The answer list is the lesson surface. Wrong feedback only adds a
+         short joke strip, so students can compare red and green in place. */
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact {
+        top: auto;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: min(30dvh, 156px);
+        padding: 10px max(env(safe-area-inset-right, 0px) + 14px, 14px)
+          max(env(safe-area-inset-bottom, 0px) + 10px, 10px)
+          max(env(safe-area-inset-left, 0px) + 14px, 14px);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-width: 1px 0 0;
+        border-top-width: 2px;
+        border-radius: 18px 18px 0 0;
+        transform: none;
+        overflow: hidden;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show {
+        animation: boohaBlitzWrongStrip 180ms cubic-bezier(.2, .9, .25, 1) both;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show.closing,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show.closing,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show.closing {
+        animation: boohaBlitzWrongStripOut 140ms ease both;
+      }
+      @keyframes boohaBlitzWrongStrip {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes boohaBlitzWrongStripOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(12px); }
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .vb-wrong-kanji,
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .vb-wrong-hira,
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .vb-wrong-en,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .sb-wrong-jp,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .sb-wrong-hira,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .sb-wrong-en,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .qb-wrong-jp,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .qb-wrong-hira,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact > .qb-wrong-en {
+        display: none !important;
+      }
+      .blitz-wrong-compact .blitz-wrong-joke {
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+        text-align: left;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .vb-wrong-scold-jp,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .sb-wrong-scold-jp,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .qb-wrong-scold-jp {
+        margin: 0;
+        max-width: 100%;
+        color: #fff7df;
+        font-size: clamp(16px, 3.2vw, 24px);
+        line-height: 1.2;
+        text-shadow: 0 0 14px var(--blitz-wrong, #ff536d);
+        overflow-wrap: anywhere;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .vb-wrong-scold-hira,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .sb-wrong-scold-hira,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .qb-wrong-scold-hira {
+        width: auto;
+        max-width: 100%;
+        padding: 0;
+        color: rgba(255, 247, 223, .76);
+        font-size: clamp(10px, 2vw, 13px);
+        line-height: 1.3;
+        letter-spacing: 1px;
+        overflow-wrap: anywhere;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .vb-wrong-scold-en,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .sb-wrong-scold-en,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact .qb-wrong-scold-en {
+        margin: 2px 0 0;
+        max-width: 100%;
+        color: rgba(255, 247, 223, .82);
+        font-size: clamp(11px, 2.2vw, 16px);
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+      }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #vb-wrong-close,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #sb-wrong-close,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #qb-wrong-close {
+        position: static;
+        margin: 0;
+        flex: 0 0 auto;
+        min-height: 44px;
+        padding: 10px 16px;
+        white-space: nowrap;
+        font-size: clamp(12px, 2.4vw, 16px);
+      }
+      #vb-overlay.wrong-active #vb-options,
+      #sb-overlay.wrong-active #sb-options,
+      #qb-overlay.wrong-active #qb-options {
+        scroll-padding-bottom: 156px;
+        padding-bottom: max(116px, env(safe-area-inset-bottom, 0px) + 112px) !important;
+      }
+      #vb-overlay.wrong-active .vb-opt:not(.wrong):not(.correct),
+      #sb-overlay.wrong-active .sb-opt:not(.wrong):not(.correct),
+      #qb-overlay.wrong-active .qb-opt:not(.wrong):not(.correct) {
+        opacity: .25 !important;
+        filter: saturate(.55) !important;
+      }
+      #vb-overlay.wrong-active .vb-opt.wrong,
+      #vb-overlay.wrong-active .vb-opt.correct,
+      #sb-overlay.wrong-active .sb-opt.wrong,
+      #sb-overlay.wrong-active .sb-opt.correct,
+      #qb-overlay.wrong-active .qb-opt.wrong,
+      #qb-overlay.wrong-active .qb-opt.correct {
+        opacity: 1 !important;
+        filter: none !important;
+      }
+      #vb-overlay.wrong-active .vb-opt.wrong,
+      #vb-overlay.wrong-active .vb-opt.correct,
+      #sb-overlay.wrong-active .sb-opt.wrong,
+      #sb-overlay.wrong-active .sb-opt.correct,
+      #qb-overlay.wrong-active .qb-opt.wrong,
+      #qb-overlay.wrong-active .qb-opt.correct {
+        padding-right: clamp(44px, 6vw, 64px) !important;
+      }
+      #vb-overlay.wrong-active .vb-opt.wrong::before,
+      #sb-overlay.wrong-active .sb-opt.wrong::before,
+      #qb-overlay.wrong-active .qb-opt.wrong::before,
+      #vb-overlay.wrong-active .vb-opt.correct::before,
+      #sb-overlay.wrong-active .sb-opt.correct::before,
+      #qb-overlay.wrong-active .qb-opt.correct::before {
+        position: absolute;
+        top: 50%;
+        right: clamp(10px, 1.2vw, 18px);
+        z-index: 2;
+        transform: translateY(-50%);
+        font-size: clamp(20px, 3.4vw, 32px);
+        font-weight: 1000;
+        line-height: 1;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, .42);
+        pointer-events: none;
+      }
+      #vb-overlay.wrong-active .vb-opt.wrong::before,
+      #sb-overlay.wrong-active .sb-opt.wrong::before,
+      #qb-overlay.wrong-active .qb-opt.wrong::before { content: '✗'; color: #fff; }
+      #vb-overlay.wrong-active .vb-opt.correct::before,
+      #sb-overlay.wrong-active .sb-opt.correct::before,
+      #qb-overlay.wrong-active .qb-opt.correct::before { content: '✓'; color: #07131a; }
+      #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #vb-wrong-close:focus-visible,
+      #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #sb-wrong-close:focus-visible,
+      #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #qb-wrong-close:focus-visible {
+        outline: 3px solid #fff7df;
+        outline-offset: 3px;
+      }
+      @media (max-width: 560px) {
+        #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact,
+        #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact,
+        #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact {
+          gap: 8px;
+          padding-inline: max(env(safe-area-inset-left, 0px) + 10px, 10px);
+        }
+        #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #vb-wrong-close,
+        #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #sb-wrong-close,
+        #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact #qb-wrong-close {
+          min-height: 42px;
+          padding-inline: 12px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show,
+        #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show,
+        #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show,
+        #vb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show.closing,
+        #sb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show.closing,
+        #qb-wrong-popup.blitz-wrong-feedback.blitz-wrong-compact.show.closing {
+          animation: none;
+          transform: none;
+        }
+      }
+      .blitz-wrong-compact {
+        isolation: isolate;
+      }
+      .blitz-wrong-compact .blitz-wrong-joke,
+      .blitz-wrong-compact #vb-wrong-close,
+      .blitz-wrong-compact #sb-wrong-close,
+      .blitz-wrong-compact #qb-wrong-close {
+        position: relative;
+        z-index: 1;
+      }
+      .blitz-scene-circus .blitz-wrong-compact {
+        border-top-style: dashed;
+        border-top-color: #ffe27a;
+      }
+      .blitz-scene-circus .blitz-wrong-compact::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 14px;
+        width: 48px;
+        height: 6px;
+        background: repeating-linear-gradient(90deg, #ffe27a 0 8px, transparent 8px 13px);
+        opacity: .9;
+      }
+      .blitz-scene-spooky .blitz-wrong-compact {
+        border-top: 4px solid #a36e4e;
+        background:
+          linear-gradient(90deg, rgba(92, 52, 37, .34), transparent 18% 82%, rgba(92, 52, 37, .34)),
+          var(--blitz-popup-bg, rgba(0, 0, 0, .92));
+      }
+      .blitz-scene-fireflies .blitz-wrong-compact {
+        border-top-color: var(--blitz-accent);
+        box-shadow: 0 -6px 28px color-mix(in srgb, var(--blitz-glow) 70%, transparent), 0 0 28px var(--blitz-glow);
+      }
+      .blitz-scene-fireflies .blitz-wrong-compact::before {
+        content: '';
+        position: absolute;
+        top: -3px;
+        right: 18px;
+        width: 36px;
+        height: 13px;
+        border-radius: 100% 0 100% 0;
+        background: radial-gradient(ellipse at 35% 50%, rgba(255, 255, 206, .95), var(--blitz-accent) 42%, transparent 72%);
+        transform: rotate(-16deg);
+        opacity: .8;
+      }
       .booha-blitz-wrong-spark {
         position: absolute;
         width: clamp(5px, 1vw, 8px);
@@ -2889,6 +3121,14 @@ window.BoohaBlitzEngine = (() => {
       hiraContainer.hidden = false;
     }
 
+    function renderRubyReading(jpContainer, hiraContainer, jp, hira) {
+      jpContainer.classList.add('booha-blitz-ruby-text');
+      jpContainer.innerHTML = `<ruby>${escapeHtml(jp)}<rt>${escapeHtml(hira)}</rt></ruby>`;
+      jpContainer.setAttribute('aria-label', `${jp} ${hira}`);
+      hiraContainer.textContent = '';
+      hiraContainer.hidden = true;
+    }
+
     function emitFinishFlash(overlay, palette, playerName, kind = 'perfect') {
       const flash = document.createElement('div');
       const isRecordFlash = kind === 'record';
@@ -3760,22 +4000,19 @@ window.BoohaBlitzEngine = (() => {
         const wrongHira = overlay.querySelector(selector('wrongHira'));
         const scoldJp = overlay.querySelector(selector('scoldJp'));
         const scoldHira = overlay.querySelector(selector('scoldHira'));
-        const status = wrongPopup.querySelector('[id$="-wrong-status"]');
         renderSeparateReading(wrongJp, wrongHira, correct.jp, correct.hira);
-        renderSeparateReading(scoldJp, scoldHira, scold.jp, scold.hira);
+        renderRubyReading(scoldJp, scoldHira, scold.jp, scold.hira);
         overlay.querySelector(selector('wrongEn')).textContent = correct.en;
         overlay.querySelector(selector('scoldEn')).textContent = scold.en;
-        const statusByFeel = {
-          playful: `${escapeHtml(spotlight.playerName)}, <ruby>BUMP!<rt>\u30d0\u30f3\u30d7!</rt></ruby> <ruby>LET'S<rt>\u30ec\u30c3\u30c4</rt></ruby> <ruby>BOUNCE<rt>\u30d0\u30a6\u30f3\u30b9</rt></ruby> <ruby>BACK.<rt>\u30d0\u30c3\u30af</rt></ruby>`,
-          arcade: `${escapeHtml(spotlight.playerName)}, <ruby>CHAIN<rt>\u30c1\u30a7\u30fc\u30f3</rt></ruby> <ruby>BROKEN<rt>\u30d6\u30ed\u30fc\u30af\u30f3</rt></ruby> \u2014 <ruby>RELOAD!<rt>\u30ea\u30ed\u30fc\u30c9!</rt></ruby>`,
-          sleek: `${escapeHtml(spotlight.playerName)}, <ruby>LINK<rt>\u30ea\u30f3\u30af</rt></ruby> <ruby>LOST<rt>\u30ed\u30b9\u30c8</rt></ruby> \u2014 <ruby>TRY<rt>\u30c8\u30e9\u30a4</rt></ruby> <ruby>AGAIN.<rt>\u30a2\u30b2\u30a4\u30f3</rt></ruby>`,
-        };
-        if (status) {
-          status.classList.add('booha-blitz-ruby-text');
-          status.innerHTML = statusByFeel[sceneFeel] || statusByFeel.playful;
-        }
+        // Keep the prompt and answer choices as the only correction surface.
+        // The compact strip below carries only the short Booha joke.
+        [wrongJp, wrongHira, overlay.querySelector(selector('wrongEn'))].forEach(node => {
+          if (!node) return;
+          node.hidden = true;
+          node.setAttribute('aria-hidden', 'true');
+        });
         wrongPopup.classList.remove('wrong-feel-playful', 'wrong-feel-arcade', 'wrong-feel-sleek');
-        wrongPopup.classList.add(`wrong-feel-${sceneFeel || 'playful'}`);
+        wrongPopup.classList.add('blitz-wrong-compact', `wrong-feel-${sceneFeel || 'playful'}`);
         overlay.classList.add('wrong-active');
         setAnswerInputEnabled(false);
         wrongPopup.scrollTop = 0;
@@ -3783,10 +4020,12 @@ window.BoohaBlitzEngine = (() => {
         const continueButton = overlay.querySelector(selector('wrongClose'));
         if (continueButton) {
           continueButton.disabled = false;
+          continueButton.removeAttribute('aria-disabled');
           continueButton.classList.remove('is-pressed');
         }
         feedbackState = 'feedback';
         wrongPopup.classList.add('show');
+        requestAnimationFrame(() => continueButton?.focus({ preventScroll: true }));
       }
 
       function recoverFromWrong(event) {
@@ -3870,8 +4109,12 @@ window.BoohaBlitzEngine = (() => {
         spotlight.resetStreak();
         setBackground(0);
         optionsEl.querySelectorAll(`.${config.optionClass}`).forEach(b => {
-          if (b.textContent === correct.en) b.classList.add('correct');
+          if (b.textContent === correct.en) {
+            b.classList.add('correct');
+            b.setAttribute('aria-label', `${correct.en} — correct answer`);
+          }
         });
+        btn.setAttribute('aria-label', `${chosen.en} — incorrect answer`);
         emitWrongMicroFeedback(btn, answerRect, overlayRect);
         playSceneSfx('wrong');
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playWrongHit();

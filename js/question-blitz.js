@@ -584,14 +584,15 @@ window.QuestionBlitz = (() => {
         </div>
         <div id="qb-options" class="booha-blitz-answer"></div>
       </div>
-      <div id="qb-wrong-popup" class="blitz-wrong-feedback">
+      <div id="qb-wrong-popup" class="blitz-wrong-feedback blitz-wrong-compact">
         <div class="qb-wrong-jp"   id="qbwj"></div>
         <div class="qb-wrong-hira" id="qbwh"></div>
         <div class="qb-wrong-en"   id="qbwe"></div>
-        <div class="qb-wrong-scold-jp"   id="qbsj"></div>
-        <div class="qb-wrong-scold-hira" id="qbsh"></div>
-        <div class="qb-wrong-scold-en"   id="qbse"></div>
-        <div id="qb-wrong-status">READY FOR THE NEXT TRY</div>
+        <div class="blitz-wrong-joke" aria-live="polite">
+          <div class="qb-wrong-scold-jp"   id="qbsj"></div>
+          <div class="qb-wrong-scold-hira" id="qbsh"></div>
+          <div class="qb-wrong-scold-en"   id="qbse"></div>
+        </div>
         <button id="qb-wrong-close" type="button">つぎへ / CONTINUE</button>
       </div>
       
