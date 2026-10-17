@@ -756,6 +756,14 @@ window.BoohaBlitzEngine = (() => {
         inset: 0;
         background: linear-gradient(180deg, rgba(4, 15, 28, .10), rgba(4, 15, 28, .22));
       }
+      /* Keep the Firefly Glade door on the prompt side in landscape so the
+         answer column does not hide the scene's focal detail. */
+      @media (orientation: landscape) {
+        .blitz-scene-fireflies .booha-blitz-scene-backdrop {
+          transform: scaleX(-1);
+          transform-origin: center;
+        }
+      }
       .booha-blitz-atmosphere-playful {
         background:
           radial-gradient(circle at 18% 78%, rgba(255, 79, 171, .42), transparent 35%),
@@ -1055,9 +1063,9 @@ window.BoohaBlitzEngine = (() => {
         65% { opacity: 1; transform: translateY(-2px) scale(1.02); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
       }
-      #vb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card),
-      #sb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card),
-      #qb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card) {
+      #vb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card):not(.booha-blitz-scene-backdrop):not(.booha-blitz-atmosphere),
+      #sb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card):not(.booha-blitz-scene-backdrop):not(.booha-blitz-atmosphere),
+      #qb-overlay.blitz-awaiting-start > *:not(.booha-blitz-start-card):not(.booha-blitz-scene-backdrop):not(.booha-blitz-atmosphere) {
         visibility: hidden;
       }
       .booha-blitz-start-card {
@@ -1126,37 +1134,43 @@ window.BoohaBlitzEngine = (() => {
         right: max(env(safe-area-inset-right, 0px) + 16px, 16px);
         z-index: 3;
         appearance: none;
-        min-width: 126px;
         min-height: 44px;
         box-sizing: border-box;
-        border: 2px solid rgba(35, 16, 38, .72);
+        border: 1px solid rgba(255,247,223,.34);
         border-radius: 999px;
-        padding: 10px 16px;
-        color: #241b2a;
-        background: rgba(255,250,238,.97);
-        box-shadow: 0 4px 16px rgba(35,16,38,.34), 0 0 0 2px rgba(255,255,255,.22);
-        font-size: clamp(12px, 1.7vw, 16px);
+        padding: 8px 14px;
+        color: rgba(255,247,223,.92);
+        background: rgba(9,26,39,.62);
+        box-shadow: 0 2px 10px rgba(0,0,0,.28);
+        font-size: 12px;
         font-weight: 950;
-        letter-spacing: 1px;
+        letter-spacing: .5px;
         line-height: 1;
         white-space: nowrap;
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
+      }
+      .booha-blitz-start-exit:hover,
+      .booha-blitz-start-exit:focus-visible {
+        background: rgba(9,26,39,.84);
+        border-color: rgba(255,247,223,.72);
+        outline: 2px solid var(--blitz-accent, #ff6fb5);
+        outline-offset: 2px;
       }
       .booha-blitz-start-exit:active { transform: scale(.96); }
       #vb-quit,
       #sb-quit,
       #qb-quit {
         z-index: 8;
-        min-width: 96px;
         min-height: 44px;
         box-sizing: border-box;
-        padding: 10px 16px;
-        color: #241b2a;
-        background: rgba(255,250,238,.97);
-        border: 2px solid rgba(36,27,42,.72);
-        box-shadow: 0 4px 16px rgba(0,0,0,.34), 0 0 0 2px rgba(255,255,255,.22);
-        font-size: clamp(12px, 1.7vw, 16px);
+        padding: 8px 14px;
+        color: rgba(255,247,223,.92);
+        background: rgba(9,26,39,.62);
+        border: 1px solid rgba(255,247,223,.34);
+        box-shadow: 0 2px 10px rgba(0,0,0,.28);
+        font-size: 12px;
+        letter-spacing: .5px;
         line-height: 1;
         white-space: nowrap;
         text-shadow: none;
@@ -1167,10 +1181,26 @@ window.BoohaBlitzEngine = (() => {
       #vb-quit:focus-visible,
       #sb-quit:focus-visible,
       #qb-quit:focus-visible {
-        background: #fff;
-        border-color: rgba(36,27,42,.62);
+        background: rgba(9,26,39,.84);
+        border-color: rgba(255,247,223,.72);
         outline: 2px solid var(--blitz-accent, #ff6fb5);
         outline-offset: 2px;
+      }
+      #vb-timer, #sb-timer, #qb-timer {
+        -webkit-text-stroke: 1px var(--blitz-prompt-outline, rgba(3, 8, 16, .86));
+        paint-order: stroke fill;
+        text-shadow:
+          0 3px 0 rgba(3, 8, 16, .72),
+          0 6px 18px rgba(3, 8, 16, .74),
+          0 0 22px color-mix(in srgb, var(--blitz-accent, #ff6fb5) 55%, transparent);
+      }
+      #vb-progress, #sb-progress, #qb-progress {
+        color: rgba(255, 247, 223, .82);
+        text-shadow: 0 2px 6px rgba(3, 8, 16, .8);
+      }
+      #vb-options, #sb-options, #qb-options,
+      #sb-prompt, #qb-prompt {
+        box-sizing: border-box;
       }
       .booha-blitz-start-copy {
         color: rgba(255,255,255,.76);
