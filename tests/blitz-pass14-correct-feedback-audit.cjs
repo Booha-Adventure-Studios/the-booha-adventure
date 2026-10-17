@@ -14,6 +14,12 @@ assert.match(engine, /function emitCorrectMicroBurst\(correctBtn, answerRect, ov
   'correct answers must emit a small immediate particle burst');
 assert.match(engine, /booha-blitz-correct-spark/,
   'the correct burst must use a shared lightweight spark surface');
+assert.match(engine, /blitz-compositor\.correct-impact::after[\s\S]*?radial-gradient\(circle at var\(--blitz-impact-x, 50%\) var\(--blitz-impact-y, 50%\)/,
+  'correct feedback must use a local answer-anchored glow instead of a full-screen wash');
+assert.match(engine, /boohaBlitzCorrectImpactPulse 220ms ease-out/,
+  'the answer-anchored glow must resolve quickly without a visible blink');
+assert.match(engine, /if \(REDUCED_MOTION\) \{[\s\S]*?flashEl\.style\.opacity = '0\.45'/,
+  'the full-screen pulse must be limited to the reduced-motion fallback');
 assert.match(engine, /blitz-feel-playful \.booha-blitz-correct-spark[\s\S]*?border-radius: 50%/,
   'Pre-Boo correct feedback must use round particles');
 assert.match(engine, /blitz-feel-arcade \.booha-blitz-correct-spark[\s\S]*?border-radius: 2px/,
