@@ -166,6 +166,11 @@
       "reason": "Shared seasonal palette, 12-month color table, canvas consumers, and reduced-motion sparkles."
     },
     {
+      "path": "tests/seasonal-art-deadline.test.cjs",
+      "status": "verify",
+      "reason": "Scheduled seasonal characters must have complete art before entering the next 14 Tokyo calendar days."
+    },
+    {
       "path": "tests/invaders-pass10.test.cjs",
       "status": "superseded",
       "reason": "Mute behavior assertion expects candy-SFX stopping that the current engine does not implement."
