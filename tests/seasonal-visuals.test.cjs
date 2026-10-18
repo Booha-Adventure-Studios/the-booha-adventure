@@ -113,6 +113,18 @@ assert.ok(seasonalKarasuki.lines.some(line => line.en.includes('Flatwoods Monste
 assert.ok(seasonalKarasuki.lines.some(line => line.en.includes('Hodag') && line.jp.includes('ひかる 目')),
   'Hodag Japanese copy must match the softened English glowing-eyes description');
 
+const christmasKarasuki = skins.seasonalKarasuki('christmas-2026');
+assert.strictEqual(christmasKarasuki.kind, 'grubb');
+assert.strictEqual(christmasKarasuki.name, 'Grubb');
+assert.strictEqual(christmasKarasuki.nameJp, 'グラブ');
+assert.strictEqual(christmasKarasuki.asset, grubb.assets.karasuki);
+assert.strictEqual(christmasKarasuki.color, christmas.glow.gold);
+assert.ok(christmasKarasuki.lines.length >= 3, 'Grubb must have several Christmas facts');
+assert.ok(christmasKarasuki.lines.every(line =>
+  line.en.includes('{name}') && line.jp.includes('{name}') && line.furigana
+), 'every Grubb fact must be bilingual, name-aware, and furigana-ready');
+assert.ok(fs.existsSync(path.join(root, christmasKarasuki.asset)), 'Grubb Karasuki asset must exist');
+
 const karasuki = read('js/karasuki.js');
 assert.match(karasuki, /function openBarbaPop\(\)/, 'Karasuki must wire the seasonal Barba popup');
 assert.match(karasuki, /function clickCheckBarba\(worldX, worldY\)/, 'Barba must be tappable');

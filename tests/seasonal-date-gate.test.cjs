@@ -87,8 +87,12 @@ assert.strictEqual(skins.mascotAsset('static', 'christmas'), 'assets/skins/grubb
   ['2026-12-27', 'quillock'],
 ].forEach(([date, expectedCharacter]) => {
   const { key: occurrenceKey } = occurrence(new Date(`${date}T00:00:00+09:00`));
-  assert.strictEqual(skins.rotationCharacterId('christmas-2026', occurrenceKey), expectedCharacter,
-    `${date}: Christmas must schedule ${expectedCharacter}`);
+  assert.strictEqual(skins.getSeason('christmas-2026').weeklyCharacterIds[date], expectedCharacter,
+    `${date}: Christmas schedule must retain ${expectedCharacter}`);
+  const resolved = skins.rotationCharacterId('christmas-2026', occurrenceKey);
+  const expected = skins.isAvailable(expectedCharacter) ? expectedCharacter : null;
+  assert.strictEqual(resolved, expected,
+    `${date}: unavailable Christmas art must fail soft instead of resolving ${expectedCharacter}`);
 });
 assert.strictEqual(skins.seasonIdForDate('2027-01-02'), 'christmas-2026',
   'Jan 2: Christmas must remain active through the final unlock week');
