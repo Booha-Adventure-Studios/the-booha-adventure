@@ -652,7 +652,7 @@ window.BoohaBlitzEngine = (() => {
 
   // The card reveals about 1s after the last answer; ignore taps briefly so
   // a hammering finger cannot skip the result without making players wait.
-  const FINAL_CARD_HOLD_MS = 1400;
+  const FINAL_CARD_HOLD_MS = 800;
   let sharedStylesInjected = false;
 
   function injectSharedStyles() {
@@ -2404,7 +2404,7 @@ window.BoohaBlitzEngine = (() => {
       .booha-blitz-final-card .qb-win-buttons {
         opacity: 0;
         transform: translateY(8px);
-        animation: boohaBlitzButtonsIn 520ms 900ms cubic-bezier(.2,.9,.25,1) both;
+        animation: boohaBlitzButtonsIn 520ms 200ms cubic-bezier(.2,.9,.25,1) both;
       }
       #vb-win.blitz-finish,
       #sb-win.blitz-finish,
@@ -3864,7 +3864,8 @@ window.BoohaBlitzEngine = (() => {
           const box = fill.getBoundingClientRect();
           const cx = box.width / 2;
           const cy = box.height * .46;
-          const radius = Math.min(box.width, box.height) * .3;
+          const radiusX = Math.min(box.width * .3, box.height * .55);
+          const radiusY = box.height * .26;
           items.forEach((item, index) => {
             cancelMotion(item);
             item.classList.add('firefly-settled');
@@ -3874,8 +3875,8 @@ window.BoohaBlitzEngine = (() => {
             const start = (index / items.length) * Math.PI * 2;
             const path = Array.from({ length: 25 }, (_, step) => {
               const angle = start + (step / 24) * Math.PI * 2;
-              const x = cx + Math.cos(angle) * radius - left;
-              const y = cy + Math.sin(angle) * radius * .78 - top;
+              const x = cx + Math.cos(angle) * radiusX - left;
+              const y = cy + Math.sin(angle) * radiusY - top;
               return { transform: `translate(-50%, -50%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)` };
             });
             const gather = item.animate([{ transform: 'translate(-50%, -50%)' }, path[0]], {

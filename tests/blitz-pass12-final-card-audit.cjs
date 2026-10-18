@@ -30,8 +30,8 @@ assert.doesNotMatch(engine, /MASTERY CLEAR|CLEAN CLEAR/,
   'failed runs must not render alternate clear tiers');
 assert.doesNotMatch(finalCardBuilder, /finalCard\.streak|PERFECT RUN · \$\{initialQueueLength\}/,
   'the compact final card must not recreate the retired streak/perfect stack');
-assert.match(engine, /FINAL_CARD_HOLD_MS = 1400/,
-  'the final card must preserve the deliberate look-first hold');
+assert.match(engine, /FINAL_CARD_HOLD_MS = 800/,
+  'the final card must preserve a short post-celebration tap guard');
 
 for (const mode of modes) {
   assert.match(mode, /winName:/, 'each mode must expose a player-name result target');
