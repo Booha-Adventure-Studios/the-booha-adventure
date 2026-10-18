@@ -842,10 +842,27 @@ window.BoohaBlitzEngine = (() => {
         align-items: center;
         justify-content: center;
         gap: clamp(6px, 1.4vw, 14px);
-        min-width: min(100%, 440px);
-        max-width: 100%;
-        min-height: clamp(150px, 24vh, 220px);
+        /* One fixed sign size for every word; the word shrinks to fit it
+           (fitMarqueeText) instead of the sign growing around the word. */
+        width: min(100%, 600px);
+        height: clamp(160px, 30vh, 270px);
         padding: clamp(18px, 3vh, 30px) clamp(28px, 4vw, 48px);
+        overflow: visible;
+      }
+      .booha-blitz-marquee > #vb-jp-word,
+      .booha-blitz-marquee > #vb-hira {
+        max-width: 100%;
+        white-space: nowrap;
+      }
+      .booha-blitz-marquee > #vb-jp-word.is-wrapped {
+        white-space: normal;
+        line-break: strict;
+        word-break: keep-all;
+        overflow-wrap: anywhere;
+        text-wrap: balance;
+      }
+      @media (orientation: portrait) {
+        .booha-blitz-marquee { height: clamp(140px, 24vh, 220px); }
       }
       .booha-blitz-marquee > :not(.booha-blitz-scene-fill) {
         position: relative;
@@ -3541,6 +3558,7 @@ window.BoohaBlitzEngine = (() => {
       fill.dataset.fillKind = fillConfig.kind || 'generic';
       // The marquee belongs to the word, not the screen: wrap the prompt in a
       // sign box so the frame and bulbs follow it in every layout and word length.
+      let marqueeTextObserver = null;
       const word = fillConfig.kind === 'circus-marquee' ? overlay.querySelector(selector('jpWord')) : null;
       if (word) {
         const sign = document.createElement('div');
@@ -3550,6 +3568,46 @@ window.BoohaBlitzEngine = (() => {
         sign.appendChild(word);
         if (hira) sign.appendChild(hira);
         sign.insertBefore(fill, sign.firstChild);
+        // Shrink the word (and furigana) to fit the fixed sign. One line
+        // when possible; very long phrases wrap to two lines at a readable
+        // size instead of becoming tiny. Transforms (the pop animation) do
+        // not affect these measurements.
+        const fitMarqueeText = () => {
+          const box = sign.getBoundingClientRect();
+          const cs = getComputedStyle(sign);
+          const padX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+          const padY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+          const availW = box.width - padX;
+          if (!(availW > 0)) return;
+          if (hira) {
+            hira.style.fontSize = '';
+            const hiraBase = parseFloat(getComputedStyle(hira).fontSize);
+            if (hira.scrollWidth > availW) hira.style.fontSize = `${Math.max(11, hiraBase * availW / hira.scrollWidth)}px`;
+          }
+          const hiraH = hira ? hira.getBoundingClientRect().height + parseFloat(cs.rowGap || cs.gap || 0) : 0;
+          const availH = box.height - padY - hiraH;
+          word.style.fontSize = '';
+          word.classList.remove('is-wrapped');
+          const base = parseFloat(getComputedStyle(word).fontSize);
+          const minOneLine = Math.max(28, base * 0.38);
+          let size = Math.min(base, base * availW / word.scrollWidth, base * availH / word.offsetHeight);
+          if (size < minOneLine) {
+            word.classList.add('is-wrapped');
+            size = Math.min(base, minOneLine * 1.15);
+            word.style.fontSize = `${size}px`;
+            for (let i = 0; i < 8 && (word.offsetHeight > availH || word.scrollWidth > availW) && size > 16; i++) {
+              size *= 0.9;
+              word.style.fontSize = `${size}px`;
+            }
+            return;
+          }
+          word.style.fontSize = `${Math.floor(size)}px`;
+        };
+        overlay._boohaBlitzFitPrompt = fitMarqueeText;
+        if (typeof ResizeObserver === 'function') {
+          marqueeTextObserver = new ResizeObserver(() => fitMarqueeText());
+          marqueeTextObserver.observe(sign);
+        }
       } else {
         overlay.insertBefore(fill, overlay.querySelector('.booha-blitz-scene-backdrop')?.nextSibling || overlay.firstChild);
       }
@@ -3708,6 +3766,8 @@ window.BoohaBlitzEngine = (() => {
       const destroy = () => {
         marqueeObserver?.disconnect();
         marqueeObserver = null;
+        marqueeTextObserver?.disconnect();
+        marqueeTextObserver = null;
         if (orientationHandler) {
           window.removeEventListener('resize', orientationHandler);
           orientationHandler = null;
@@ -4732,6 +4792,7 @@ window.BoohaBlitzEngine = (() => {
           hiraEl.style.animation = '';
           jpWordEl.textContent = card.jp;
           hiraEl.textContent = card.hira;
+          overlay._boohaBlitzFitPrompt?.();
         });
         progressEl.textContent = `${Math.min(current, initialQueueLength)} / ${initialQueueLength}`;
         const wrong = shuffle(weekCards.filter(c => c.n !== card.n)).slice(0, 5);

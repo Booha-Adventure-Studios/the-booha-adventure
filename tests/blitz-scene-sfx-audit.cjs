@@ -18,8 +18,14 @@ assert.match(engine, /const step = \(2 \* \(w \+ h\)\) \/ items\.length/,
   'Circus marquee bulbs must be spaced from the sign perimeter, not hand-tuned percentages');
 assert.match(engine, /new ResizeObserver\(layoutMarquee\)/,
   'Circus marquee must relayout when its prompt-owned sign resizes');
-assert.match(engine, /\.booha-blitz-marquee \{[\s\S]*?min-width: min\(100%, 440px\);[\s\S]*?min-height: clamp\(150px, 24vh, 220px\);/,
-  'Circus must size a stable prompt-owned sign box');
+assert.match(engine, /\.booha-blitz-marquee \{[\s\S]*?width: min\(100%, 600px\);[\s\S]*?height: clamp\(160px, 30vh, 270px\);/,
+  'Circus must use one fixed sign size for every word');
+assert.match(engine, /overlay\._boohaBlitzFitPrompt = fitMarqueeText;/,
+  'Circus must shrink each word to fit the fixed sign');
+assert.match(engine, /marqueeTextObserver = new ResizeObserver\(\(\) => fitMarqueeText\(\)\);/,
+  'Circus text fitting must re-run when the sign changes size');
+assert.match(engine, /marqueeTextObserver\?\.disconnect\(\);/,
+  'Circus text fitting observer must be cleaned up with the scene');
 assert.match(engine, /sign\.insertBefore\(fill, sign\.firstChild\)/,
   'Circus marquee fill must be mounted inside the prompt-owned sign');
 assert.match(engine, /#vb-stage, #sb-prompt, #qb-prompt \{\s*box-sizing: border-box;/,
