@@ -9,7 +9,6 @@ const BoohaSkins = (() => {
   'use strict';
 
   const BASE = 'assets/img/booha_ghost.webp';
-  const CURRENT_SEASON_ID = 'halloween';
   const HALLOWEEN_PALETTE = Object.freeze({
     orange: '#e8731f',
     purple: '#9b63e8',
@@ -108,7 +107,7 @@ const BoohaSkins = (() => {
   const SKINS = Object.freeze({
     batty: Object.freeze({
       id: 'batty',
-      seasonId: 'halloween',
+      seasonId: 'halloween-2026',
       enabled: true,
       name: 'Batty Booha',
       nameJp: 'バッティー・ブーハー',
@@ -129,7 +128,7 @@ const BoohaSkins = (() => {
     }),
     mummington: Object.freeze({
       id: 'mummington',
-      seasonId: 'halloween',
+      seasonId: 'halloween-2026',
       enabled: true,
       name: 'Mummington Booha',
       nameJp: 'マミングトン ブーハー',
@@ -150,7 +149,7 @@ const BoohaSkins = (() => {
     }),
     mortisa: Object.freeze({
       id: 'mortisa',
-      seasonId: 'halloween',
+      seasonId: 'halloween-2026',
       enabled: true,
       name: 'Mortisa Booha',
       nameJp: 'モーティサ・ブーハー',
@@ -171,7 +170,7 @@ const BoohaSkins = (() => {
     }),
     doomlet: Object.freeze({
       id: 'doomlet',
-      seasonId: 'halloween',
+      seasonId: 'halloween-2026',
       enabled: true,
       name: 'Doomlet Booha',
       nameJp: 'ドゥームレット・ブーハー',
@@ -192,7 +191,7 @@ const BoohaSkins = (() => {
     }),
     hazel: Object.freeze({
       id: 'hazel',
-      seasonId: 'halloween',
+      seasonId: 'halloween-2026',
       enabled: true,
       name: 'Hazel Booha',
       nameJp: 'ヘイゼル・ブーハー',
@@ -213,7 +212,7 @@ const BoohaSkins = (() => {
     }),
     mister_happy: Object.freeze({
       id: 'mister_happy',
-      seasonId: 'halloween',
+      seasonId: 'halloween-2026',
       enabled: true,
       name: 'Mister Happy Booha',
       nameJp: 'ミスター・ハッピー・ブーハー',
@@ -234,10 +233,12 @@ const BoohaSkins = (() => {
     }),
   });
 
-  const SEASONS = Object.freeze({
-    halloween: Object.freeze({
-      id: 'halloween',
+  const seasonDefinitions = {
+    'halloween-2026': Object.freeze({
+      id: 'halloween-2026',
+      themeId: 'halloween',
       name: 'Halloween',
+      collectionJp: 'ハロウィンのなかま',
       // Halloween unlocks are assigned to the six Sunday-started occurrences
       // from September 20 through October 25, 2026.
       startDate: '2026-09-20',
@@ -271,7 +272,14 @@ const BoohaSkins = (() => {
       }),
       seasonalKarasuki: HALLOWEEN_KARASUKI,
     }),
+  };
+  // Keep the old unversioned lookup working for existing world code while
+  // canonical season IDs remain year-scoped for collection storage.
+  Object.defineProperty(seasonDefinitions, 'halloween', {
+    value: seasonDefinitions['halloween-2026'],
+    enumerable: false,
   });
+  const SEASONS = Object.freeze(seasonDefinitions);
 
   function save() {
     return window.BoohaAdventure && BoohaAdventure.save;
@@ -296,6 +304,10 @@ const BoohaSkins = (() => {
     } catch (_) { return ''; }
   }
 
+  function currentSeasonId() {
+    return seasonIdForDate();
+  }
+
   function seasonIdForDate(dateKey = currentDateKey()) {
     const date = String(dateKey || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
@@ -306,7 +318,12 @@ const BoohaSkins = (() => {
     }) || null;
   }
 
-  function rotationCharacterId(seasonId = CURRENT_SEASON_ID, occurrenceKey = currentWeekKey()) {
+  function canonicalSeasonId(id) {
+    if (id === 'halloween') return 'halloween-2026';
+    return id;
+  }
+
+  function rotationCharacterId(seasonId = currentSeasonId(), occurrenceKey = currentWeekKey()) {
     const season = getSeason(seasonId);
     if (!season || !season.characterIds.length) return null;
     const anchor = String(season.rotationStartOccurrenceKey || '').split('|')[0];
@@ -325,7 +342,7 @@ const BoohaSkins = (() => {
     return season.characterIds[weekIndex % season.characterIds.length];
   }
 
-  function menuCharacterId(seasonId = CURRENT_SEASON_ID, dateKey = currentDateKey()) {
+  function menuCharacterId(seasonId = currentSeasonId(), dateKey = currentDateKey()) {
     const season = getSeason(seasonId);
     const date = String(dateKey || '').slice(0, 10);
     const entry = (season?.menuSchedule || []).find(item => date >= item.start && date <= item.end);
@@ -347,8 +364,8 @@ const BoohaSkins = (() => {
     return SKINS[id] || null;
   }
 
-  function getSeason(id = CURRENT_SEASON_ID) {
-    return SEASONS[id] || null;
+  function getSeason(id = currentSeasonId()) {
+    return SEASONS[canonicalSeasonId(id)] || null;
   }
 
   function monthColorsForWeek(weekNumber) {
@@ -372,7 +389,9 @@ const BoohaSkins = (() => {
     const season = getSeason(seasonId);
     if (!season || !season.palette) return null;
     const root = document.documentElement;
-    root.dataset.season = season.id;
+    // Existing Halloween presentation CSS uses the stable theme key. The
+    // season object itself remains year-scoped for rewards and collection.
+    root.dataset.season = season.themeId || season.id;
     const vars = {
       orange: '--season-orange',
       purple: '--season-purple',
@@ -393,17 +412,17 @@ const BoohaSkins = (() => {
     return !!skin && skin.enabled === true && hasCompleteAssetSet(id);
   }
 
-  function seasonCharacters(seasonId = CURRENT_SEASON_ID) {
+  function seasonCharacters(seasonId = currentSeasonId()) {
     const season = getSeason(seasonId);
     if (!season) return [];
     return season.characterIds.map(id => get(id)).filter(Boolean);
   }
 
-  function availableCharacters(seasonId = CURRENT_SEASON_ID) {
+  function availableCharacters(seasonId = currentSeasonId()) {
     return seasonCharacters(seasonId).filter(skin => isAvailable(skin.id));
   }
 
-  function nextAvailableId(id, seasonId = CURRENT_SEASON_ID) {
+  function nextAvailableId(id, seasonId = currentSeasonId()) {
     const characters = availableCharacters(seasonId);
     if (!characters.length) return null;
     const index = characters.findIndex(skin => skin.id === id);
@@ -423,15 +442,43 @@ const BoohaSkins = (() => {
   // Weekly unlocks are intentionally temporary, but the Records shelf needs
   // a small permanent collection history so earned seasonal characters remain
   // visible after the Sunday rollover clears the active reward bucket.
+  function collectionKey(skin) {
+    return `${skin.seasonId}:${skin.id}`;
+  }
+
+  function migrateCollection(data) {
+    const collection = data?.meta?.boohaSkinCollection;
+    if (!collection || typeof collection !== 'object' || Array.isArray(collection)) return false;
+    let changed = false;
+    Object.entries(collection).forEach(([storedKey, entry]) => {
+      const skinId = storedKey.includes(':') ? storedKey.slice(storedKey.lastIndexOf(':') + 1) : storedKey;
+      const skin = get(skinId);
+      if (!skin) return;
+      const storedSeasonId = typeof entry?.seasonId === 'string'
+        ? canonicalSeasonId(entry.seasonId)
+        : skin.seasonId;
+      const key = `${storedSeasonId}:${skin.id}`;
+      if (storedKey === key) return;
+      if (!collection[key]) collection[key] = { ...(entry || {}), seasonId: storedSeasonId };
+      delete collection[storedKey];
+      changed = true;
+    });
+    return changed;
+  }
+
   function isCollected(id) {
     const skin = get(id);
     if (!skin) return false;
     try {
-      return !!save()?.load()?.meta?.boohaSkinCollection?.[skin.id];
+      const saveFile = save();
+      const data = saveFile?.load();
+      const changed = migrateCollection(data);
+      if (changed) saveFile.save(data);
+      return !!data?.meta?.boohaSkinCollection?.[collectionKey(skin)];
     } catch (_) { return false; }
   }
 
-  function collectedSkinIds(seasonId = CURRENT_SEASON_ID) {
+  function collectedSkinIds(seasonId = currentSeasonId()) {
     return seasonCharacters(seasonId)
       .filter(skin => isCollected(skin.id))
       .map(skin => skin.id);
@@ -456,6 +503,7 @@ const BoohaSkins = (() => {
     const saveFile = save();
     if (!skin || !isAvailable(id) || !saveFile) return false;
     const data = saveFile.load();
+    migrateCollection(data);
     if (rotationCharacterId(skin.seasonId) !== id || !hasCurrentBlitzTriple(data)) return false;
     if (!data.weekly || typeof data.weekly !== 'object' || Array.isArray(data.weekly)) data.weekly = {};
     if (!data.weekly.unlockedBoohaSkins || typeof data.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(data.weekly.unlockedBoohaSkins)) {
@@ -471,8 +519,9 @@ const BoohaSkins = (() => {
     if (!data.meta.boohaSkinCollection || typeof data.meta.boohaSkinCollection !== 'object' || Array.isArray(data.meta.boohaSkinCollection)) {
       data.meta.boohaSkinCollection = {};
     }
-    if (!data.meta.boohaSkinCollection[skin.id]) {
-      data.meta.boohaSkinCollection[skin.id] = { unlockedAt: Date.now(), seasonId: skin.seasonId };
+    const key = collectionKey(skin);
+    if (!data.meta.boohaSkinCollection[key]) {
+      data.meta.boohaSkinCollection[key] = { unlockedAt: Date.now(), seasonId: skin.seasonId };
     }
     return saveFile.save(data);
   }
@@ -501,7 +550,8 @@ const BoohaSkins = (() => {
 
   return Object.freeze({
     BASE,
-    CURRENT_SEASON_ID,
+    get CURRENT_SEASON_ID() { return currentSeasonId(); },
+    currentSeasonId,
     POSE_KEYS,
     MONTH_COLORS,
     hasCurrentBlitzTriple,
