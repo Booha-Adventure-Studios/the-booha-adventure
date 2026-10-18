@@ -33,7 +33,7 @@ const CURRENT_CACHES = {
   // scheduled Batty/Mummington popups reach returning clients.
   // Booha spelling consistency pass (2026-10-08): refresh the precached
   // shells after standardizing the Japanese name to ブーハー.
-  pages:  'booha-pages-2026-456',
+  pages:  'booha-pages-2026-457',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -207,8 +207,8 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-576',
-  decks:  'booha-decks-2026-311',
+  assets: 'booha-assets-2026-577',
+  decks:  'booha-decks-2026-312',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;

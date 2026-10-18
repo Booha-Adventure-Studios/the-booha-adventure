@@ -426,15 +426,32 @@ window.BoohaDailyCheck = (function () {
     html[data-season="halloween"] .dc-btn.ghost{border-color:rgba(202,185,207,.55);}
     html[data-season="halloween"] .dc-btn:not(.ghost),
     html[data-season="halloween"] .dc-audio{box-shadow:0 8px 22px rgba(232,115,31,.42);}
+    html[data-season="christmas"] .dc-root{
+      --pink:var(--season-orange,#c94b55);--pink2:var(--season-lime,#f4d06f);
+      background:
+        radial-gradient(ellipse at 50% 30%,rgba(14,45,36,.48) 0%,rgba(5,18,22,.82) 62%,rgba(3,8,8,.95) 100%),
+        var(--bg,#000) url('assets/img/background-1.webp') center/cover no-repeat;}
+    html[data-season="christmas"] .dc-card{background:rgba(7,28,22,.78);border-color:rgba(85,212,134,.34);}
+    html[data-season="christmas"] .dc-ghost{filter:drop-shadow(0 8px 24px rgba(244,208,111,.34));}
+    html[data-season="christmas"] .dc-streak{background:rgba(21,66,41,.5);border-color:rgba(244,208,111,.4);color:#ffe9a3;}
+    html[data-season="christmas"] .dc-btn.ghost{border-color:rgba(181,231,197,.55);}
+    html[data-season="christmas"] .dc-btn:not(.ghost),
+    html[data-season="christmas"] .dc-audio{box-shadow:0 8px 22px rgba(201,75,85,.38);}
     @media (prefers-reduced-motion: no-preference){
       html[data-season="halloween"] .dc-btn.dc-start-ready{animation-name:dcStartGlowHalloween;}
+      html[data-season="christmas"] .dc-btn.dc-start-ready{animation-name:dcStartGlowChristmas;}
     }
     @media (prefers-reduced-motion: reduce){
       html[data-season="halloween"] .dc-btn.dc-start-ready{box-shadow:0 8px 26px rgba(232,115,31,.68),0 0 0 4px rgba(255,180,90,.18),0 0 28px rgba(232,115,31,.45);}
+      html[data-season="christmas"] .dc-btn.dc-start-ready{box-shadow:0 8px 26px rgba(201,75,85,.62),0 0 0 4px rgba(244,208,111,.16),0 0 28px rgba(85,212,134,.36);}
     }
     @keyframes dcStartGlowHalloween{
       0%,100%{box-shadow:0 8px 22px rgba(232,115,31,.42),0 0 0 0 rgba(255,180,90,0);}
       50%{box-shadow:0 8px 26px rgba(232,115,31,.68),0 0 0 7px rgba(255,180,90,.18),0 0 34px rgba(232,115,31,.5);}
+    }
+    @keyframes dcStartGlowChristmas{
+      0%,100%{box-shadow:0 8px 22px rgba(201,75,85,.38),0 0 0 0 rgba(244,208,111,0);}
+      50%{box-shadow:0 8px 26px rgba(201,75,85,.62),0 0 0 7px rgba(244,208,111,.16),0 0 34px rgba(85,212,134,.42);}
     }
     @media (orientation:landscape) and (max-height:600px){
       html[data-season="halloween"] .dc-ghost{filter:none;}
@@ -475,9 +492,12 @@ window.BoohaDailyCheck = (function () {
 
   function burst(root, x, y) {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const colors = document.documentElement.dataset.season === 'halloween'
+    const season = document.documentElement.dataset.season;
+    const colors = season === 'halloween'
       ? ['#ff8a2a', '#ffb45a', '#ffd36e', '#9b63e8', '#c9a6ff']
-      : ['#ff3bbd', '#ff79d7', '#ffd36e', '#7ef0ff', '#a6ff7e'];
+      : season === 'christmas'
+        ? ['#ff6f78', '#f4d06f', '#ffe9a3', '#55d486', '#d8ffe3']
+        : ['#ff3bbd', '#ff79d7', '#ffd36e', '#7ef0ff', '#a6ff7e'];
     for (let i = 0; i < 12; i++) {
       const d = document.createElement('div');
       d.className = 'dc-burst';
@@ -544,7 +564,9 @@ window.BoohaDailyCheck = (function () {
       const id = window.BoohaSkins?.menuCharacterId?.();
       const skin = id ? window.BoohaSkins.get(id) : null;
       g.className = 'dc-ghost';
-      g.src = skin?.assets?.maze || 'assets/img/booha_ghost.webp';
+      g.src = skin?.assets?.maze
+        || (skin?.kind === 'mascot' ? window.BoohaSkins?.mascotAsset?.('static') : null)
+        || 'assets/img/booha_ghost.webp';
       g.alt = skin?.name || 'Booha';
       return g;
     }
@@ -776,9 +798,12 @@ window.BoohaDailyCheck = (function () {
           sub.textContent = `${pct}%  ·  ${content.curr.toUpperCase()}`; root.appendChild(sub);
 
           const streakEl = document.createElement('div'); streakEl.className = 'dc-streak';
-          streakEl.textContent = document.documentElement.dataset.season === 'halloween'
+          const season = document.documentElement.dataset.season;
+          streakEl.textContent = season === 'halloween'
             ? `キャンディ ${st}個`
-            : `✓ ${st}日`;
+            : season === 'christmas'
+              ? `ギフト ${st}個`
+              : `✓ ${st}日`;
           root.appendChild(streakEl);
 
           const b = document.createElement('button');

@@ -439,6 +439,71 @@
     .halloweenLabel { display: none !important; }
     html[data-season="halloween"] .halloweenLabel { display: block !important; color: #ffbc65; text-shadow: 0 0 12px rgba(255,131,34,.56); }
     html[data-season="halloween"] .defaultLabel { display: none !important; }
+    html[data-season="christmas"] #startScene {
+      background:
+        linear-gradient(180deg, rgba(5,18,22,.48) 0%, rgba(26,5,17,.76) 100%),
+        url('assets/img/background-1.webp') center/cover no-repeat;
+    }
+    html[data-season="christmas"] #startScene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(244,208,111,.17) 0 2px, transparent 3px),
+        radial-gradient(circle at 78% 26%, rgba(85,212,134,.16) 0 2px, transparent 3px),
+        linear-gradient(180deg, transparent 58%, rgba(7,19,15,.22) 100%);
+      background-size: 180px 220px, 230px 260px, 100% 100%;
+      animation: christmasGlow 12s ease-in-out infinite alternate;
+    }
+    html[data-season="christmas"] #startScene::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 35;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 34%, rgba(7,19,15,.26) 72%, rgba(5,8,8,.58) 100%);
+    }
+    @keyframes christmasGlow {
+      from { opacity: .72; transform: scale(1); }
+      to { opacity: 1; transform: scale(1.03); }
+    }
+    html[data-season="christmas"] .sp {
+      background: var(--season-lime, #f4d06f);
+      box-shadow: 0 0 4px 1px var(--season-lime, #ffe9a3), 0 0 12px 3px var(--season-purple, #2f7d4a);
+    }
+    html[data-season="christmas"] .hubHeading {
+      background: linear-gradient(100deg, #fff 0%, #ffe9a3 24%, var(--season-lime, #f4d06f) 42%, #e7fff0 64%, var(--season-purple, #2f7d4a) 82%, #fff 100%);
+      background-size: 260% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      filter: drop-shadow(0 0 26px rgba(85,212,134,.38)) drop-shadow(0 0 58px rgba(201,75,85,.24)) drop-shadow(0 2px 8px rgba(0,0,0,.9));
+    }
+    html[data-season="christmas"] .hubHeadingJp { color: rgba(255,233,163,.84); text-shadow: 0 0 12px rgba(85,212,134,.34), 0 1px 4px rgba(0,0,0,.8); }
+    html[data-season="christmas"] .btnGold {
+      border-radius: 18px 18px 12px 12px;
+      background: linear-gradient(180deg, #f7d878, #b83e4b);
+      color: #241006;
+      box-shadow: 0 8px 24px rgba(201,75,85,.34), inset 0 1px 0 rgba(255,255,255,.62), 0 0 20px rgba(244,208,111,.2);
+    }
+    html[data-season="christmas"] .btnGhost {
+      border: 1.5px solid rgba(85,212,134,.62);
+      border-radius: 48% 48% 10px 10px;
+      color: rgba(235,255,242,.92);
+      background: linear-gradient(180deg, rgba(47,125,74,.42), rgba(16,45,31,.9));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 8px 22px rgba(0,0,0,.42);
+    }
+    html[data-season="christmas"] .btnGold.pressed { filter: brightness(1.18); transform: scale(.96) translateY(2px); }
+    html[data-season="christmas"] .btnGhost.pressed { filter: brightness(1.16); transform: scale(.97) translateY(2px); }
+    html[data-season="christmas"] .dcStamp {
+      color: var(--season-lime, #f4d06f);
+      border: 1px solid rgba(85,212,134,.42);
+      border-radius: 999px;
+      padding: 4px 12px;
+      background: rgba(21,66,41,.48);
+      text-shadow: 0 0 12px rgba(244,208,111,.56);
+    }
     @media (prefers-reduced-motion: reduce) {
       .sp { animation: none; }
       html[data-season="halloween"] #halloweenOpening,
@@ -446,6 +511,8 @@
       html[data-season="halloween"] .btnGold { animation: none; }
       html[data-season="halloween"] #halloweenOpening { display: none; }
       html[data-season="halloween"] .hubHeading { animation: none; background-position: 0 50%; }
+      html[data-season="christmas"] #startScene::before { animation: none; }
+      html[data-season="christmas"] .hubHeading { animation: none; background-position: 0 50%; }
     }
 
     #boohaGhost {
@@ -2424,7 +2491,9 @@ function applySeasonalLandingSkin() {
   const id = window.BoohaSkins?.menuCharacterId?.();
   const skin = id ? window.BoohaSkins.get(id) : null;
   if (!image) return;
-  const source = skin?.assets?.maze || image.dataset.defaultSrc;
+  const source = skin?.assets?.maze
+    || (skin?.kind === 'mascot' ? window.BoohaSkins?.mascotAsset?.('static') : null)
+    || image.dataset.defaultSrc;
   if (!source) return;
   if (image.getAttribute('src') !== source) image.src = source;
   image.alt = skin?.name || 'Booha';

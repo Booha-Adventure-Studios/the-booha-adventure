@@ -20,6 +20,17 @@ const BoohaSkins = (() => {
     purple: '#b44dff',
     lime: '#9dff3a',
   });
+  const CHRISTMAS_PALETTE = Object.freeze({
+    orange: '#c94b55',
+    purple: '#2f7d4a',
+    lime: '#f4d06f',
+    black: '#07130f',
+  });
+  const CHRISTMAS_GLOW = Object.freeze({
+    orange: '#ff6f78',
+    purple: '#55d486',
+    lime: '#ffe9a3',
+  });
   const HALLOWEEN_KARASUKI = Object.freeze({
     kind: 'barba',
     name: 'Barba',
@@ -108,6 +119,30 @@ const BoohaSkins = (() => {
   const MASCOT_POSE_KEYS = Object.freeze(['static', 'karasuki']);
   const BLITZ_GAME_TYPES = Object.freeze(['vocab', 'sentences', 'questions']);
   const BLITZ_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
+  function makeSeasonalUnlockable(id, name, nameJp, enabled = false) {
+    const folder = `assets/skins/${id}_booha`;
+    return Object.freeze({
+      id,
+      seasonId: 'christmas-2026',
+      enabled,
+      name: `${name} Booha`,
+      nameJp: `${nameJp}・ブーハー`,
+      unlockId: `booha_skin_${id}`,
+      assets: Object.freeze({
+        maze: `${folder}/static.webp`,
+        karasuki: `${folder}/static.webp`,
+        grimmerglen: `${folder}/static.webp`,
+        utsuroba: `${folder}/static.webp`,
+        muenba: `${folder}/static.webp`,
+        familyRoom: `${folder}/static.webp`,
+        marking: `${folder}/marking.webp`,
+        hiding: `${folder}/hiding.webp`,
+        danceArmsUp: `${folder}/dance_arms_up.webp`,
+        danceSway: `${folder}/dance_sway.webp`,
+        danceWave: `${folder}/dance_wave.webp`,
+      }),
+    });
+  }
   const SKINS = Object.freeze({
     batty: Object.freeze({
       id: 'batty',
@@ -247,6 +282,17 @@ const BoohaSkins = (() => {
         karasuki: 'assets/skins/grubb_booha/karasuki.webp',
       }),
     }),
+    // Art-complete unlockables are enabled one at a time as their full pose
+    // sets land. The schedule is defined up front, but missing art can never
+    // become a playable selection by accident.
+    thumpkin: makeSeasonalUnlockable('thumpkin', 'Thumpkin', 'ソンプキン', true),
+    crumbly: makeSeasonalUnlockable('crumbly', 'Crumbly', 'クランブリー'),
+    gnasher: makeSeasonalUnlockable('gnasher', 'Gnasher', 'ナーシャー'),
+    waddlesworth: makeSeasonalUnlockable('waddlesworth', 'Waddlesworth', 'ワードルスワース'),
+    snaggle: makeSeasonalUnlockable('snaggle', 'Snaggle', 'スナグル'),
+    tinkerplunk: makeSeasonalUnlockable('tinkerplunk', 'Tinkerplunk', 'ティンカープランク'),
+    oats: makeSeasonalUnlockable('oats', 'Oats', 'オーツ'),
+    quillock: makeSeasonalUnlockable('quillock', 'Quillock', 'クウィラック'),
   });
 
   const seasonDefinitions = {
@@ -288,11 +334,50 @@ const BoohaSkins = (() => {
       }),
       seasonalKarasuki: HALLOWEEN_KARASUKI,
     }),
+    'christmas-2026': Object.freeze({
+      id: 'christmas-2026',
+      themeId: 'christmas',
+      name: 'Christmas',
+      collectionJp: 'クリスマスのなかま',
+      mascotId: 'grubb',
+      // Eight player characters run from Nov 1 through Jan 2. The fifth
+      // Sunday occurrence repeats Week 4's content but still gets its own
+      // weekly save bucket through the calendar occurrence key.
+      startDate: '2026-11-01',
+      endDate: '2027-01-02',
+      rotationStartOccurrenceKey: '2026-11-01|november-w1',
+      characterIds: Object.freeze([
+        'thumpkin', 'crumbly', 'gnasher', 'waddlesworth',
+        'snaggle', 'tinkerplunk', 'oats', 'quillock',
+      ]),
+      weeklyCharacterIds: Object.freeze({
+        '2026-11-01': 'thumpkin',
+        '2026-11-08': 'crumbly',
+        '2026-11-15': 'gnasher',
+        '2026-11-22': 'waddlesworth',
+        '2026-11-29': 'waddlesworth',
+        '2026-12-06': 'snaggle',
+        '2026-12-13': 'tinkerplunk',
+        '2026-12-20': 'oats',
+        '2026-12-27': 'quillock',
+      }),
+      // Grubb is the seasonal mascot, not a weekly reward. He is visible on
+      // the landing page and in Daily Check throughout the whole season.
+      menuSchedule: Object.freeze([
+        Object.freeze({ start: '2026-11-01', end: '2027-01-02', characterId: 'grubb' }),
+      ]),
+      palette: CHRISTMAS_PALETTE,
+      glow: CHRISTMAS_GLOW,
+    }),
   };
   // Keep the old unversioned lookup working for existing world code while
   // canonical season IDs remain year-scoped for collection storage.
   Object.defineProperty(seasonDefinitions, 'halloween', {
     value: seasonDefinitions['halloween-2026'],
+    enumerable: false,
+  });
+  Object.defineProperty(seasonDefinitions, 'christmas', {
+    value: seasonDefinitions['christmas-2026'],
     enumerable: false,
   });
   const SEASONS = Object.freeze(seasonDefinitions);
@@ -336,6 +421,7 @@ const BoohaSkins = (() => {
 
   function canonicalSeasonId(id) {
     if (id === 'halloween') return 'halloween-2026';
+    if (id === 'christmas') return 'christmas-2026';
     return id;
   }
 
