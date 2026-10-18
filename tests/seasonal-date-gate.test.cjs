@@ -55,7 +55,7 @@ const sundaySwitches = [
 sundaySwitches.forEach(([iso, key, expectedCharacter]) => {
   const { week, key: occurrenceKey } = occurrence(new Date(iso));
   assert.strictEqual(dateKey(new Date(iso)), key, `${key}: Tokyo date must be stable`);
-  assert.strictEqual(skins.seasonIdForDate(key), 'halloween', `${key}: Halloween must be active`);
+  assert.strictEqual(skins.seasonIdForDate(key), 'halloween-2026', `${key}: Halloween must be active`);
   assert.strictEqual(skins.menuCharacterId('halloween', key), 'batty', `${key}: menu must show Batty`);
   assert.strictEqual(skins.rotationCharacterId('halloween', occurrenceKey), expectedCharacter,
     `${key}: weekly unlock must schedule ${expectedCharacter}`);

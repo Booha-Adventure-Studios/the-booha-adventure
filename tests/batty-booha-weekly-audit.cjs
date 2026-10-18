@@ -50,10 +50,10 @@ vm.createContext(context);
 vm.runInContext(source, context, { filename: 'js/core/booha-skins.js' });
 const skins = context.window.BoohaSkins;
 
-assert.strictEqual(skins.CURRENT_SEASON_ID, 'halloween');
+assert.strictEqual(skins.CURRENT_SEASON_ID, 'halloween-2026');
 const mummington = skins.get('mummington');
 assert.strictEqual(mummington.id, 'mummington');
-assert.strictEqual(mummington.seasonId, 'halloween');
+assert.strictEqual(mummington.seasonId, 'halloween-2026');
 assert.strictEqual(mummington.enabled, true);
 assert.strictEqual(mummington.name, 'Mummington Booha');
 assert.strictEqual(mummington.nameJp, 'マミングトン ブーハー');
@@ -89,13 +89,20 @@ stored.weekly.unlockedBoohaSkins = {};
 assert.strictEqual(skins.isUnlocked('batty'), false);
 assert.strictEqual(skins.unlockAndEquip('batty'), true);
 assert.ok(stored.weekly.unlockedBoohaSkins.batty);
-assert.ok(stored.meta.boohaSkinCollection.batty);
+assert.ok(stored.meta.boohaSkinCollection['halloween-2026:batty']);
 assert.strictEqual(stored.meta.selectedBoohaSkin, 'batty');
 assert.strictEqual(stored.unlocks.booha_skin_batty, undefined,
   'Batty must not be written to permanent unlocks');
 assert.strictEqual(skins.isUnlocked('batty'), true);
 assert.strictEqual(skins.selectedId(), 'batty');
 assert.ok(events.includes('booha:skinChanged'));
+
+// Saves created by the first Records shelf stored collection entries by skin
+// id only. They migrate to the year-scoped key without losing the unlock.
+stored.meta.boohaSkinCollection = { batty: { unlockedAt: 1, seasonId: 'halloween' } };
+assert.strictEqual(skins.isCollected('batty'), true);
+assert.ok(stored.meta.boohaSkinCollection['halloween-2026:batty']);
+assert.strictEqual(stored.meta.boohaSkinCollection.batty, undefined);
 
 // The weekly rollover clears this bucket and the selected skin, after which
 // the next qualifying Blitz completion can call unlockAndEquip again.
