@@ -427,16 +427,18 @@ window.BoohaDailyCheck = (function () {
     html[data-season="halloween"] .dc-btn:not(.ghost),
     html[data-season="halloween"] .dc-audio{box-shadow:0 8px 22px rgba(232,115,31,.42);}
     html[data-season="christmas"] .dc-root{
-      --pink:var(--season-orange,#c94b55);--pink2:var(--season-lime,#f4d06f);
+      --pink:var(--season-red,#c7354b);--pink2:var(--season-gold,#f2c95c);
       background:
+        radial-gradient(circle at 18px 26px,rgba(255,250,240,.8) 0 1.5px,transparent 2.8px),
+        radial-gradient(circle at 92px 116px,rgba(255,250,240,.62) 0 2px,transparent 3.5px),
         radial-gradient(ellipse at 50% 30%,rgba(14,45,36,.48) 0%,rgba(5,18,22,.82) 62%,rgba(3,8,8,.95) 100%),
         var(--bg,#000) url('assets/img/background-1.webp') center/cover no-repeat;}
-    html[data-season="christmas"] .dc-card{background:rgba(7,28,22,.78);border-color:rgba(85,212,134,.34);}
-    html[data-season="christmas"] .dc-ghost{filter:drop-shadow(0 8px 24px rgba(244,208,111,.34));}
-    html[data-season="christmas"] .dc-streak{background:rgba(21,66,41,.5);border-color:rgba(244,208,111,.4);color:#ffe9a3;}
-    html[data-season="christmas"] .dc-btn.ghost{border-color:rgba(181,231,197,.55);}
+    html[data-season="christmas"] .dc-card{background:rgba(7,28,22,.78);border-color:rgba(38,116,72,.55);}
+    html[data-season="christmas"] .dc-ghost{filter:drop-shadow(0 8px 24px rgba(242,201,92,.34));}
+    html[data-season="christmas"] .dc-streak{background:rgba(38,116,72,.38);border-color:rgba(242,201,92,.5);color:#fffaf0;}
+    html[data-season="christmas"] .dc-btn.ghost{border-color:rgba(255,250,240,.58);}
     html[data-season="christmas"] .dc-btn:not(.ghost),
-    html[data-season="christmas"] .dc-audio{box-shadow:0 8px 22px rgba(201,75,85,.38);}
+    html[data-season="christmas"] .dc-audio{box-shadow:0 8px 22px rgba(199,53,75,.42);}
     @media (prefers-reduced-motion: no-preference){
       html[data-season="halloween"] .dc-btn.dc-start-ready{animation-name:dcStartGlowHalloween;}
       html[data-season="christmas"] .dc-btn.dc-start-ready{animation-name:dcStartGlowChristmas;}

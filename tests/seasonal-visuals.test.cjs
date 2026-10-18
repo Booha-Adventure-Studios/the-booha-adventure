@@ -56,10 +56,12 @@ assert.ok(skins.isAvailable('thumpkin'), 'Thumpkin is the first complete Christm
 assert.ok(!skins.isAvailable('crumbly'), 'future Christmas art must stay unavailable until enabled with a complete set');
 assert.strictEqual(skins.seasonMascot('christmas-2026').id, 'grubb');
 assert.strictEqual(skins.mascotAsset('karasuki', 'christmas-2026'), grubb.assets.karasuki);
-assert.deepStrictEqual(Object.keys(christmas.palette).sort(), ['black', 'lime', 'orange', 'purple']);
-assert.strictEqual(christmas.palette.orange, '#c94b55');
-assert.strictEqual(christmas.palette.purple, '#2f7d4a');
-assert.strictEqual(christmas.glow.lime, '#ffe9a3');
+assert.deepStrictEqual(Object.keys(christmas.palette).sort(), ['black', 'gold', 'green', 'lime', 'orange', 'purple', 'red', 'white']);
+assert.strictEqual(christmas.palette.red, '#c7354b');
+assert.strictEqual(christmas.palette.green, '#267448');
+assert.strictEqual(christmas.palette.white, '#fffaf0');
+assert.strictEqual(christmas.palette.gold, '#f2c95c');
+assert.strictEqual(christmas.glow.gold, '#ffe9a3');
 const palette = skins.SEASONS.halloween.palette;
 const glow = skins.SEASONS.halloween.glow;
 assert.deepStrictEqual(Object.keys(palette).sort(), ['black', 'lime', 'orange', 'purple']);
@@ -145,6 +147,8 @@ assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ an
   'index sparkles must stop under reduced motion');
 assert.match(index, /html\[data-season="christmas"\] #startScene/,
   'Christmas must have an explicit landing presentation theme');
+assert.match(index, /@keyframes christmasSnow/,
+  'Christmas must render a lightweight drifting snow layer');
 assert.match(index, /mascotAsset\?\.\('static'\)/,
   'landing page must be able to render a mascot with no gameplay pose set');
 
