@@ -34,6 +34,15 @@ vm.createContext(context);
 vm.runInContext(read('js/core/booha-skins.js'), context, { filename: 'js/core/booha-skins.js' });
 
 const skins = context.window.BoohaSkins;
+const grubb = skins.get('grubb');
+assert.strictEqual(grubb.kind, 'mascot');
+assert.strictEqual(grubb.seasonId, 'christmas-2026');
+assert.ok(skins.isMascot('grubb'), 'Grubb must be modeled as a seasonal mascot');
+assert.ok(skins.hasCompleteMascotAssetSet('grubb'), 'Grubb must satisfy the mascot asset contract');
+assert.ok(!skins.hasCompleteAssetSet('grubb'), 'Grubb must not be required to have weekly gameplay poses');
+assert.ok(skins.isAvailable('grubb'), 'a complete mascot should be available to the season resolver');
+assert.ok(fs.existsSync(path.join(root, grubb.assets.static)), 'Grubb static asset must exist');
+assert.ok(fs.existsSync(path.join(root, grubb.assets.karasuki)), 'Grubb Karasuki asset must exist');
 const palette = skins.SEASONS.halloween.palette;
 const glow = skins.SEASONS.halloween.glow;
 assert.deepStrictEqual(Object.keys(palette).sort(), ['black', 'lime', 'orange', 'purple']);

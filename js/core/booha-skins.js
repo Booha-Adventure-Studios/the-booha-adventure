@@ -102,6 +102,10 @@ const BoohaSkins = (() => {
     'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
     'marking', 'hiding', 'danceArmsUp', 'danceSway', 'danceWave',
   ]);
+  // Mascots are seasonal visitors, not weekly player skins. They need one
+  // everyday sprite plus an optional warmer Karasuki interaction pose, not
+  // the full gameplay/dance set required by an unlockable character.
+  const MASCOT_POSE_KEYS = Object.freeze(['static', 'karasuki']);
   const BLITZ_GAME_TYPES = Object.freeze(['vocab', 'sentences', 'questions']);
   const BLITZ_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
   const SKINS = Object.freeze({
@@ -229,6 +233,18 @@ const BoohaSkins = (() => {
         danceArmsUp: 'assets/skins/mister_happy_booha/dance_arms_up.webp',
         danceSway: 'assets/skins/mister_happy_booha/dance_sway.webp',
         danceWave: 'assets/skins/mister_happy_booha/dance_wave.webp',
+      }),
+    }),
+    grubb: Object.freeze({
+      id: 'grubb',
+      kind: 'mascot',
+      seasonId: 'christmas-2026',
+      enabled: true,
+      name: 'Grubb',
+      nameJp: 'グラブ',
+      assets: Object.freeze({
+        static: 'assets/skins/grubb_booha/static.webp',
+        karasuki: 'assets/skins/grubb_booha/karasuki.webp',
       }),
     }),
   });
@@ -384,6 +400,17 @@ const BoohaSkins = (() => {
     return getSeason(seasonId)?.seasonalKarasuki || null;
   }
 
+  function seasonMascot(seasonId = seasonIdForDate()) {
+    const mascotId = getSeason(seasonId)?.mascotId;
+    return mascotId && isMascot(mascotId) ? get(mascotId) : null;
+  }
+
+  function mascotAsset(role = 'static', seasonId = seasonIdForDate()) {
+    const mascot = seasonMascot(seasonId);
+    if (!mascot || !isAvailable(mascot.id)) return null;
+    return mascot.assets[role] || mascot.assets.static || null;
+  }
+
   function applySeasonTheme(seasonId = seasonIdForDate()) {
     if (typeof document === 'undefined' || !document.documentElement) return null;
     const season = getSeason(seasonId);
@@ -404,12 +431,25 @@ const BoohaSkins = (() => {
 
   function hasCompleteAssetSet(id) {
     const skin = get(id);
-    return !!skin && POSE_KEYS.every(key => typeof skin.assets[key] === 'string' && skin.assets[key]);
+    return !!skin && !isMascot(id) && POSE_KEYS.every(key => typeof skin.assets[key] === 'string' && skin.assets[key]);
+  }
+
+  function isMascot(id) {
+    return get(id)?.kind === 'mascot';
+  }
+
+  function hasCompleteMascotAssetSet(id) {
+    const skin = get(id);
+    return !!skin && isMascot(id) && MASCOT_POSE_KEYS.every(key =>
+      typeof skin.assets[key] === 'string' && skin.assets[key]
+    );
   }
 
   function isAvailable(id) {
     const skin = get(id);
-    return !!skin && skin.enabled === true && hasCompleteAssetSet(id);
+    return !!skin && skin.enabled === true && (isMascot(id)
+      ? hasCompleteMascotAssetSet(id)
+      : hasCompleteAssetSet(id));
   }
 
   function seasonCharacters(seasonId = currentSeasonId()) {
@@ -553,6 +593,7 @@ const BoohaSkins = (() => {
     get CURRENT_SEASON_ID() { return currentSeasonId(); },
     currentSeasonId,
     POSE_KEYS,
+    MASCOT_POSE_KEYS,
     MONTH_COLORS,
     hasCurrentBlitzTriple,
     SKINS,
@@ -560,6 +601,8 @@ const BoohaSkins = (() => {
     get,
     getSeason,
     hasCompleteAssetSet,
+    hasCompleteMascotAssetSet,
+    isMascot,
     isAvailable,
     seasonCharacters,
     collectedSkinIds,
@@ -571,6 +614,8 @@ const BoohaSkins = (() => {
     monthColorsForWeek,
     seasonalVisitor,
     seasonalKarasuki,
+    seasonMascot,
+    mascotAsset,
     applySeasonTheme,
     unlock,
     isUnlocked,
