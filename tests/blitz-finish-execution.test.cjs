@@ -58,10 +58,15 @@ function makeFinishDom() {
   };
 }
 
-function runFinish({ perfect = true, isRecord = false, dispatchError = false } = {}) {
+function runFinish({ perfect = true, isRecord = false, dispatchError = false, reducedMotion = false, lowPower = false } = {}) {
   const dom = makeFinishDom();
+  if (lowPower) dom.overlay.classList.add('low-power');
   const events = [];
+  const timers = [];
+  let nextTimerId = 0;
   let saveCalls = 0;
+  let sceneCelebrations = 0;
+  let sceneSettles = 0;
   const context = {
     console: { ...console, error: () => {} },
     performance: { now: () => 1234 },
@@ -75,7 +80,7 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     runIsActive: true,
     climaxTimer: null,
     runEpoch: 1,
-    REDUCED_MOTION: false,
+    REDUCED_MOTION: reducedMotion,
     LEGACY_BLITZ_CELEBRATIONS_ENABLED: false,
     playSceneSfx: () => {},
     visibilityPaused: false,
@@ -85,6 +90,10 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     overlay: dom.overlay,
     winScreen: dom.winScreen,
     finalCard: dom.finalCard,
+    sceneFill: {
+      celebrate() { sceneCelebrations++; },
+      settleCelebration() { sceneSettles++; },
+    },
     FINAL_CARD_HOLD_MS: 1400,
     scene: { label: 'CIRCUS TENT' },
     renderFinalWeekRow: () => {},
@@ -108,19 +117,41 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     speedBandFor: (ms, targetMs) => ms <= targetMs * 0.75 ? 'elite' : ms <= targetMs ? 'target' : 'clear',
     document: { dispatchEvent: event => { events.push(event); if (dispatchError) throw new Error('listener failure'); } },
     CustomEvent: function CustomEvent(type, init) { return { type, ...init }; },
-    setTimeout: () => 1,
-    clearTimeout: () => {},
+    setTimeout: (callback, delay) => {
+      const timer = { id: ++nextTimerId, callback, delay, cancelled: false };
+      timers.push(timer);
+      return timer.id;
+    },
+    clearTimeout: id => {
+      const timer = timers.find(entry => entry.id === id);
+      if (timer) timer.cancelled = true;
+    },
     emitPerfectFlash: () => {}, emitFinishFlash: () => {}, playFinalStinger: () => {}, startFinalHold: () => {}, celebrate: () => {},
   };
   context.spotlight = { playerName: 'PLAYER', nameplate: new FakeElement(), announce: () => {} };
 
   const showWin = vm.runInNewContext(`(${showWinSource})`, context);
   assert.doesNotThrow(() => showWin(1234), 'showWin() must not throw');
-  return { dom, events, saveCalls };
+  const visibleBeforeReveal = dom.winScreen.classList.contains('show');
+  const expectedDelay = reducedMotion ? 420 : lowPower ? 1000 : 2600;
+  const finaleTimer = timers.find(timer => timer.delay === expectedDelay && !timer.cancelled);
+  if (!dispatchError) {
+    assert(finaleTimer, `finish must schedule a ${expectedDelay}ms finale`);
+    finaleTimer.callback();
+  }
+  return { dom, events, saveCalls, visibleBeforeReveal, sceneCelebrations, sceneSettles, expectedDelay };
 }
 
 const perfect = runFinish();
 assert(perfect.dom.winScreen.classList.contains('show'), 'perfect finish screen must be visible');
+assert.strictEqual(perfect.visibleBeforeReveal, false, 'the result card must wait for the finale');
+assert.strictEqual(perfect.sceneCelebrations, 1, 'the scene must celebrate once');
+assert.strictEqual(perfect.sceneSettles, 1, 'the scene must settle under the result card');
+assert.strictEqual(perfect.expectedDelay, 2600);
+assert.strictEqual(runFinish({ reducedMotion: true }).expectedDelay, 420,
+  'reduced motion must use the short finale');
+assert.strictEqual(runFinish({ lowPower: true }).expectedDelay, 1000,
+  'low power must use the shorter finale');
 assert.match(perfect.dom.winScreen.children.winRecord.innerHTML, /vs best/,
   'a slower clear must show its gap to the best time, not a NEW BEST header');
 assert.strictEqual(perfect.events.length, 1, 'perfect run must emit one completion event');

@@ -164,9 +164,12 @@
     function maybeShowSeasonalUnlockPopup() {
       if (popupShown || !skins) return;
       const id = skins.rotationCharacterId?.();
-      if (!id || skins.isUnlocked?.(id) || !blitzTripleCompleteForAnyCurriculum()) return;
+      if (!id || !blitzTripleCompleteForAnyCurriculum()) return;
+      // Blitz now unlocks the character itself; Maze shows the reveal once.
+      if (skins.isUnlocked?.(id) && skins.isRevealSeen?.(id)) return;
       if (!prepareSeasonalUnlockPopup(id)) return;
-      if (typeof skins.unlock !== 'function' || !skins.unlock(id)) return;
+      if (!skins.isUnlocked?.(id) && (typeof skins.unlock !== 'function' || !skins.unlock(id))) return;
+      skins.markRevealSeen?.(id);
       unlockId = id;
       popupShown = true;
       ui.scrim?.classList.add('show');

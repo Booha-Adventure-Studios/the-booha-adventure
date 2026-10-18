@@ -910,6 +910,42 @@ window.BoohaBlitzEngine = (() => {
         from { opacity: .98; transform: translate(-50%, -50%) scale(1); filter: brightness(1.15); }
         to { opacity: .72; transform: translate(-50%, -50%) scale(.74); filter: brightness(.62); }
       }
+      /* Finish finale. Opacity and transform only, so reduced-power devices
+         can run it; low-power and reduced-motion keep the lights steady. */
+      .blitz-scene-fill-circus.is-finale .booha-blitz-scene-fill-item.is-lit {
+        animation: boohaBlitzMarqueeChase 900ms linear calc(var(--bulb-i, 0) * 60ms) infinite;
+      }
+      @keyframes boohaBlitzMarqueeChase {
+        0%, 100% { opacity: .55; transform: translate(-50%, -50%) scale(.88); }
+        10% { opacity: 1; transform: translate(-50%, -50%) scale(1.35); }
+        28% { opacity: .9; transform: translate(-50%, -50%) scale(1); }
+      }
+      .blitz-scene-fill-spooky.is-finale::before {
+        animation: boohaBlitzFogFinale 1.5s ease-in-out infinite alternate;
+      }
+      .blitz-scene-fill-spooky.is-finale::after {
+        animation: boohaBlitzFogGlowFinale 1.5s ease-in-out infinite alternate;
+      }
+      @keyframes boohaBlitzFogFinale {
+        from { opacity: .16; }
+        to { opacity: .6; }
+      }
+      @keyframes boohaBlitzFogGlowFinale {
+        from { opacity: .32; transform: scale(1); }
+        to { opacity: .9; transform: scale(1.18); }
+      }
+      .blitz-compositor.low-power .blitz-scene-fill-circus.is-finale .booha-blitz-scene-fill-item.is-lit,
+      .blitz-compositor.low-power .blitz-scene-fill-spooky.is-finale::before,
+      .blitz-compositor.low-power .blitz-scene-fill-spooky.is-finale::after {
+        animation: none;
+      }
+      .blitz-compositor.low-power .blitz-scene-fill-spooky.is-finale::after { opacity: .6; }
+      @media (prefers-reduced-motion: reduce) {
+        .blitz-scene-fill-circus.is-finale .booha-blitz-scene-fill-item.is-lit,
+        .blitz-scene-fill-spooky.is-finale::before,
+        .blitz-scene-fill-spooky.is-finale::after { animation: none; }
+        .blitz-scene-fill-spooky.is-finale::after { opacity: .6; }
+      }
       .blitz-scene-fill-spooky {
         --blitz-spooky-fog-opacity: .58;
         --blitz-spooky-glow-top: 82%;
@@ -3623,6 +3659,9 @@ window.BoohaBlitzEngine = (() => {
             fill.style.setProperty('--blitz-spooky-glow-opacity', (0.14 + progress * 0.34).toFixed(3));
             fill.dataset.litCount = String(Math.round(progress * total));
           },
+          celebrate() {
+            fill.classList.add('is-finale');
+          },
         };
       }
 
@@ -3810,6 +3849,53 @@ window.BoohaBlitzEngine = (() => {
           }
           fill.dataset.litCount = String(count);
         },
+        // Finish finale: every light comes on, whatever the run's streak.
+        // Circus bulbs race around the sign; fireflies circle the glade.
+        celebrate() {
+          fill.classList.add('is-finale');
+          items.forEach((item, index) => {
+            item.style.setProperty('--bulb-i', String(index));
+            item.classList.remove('is-popping-out');
+            item.classList.add('is-lit');
+          });
+          if (!isFirefly) return;
+          fill.classList.add('all-lit');
+          const still = REDUCED_MOTION || overlay.classList.contains('low-power');
+          const box = fill.getBoundingClientRect();
+          const cx = box.width / 2;
+          const cy = box.height * .46;
+          const radius = Math.min(box.width, box.height) * .3;
+          items.forEach((item, index) => {
+            cancelMotion(item);
+            item.classList.add('firefly-settled');
+            if (still || typeof item.animate !== 'function' || !box.width) return;
+            const left = (parseFloat(item.style.left) / 100) * box.width;
+            const top = (parseFloat(item.style.top) / 100) * box.height;
+            const start = (index / items.length) * Math.PI * 2;
+            const path = Array.from({ length: 25 }, (_, step) => {
+              const angle = start + (step / 24) * Math.PI * 2;
+              const x = cx + Math.cos(angle) * radius - left;
+              const y = cy + Math.sin(angle) * radius * .78 - top;
+              return { transform: `translate(-50%, -50%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)` };
+            });
+            const gather = item.animate([{ transform: 'translate(-50%, -50%)' }, path[0]], {
+              duration: 560 + (index % 5) * 40,
+              easing: 'cubic-bezier(.3, .8, .3, 1)',
+              fill: 'forwards',
+            });
+            item._boohaMotion = gather;
+            gather.onfinish = () => {
+              if (item._boohaMotion !== gather) return;
+              const orbit = item.animate(path, { duration: 2600, iterations: Infinity });
+              item._boohaMotion = orbit;
+              gather.cancel();
+            };
+          });
+        },
+        // Freeze the circle under the result card instead of snapping back.
+        settleCelebration() {
+          items.forEach(item => item._boohaMotion?.pause?.());
+        },
       };
     }
 
@@ -3862,6 +3948,9 @@ window.BoohaBlitzEngine = (() => {
       const left = done.filter(isDone => !isDone).length;
       const skins = window.BoohaSkins;
       const skinId = skins?.rotationCharacterId?.();
+      // Clearing the third Blitz is the unlock. Collect it here so Records
+      // shows the character even if the student never opens the Maze.
+      if (!left && skinId && !skins.isUnlocked?.(skinId)) skins.unlock?.(skinId);
       const skin = skinId ? skins.get?.(skinId) : null;
       const art = skin?.assets?.maze || '';
       const name = skin ? escapeHtml(String(skin.name || '').replace(/\s*Booha$/, '')) : '';
@@ -4970,17 +5059,41 @@ window.BoohaBlitzEngine = (() => {
           else if (isRecord) emitFinishFlash(overlay, palette, playerName, 'record');
         }
         overlay.classList.add('blitz-finished');
-        winScreen.classList.add('show', 'climax-awaiting');
+        // Finale: the scene celebrates on its own before the result card arrives.
+        // A tap after the first moment skips straight to the card.
+        if (overlay._boohaBlitzFitPrompt) {
+          const signWord = overlay.querySelector(selector('jpWord'));
+          const signHira = overlay.querySelector(selector('hira'));
+          if (signWord) signWord.textContent = String(playerName || 'CLEAR').toUpperCase();
+          if (signHira) signHira.textContent = 'クリア！';
+          overlay._boohaBlitzFitPrompt();
+        }
+        sceneFill?.celebrate?.();
         if (climaxTimer) clearTimeout(climaxTimer);
         const revealEpoch = runEpoch;
-        climaxTimer = setTimeout(() => {
-          if (revealEpoch !== runEpoch) return;
-          winScreen.classList.remove('climax-awaiting');
+        const finaleMs = REDUCED_MOTION ? 420 : (overlay.classList.contains('low-power') ? 1000 : 2600);
+        const finaleStarted = performance.now();
+        let finaleRevealed = false;
+        const revealCard = () => {
+          if (finaleRevealed) return;
+          finaleRevealed = true;
+          overlay._boohaBlitzFinaleCleanup?.();
+          overlay._boohaBlitzFinaleCleanup = null;
+          if (revealEpoch !== runEpoch || winScreen.classList.contains('show')) return;
+          if (climaxTimer) clearTimeout(climaxTimer);
           climaxTimer = null;
-        }, REDUCED_MOTION ? 420 : 980);
+          sceneFill?.settleCelebration?.();
+          winScreen.classList.add('show');
+          startFinalHold();
+        };
+        const skipFinale = () => {
+          if (performance.now() - finaleStarted > 700) revealCard();
+        };
+        overlay._boohaBlitzFinaleCleanup = () => overlay.removeEventListener?.('pointerdown', skipFinale);
+        overlay.addEventListener?.('pointerdown', skipFinale);
+        climaxTimer = setTimeout(revealCard, finaleMs);
         playSceneSfx('finish', { isRecord, isPerfectRun });
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playFinalStinger(isRecord, isPerfectRun);
-        startFinalHold();
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) celebrate(overlay, palette, isRecord, speedBand);
         } catch (error) {
           console.error(`[${config.apiName}] Finish rendering failed:`, error);
@@ -4996,6 +5109,8 @@ window.BoohaBlitzEngine = (() => {
         if (climaxTimer) clearTimeout(climaxTimer);
         impactTimer = null;
         climaxTimer = null;
+        overlay._boohaBlitzFinaleCleanup?.();
+        overlay._boohaBlitzFinaleCleanup = null;
         winScreen.classList.remove('climax-awaiting');
         stopFinalHold();
         stopStreakBeat();
@@ -5012,6 +5127,8 @@ window.BoohaBlitzEngine = (() => {
         if (climaxTimer) clearTimeout(climaxTimer);
         impactTimer = null;
         climaxTimer = null;
+        overlay._boohaBlitzFinaleCleanup?.();
+        overlay._boohaBlitzFinaleCleanup = null;
         stopFinalHold();
         stopStreakBeat();
         stopTimer();
@@ -5384,6 +5501,8 @@ window.BoohaBlitzEngine = (() => {
       awake.hidden = false;
       const clearedCount = rows.filter(r => r.score).length;
       const skin = window.BoohaSkins?.get?.(window.BoohaSkins?.rotationCharacterId?.());
+      // Students who cleared all three before this fix get their unlock here.
+      if (skin && clearedCount === 3 && !window.BoohaSkins?.isUnlocked?.(skin.id)) window.BoohaSkins?.unlock?.(skin.id);
       const collected = !!skin && (window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id));
       const skinName = String(skin?.name || 'THIS WEEK\'S BOOHA').replace(/\s+Booha$/i, '');
       awakeSkin.hidden = !skin?.assets?.maze;
