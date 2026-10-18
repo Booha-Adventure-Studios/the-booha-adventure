@@ -5193,7 +5193,7 @@ window.BoohaBlitzEngine = (() => {
                    max(env(safe-area-inset-bottom,0px) + 12px, 14px)
                    max(env(safe-area-inset-left,0px) + 12px, 14px);
           background:
-            radial-gradient(ellipse at center, rgba(3,8,18,.50), rgba(3,8,18,.80)),
+            radial-gradient(ellipse at center, rgba(3,8,18,.18) 0%, rgba(3,8,18,.38) 54%, rgba(3,8,18,.76) 100%),
             url("${RECORD_ASSET_ROOT}records-backdrop${RECORD_SCENE_EXT}") center / cover;
           font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,
             "Noto Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
@@ -5203,7 +5203,7 @@ window.BoohaBlitzEngine = (() => {
           width: min(680px, 100%); max-height: min(840px, 100%);
           overflow-y: auto; overscroll-behavior: contain;
           border: 2px solid rgba(255,255,255,.36); border-radius: 26px;
-          background: linear-gradient(145deg, rgba(14,22,39,.88), rgba(8,13,26,.90));
+          background: linear-gradient(145deg, rgba(14,22,39,.82), rgba(8,13,26,.86));
           box-shadow: 0 24px 70px rgba(0,0,0,.72), 0 0 0 2px rgba(255,255,255,.08),
             0 0 42px rgba(255,111,181,.28);
           color: #fff;
