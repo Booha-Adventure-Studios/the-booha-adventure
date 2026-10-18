@@ -123,6 +123,9 @@ assert.ok(christmasKarasuki.lines.length >= 3, 'Grubb must have several Christma
 assert.ok(christmasKarasuki.lines.every(line =>
   line.en.includes('{name}') && line.jp.includes('{name}') && line.furigana
 ), 'every Grubb fact must be bilingual, name-aware, and furigana-ready');
+assert.strictEqual(christmasKarasuki.lines[2].furigana['人'], 'ひと');
+assert.strictEqual(christmasKarasuki.lines[3].furigana['木'], 'き');
+assert.strictEqual(christmasKarasuki.lines[4].furigana['一'], 'ひと');
 assert.ok(fs.existsSync(path.join(root, christmasKarasuki.asset)), 'Grubb Karasuki asset must exist');
 
 const karasuki = read('js/karasuki.js');

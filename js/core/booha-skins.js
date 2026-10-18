@@ -124,17 +124,17 @@ const BoohaSkins = (() => {
       Object.freeze({
         en: '{name}, hello! Did you know? Reindeer can see some kinds of light that people cannot see.',
         jp: '{name}、こんにちは！ しってる？ トナカイは、人には 見えない ひかりを 見られることが あるよ。',
-        furigana: Object.freeze({ '見': 'み' }),
+        furigana: Object.freeze({ '人': 'ひと', '見': 'み' }),
       }),
       Object.freeze({
         en: '{name}, hello! Did you know? Evergreen trees stay green through the winter.',
         jp: '{name}、こんにちは！ しってる？ もみの木などの 常緑樹は、冬も みどりのままだよ。',
-        furigana: Object.freeze({ '常緑樹': 'じょうりょくじゅ', '冬': 'ふゆ' }),
+        furigana: Object.freeze({ '木': 'き', '常緑樹': 'じょうりょくじゅ', '冬': 'ふゆ' }),
       }),
       Object.freeze({
         en: '{name}, hello! Did you know? Snowflakes have six sides, and every one is different.',
         jp: '{name}、こんにちは！ しってる？ ゆきの 結晶は 六つの はしが あって、一つずつ ちがうよ。',
-        furigana: Object.freeze({ '結晶': 'けっしょう', '六': 'むっ' }),
+        furigana: Object.freeze({ '結晶': 'けっしょう', '六': 'むっ', '一': 'ひと' }),
       }),
     ]),
   });
