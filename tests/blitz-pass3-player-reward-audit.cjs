@@ -24,14 +24,14 @@ assert.match(engine, /spotlight\.clearAnnouncement\(\);\s*spotlight\.setStreak\(
 assert.doesNotMatch(engine, /NICE START|IS ON FIRE|IS UNSTOPPABLE|OWNS THIS RUN/,
   'ordinary streak callout copy must not return over the game field');
 
-assert.match(engine, /const FINAL_CARD_HOLD_MS = 4000;/,
-  'final card must remain visible for a meaningful four-second reveal');
+assert.match(engine, /const FINAL_CARD_HOLD_MS = 1400;/,
+  'final-card actions must ignore taps briefly so a hammering finger cannot skip the card');
 assert.match(engine, /function ensureFinalCard\(winScreen(?:, palette)?\)/,
   'shared engine must build the final player summary card');
 assert.match(engine, /button\.disabled = true;/,
   'final-card actions must be locked during the reveal');
-assert.match(engine, /YOUR MOMENT — READY/,
-  'final card must explicitly announce when actions become available');
+assert.doesNotMatch(engine, /YOUR MOMENT — READY|LOOK AT YOUR CLEAR —/,
+  'the tap guard must stay silent rather than show a countdown');
 assert.doesNotMatch(finalCardBuilder, /booha-blitz-final-streak|booha-blitz-final-perfect|booha-blitz-final-headline|booha-blitz-final-residual/,
   'the final card must not rebuild the retired stacked celebration copy');
 

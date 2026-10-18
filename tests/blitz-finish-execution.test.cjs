@@ -85,7 +85,9 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
     overlay: dom.overlay,
     winScreen: dom.winScreen,
     finalCard: dom.finalCard,
-    FINAL_CARD_HOLD_MS: 4000,
+    FINAL_CARD_HOLD_MS: 1400,
+    scene: { label: 'CIRCUS TENT' },
+    renderFinalWeekRow: () => {},
     palette: {
       name: 'Pre-Boo', accent: '#ff6fb5', glow: 'rgba(255,111,181,.62)', timerColor: '#fff0a8',
       rewardColors: ['#fffbe1', '#ffe27a'], rewardGlow: 'rgba(255,184,72,.72)', streak: { label: 'STREAK' },
@@ -119,15 +121,15 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false } =
 
 const perfect = runFinish();
 assert(perfect.dom.winScreen.classList.contains('show'), 'perfect finish screen must be visible');
-assert.strictEqual(perfect.dom.winScreen.children.winRecord.textContent, '',
-  'a non-record clear must not show the NEW BEST TIME header');
+assert.match(perfect.dom.winScreen.children.winRecord.innerHTML, /vs best/,
+  'a slower clear must show its gap to the best time, not a NEW BEST header');
 assert.strictEqual(perfect.events.length, 1, 'perfect run must emit one completion event');
 assert.strictEqual(perfect.events[0].detail.completed, true);
 assert.strictEqual(perfect.events[0].detail.mistakes, 0);
 assert.strictEqual(perfect.saveCalls, 1, 'perfect run must save its PB');
 
 const record = runFinish({ isRecord: true });
-assert.match(record.dom.winScreen.children.winRecord.innerHTML, /NEW.*BEST.*TIME/);
+assert.match(record.dom.winScreen.children.winRecord.innerHTML, /FIRST CLEAR|NEW BEST/);
 
 const clear = runFinish({ perfect: false });
 assert(clear.dom.winScreen.classList.contains('show'), 'a normal completed run must show a completion card');
