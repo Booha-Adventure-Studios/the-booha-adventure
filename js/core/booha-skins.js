@@ -102,6 +102,42 @@ const BoohaSkins = (() => {
       }),
     ]),
   });
+  const CHRISTMAS_KARASUKI = Object.freeze({
+    kind: 'grubb',
+    name: 'Grubb',
+    nameJp: 'グラブ',
+    asset: 'assets/skins/grubb_booha/karasuki.webp',
+    color: CHRISTMAS_GLOW.gold,
+    popupLabel: 'GRUBB SAYS',
+    popupLabelJp: 'グラブからのひとこと',
+    lines: Object.freeze([
+      Object.freeze({
+        en: '{name}, hello! Did you know? In the U.S., many families leave cookies and milk for Santa.',
+        jp: '{name}、こんにちは！ しってる？ アメリカでは、サンタさんに クッキーと ミルクを おいておく 家が おおいよ。',
+        furigana: Object.freeze({ '家': 'いえ' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? In England, people pull Christmas crackers. Pop! There is a paper hat inside.',
+        jp: '{name}、こんにちは！ しってる？ イギリスでは クリスマス・クラッカーを ひっぱるよ。ポン！ なかに かみの ぼうしが はいってるよ。',
+        furigana: Object.freeze({}),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Reindeer can see some kinds of light that people cannot see.',
+        jp: '{name}、こんにちは！ しってる？ トナカイは、人には 見えない ひかりを 見られることが あるよ。',
+        furigana: Object.freeze({ '見': 'み' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Evergreen trees stay green through the winter.',
+        jp: '{name}、こんにちは！ しってる？ もみの木などの 常緑樹は、冬も みどりのままだよ。',
+        furigana: Object.freeze({ '常緑樹': 'じょうりょくじゅ', '冬': 'ふゆ' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Snowflakes have six sides, and every one is different.',
+        jp: '{name}、こんにちは！ しってる？ ゆきの 結晶は 六つの はしが あって、一つずつ ちがうよ。',
+        furigana: Object.freeze({ '結晶': 'けっしょう', '六': 'むっ' }),
+      }),
+    ]),
+  });
   // One shared table keeps the checkpoint/room atmosphere aligned across
   // Maze, Karasuki, and Utsuroba. October is the Halloween orange/purple
   // month; December has an explicit Christmas red/green pair instead of a fallback.
@@ -378,6 +414,7 @@ const BoohaSkins = (() => {
       ]),
       palette: CHRISTMAS_PALETTE,
       glow: CHRISTMAS_GLOW,
+      seasonalKarasuki: CHRISTMAS_KARASUKI,
     }),
   };
   // Keep the old unversioned lookup working for existing world code while
@@ -438,20 +475,24 @@ const BoohaSkins = (() => {
   function rotationCharacterId(seasonId = currentSeasonId(), occurrenceKey = currentWeekKey()) {
     const season = getSeason(seasonId);
     if (!season || !season.characterIds.length) return null;
+    const firstAvailableId = season.characterIds.find(id => isAvailable(id)) || null;
     const anchor = String(season.rotationStartOccurrenceKey || '').split('|')[0];
     const current = String(occurrenceKey || '').split('|')[0];
     const anchorMs = Date.parse(`${anchor}T00:00:00Z`);
     const currentMs = Date.parse(`${current}T00:00:00Z`);
     if (!Number.isFinite(anchorMs) || !Number.isFinite(currentMs)) {
-      return season.characterIds[0];
+      return firstAvailableId;
     }
     if (season.startDate && current < season.startDate) return null;
     if (season.endDate && current > season.endDate) return null;
     if (currentMs < anchorMs) return null;
     const scheduledId = season.weeklyCharacterIds?.[current];
-    if (scheduledId && season.characterIds.includes(scheduledId)) return scheduledId;
+    if (scheduledId && season.characterIds.includes(scheduledId)) {
+      return isAvailable(scheduledId) ? scheduledId : null;
+    }
     const weekIndex = Math.floor((currentMs - anchorMs) / (7 * 24 * 60 * 60 * 1000));
-    return season.characterIds[weekIndex % season.characterIds.length];
+    const fallbackId = season.characterIds[weekIndex % season.characterIds.length];
+    return isAvailable(fallbackId) ? fallbackId : null;
   }
 
   function menuCharacterId(seasonId = currentSeasonId(), dateKey = currentDateKey()) {
