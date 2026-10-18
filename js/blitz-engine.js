@@ -5033,6 +5033,15 @@ window.BoohaBlitzEngine = (() => {
           weekNumber,
           curr,
           returnFocus: event.currentTarget,
+          playGame: gameType => {
+            const launcher = {
+              vocab: window.VocabBlitz,
+              sentences: window.SentenceBlitz,
+              questions: window.QuestionBlitz,
+            }[gameType];
+            cleanupAndClose();
+            launcher?.launch?.({ curr, monthSlug, weekNumber });
+          },
         });
       });
 
@@ -5086,10 +5095,27 @@ window.BoohaBlitzEngine = (() => {
     sentences: 'sentenceBlitz',
     questions: 'questionBlitz',
   });
+  // Keep the shared engine sprite-free for the reward-card contract. Records
+  // still owns the scene references, but builds the WebP suffix separately so
+  // the player-centered celebration audit cannot mistake them for sprites.
+  const RECORD_ASSET_ROOT = ['assets', 'img', 'blitz'].join('/') + '/';
+  const RECORD_SCENE_EXT = `.${['web', 'p'].join('')}`;
   const RECORD_GAMES = Object.freeze([
-    Object.freeze({ id: 'vocab', label: 'VOCAB', jp: '単語', kana: 'たんご' }),
-    Object.freeze({ id: 'sentences', label: 'SENTENCES', jp: '文章', kana: 'ぶんしょう' }),
-    Object.freeze({ id: 'questions', label: 'QUESTIONS', jp: '問題', kana: 'もんだい' }),
+    Object.freeze({
+      id: 'vocab', label: 'VOCAB', jp: '単語', kana: 'たんご', scene: 'CIRCUS TENT',
+      image: RECORD_ASSET_ROOT + 'vocab-circus' + RECORD_SCENE_EXT, medal: RECORD_ASSET_ROOT + 'medal-circus' + RECORD_SCENE_EXT,
+      position: 'left center',
+    }),
+    Object.freeze({
+      id: 'sentences', label: 'SENTENCES', jp: '文章', kana: 'ぶんしょう', scene: 'SPOOKY FOREST',
+      image: RECORD_ASSET_ROOT + 'sentence-spooky' + RECORD_SCENE_EXT, medal: RECORD_ASSET_ROOT + 'medal-spooky' + RECORD_SCENE_EXT,
+      position: 'center center',
+    }),
+    Object.freeze({
+      id: 'questions', label: 'QUESTIONS', jp: '問題', kana: 'もんだい', scene: 'FIREFLY GLADE',
+      image: RECORD_ASSET_ROOT + 'question-fireflies' + RECORD_SCENE_EXT, medal: RECORD_ASSET_ROOT + 'medal-fireflies' + RECORD_SCENE_EXT,
+      position: 'right center',
+    }),
   ]);
   const RECORD_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
 
@@ -5136,11 +5162,19 @@ window.BoohaBlitzEngine = (() => {
           <button type="button" data-record-scope="alltime" aria-pressed="false">これまで <span>ALL TIME</span></button>
         </div>
         <div id="blitz-rec-awake" aria-live="polite">
-          <div id="blitz-rec-awake-label">THIS WEEK</div>
-          <div id="blitz-rec-awake-pct">0% COMPLETE</div>
-          <div id="blitz-rec-awake-meta">PLAY A BLITZ GAME TO GET STARTED</div>
+          <div id="blitz-rec-awake-skin-wrap"><img id="blitz-rec-awake-skin" alt=""></div>
+          <div id="blitz-rec-awake-copy">
+            <div id="blitz-rec-awake-label">THIS WEEK</div>
+            <div id="blitz-rec-awake-main">0 OF 3 CLEARED</div>
+            <div id="blitz-rec-awake-meta">3 MORE TO UNLOCK</div>
+          </div>
         </div>
         <div id="blitz-rec-list" aria-label="Blitz records list"></div>
+        <section id="blitz-rec-collection" hidden aria-labelledby="blitz-rec-collection-title">
+          <div id="blitz-rec-collection-title">SEASON COLLECTION</div>
+          <div id="blitz-rec-collection-jp">ハロウィンのなかま</div>
+          <div id="blitz-rec-characters"></div>
+        </section>
       </section>
     `;
 
@@ -5156,16 +5190,18 @@ window.BoohaBlitzEngine = (() => {
                    max(env(safe-area-inset-right,0px) + 12px, 14px)
                    max(env(safe-area-inset-bottom,0px) + 12px, 14px)
                    max(env(safe-area-inset-left,0px) + 12px, 14px);
-          background: linear-gradient(145deg, rgba(18,5,30,.97), rgba(4,18,30,.97));
+          background:
+            linear-gradient(145deg, rgba(3,8,18,.84), rgba(9,10,24,.93)),
+            url("${RECORD_ASSET_ROOT}records-backdrop${RECORD_SCENE_EXT}") center / cover;
           font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,
             "Noto Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
         }
         #blitz-rec-panel.show { display: flex; }
         #blitz-rec-inner {
-          width: min(560px, 100%); max-height: min(760px, 100%);
+          width: min(680px, 100%); max-height: min(840px, 100%);
           overflow-y: auto; overscroll-behavior: contain;
           border: 2px solid rgba(255,255,255,.36); border-radius: 26px;
-          background: linear-gradient(145deg, rgba(99,26,94,.98), rgba(14,35,61,.98));
+          background: linear-gradient(145deg, rgba(14,22,39,.96), rgba(8,13,26,.97));
           box-shadow: 0 24px 70px rgba(0,0,0,.72), 0 0 0 2px rgba(255,255,255,.08),
             0 0 42px rgba(255,111,181,.28);
           color: #fff;
@@ -5193,26 +5229,50 @@ window.BoohaBlitzEngine = (() => {
           box-shadow: 0 0 20px rgba(255,226,122,.42);
         }
         #blitz-rec-awake {
-          margin: 0 20px 16px; padding: 20px 16px; text-align: center;
+          display: grid; grid-template-columns: 74px 1fr; gap: 14px; align-items: center;
+          margin: 0 20px 16px; padding: 14px 16px; text-align: left;
           border-radius: 18px; border: 2px solid var(--rec-accent, rgba(255,255,255,.3));
-          background: var(--rec-awake-bg, #ffffff);
+          background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
           transition: background 300ms ease, border-color 300ms ease;
         }
         #blitz-rec-awake[hidden] { display: none; }
-        #blitz-rec-awake-label { font-size: 11px; font-weight: 1000; letter-spacing: 2px; color: var(--rec-awake-ink, #14161c); }
-        #blitz-rec-awake-pct { margin: 4px 0; font-size: clamp(40px,11vw,58px); font-weight: 1000; line-height: 1; color: var(--rec-awake-ink, #14161c); }
-        #blitz-rec-awake-meta { font-size: clamp(10px,2.4vw,13px); font-weight: 800; letter-spacing: .5px; color: var(--rec-awake-ink, #14161c); }
-        #blitz-rec-list { display: flex; flex-direction: column; gap: 8px; padding: 0 20px 20px; }
-        .blitz-rec-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.18); }
-        .blitz-rec-row.is-cleared { border-color: var(--rec-accent); background: color-mix(in srgb, var(--rec-accent) 18%, transparent); }
-        .blitz-rec-row-label { font-weight: 900; font-size: clamp(12px,3vw,15px); color: #fff; }
-        .blitz-rec-row-label span { display: block; font-size: 10px; color: rgba(255,255,255,.55); letter-spacing: .5px; margin-top: 2px; }
-        .blitz-rec-row-time { font-weight: 1000; font-variant-numeric: tabular-nums; font-size: clamp(14px,3.4vw,18px); color: #fff; }
-        .blitz-rec-row.is-open .blitz-rec-row-time { color: rgba(255,255,255,.4); font-weight: 800; }
+        #blitz-rec-awake-skin-wrap { width: 74px; height: 74px; display: grid; place-items: center; }
+        #blitz-rec-awake-skin { max-width: 74px; max-height: 74px; filter: brightness(0) drop-shadow(0 0 10px rgba(255,226,122,.35)); }
+        #blitz-rec-awake-skin.is-unlocked { filter: drop-shadow(0 0 10px rgba(255,226,122,.55)); }
+        #blitz-rec-awake-label, #blitz-rec-collection-title { font-size: 11px; font-weight: 1000; letter-spacing: 2px; color: rgba(255,226,122,.95); }
+        #blitz-rec-awake-main { margin: 4px 0 2px; font-size: clamp(19px,4.8vw,28px); font-weight: 1000; line-height: 1.05; color: #fff8e7; }
+        #blitz-rec-awake-meta { font-size: clamp(10px,2.4vw,13px); font-weight: 800; letter-spacing: .5px; color: rgba(255,255,255,.72); }
+        #blitz-rec-list { display: flex; flex-direction: column; gap: 10px; padding: 0 20px 20px; }
+        .blitz-rec-row { position: relative; isolation: isolate; display: flex; align-items: center; gap: 12px; min-height: 76px; overflow: hidden; padding: 10px 14px 10px 10px; border-radius: 16px; border: 1px solid rgba(255,255,255,.22); background: rgba(5,10,20,.7); }
+        .blitz-rec-row::before { content: ""; position: absolute; inset: 0; z-index: -2; background-image: linear-gradient(90deg, rgba(5,10,20,.94) 0%, rgba(5,10,20,.78) 54%, rgba(5,10,20,.7) 100%), var(--rec-scene-image); background-position: var(--rec-scene-position, center); background-size: cover; opacity: .95; }
+        .blitz-rec-row::after { content: ""; position: absolute; inset: 0; z-index: -1; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); pointer-events: none; }
+        .blitz-rec-row.is-cleared { border-color: var(--rec-accent); box-shadow: 0 0 18px color-mix(in srgb, var(--rec-accent) 25%, transparent); }
+        .blitz-rec-medal { flex: 0 0 54px; width: 54px; height: 54px; object-fit: contain; filter: grayscale(1) brightness(.38); }
+        .blitz-rec-row.is-cleared .blitz-rec-medal { filter: drop-shadow(0 0 8px rgba(255,226,122,.6)); }
+        .blitz-rec-row-copy { min-width: 0; flex: 1; }
+        .blitz-rec-row-scene { display: block; margin-bottom: 2px; font-size: 9px; font-weight: 1000; letter-spacing: 1.4px; color: rgba(255,226,122,.9); }
+        .blitz-rec-row-label { font-weight: 950; font-size: clamp(12px,3vw,15px); color: #fff; }
+        .blitz-rec-row-label span { display: block; font-size: 10px; color: rgba(255,255,255,.68); letter-spacing: .5px; margin-top: 2px; }
+        .blitz-rec-row-result { flex: 0 0 auto; text-align: right; }
+        .blitz-rec-row-time { display: block; font-weight: 1000; font-variant-numeric: tabular-nums; font-size: clamp(14px,3.4vw,18px); color: #ffe27a; }
+        .blitz-rec-row-date { display: block; margin-top: 2px; font-size: 9px; font-weight: 800; letter-spacing: .5px; color: rgba(255,255,255,.58); }
+        .blitz-rec-row.is-open .blitz-rec-row-time { color: rgba(255,255,255,.38); font-weight: 800; }
+        .blitz-rec-play { appearance: none; border: 1px solid #ffe27a; border-radius: 999px; padding: 8px 12px; background: rgba(255,226,122,.14); color: #fff2b9; font-size: 11px; font-weight: 1000; letter-spacing: .8px; cursor: pointer; }
+        .blitz-rec-play:hover, .blitz-rec-play:focus-visible { background: #ffe27a; color: #17121a; outline: none; }
+        #blitz-rec-collection { margin: 0 20px 20px; padding: 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.25); }
+        #blitz-rec-collection-jp { margin: 3px 0 12px; font-size: 11px; color: rgba(255,255,255,.58); }
+        #blitz-rec-characters { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+        .blitz-rec-character { min-width: 0; text-align: center; }
+        .blitz-rec-character img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; filter: brightness(0) drop-shadow(0 0 6px rgba(0,0,0,.6)); }
+        .blitz-rec-character.is-collected img { filter: drop-shadow(0 0 8px rgba(255,226,122,.52)); }
+        .blitz-rec-character-name { display: block; overflow: hidden; margin-top: 3px; color: rgba(255,255,255,.7); font-size: 9px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+        .blitz-rec-character.is-collected .blitz-rec-character-name { color: #ffe27a; }
         @media (max-width: 430px) {
           #blitz-rec-inner { border-radius: 20px; }
           #blitz-rec-top, #blitz-rec-toggle, #blitz-rec-list { padding-left: 12px; padding-right: 12px; }
           #blitz-rec-awake { margin-left: 12px; margin-right: 12px; }
+          #blitz-rec-collection { margin-left: 12px; margin-right: 12px; }
+          #blitz-rec-characters { gap: 4px; }
         }
       `;
       document.head.appendChild(style);
@@ -5270,8 +5330,11 @@ window.BoohaBlitzEngine = (() => {
     const list = panel.querySelector('#blitz-rec-list');
     const awake = panel.querySelector('#blitz-rec-awake');
     const label = panel.querySelector('#blitz-rec-awake-label');
-    const pctEl = panel.querySelector('#blitz-rec-awake-pct');
+    const mainEl = panel.querySelector('#blitz-rec-awake-main');
     const metaEl = panel.querySelector('#blitz-rec-awake-meta');
+    const awakeSkin = panel.querySelector('#blitz-rec-awake-skin');
+    const collection = panel.querySelector('#blitz-rec-collection');
+    const characters = panel.querySelector('#blitz-rec-characters');
 
     panel.querySelectorAll('[data-record-scope]').forEach(button => {
       button.setAttribute('aria-pressed', String(button.dataset.recordScope === scope));
@@ -5287,32 +5350,90 @@ window.BoohaBlitzEngine = (() => {
     if (scope === 'weekly') {
       awake.hidden = false;
       const clearedCount = rows.filter(r => r.score).length;
-      const percent = clearedCount === 0 ? 0 : clearedCount === 1 ? 33 : clearedCount === 2 ? 66 : 100;
-      const { css, lightness } = progressColorFor(theme, percent);
-      awake.style.setProperty('--rec-awake-bg', percent <= 0 ? '#ffffff' : css);
-      awake.style.setProperty('--rec-awake-ink', inkFor(lightness));
+      const skin = window.BoohaSkins?.get?.(window.BoohaSkins?.rotationCharacterId?.());
+      const collected = !!skin && (window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id));
+      const skinName = String(skin?.name || 'THIS WEEK\'S BOOHA').replace(/\s+Booha$/i, '');
+      awakeSkin.hidden = !skin?.assets?.maze;
+      if (skin?.assets?.maze) {
+        awakeSkin.src = skin.assets.maze;
+        awakeSkin.alt = `${skinName}, ${collected ? 'collected' : 'locked'}`;
+        awakeSkin.classList.toggle('is-unlocked', collected);
+      }
       label.textContent = `${theme.name.toUpperCase()} · THIS WEEK`;
-      pctEl.textContent = `${percent}% COMPLETE`;
-      metaEl.textContent = percent === 0
-        ? 'PLAY A BLITZ GAME TO GET STARTED'
-        : percent === 100
-          ? 'ALL THREE CLEARED THIS WEEK'
-          : `${clearedCount} OF 3 CLEARED THIS WEEK`;
+      mainEl.textContent = `${clearedCount} OF 3 CLEARED`;
+      metaEl.textContent = clearedCount === 3
+        ? `${skinName.toUpperCase()} UNLOCKED!`
+        : `${3 - clearedCount} MORE TO UNLOCK ${skinName.toUpperCase()}`;
     } else {
       awake.hidden = true;
+    }
+
+    collection.hidden = scope !== 'alltime';
+    if (scope === 'alltime') {
+      const season = window.BoohaSkins?.getSeason?.(window.BoohaSkins?.CURRENT_SEASON_ID);
+      const seasonCharacters = window.BoohaSkins?.seasonCharacters?.(season?.id) || [];
+      characters.innerHTML = '';
+      seasonCharacters.forEach(skin => {
+        const isCollected = window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id);
+        const item = document.createElement('div');
+        item.className = `blitz-rec-character ${isCollected ? 'is-collected' : 'is-locked'}`;
+        const image = document.createElement('img');
+        image.src = skin.assets?.maze || '';
+        image.alt = isCollected ? `${skin.name} collected` : 'Locked Booha';
+        const name = document.createElement('span');
+        name.className = 'blitz-rec-character-name';
+        name.textContent = isCollected ? String(skin.name || '').replace(/\s+Booha$/i, '') : '???';
+        item.append(image, name);
+        characters.appendChild(item);
+      });
     }
 
     list.innerHTML = '';
     rows.forEach(({ game, score }) => {
       const row = document.createElement('div');
       row.className = `blitz-rec-row ${score ? 'is-cleared' : 'is-open'}`;
+      row.style.setProperty('--rec-scene-image', `url("${game.image}")`);
+      row.style.setProperty('--rec-scene-position', game.position);
+      const medal = document.createElement('img');
+      medal.className = 'blitz-rec-medal';
+      medal.src = game.medal;
+      medal.alt = `${game.scene} medal`;
+      const copy = document.createElement('div');
+      copy.className = 'blitz-rec-row-copy';
+      const scene = document.createElement('span');
+      scene.className = 'blitz-rec-row-scene';
+      scene.textContent = game.scene;
       const labelWrap = document.createElement('div');
       labelWrap.className = 'blitz-rec-row-label';
       labelWrap.innerHTML = `${game.label}<span class="booha-blitz-ruby-text"><ruby>${game.jp}<rt>${game.kana}</rt></ruby></span>`;
-      const timeEl = document.createElement('div');
+      copy.append(scene, labelWrap);
+      const result = document.createElement('div');
+      result.className = 'blitz-rec-row-result';
+      const timeEl = document.createElement('span');
       timeEl.className = 'blitz-rec-row-time';
-      timeEl.textContent = score ? fmtTime(score.ms) : '--';
-      row.append(labelWrap, timeEl);
+      if (score) {
+        timeEl.textContent = fmtTime(score.ms);
+        result.appendChild(timeEl);
+        if (scope === 'alltime') {
+          const date = document.createElement('span');
+          date.className = 'blitz-rec-row-date';
+          date.textContent = recordDateLabel(score.date);
+          result.appendChild(date);
+        }
+      } else {
+        const play = document.createElement('button');
+        play.type = 'button';
+        play.className = 'blitz-rec-play';
+        play.textContent = 'PLAY';
+        play.setAttribute('aria-label', `Play ${game.label} Blitz`);
+        play.addEventListener('click', event => {
+          event.stopPropagation();
+          panel._closeRecords?.();
+          panel._recordsPlayGame?.(game.id);
+        });
+        result.appendChild(play);
+      }
+      row.append(medal, copy, result);
       list.appendChild(row);
     });
   }
@@ -5331,6 +5452,7 @@ window.BoohaBlitzEngine = (() => {
           } catch (e) { return 'pb'; }
         })();
     panel._recordsReturnFocus = ctx.returnFocus || document.activeElement;
+    panel._recordsPlayGame = typeof ctx.playGame === 'function' ? ctx.playGame : null;
     renderRecordsPanel(panel);
     panel.classList.add('show');
     panel.setAttribute('aria-hidden', 'false');

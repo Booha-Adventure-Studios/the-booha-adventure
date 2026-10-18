@@ -5,6 +5,8 @@
 // ============================================================
 
 const CURRENT_CACHES = {
+  // Blitz Records redesign adds the scene-backed records popup and collection
+  // language to the cached index shell.
   // Muenba Pass C/D profile pass: ship the clarified hunt status and
   // invalidate the cache-first profile/runtime files together.
   // Profile consolidation Pass 1: ship the canonical progress page and its
@@ -31,7 +33,7 @@ const CURRENT_CACHES = {
   // scheduled Batty/Mummington popups reach returning clients.
   // Booha spelling consistency pass (2026-10-08): refresh the precached
   // shells after standardizing the Japanese name to ブーハー.
-  pages:  'booha-pages-2026-454',
+  pages:  'booha-pages-2026-455',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

@@ -2876,6 +2876,7 @@ const PILLS = [
         monthSlug: cw.monthSlug,
         weekNumber: cw.weekNumber,
         curr: activeTab,
+        playGame: type => launchHomeworkBlitz(type, activeTab),
       });
     } catch (error) {
       console.error('Blitz load error:', error);
