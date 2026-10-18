@@ -610,9 +610,9 @@ window.SentenceBlitz = (() => {
         <div class="sb-win-best"   id="sb-win-best-val"></div>
         <div class="sb-win-delta"  id="sb-win-delta"></div>
         <div class="sb-win-buttons">
-          <button class="sb-win-btn" id="sb-play-again" type="button">もう一度</button>
-          <button class="sb-win-btn ghost records" id="sb-records" type="button">RECORDS / きろくを みる</button>
-          <button class="sb-win-btn ghost" id="sb-win-close" type="button">もどる</button>
+          <button class="sb-win-btn" id="sb-play-again" type="button">PLAY AGAIN <small>もう一度</small></button>
+          <button class="sb-win-btn ghost records" id="sb-records" type="button">RECORDS · きろく</button>
+          <button class="sb-win-btn ghost" id="sb-win-close" type="button">BACK · もどる</button>
         </div>
       </div>
       

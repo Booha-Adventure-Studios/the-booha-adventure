@@ -606,9 +606,9 @@ window.QuestionBlitz = (() => {
         <div class="qb-win-best"   id="qb-win-best-val"></div>
         <div class="qb-win-delta"  id="qb-win-delta"></div>
         <div class="qb-win-buttons">
-          <button class="qb-win-btn" id="qb-play-again" type="button">もう一度</button>
-          <button class="qb-win-btn ghost records" id="qb-records" type="button">RECORDS / きろくを みる</button>
-          <button class="qb-win-btn ghost" id="qb-win-close" type="button">もどる</button>
+          <button class="qb-win-btn" id="qb-play-again" type="button">PLAY AGAIN <small>もう一度</small></button>
+          <button class="qb-win-btn ghost records" id="qb-records" type="button">RECORDS · きろく</button>
+          <button class="qb-win-btn ghost" id="qb-win-close" type="button">BACK · もどる</button>
         </div>
       </div>
       

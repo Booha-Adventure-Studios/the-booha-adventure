@@ -18,8 +18,8 @@ assert.match(engine, /function playFinalStinger\(isRecord, isPerfectRun\)/,
   'the final card must have a distinct completion stinger');
 assert.match(engine, /isRecord\s*\?\s*\[659, 831, 1047, 1319\]/,
   'new records must receive the strongest final stinger');
-assert.match(engine, /startFinalHold\(isPerfectRun \? 5600 : isRecord \? 5000 : FINAL_CARD_HOLD_MS\)/,
-  'perfect and record runs must hold the final card longer');
+assert.match(engine, /startFinalHold\(\);/,
+  'every clear must use the same short tap guard');
 assert.match(engine, /boohaBlitzButtonsIn 520ms 900ms/,
   'replay and menu controls must enter after the celebration begins');
 assert.match(engine, /\.booha-blitz-final-headline,[\s\S]*?animation: none; opacity: 1; transform: none;/,

@@ -640,9 +640,9 @@ const SCOLDS = [
         <div class="vb-win-best"   id="vb-win-best-val"></div>
         <div class="vb-win-delta"  id="vb-win-delta"></div>
         <div class="vb-win-buttons">
-          <button class="vb-win-btn" id="vb-play-again" type="button">もう一度</button>
-          <button class="vb-win-btn ghost records" id="vb-records" type="button">RECORDS / きろくを みる</button>
-          <button class="vb-win-btn ghost" id="vb-win-close" type="button">もどる</button>
+          <button class="vb-win-btn" id="vb-play-again" type="button">PLAY AGAIN <small>もう一度</small></button>
+          <button class="vb-win-btn ghost records" id="vb-records" type="button">RECORDS · きろく</button>
+          <button class="vb-win-btn ghost" id="vb-win-close" type="button">BACK · もどる</button>
         </div>
       </div>
       

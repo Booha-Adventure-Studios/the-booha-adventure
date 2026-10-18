@@ -650,7 +650,9 @@ window.BoohaBlitzEngine = (() => {
     return getWeeklyScore(gameType, curr, currentWeekId);
   }
 
-  const FINAL_CARD_HOLD_MS = 4000;
+  // The card reveals about 1s after the last answer; ignore taps briefly so
+  // a hammering finger cannot skip the result without making players wait.
+  const FINAL_CARD_HOLD_MS = 1400;
   let sharedStylesInjected = false;
 
   function injectSharedStyles() {
@@ -2646,6 +2648,182 @@ window.BoohaBlitzEngine = (() => {
         opacity: .42;
         filter: grayscale(.35);
       }
+      /* Scene final card: the art stays visible, the time is the hero, and
+         Play Again is the primary action. This comes after the legacy card
+         rules so the shared win DOM can be reused without stale styling. */
+      #vb-win.blitz-finish.scene-card,
+      #sb-win.blitz-finish.scene-card,
+      #qb-win.blitz-finish.scene-card {
+        border: 0;
+        background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(4, 8, 16, .40), rgba(4, 8, 16, .74));
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+      #vb-win.blitz-finish.scene-card .booha-blitz-final-card,
+      #sb-win.blitz-finish.scene-card .booha-blitz-final-card,
+      #qb-win.blitz-finish.scene-card .booha-blitz-final-card {
+        width: min(100%, 440px);
+        gap: 10px;
+        padding: 22px 22px 18px;
+        border: 1px solid color-mix(in srgb, var(--blitz-accent) 55%, transparent);
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(14, 18, 30, .88), rgba(10, 12, 22, .94));
+        box-shadow: 0 24px 60px rgba(0, 0, 0, .5), 0 0 40px color-mix(in srgb, var(--blitz-accent) 22%, transparent);
+        text-align: center;
+      }
+      .scene-card .booha-blitz-final-card::before { display: none; }
+      .scene-card .vb-win-scream, .scene-card .sb-win-scream, .scene-card .qb-win-scream,
+      .scene-card .vb-win-jp, .scene-card .sb-win-jp, .scene-card .qb-win-jp,
+      .scene-card .vb-win-label, .scene-card .sb-win-label, .scene-card .qb-win-label,
+      .scene-card .vb-win-delta, .scene-card .sb-win-delta, .scene-card .qb-win-delta,
+      .scene-card .booha-blitz-final-hold { display: none; }
+      .scene-card .vb-win-name, .scene-card .sb-win-name, .scene-card .qb-win-name {
+        display: grid;
+        gap: 4px;
+        margin: 0;
+        font-size: inherit;
+        text-shadow: none;
+        animation: none;
+      }
+      .booha-blitz-final-kicker {
+        color: color-mix(in srgb, var(--blitz-accent) 80%, white);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+      }
+      .booha-blitz-final-cleared {
+        color: #fff7df;
+        font-size: clamp(22px, 3.6vw, 30px);
+        font-weight: 950;
+        line-height: 1.05;
+        text-wrap: balance;
+      }
+      .booha-blitz-final-cleared .nm { color: var(--blitz-accent); }
+      .booha-blitz-final-cleared-jp { color: rgba(238, 241, 246, .7); font-size: 13px; font-weight: 600; }
+      .scene-card .vb-win-time, .scene-card .sb-win-time, .scene-card .qb-win-time {
+        margin: 0;
+        color: #fff7df;
+        font-size: clamp(54px, 10vw, 84px);
+        line-height: .95;
+        font-variant-numeric: tabular-nums;
+        text-shadow: 0 0 26px color-mix(in srgb, var(--blitz-accent) 55%, transparent);
+      }
+      .scene-card .vb-win-time.gold, .scene-card .sb-win-time.gold, .scene-card .qb-win-time.gold {
+        color: #ffd76a;
+        text-shadow: 0 0 28px rgba(255, 200, 80, .75), 0 0 60px rgba(255, 120, 40, .35);
+      }
+      .scene-card .vb-win-record, .scene-card .sb-win-record, .scene-card .qb-win-record {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        margin: 0;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 900;
+        letter-spacing: .6px;
+        text-shadow: none;
+        animation: none;
+      }
+      .scene-card .vb-win-record small, .scene-card .sb-win-record small, .scene-card .qb-win-record small {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0;
+        opacity: .85;
+      }
+      .scene-card .is-best { color: #2a1700; background: #ffd76a; box-shadow: 0 0 22px rgba(255, 200, 80, .5); animation: boohaBlitzBestStamp 520ms cubic-bezier(.2, 1.6, .3, 1) 380ms both; }
+      .scene-card .is-first { color: #082016; background: #7ff0b0; }
+      .scene-card .is-slower { color: #eef1f6; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .14); font-weight: 700; }
+      @keyframes boohaBlitzBestStamp {
+        from { opacity: 0; transform: scale(1.8) rotate(-6deg); }
+        to { opacity: 1; transform: none; }
+      }
+      .scene-card .vb-win-best, .scene-card .sb-win-best, .scene-card .qb-win-best {
+        margin: -4px 0 0;
+        color: rgba(238, 241, 246, .62);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+      .booha-blitz-final-week {
+        width: 100%;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        margin-top: 4px;
+        padding: 10px 12px;
+        border: 1px solid rgba(255, 255, 255, .08);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, .05);
+        text-align: left;
+      }
+      .booha-blitz-final-week img { width: 52px; height: 52px; object-fit: contain; }
+      .booha-blitz-final-week img.locked { filter: brightness(0) drop-shadow(0 0 6px rgba(255, 255, 255, .35)); opacity: .85; }
+      .booha-blitz-week-text { min-width: 0; }
+      .booha-blitz-week-pips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+      .booha-blitz-week-pip {
+        padding: 2px 8px;
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 999px;
+        color: rgba(238, 241, 246, .62);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .6px;
+        white-space: nowrap;
+      }
+      .booha-blitz-week-pip.done { color: #082016; background: #7ff0b0; border-color: #7ff0b0; }
+      .booha-blitz-week-msg { color: #eef1f6; font-size: 13px; line-height: 1.35; }
+      .booha-blitz-week-msg .jp { display: block; color: rgba(238, 241, 246, .62); font-size: 12px; }
+      .scene-card .vb-win-buttons, .scene-card .sb-win-buttons, .scene-card .qb-win-buttons {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .scene-card #vb-play-again, .scene-card #sb-play-again, .scene-card #qb-play-again {
+        grid-column: 1 / -1;
+        min-height: 50px;
+        border: 0;
+        border-radius: 14px;
+        color: #1a1206;
+        background: linear-gradient(180deg, color-mix(in srgb, var(--blitz-accent) 70%, white), var(--blitz-accent));
+        box-shadow: 0 6px 18px color-mix(in srgb, var(--blitz-accent) 35%, transparent);
+        font-size: 16px;
+        font-weight: 900;
+      }
+      .scene-card #vb-records, .scene-card #sb-records, .scene-card #qb-records,
+      .scene-card #vb-win-close, .scene-card #sb-win-close, .scene-card #qb-win-close {
+        min-height: 40px;
+        border: 1px solid rgba(255, 255, 255, .16);
+        border-radius: 12px;
+        color: #eef1f6;
+        background: transparent;
+        box-shadow: none;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .scene-card .vb-win-buttons button small, .scene-card .sb-win-buttons button small, .scene-card .qb-win-buttons button small {
+        margin-left: 6px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      /* On finish, fade the game UI so the scene and its lights frame the
+         card. The Vocab marquee stays as the visible reward. */
+      .blitz-finished .booha-blitz-hud,
+      .blitz-finished .booha-blitz-nameplate,
+      .blitz-finished #vb-options, .blitz-finished #sb-options, .blitz-finished #qb-options,
+      .blitz-finished #sb-prompt, .blitz-finished #qb-prompt {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 300ms ease;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .scene-card .is-best { animation: none; }
+      }
       @media (prefers-reduced-motion: reduce) {
         .booha-blitz-callout.show { animation: none; opacity: 1; transform: translate(-50%, -50%); }
         .booha-blitz-fire-wallpaper { animation: none; opacity: .52; }
@@ -3601,6 +3779,53 @@ window.BoohaBlitzEngine = (() => {
     // were most of the "too much info" on the old completion screen. All
     // that's kept here is the anti-skip hold countdown; every other line on
     // the card is one of the plain winScreen fields populated in showWin().
+    const BLITZ_WEEK_GAMES = Object.freeze([
+      ['vocab', 'VOCAB'],
+      ['sentences', 'SENTENCES'],
+      ['questions', 'QUESTIONS'],
+    ]);
+
+    // Show the learner what is complete this week and what the next unlock is.
+    // This is deliberately fail-soft: the card still works if seasonal skin
+    // data is unavailable on a partially loaded page.
+    function renderFinalWeekRow(winScreen, curr, weekId) {
+      const card = winScreen.querySelector('.booha-blitz-final-card') || winScreen;
+      let row = card.querySelector('.booha-blitz-final-week');
+      if (!row) {
+        row = document.createElement('div');
+        row.className = 'booha-blitz-final-week';
+        const buttons = winScreen.querySelector(selector('playAgain'))?.parentElement;
+        card.insertBefore(row, buttons && buttons.parentElement === card ? buttons : null);
+      }
+
+      const done = BLITZ_WEEK_GAMES.map(([type]) => !!getWeeklyScore(type, curr, weekId));
+      const left = done.filter(isDone => !isDone).length;
+      const skins = window.BoohaSkins;
+      const skinId = skins?.rotationCharacterId?.();
+      const skin = skinId ? skins.get?.(skinId) : null;
+      const art = skin?.assets?.maze || '';
+      const name = skin ? escapeHtml(String(skin.name || '').replace(/\s*Booha$/, '')) : '';
+      const nameJp = skin?.nameJp ? escapeHtml(String(skin.nameJp).split('・')[0]) : '';
+      const pips = BLITZ_WEEK_GAMES
+        .map(([, label], index) => `<span class="booha-blitz-week-pip${done[index] ? ' done' : ''}">${label}${done[index] ? ' ✓' : ''}</span>`)
+        .join('');
+
+      let message;
+      if (!skin) {
+        message = left
+          ? `${left} more Blitz this week<span class="jp">こんしゅう あと ${left}つ</span>`
+          : 'All 3 Blitz cleared this week!<span class="jp">こんしゅう ぜんぶ クリア！</span>';
+      } else if (left) {
+        message = `${left} more Blitz to unlock ${name}!<span class="jp">あと ${left}つ で ${nameJp} が でるよ！</span>`;
+      } else {
+        message = `${name} Booha unlocked! See the Maze.<span class="jp">${nameJp} が でたよ！ めいろ で みてね。</span>`;
+      }
+
+      row.innerHTML = `${art ? `<img src="${escapeHtml(art)}" alt="" class="${left ? 'locked' : ''}">` : ''}`
+        + `<div class="booha-blitz-week-text"><div class="booha-blitz-week-pips">${pips}</div>`
+        + `<div class="booha-blitz-week-msg">${message}</div></div>`;
+    }
+
     function ensureFinalCard(winScreen, palette) {
       const existing = winScreen.querySelector('.booha-blitz-final-card');
       if (existing) {
@@ -4187,33 +4412,24 @@ window.BoohaBlitzEngine = (() => {
       }
 
       function startFinalHold(holdMs = FINAL_CARD_HOLD_MS) {
+        // Silent tap guard: controls are visibly present but briefly disabled
+        // so the last answer tap cannot skip the result card.
         stopFinalHold();
         const buttons = [
           winScreen.querySelector(selector('playAgain')),
+          winScreen.querySelector(selector('records')),
           winScreen.querySelector(selector('winClose')),
         ].filter(Boolean);
         buttons.forEach(button => {
           button.disabled = true;
           button.setAttribute('aria-disabled', 'true');
-          button.title = 'Please look at your clear first.';
         });
-
-        const releaseAt = Date.now() + holdMs;
-        const paintHold = () => {
-          const seconds = Math.max(1, Math.ceil((releaseAt - Date.now()) / 1000));
-          finalCard.hold.textContent = `${spotlight.playerName}, LOOK AT YOUR CLEAR — ${seconds}`;
-        };
-        finalCard.hold.classList.remove('ready');
-        paintHold();
-        finalHoldInterval = setInterval(paintHold, 250);
+        finalCard.hold.textContent = '';
         finalHoldTimer = setTimeout(() => {
           stopFinalHold();
-          finalCard.hold.classList.add('ready');
-          finalCard.hold.textContent = `${spotlight.playerName}, YOUR MOMENT — READY`;
           buttons.forEach(button => {
             button.disabled = false;
             button.removeAttribute('aria-disabled');
-            button.title = '';
           });
         }, holdMs);
       }
@@ -4590,6 +4806,7 @@ window.BoohaBlitzEngine = (() => {
             if (fallbackTime && !fallbackTime.textContent) fallbackTime.textContent = fmtTime(ms);
             [
               winScreen.querySelector(selector('playAgain')),
+              winScreen.querySelector(selector('records')),
               winScreen.querySelector(selector('winClose')),
             ].filter(Boolean).forEach(button => {
               button.disabled = false;
@@ -4628,7 +4845,6 @@ window.BoohaBlitzEngine = (() => {
           },
         }));
 
-        const best = getBestScore(config.gameType, config.legacyKey, curr);
         const playerName = getPlayerName();
         const isRecord = result.isAllTimeRecord;
         const oldRecord = result.oldRecord;
@@ -4643,48 +4859,44 @@ window.BoohaBlitzEngine = (() => {
           : `${palette.accent}, ${palette.accent2}, #ffffff`;
         winScreen.style.setProperty('--blitz-finish-gradient', `linear-gradient(90deg, ${finishGradient})`);
 
-        // Fixed scorecard copy -- content no longer branches on outcome
-        // beyond the "NEW BEST TIME" header, per spec.
+        // One headline, the time as hero, one result chip, and a goal for
+        // next time. Older nodes remain for shared selectors; scene-card CSS
+        // hides the retired scream, JP, label, and delta lines.
+        winScreen.classList.add('scene-card');
         const winNameEl = winScreen.querySelector(selector('winName'));
-        winNameEl.classList.add('booha-blitz-ruby-text');
-        winNameEl.innerHTML = `${escapeHtml(playerName)} <ruby>is<rt>\u30a4\u30ba</rt></ruby> <ruby>Awesome!!<rt>\u30a2\u30a6\u30b5\u30e0!!</rt></ruby>`;
-        const screamEl = winScreen.querySelector(selector('winScream'));
-        screamEl.classList.add('booha-blitz-ruby-text');
-        screamEl.innerHTML = '<ruby>Booha<rt>\u30d6\u30fc\u30cf\u30fc</rt></ruby> <ruby>is<rt>\u30a4\u30ba</rt></ruby> <ruby>happy!!<rt>\u30cf\u30c3\u30d4\u30fc!!</rt></ruby>';
-        const jpLine = winScreen.querySelector(selector('winJp'));
-        jpLine.classList.add('booha-blitz-ruby-text');
-        jpLine.innerHTML = '<ruby>For<rt>\u30d5\u30a9\u30fc</rt></ruby> <ruby>you:<rt>\u30e6\u30fc</rt></ruby> <ruby>It\u2019s<rt>\u30a4\u30c3\u30c4</rt></ruby> <ruby>Booha<rt>\u30d6\u30fc\u30cf\u30fc</rt></ruby>';
+        winNameEl.classList.remove('booha-blitz-ruby-text');
+        winNameEl.innerHTML = '<span class="booha-blitz-final-kicker">'
+          + escapeHtml(scene.label) + ' · ' + escapeHtml(palette.name || '') + '</span>'
+          + '<span class="booha-blitz-final-cleared"><span class="nm">'
+          + escapeHtml(playerName) + '</span> CLEARED IT!</span>'
+          + '<span class="booha-blitz-final-cleared-jp">クリア！ よく できました！</span>';
         const timeEl = winScreen.querySelector(selector('winTime'));
         timeEl.textContent = fmtTime(ms);
-        timeEl.style.color = isRecord ? '#ffd700' : aliveColor;
-        timeEl.style.textShadow = isRecord
-          ? '0 0 28px rgba(255,215,0,1), 0 0 70px rgba(255,90,0,0.75)'
-          : `0 0 32px ${palette.glow}, 0 0 64px ${palette.glow}`;
+        timeEl.classList.toggle('gold', isRecord && !!oldRecord);
+        timeEl.style.color = '';
+        timeEl.style.textShadow = '';
         const recordEl = winScreen.querySelector(selector('winRecord'));
         const bestEl = winScreen.querySelector(selector('winBest'));
-        const deltaEl = winScreen.querySelector(selector('winDelta'));
-        // "NEW BEST TIME" only appears when this run set the all-time best --
-        // otherwise the header is skipped entirely, per spec.
-        recordEl.hidden = !isRecord;
-        recordEl.classList.toggle('big', isRecord);
-        recordEl.classList.add('booha-blitz-ruby-text');
-        recordEl.innerHTML = isRecord
-          ? '<ruby>NEW<rt>\u30cb\u30e5\u30fc</rt></ruby> <ruby>BEST<rt>\u30d9\u30b9\u30c8</rt></ruby> <ruby>TIME<rt>\u30bf\u30a4\u30e0</rt></ruby>'
-          : '';
-        bestEl.classList.add('booha-blitz-ruby-text');
-        bestEl.innerHTML = `<ruby>Your<rt>\u30e6\u30a2</rt></ruby> <ruby>best<rt>\u30d9\u30b9\u30c8</rt></ruby> <ruby>time:<rt>\u30bf\u30a4\u30e0</rt></ruby> ${fmtTime(isRecord ? ms : (best ? best.ms : ms))}`;
-        // Kept, per spec ("there is already a built-in +/- time, just have
-        // this on the bottom") -- markup order puts it after the buttons.
-        deltaEl.classList.add('booha-blitz-ruby-text');
-        if (isRecord) {
-          deltaEl.innerHTML = oldRecord
-            ? `-${fmtTime(oldRecord.ms - ms)} <ruby>faster<rt>\u30d5\u30a1\u30b9\u30bf\u30fc</rt></ruby> <ruby>than<rt>\u30b6\u30f3</rt></ruby> <ruby>your<rt>\u30e6\u30a2</rt></ruby> <ruby>previous<rt>\u30d7\u30ea\u30d3\u30a2\u30b9</rt></ruby> <ruby>best!<rt>\u30d9\u30b9\u30c8!</rt></ruby>`
-            : '<ruby>Your<rt>\u30e6\u30a2</rt></ruby> <ruby>first<rt>\u30d5\u30a1\u30fc\u30b9\u30c8</rt></ruby> <ruby>record!<rt>\u30ec\u30b3\u30fc\u30c9!</rt></ruby>';
+        recordEl.hidden = false;
+        recordEl.classList.remove('big', 'booha-blitz-ruby-text', 'is-best', 'is-first', 'is-slower');
+        bestEl.classList.remove('booha-blitz-ruby-text');
+        if (isRecord && oldRecord) {
+          recordEl.classList.add('is-best');
+          recordEl.innerHTML = 'NEW BEST! <small>ベスト こうしん</small>';
+          bestEl.hidden = false;
+          bestEl.innerHTML = `old best <s>${fmtTime(oldRecord.ms)}</s> · ${fmtTime(oldRecord.ms - ms)} faster`;
+        } else if (!oldRecord) {
+          recordEl.classList.add('is-first');
+          recordEl.innerHTML = 'FIRST CLEAR! <small>はじめて クリア</small>';
+          bestEl.hidden = false;
+          bestEl.textContent = 'Beat it next time!';
         } else {
-          deltaEl.innerHTML = oldRecord
-            ? `+${fmtTime(ms - oldRecord.ms)} <ruby>vs.<rt>\u30d0\u30fc\u30b5\u30b9</rt></ruby> <ruby>your<rt>\u30e6\u30a2</rt></ruby> <ruby>best<rt>\u30d9\u30b9\u30c8</rt></ruby>`
-            : '';
+          recordEl.classList.add('is-slower');
+          recordEl.innerHTML = `+${fmtTime(ms - oldRecord.ms)} <small>vs best ${fmtTime(oldRecord.ms)}</small>`;
+          bestEl.hidden = true;
+          bestEl.textContent = '';
         }
+        renderFinalWeekRow(winScreen, curr, weekId);
         winScreen.classList.toggle('perfect-mode', isPerfectRun);
         winScreen.classList.toggle('speed-target-mode', speedBand === 'target');
         winScreen.classList.toggle('speed-elite-mode', speedBand === 'elite');
@@ -4696,6 +4908,7 @@ window.BoohaBlitzEngine = (() => {
           else if (isPerfectRun) emitFinishFlash(overlay, palette, playerName, 'clear');
           else if (isRecord) emitFinishFlash(overlay, palette, playerName, 'record');
         }
+        overlay.classList.add('blitz-finished');
         winScreen.classList.add('show', 'climax-awaiting');
         if (climaxTimer) clearTimeout(climaxTimer);
         const revealEpoch = runEpoch;
@@ -4706,7 +4919,7 @@ window.BoohaBlitzEngine = (() => {
         }, REDUCED_MOTION ? 420 : 980);
         playSceneSfx('finish', { isRecord, isPerfectRun });
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) playFinalStinger(isRecord, isPerfectRun);
-        startFinalHold(isPerfectRun ? 5600 : isRecord ? 5000 : FINAL_CARD_HOLD_MS);
+        startFinalHold();
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) celebrate(overlay, palette, isRecord, speedBand);
         } catch (error) {
           console.error(`[${config.apiName}] Finish rendering failed:`, error);

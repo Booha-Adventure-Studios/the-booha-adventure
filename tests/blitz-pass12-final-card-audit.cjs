@@ -16,12 +16,12 @@ assert.match(engine, /className = 'booha-blitz-final-card'/,
   'the clear result must use a dedicated final-card surface');
 assert.doesNotMatch(finalCardBuilder, /booha-blitz-final-curriculum/,
   'the compact final card must not restore the retired curriculum banner');
-assert.match(engine, /winNameEl\.innerHTML = `\$\{escapeHtml\(playerName\)\} <ruby>is<rt>/,
+assert.match(engine, /CLEARED IT!/,
   'the player name must remain the final-card hero');
-assert.match(engine, /bestEl\.innerHTML = `.*<ruby>best<rt>/,
-  'the final card must show the personal best explicitly');
-assert.match(engine, /deltaEl\.innerHTML = oldRecord[\s\S]*<ruby>previous<rt>/,
-  'the final card must show the delta from the previous best');
+assert.match(engine, /bestEl\.innerHTML = `old best <s>\$\{fmtTime\(oldRecord\.ms\)\}<\/s>/,
+  'the final card must show the previous best explicitly on a new record');
+assert.match(engine, /recordEl\.innerHTML = `\+\$\{fmtTime\(ms - oldRecord\.ms\)\} <small>vs best/,
+  'a slower clear must show its gap to the best time');
 assert.match(engine, /const isPerfectRun = current === initialQueueLength/,
   'the final card must require a full mistake-free run');
 assert.match(engine, /winScreen\.classList\.toggle\('perfect-mode', isPerfectRun\)/,
@@ -30,7 +30,7 @@ assert.doesNotMatch(engine, /MASTERY CLEAR|CLEAN CLEAR/,
   'failed runs must not render alternate clear tiers');
 assert.doesNotMatch(finalCardBuilder, /finalCard\.streak|PERFECT RUN · \$\{initialQueueLength\}/,
   'the compact final card must not recreate the retired streak/perfect stack');
-assert.match(engine, /FINAL_CARD_HOLD_MS = 4000/,
+assert.match(engine, /FINAL_CARD_HOLD_MS = 1400/,
   'the final card must preserve the deliberate look-first hold');
 
 for (const mode of modes) {
