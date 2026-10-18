@@ -34,10 +34,23 @@ class FakeElement {
     this.disabled = false;
     this.attributes = {};
     this.children = {};
+    this.listeners = new Map();
   }
   querySelector(selector) { return this.children[selector] || null; }
   setAttribute(name, value) { this.attributes[name] = String(value); }
   removeAttribute(name) { delete this.attributes[name]; }
+  addEventListener(type, handler) {
+    const handlers = this.listeners.get(type) || new Set();
+    handlers.add(handler);
+    this.listeners.set(type, handlers);
+  }
+  removeEventListener(type, handler) {
+    this.listeners.get(type)?.delete(handler);
+  }
+  dispatchEvent(event) {
+    this.listeners.get(event.type)?.forEach(handler => handler(event));
+  }
+  listenerCount(type) { return this.listeners.get(type)?.size || 0; }
 }
 
 function makeFinishDom() {
@@ -58,18 +71,19 @@ function makeFinishDom() {
   };
 }
 
-function runFinish({ perfect = true, isRecord = false, dispatchError = false, reducedMotion = false, lowPower = false } = {}) {
+function runFinish({ perfect = true, isRecord = false, dispatchError = false, reducedMotion = false, lowPower = false, skipFinale = false } = {}) {
   const dom = makeFinishDom();
   if (lowPower) dom.overlay.classList.add('low-power');
   const events = [];
   const timers = [];
   let nextTimerId = 0;
+  let nowValue = 1234;
   let saveCalls = 0;
   let sceneCelebrations = 0;
   let sceneSettles = 0;
   const context = {
     console: { ...console, error: () => {} },
-    performance: { now: () => 1234 },
+    performance: { now: () => nowValue },
     current: perfect ? 2 : 1,
     initialQueueLength: 2,
     speedTarget: { bestMs: 900, targetMs: 1200 },
@@ -137,9 +151,14 @@ function runFinish({ perfect = true, isRecord = false, dispatchError = false, re
   const finaleTimer = timers.find(timer => timer.delay === expectedDelay && !timer.cancelled);
   if (!dispatchError) {
     assert(finaleTimer, `finish must schedule a ${expectedDelay}ms finale`);
-    finaleTimer.callback();
+    if (skipFinale) {
+      nowValue += 701;
+      dom.overlay.dispatchEvent({ type: 'pointerdown' });
+    } else {
+      finaleTimer.callback();
+    }
   }
-  return { dom, events, saveCalls, visibleBeforeReveal, sceneCelebrations, sceneSettles, expectedDelay };
+  return { dom, events, saveCalls, visibleBeforeReveal, sceneCelebrations, sceneSettles, expectedDelay, timers };
 }
 
 const perfect = runFinish();
@@ -152,6 +171,13 @@ assert.strictEqual(runFinish({ reducedMotion: true }).expectedDelay, 420,
   'reduced motion must use the short finale');
 assert.strictEqual(runFinish({ lowPower: true }).expectedDelay, 1000,
   'low power must use the shorter finale');
+const skipped = runFinish({ skipFinale: true });
+assert(skipped.dom.winScreen.classList.contains('show'), 'a late tap must reveal the finish card');
+assert.strictEqual(skipped.sceneSettles, 1, 'a skipped finale must settle the scene');
+assert(skipped.timers.some(timer => timer.delay === 2600 && timer.cancelled),
+  'a skipped finale must cancel its delayed reveal timer');
+assert.strictEqual(skipped.dom.overlay.listenerCount('pointerdown'), 0,
+  'a skipped finale must remove its pointer listener');
 assert.match(perfect.dom.winScreen.children.winRecord.innerHTML, /vs best/,
   'a slower clear must show its gap to the best time, not a NEW BEST header');
 assert.strictEqual(perfect.events.length, 1, 'perfect run must emit one completion event');
