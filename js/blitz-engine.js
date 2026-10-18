@@ -5172,7 +5172,9 @@ window.BoohaBlitzEngine = (() => {
         <div id="blitz-rec-list" aria-label="Blitz records list"></div>
         <section id="blitz-rec-collection" hidden aria-labelledby="blitz-rec-collection-title">
           <div id="blitz-rec-collection-title">SEASON COLLECTION</div>
-          <div id="blitz-rec-collection-jp">ハロウィンのなかま</div>
+          <div id="blitz-rec-season-tabs" role="tablist" aria-label="Collection years"></div>
+          <div id="blitz-rec-collection-season"></div>
+          <div id="blitz-rec-collection-jp"></div>
           <div id="blitz-rec-characters"></div>
         </section>
       </section>
@@ -5260,8 +5262,16 @@ window.BoohaBlitzEngine = (() => {
         .blitz-rec-play { appearance: none; border: 1px solid #ffe27a; border-radius: 999px; padding: 8px 12px; background: rgba(255,226,122,.14); color: #fff2b9; font-size: 11px; font-weight: 1000; letter-spacing: .8px; cursor: pointer; }
         .blitz-rec-play:hover, .blitz-rec-play:focus-visible { background: #ffe27a; color: #17121a; outline: none; }
         #blitz-rec-collection { margin: 0 20px 20px; padding: 16px; border-radius: 18px; border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.25); }
+        #blitz-rec-season-tabs { display: flex; gap: 6px; overflow-x: auto; margin: 10px 0 14px; padding: 2px 0 4px; scrollbar-width: thin; }
+        #blitz-rec-season-tabs[hidden] { display: none; }
+        #blitz-rec-season-tabs button { flex: 0 0 auto; appearance: none; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 7px 13px; background: rgba(0,0,0,.24); color: rgba(255,255,255,.62); font-size: 11px; font-weight: 1000; letter-spacing: .7px; cursor: pointer; }
+        #blitz-rec-season-tabs button[aria-selected="true"] { color: #17121a; border-color: #ffe27a; background: #ffe27a; box-shadow: 0 0 16px rgba(255,226,122,.28); }
+        #blitz-rec-collection-season { margin-top: 2px; color: #fff3bd; font-size: 13px; font-weight: 1000; letter-spacing: .8px; }
         #blitz-rec-collection-jp { margin: 3px 0 12px; font-size: 11px; color: rgba(255,255,255,.58); }
-        #blitz-rec-characters { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+        #blitz-rec-characters { display: flex; flex-direction: column; gap: 14px; }
+        .blitz-rec-season-block { min-width: 0; }
+        .blitz-rec-season-block-title { display: block; margin-bottom: 7px; color: rgba(255,226,122,.82); font-size: 9px; font-weight: 1000; letter-spacing: 1.2px; }
+        .blitz-rec-character-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
         .blitz-rec-character { min-width: 0; text-align: center; }
         .blitz-rec-character img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; filter: brightness(0) drop-shadow(0 0 6px rgba(0,0,0,.6)); }
         .blitz-rec-character.is-collected img { filter: drop-shadow(0 0 8px rgba(255,226,122,.52)); }
@@ -5272,7 +5282,7 @@ window.BoohaBlitzEngine = (() => {
           #blitz-rec-top, #blitz-rec-toggle, #blitz-rec-list { padding-left: 12px; padding-right: 12px; }
           #blitz-rec-awake { margin-left: 12px; margin-right: 12px; }
           #blitz-rec-collection { margin-left: 12px; margin-right: 12px; }
-          #blitz-rec-characters { gap: 4px; }
+          .blitz-rec-character-grid { gap: 4px; }
         }
       `;
       document.head.appendChild(style);
@@ -5320,6 +5330,24 @@ window.BoohaBlitzEngine = (() => {
     return panel;
   }
 
+  function recordSeasonYear(season) {
+    const match = String(season?.startDate || season?.id || '').match(/20\d{2}/);
+    return match ? match[0] : '';
+  }
+
+  function recordCollectionSeasons() {
+    const seasons = window.BoohaSkins?.SEASONS || {};
+    return Object.values(seasons)
+      .filter(season => season && season.id && recordSeasonYear(season))
+      .sort((a, b) => `${recordSeasonYear(b)}:${b.id}`.localeCompare(`${recordSeasonYear(a)}:${a.id}`));
+  }
+
+  function recordCurrentSeasonId() {
+    return window.BoohaSkins?.currentSeasonId?.()
+      || window.BoohaSkins?.CURRENT_SEASON_ID
+      || null;
+  }
+
   function renderRecordsPanel(panel) {
     const scope = panel._recordsScope || 'weekly';
     const weekId = panel._recordsWeekId;
@@ -5334,6 +5362,9 @@ window.BoohaBlitzEngine = (() => {
     const metaEl = panel.querySelector('#blitz-rec-awake-meta');
     const awakeSkin = panel.querySelector('#blitz-rec-awake-skin');
     const collection = panel.querySelector('#blitz-rec-collection');
+    const seasonTabs = panel.querySelector('#blitz-rec-season-tabs');
+    const collectionSeason = panel.querySelector('#blitz-rec-collection-season');
+    const collectionJp = panel.querySelector('#blitz-rec-collection-jp');
     const characters = panel.querySelector('#blitz-rec-characters');
 
     panel.querySelectorAll('[data-record-scope]').forEach(button => {
@@ -5370,21 +5401,60 @@ window.BoohaBlitzEngine = (() => {
 
     collection.hidden = scope !== 'alltime';
     if (scope === 'alltime') {
-      const season = window.BoohaSkins?.getSeason?.(window.BoohaSkins?.CURRENT_SEASON_ID);
-      const seasonCharacters = window.BoohaSkins?.seasonCharacters?.(season?.id) || [];
+      const seasons = recordCollectionSeasons();
+      const currentSeason = seasons.find(season => season.id === recordCurrentSeasonId());
+      const years = [...new Set(seasons.map(recordSeasonYear))].sort((a, b) => b.localeCompare(a));
+      const currentYear = recordSeasonYear(currentSeason) || String(new Date().getFullYear());
+      const requestedYear = panel._recordsCollectionYear || currentYear;
+      const selectedYear = years.includes(requestedYear) ? requestedYear : (years[0] || currentYear);
+      panel._recordsCollectionYear = selectedYear;
+      seasonTabs.innerHTML = '';
+      seasonTabs.hidden = years.length < 2;
+      years.forEach(year => {
+        const tab = document.createElement('button');
+        tab.type = 'button';
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-selected', String(year === selectedYear));
+        tab.setAttribute('aria-controls', 'blitz-rec-characters');
+        tab.textContent = year;
+        tab.addEventListener('click', () => {
+          panel._recordsCollectionYear = year;
+          renderRecordsPanel(panel);
+        });
+        seasonTabs.appendChild(tab);
+      });
+      const selectedSeasons = seasons.filter(season => recordSeasonYear(season) === selectedYear);
+      collectionSeason.textContent = selectedSeasons
+        .map(season => `${season.name || season.id} · ${selectedYear}`)
+        .join(' · ');
+      collectionJp.textContent = selectedSeasons
+        .map(season => season.collectionJp)
+        .filter(Boolean)
+        .join(' · ');
       characters.innerHTML = '';
-      seasonCharacters.forEach(skin => {
-        const isCollected = window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id);
-        const item = document.createElement('div');
-        item.className = `blitz-rec-character ${isCollected ? 'is-collected' : 'is-locked'}`;
-        const image = document.createElement('img');
-        image.src = skin.assets?.maze || '';
-        image.alt = isCollected ? `${skin.name} collected` : 'Locked Booha';
-        const name = document.createElement('span');
-        name.className = 'blitz-rec-character-name';
-        name.textContent = isCollected ? String(skin.name || '').replace(/\s+Booha$/i, '') : '???';
-        item.append(image, name);
-        characters.appendChild(item);
+      selectedSeasons.forEach(season => {
+        const block = document.createElement('div');
+        block.className = 'blitz-rec-season-block';
+        const blockTitle = document.createElement('span');
+        blockTitle.className = 'blitz-rec-season-block-title';
+        blockTitle.textContent = season.name || season.id;
+        const grid = document.createElement('div');
+        grid.className = 'blitz-rec-character-grid';
+        (season.characterIds || []).map(id => window.BoohaSkins?.get?.(id)).filter(Boolean).forEach(skin => {
+          const isCollected = window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id);
+          const item = document.createElement('div');
+          item.className = `blitz-rec-character ${isCollected ? 'is-collected' : 'is-locked'}`;
+          const image = document.createElement('img');
+          image.src = skin.assets?.maze || '';
+          image.alt = isCollected ? `${skin.name} collected` : 'Locked Booha';
+          const name = document.createElement('span');
+          name.className = 'blitz-rec-character-name';
+          name.textContent = isCollected ? String(skin.name || '').replace(/\s+Booha$/i, '') : '???';
+          item.append(image, name);
+          grid.appendChild(item);
+        });
+        block.append(blockTitle, grid);
+        characters.appendChild(block);
       });
     }
 
@@ -5453,6 +5523,7 @@ window.BoohaBlitzEngine = (() => {
         })();
     panel._recordsReturnFocus = ctx.returnFocus || document.activeElement;
     panel._recordsPlayGame = typeof ctx.playGame === 'function' ? ctx.playGame : null;
+    panel._recordsCollectionYear = null;
     renderRecordsPanel(panel);
     panel.classList.add('show');
     panel.setAttribute('aria-hidden', 'false');

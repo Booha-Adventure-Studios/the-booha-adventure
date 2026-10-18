@@ -19,6 +19,10 @@ const index = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 
 assert.match(engine, /id="blitz-rec-awake-main"/);
 assert.match(engine, /id="blitz-rec-collection"/);
+assert.match(engine, /id="blitz-rec-season-tabs"/);
+assert.match(engine, /season\.collectionJp/);
+assert.match(engine, /recordCollectionSeasons/);
+assert.match(engine, /recordCurrentSeasonId/);
 assert.match(engine, /RECORD_ASSET_ROOT \+ 'vocab-circus'/);
 assert.match(engine, /RECORD_ASSET_ROOT \+ 'sentence-spooky'/);
 assert.match(engine, /RECORD_ASSET_ROOT \+ 'question-fireflies'/);
