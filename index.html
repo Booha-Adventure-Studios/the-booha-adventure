@@ -181,7 +181,7 @@
 
     /* ── START ── */
     #startScene {
-      background: #000;
+      background: transparent;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -288,8 +288,8 @@
     }
     html[data-season="halloween"] #startScene {
       background:
-        radial-gradient(ellipse at 50% 38%, rgba(10,14,34,.55) 0%, rgba(4,6,16,.82) 60%, rgba(2,2,8,.94) 100%),
-        linear-gradient(180deg, rgba(8,12,30,.6) 0%, rgba(2,2,8,.85) 100%);
+        linear-gradient(180deg, rgba(5,8,20,.22) 0%, rgba(13,4,27,.62) 100%),
+        url('assets/img/hw-background-1.webp') center/cover no-repeat;
     }
     html[data-season="halloween"] #startScene::after {
       content: '';
@@ -334,7 +334,7 @@
       background: radial-gradient(circle at 38% 35%, #fff7c9 0 7%, #ffd77f 34%, rgba(255,166,55,.38) 55%, transparent 72%);
       filter: blur(.2px) drop-shadow(0 0 42px rgba(255,152,49,.76));
       opacity: 0;
-      animation: halloweenMoonIn 680ms ease-out 180ms forwards;
+      animation: halloweenMoonIn 1700ms ease-out 450ms forwards;
     }
     #halloweenOpening .openingMoon::after {
       content: '';
@@ -356,9 +356,9 @@
       transform-box: fill-box;
       transform-origin: center;
     }
-    #halloweenOpening .openingBat:nth-child(1) { animation: halloweenBatCross 740ms ease-in 520ms forwards; }
-    #halloweenOpening .openingBat:nth-child(2) { animation: halloweenBatCross 850ms ease-in 680ms forwards; }
-    #halloweenOpening .openingBat:nth-child(3) { animation: halloweenBatCross 780ms ease-in 790ms forwards; }
+    #halloweenOpening .openingBat:nth-child(1) { animation: halloweenBatCross 1850ms ease-in 1300ms forwards; }
+    #halloweenOpening .openingBat:nth-child(2) { animation: halloweenBatCross 2125ms ease-in 1700ms forwards; }
+    #halloweenOpening .openingBat:nth-child(3) { animation: halloweenBatCross 1950ms ease-in 1975ms forwards; }
     @keyframes halloweenMoonIn { to { opacity: 1; } }
     @keyframes halloweenBatCross {
       0% { opacity: 0; transform: translate3d(-18vw, 12vh, 0) scale(.5) rotate(-8deg); }
@@ -374,7 +374,7 @@
       letter-spacing: 2px;
       text-transform: uppercase;
       opacity: 0;
-      animation: halloweenHintIn 400ms ease 950ms forwards;
+      animation: halloweenHintIn 1000ms ease 2375ms forwards;
     }
     @keyframes halloweenHintIn { to { opacity: .8; } }
     html.halloween-opening #startScene > .ghostOuter,
@@ -3617,7 +3617,7 @@ const dailyCheckBtn = document.getElementById('dailyCheckBtn');
   };
   const startTimer = () => {
     if (finished || timer !== null) return;
-    timer = window.setTimeout(finish, 1500);
+    timer = window.setTimeout(finish, 3750);
   };
 
   const prepareForStudent = () => {
