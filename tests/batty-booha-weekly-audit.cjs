@@ -11,7 +11,7 @@ const source = fs.readFileSync(path.join(ROOT, 'js/core/booha-skins.js'), 'utf8'
 
 let stored = {
   unlocks: {},
-  meta: { selectedBoohaSkin: null },
+  meta: { selectedBoohaSkin: null, boohaSkinCollection: {} },
   weekly: { unlockedBoohaSkins: {} },
 };
 const currentWeek = { occurrenceKey: '2026-09-20|september-w3' };
@@ -89,6 +89,7 @@ stored.weekly.unlockedBoohaSkins = {};
 assert.strictEqual(skins.isUnlocked('batty'), false);
 assert.strictEqual(skins.unlockAndEquip('batty'), true);
 assert.ok(stored.weekly.unlockedBoohaSkins.batty);
+assert.ok(stored.meta.boohaSkinCollection.batty);
 assert.strictEqual(stored.meta.selectedBoohaSkin, 'batty');
 assert.strictEqual(stored.unlocks.booha_skin_batty, undefined,
   'Batty must not be written to permanent unlocks');
@@ -102,6 +103,7 @@ stored.weekly.unlockedBoohaSkins = {};
 stored.meta.selectedBoohaSkin = null;
 stored.meta.blitz.weekly = {};
 assert.strictEqual(skins.isUnlocked('batty'), false);
+assert.strictEqual(skins.isCollected('batty'), true);
 assert.strictEqual(skins.selectedId(), null);
 assert.strictEqual(skins.unlockAndEquip('batty'), false);
 
@@ -122,6 +124,7 @@ assert.strictEqual(skins.unlockAndEquip('batty'), false);
 assert.strictEqual(skins.rotationCharacterId(), 'mummington');
 assert.strictEqual(skins.unlockAndEquip('mummington'), true);
 assert.strictEqual(skins.selectedId(), 'mummington');
+assert.strictEqual(skins.collectedSkinIds().sort().join(','), 'batty,mummington');
 
 // Every October occurrence has its own scheduled Halloween character.
 [
