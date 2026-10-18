@@ -3137,7 +3137,7 @@
       wandererCacheBudgetBytes: 0,
       roomLoadDecodeMs: 0,
       activeAudioBufferCount: 0,
-      serviceWorkerCacheVersion: 'booha-assets-2026-516',
+      serviceWorkerCacheVersion: 'booha-assets-2026-576',
       averageFps: worldPerf.metrics().averageFps,
     }));
     scheduleGrimmerglenFrame();

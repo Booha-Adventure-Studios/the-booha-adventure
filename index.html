@@ -52,9 +52,15 @@
 <script src="./js/core/booha-skins.js"></script>
 <script>
   (function () {
-    var season = window.BoohaSkins && window.BoohaSkins.seasonIdForDate
+    var seasonId = window.BoohaSkins && window.BoohaSkins.seasonIdForDate
       ? window.BoohaSkins.seasonIdForDate()
       : null;
+    // Presentation keys off the theme ("halloween", "christmas"); the
+    // year-scoped id is reserved for rewards and collection history.
+    var seasonObj = seasonId && window.BoohaSkins && window.BoohaSkins.getSeason
+      ? window.BoohaSkins.getSeason(seasonId)
+      : null;
+    var season = (seasonObj && seasonObj.themeId) || seasonId;
     if (season) document.documentElement.dataset.season = season;
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var lowPowerHint = navigator.connection && navigator.connection.saveData;
