@@ -724,6 +724,26 @@ const BoohaSkins = (() => {
     return ok;
   }
 
+  // The Maze reveal popup is a one-time moment per weekly unlock. The unlock
+  // itself can now happen when the third Blitz clears, so the popup needs its
+  // own "seen" mark instead of using "not unlocked yet" as its trigger.
+  function isRevealSeen(id) {
+    try {
+      return !!save()?.load()?.weekly?.unlockedBoohaSkins?.[id]?.revealSeenAt;
+    } catch (_) { return false; }
+  }
+
+  function markRevealSeen(id) {
+    const saveFile = save();
+    if (!saveFile) return false;
+    const data = saveFile.load();
+    const entry = data?.weekly?.unlockedBoohaSkins?.[id];
+    if (!entry || typeof entry !== 'object') return false;
+    if (entry.revealSeenAt) return true;
+    entry.revealSeenAt = Date.now();
+    return saveFile.save(data);
+  }
+
   function equip(id) {
     if (!isUnlocked(id)) return false;
     const saveFile = save();
@@ -762,6 +782,8 @@ const BoohaSkins = (() => {
     applySeasonTheme,
     unlock,
     isUnlocked,
+    isRevealSeen,
+    markRevealSeen,
     isCollected,
     selectedId,
     asset,
