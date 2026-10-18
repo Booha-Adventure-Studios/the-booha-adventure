@@ -20,8 +20,8 @@ assert.match(engine, /isRecord\s*\?\s*\[659, 831, 1047, 1319\]/,
   'new records must receive the strongest final stinger');
 assert.match(engine, /startFinalHold\(\);/,
   'every clear must use the same short tap guard');
-assert.match(engine, /boohaBlitzButtonsIn 520ms 900ms/,
-  'replay and menu controls must enter after the celebration begins');
+assert.match(engine, /boohaBlitzButtonsIn 520ms 200ms/,
+  'replay and menu controls must enter shortly after the celebration card appears');
 assert.match(engine, /\.booha-blitz-final-headline,[\s\S]*?animation: none; opacity: 1; transform: none;/,
   'reduced motion must disable final-card entrance motion');
 assert.match(verify, /tests\/blitz-pass15-final-energy-audit\.cjs/,
