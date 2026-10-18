@@ -63,12 +63,37 @@ sundaySwitches.forEach(([iso, key, expectedCharacter]) => {
 });
 
 const novFirst = occurrence(new Date('2026-11-01T00:00:00+09:00'));
-assert.strictEqual(skins.seasonIdForDate('2026-11-01'), null,
-  'Nov 1: Halloween must be shut off');
 assert.strictEqual(skins.menuCharacterId('halloween', '2026-11-01'), null,
   'Nov 1: Batty must leave the landing menu');
 assert.strictEqual(skins.rotationCharacterId('halloween', novFirst.key), null,
   'Nov 1: no Halloween weekly character may be scheduled');
+
+assert.strictEqual(skins.seasonIdForDate('2026-11-01'), 'christmas-2026',
+  'Nov 1: Christmas must begin at the Tokyo date boundary');
+assert.strictEqual(skins.getSeason('christmas').themeId, 'christmas');
+assert.strictEqual(skins.seasonMascot('christmas').id, 'grubb');
+assert.strictEqual(skins.menuCharacterId('christmas', '2026-11-01'), 'grubb');
+assert.strictEqual(skins.mascotAsset('static', 'christmas'), 'assets/skins/grubb_booha/static.webp');
+
+[
+  ['2026-11-01', 'thumpkin'],
+  ['2026-11-08', 'crumbly'],
+  ['2026-11-15', 'gnasher'],
+  ['2026-11-22', 'waddlesworth'],
+  ['2026-11-29', 'waddlesworth'],
+  ['2026-12-06', 'snaggle'],
+  ['2026-12-13', 'tinkerplunk'],
+  ['2026-12-20', 'oats'],
+  ['2026-12-27', 'quillock'],
+].forEach(([date, expectedCharacter]) => {
+  const { key: occurrenceKey } = occurrence(new Date(`${date}T00:00:00+09:00`));
+  assert.strictEqual(skins.rotationCharacterId('christmas-2026', occurrenceKey), expectedCharacter,
+    `${date}: Christmas must schedule ${expectedCharacter}`);
+});
+assert.strictEqual(skins.seasonIdForDate('2027-01-02'), 'christmas-2026',
+  'Jan 2: Christmas must remain active through the final unlock week');
+assert.strictEqual(skins.seasonIdForDate('2027-01-03'), null,
+  'Jan 3: Christmas must end after the eighth unlock week');
 
 // The requested fifth-Sunday case is Aug 30, outside the Sep 1–Nov 7 sweep.
 const fifthSunday = occurrence(new Date('2026-08-30T12:00:00+09:00'));

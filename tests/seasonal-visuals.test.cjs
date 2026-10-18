@@ -43,6 +43,23 @@ assert.ok(!skins.hasCompleteAssetSet('grubb'), 'Grubb must not be required to ha
 assert.ok(skins.isAvailable('grubb'), 'a complete mascot should be available to the season resolver');
 assert.ok(fs.existsSync(path.join(root, grubb.assets.static)), 'Grubb static asset must exist');
 assert.ok(fs.existsSync(path.join(root, grubb.assets.karasuki)), 'Grubb Karasuki asset must exist');
+const christmas = skins.getSeason('christmas-2026');
+assert.strictEqual(christmas.themeId, 'christmas');
+assert.strictEqual(christmas.collectionJp, 'クリスマスのなかま');
+assert.strictEqual(christmas.mascotId, 'grubb');
+assert.deepStrictEqual([...christmas.characterIds], [
+  'thumpkin', 'crumbly', 'gnasher', 'waddlesworth',
+  'snaggle', 'tinkerplunk', 'oats', 'quillock',
+]);
+assert.strictEqual(skins.get('thumpkin').seasonId, 'christmas-2026');
+assert.ok(skins.isAvailable('thumpkin'), 'Thumpkin is the first complete Christmas unlockable');
+assert.ok(!skins.isAvailable('crumbly'), 'future Christmas art must stay unavailable until enabled with a complete set');
+assert.strictEqual(skins.seasonMascot('christmas-2026').id, 'grubb');
+assert.strictEqual(skins.mascotAsset('karasuki', 'christmas-2026'), grubb.assets.karasuki);
+assert.deepStrictEqual(Object.keys(christmas.palette).sort(), ['black', 'lime', 'orange', 'purple']);
+assert.strictEqual(christmas.palette.orange, '#c94b55');
+assert.strictEqual(christmas.palette.purple, '#2f7d4a');
+assert.strictEqual(christmas.glow.lime, '#ffe9a3');
 const palette = skins.SEASONS.halloween.palette;
 const glow = skins.SEASONS.halloween.glow;
 assert.deepStrictEqual(Object.keys(palette).sort(), ['black', 'lime', 'orange', 'purple']);
@@ -126,10 +143,24 @@ assert.deepStrictEqual(
 const index = read('index.html');
 assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ animation: none; \}/,
   'index sparkles must stop under reduced motion');
+assert.match(index, /html\[data-season="christmas"\] #startScene/,
+  'Christmas must have an explicit landing presentation theme');
+assert.match(index, /mascotAsset\?\.\('static'\)/,
+  'landing page must be able to render a mascot with no gameplay pose set');
+
+const dailyCheck = read('js/daily-check.js');
+assert.match(dailyCheck, /html\[data-season="christmas"\] \.dc-root/,
+  'Daily Check must have an explicit Christmas presentation theme');
+assert.match(dailyCheck, /season === 'christmas'/,
+  'Daily Check feedback must recognize the Christmas season');
+assert.match(dailyCheck, /mascotAsset\?\.\('static'\)/,
+  'Daily Check must be able to render the seasonal mascot');
 
 const maze = read('maze.html');
 assert.match(maze, /html\[data-season="halloween"\] #mazeImg\{ filter:brightness\(1\.10\) saturate\(1\.08\); \}/,
   'Halloween Maze artwork must receive a modest brightness lift');
+assert.match(maze, /html\[data-season="christmas"\] #mazeImg/,
+  'Christmas Maze artwork must receive an explicit seasonal treatment');
 assert.match(maze, /const hallowCP = halloween && getMonthIndexFromWeekNumber\(cp\.w\) === 9;/,
   'Halloween checkpoint blending must be limited to October');
 assert.match(maze, /drawGlow\(x,y,glowR\*4\.9,HALLOWEEN_GLOW\.lime,alpha\*\(\.06\+pulse\*\.04\)\)/,
