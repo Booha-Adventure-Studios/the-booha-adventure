@@ -1655,6 +1655,13 @@ else
   bad "Blitz wrong-answer strip audit failed"
 fi
 
+echo "[blitz] records redesign audit"
+if node tests/blitz-records-redesign-audit.cjs >/dev/null 2>&1; then
+  ok "Blitz Records redesign audit passed"
+else
+  bad "Blitz Records redesign audit failed"
+fi
+
 echo "[games] nine-engine audio polish audit"
 if node tests/games-audio-polish-audit.cjs >/dev/null 2>&1; then
   ok "Nine-engine audio polish audit passed"

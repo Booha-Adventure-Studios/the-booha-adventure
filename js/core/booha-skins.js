@@ -420,6 +420,23 @@ const BoohaSkins = (() => {
     } catch (_) { return false; }
   }
 
+  // Weekly unlocks are intentionally temporary, but the Records shelf needs
+  // a small permanent collection history so earned seasonal characters remain
+  // visible after the Sunday rollover clears the active reward bucket.
+  function isCollected(id) {
+    const skin = get(id);
+    if (!skin) return false;
+    try {
+      return !!save()?.load()?.meta?.boohaSkinCollection?.[skin.id];
+    } catch (_) { return false; }
+  }
+
+  function collectedSkinIds(seasonId = CURRENT_SEASON_ID) {
+    return seasonCharacters(seasonId)
+      .filter(skin => isCollected(skin.id))
+      .map(skin => skin.id);
+  }
+
   function selectedId() {
     try {
       const id = save()?.load()?.meta?.selectedBoohaSkin;
@@ -451,6 +468,12 @@ const BoohaSkins = (() => {
     // passing through the current save-file migration first.
     if (data.unlocks && typeof data.unlocks === 'object') delete data.unlocks[skin.unlockId];
     if (!data.meta || typeof data.meta !== 'object') data.meta = {};
+    if (!data.meta.boohaSkinCollection || typeof data.meta.boohaSkinCollection !== 'object' || Array.isArray(data.meta.boohaSkinCollection)) {
+      data.meta.boohaSkinCollection = {};
+    }
+    if (!data.meta.boohaSkinCollection[skin.id]) {
+      data.meta.boohaSkinCollection[skin.id] = { unlockedAt: Date.now(), seasonId: skin.seasonId };
+    }
     return saveFile.save(data);
   }
 
@@ -489,6 +512,7 @@ const BoohaSkins = (() => {
     hasCompleteAssetSet,
     isAvailable,
     seasonCharacters,
+    collectedSkinIds,
     availableCharacters,
     nextAvailableId,
     seasonIdForDate,
@@ -500,6 +524,7 @@ const BoohaSkins = (() => {
     applySeasonTheme,
     unlock,
     isUnlocked,
+    isCollected,
     selectedId,
     asset,
     unlockAndEquip,

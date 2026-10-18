@@ -85,6 +85,7 @@ const BoohaSaveFile = (() => {
         weekLog:        {},      // { "2026-w27": { adv, blitz, duel } }
         lastActivityTs: 0,
         selectedBoohaSkin: null,
+        boohaSkinCollection: {}, // permanent seasonal Booha unlock history
         curriculum:       null, // 'pb' | 'br' | 'bc' — student's saved track
       },
 
@@ -325,6 +326,7 @@ const BoohaSaveFile = (() => {
     if (typeof save.meta.allTimeStars   !== 'number') save.meta.allTimeStars   = 0;
     if (typeof save.meta.lastActivityTs !== 'number') save.meta.lastActivityTs = 0;
     if (save.meta.selectedBoohaSkin !== null && typeof save.meta.selectedBoohaSkin !== 'string') save.meta.selectedBoohaSkin = null;
+    if (!save.meta.boohaSkinCollection || typeof save.meta.boohaSkinCollection !== 'object' || Array.isArray(save.meta.boohaSkinCollection)) save.meta.boohaSkinCollection = {};
     if (!['pb', 'br', 'bc'].includes(save.meta.curriculum)) save.meta.curriculum = null;
     if (!save.meta.dayLog)  save.meta.dayLog  = {};
     if (!save.meta.weekLog) save.meta.weekLog = {};
