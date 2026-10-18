@@ -2651,9 +2651,9 @@ window.BoohaBlitzEngine = (() => {
       /* Scene final card: the art stays visible, the time is the hero, and
          Play Again is the primary action. This comes after the legacy card
          rules so the shared win DOM can be reused without stale styling. */
-      #vb-win.blitz-finish.scene-card,
-      #sb-win.blitz-finish.scene-card,
-      #qb-win.blitz-finish.scene-card {
+      #vb-overlay #vb-win.blitz-finish.scene-card,
+      #sb-overlay #sb-win.blitz-finish.scene-card,
+      #qb-overlay #qb-win.blitz-finish.scene-card {
         border: 0;
         background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(4, 8, 16, .40), rgba(4, 8, 16, .74));
         backdrop-filter: none;
