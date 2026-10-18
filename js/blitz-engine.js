@@ -5274,6 +5274,8 @@ window.BoohaBlitzEngine = (() => {
         .blitz-rec-character-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
         .blitz-rec-character { min-width: 0; text-align: center; }
         .blitz-rec-character img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; filter: brightness(0) drop-shadow(0 0 6px rgba(0,0,0,.6)); }
+        .blitz-rec-character-placeholder { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border: 1px solid rgba(255,226,122,.26); border-radius: 12px; background: radial-gradient(circle at 50% 38%, rgba(255,226,122,.12), rgba(0,0,0,.28) 70%); color: rgba(255,226,122,.82); font-size: 26px; font-weight: 1000; box-shadow: inset 0 0 16px rgba(0,0,0,.28); }
+        .blitz-rec-character.is-unavailable .blitz-rec-character-name { color: rgba(255,255,255,.46); }
         .blitz-rec-character.is-collected img { filter: drop-shadow(0 0 8px rgba(255,226,122,.52)); }
         .blitz-rec-character-name { display: block; overflow: hidden; margin-top: 3px; color: rgba(255,255,255,.7); font-size: 9px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
         .blitz-rec-character.is-collected .blitz-rec-character-name { color: #ffe27a; }
@@ -5442,15 +5444,28 @@ window.BoohaBlitzEngine = (() => {
         grid.className = 'blitz-rec-character-grid';
         (season.characterIds || []).map(id => window.BoohaSkins?.get?.(id)).filter(Boolean).forEach(skin => {
           const isCollected = window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id);
+          const isAvailable = window.BoohaSkins?.isAvailable?.(skin.id) === true;
           const item = document.createElement('div');
-          item.className = `blitz-rec-character ${isCollected ? 'is-collected' : 'is-locked'}`;
-          const image = document.createElement('img');
-          image.src = skin.assets?.maze || '';
-          image.alt = isCollected ? `${skin.name} collected` : 'Locked Booha';
+          item.className = `blitz-rec-character ${isCollected ? 'is-collected' : 'is-locked'}${isAvailable ? '' : ' is-unavailable'}`;
+          if (isAvailable && skin.assets?.maze) {
+            const image = document.createElement('img');
+            image.src = skin.assets.maze;
+            image.alt = isCollected ? `${skin.name} collected` : 'Locked Booha';
+            item.appendChild(image);
+          } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'blitz-rec-character-placeholder';
+            placeholder.textContent = '?';
+            placeholder.setAttribute('role', 'img');
+            placeholder.setAttribute('aria-label', 'Booha artwork coming soon');
+            item.appendChild(placeholder);
+          }
           const name = document.createElement('span');
           name.className = 'blitz-rec-character-name';
-          name.textContent = isCollected ? String(skin.name || '').replace(/\s+Booha$/i, '') : '???';
-          item.append(image, name);
+          name.textContent = isCollected
+            ? String(skin.name || '').replace(/\s+Booha$/i, '')
+            : (isAvailable ? '???' : 'COMING SOON');
+          item.appendChild(name);
           grid.appendChild(item);
         });
         block.append(blockTitle, grid);
