@@ -21,12 +21,22 @@ const BoohaSkins = (() => {
     lime: '#9dff3a',
   });
   const CHRISTMAS_PALETTE = Object.freeze({
-    orange: '#c94b55',
-    purple: '#2f7d4a',
-    lime: '#f4d06f',
+    red: '#c7354b',
+    green: '#267448',
+    white: '#fffaf0',
+    gold: '#f2c95c',
+    // Legacy semantic names keep existing shared world consumers working.
+    orange: '#c7354b',
+    purple: '#267448',
+    lime: '#fffaf0',
     black: '#07130f',
   });
   const CHRISTMAS_GLOW = Object.freeze({
+    red: '#ff6f78',
+    green: '#55d486',
+    white: '#ffffff',
+    gold: '#ffe9a3',
+    // Legacy semantic names keep existing shared world consumers working.
     orange: '#ff6f78',
     purple: '#55d486',
     lime: '#ffe9a3',
@@ -510,8 +520,14 @@ const BoohaSkins = (() => {
       purple: '--season-purple',
       lime: '--season-lime',
       black: '--season-black',
+      red: '--season-red',
+      green: '--season-green',
+      white: '--season-white',
+      gold: '--season-gold',
     };
-    Object.keys(vars).forEach(key => root.style.setProperty(vars[key], season.palette[key]));
+    Object.keys(vars).forEach(key => {
+      if (season.palette[key]) root.style.setProperty(vars[key], season.palette[key]);
+    });
     return season.id;
   }
 
