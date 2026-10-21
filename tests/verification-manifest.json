@@ -11,6 +11,11 @@
   },
   "exceptions": [
     {
+      "path": "tests/adventure-profile-redesign.test.cjs",
+      "status": "verify",
+      "reason": "Current Adventure profile redesign contract: hearts at 3/8/15 visits, Akiya cabinet, locked world portals and the skin closet."
+    },
+    {
       "path": "tests/adventure-collection.test.cjs",
       "status": "verify",
       "reason": "Current adventure-profile collection contract."

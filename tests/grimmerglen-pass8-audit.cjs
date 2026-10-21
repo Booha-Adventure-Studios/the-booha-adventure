@@ -197,7 +197,11 @@ assert(!unlockSource.includes('GRIMMERGLEN_BUILD_READY'), 'Grimmerglen must use 
 for (const profilePage of ['profile.html', 'adventure-profile.html', 'utsuroba-profile.html', 'muenba-profile.html']) {
   const source = fs.readFileSync(path.join(root, profilePage), 'utf8');
   assert(source.includes('id="pnet-grimmerglen"'), `${profilePage} must expose the Grimmerglen profile tab`);
-  assert(source.includes('id="pnet-grimmerglen" hidden'), `${profilePage} must hide the Grimmerglen tab before the weekly gate`);
+  // profile.html and adventure-profile.html show every world: locked portals
+  // start dimmed with a padlock and only gain their link once the gate opens.
+  const lockedPortal = source.includes('id="pnet-grimmerglen" class="is-locked" aria-disabled="true"') &&
+    source.includes('BoohaPortals.setLocked(tab, !open)');
+  assert(source.includes('id="pnet-grimmerglen" hidden') || lockedPortal, `${profilePage} must gate the Grimmerglen tab before the weekly gate`);
 }
 assert(profile.includes('clickTone'), 'profile must include the cute WebAudio click cue');
 assert(profile.includes('memory-card'), 'profile must render the eight memory lanes');
