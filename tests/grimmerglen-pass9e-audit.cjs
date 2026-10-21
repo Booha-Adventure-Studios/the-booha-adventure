@@ -89,8 +89,11 @@ for (const pageName of profilePages) {
   const source = fs.readFileSync(path.join(root, pageName), 'utf8');
   assert(source.includes('id="pnet-grimmerglen"'),
     `${pageName} must expose the gated Grimmerglen profile tab`);
-  assert(source.includes('id="pnet-grimmerglen" hidden'),
-    `${pageName} must hide Grimmerglen before the weekly gate`);
+  // Locked portals may stay visible (dimmed + padlock, no link) instead of hidden.
+  const lockedPortal = source.includes('id="pnet-grimmerglen" class="is-locked" aria-disabled="true"') &&
+    source.includes('BoohaPortals.setLocked(tab, !open)');
+  assert(source.includes('id="pnet-grimmerglen" hidden') || lockedPortal,
+    `${pageName} must gate Grimmerglen before the weekly gate`);
   assert(source.includes('isWeeklyWorldGateOpen()'),
     `${pageName} must use the shared weekly world gate`);
   assert(source.includes('tab.hidden = !open;'),

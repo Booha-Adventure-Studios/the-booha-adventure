@@ -405,14 +405,23 @@
     }
     .profile-network {
       margin:14px 8px 0; padding:12px 6px 10px; border-radius:22px;
-      display:flex; justify-content:center; flex-wrap:wrap; gap:6px 4px;
+      display:flex; justify-content:center; flex-wrap:nowrap; gap:6px 4px;
       background:rgba(13,11,20,.72); border:1px solid rgba(242,181,58,.3);
     }
     .profile-network a {
-      flex:0 1 72px; min-width:62px; display:flex; flex-direction:column; align-items:center; gap:6px;
+      flex:1 1 0; min-width:0; max-width:84px; display:flex; flex-direction:column; align-items:center; gap:6px;
       text-decoration:none; color:#d9cbb0; -webkit-tap-highlight-color:transparent;
     }
     .profile-network a[hidden] { display:none; }
+    .profile-network a.is-locked { color:#8c8070; cursor:default; pointer-events:none; }
+    .profile-network a.is-locked .pn-orb { position:relative; background:#14111b; border:2px dashed #4a3a58; }
+    .profile-network a.is-locked .pn-orb img { filter:brightness(0); opacity:.6; }
+    .profile-network a.is-locked .pn-orb::after {
+      content:''; position:absolute; right:-4px; bottom:-4px; width:22px; height:22px; border-radius:50%;
+      background:#16121f url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c9b9e8' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / 15px no-repeat;
+    }
+    .profile-network a.is-locked:hover .pn-orb { transform:none; box-shadow:none; }
+    .profile-network a.is-locked .pn-label small { color:#8c8070; }
     .pn-orb {
       width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center;
       border:2px solid #4a3a58; transition:transform .18s ease, box-shadow .18s ease;
@@ -422,7 +431,7 @@
     .pn-orb.utsuroba { background:radial-gradient(circle at 50% 40%,#1d3340,#10161c 75%); border-color:#3a5566; }
     .pn-orb.muenba { background:radial-gradient(circle at 50% 40%,#1f3a2f,#101a15 75%); border-color:#3a6650; }
     .pn-orb.log { background:radial-gradient(circle at 50% 40%,#4a3414,#1b1208 75%); }
-    .pn-label { font-size:11px; line-height:1.2; text-align:center; }
+    .pn-label { width:100%; overflow-wrap:anywhere; font-size:11px; line-height:1.2; text-align:center; }
     .pn-label small { display:block; font-family:'Cinzel',serif; font-size:8px; letter-spacing:1px; color:#b7a88a; }
     .profile-network a:hover .pn-orb { transform:translateY(-2px); box-shadow:0 0 14px rgba(255,215,122,.35); }
     .profile-network a:focus-visible { outline:none; }
@@ -759,10 +768,10 @@
       <a href="profile.html" aria-current="page"><span class="pn-orb log"><img src="assets/img/profile/portal-log.webp" alt="" width="50" height="50"></span><span class="pn-label">ログ<small>LOG</small></span></a>
       <a href="adventure-profile.html"><span class="pn-orb adventure"><img src="assets/img/profile/portal-adventure.webp" alt="" width="40" height="40"></span><span class="pn-label">ぼうけん<small>ADVENTURE</small></span></a>
       <a href="utsuroba-profile.html"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="40" height="46"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
-      <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked(). -->
-      <a href="muenba-profile.html" id="pnet-muenba" hidden><span class="pn-orb muenba"><img src="assets/img/profile/portal-muenba.webp" alt="" width="40" height="48"></span><span class="pn-label">むえんば<small>MUENBA</small></span></a>
-      <!-- Hidden until all nine games open the Grimmerglen world gate. -->
-      <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden><span class="pn-orb grimmerglen"><img src="assets/img/profile/portal-grimmerglen.webp" alt="" width="40" height="40"></span><span class="pn-label">グリマー<small>GRIMMERGLEN</small></span></a>
+      <!-- Shown locked (dim + padlock) until BoohaUnlockSystem.isMuenbaUnlocked(). -->
+      <a href="muenba-profile.html" id="pnet-muenba" class="is-locked" aria-disabled="true" data-label="MUENBA"><span class="pn-orb muenba"><img src="assets/img/profile/portal-muenba.webp" alt="" width="40" height="48"></span><span class="pn-label">むえんば<small>MUENBA</small></span></a>
+      <!-- Shown locked until all nine games open the Grimmerglen world gate. -->
+      <a href="grimmerglen-profile.html" id="pnet-grimmerglen" class="is-locked" aria-disabled="true" data-label="GRIMMERGLEN"><span class="pn-orb grimmerglen"><img src="assets/img/profile/portal-grimmerglen.webp" alt="" width="40" height="40"></span><span class="pn-label">グリマー<small>GRIMMERGLEN</small></span></a>
     </nav>
   </header>
 
@@ -858,6 +867,7 @@
 <script src="./js/ui/juku-report-log.js"></script>
 <script src="./js/ui/profile-game.js"></script>
 <script src="./js/ui/medal-toast.js"></script>
+<script src="./js/ui/world-portals.js"></script>
 <script src="./js/daily-check.js"></script>
 <script>
   (function () {
@@ -871,7 +881,8 @@
           typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
           BoohaUnlockSystem.isMuenbaUnlocked());
       } catch (_) {}
-      muenbaTab.hidden = !open;
+      if (window.BoohaPortals) BoohaPortals.setLocked(muenbaTab, !open);
+      else muenbaTab.hidden = !open;
     }
 
     if (window.BOOHA_READY) renderMuenbaDoor();
@@ -1010,7 +1021,8 @@
             typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' &&
             BoohaUnlockSystem.isWeeklyWorldGateOpen());
         } catch (_) {}
-        tab.hidden = !open;
+        if (window.BoohaPortals) BoohaPortals.setLocked(tab, !open);
+        else tab.hidden = !open;
       }
       if (window.BOOHA_READY) renderGrimmerglenTab();
       else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });
