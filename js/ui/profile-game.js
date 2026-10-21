@@ -29,15 +29,7 @@ const BoohaProfileGame = (() => {
   const BLITZ_LABEL = { vocab: 'VOCAB BLITZ', sentence: 'SENTENCE BLITZ', question: 'QUESTION BLITZ' };
   const CURR_NAME = { pb: 'Pre-Boo', br: 'Boo-riculum', bc: 'Boo-continuum' };
 
-  // Bryan's categories. Everyone not listed is friendly.
-  const WANDERER_KIND = Object.freeze({
-    'ena-yamakage': 'dangerous', 'gorogui': 'dangerous', 'mikachan': 'dangerous',
-    'snakuma': 'dangerous', 'sumiyo-horaguchi': 'dangerous', 'yukan': 'dangerous',
-    'jubei-tsukigase': 'dangerous',
-    'whistler': 'mischievous', 'san': 'mischievous', 'poopika': 'mischievous',
-    'denoying': 'mischievous', 'amekuro': 'mischievous', 'jeffrey': 'mischievous',
-    'mouhitome': 'mischievous', 'nulvane': 'mischievous', 'shoganai': 'mischievous',
-  });
+  const WANDERER_KINDS = new Set(['friendly', 'mischievous', 'dangerous']);
   const KIND_LABEL = {
     friendly: ['なかま', 'FRIENDLY'],
     mischievous: ['いたずら', 'MISCHIEVOUS'],
@@ -79,6 +71,10 @@ const BoohaProfileGame = (() => {
 
   function isObject(value) {
     return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function kindFor(item) {
+    return item && WANDERER_KINDS.has(item.kind) ? item.kind : 'friendly';
   }
 
   function fallback(host, label, error) {
@@ -153,6 +149,9 @@ const BoohaProfileGame = (() => {
     const cw = window.CALENDAR && CALENDAR.getCurrentCurriculumWeek ? CALENDAR.getCurrentCurriculumWeek() : null;
     const dailyThisWeek = cw && cw.weekStart ? L.dailyDoneInWeek(checkIn, cw.weekStart) : 0;
     const weekTotal = week.total + dailyThisWeek * L.RULES.daily;
+    const levelWeekTotal = L.weekTotalAllCurricula
+      ? L.weekTotalAllCurricula(weekLog[keys.week], checkIn, cw && cw.weekStart, gamesByCurr, starsFor)
+      : weekTotal;
 
     // Most recently played maze game this week for Booha's trail token.
     const scores = isObject(data.scores) ? data.scores : {};
@@ -193,7 +192,7 @@ const BoohaProfileGame = (() => {
 
     return {
       data, meta, keys, curr, games, week, life, weekTotal, dailyThisWeek,
-      level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - weekTotal),
+      level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - levelWeekTotal),
       lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed,
       name: firstName(), sprite: heroSprite(),
     };
@@ -402,7 +401,7 @@ const BoohaProfileGame = (() => {
       const rec = records[id];
       return {
         id, name,
-        kind: WANDERER_KIND[id] || 'friendly',
+        kind: kindFor(source[name]),
         found: !!rec,
         visits: rec ? Math.max(1, Number(rec.visits) || 1) : 0,
       };
@@ -542,7 +541,7 @@ const BoohaProfileGame = (() => {
   function sealedKey(s) {
     let user = '';
     try { user = localStorage.getItem('booha_userid') || ''; } catch (_) {}
-    return `${user}|${s.keys.week}|${s.curr}`;
+    return `${user}|${s.keys.week}`;
   }
 
   function maybeCelebrate(s) {
@@ -556,7 +555,7 @@ const BoohaProfileGame = (() => {
     const pct = s.weekPct == null ? '—' : `${s.weekPct}%`;
     const tier = s.weekPct == null ? 'SEAL' : s.weekPct >= 90 ? 'GOLD SEAL' : s.weekPct >= 75 ? 'SILVER SEAL' : 'BRONZE SEAL';
     const rewards = [
-      `<li class="gold"><span>こんしゅうの ★</span><b>+${s.weekTotal}★</b></li>`,
+      `<li class="gold"><span>こんしゅうのスター · WEEK TOTAL</span><b>${s.weekTotal}★</b></li>`,
     ];
     if (s.level.level > s.levelBefore.level) {
       rewards.push(`<li class="coin"><img src="${IMG}rank-coin-${s.level.level}.webp" alt="" width="34" height="34"><span>レベルアップ！ Lv ${s.levelBefore.level} → ${s.level.level}</span><b>NEW COIN</b></li>`);
@@ -623,7 +622,7 @@ const BoohaProfileGame = (() => {
   document.addEventListener('booha:checkIn', render);
   document.addEventListener('booha:profileCurr', render);
 
-  return { render, _test: { WANDERER_KIND, nodePos, speech, MEDALS } };
+  return { render, _test: { kindFor, nodePos, speech, sealedKey, MEDALS } };
 })();
 
 window.BoohaProfileGame = BoohaProfileGame;
