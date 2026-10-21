@@ -207,6 +207,17 @@
     .closet-hanger { position:absolute; top:-10px; left:50%; width:26px; height:14px; margin-left:-13px;
       background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 14' fill='none' stroke='%23d8b27a' stroke-width='1.6'%3E%3Cpath d='M13 1v3M2 13l11-8 11 8z'/%3E%3C/svg%3E") center / contain no-repeat; }
     .closet-skin img { width:72px; height:72px; object-fit:contain; filter:brightness(0) invert(.32) sepia(.4) hue-rotate(220deg); opacity:.8; }
+    .closet-skin.now { order:-1; }
+    .closet-skin.thisweek { border:2px solid var(--lemon); box-shadow:0 0 18px rgba(255,228,92,.45); background:radial-gradient(circle at 50% 35%,rgba(255,228,92,.2),var(--night-2) 70%); animation:advGlow 2.4s ease-in-out infinite; }
+    .closet-now-tag { position:absolute; top:6px; right:-4px; padding:2px 7px; border-radius:999px; background:var(--lemon); color:var(--night); font-size:9px; transform:rotate(8deg); }
+    .closet-skin.placeholder { border:1.5px dashed #5a4a70; background:#160b2c; }
+    .closet-skin img.closet-ph, .closet-silhouettes img.closet-ph { filter:brightness(0) invert(.32); opacity:.55; outline:1.5px dashed #6a5a80; outline-offset:2px; border-radius:50%; }
+    .closet-intro { margin:0 0 12px; padding:12px 14px; border-radius:18px; border:2px solid var(--lemon); background:rgba(255,228,92,.1); display:flex; flex-direction:column; gap:6px; }
+    .closet-intro b { font-family:var(--font-display); font-weight:400; font-size:15px; color:var(--lemon); }
+    .closet-intro p { margin:0; font-size:12px; line-height:1.6; color:#e6d8f2; }
+    .closet-intro-ok { align-self:flex-end; min-height:40px; padding:0 18px; border-radius:999px; border:0; background:var(--lemon); color:var(--night); font-family:inherit; font-weight:700; cursor:pointer; }
+    .closet-intro-ok:focus-visible { outline:3px solid var(--pink); outline-offset:2px; }
+    @keyframes advGlow { 0%,100% { box-shadow:0 0 12px rgba(255,228,92,.35); } 50% { box-shadow:0 0 24px rgba(255,228,92,.7); } }
     .closet-q { width:72px; height:72px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:2px dashed #4a3a60; font-family:var(--font-display); font-size:26px; color:#6a5a80; }
     .closet-q.mascot { width:70px; height:70px; flex:0 0 70px; }
     .closet-silhouettes .closet-q { width:26px; height:26px; font-size:12px; border-width:1px; }
@@ -283,6 +294,7 @@
     .wcard.unknown .wcard-name, .wcard-hint { color:#6a5a80; font-size:10px; }
     .wcard-stripe { width:100%; padding:2px 0; font-size:9px; color:var(--night); background:var(--kind); }
     .wcard-hearts { min-height:13px; font-size:11px; letter-spacing:1px; color:var(--lemon); }
+    .wcard-next { font-size:9px; line-height:1.2; color:#e6d8f2; }
     .wcard-empty { grid-column:1 / -1; padding:18px; text-align:center; font-size:13px; color:var(--muted); border:1px dashed var(--line); border-radius:16px; }
 
     /* flipped wanderer card */
@@ -382,7 +394,8 @@
     <nav class="profile-network" aria-label="Output profiles">
       <a href="profile.html"><span class="pn-orb log"><img src="assets/img/profile/portal-log.webp" alt="" width="50" height="50"></span><span class="pn-label">ログ<small>LOG</small></span></a>
       <a href="adventure-profile.html" aria-current="page"><span class="pn-orb adventure"><img src="assets/img/profile/portal-adventure.webp" alt="" width="40" height="40"></span><span class="pn-label">ぼうけん<small>ADVENTURE</small></span></a>
-      <a href="utsuroba-profile.html"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="40" height="46"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
+      <!-- Shown locked until the weekly world gate opens (same gate as the Utsuroba world). -->
+      <a href="utsuroba-profile.html" id="pnet-utsuroba" class="is-locked" aria-disabled="true" data-label="UTSUROBA"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="40" height="46"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
       <!-- Shown locked (dim + padlock) until BoohaUnlockSystem.isMuenbaUnlocked(). -->
       <a href="muenba-profile.html" id="pnet-muenba" class="is-locked" aria-disabled="true" data-label="MUENBA"><span class="pn-orb muenba"><img src="assets/img/profile/portal-muenba.webp" alt="" width="40" height="48"></span><span class="pn-label">むえんば<small>MUENBA</small></span></a>
       <!-- Shown locked until all nine games open the Grimmerglen world gate. -->
@@ -589,6 +602,12 @@
       document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
       document.addEventListener('booha:newWeek', renderGrimmerglenTab);
     })();
+  </script>
+  <script>
+    // Utsuroba opens with the weekly world gate, like Muenba and Grimmerglen.
+    if (window.BoohaPortals) BoohaPortals.watch('pnet-utsuroba', function () {
+      return window.BoohaUnlockSystem && BoohaUnlockSystem.isWeeklyWorldGateOpen();
+    });
   </script>
 </body>
 </html>

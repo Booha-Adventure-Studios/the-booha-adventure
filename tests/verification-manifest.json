@@ -11,6 +11,11 @@
   },
   "exceptions": [
     {
+      "path": "tests/utsuroba-archive-redesign.test.cjs",
+      "status": "verify",
+      "reason": "Current Utsuroba archive profile, Japanese toggle, gated Utsuroba portal, teacher world switch, Utsuroba vocabulary, and Adventure closet/heart follow-ups."
+    },
+    {
       "path": "tests/adventure-profile-redesign.test.cjs",
       "status": "verify",
       "reason": "Current Adventure profile redesign contract: hearts at 3/8/15 visits, Akiya cabinet, locked world portals and the skin closet."

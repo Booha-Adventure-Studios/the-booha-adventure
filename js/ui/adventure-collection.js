@@ -133,13 +133,16 @@
     var kind = kindOf(item);
     var visits = Math.max(1, Number(record.visits) || 1);
     var n = hearts(visits);
+    var next = nextHeartAt(visits);
     return '<button type="button" class="wcard found ' + kind + '" data-wanderer-id="' + esc(item.id) + '" ' +
-      'aria-label="' + esc(item.name) + ', ' + KINDS[kind].en.toLowerCase() + ', VISITS ' + visits + '. Open card">' +
+      'aria-label="' + esc(item.name) + ', ' + KINDS[kind].en.toLowerCase() + ', VISITS ' + visits +
+      (next ? ', ' + (next - visits) + ' more visits to the next heart' : ', friendship max') + '. Open card">' +
       '<span class="wanderer-index">No.' + number + '</span>' +
       '<img class="wcard-img" src="assets/img/wanderers/' + imageSlug(item) + '-1.webp" alt="" width="76" height="76" loading="lazy" decoding="async">' +
       '<span class="wcard-name">' + esc(item.name) + '</span>' +
       '<span class="wcard-stripe">' + KINDS[kind].jp + '</span>' +
       '<span class="wcard-hearts" aria-hidden="true">' + (heartText(n) || '·') + '</span>' +
+      '<span class="wcard-next" aria-hidden="true">' + (next ? 'つぎの ♥ まで あと ' + (next - visits) : 'なかよし MAX') + '</span>' +
       '</button>';
   }
 

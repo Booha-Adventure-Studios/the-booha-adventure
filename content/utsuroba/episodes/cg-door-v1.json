@@ -10,7 +10,10 @@
     {"word":"shape","definition":"the form of something","definitionJP":"物の形"},
     {"word":"reflection","definition":"an image seen in glass or a mirror","definitionJP":"ガラスや鏡に見える姿"},
     {"word":"afraid","definition":"feeling fear","definitionJP":"怖いと感じる"},
-    {"word":"breathe","definition":"to take air in and out","definitionJP":"息を吸ったり吐いたりする"}
+    {"word":"breathe","definition":"to take air in and out","definitionJP":"息を吸ったり吐いたりする"},
+    {"word":"follow","definition":"to come after someone","definitionJP":"だれかのあとについてくる"},
+    {"word":"turn around","definition":"to look behind you","definitionJP":"うしろをふり返る"},
+    {"word":"glass","definition":"a hard, clear material","definitionJP":"かたくて すきとおった物"}
   ],
   "mechanic": {"type":"emotion-thread","name":"Deep Memory","nameJP":"深い記憶","instruction":"Follow the feeling from alarm to understanding.","instructionJP":"驚きから理解まで、気持ちの変化を追いましょう。","complete":"The fear has a name now.","completeJP":"恐怖に、今は名前があります。","beats":[{"title":"Alarm","titleJP":"驚き","caption":"A door closes behind Chagrin.","captionJP":"チャグリンの後ろで扉が閉まります。"},{"title":"Doubt","titleJP":"迷い","caption":"A shape moves across the glass.","captionJP":"ガラスの上を何かの形が動きます。"},{"title":"Relief","titleJP":"安心","caption":"The frightening shape is only a reflection.","captionJP":"怖い形は、ただの自分の姿でした。"}]},
   "trailIntro": "Follow the change in Chagrin's feeling.",
@@ -45,7 +48,10 @@
       {"word":"shape","definition":"the outside form of something","definitionJP":"物の形"},
       {"word":"reflection","definition":"your picture in glass or a mirror","definitionJP":"ガラスや鏡に映る自分の姿"},
       {"word":"afraid","definition":"feeling scared","definitionJP":"怖いと感じること"},
-      {"word":"breathe","definition":"to take in air","definitionJP":"息をすること"}
+      {"word":"breathe","definition":"to take in air","definitionJP":"息をすること"},
+      {"word":"scared","definition":"feeling afraid","definitionJP":"こわいと感じる"},
+      {"word":"glass","definition":"a hard, clear material","definitionJP":"かたくて すきとおった物"},
+      {"word":"close","definition":"to shut","definitionJP":"閉まる"}
     ],
     "mechanic": {"instruction":"Connect the clues. What answer fits them all?","instructionJP":"手がかりをつなぎましょう。全部に合う答えは何ですか？","complete":"Chagrin is not scared anymore.","completeJP":"チャグリンはもう怖くありません。","beats":[{"title":"Alarm","titleJP":"驚き","caption":"A door closes behind Chagrin.","captionJP":"チャグリンの後ろで扉が閉まります。"},{"title":"A shape","titleJP":"形","caption":"Something moves in the glass.","captionJP":"ガラスの中で何かが動きます。"},{"title":"Just me","titleJP":"自分だった","caption":"It was only his reflection.","captionJP":"それはただの自分の姿でした。"}],"name":"Case Memory","nameJP":"ケースの記憶","type":"evidence-board"},
     "trailIntro": "Collect three clues. Then connect them into one case.",
@@ -65,7 +71,7 @@
     "postcard": {"chunks":["A door closed behind Chagrin.","A shape moved in the glass.","It was only his reflection."],"chunksJP":["チャグリンの後ろで扉が閉まった。","ガラスの中で形が動いた。","それはただの反射だった。"],"order":[0,1,2],"savedText":"A door closed behind Chagrin. A shape moved in the glass. It was only his reflection.","title":"Case memory postcard","titleJP":"ケース記憶カード","instruction":"Connect the three clues into a short case summary.","instructionJP":"三つの手がかりをつないで、短いケースのまとめを作りましょう。"}
   },
   "start": {
-    "intro":"A door closes behind Chagrin. A shape moves in the glass. It is only his reflection.","introJP":"扉が閉まり、ガラスに形が動きます。それは反射でした。","vocabulary":[{"word":"door","definition":"a thing you open","definitionJP":"開けるもの"},{"word":"shape","definition":"the form of something","definitionJP":"ものの形"},{"word":"glass","definition":"a hard clear material","definitionJP":"透明で硬いもの"},{"word":"reflection","definition":"an image in glass","definitionJP":"ガラスに映る像"}],
+    "intro":"A door closes behind Chagrin. A shape moves in the glass. It is only his reflection.","introJP":"扉が閉まり、ガラスに形が動きます。それは反射でした。","vocabulary":[{"word":"door","definition":"a thing you open","definitionJP":"開けるもの"},{"word":"shape","definition":"the form of something","definitionJP":"ものの形"},{"word":"glass","definition":"a hard clear material","definitionJP":"透明で硬いもの"},{"word":"reflection","definition":"an image in glass","definitionJP":"ガラスに映る像"},{"word":"close","definition":"to shut","definitionJP":"閉まる"},{"word":"behind","definition":"at the back of","definitionJP":"うしろに"},{"word":"move","definition":"to go from one place to another","definitionJP":"場所を変えて動く"},{"word":"only","definition":"just; nothing more","definitionJP":"〜だけ"}],
     "mechanic":{"type":"emotion-thread","name":"Starter Memory","nameJP":"子ども向けの記憶","instruction":"Read one small part at a time.","instructionJP":"短い場面を一つずつ読みましょう。","complete":"You remembered the whole story.","completeJP":"物語を全部思い出しました。","beats":[{"title":"First","titleJP":"最初","caption":"A door closes behind Chagrin.","captionJP":"チャグリンの後ろで扉が閉まります。"},{"title":"Next","titleJP":"次","caption":"A shape moves in the glass.","captionJP":"ガラスで形が動きます。"},{"title":"Last","titleJP":"最後","caption":"It is only his reflection.","captionJP":"それはただの反射です。"}]},
     "trailIntro":"Follow the story one small step at a time.","trailIntroJP":"物語を一歩ずつ追いましょう。","trail":[{"id":"cg_door_evidence_01","roomId":"room_06","type":"event","label":"01 / FIRST","labelJP":"最初","title":"First part","titleJP":"最初の場面","text":"A door closes behind Chagrin.","hint":"The next memory is near a room with a glass surface.","hintJP":"次の記憶はガラスのある部屋の近くです。"},{"id":"cg_door_evidence_02","roomId":"room_15","type":"detail","label":"02 / NEXT","labelJP":"次","title":"Next part","titleJP":"次の場面","text":"A shape moves in the glass.","hint":"The final memory is near the start of the path.","hintJP":"最後の記憶は道の始まりの近くです。"},{"id":"cg_door_evidence_03","roomId":"room_03","type":"inference","label":"03 / LAST","labelJP":"最後","title":"Last part","titleJP":"最後の場面","text":"The shape is only a reflection.","hint":"Return to Chagrin with the short story.","hintJP":"短い物語を持ってチャグリンのところへ戻りましょう。"}],
     "lines":[{"speaker":"Chagrin","en":"A door closes behind Chagrin."},{"speaker":"Narrator","en":"A shape moves in the glass."},{"speaker":"Chagrin","en":"It is only his reflection."}],

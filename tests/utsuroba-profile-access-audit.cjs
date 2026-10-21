@@ -52,16 +52,15 @@ assert.match(profile, /うつろばは<ruby>開<rt>ひら<\/rt><\/ruby>いてい
 
 assert.match(profile, /src="assets\/img\/drifters\/kurobane_shizuma-profile\.webp"[^>]+width="768"[^>]+height="768"[^>]+decoding="async"/,
   'the Utsuroba hero must reference the Kurobane profile asset with intrinsic dimensions and async decoding');
-assert.match(profile, /\.hero-art[\s\S]*?280px/,
-  'the Utsuroba hero must reserve the larger Marietta-matched artwork footprint');
+// Ink & lantern archive redesign: Kurobane sits in a round moon window.
+assert.match(profile, /\.hero-art \{[\s\S]*?width: 220px; height: 220px; border-radius: 50%;/,
+  'the Utsuroba hero must frame Kurobane in the round moon window');
 assert.match(profile, /\.hero-art img[\s\S]*?object-fit: contain/,
   'the Kurobane art must stay contained inside its hero slot');
-assert.match(profile, /radial-gradient\(circle, rgba\(216,168,255/,
-  'the Utsuroba hero must keep its restrained violet glow');
-assert.match(profile, /rgba\(159,228,186/,
-  'the Utsuroba hero must include the mint edge of its glow palette');
-assert.match(profile, /@media \(max-width: 760px\)[\s\S]*?\.hero \{ grid-template-columns: 1fr; \}/,
-  'the hero must stack on narrow screens');
+assert.match(profile, /rgba\(127,211,199/,
+  'the Utsuroba hero must keep its quiet teal glow');
+assert.match(profile, /\.hero \{ display: flex; flex-direction: column;/,
+  'the hero must stack in one column on narrow screens');
 
 assert.strictEqual(asset.slice(0, 4).toString('ascii'), 'RIFF', 'Kurobane profile asset must have a RIFF header');
 assert.strictEqual(asset.slice(8, 12).toString('ascii'), 'WEBP', 'Kurobane profile asset must be WebP');

@@ -767,7 +767,8 @@
     <nav class="profile-network" aria-label="Output profiles">
       <a href="profile.html" aria-current="page"><span class="pn-orb log"><img src="assets/img/profile/portal-log.webp" alt="" width="50" height="50"></span><span class="pn-label">ログ<small>LOG</small></span></a>
       <a href="adventure-profile.html"><span class="pn-orb adventure"><img src="assets/img/profile/portal-adventure.webp" alt="" width="40" height="40"></span><span class="pn-label">ぼうけん<small>ADVENTURE</small></span></a>
-      <a href="utsuroba-profile.html"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="40" height="46"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
+      <!-- Shown locked until the weekly world gate opens (same gate as the Utsuroba world). -->
+      <a href="utsuroba-profile.html" id="pnet-utsuroba" class="is-locked" aria-disabled="true" data-label="UTSUROBA"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="40" height="46"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
       <!-- Shown locked (dim + padlock) until BoohaUnlockSystem.isMuenbaUnlocked(). -->
       <a href="muenba-profile.html" id="pnet-muenba" class="is-locked" aria-disabled="true" data-label="MUENBA"><span class="pn-orb muenba"><img src="assets/img/profile/portal-muenba.webp" alt="" width="40" height="48"></span><span class="pn-label">むえんば<small>MUENBA</small></span></a>
       <!-- Shown locked until all nine games open the Grimmerglen world gate. -->
@@ -1030,6 +1031,12 @@
       document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
       document.addEventListener('booha:newWeek', renderGrimmerglenTab);
     })();
+  </script>
+  <script>
+    // Utsuroba opens with the weekly world gate, like Muenba and Grimmerglen.
+    if (window.BoohaPortals) BoohaPortals.watch('pnet-utsuroba', function () {
+      return window.BoohaUnlockSystem && BoohaUnlockSystem.isWeeklyWorldGateOpen();
+    });
   </script>
 </body>
   

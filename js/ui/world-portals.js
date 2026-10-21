@@ -34,5 +34,22 @@ window.BoohaPortals = (function () {
     }
   }
 
-  return { setLocked: setLocked };
+  // Keep one portal in step with its gate: check(), a function returning
+  // true when the world is open, is re-read whenever the save or week changes.
+  function watch(id, check) {
+    var link = document.getElementById(id);
+    if (!link) return;
+    function update() {
+      var open = false;
+      try { open = !!check(); } catch (_) {}
+      setLocked(link, !open);
+    }
+    if (window.BOOHA_READY) update();
+    else document.addEventListener('booha:ready', update, { once: true });
+    document.addEventListener('booha:saved', update);
+    document.addEventListener('booha:weeklyReset', update);
+    document.addEventListener('booha:newWeek', update);
+  }
+
+  return { setLocked: setLocked, watch: watch };
 })();
