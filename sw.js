@@ -38,7 +38,8 @@ const CURRENT_CACHES = {
   // traveler records on karasuki.html and muenba.html.
   // Weekly medals pass (2026-10-21): medal/level-up popups on index, maze,
   // and game results; new profile header, weekly shelf, and record book.
-  pages:  'booha-pages-2026-461',
+  // Weekly-medal popup deduplication and all-perfect Blitz rule fix.
+  pages:  'booha-pages-2026-462',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
