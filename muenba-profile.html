@@ -6,305 +6,325 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Muenba — Ghost Ledger</title>
   <link rel="manifest" href="/the-booha-adventure/manifest.json">
-  <meta name="theme-color" content="#04110c">
+  <meta name="theme-color" content="#060d09">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Booha Adventure">
   <link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <script>
+    // Japanese help is shared with the Utsuroba profile: one choice per device.
+    try { if (localStorage.getItem('booha_utsu_jp') === '0') document.documentElement.classList.add('jp-off'); } catch (_) {}
+  </script>
 
   <!--
-    Muenba's case-file profile page — a darker field-ledger treatment with
-    its own condensed display face, asymmetrical header, and cemetery-sage
-    palette. The data model still follows the shared profile contract so the
-    page can read the same save safely without inheriting Utsuroba's visual
-    language.
-
-    Reads defensively from data.muenba, a section that doesn't exist in
-    the save yet — that's Pass 6. Everything below renders a correct
-    empty/zero state today (0 ghosts found, 0 orbs, empty journal) and is
-    shaped to light up once Pass 6 starts writing real values into:
-      data.muenba.ghostsFound     — { <ghostId>: true, ... }
-      data.muenba.orbsCollected   — number
-      data.muenba.caseRecords     — { <caseId>: { completed, difficulty, ... } }
-      data.muenba.visitedRooms    — { <roomId>: true, ... }
-      data.muenba.huntJournal.entries — [{ ghostId, capturedAt, ... }, ...]
-    (Field names are a Pass 5 best guess for Pass 6 to adopt or revise —
-    not a locked schema.)
+    Muenba profile — "ghost hunter's field kit". Near-black moss, ecto-green
+    glow for this week's hunt, gold flashlights for the reading level, and the
+    jizo-bib pink for danger (Jerks). This week comes first and starts fresh
+    every Sunday; the all-time ledger sits underneath.
   -->
-
   <style>
     :root {
-      --night: #050b09;
-      --ink: #e9f5ee;
-      --muted: #a3c4b4;
-      --quiet: #6f8c7c;
-      --moss: #8fdcb2;
-      --moss-soft: rgba(143,220,178,.15);
-      --spectral: #cfe8da;
-      --gold: #d8c98b;
-      --line: rgba(143,220,178,.2);
-      --panel: rgba(9,24,18,.82);
-      --font: Georgia, "Times New Roman", serif;
-      --muenba-display: "Avenir Next Condensed", "Arial Narrow", "Trebuchet MS", sans-serif;
-      --sans: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --night: #060d09; --night-2: #0a120e; --night-3: #0e1a14; --night-4: #12231b;
+      --line: #1c3326; --line-2: #24402f; --line-3: #3f5a4b;
+      --text: #eaf7ef; --mist: #9fbcaa; --mist-2: #cfe3d6;
+      --ecto: #8cffb4; --ecto-deep: #1f8a55;
+      --gold: #ffd76a; --gold-dim: #c9b277;
+      --danger: #ff7aa8; --danger-soft: #ffb8cf;
+      --display: 'Mochiy Pop One', 'Zen Maru Gothic', sans-serif;
+      --sans: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
     }
-
     * { box-sizing: border-box; }
     html { min-height: 100%; background: var(--night); }
     body {
-      min-height: 100vh;
-      margin: 0;
-      color: var(--ink);
-      font-family: var(--font);
-      background:
-        radial-gradient(circle at 50% -10%, rgba(70,140,105,.24), transparent 42rem),
-        radial-gradient(circle at 10% 70%, rgba(40,95,75,.13), transparent 28rem),
-        linear-gradient(160deg, #0a1712 0%, #050b09 62%, #030605 100%);
-      overflow-x: hidden;
+      min-height: 100vh; margin: 0; color: var(--text); font-family: var(--sans); font-weight: 700; -webkit-font-smoothing: antialiased;
+      background: radial-gradient(ellipse at 50% 0%, #142a20 0%, rgba(6,13,9,0) 50%), var(--night);
     }
+    rt { font-size: .5em; color: var(--mist); }
+    button { font-family: inherit; font-weight: 700; }
+    a { color: var(--ecto); }
+    html.jp-off .jp { display: none !important; }
+    .page { width: min(720px, 100%); margin: 0 auto; padding: 12px 14px 48px; display: flex; flex-direction: column; gap: 30px; }
+    #profile-content { display: flex; flex-direction: column; gap: 34px; }
+    .kick { font-size: 10px; letter-spacing: .22em; color: var(--ecto); }
+    .h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 22px; line-height: 1.3; color: var(--text); }
+    .sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+    .sec-head > div { display: flex; flex-direction: column; gap: 2px; }
+    .sec-num { font-family: var(--display); font-size: 24px; color: var(--ecto); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sec-num small { font-size: 14px; color: var(--mist); }
+    .jp-line { display: block; font-size: 12px; color: var(--mist); line-height: 1.7; }
+    .note { margin: 10px 0 0; text-align: center; font-size: 12px; line-height: 1.6; color: var(--mist); }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .38;
-      background-image:
-        radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 1.5px),
-        radial-gradient(circle at 83% 13%, #8fdcb2 0 1px, transparent 1.5px),
-        radial-gradient(circle at 71% 67%, #fff 0 1px, transparent 1.5px),
-        radial-gradient(circle at 24% 84%, #d8c98b 0 1px, transparent 1.5px),
-        radial-gradient(circle at 92% 88%, #fff 0 1px, transparent 1.5px);
-      background-size: 310px 270px, 420px 360px, 510px 430px, 370px 330px, 610px 470px;
-    }
+    /* top bar + portals */
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; }
+    .case-label { font-size: 10px; letter-spacing: .2em; color: var(--ecto); line-height: 1.5; }
+    .back-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--ecto); color: var(--text); text-decoration: none; font-size: 13px; }
+    .back-link[hidden] { display: none; }
+    .jp-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; cursor: pointer; border: 1.5px solid var(--line-2); background: var(--night-3); color: var(--mist-2); font-size: 12px; }
+    .jp-toggle[aria-pressed="true"] { border-color: var(--ecto); color: var(--ecto); }
+    .jp-toggle .dot { width: 30px; height: 18px; border-radius: 9px; background: var(--line-2); position: relative; }
+    .jp-toggle .dot::after { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--mist); transition: transform .18s; }
+    .jp-toggle[aria-pressed="true"] .dot { background: rgba(140,255,180,.3); }
+    .jp-toggle[aria-pressed="true"] .dot::after { transform: translateX(12px); background: var(--ecto); }
+    .back-link:focus-visible, .jp-toggle:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
-    a { color: inherit; }
-    button, a { -webkit-tap-highlight-color: transparent; }
-
-    .page { width: min(1040px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 64px; position: relative; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
-    .back-link {
-      display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px;
-      border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
-      text-decoration: none; font-size: .78rem; background: rgba(255,255,255,.035);
-      transition: border-color .18s, color .18s, transform .18s;
-    }
-    .back-link[hidden] { display: none !important; }
-    .back-link:hover, .back-link:focus-visible { color: var(--ink); border-color: var(--moss); transform: translateY(-1px); outline: none; }
-    .case-label { color: var(--quiet); font: 700 .62rem/1.3 var(--sans); letter-spacing: .18em; text-transform: uppercase; text-align: right; }
-
-    /* ── Output profile switcher ─────────────────────── */
-    .profile-network {
-      display: flex; justify-content: center; flex-wrap: wrap; gap: 7px;
-      margin: 0 0 22px; padding: 7px;
-      border: 1px solid var(--line); border-radius: 999px;
-      background: rgba(255,255,255,.025);
-    }
-    .profile-network a {
-      display: inline-flex; align-items: center; gap: 6px; min-height: 38px;
-      padding: 7px 14px; border: 1px solid rgba(143,220,178,.26); border-radius: 10px;
-      color: #eafff2; text-decoration: none; font: 900 .7rem/1.2 var(--sans);
-      letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0,0,0,.7);
-      background: linear-gradient(180deg, rgba(143,220,178,.12), rgba(6,15,11,.42));
-      box-shadow: 0 2px 0 rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.1);
-      transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s;
-    }
-    .profile-network a small { color: #cfe8da; font: 800 .9em var(--font); letter-spacing: .02em; }
-    .profile-network a:hover, .profile-network a:focus-visible {
-      color: var(--ink); border-color: var(--moss); background: var(--moss-soft);
-      outline: none; transform: translateY(-1px); box-shadow: 0 4px 0 rgba(0,0,0,.28), 0 0 18px rgba(143,220,178,.2), inset 0 1px rgba(255,255,255,.18);
-    }
-    .profile-network a[aria-current="page"] {
-      color: #f4fff8; border-color: #b9f0d1;
-      background: linear-gradient(180deg, rgba(143,220,178,.28), rgba(143,220,178,.1));
-      box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 18px rgba(143,220,178,.3), inset 0 1px rgba(255,255,255,.18);
-      animation: outputProfileButtonPulse 2.6s ease-in-out infinite;
-    }
+    .profile-network { display: flex; flex-wrap: nowrap; justify-content: center; gap: 4px; padding: 10px 4px; border-radius: 20px; background: rgba(6,13,9,.85); border: 1px solid var(--line); }
+    .profile-network a { flex: 1 1 0; min-width: 0; max-width: 84px; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: #b9d4c4; -webkit-tap-highlight-color: transparent; }
+    .profile-network a[hidden] { display: none; }
+    .pn-orb { position: relative; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #4a5a50; background: radial-gradient(circle at 50% 40%, #2a3830, #101812 75%); transition: transform .18s, box-shadow .18s; }
+    .pn-orb img { object-fit: contain; }
+    .pn-orb.log { background: radial-gradient(circle at 50% 40%, #4a3414, #1b1208 75%); }
+    .pn-orb.adventure { background: radial-gradient(circle at 50% 40%, #3a1d4a, #1a0f2c 75%); }
+    .pn-orb.utsuroba { background: radial-gradient(circle at 50% 40%, #1d3340, #10161c 75%); border-color: #3a5566; }
+    .pn-orb.muenba { background: radial-gradient(circle at 50% 40%, #1f3a2f, #101a15 75%); border-color: #3a6650; }
+    .pn-label { width: 100%; overflow-wrap: anywhere; font-size: 11px; line-height: 1.2; text-align: center; }
+    .pn-label small { display: block; font-size: 7px; letter-spacing: 1px; color: var(--mist); }
+    .profile-network a:hover .pn-orb { transform: translateY(-2px); box-shadow: 0 0 14px rgba(140,255,180,.35); }
+    .profile-network a:focus-visible { outline: none; }
+    .profile-network a:focus-visible .pn-orb { outline: 3px solid var(--gold); outline-offset: 3px; }
+    .profile-network a[aria-current="page"] { color: var(--ecto); }
+    .profile-network a[aria-current="page"] .pn-orb { border-color: transparent; animation: outputProfileButtonPulse 2.6s ease-in-out infinite; box-shadow: 0 0 0 3px var(--ecto), 0 0 14px rgba(140,255,180,.55); }
     @keyframes outputProfileButtonPulse {
-      0%, 100% { box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 13px rgba(143,220,178,.2), inset 0 1px rgba(255,255,255,.14); }
-      50% { box-shadow: 0 4px 0 rgba(0,0,0,.22), 0 0 28px rgba(143,220,178,.5), inset 0 1px rgba(255,255,255,.28); }
+      0%, 100% { box-shadow: 0 0 0 3px #8cffb4, 0 0 14px rgba(140,255,180,.55); }
+      50% { box-shadow: 0 0 0 3px #8cffb4, 0 0 26px rgba(140,255,180,.9); }
     }
-    @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
-
-    .hero {
-      display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: center; gap: 30px;
-      position: relative; overflow: hidden; padding: clamp(30px, 6vw, 62px) clamp(22px, 6vw, 72px);
-      border: 1px solid rgba(118,151,143,.34); border-left: 4px solid rgba(143,220,178,.42);
-      border-radius: 6px 28px 6px 28px;
-      background:
-        linear-gradient(115deg, rgba(3,9,9,.99), rgba(7,16,17,.96) 58%, rgba(4,10,11,.99)),
-        repeating-linear-gradient(0deg, transparent 0 23px, rgba(143,220,178,.025) 24px);
-      box-shadow: 0 25px 80px rgba(0,0,0,.58), inset 0 1px rgba(255,255,255,.035), inset 18px 0 32px rgba(0,0,0,.2);
+    .profile-network a.is-locked { color: #6e8578; cursor: default; pointer-events: none; }
+    .profile-network a.is-locked .pn-orb { background: var(--night); border: 2px dashed var(--line-3); }
+    .profile-network a.is-locked .pn-orb img { filter: brightness(0); opacity: .55; }
+    .profile-network a.is-locked .pn-orb::after {
+      content: ''; position: absolute; right: -4px; bottom: -4px; width: 22px; height: 22px; border-radius: 50%;
+      background: #060d09 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238cffb4' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / 15px no-repeat;
     }
-    .hero .eyebrow { margin: 0 0 12px; color: #b6c98e; font: 700 .64rem/1.4 var(--muenba-display); letter-spacing: .24em; text-transform: uppercase; }
-    .hero h1 { margin: 0; font-family: var(--muenba-display); font-size: clamp(2.35rem, 9vw, 5.5rem); font-weight: 700; letter-spacing: .12em; line-height: .92; text-transform: uppercase; text-shadow: 0 0 26px rgba(91,167,135,.2); }
-    .hero-jp { margin: 16px 0 0; color: #c6ddd0; font-family: var(--muenba-display); font-size: clamp(.92rem, 2.8vw, 1.2rem); letter-spacing: .2em; }
-    .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
-    .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
-    .hero-art { width: 280px; height: 280px; justify-self: center; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, rgba(107,157,119,.2) 0 38%, rgba(53,91,68,.12) 58%, transparent 72%); filter: drop-shadow(0 0 18px rgba(103,160,120,.18)); }
-    .hero-art img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 16px 12px rgba(0,0,0,.46)); }
-    .status-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 20px; }
-    .status-pill { display: inline-flex; align-items: flex-start; gap: 9px; padding: 9px 12px; border: 1px solid rgba(143,220,178,.2); border-radius: 10px; background: rgba(2,8,7,.78); box-shadow: inset 0 0 18px rgba(143,220,178,.035); }
-    .status-dot { width: 9px; height: 9px; flex: 0 0 auto; margin-top: 4px; border-radius: 50%; background: #4d6258; box-shadow: 0 0 0 3px rgba(77,98,88,.12); }
-    .status-dot.open { background: var(--moss); box-shadow: 0 0 0 3px rgba(143,220,178,.16), 0 0 14px rgba(143,220,178,.82); }
-    .world-status-copy { display: flex; flex-direction: column; gap: 2px; }
-    .world-status-en { color: var(--spectral); font: 700 .68rem/1.25 var(--sans); letter-spacing: .09em; }
-    .world-status-jp { color: var(--quiet); font: .74rem/1.35 var(--font); }
-    .world-status-jp ruby { ruby-position: over; }
-    .world-status-jp rt { font-size: .7em; }
+    .profile-network a.is-locked .pn-label small { color: #6e8578; }
 
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 28px; }
-    .stat { min-height: 92px; padding: 15px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(9,24,18,.7); }
-    .stat-value { color: var(--gold); font-size: clamp(1.65rem, 5vw, 2.5rem); line-height: 1; }
-    .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-    .stat-label small { display: block; margin-top: 3px; color: var(--quiet); font: 400 .72rem/1.2 var(--font); letter-spacing: 0; text-transform: none; }
+    /* hero: ghost-orb background, Nuppi centered */
+    .hero { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-height: 420px; padding: 0 16px 20px; border-radius: 26px; overflow: hidden; text-align: center; background: var(--night) url("assets/img/muenba/ghost-orb-background-v1.webp") center / cover no-repeat; box-shadow: inset 0 0 60px rgba(0,0,0,.9); }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(6,13,9,0) 0%, rgba(6,13,9,.55) 55%, rgba(6,13,9,.92) 100%), linear-gradient(180deg, rgba(6,13,9,.3) 0%, rgba(6,13,9,0) 40%, #060d09 94%); }
+    .hero > * { position: relative; }
+    .hero-art { width: 210px; height: 210px; margin-bottom: -4px; animation: bob 3.2s ease-in-out infinite; }
+    .hero-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 22px rgba(140,255,180,.35)); }
+    .orbp { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--ecto); box-shadow: 0 0 10px var(--ecto); animation: drift 5s ease-in infinite; pointer-events: none; }
+    .eyebrow { margin: 0; font-size: 10px; letter-spacing: .22em; color: var(--ecto); }
+    .hero h1 { margin: 4px 0 0; font-family: var(--display); font-weight: 400; font-size: 44px; line-height: 1; text-shadow: 0 0 18px rgba(140,255,180,.6); }
+    .hero-copy { margin: 8px 0 0; font-size: 14px; line-height: 1.5; }
+    .status-strip { margin-top: 10px; }
+    .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 16px; border: 1.5px solid var(--line-3); background: rgba(6,13,9,.75); color: var(--mist-2); text-align: left; }
+    .status-pill.open { border-color: var(--ecto); background: rgba(140,255,180,.12); color: var(--ecto); }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-3); flex: 0 0 auto; }
+    .status-dot.open { background: var(--ecto); box-shadow: 0 0 10px var(--ecto); }
+    .world-status-copy { display: flex; flex-direction: column; gap: 1px; }
+    .world-status-en { font-size: 12px; letter-spacing: .08em; }
+    .world-status-jp { font-size: 11px; color: var(--mist); }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes drift { 0% { transform: translateY(0); opacity: .2; } 50% { opacity: .9; } 100% { transform: translateY(-40px); opacity: 0; } }
 
-    .weekly-hunt { margin-top: 16px; padding: 18px 20px; border: 1px solid rgba(143,220,178,.34); border-radius: 6px 18px 6px 18px; background: linear-gradient(120deg, rgba(19,55,39,.72), rgba(9,24,18,.74)); }
-    .weekly-hunt-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
-    .weekly-hunt-heading h2 { margin: 0; color: #f4fff8; font-size: 1.15rem; font-weight: 400; }
-    .weekly-hunt-heading span { color: var(--moss); font: 700 .66rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-    .weekly-hunt-heading span small { display: block; margin-top: 2px; color: var(--quiet); font: 400 .7rem/1.2 var(--font); letter-spacing: 0; text-transform: none; }
-    .weekly-hunt-copy { margin: 8px 0 14px; color: var(--muted); font-size: .84rem; line-height: 1.5; }
-    .weekly-hunt-copy small { display: block; margin-top: 4px; color: var(--quiet); font-size: .9em; }
-    .weekly-hunt-progress { display: flex; align-items: center; gap: 12px; }
-    .weekly-hunt-progress progress { width: 100%; height: 9px; accent-color: var(--moss); }
-    .weekly-hunt-count { flex: 0 0 auto; color: var(--gold); font: 700 .78rem/1.4 var(--sans); white-space: nowrap; }
-    .weekly-hunt-legend { margin: 10px 0 0; color: var(--quiet); font: .65rem/1.5 var(--sans); letter-spacing: .03em; }
+    /* reading level: gold flashlights */
+    .depth { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .difficulty-option { min-height: 100px; border-radius: 18px; border: 1.5px solid #4a4128; background: var(--night-3); color: #d9cfae; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 4px; }
+    .difficulty-option .beam { fill: rgba(255,215,106,.32); }
+    .difficulty-option .body { fill: #8a7440; } .difficulty-option .lens { fill: #b89a4e; }
+    .difficulty-option .d-jp { font-size: 14px; }
+    .difficulty-option .d-en { font-size: 10px; color: var(--gold-dim); letter-spacing: .06em; }
+    .difficulty-option.is-active { border: 2px solid var(--gold); background: radial-gradient(ellipse at 60% 30%, rgba(255,215,106,.28), var(--night-3) 70%); color: #fff4d0; box-shadow: 0 0 22px rgba(255,215,106,.45); }
+    .difficulty-option.is-active .beam { fill: rgba(255,215,106,.85); filter: drop-shadow(0 0 6px #ffd76a); }
+    .difficulty-option.is-active .body { fill: #c9a24a; } .difficulty-option.is-active .lens { fill: var(--gold); }
+    .difficulty-option.is-active .d-en { color: var(--gold); }
+    .difficulty-option:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+    .difficulty-note { margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--night-3); border: 1px solid #2a2618; font-size: 13px; line-height: 1.6; }
 
-    .section { margin-top: 26px; }
-    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 2px 11px; }
-    .section-heading h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); font-weight: 400; }
-    .section-heading p { margin: 0; color: var(--quiet); font: .63rem/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; text-align: right; }
+    /* this week's hunt in the fog */
+    .fog { position: relative; height: 290px; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: var(--night) url("assets/img/muenba/ghost-orb-background-v1.webp") center / cover no-repeat; box-shadow: inset 0 0 50px rgba(0,0,0,.9); }
+    .fog::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 110px; background: linear-gradient(180deg, rgba(207,227,214,0), rgba(207,227,214,.16)); pointer-events: none; }
+    .fog.carrying { border-color: var(--danger); box-shadow: inset 0 0 50px rgba(0,0,0,.9), 0 0 18px rgba(255,122,168,.35); }
+    .jerk { position: absolute; width: auto; filter: drop-shadow(0 0 8px rgba(255,122,168,.7)) brightness(.75); animation: peek 4s ease-in-out infinite; pointer-events: none; }
+    @keyframes peek { 0%, 100% { opacity: .2; } 50% { opacity: .45; } }
+    .fog.carrying .jerk { animation-name: peekHard; }
+    @keyframes peekHard { 0%, 100% { opacity: .45; } 50% { opacity: .85; } }
+    .hunt-row { position: absolute; inset: auto 0 0 0; z-index: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: end; padding: 0 6px 16px; list-style: none; margin: 0; }
+    .hunt-ghost { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--mist); text-align: center; }
+    .hunt-ghost img { height: 92px; width: auto; opacity: .3; filter: blur(1.5px); }
+    .hunt-ghost .tag { font-family: var(--display); font-size: 16px; color: var(--mist-2); line-height: 1.2; }
+    .hunt-ghost.found { color: var(--text); }
+    .hunt-ghost.found img { opacity: 1; filter: drop-shadow(0 0 10px rgba(140,255,180,.9)); }
+    .hunt-ghost.found .tag { padding: 2px 6px; border-radius: 999px; background: var(--ecto); color: var(--night); font-family: var(--sans); font-size: 9px; }
+    .fog.carrying { height: 350px; }
+    .carry-banner { position: absolute; top: 96px; left: 10px; right: 10px; z-index: 2; padding: 8px 12px; border-radius: 14px; background: rgba(34,9,26,.88); border: 1.5px solid var(--danger); color: var(--danger-soft); font-size: 12px; line-height: 1.5; text-align: center; }
+    .weekly-hunt-progress { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+    .weekly-hunt-progress progress { flex: 1; height: 8px; appearance: none; -webkit-appearance: none; border: 0; border-radius: 999px; background: var(--night-4); overflow: hidden; }
+    .weekly-hunt-progress progress::-webkit-progress-bar { background: var(--night-4); border-radius: 999px; }
+    .weekly-hunt-progress progress::-webkit-progress-value { background: var(--ecto); border-radius: 999px; box-shadow: 0 0 8px var(--ecto); }
+    .weekly-hunt-progress progress::-moz-progress-bar { background: var(--ecto); border-radius: 999px; }
+    .weekly-hunt-count { font-family: var(--display); font-size: 13px; color: var(--ecto); }
+    .weekly-hunt-legend { margin: 8px 0 0; text-align: center; font-size: 12px; line-height: 1.6; color: var(--mist); }
+    .weekly-hunt-legend .jerks { display: block; color: #ff9cbd; }
+    .weekly-hunt-copy { margin: 4px 0 0; text-align: center; font-size: 11px; color: var(--mist); }
 
-    .ghost-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-    .ghost-card { min-height: 176px; padding: 12px 11px 11px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; text-align: center; }
-    .ghost-card.is-weekly-found { border-color: rgba(143,220,178,.55); background: linear-gradient(145deg, rgba(28,68,50,.78), var(--panel)); }
-    .ghost-card::after { content: ""; position: absolute; width: 86px; height: 86px; right: -28px; bottom: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(143,220,178,.13), transparent 70%); pointer-events: none; }
-    .ghost-avatar { width: 68px; height: 68px; object-fit: contain; margin: 0 auto 5px; display: block; filter: grayscale(.85) brightness(.75); opacity: .5; }
-    .is-weekly-found .ghost-avatar { filter: none; opacity: 1; }
-    .ghost-name { margin: 0; color: #f2fff7; font-size: .95rem; font-weight: 400; line-height: 1.2; }
-    .ghost-name-kana { margin: 3px 0 0; color: var(--quiet); font: .7rem/1.2 var(--muenba-display); letter-spacing: .1em; }
-    .ghost-personality { min-height: 2.65em; margin: 6px 0 0; color: var(--muted); font-size: .68rem; line-height: 1.32; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .ghost-personality-jp { min-height: 1.35em; margin: 2px 0 0; color: var(--quiet); font: .67rem/1.3 var(--font); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-    .ghost-state { margin: 7px 0 0; color: var(--quiet); font: 700 .59rem/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
-    .ghost-state small { display: inline; margin-left: 4px; color: var(--quiet); font: .72rem var(--font); letter-spacing: 0; text-transform: none; }
-    .ghost-memory-current { margin: 6px 0 0; color: var(--gold); font: 700 .63rem/1.3 var(--sans); letter-spacing: .04em; }
-    .ghost-memory-current small { display: block; margin-top: 2px; color: var(--quiet); font: .61rem/1.25 var(--sans); letter-spacing: .02em; }
-    .is-weekly-found .ghost-state { color: var(--moss); }
-    .is-weekly-found .ghost-state small { color: rgba(143,220,178,.72); }
-    .ghost-card:not(.is-weekly-found) .ghost-state { color: var(--gold); }
+    /* orb jar (this week) */
+    .jar-card { display: grid; grid-template-columns: 170px 1fr; gap: 14px; align-items: center; padding: 14px; border-radius: 22px; background: var(--night-2); border: 1px solid var(--line); }
+    .jar { position: relative; width: 170px; height: 238px; }
+    .jar img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 14px; }
+    .jar svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .jar-count { font-family: var(--display); font-size: 44px; line-height: 1; color: var(--ecto); text-shadow: 0 0 14px rgba(140,255,180,.6); font-variant-numeric: tabular-nums; }
+    .jar-label { font-size: 13px; line-height: 1.4; }
+    .jar-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .jar-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; background: var(--night-4); font-size: 12px; }
+    .jar-row > span { display: flex; flex-direction: column; line-height: 1.3; }
+    .jar-row > span .jp { font-size: 10px; color: var(--mist); }
+    .jar-row b { color: var(--ecto); }
+    .jar-row.warn b { color: var(--danger); }
 
-    .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
-    .panel { padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
-    .journal-list { display: grid; gap: 10px; }
-    .journal-entry { padding: 13px 14px; border-left: 2px solid var(--moss); background: rgba(143,220,178,.05); }
-    .journal-entry h3 { margin: 0; color: #f2fff7; font-size: .98rem; font-weight: 400; }
-    .journal-entry h3 small { display: block; margin-top: 4px; color: var(--quiet); font-size: .73rem; }
-    .journal-case-ghost { margin: 7px 0 0; color: var(--muted); font: .72rem/1.4 var(--sans); letter-spacing: .03em; }
-    .case-record-grid { display: grid; gap: 12px; }
-    .case-record-card { padding: 16px; border-left: 3px solid var(--gold); background: rgba(216,201,139,.06); }
-    .case-record-card.is-next { border-left-color: var(--moss); background: rgba(143,220,178,.07); }
-    .case-record-card.is-locked { border-left-color: rgba(143,220,178,.2); opacity: .72; }
-    .case-record-card.is-settled { border-left-color: var(--gold); }
-    .case-record-card h3 { margin: 0; color: #fff5d5; font-size: 1.05rem; font-weight: 400; }
-    .case-record-card small { display: block; margin-top: 5px; color: var(--quiet); font: .68rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
-    .case-record-card .case-status-jp { display: inline; margin-left: 7px; color: var(--quiet); font: .78rem var(--font); letter-spacing: 0; text-transform: none; }
-    .case-record-card .case-memory-badge { display: inline-block; width: fit-content; margin-top: 9px; padding: 4px 7px; border: 1px solid rgba(216,201,139,.45); border-radius: 999px; color: #e9d993; font-size: .59rem; letter-spacing: .08em; }
-    .case-memory-badge small { display: inline; margin-left: 6px; color: var(--quiet); font: .72rem var(--font); letter-spacing: 0; text-transform: none; }
-    .case-record-card.is-next .case-memory-badge { border-color: rgba(143,220,178,.45); color: var(--moss); }
-    .case-record-resolution { margin: 11px 0 0; color: #f2e8c7; font-size: .9rem; line-height: 1.5; }
-    .case-record-review { margin-top: 12px; border-top: 1px solid rgba(216,201,139,.2); padding-top: 9px; }
-    .case-record-review summary { cursor: pointer; color: var(--muted); font: 700 .66rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
-    .case-record-review summary::marker { color: var(--gold); }
-    .case-record-review summary small { display: inline; margin: 0 0 0 7px; color: var(--quiet); font: .78rem var(--font); letter-spacing: 0; text-transform: none; }
-    .case-record-card ol { margin: 11px 0 0; padding-left: 21px; color: #f2e8c7; }
-    .case-record-card li { margin: 7px 0; padding-left: 4px; font-size: .86rem; line-height: 1.5; }
-    .case-queue-copy { margin: 13px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
-    .case-queue-copy small { margin-top: 7px; color: var(--quiet); font-size: .84em; letter-spacing: 0; text-transform: none; }
-    .weekly-hunt-legend small, .ghost-memory-current small, .journal-status-jp, .orb-label small, .orb-note small { display: block; margin-top: 3px; color: var(--quiet); font: 400 .76rem/1.35 var(--font); letter-spacing: 0; text-transform: none; }
-    .difficulty-card { padding: 17px 19px; border: 1px solid rgba(118,151,143,.34); border-radius: 6px 18px 6px 18px; background: rgba(4,11,11,.86); box-shadow: inset 0 0 28px rgba(0,0,0,.24); }
-    .difficulty-intro { margin: 0 0 13px; color: var(--muted); font-size: .86rem; line-height: 1.55; }
-    .difficulty-intro small { display: block; margin-top: 5px; color: var(--quiet); font-size: .9em; }
-    .difficulty-toggle { display: flex; flex-wrap: wrap; gap: 8px; }
-    .difficulty-option { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; flex: 1 1 160px; padding: 11px 15px; border: 1px solid rgba(143,220,178,.24); border-radius: 10px; color: #e4f1e9; font: 700 .82rem/1.2 var(--muenba-display); text-align: left; cursor: pointer; background: linear-gradient(180deg, rgba(143,220,178,.08), rgba(3,9,9,.48)); transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s; }
-    .difficulty-option small { color: var(--quiet); font: .72rem/1.3 var(--font); letter-spacing: .03em; }
-    .difficulty-option:hover, .difficulty-option:focus-visible { color: var(--ink); border-color: var(--moss); background: var(--moss-soft); outline: none; transform: translateY(-1px); }
-    .difficulty-option.is-active { color: #f4fff8; border-color: #b9f0d1; background: linear-gradient(180deg, rgba(143,220,178,.25), rgba(143,220,178,.08)); box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 16px rgba(143,220,178,.2), inset 0 1px rgba(255,255,255,.16); }
-    .difficulty-option.is-active small { color: #c6e5d3; }
-    .difficulty-note { margin: 13px 2px 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
-    .difficulty-note small { display: block; margin-top: 5px; color: var(--quiet); font-size: .9em; }
-    .journal-meta { margin: 9px 0 0; color: var(--muted); font: .67rem/1.4 var(--sans); }
-    .journal-empty { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
-    .journal-empty small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
-    .orb-count { color: var(--gold); font-size: 2.7rem; line-height: 1; }
-    .orb-label { margin: 9px 0 4px; color: var(--muted); font-size: .9rem; }
-    .orb-note { margin: 0; color: var(--quiet); font-size: .78rem; line-height: 1.5; }
+    /* all-time ledger */
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .stat { padding: 10px 4px; border-radius: 14px; background: var(--night-2); border: 1px solid var(--line); text-align: center; }
+    .stat-value { font-family: var(--display); font-size: 20px; color: var(--mist-2); font-variant-numeric: tabular-nums; }
+    .stat-label { font-size: 10px; color: var(--mist); letter-spacing: .04em; }
+    .stat-label small { display: block; font-size: 10px; }
+    html.jp-off .stat-label small { display: none; }
 
-    .footer-note { margin: 30px 0 0; color: var(--quiet); font: .65rem/1.6 var(--sans); letter-spacing: .08em; text-align: center; text-transform: uppercase; }
-    .loading { padding: 44px 20px; color: var(--muted); text-align: center; }
-    .loading small { display: block; margin-top: 6px; color: var(--quiet); }
+    /* ghost field guide */
+    .ghost-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .ghost-card { min-height: 176px; padding: 12px 11px 11px; position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; border-radius: 20px; text-align: center; background: var(--night-3); border: 1.5px solid var(--line-2); }
+    .ghost-card.has-lifetime-memory { border-color: #4f8a68; }
+    .ghost-card.is-weekly-found { background: radial-gradient(circle at 50% 30%, #24503a, var(--night-4) 70%); border: 2px solid var(--ecto); box-shadow: 0 0 18px rgba(140,255,180,.35); }
+    .ghost-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    .ghost-avatar { height: 104px; width: auto; }
+    .ghost-card:not(.is-weekly-found) .ghost-avatar { opacity: .4; filter: blur(.8px); }
+    .ghost-name { margin: 0; font-family: var(--display); font-weight: 400; font-size: 16px; }
+    .ghost-name-kana { margin: 0; font-size: 11px; color: var(--mist); }
+    .ghost-state { margin: 0 0 2px; align-self: stretch; text-align: center; line-height: 1.4; padding: 3px 9px; border-radius: 999px; font-size: 10px; border: 1px dashed #4f6b5b; color: var(--mist); }
+    .ghost-card.is-weekly-found .ghost-state { border: 0; background: var(--ecto); color: var(--night); }
+    .ghost-personality { width: 100%; margin: 4px 0 0; padding: 8px 8px 0; border-radius: 12px 12px 0 0; background: var(--night); font-size: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ghost-personality-jp { width: 100%; margin: 0; padding: 2px 8px 8px; border-radius: 0 0 12px 12px; background: var(--night); font-size: 11px; line-height: 1.5; color: var(--mist); }
+    .ghost-pips { display: flex; gap: 4px; }
+    .ghost-pip { width: 20px; height: 22px; border-radius: 6px; border: 1.5px solid var(--line-3); color: #7a9486; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+    .ghost-pip.on { background: var(--ecto); border-color: var(--ecto); color: var(--night); }
+    .ghost-pip.current { outline: 2px solid var(--gold); outline-offset: 1px; }
+    .ghost-memory-current { margin: 2px 0 0; font-size: 10px; color: var(--mist); }
 
+    .jerk-card { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding: 16px 14px; border-radius: 20px; background: repeating-linear-gradient(135deg, #22091a 0 14px, #2c0e20 14px 28px); border: 2px solid var(--danger); box-shadow: 0 0 24px rgba(255,122,168,.35); text-align: center; }
+    .jerk-top { display: flex; justify-content: space-between; align-items: center; }
+    .jerk-badge { padding: 3px 10px; border-radius: 6px; background: var(--danger); color: #22091a; font-size: 11px; letter-spacing: .14em; }
+    .jerk-crowd { display: flex; justify-content: center; align-items: flex-end; height: 112px; overflow: hidden; }
+    .jerk-crowd img { width: auto; margin-left: -34px; filter: drop-shadow(0 0 8px rgba(255,122,168,.75)); animation: jerkPeek 3s ease-in-out infinite; }
+    .jerk-crowd img:first-child { margin-left: 0; }
+    @keyframes jerkPeek { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+    .jerk-name { font-family: var(--display); font-size: 20px; }
+    .jerk-name small { font-family: var(--sans); font-size: 12px; color: var(--danger-soft); }
+    .jerk-counts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .jerk-counts > span { padding: 8px; border-radius: 12px; background: rgba(0,0,0,.4); font-size: 12px; }
+    .jerk-counts b { display: block; font-family: var(--display); font-weight: 400; font-size: 20px; color: #ff9cbd; }
+    .jerk-card .jp-line { color: var(--danger-soft); }
+
+    /* case board */
+    .case-record-grid { display: flex; flex-direction: column; gap: 10px; }
+    .case-record-card { position: relative; display: grid; grid-template-columns: 56px 1fr; gap: 6px 10px; align-items: center; padding: 12px; border-radius: 16px; background: var(--night-3); border: 1.5px solid var(--line-2); }
+    .case-record-card.is-settled { background: #10221a; border-color: #4f8a68; }
+    .case-record-card.is-next { border: 2px solid var(--ecto); box-shadow: 0 0 16px rgba(140,255,180,.35); }
+    .case-record-card.is-locked { border-style: dashed; opacity: .75; }
+    .case-num { grid-row: 1 / 3; width: 56px; height: 56px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--night); font-family: var(--display); font-size: 18px; color: var(--ecto); }
+    .case-num small { font-family: var(--sans); font-size: 8px; letter-spacing: .1em; color: var(--mist); }
+    .is-locked .case-num { color: #4f6b5b; }
+    .case-record-card h3 { margin: 0; padding-right: 54px; font-family: var(--display); font-weight: 400; font-size: 14px; line-height: 1.35; }
+    .case-meta { font-size: 11px; color: var(--mist); }
+    .case-status-jp { margin-left: 4px; }
+    .case-stamp { position: absolute; right: 10px; top: 8px; padding: 4px 8px; border: 2.5px solid var(--ecto); border-radius: 8px; color: var(--ecto); font-family: var(--display); font-size: 13px; transform: rotate(-10deg); }
+    .case-memory-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid #4f8a68; font-size: 10px; color: var(--mist-2); }
+    .case-record-resolution { grid-column: 1 / -1; margin: 6px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--ecto); color: var(--night); font-size: 14px; line-height: 1.5; }
+    .case-record-resolution > span { display: block; font-size: 10px; letter-spacing: .2em; }
+    .case-queue-copy { grid-column: 2; margin: 0; font-size: 12px; line-height: 1.5; color: var(--mist-2); }
+    .case-record-review { grid-column: 1 / -1; }
+    .case-record-review summary { min-height: 44px; display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: var(--ecto); list-style: none; }
+    .case-record-review summary::-webkit-details-marker { display: none; }
+    .case-record-review summary::before { content: '▸'; transition: transform .15s; }
+    .case-record-review[open] summary::before { transform: rotate(90deg); }
+    .case-record-review summary:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
+    .case-record-review ol { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .evidence { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border-radius: 14px; background: var(--night); border: 1px solid var(--line-2); }
+    .evidence-num { width: 34px; height: 34px; border-radius: 10px; background: var(--ecto); color: var(--night); display: flex; align-items: center; justify-content: center; font-family: var(--display); }
+    .evidence strong { display: block; font-size: 12px; color: var(--ecto); }
+    .evidence-text { font-size: 16px; line-height: 1.5; }
+    .kw { padding: 0 3px; border: 0; border-bottom: 2px dotted var(--ecto); border-radius: 4px; background: rgba(140,255,180,.22); color: inherit; font: inherit; cursor: pointer; }
+    .kw[aria-pressed="true"] { background: var(--gold); color: var(--night); border-bottom-color: var(--gold); }
+    .kw:focus-visible { outline: 3px solid var(--gold); outline-offset: 1px; }
+    .kw-help { margin-top: 8px; display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 10px 14px; border-radius: 14px; background: var(--night); border: 1.5px dashed var(--gold); font-size: 13px; line-height: 1.45; }
+    .kw-help b { font-family: var(--display); font-weight: 400; font-size: 18px; color: var(--gold); }
+    .kw-help span { display: flex; flex-direction: column; }
+
+    /* hunt journal */
+    .journal-list { display: flex; flex-direction: column; gap: 8px; }
+    .journal-entry { display: grid; grid-template-columns: 52px 1fr auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 14px; background: var(--night-3); }
+    .journal-entry img { height: 52px; width: auto; justify-self: center; }
+    .journal-entry h3 { margin: 0; font-size: 13px; line-height: 1.35; display: flex; flex-direction: column; }
+    .journal-entry h3 small { font-size: 11px; color: var(--ecto); }
+    .journal-status-jp { margin-left: 4px; }
+    .journal-case-ghost { display: none; }
+    .journal-meta { margin: 0; font-size: 11px; color: var(--mist); }
+    .journal-empty { margin: 0; padding: 18px; border-radius: 16px; border: 1px dashed var(--line-2); text-align: center; font-size: 13px; line-height: 1.6; color: var(--mist); }
+    .journal-empty small { display: block; }
+
+    .loading { padding: 30px; text-align: center; color: var(--mist); }
+    .loading small { display: block; margin-top: 4px; }
+    .footer-note { margin: 0; text-align: center; font-size: 11px; line-height: 1.7; color: var(--mist); }
+
+    @media (min-width: 640px) {
+      .ghost-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .ghost-card:last-child:nth-child(odd) { grid-column: auto; }
+    }
     @media (max-width: 760px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-art { order: 2; width: 250px; height: 250px; margin: 2px auto 0; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .ghost-grid { grid-template-columns: repeat(3, 1fr); }
-      .lower-grid { grid-template-columns: 1fr; }
+      .hero { min-height: 400px; }
     }
-    @media (max-width: 460px) {
-      .page { width: min(100% - 18px, 1040px); padding-top: 15px; }
-      .topbar { margin-bottom: 15px; }
-      .case-label { display: none; }
-      .hero { border-radius: 19px; padding: 30px 20px 34px; }
-      .hero-art { width: 225px; height: 225px; }
+    @media (max-width: 380px) {
       .ghost-grid { grid-template-columns: repeat(2, 1fr); }
-      .ghost-card { min-height: 140px; }
+      .jar-card { grid-template-columns: 130px 1fr; }
+      .jar { width: 130px; height: 182px; }
+      .pn-orb { width: 44px; height: 44px; }
+      .hunt-ghost img { height: 74px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
     }
   </style>
 </head>
 <body>
   <main class="page">
     <div class="topbar">
-      <div class="case-label">MUENBA / GHOST LEDGER<br><ruby>幽霊<rt>ゆうれい</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></div>
-      <a class="back-link" id="muenba-profile-karasuki" href="karasuki.html?room=room_13" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
+      <a class="back-link" id="muenba-profile-karasuki" href="karasuki.html?room=room_13" hidden aria-label="Enter Karasuki / カラスキへ">からすきへ →</a>
+      <div class="case-label">MUENBA / GHOST LEDGER<span class="jp"><br><ruby>幽霊<rt>ゆうれい</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></span></div>
+      <button type="button" class="jp-toggle" id="jp-toggle" aria-pressed="true" aria-label="Japanese help / にほんごの ヘルプ"><span class="dot" aria-hidden="true"></span>にほんご</button>
     </div>
 
-      <nav class="profile-network" aria-label="Output profiles">
-        <a href="profile.html">LOG <small>ぼうけんログ</small></a>
-        <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
-        <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
-        <a href="muenba-profile.html" aria-current="page">MUENBA <small>むえんば</small></a>
-        <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
-      </nav>
+    <nav class="profile-network" aria-label="Output profiles">
+      <a href="profile.html"><span class="pn-orb log"><img src="assets/img/profile/portal-log.webp" alt="" width="44" height="44"></span><span class="pn-label">ログ<small>LOG</small></span></a>
+      <a href="adventure-profile.html"><span class="pn-orb adventure"><img src="assets/img/profile/portal-adventure.webp" alt="" width="36" height="36"></span><span class="pn-label">ぼうけん<small>ADVENTURE</small></span></a>
+      <!-- Shown locked until the weekly world gate opens (same gate as the Utsuroba world). -->
+      <a href="utsuroba-profile.html" id="pnet-utsuroba" class="is-locked" aria-disabled="true" data-label="UTSUROBA"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="36" height="42"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
+      <a href="muenba-profile.html" aria-current="page"><span class="pn-orb muenba"><img src="assets/img/profile/portal-muenba.webp" alt="" width="36" height="44"></span><span class="pn-label">むえんば<small>MUENBA</small></span></a>
+      <!-- Shown locked until all nine games open the Grimmerglen world gate. -->
+      <a href="grimmerglen-profile.html" id="pnet-grimmerglen" class="is-locked" aria-disabled="true" data-label="GRIMMERGLEN"><span class="pn-orb grimmerglen"><img src="assets/img/profile/portal-grimmerglen.webp" alt="" width="36" height="36"></span><span class="pn-label">グリマー<small>GRIMMERGLEN</small></span></a>
+    </nav>
 
     <section class="hero" aria-labelledby="page-title">
-      <div class="hero-copy-block">
-        <p class="eyebrow">A ledger of who's still hiding</p>
-        <h1 id="page-title">Muenba</h1>
-        <p class="hero-jp">むえんば — <ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>探<rt>さが</rt></ruby>しの<ruby>記録<rt>きろく</rt></ruby></p>
-        <p class="hero-copy">
-          Fifteen fog-filled rooms, and something in each one that doesn't
-          always want to be found. This ledger tracks collected ghost energy
-          separately from the memory styles used to understand each case.
-          <small>15の霧に<ruby>包<rt>つつ</rt></ruby>まれた<ruby>部屋<rt>へや</rt></ruby>には、<ruby>見<rt>み</rt></ruby>つかりたがらないものがいます。ここでは、<ruby>集<rt>あつ</rt></ruby>めた<ruby>幽霊<rt>ゆうれい</rt></ruby>エネルギーと、<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>を<ruby>別<rt>べつ</rt></ruby>に<ruby>記録<rt>きろく</rt></ruby>します。</small>
-        </p>
-        <div class="status-strip" aria-live="polite">
-          <span class="status-pill">
-            <i class="status-dot" id="world-dot" aria-hidden="true"></i>
-            <span id="world-status" class="world-status-copy"><span class="world-status-en">MUENBA IS LOCKED</span><span class="world-status-jp">むえんばは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span></span>
-          </span>
-        </div>
+      <span class="orbp" style="left:22%;top:34%" aria-hidden="true"></span>
+      <span class="orbp" style="left:76%;top:26%;animation-delay:1.6s" aria-hidden="true"></span>
+      <span class="orbp" style="left:64%;top:46%;animation-delay:3.1s;width:6px;height:6px" aria-hidden="true"></span>
+      <span class="orbp" style="left:32%;top:16%;animation-delay:2.3s;width:5px;height:5px" aria-hidden="true"></span>
+      <div class="hero-art"><img src="assets/img/muenba/nuppi_profile.webp" alt="Nuppi welcoming Booha toward Muenba" width="768" height="768" decoding="async"></div>
+      <p class="eyebrow">MUENBA · A LEDGER OF WHO'S STILL HIDING</p>
+      <h1 id="page-title"><span class="jp">むえんば</span><span class="en-only" hidden>Muenba</span></h1>
+      <p class="hero-copy">Fifteen foggy rooms. Five ghosts hiding.<span class="jp-line jp">きりの へやが 15こ。ゴーストが 5たい かくれている。</span></p>
+      <div class="status-strip" aria-live="polite">
+        <span class="status-pill" id="world-pill">
+          <i class="status-dot" id="world-dot" aria-hidden="true"></i>
+          <span id="world-status" class="world-status-copy"><span class="world-status-en">MUENBA IS LOCKED</span><span class="world-status-jp jp">むえんばは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span></span>
+        </span>
       </div>
-      <div class="hero-art"><img src="assets/img/muenba/nuppi_profile.webp" alt="Nuppi welcoming Booha toward Muenba" decoding="async"></div>
     </section>
 
     <section id="profile-content" aria-live="polite">
-      <div class="loading">Opening the ledger…<small><ruby>記録<rt>きろく</rt></ruby>をひらいています…</small></div>
+      <div class="loading">Opening the ledger…<small class="jp"><ruby>記録<rt>きろく</rt></ruby>をひらいています…</small></div>
     </section>
 
-    <p class="footer-note">The ledger stays after the week changes · <ruby>記録<rt>きろく</rt></ruby>は<ruby>週<rt>しゅう</rt></ruby>が<ruby>変<rt>か</rt></ruby>わっても<ruby>残<rt>のこ</rt></ruby>ります</p>
+    <p class="footer-note">The ledger stays after the week changes<span class="jp"> · <ruby>記録<rt>きろく</rt></ruby>は<ruby>週<rt>しゅう</rt></ruby>が<ruby>変<rt>か</rt></ruby>わっても<ruby>残<rt>のこ</rt></ruby>ります</span></p>
   </main>
 
   <script src="./js/token.js"></script>
@@ -316,7 +336,7 @@
   <script src="./js/core/score-system.js"></script>
   <script src="./js/core/unlock-system.js"></script>
   <script src="./js/muenba-data.js"></script>
-
+  <script src="./js/ui/world-portals.js"></script>
   <script>
     (() => {
       'use strict';
@@ -335,6 +355,22 @@
             ? BoohaAdventure.save.load() : {};
         } catch (_) { return {}; }
       }
+
+      // ── Japanese help toggle (shared with the Utsuroba profile) ─────────
+      const jpToggle = document.getElementById('jp-toggle');
+      function jpOn() { return !document.documentElement.classList.contains('jp-off'); }
+      function syncJpToggle() {
+        const on = jpOn();
+        jpToggle.setAttribute('aria-pressed', String(on));
+        document.querySelectorAll('.en-only').forEach(el => { el.hidden = on; });
+      }
+      jpToggle.addEventListener('click', () => {
+        const on = !jpOn();
+        document.documentElement.classList.toggle('jp-off', !on);
+        try { localStorage.setItem('booha_utsu_jp', on ? '1' : '0'); } catch (_) {}
+        syncJpToggle();
+      });
+      syncJpToggle();
 
       function getReadingDifficulty() {
         const value = getSave().muenba?.readingDifficulty;
@@ -358,21 +394,19 @@
         render();
       }
 
+      const FLASH = { start: 30, fresh: 42, deep: 56 };
+      function flashlight(mode) {
+        const tip = FLASH[mode];
+        const spread = mode === 'start' ? 5 : mode === 'fresh' ? 7 : 8;
+        return `<svg width="56" height="24" viewBox="0 0 56 24" aria-hidden="true"><rect class="body" x="0" y="8" width="14" height="8" rx="2"></rect><rect class="lens" x="13" y="7" width="3" height="10"></rect><path class="beam" d="M16 8 L${tip} ${12 - spread * 1.5} L${tip} ${12 + spread * 1.5} L16 16 Z"></path></svg>`;
+      }
+
       function difficultyMarkup() {
         const current = getReadingDifficulty();
         const descriptions = {
-          start: {
-            note: 'Starter Memory uses very short sentences and easy words for new readers.',
-            noteJP: '<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>読者<rt>どくしゃ</rt></ruby>が<ruby>読<rt>よ</rt></ruby>みやすい、<ruby>短<rt>みじか</rt></ruby>くてやさしい<ruby>文<rt>ぶん</rt></ruby>です。'
-          },
-          fresh: {
-            note: 'Case Memory adds more detail and asks you to connect the clues.',
-            noteJP: '<ruby>事件<rt>じけん</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりをつなげて<ruby>読<rt>よ</rt></ruby>みます。'
-          },
-          deep: {
-            note: 'Deep Memory uses fuller clues and asks you to think about why.',
-            noteJP: '<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>は、<ruby>事件<rt>じけん</rt></ruby>をじっくり<ruby>読<rt>よ</rt></ruby>むための、<ruby>詳<rt>くわ</rt></ruby>しい<ruby>手<rt>て</rt></ruby>がかりです。'
-          }
+          start: { note: 'Very short sentences and easy words for new readers.', noteJP: 'みじかい ぶんと やさしい ことば。' },
+          fresh: { note: 'More detail — connect the clues.', noteJP: 'てがかりを つなげて よもう。' },
+          deep: { note: 'Fuller clues — think about why.', noteJP: 'くわしい てがかりで「なぜ？」を かんがえよう。' }
         };
         const description = descriptions[current] || descriptions.start;
         const weeklyMuenba = getSave().weekly?.worlds?.muenba;
@@ -383,19 +417,19 @@
           ? 'Your current hunt target stays the same when you change levels. The new level applies when you open that ghost case.'
           : description.note;
         const noteJP = huntInProgress
-          ? '探索中の<ruby>幽霊<rt>ゆうれい</rt></ruby>は、<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>変<rt>か</rt></ruby>えても<ruby>変<rt>か</rt></ruby>わりません。<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>くと<ruby>新<rt>あたら</rt></ruby>しい<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>が<ruby>使<rt>つか</rt></ruby>われます。'
+          ? 'いま さがしている ゴーストは かわらないよ。つぎに じけんを ひらくと、あたらしい よみかたに なるよ。'
           : description.noteJP;
-        return `<section class="section">
-          <div class="section-heading"><h2>How It Reads</h2><p><ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby></p></div>
-          <div class="difficulty-card">
-            <p class="difficulty-intro">Choose a reading level for new ghost cases.<small><ruby>新<rt>あたら</rt></ruby>しい<ruby>幽霊<rt>ゆうれい</rt></ruby><ruby>事件<rt>じけん</rt></ruby>の<ruby>読<rt>よ</rt></ruby>み<ruby>方<rt>かた</rt></ruby>を<ruby>選<rt>えら</rt></ruby>びます。</small></p>
-            <div class="difficulty-toggle" role="group" aria-label="Muenba case reading style">
-              <button type="button" class="difficulty-option${current === 'start' ? ' is-active' : ''}" data-muenba-difficulty="start" aria-pressed="${current === 'start'}">Starter Memory<small><ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby></small></button>
-              <button type="button" class="difficulty-option${current === 'fresh' ? ' is-active' : ''}" data-muenba-difficulty="fresh" aria-pressed="${current === 'fresh'}">Case Memory<small><ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby></small></button>
-              <button type="button" class="difficulty-option${current === 'deep' ? ' is-active' : ''}" data-muenba-difficulty="deep" aria-pressed="${current === 'deep'}">Deep Memory<small><ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby></small></button>
-            </div>
-            <p class="difficulty-note">${note}<small>${noteJP}</small></p>
+        const options = [
+          ['start', 'Starter Memory', 'はじめ', 'STARTER'],
+          ['fresh', 'Case Memory', 'ケース', 'CASE'],
+          ['deep', 'Deep Memory', 'ふかい', 'DEEP'],
+        ];
+        return `<section class="section" aria-labelledby="reads-title">
+          <div class="sec-head"><div><span class="kick">HOW IT READS</span><h2 class="h2" id="reads-title">ケースの よみかた</h2></div></div>
+          <div class="depth" role="group" aria-label="Muenba case reading style">
+            ${options.map(([mode, label, jp, short]) => `<button type="button" class="difficulty-option${current === mode ? ' is-active' : ''}" data-muenba-difficulty="${mode}" aria-pressed="${current === mode}" aria-label="${label}">${flashlight(mode)}<span class="d-jp">${jp}</span><span class="d-en">${short}</span></button>`).join('')}
           </div>
+          <p class="difficulty-note">${note}<span class="jp-line jp">${noteJP}</span></p>
         </section>`;
       }
 
@@ -411,12 +445,70 @@
         const status = document.getElementById('world-status');
         if (status) {
           status.innerHTML = open
-            ? '<span class="world-status-en">MUENBA IS OPEN</span><span class="world-status-jp">むえんばは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
-            : '<span class="world-status-en">MUENBA IS LOCKED</span><span class="world-status-jp">むえんばは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span>';
+            ? '<span class="world-status-en">MUENBA IS OPEN</span><span class="world-status-jp jp">むえんばは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
+            : '<span class="world-status-en">MUENBA IS LOCKED</span><span class="world-status-jp jp">むえんばは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span>';
         }
         document.getElementById('world-dot')?.classList.toggle('open', open);
+        document.getElementById('world-pill')?.classList.toggle('open', open);
         const karasukiLink = document.getElementById('muenba-profile-karasuki');
         if (karasukiLink) karasukiLink.hidden = !open;
+      }
+
+      // ── orb jar: positions inside the glass (jar art is 300 × 420 units) ─
+      // Rows fill from the bottom; the two lowest rows sit narrower because
+      // the jar's base curves in. Checked against ghost-orb-jar-v1.webp.
+      const JAR_ROWS = (() => {
+        const rows = [];
+        for (let k = 0; k < 9; k++) {
+          const y = 355 - k * 26;
+          const narrow = k === 0;
+          const offset = k % 2 === 1;
+          const xs = [];
+          const start = narrow ? 74 : (offset ? 64 : 79);
+          const end = narrow ? 226 : (offset ? 244 : 229);
+          for (let x = start; x <= end; x += 30) xs.push(x);
+          rows.push({ y, xs });
+        }
+        return rows;
+      })();
+      const JAR_SLOTS = JAR_ROWS.flatMap(row => row.xs.map(x => [x, row.y]));
+      function jarOrbs(count) {
+        const shown = Math.min(count, JAR_SLOTS.length);
+        let seed = 7;
+        const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+        return JAR_SLOTS.slice(0, shown).map(([x, y]) => {
+          const jx = (x + (rand() * 4 - 2)).toFixed(1);
+          const jy = (y + (rand() * 4 - 2)).toFixed(1);
+          const op = (0.82 + rand() * 0.18).toFixed(2);
+          return `<circle cx="${jx}" cy="${jy}" r="12" fill="url(#orbg)" opacity="${op}"></circle>`;
+        }).join('');
+      }
+
+      // ── keyword help on case clues ──────────────────────────────────────
+      const KW_HELP = window.MUENBA_DATA?.keywordHelp || {};
+      function clueHTML(text, keywords) {
+        const raw = String(text || '');
+        const marks = [];
+        (keywords || []).slice().sort((a, b) => b.length - a.length).forEach(word => {
+          const re = new RegExp(`(^|[^A-Za-z])(${String(word).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?=[^A-Za-z]|$)`, 'i');
+          const m = re.exec(raw);
+          if (!m) return;
+          const start = m.index + m[1].length;
+          const end = start + m[2].length;
+          if (marks.some(x => start < x.end && end > x.start)) return;
+          marks.push({ start, end, word });
+        });
+        marks.sort((a, b) => a.start - b.start);
+        let out = '';
+        let pos = 0;
+        marks.forEach(m => {
+          out += esc(raw.slice(pos, m.start));
+          out += KW_HELP[m.word]
+            ? `<button type="button" class="kw" data-kw="${esc(m.word)}" aria-pressed="false">${esc(raw.slice(m.start, m.end))}</button>`
+            : esc(raw.slice(m.start, m.end));
+          pos = m.end;
+        });
+        return out + esc(raw.slice(pos));
       }
 
       function render() {
@@ -428,6 +520,7 @@
         const weeklyGhostsFound = weeklyMuenba.ghostsFound && typeof weeklyMuenba.ghostsFound === 'object'
           ? weeklyMuenba.ghostsFound : {};
         const ghosts = Array.isArray(window.MUENBA_DATA?.ghosts) ? window.MUENBA_DATA.ghosts : [];
+        const jerk = window.MUENBA_DATA?.jerk || null;
         const cases = window.MUENBA_DATA?.cases && typeof window.MUENBA_DATA.cases === 'object' ? window.MUENBA_DATA.cases : {};
         const memoryModes = ['start', 'fresh', 'deep'];
         const memoryModeLabels = {
@@ -435,18 +528,19 @@
           fresh: 'Case Memory',
           deep: 'Deep Memory'
         };
+        const memoryModeShort = { start: 'はじめ', fresh: 'ケース', deep: 'ふかい' };
         const memoryModeLabel = mode => memoryModeLabels[mode] || memoryModeLabels.start;
         const currentMemory = getReadingDifficulty();
         const caseOrder = (Array.isArray(window.MUENBA_DATA?.caseOrder) ? window.MUENBA_DATA.caseOrder : Object.keys(cases))
           .map(caseId => cases[caseId]).filter(Boolean);
+        // All-time ledger: plain running totals (every capture, every
+        // case+tier settled, every room entry — replays included).
         const orbs = typeof mu.orbsCollected === 'number' ? mu.orbsCollected : 0;
-        // Pass 13: these three are plain running totals (every capture,
-        // every case+tier settled, every room entry — replays included),
-        // not distinct-progress fractions, matching how orbsCollected
-        // already behaved. See migrateMuenbaSave()/commitSuccessfulCapture()/
-        // markMuenbaRoomVisited() in muenba.js for where each one is bumped.
         const totalCaptures = Number.isInteger(mu.rhythm?.capturesCompleted) ? mu.rhythm.capturesCompleted : 0;
         const caseSettles = Number.isInteger(mu.caseRecordsSettled) ? mu.caseRecordsSettled : 0;
+        // This week: the jar starts empty every Sunday (weekly bucket).
+        const weeklyOrbs = Math.max(0, Number(weeklyMuenba.orbsReturned) || 0);
+        const carryingOrbs = Math.max(0, Number(weeklyMuenba.orbsPending) || 0);
         const caseRecords = mu.caseRecords && typeof mu.caseRecords === 'object' ? mu.caseRecords : {};
         const legacyCompletedIds = new Set(Array.isArray(mu.caseProgress?.completedCaseIds) ? mu.caseProgress.completedCaseIds : []);
         const recordForCase = caseData => {
@@ -468,6 +562,9 @@
         const journal = Array.isArray(mu.huntJournal?.entries) ? mu.huntJournal.entries : [];
         const weeklyFoundCount = ghosts.filter(ghost => weeklyGhostsFound[ghost.id] === true).length;
         const weeklyRemainingCount = Math.max(ghosts.length - weeklyFoundCount, 0);
+        const solvedAtCurrent = caseOrder.filter(caseData => modeComplete(recordForCase(caseData), currentMemory)).length;
+
+        const evidenceList = clues => (clues || []).map((clue, i) => `<li class="evidence"><span class="evidence-num" aria-hidden="true">${i + 1}</span><span><strong>${esc(clue.title)}</strong><span class="evidence-text">${clueHTML(clue.text, clue.keywords)}</span></span></li>`).join('');
 
         const caseRecordMarkup = caseOrder.length
           ? `<div class="case-record-grid">${caseOrder.map((caseData, index) => {
@@ -475,6 +572,7 @@
               const isCompleted = completedIds.has(caseData.id);
               const isNext = nextCase && nextCase.id === caseData.id;
               const isCurrentModeComplete = modeComplete(record, currentMemory);
+              const num = `<span class="case-num" aria-hidden="true"><small>CASE</small>${String(index + 1).padStart(2, '0')}</span>`;
               if (isCompleted || isCurrentModeComplete) {
                 const settledMode = isCompleted
                   ? (caseData[record.difficulty] || caseData.deep || caseData.fresh)
@@ -482,53 +580,56 @@
                 const settledModeLabel = isCompleted ? 'All memory modes' : memoryModeLabel(currentMemory);
                 const resolution = settledMode?.resolution || 'This case memory is settled.';
                 const reviewLabel = isCompleted ? 'Review all clues' : 'Review clues';
-                const reviewJp = isCompleted ? 'すべての手がかりを見る' : '手がかりを見る';
-                const clueMarkup = (settledMode?.clues || []).map(clue => `<li><strong>${esc(clue.title)}</strong><br>${esc(clue.text)}</li>`).join('');
+                const reviewJp = isCompleted ? 'すべての てがかり' : 'てがかりを みる';
+                const solvedModes = memoryModes.filter(mode => modeComplete(record, mode)).map(mode => `${memoryModeShort[mode]} ✓`).join(' · ');
                 return `<article class="case-record-card is-settled">
+                  ${num}
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · SETTLED<span class="case-status-jp"><ruby>解決<rt>かいけつ</rt></ruby></span></small>
-                  <span class="case-memory-badge">${esc(settledModeLabel)}<small><ruby>完了<rt>かんりょう</rt></ruby></small></span>
-                  <p class="case-record-resolution">${esc(resolution)}</p>
+                  <span class="case-meta">Case ${index + 1} · SETTLED<span class="case-status-jp jp"><ruby>解決<rt>かいけつ</rt></ruby></span> <span class="case-memory-badge">${esc(settledModeLabel)}<span class="jp"> · ${esc(solvedModes)}</span></span></span>
+                  <span class="case-stamp" aria-hidden="true">解決</span>
+                  <p class="case-record-resolution"><span>CASE SOLVED<span class="jp"> · かいけつ</span></span>${esc(resolution)}</p>
                   <details class="case-record-review">
-                    <summary>${reviewLabel}<small>${reviewJp}</small></summary>
-                    <ol>${clueMarkup}</ol>
+                    <summary>${reviewLabel}<span class="jp"> · ${reviewJp}</span></summary>
+                    <ol>${evidenceList(settledMode?.clues)}</ol>
+                    <div class="kw-help" aria-live="polite"><span>Tap a glowing word to see what it means.<span class="jp-line jp">ひかる ことばを タップしてね。</span></span></div>
                   </details>
                 </article>`;
               }
               if (isNext) {
                 return `<article class="case-record-card is-next">
+                  ${num}
                   <h3>${esc(caseData.title)}</h3>
-                  <small>Case ${index + 1} · NEXT<span class="case-status-jp"><ruby>次<rt>つぎ</rt></ruby></span></small>
-                  <span class="case-memory-badge">${esc(memoryModeLabel(currentMemory))}<small><ruby>進行中<rt>しんこうちゅう</rt></ruby></small></span>
-                  <p class="case-queue-copy">Find the next ghost in Muenba to open this case.<small>ムエンバで<ruby>次<rt>つぎ</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>して、この<ruby>事件<rt>じけん</rt></ruby>を<ruby>開<rt>ひら</rt></ruby>こう。</small></p>
+                  <span class="case-meta">Case ${index + 1} · NEXT<span class="case-status-jp jp"><ruby>次<rt>つぎ</rt></ruby></span> <span class="case-memory-badge">${esc(memoryModeLabel(currentMemory))}<span class="jp"> · <ruby>進行中<rt>しんこうちゅう</rt></ruby></span></span></span>
+                  <p class="case-queue-copy">Find the next ghost in Muenba to open this case.<span class="jp-line jp">むえんばで つぎの ゴーストを さがして、この じけんを ひらこう。</span></p>
                 </article>`;
               }
               return `<article class="case-record-card is-locked">
+                ${num}
                 <h3>${esc(caseData.title)}</h3>
-                <small>Case ${index + 1} · WAITING<span class="case-status-jp"><ruby>待機中<rt>たいきちゅう</rt></ruby></span></small>
-                <p class="case-queue-copy">Waiting for the earlier case.<small>前の<ruby>事件<rt>じけん</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っています。</small></p>
+                <span class="case-meta">Case ${index + 1} · WAITING<span class="case-status-jp jp"><ruby>待機中<rt>たいきちゅう</rt></ruby></span></span>
+                <p class="case-queue-copy">Waiting for the earlier case.<span class="jp-line jp">前の<ruby>事件<rt>じけん</rt></ruby>を<ruby>待<rt>ま</rt></ruby>っています。</span></p>
               </article>`;
             }).join('')}</div>`
-          : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small><small>まだ<ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>はありません。</small></p>`;
+          : `<p class="journal-empty">No case records yet.<small>Complete a ghost case to place its English record here.</small><small class="jp">まだ<ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>はありません。</small></p>`;
 
         const ghostCards = ghosts.map(ghost => {
           const ghostCase = caseOrder.find(caseData => caseData.ghostId === ghost.id);
           const ghostRecord = ghostCase ? recordForCase(ghostCase) : null;
           const currentModeComplete = ghostCase && modeComplete(ghostRecord, currentMemory);
           const weeklyFound = weeklyGhostsFound[ghost.id] === true;
-          // Pass 13: highlighting now tracks whether *this ghost's case is
-          // solved at the currently-selected memory tier*, not lifetime
-          // capture — previously every found-at-least-once ghost stayed lit
-          // up on every tier, even ones you hadn't actually solved there.
+          // Highlighting tracks whether *this ghost's case is solved at the
+          // currently-selected memory tier*; the glow tracks this week.
           const isFound = !!currentModeComplete;
+          const pips = memoryModes.map(mode => `<span class="ghost-pip${ghostRecord && modeComplete(ghostRecord, mode) ? ' on' : ''}${mode === currentMemory ? ' current' : ''}">${mode === 'start' ? 'S' : mode === 'fresh' ? 'C' : 'D'}</span>`).join('');
           return `<article class="ghost-card${isFound ? ' has-lifetime-memory' : ''}${weeklyFound ? ' is-weekly-found' : ''}">
-            <img class="ghost-avatar" src="${esc(ghost.img)}" alt="">
+            <p class="ghost-state">${weeklyFound ? 'Found this week' : 'Available this week'}<span class="jp"> · ${weeklyFound ? 'こんしゅう ✓' : 'かくれてる'}</span></p>
+            <img class="ghost-avatar" src="${esc(ghost.img)}" alt="" height="104" loading="lazy" decoding="async">
             <h3 class="ghost-name">${esc(ghost.name)}</h3>
-            <p class="ghost-name-kana">${esc(ghost.kana || '')}</p>
+            <p class="ghost-name-kana jp">${esc(ghost.kana || '')}</p>
+            <div class="ghost-pips" aria-label="Case solved: ${memoryModes.map(mode => `${memoryModeLabel(mode)} ${ghostRecord && modeComplete(ghostRecord, mode) ? 'yes' : 'not yet'}`).join(', ')}">${pips}</div>
             <p class="ghost-personality">${esc(ghost.personality || '')}</p>
-            <p class="ghost-personality-jp">${ghost.personalityJp || ''}</p>
-            <p class="ghost-state">${weeklyFound ? 'Found this week' : 'Available this week'}<small>${weeklyFound ? '<ruby>今週<rt>こんしゅう</rt></ruby>みつけた' : '<ruby>今週<rt>こんしゅう</rt></ruby>はまだ'}</small></p>
-            <p class="ghost-memory-current" title="${esc(memoryModeLabel(currentMemory))}">Memory: ${currentModeComplete ? 'settled' : 'open'}<small>${esc(memoryModeLabel(currentMemory))} · ${currentModeComplete ? '<ruby>完了<rt>かんりょう</rt></ruby>' : '<ruby>未完了<rt>みかんりょう</rt></ruby>'}</small></p>
+            <p class="ghost-personality-jp jp">${ghost.personalityJp || ''}</p>
+            <p class="ghost-memory-current" title="${esc(memoryModeLabel(currentMemory))}">Memory: ${currentModeComplete ? 'settled' : 'open'}<span class="jp"> · ${esc(memoryModeShort[currentMemory])} ${currentModeComplete ? '<ruby>完了<rt>かんりょう</rt></ruby>' : '<ruby>未完了<rt>みかんりょう</rt></ruby>'}</span></p>
           </article>`;
         }).join('');
 
@@ -536,49 +637,128 @@
           ? `<div class="journal-list">${journal.slice(0, 8).map(entry => {
               const ghost = ghosts.find(g => g.id === entry.ghostId);
               const caseData = entry.caseId ? cases[entry.caseId] : null;
+              const when = entry.capturedAt ? new Date(entry.capturedAt) : null;
               return `<article class="journal-entry">
-                <h3>${esc(caseData?.title || ghost?.name || entry.ghostId || 'Unknown ghost')}<small>${caseData ? 'Case settled<span class="journal-status-jp"><ruby>事件<rt>じけん</rt></ruby>を<ruby>解決<rt>かいけつ</rt></ruby></span>' : 'Caught<span class="journal-status-jp"><ruby>捕<rt>つか</rt></ruby>まえた</span>'}</small></h3>
+                ${ghost ? `<img src="${esc(ghost.img)}" alt="" height="52" loading="lazy" decoding="async">` : '<span></span>'}
+                <h3>${esc(caseData?.title || ghost?.name || entry.ghostId || 'Unknown ghost')}<small>${caseData ? `Case settled<span class="journal-status-jp jp"><ruby>事件<rt>じけん</rt></ruby>を<ruby>解決<rt>かいけつ</rt></ruby></span> · ${esc(memoryModeLabel(entry.caseDifficulty || 'fresh'))}` : 'Caught<span class="journal-status-jp jp"><ruby>捕<rt>つか</rt></ruby>まえた</span>'}</small></h3>
                 ${caseData ? `<p class="journal-case-ghost">${esc(ghost?.name || '')} · ${esc(memoryModeLabel(entry.caseDifficulty || 'fresh'))}</p>` : ''}
-                <p class="journal-meta">${esc(entry.capturedAt ? new Date(entry.capturedAt).toLocaleDateString() : '')}</p>
+                <p class="journal-meta">${when && !isNaN(when.getTime()) ? `${when.getMonth() + 1}/${when.getDate()}` : ''}</p>
               </article>`;
             }).join('')}</div>`
-          : `<p class="journal-empty">No hunts recorded yet.<small><ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>捕<rt>つか</rt></ruby>まえると、ここに<ruby>記録<rt>きろく</rt></ruby>されます。</small></p>`;
+          : `<p class="journal-empty">No hunts recorded yet.<small class="jp"><ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>捕<rt>つか</rt></ruby>まえると、ここに<ruby>記録<rt>きろく</rt></ruby>されます。</small></p>`;
+
+        // ── this week's hunt: five ghosts in the fog, Jerks lurking above
+        const jerkImg = esc(jerk?.img || 'assets/img/muenba/ghosts/jerk.webp');
+        const JERK_SPOTS = [[6, 10, 54, 0], [30, 26, 40, 1], [52, 4, 48, 2.2], [72, 30, 36, .5], [86, 8, 50, 3], [18, 52, 34, 1.4], [42, 56, 30, 2.6], [64, 54, 32, .9]];
+        const jerkCount = carryingOrbs > 0 ? 8 : 5;
+        const jerksMarkup = JERK_SPOTS.slice(0, jerkCount).map(([l, t, h, d]) => `<img class="jerk" src="${jerkImg}" alt="" style="left:${l}%;top:${t}px;height:${h}px;animation-delay:${d}s" loading="lazy" decoding="async">`).join('');
+        const huntMarkup = `
+          <div class="fog${carryingOrbs > 0 ? ' carrying' : ''}">
+            ${jerksMarkup}
+            ${carryingOrbs > 0 ? `<p class="carry-banner">You're carrying ${carryingOrbs} orb${carryingOrbs === 1 ? '' : 's'} — bring them to Nuppi!<span class="jp-line jp" style="color:inherit">オーブを はこんでいる！ ヌーピーの ところへ もどろう。</span></p>` : ''}
+            <ul class="hunt-row">
+              ${ghosts.map(ghost => {
+                const found = weeklyGhostsFound[ghost.id] === true;
+                return `<li class="hunt-ghost${found ? ' found' : ''}"><span class="tag">${found ? 'つかまえた!' : '?'}</span><img src="${esc(ghost.img)}" alt="${esc(ghost.name)}${found ? ', caught this week' : ', still hiding'}" height="92" loading="lazy" decoding="async">${esc(ghost.name)}</li>`;
+              }).join('')}
+            </ul>
+          </div>`;
+
+        // ── jar
+        const jarFull = weeklyOrbs >= JAR_SLOTS.length;
+        const jarMarkup = `
+          <div class="jar-card">
+            <div class="jar">
+              <img src="assets/img/muenba/ghost-orb-jar-v1.webp" alt="" width="480" height="672" decoding="async">
+              <svg viewBox="0 0 300 420" role="img" aria-label="${weeklyOrbs} orb${weeklyOrbs === 1 ? '' : 's'} in the jar this week">
+                <defs>
+                  <radialGradient id="orbg" cx="40%" cy="35%" r="65%"><stop offset="0%" stop-color="#f2fff6"></stop><stop offset="45%" stop-color="#8cffb4"></stop><stop offset="100%" stop-color="#1f8a55"></stop></radialGradient>
+                  <filter id="orbglow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5" result="b"></feGaussianBlur><feMerge><feMergeNode in="b"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+                </defs>
+                <g filter="url(#orbglow)">${jarOrbs(weeklyOrbs)}</g>
+              </svg>
+            </div>
+            <div>
+              <div class="jar-count">${weeklyOrbs}</div>
+              <div class="jar-label">orbs returned to Nuppi this week<span class="jp-line jp">こんしゅう ヌーピーに かえした オーブ${jarFull ? '（びんが いっぱい！）' : ''}</span></div>
+              <div class="jar-rows">
+                <span class="jar-row"><span>Caught this week<span class="jp">つかまえた</span></span><b>${weeklyFoundCount}</b></span>
+                ${carryingOrbs > 0 ? `<span class="jar-row warn"><span>Carrying now<span class="jp">はこんでいる</span></span><b>${carryingOrbs}</b></span>` : ''}
+              </div>
+            </div>
+          </div>`;
+
+        const jerkCard = jerk ? `
+          <article class="jerk-card" aria-label="Jerks: danger, cannot be caught">
+            <div class="jerk-top"><span class="jerk-badge">DANGER<span class="jp"> · きけん</span></span><span class="jerk-name" style="font-size:14px;color:var(--danger-soft)">×5 〜 ×8</span></div>
+            <div class="jerk-crowd" aria-hidden="true">${[[70, -8, 0], [86, 4, .6], [106, 0, 1.2], [86, -4, 1.8], [70, 8, 2.4]].map(([h, r, d]) => `<img src="${jerkImg}" alt="" height="${h}" style="height:${h}px;transform:rotate(${r}deg);animation-delay:${d}s" loading="lazy" decoding="async">`).join('')}</div>
+            <span class="jerk-name">Jerks <small class="jp">${esc(jerk.kana || '')}</small></span>
+            <span style="font-size:13px;line-height:1.5">${esc(jerk.personality || '')}<span class="jp-line jp">${jerk.personalityJp || ''}</span></span>
+            <div class="jerk-counts">
+              <span><b>5</b>in the fog<span class="jp-line jp">さがしている とき</span></span>
+              <span><b>8</b>on the way home<span class="jp-line jp">オーブを はこぶ とき</span></span>
+            </div>
+            <span style="font-size:12px;color:#ffd6e3">Can't be caught<span class="jp"> · つかまえられない</span></span>
+          </article>` : '';
 
         host.innerHTML = `
           ${difficultyMarkup()}
 
           <section class="weekly-hunt" aria-labelledby="weekly-hunt-heading">
-            <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Hunt</h2><span>Fresh every Sunday<small><ruby>毎週日曜日<rt>まいしゅうにちようび</rt></ruby>にリセット</small></span></div>
-            <p class="weekly-hunt-copy">Weekly hunt; lifetime memory stays saved.<small>今週の<ruby>探索<rt>たんさく</rt></ruby>は<ruby>毎週日曜日<rt>まいしゅうにちようび</rt></ruby>にリセットされ、<ruby>記憶<rt>きおく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
+            <div class="sec-head"><div><span class="kick">THIS WEEK'S HUNT · Fresh every Sunday</span><h2 class="h2" id="weekly-hunt-heading">こんしゅうの ゴースト</h2></div><span class="sec-num">${weeklyFoundCount}<small> / ${ghosts.length}</small></span></div>
+            ${huntMarkup}
             <div class="weekly-hunt-progress"><progress max="${Math.max(ghosts.length, 1)}" value="${weeklyFoundCount}" aria-label="${weeklyFoundCount} of ${ghosts.length} ghosts found this week"></progress><span class="weekly-hunt-count">${weeklyFoundCount} / ${ghosts.length}</span></div>
-            <p class="weekly-hunt-legend">${weeklyRemainingCount ? `${weeklyRemainingCount} ghost${weeklyRemainingCount === 1 ? '' : 's'} available to find again this week.` : 'All ghosts found this week.'}<small>${weeklyRemainingCount ? `今週はあと${weeklyRemainingCount}<ruby>体<rt>たい</rt></ruby>の<ruby>幽霊<rt>ゆうれい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>せます。` : '今週の<ruby>幽霊<rt>ゆうれい</rt></ruby>は<ruby>全部<rt>ぜんぶ</rt></ruby>見つけました。'}</small></p>
+            <p class="weekly-hunt-legend">${weeklyRemainingCount ? `${weeklyRemainingCount} ghost${weeklyRemainingCount === 1 ? '' : 's'} still hiding this week.` : 'All ghosts found this week!'}<span class="jp-line jp">${weeklyRemainingCount ? `あと ${weeklyRemainingCount}たい きりの なかに かくれている。` : 'こんしゅうの ゴーストは ぜんぶ みつけた！'}</span><span class="jerks">Jerks: 5 in the fog · 8 on the way home with orbs</span></p>
+            <p class="weekly-hunt-copy">Weekly hunt; lifetime memory stays saved.</p>
           </section>
 
-          <section class="stats" aria-label="Muenba totals">
-            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Captures<small><ruby>捕獲<rt>ほかく</rt></ruby></small></div></div>
-            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs<small>オーブ</small></div></div>
-            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Cases<small><ruby>事件<rt>じけん</rt></ruby></small></div></div>
-            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms<small><ruby>部屋<rt>へや</rt></ruby></small></div></div>
+          <section class="section" aria-labelledby="jar-title">
+            <div class="sec-head"><div><span class="kick">ENERGY ORBS · THIS WEEK</span><h2 class="h2" id="jar-title">オーブの びん</h2></div></div>
+            ${jarMarkup}
+            <p class="note">The jar starts empty every Sunday.<span class="jp-line jp">びんは まいしゅう にちようびに からっぽに なるよ。</span></p>
           </section>
 
-          <section class="section">
-            <div class="section-heading"><h2>The Ghosts</h2><p>Weekly hunt · lifetime memory<br><ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>探索<rt>たんさく</rt></ruby>・<ruby>記憶<rt>きおく</rt></ruby></p></div>
+          <section class="section" aria-labelledby="guide-title">
+            <div class="sec-head"><div><span class="kick">GHOST FIELD GUIDE</span><h2 class="h2" id="guide-title">ゴースト ずかん</h2></div><span class="sec-num">${solvedAtCurrent}<small> / ${ghosts.length}</small></span></div>
             <div class="ghost-grid">${ghostCards || '<p class="journal-empty">The ledger is quiet.</p>'}</div>
+            ${jerkCard}
+            <p class="note">S · C · D = case solved at はじめ · ケース · ふかい</p>
           </section>
 
-          <section class="section">
-            <div class="section-heading"><h2>Case Records</h2><p><ruby>事件<rt>じけん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></p></div>
+          <section class="section" aria-labelledby="cases-title">
+            <div class="sec-head"><div><span class="kick">CASE BOARD · Case Records</span><h2 class="h2" id="cases-title">じけんファイル</h2></div><span class="sec-num">${solvedAtCurrent}<small> / ${caseOrder.length}</small></span></div>
             ${caseRecordMarkup}
           </section>
 
-          <section class="section lower-grid">
-            <div class="panel"><div class="section-heading"><h2>Hunt Journal</h2><p><ruby>探索<rt>たんさく</rt></ruby>ノート</p></div>${journalMarkup}</div>
-            <div class="panel"><div class="section-heading"><h2>Energy Orbs</h2><p>エネルギー</p></div><div class="orb-count">${orbs}</div><div class="orb-label">orbs returned to Nuppi<small>ヌーピーに<ruby>返<rt>かえ</rt></ruby>したオーブ</small></div><p class="orb-note">Every ghost you catch leaves a trail of these behind — bring them all back before the trail goes cold.<small>幽霊を<ruby>捕<rt>つか</rt></ruby>まえるとオーブが<ruby>残<rt>のこ</rt></ruby>ります。<ruby>消<rt>き</rt></ruby>える<ruby>前<rt>まえ</rt></ruby>に<ruby>全部<rt>ぜんぶ</rt></ruby>ヌーピーへ<ruby>届<rt>とど</rt></ruby>けましょう。</small></p></div>
-          </section>`;
+          <section class="section" aria-labelledby="journal-title">
+            <div class="sec-head"><div><span class="kick">HUNT JOURNAL</span><h2 class="h2" id="journal-title">つかまえた きろく</h2></div></div>
+            ${journalMarkup}
+          </section>
+
+          <section class="stats" aria-label="Muenba all-time ledger">
+            <div class="stat"><div class="stat-value">${totalCaptures}</div><div class="stat-label">Captures<small>つかまえた</small></div></div>
+            <div class="stat"><div class="stat-value">${orbs}</div><div class="stat-label">Orbs<small>オーブ</small></div></div>
+            <div class="stat"><div class="stat-value">${caseSettles}</div><div class="stat-label">Cases<small>じけん</small></div></div>
+            <div class="stat"><div class="stat-value">${rooms}</div><div class="stat-label">Rooms<small>へや</small></div></div>
+          </section>
+          <p class="note" style="margin-top:-24px">ALL-TIME LEDGER<span class="jp"> · これまでの ぜんぶ</span></p>`;
 
         host.querySelectorAll('[data-muenba-difficulty]').forEach(button => {
           button.addEventListener('click', () => setReadingDifficulty(button.dataset.muenbaDifficulty));
         });
+        host.querySelectorAll('.case-record-review').forEach(review => {
+          const help = review.querySelector('.kw-help');
+          review.querySelectorAll('[data-kw]').forEach(button => {
+            button.addEventListener('click', () => {
+              const word = button.dataset.kw;
+              const info = KW_HELP[word];
+              if (!info || !help) return;
+              help.innerHTML = `<b>${esc(word)}</b><span>${esc(info.en)}<span class="jp-line jp">${esc(info.jp)}</span></span>`;
+              review.querySelectorAll('[data-kw]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+            });
+          });
+        });
+        syncJpToggle();
       }
 
       function boot() {
@@ -593,6 +773,12 @@
     })();
   </script>
   <script>
+    // Utsuroba opens with the weekly world gate, like Muenba and Grimmerglen.
+    if (window.BoohaPortals) BoohaPortals.watch('pnet-utsuroba', function () {
+      return window.BoohaUnlockSystem && BoohaUnlockSystem.isWeeklyWorldGateOpen();
+    });
+  </script>
+  <script>
     // Grimmerglen follows the same weekly world gate as the other areas.
     (function () {
       var tab = document.getElementById('pnet-grimmerglen');
@@ -604,7 +790,8 @@
             typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' &&
             BoohaUnlockSystem.isWeeklyWorldGateOpen());
         } catch (_) {}
-        tab.hidden = !open;
+        if (window.BoohaPortals) BoohaPortals.setLocked(tab, !open);
+        else tab.hidden = !open;
       }
       if (window.BOOHA_READY) renderGrimmerglenTab();
       else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });

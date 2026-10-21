@@ -1211,6 +1211,7 @@
     if (world.activeHuntGhostId === undefined) world.activeHuntGhostId = null;
     world.activeCaseRecoveryDone = world.activeCaseRecoveryDone === true;
     if (!Number.isFinite(world.orbsPending) || world.orbsPending < 0) world.orbsPending = 0;
+    if (!Number.isFinite(world.orbsReturned) || world.orbsReturned < 0) world.orbsReturned = 0;
     world.huntAccepted = world.huntAccepted === true;
     return world;
   }
@@ -4859,6 +4860,8 @@
     }
     const collected = Number.isInteger(mu.orbsCollected) ? mu.orbsCollected : 0;
     mu.orbsCollected = collected + pending;
+    // This week's jar on the profile (resets with the weekly bucket).
+    weekly.orbsReturned = (Number.isFinite(weekly.orbsReturned) ? weekly.orbsReturned : 0) + pending;
     weekly.orbsPending = 0;
     if (!writeSave(d)) {
       state.handoffResolving = false;

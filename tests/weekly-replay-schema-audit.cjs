@@ -87,7 +87,7 @@ assert.strictEqual(migrated.version, 3);
 assert.deepStrictEqual(plain(migrated.weekly.worlds), {
   occurrenceKey: '',
   utsuroba: { drifterQuest: null, drifters: {}, readingChallenge: null },
-  muenba: { ghostsFound: {}, huntGhostOrder: [], activeCaseId: null, activeHuntGhostId: null, activeCaseRecoveryDone: false, orbsPending: 0, huntAccepted: false },
+  muenba: { ghostsFound: {}, huntGhostOrder: [], activeCaseId: null, activeHuntGhostId: null, activeCaseRecoveryDone: false, orbsPending: 0, orbsReturned: 0, huntAccepted: false },
   grimmerglen: {
     objects: {},
     objectSlots: {},
@@ -116,6 +116,7 @@ assert.deepStrictEqual(plain(migrated.weekly.worlds), {
 
 save.save(migrated);
 stored.muenba.orbsPending = 5;
+stored.weekly.worlds.muenba.orbsReturned = 12; // this week's jar must empty at rollover
 stored.muenba.caseProgress = { completedCaseIds: ['case-1'], activeCaseId: 'case-2' };
 stored.grimmerglen.activeTargetType = 'banner';
 stored.grimmerglen.carriedObjectId = 'banner-1';
@@ -136,6 +137,7 @@ assert.deepStrictEqual(plain(stored.weekly.worlds.muenba), {
   activeHuntGhostId: null,
   activeCaseRecoveryDone: false,
   orbsPending: 0,
+  orbsReturned: 0,
   huntAccepted: false,
 });
 assert.deepStrictEqual(plain(stored.weekly.worlds.grimmerglen), {
