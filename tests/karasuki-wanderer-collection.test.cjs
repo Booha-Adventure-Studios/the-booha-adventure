@@ -4,6 +4,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const dataSource = fs.readFileSync(path.join(ROOT, 'js/karasuki-wanderer-data.js'), 'utf8');
@@ -17,8 +18,11 @@ const expectedNames = [
   'Mikachan', 'Kara Ageha', 'Jinguru Kan', 'Oboteruyo', 'Mimasayuki', 'Mouhitome', 'Yūkan', 'Chillicothe', 'Shoganai',
 ];
 
-const objectSource = dataSource.replace(/^\/\*[\s\S]*?\*\/\s*/, '').replace(/^window\.KARASUKI_WANDERER_DATA\s*=\s*/, '').replace(/;\s*$/, '');
-const data = Function(`"use strict"; return (${objectSource});`)();
+const dataSandbox = { window: {}, console };
+dataSandbox.window = dataSandbox;
+vm.createContext(dataSandbox);
+vm.runInContext(dataSource, dataSandbox);
+const data = dataSandbox.KARASUKI_WANDERER_DATA;
 
 assert.deepStrictEqual(Object.keys(data), expectedNames, 'collection data should follow the 36-wanderer order');
 for (const name of expectedNames) {
@@ -26,6 +30,7 @@ for (const name of expectedNames) {
   assert.ok(entry && entry.id, `${name} should have a stable collection id`);
   assert.ok(entry.en && entry.jp, `${name} should have English and Japanese comments`);
   assert.ok(entry.furigana && typeof entry.furigana === 'object', `${name} should have a furigana map`);
+  assert.ok(['friendly', 'mischievous', 'dangerous'].includes(entry.kind), `${name} should have a valid collection kind`);
 }
 
 assert.match(saveSource, /collection:\s*\{[\s\S]*?wanderers:\s*\{\}/,

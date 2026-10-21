@@ -12,7 +12,14 @@ const ROOT = path.resolve(__dirname, '..');
 const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 /* ── level-stars.js ────────────────────────────────────────────── */
-const L = require(path.join(ROOT, 'js/core/level-stars.js'));
+// The project is ESM by package scope, while these browser files are loaded
+// as classic scripts in HTML. Execute the file in a browser-like VM so the
+// test exercises the same global contract as profile.html.
+const levelSandbox = { console };
+levelSandbox.window = levelSandbox;
+vm.createContext(levelSandbox);
+vm.runInContext(read('js/core/level-stars.js'), levelSandbox);
+const L = levelSandbox.BoohaLevelStars;
 const starsFor = (saveId, pct) => (pct >= 90 ? 3 : pct >= 70 ? 2 : pct >= 40 ? 1 : 0);
 
 assert.deepStrictEqual([...L.LEVELS], [0, 40, 120, 240, 400, 600, 850, 1150, 1500],
@@ -32,7 +39,7 @@ const week = {
 };
 const w = L.weekStars(week, 'br', ids, starsFor);
 assert.deepStrictEqual(w.stars, [3, 2, 1, 2, null], 'maze stars come from each best weekly pct');
-assert.deepStrictEqual(w.links, [true, false, false, false],
+assert.deepStrictEqual(Array.from(w.links), [true, false, false, false],
   'a link lights only when both neighbours have two or more stars');
 assert.strictEqual(w.linkStars, 1, 'each lit link is worth one star');
 assert.strictEqual(w.blitzCount, 2, 'only Blitz clears with a time count (legacy numbers included)');
@@ -46,8 +53,12 @@ const checkIn = {
 assert.strictEqual(L.dailyDoneCount(checkIn), 3, 'skipped days never earn Daily Check stars');
 assert.strictEqual(L.dailyDoneInWeek(checkIn, '2026-10-18'), 2, 'weekly Daily Check count stays inside its Sunday week');
 const life = L.lifetime({ w1: week, w2: { adv: { 'br:a': 90 } } }, checkIn, { br: ids, bc: ids, pb: [] }, starsFor);
-assert.deepStrictEqual(life, { maze: 8 + 3 + 3, links: 1, blitz: 6, daily: 6, total: 27 },
+assert.deepStrictEqual({ ...life }, { maze: 8 + 3 + 3, links: 1, blitz: 6, daily: 6, total: 27 },
   'lifetime stars add every recorded week and curriculum plus 2 per Daily Check');
+assert.strictEqual(
+  L.weekTotalAllCurricula(week, checkIn, '2026-10-18', { pb: [], br: ids, bc: ids }, starsFor),
+  8 + 1 + 6 + 3 + 4,
+  'level-before math includes all curricula recorded in the current week');
 
 /* ── profile-game.js categories ────────────────────────────────── */
 const sandbox = {
@@ -59,14 +70,19 @@ sandbox.window = sandbox;
 vm.createContext(sandbox);
 vm.runInContext(read('js/karasuki-wanderer-data.js'), sandbox);
 vm.runInContext(read('js/ui/profile-game.js'), sandbox);
-const kinds = sandbox.BoohaProfileGame._test.WANDERER_KIND;
 const wandererIds = Object.values(sandbox.KARASUKI_WANDERER_DATA).map(item => item.id);
-Object.keys(kinds).forEach(id => assert(wandererIds.includes(id), `category id must be a real wanderer: ${id}`));
-const count = kind => wandererIds.filter(id => (kinds[id] || 'friendly') === kind).length;
+const records = Object.values(sandbox.KARASUKI_WANDERER_DATA);
+const count = kind => records.filter(item => item.kind === kind).length;
 assert.strictEqual(count('dangerous'), 7, 'seven wanderers are dangerous');
 assert.strictEqual(count('mischievous'), 9, 'nine wanderers are mischievous');
 assert.strictEqual(count('friendly'), wandererIds.length - 16, 'everyone else is friendly');
-assert.strictEqual(kinds.gorogui, 'dangerous', 'Gorogui keeps its canonical id');
+assert(records.every(item => ['friendly', 'mischievous', 'dangerous'].includes(item.kind)), 'every wanderer has a valid collection kind');
+assert.strictEqual(sandbox.BoohaProfileGame._test.kindFor({ kind: 'unknown' }), 'friendly', 'unknown kinds fail soft to friendly');
+assert.strictEqual(records.find(item => item.id === 'gorogui').kind, 'dangerous', 'Gorogui keeps its canonical kind');
+assert.strictEqual(
+  sandbox.BoohaProfileGame._test.sealedKey({ keys: { week: '2026-10-18|october-w3' }, curr: 'br' }),
+  sandbox.BoohaProfileGame._test.sealedKey({ keys: { week: '2026-10-18|october-w3' }, curr: 'bc' }),
+  'week sealed celebration should be shown once per week, not once per curriculum');
 
 /* ── traveler-record.js ────────────────────────────────────────── */
 let stored = { collection: { wanderers: {} } };

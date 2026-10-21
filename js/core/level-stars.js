@@ -130,9 +130,24 @@ const BoohaLevelStars = (() => {
     return out;
   }
 
+  /**
+   * All derived stars earned during one current week, across curricula.
+   * This is used only to calculate the level before the week's progress;
+   * the profile's visible weekly breakdown remains curriculum-specific.
+   */
+  function weekTotalAllCurricula(week, checkIn, weekStart, gamesByCurr, starsFor) {
+    let total = 0;
+    CURRICULA.forEach(curr => {
+      const ids = gamesByCurr && Array.isArray(gamesByCurr[curr]) ? gamesByCurr[curr] : [];
+      if (ids.length) total += weekStars(week, curr, ids, starsFor).total;
+    });
+    total += dailyDoneInWeek(checkIn, weekStart) * RULES.daily;
+    return total;
+  }
+
   return Object.freeze({
     LEVELS, RULES, BLITZ_TYPES,
-    levelFor, weekStars, lifetime, dailyDoneCount, dailyDoneInWeek,
+    levelFor, weekStars, lifetime, weekTotalAllCurricula, dailyDoneCount, dailyDoneInWeek,
   });
 })();
 
