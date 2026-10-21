@@ -39,6 +39,7 @@ const BoohaWeeklyMedals = (() => {
   ]);
   const DEFAULT_THRESHOLDS = Object.freeze([40, 70, 90]);
   const CURRICULA = Object.freeze(['pb', 'br', 'bc']);
+  const BLITZ_TYPES = Object.freeze(['vocab', 'sentence', 'question']);
   const DAY_MS = 86400000;
 
   function isObject(value) {
@@ -63,14 +64,16 @@ const BoohaWeeklyMedals = (() => {
     return Number.isFinite(ms) ? ms : null;
   }
 
+  function perfectBlitzResult(value) {
+    // Legacy numeric stamps were written only by record-eligible clears and
+    // are therefore treated as perfect for the all-perfect weekly medal.
+    if (typeof value === 'number') return Number.isFinite(value);
+    return isObject(value) && Number.isFinite(value.ms) && value.tier === 'perfect';
+  }
+
   function blitzPerfect(week) {
     const blitz = isObject(week && week.blitz) ? week.blitz : {};
-    return Object.keys(blitz).some(key => {
-      const v = blitz[key];
-      // Legacy numeric stamps were written only by record-eligible clears.
-      if (typeof v === 'number') return Number.isFinite(v);
-      return isObject(v) && Number.isFinite(v.ms) && v.tier === 'perfect';
-    });
+    return CURRICULA.some(curr => BLITZ_TYPES.every(type => perfectBlitzResult(blitz[`${curr}:${type}`])));
   }
 
   /**

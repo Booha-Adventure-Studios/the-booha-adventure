@@ -6,11 +6,25 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
-const L = require(path.join(ROOT, 'js/core/level-stars.js'));
-const W = require(path.join(ROOT, 'js/core/weekly-medals.js'));
+
+// These browser files are classic scripts loaded by HTML. The repository is
+// ESM-scoped, so CommonJS require() does not expose their browser globals.
+// Run them in browser-like VM contexts and use the same globals the pages use.
+const levelSandbox = { console, module: { exports: {} } };
+levelSandbox.window = levelSandbox;
+vm.createContext(levelSandbox);
+vm.runInContext(read('js/core/level-stars.js'), levelSandbox, { filename: 'level-stars.js' });
+const L = levelSandbox.BoohaLevelStars;
+
+const medalSandbox = { console, module: { exports: {} } };
+medalSandbox.window = medalSandbox;
+vm.createContext(medalSandbox);
+vm.runInContext(read('js/core/weekly-medals.js'), medalSandbox, { filename: 'weekly-medals.js' });
+const W = medalSandbox.BoohaWeeklyMedals;
 
 const IDS = ['ask_question', 'say_sentence', 'say_word', 'sentence_order', 'sentence_speed', 'sentence_tap', 'spell_word', 'vocab_speed', 'vocab_tap'];
 const gamesByCurr = { pb: IDS, br: IDS, bc: IDS };
@@ -19,7 +33,7 @@ const byId = rows => Object.fromEntries(rows.map(r => [r.id, r]));
 
 /* ── tiers ─────────────────────────────────────────────────────── */
 assert.strictEqual(W.MEDALS.length, 8, 'there are eight weekly medals');
-assert.deepStrictEqual(W.MEDALS.map(m => m.tier).reduce((t, x) => (t[x] = (t[x] || 0) + 1, t), {}),
+assert.deepStrictEqual(Array.from(W.MEDALS, m => m.tier).reduce((t, x) => (t[x] = (t[x] || 0) + 1, t), {}),
   { bronze: 2, silver: 3, gold: 3 }, 'two bronze, three silver and three gold medals');
 assert.strictEqual(W.bonusFor('warm_up'), 3, 'bronze is +3 stars');
 assert.strictEqual(W.bonusFor('arcade_open'), 5, 'silver is +5 stars');
@@ -34,7 +48,13 @@ const week = {
   adv: Object.assign(
     adv('br', [95, 95, 95, 95, 95, 80, null, null, null]),   // 5 played at ★★+, 4 links
     adv('bc', [75, 75, 75, 75, null, null, null, null, null])),
-  blitz: { 'br:vocab': { ms: 40000, tier: 'clean' }, 'bc:sentence': 39000, 'bc:question': { ms: 1, tier: 'clean' } },
+  blitz: {
+    'br:vocab': { ms: 40000, tier: 'perfect' },
+    'br:sentence': 39000,
+    'br:question': 38000,
+    'bc:sentence': 39000,
+    'bc:question': { ms: 1, tier: 'clean' },
+  },
 };
 const checkIn = {};
 for (let i = 0; i < 7; i++) checkIn[new Date(startMs + 9 * 3600000 + i * 86400000).toISOString().slice(0, 10)] = { st: 'done' };
@@ -48,8 +68,11 @@ const rows = byId(W.progress({ week, checkIn, weekStart, wanderers, gamesByCurr,
 assert.deepStrictEqual([rows.warm_up.n, rows.warm_up.earned], [3, true], 'warm up caps at its goal and is earned');
 assert.strictEqual(rows.arcade_open.n, 6, 'arcade progress uses the best curriculum, not BR + BC together');
 assert.strictEqual(rows.link_master.n, 5, 'link progress uses the best curriculum');
-assert.strictEqual(rows.blitz_triple.n, 2, 'Blitz Triple needs three clears in one curriculum');
-assert.strictEqual(rows.blitz_perfect.earned, true, 'a legacy numeric Blitz stamp counts as a perfect clear');
+assert.strictEqual(rows.blitz_triple.n, 3, 'Blitz Triple needs three clears in one curriculum');
+assert.strictEqual(rows.blitz_perfect.earned, true, 'Blitz Perfect needs all three Blitz clears perfect in one curriculum');
+const notPerfectWeek = { ...week, blitz: { ...week.blitz, 'br:question': { ms: 38000, tier: 'clean' } } };
+assert.strictEqual(byId(W.progress({ week: notPerfectWeek, checkIn, weekStart, wanderers, gamesByCurr, L })).blitz_perfect.earned, false,
+  'a clean result must not complete the all-perfect Blitz medal');
 assert.strictEqual(rows.lantern_week.earned, true, 'seven Daily Checks earn Lantern Week');
 assert.strictEqual(rows.wanderer_week.n, 2, 'only wanderers met inside the Tokyo Sunday week count');
 assert.strictEqual(rows.perfect_week.n, 5, 'perfect week counts three-star games');
@@ -75,26 +98,26 @@ let stored = {
   collection: { wanderers: {} },
 };
 const events = [];
-global.window = {
-  CALENDAR: {
+medalSandbox.document = { dispatchEvent: e => events.push(e) };
+medalSandbox.CustomEvent = class { constructor(type, init) { this.type = type; this.detail = init && init.detail; } };
+medalSandbox.window.CALENDAR = {
     getCurrentCurriculumWeek: () => ({ weekStart, occurrenceKey: '2026-10-18|october-w3' }),
     getCurriculumWeekOccurrenceKey: cw => cw.occurrenceKey,
-  },
-  BoohaAdventure: { save: { load: () => JSON.parse(JSON.stringify(stored)), save: d => { stored = d; return true; } } },
-  BoohaLevelStars: L,
-};
-global.document = { dispatchEvent: e => events.push(e) };
-global.CustomEvent = class { constructor(type, init) { this.type = type; this.detail = init && init.detail; } };
+  };
+medalSandbox.window.BoohaAdventure = { save: { load: () => JSON.parse(JSON.stringify(stored)), save: d => { stored = d; return true; } } };
+medalSandbox.window.BoohaLevelStars = L;
+/* Keep the browser globals above on the VM context, where the loaded script
+ * resolves `window`, `document`, and `CustomEvent`. */
 
 const first = W.sync();
-assert.deepStrictEqual(first.map(m => m.id), ['warm_up'], 'only medals earned in the current week are recorded');
+assert.deepStrictEqual(Array.from(first, m => m.id), ['warm_up'], 'only medals earned in the current week are recorded');
 assert.deepStrictEqual(Object.keys(stored.meta.medalLog), ['2026-10-18|october-w3'],
   'fresh start: past weeks are never back-filled');
 assert.strictEqual(events[0].type, 'booha:medalEarned', 'a newly recorded medal is announced');
-assert.deepStrictEqual(W.sync(), [], 'a medal is recorded only once per week');
-assert.deepStrictEqual(W.pendingPopups().map(m => m.id), ['warm_up'], 'the new medal waits for its popup');
+assert.deepStrictEqual(Array.from(W.sync()), [], 'a medal is recorded only once per week');
+assert.deepStrictEqual(Array.from(W.pendingPopups(), m => m.id), ['warm_up'], 'the new medal waits for its popup');
 W.markShown(['warm_up']);
-assert.deepStrictEqual(W.pendingPopups(), [], 'a medal pops up exactly once');
+assert.deepStrictEqual(Array.from(W.pendingPopups()), [], 'a medal pops up exactly once');
 assert.strictEqual(W.unseenCount(), 1, 'the hub badge counts medals not yet seen on the profile');
 W.markSeen();
 assert.strictEqual(W.unseenCount(), 0, 'opening the profile clears the hub badge');
@@ -102,9 +125,6 @@ const snap = W.snapshot();
 assert.strictEqual(snap.medalStars, 3, 'the bronze medal adds three bonus stars');
 assert.strictEqual(snap.lifetimeStars, L.lifetime(stored.meta.weekLog, {}, gamesByCurr, (id, p) => p >= 90 ? 3 : p >= 70 ? 2 : p >= 40 ? 1 : 0).total + 3,
   'medal bonus stars count toward the level');
-delete global.window;
-delete global.document;
-delete global.CustomEvent;
 
 /* ── wiring ────────────────────────────────────────────────────── */
 ['index.html', 'maze.html', 'game.html', 'profile.html'].forEach(page => {
@@ -119,5 +139,8 @@ const toast = read('js/ui/medal-toast.js');
 assert.match(toast, /blitz-active/, 'popups must wait while a Blitz run is active');
 assert.match(toast, /dc-result-score/, 'popups must wait until Daily Check shows its result');
 assert.match(toast, /Fresh start/, 'the first visit records the current level without a level-up popup');
+assert.match(toast, /queuedMedalKeys/, 'popup queue must reserve medals before they are displayed');
+assert.match(toast, /if \(queuedMedalKeys\.has\(medalKey\)\) return/, 'already queued medals must be skipped');
+assert.match(toast, /queuedMedalKeys\.add\(medalKey\)/, 'new queued medals must be reserved immediately');
 
 console.log('Weekly medals test passed: rules, best curriculum, fresh start, single popups, bonus stars, wiring.');
