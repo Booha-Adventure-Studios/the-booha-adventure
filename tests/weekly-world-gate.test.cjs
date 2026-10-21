@@ -91,8 +91,10 @@ assert.doesNotMatch(profileSource, /id="world-door-(karasuki|utsuroba|muenba)"/,
   'Output profile should keep world navigation in the top profile network');
 assert.match(profileSource, /class="profile-network"/, 
   'Output profile must keep its compact profile navigation');
-assert.match(profileSource, /id="pnet-muenba" hidden/,
-  'Output profile must keep Muenba gated in the top profile network');
+assert.match(profileSource, /id="pnet-muenba" class="is-locked" aria-disabled="true"/,
+  'Output profile must keep Muenba gated (shown locked) in the top profile network');
+assert.match(profileSource, /BoohaPortals\.setLocked\(muenbaTab, !open\)/,
+  'Output profile must unlock the Muenba portal only after its gate opens');
 assert.doesNotMatch(profileSource, /href="juku\.html"/, 
   'Output world doors must not add a Juku route');
 assert.match(profileSource, /booha:weeklyReset/,
