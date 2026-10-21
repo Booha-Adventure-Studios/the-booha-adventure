@@ -37,17 +37,20 @@ assert.match(read('js/ui/world-portals.js'), /function watch\(id, check\)/, 'wor
 // ── Teacher switch ─────────────────────────────────────────────────────────
 const unlock = read('js/core/unlock-system.js');
 assert.match(unlock, /'booha_dev_worlds'/, 'the teacher switch must use the booha_dev_worlds key');
-assert.match(unlock, /window\.__devUtsuroba = true;[\s\S]*window\.__devMuenba = true;[\s\S]*window\.__devGrimmerglen = true;/, 'the switch must open all three worlds');
+assert.match(unlock, /if \(enabled\) \{[\s\S]*?window\.__devUtsuroba = true;[\s\S]*?window\.__devMuenba = true;[\s\S]*?window\.__devGrimmerglen = true;/, 'the switch must open all three worlds');
 assert.match(unlock, /DEV · WORLDS OPEN/, 'the switch must show a visible reminder tag');
+assert.match(unlock, /booha:devWorldsChanged/, 'the teacher switch must refresh live without a reload');
 assert.match(read('js/karasuki.js'), /const keepWorlds = window\.__devWorldsSwitch === true;/, 'the Karasuki dev panel must not undo the switch');
 
 // ── Utsuroba vocabulary: 8 words per memory per level ─────────────────────
 const index = JSON.parse(read('content/utsuroba/episodes/index.json'));
+let vocabularyTotal = 0;
 for (const entry of index.episodes) {
   const episode = JSON.parse(read(`content/utsuroba/episodes/${entry.file}`));
   for (const [tier, block] of [['deep', episode], ['fresh', episode.fresh], ['start', episode.start]]) {
     if (!block || !Array.isArray(block.vocabulary)) continue;
     assert.strictEqual(block.vocabulary.length, 8, `${entry.id} ${tier}: 8 vocabulary words fill the Word Cabinet`);
+    vocabularyTotal += block.vocabulary.length;
     const words = new Set();
     block.vocabulary.forEach(item => {
       assert.ok(item.word && item.definition && item.definitionJP, `${entry.id} ${tier}: ${item.word} needs English and Japanese help`);
@@ -56,6 +59,7 @@ for (const entry of index.episodes) {
     });
   }
 }
+assert.strictEqual(vocabularyTotal, 144, 'the six memories contain 144 vocabulary entries across three levels');
 
 // ── Adventure follow-ups ──────────────────────────────────────────────────
 const atlas = read('js/ui/adventure-collection.js');

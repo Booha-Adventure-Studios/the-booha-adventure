@@ -895,6 +895,7 @@
         document.addEventListener('booha:saved', render);
         document.addEventListener('booha:weeklyReset', render);
         document.addEventListener('booha:newWeek', render);
+        document.addEventListener('booha:devWorldsChanged', render);
       }
 
       if (window.BOOHA_READY) boot();
@@ -922,6 +923,7 @@
       document.addEventListener('booha:saved', renderMuenbaTab);
       document.addEventListener('booha:weeklyReset', renderMuenbaTab);
       document.addEventListener('booha:newWeek', renderMuenbaTab);
+      document.addEventListener('booha:devWorldsChanged', renderMuenbaTab);
     })();
   </script>
   <script>
@@ -944,6 +946,7 @@
       document.addEventListener('booha:saved', renderGrimmerglenTab);
       document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
       document.addEventListener('booha:newWeek', renderGrimmerglenTab);
+      document.addEventListener('booha:devWorldsChanged', renderGrimmerglenTab);
     })();
   </script>
 </body>

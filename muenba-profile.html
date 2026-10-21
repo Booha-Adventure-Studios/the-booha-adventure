@@ -579,8 +579,8 @@
                   : (caseData[currentMemory] || caseData.fresh);
                 const settledModeLabel = isCompleted ? 'All memory modes' : memoryModeLabel(currentMemory);
                 const resolution = settledMode?.resolution || 'This case memory is settled.';
-                const reviewLabel = isCompleted ? 'Review all clues' : 'Review clues';
-                const reviewJp = isCompleted ? 'すべての てがかり' : 'てがかりを みる';
+                const reviewLabel = 'Review clues';
+                const reviewJp = 'てがかりを みる';
                 const solvedModes = memoryModes.filter(mode => modeComplete(record, mode)).map(mode => `${memoryModeShort[mode]} ✓`).join(' · ');
                 return `<article class="case-record-card is-settled">
                   ${num}
@@ -766,6 +766,7 @@
         document.addEventListener('booha:saved', render);
         document.addEventListener('booha:weeklyReset', render);
         document.addEventListener('booha:newWeek', render);
+        document.addEventListener('booha:devWorldsChanged', render);
       }
 
       if (window.BOOHA_READY) boot();
@@ -798,6 +799,7 @@
       document.addEventListener('booha:saved', renderGrimmerglenTab);
       document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
       document.addEventListener('booha:newWeek', renderGrimmerglenTab);
+      document.addEventListener('booha:devWorldsChanged', renderGrimmerglenTab);
     })();
   </script>
 </body>
