@@ -10,7 +10,10 @@
     {"word":"straighten","definition":"to make something neat or in order","definitionJP":"きちんと整えること"},
     {"word":"wave","definition":"to move your hand to say hello or goodbye","definitionJP":"挨拶やさよならで手を振ること"},
     {"word":"wait","definition":"to stay in one place until something happens","definitionJP":"何かが起こるまでその場にいること"},
-    {"word":"keep","definition":"to hold onto something and not let it go","definitionJP":"何かを手放さずに持っておくこと"}
+    {"word":"keep","definition":"to hold onto something and not let it go","definitionJP":"何かを手放さずに持っておくこと"},
+    {"word":"collar","definition":"the part of a shirt around your neck","definitionJP":"シャツの首まわりの部分"},
+    {"word":"matching","definition":"the same as another one","definitionJP":"おそろいの"},
+    {"word":"just in case","definition":"to be ready if something happens","definitionJP":"念のため"}
   ],
   "mechanic": {"type":"memory-theatre","name":"Deep Memory","nameJP":"深い記憶","instruction":"Open one keepsake at a time, darling.","instructionJP":"一つずつ、思い出を開きましょう、ダーリン。","complete":"The whole box is open now.","completeJP":"箱が全部開きました。","acts":[{"title":"Tying the ribbon","titleJP":"リボンを結ぶ","caption":"Patricia ties a ribbon and straightens a collar.","captionJP":"パトリシアはリボンを結び、襟を整えます。"},{"title":"The wave goodbye","titleJP":"さよならの手振り","caption":"Someone waves and walks away.","captionJP":"誰かが手を振って去っていきます。"},{"title":"The empty hook","titleJP":"空っぽのフック","caption":"No one comes back for the matching ribbon.","captionJP":"対になるリボンを取りに、誰も戻ってきません。"}]},
   "trailIntro": "Follow the little moments Patricia kept.",
@@ -45,7 +48,10 @@
       {"word":"straighten","definition":"to make neat","definitionJP":"きちんと整えること"},
       {"word":"wave","definition":"to move your hand to say hi or bye","definitionJP":"手を振ること"},
       {"word":"wait","definition":"to stay until something happens","definitionJP":"何かが起きるまでいること"},
-      {"word":"keep","definition":"to not give away","definitionJP":"手放さないこと"}
+      {"word":"keep","definition":"to not give away","definitionJP":"手放さないこと"},
+      {"word":"love","definition":"to care about someone very much","definitionJP":"だれかをとても大切に思う"},
+      {"word":"care about","definition":"to think someone is important","definitionJP":"人を大切に思う"},
+      {"word":"come back","definition":"to return to a place","definitionJP":"もとの場所に戻ってくる"}
     ],
     "mechanic": {"instruction":"Connect the clues. What answer fits them all?","instructionJP":"手がかりをつなぎましょう。全部に合う答えは何ですか？","complete":"All the memories are open now.","completeJP":"すべての思い出が開きました。","acts":[{"title":"Tying a ribbon","titleJP":"リボンを結ぶ","caption":"Patricia ties a ribbon for someone she loves.","captionJP":"パトリシアは大切な人にリボンを結びます。"},{"title":"A wave goodbye","titleJP":"さよならの手振り","caption":"They wave, then leave.","captionJP":"その人は手を振って、去ります。"},{"title":"A kept ribbon","titleJP":"取っておいたリボン","caption":"Patricia still keeps the matching ribbon.","captionJP":"パトリシアは今も対のリボンを持っています。"}],"name":"Case Memory","nameJP":"ケースの記憶","type":"evidence-board"},
     "trailIntro": "Collect three clues. Then connect them into one case.",
@@ -65,7 +71,7 @@
     "postcard": {"chunks":["Patricia tied a ribbon for someone she loved.","They waved and left.","She still keeps the other ribbon."],"chunksJP":["パトリシアは大切な人にリボンを結んだ。","その人は手を振って去った。","彼女は今もそのリボンを持っている。"],"order":[0,1,2],"savedText":"Patricia tied a ribbon for someone she loved. They waved and left. She still keeps the other ribbon.","title":"Case memory postcard","titleJP":"ケース記憶カード","instruction":"Connect the three clues into a short case summary.","instructionJP":"三つの手がかりをつないで、短いケースのまとめを作りましょう。"}
   },
   "start": {
-    "intro":"Patricia ties a ribbon. The person leaves. Patricia keeps the other ribbon.","introJP":"パトリシアはリボンを結びます。その人は去ります。","vocabulary":[{"word":"ribbon","definition":"a thin strip of cloth","definitionJP":"細い布"},{"word":"tie","definition":"to hold with a knot","definitionJP":"結んで留める"},{"word":"leave","definition":"to go away","definitionJP":"立ち去る"},{"word":"keep","definition":"to not give away","definitionJP":"手元に置く"}],
+    "intro":"Patricia ties a ribbon. The person leaves. Patricia keeps the other ribbon.","introJP":"パトリシアはリボンを結びます。その人は去ります。","vocabulary":[{"word":"ribbon","definition":"a thin strip of cloth","definitionJP":"細い布"},{"word":"tie","definition":"to hold with a knot","definitionJP":"結んで留める"},{"word":"leave","definition":"to go away","definitionJP":"立ち去る"},{"word":"keep","definition":"to not give away","definitionJP":"手元に置く"},{"word":"person","definition":"a man, a woman, or a child","definitionJP":"人"},{"word":"other","definition":"not this one","definitionJP":"もう一つの"},{"word":"wave","definition":"to move your hand to say goodbye","definitionJP":"さようならと手をふる"},{"word":"wait","definition":"to stay until someone comes","definitionJP":"だれかが来るまで待つ"}],
     "mechanic":{"type":"memory-theatre","name":"Starter Memory","nameJP":"子ども向けの記憶","instruction":"Read one small part at a time.","instructionJP":"短い場面を一つずつ読みましょう。","complete":"You remembered the whole story.","completeJP":"物語を全部思い出しました。","acts":[{"title":"First","titleJP":"最初","caption":"Patricia ties a ribbon.","captionJP":"パトリシアはリボンを結びます。"},{"title":"Next","titleJP":"次","caption":"The person leaves.","captionJP":"その人は去ります。"},{"title":"Last","titleJP":"最後","caption":"Patricia keeps the other ribbon.","captionJP":"パトリシアはもう一つのリボンを持っています。"}]},
     "trailIntro":"Follow the story one small step at a time.","trailIntroJP":"物語を一歩ずつ追いましょう。","trail":[{"id":"ph_ribbon_evidence_01","roomId":"room_13","type":"event","label":"01 / FIRST","labelJP":"最初","title":"First part","titleJP":"最初の場面","text":"Patricia ties a ribbon for someone.","hint":"The next memory is near a room with a crossing path.","hintJP":"次の記憶は道が交わる部屋の近くです。"},{"id":"ph_ribbon_evidence_02","roomId":"room_08","type":"detail","label":"02 / NEXT","labelJP":"次","title":"Next part","titleJP":"次の場面","text":"The person waves and leaves.","hint":"The final memory is near the first room.","hintJP":"最後の記憶は最初の部屋の近くです。"},{"id":"ph_ribbon_evidence_03","roomId":"room_01","type":"inference","label":"03 / LAST","labelJP":"最後","title":"Last part","titleJP":"最後の場面","text":"Patricia keeps the other ribbon.","hint":"Return to Patricia with the short story.","hintJP":"短い物語を持ってパトリシアのところへ戻りましょう。"}],
     "lines":[{"speaker":"Patricia","en":"Patricia ties a ribbon."},{"speaker":"Narrator","en":"The person leaves."},{"speaker":"Patricia","en":"Patricia keeps the other ribbon."}],

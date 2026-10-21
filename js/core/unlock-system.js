@@ -9,6 +9,36 @@
 const BoohaUnlockSystem = (() => {
   'use strict';
 
+  // ── Teacher test switch: every world open on THIS browser ────────────────
+  // Type in the Inspect console:
+  //   localStorage.setItem('booha_dev_worlds', '1')   // all worlds open
+  //   localStorage.removeItem('booha_dev_worlds')     // back to normal gates
+  // It only sets the existing __dev* flags, so the gates read as open but no
+  // progress is ever written. A small "DEV · WORLDS OPEN" tag shows while on.
+  const DEV_WORLDS_KEY = 'booha_dev_worlds';
+  function devWorldsOn() {
+    try { return localStorage.getItem(DEV_WORLDS_KEY) === '1'; } catch (_) { return false; }
+  }
+  function showDevWorldsTag() {
+    if (document.getElementById('booha-dev-worlds-tag')) return;
+    const tag = document.createElement('div');
+    tag.id = 'booha-dev-worlds-tag';
+    tag.setAttribute('aria-hidden', 'true');
+    tag.textContent = 'DEV · WORLDS OPEN';
+    tag.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:2147483000;pointer-events:none;' +
+      'padding:3px 8px;border-radius:6px;background:rgba(0,0,0,.78);border:1px solid #ffd700;' +
+      'color:#ffd700;font:700 10px/1.4 monospace;letter-spacing:.08em;';
+    document.body.appendChild(tag);
+  }
+  if (devWorldsOn()) {
+    window.__devWorldsSwitch = true;
+    window.__devUtsuroba = true;
+    window.__devMuenba = true;
+    window.__devGrimmerglen = true;
+    if (document.body) showDevWorldsTag();
+    else document.addEventListener('DOMContentLoaded', showDevWorldsTag, { once: true });
+  }
+
   // ── Permanent achievement helpers ─────────────────────────────────────────
   function _done(curriculum, baseId) {
     return BoohaAdventure.scores.isCompleted(
@@ -307,6 +337,7 @@ const BONUS_GAMES = [
     checkAll,
     checkWeeklyBonusGames,
     isBonusGameUnlocked,
+    devWorldsOn,
     BONUS_GAMES,
     forceUnlock,
     getAll,

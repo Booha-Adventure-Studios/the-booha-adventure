@@ -10,7 +10,10 @@
     {"word":"wrapper","definition":"paper or plastic around something","definitionJP":"物を包む紙やビニール"},
     {"word":"pocket","definition":"a small part of clothing for carrying things","definitionJP":"物を入れる服の小さな袋"},
     {"word":"empty","definition":"with nothing inside","definitionJP":"中に何もない"},
-    {"word":"forget","definition":"to not remember something","definitionJP":"覚えていたことを思い出せない"}
+    {"word":"forget","definition":"to not remember something","definitionJP":"覚えていたことを思い出せない"},
+    {"word":"gate","definition":"a door in a fence or wall","definitionJP":"へいやかべの出入り口"},
+    {"word":"check","definition":"to look again to be sure","definitionJP":"もう一度見て確かめる"},
+    {"word":"lose","definition":"to not be able to find something","definitionJP":"物をなくして見つけられない"}
   ],
   "mechanic": {"type":"evidence-board","name":"Deep Memory","nameJP":"深い記憶","instruction":"Pin the clues in your mind. The loudest idea is not always true.","instructionJP":"手がかりを心に並べます。大きな声の考えが、いつも正しいとは限りません。","complete":"The clues make one silly truth.","completeJP":"手がかりが、ひとつの小さな真実になりました。","items":[{"title":"The saved sweet","titleJP":"取っておいた甘い物","caption":"Ned saved one red candy for later.","captionJP":"ネドは赤いキャンディを一つ、あとで食べるために取っておきました。"},{"title":"The empty pocket","titleJP":"空っぽのポケット","caption":"A wrapper remained, but the candy was gone.","captionJP":"包み紙は残りましたが、キャンディはなくなっていました。"},{"title":"The forgotten bite","titleJP":"忘れた一口","caption":"Ned may have eaten the candy and forgotten.","captionJP":"ネドはキャンディを食べたことを忘れたのかもしれません。"}]},
   "trailIntro": "Follow Ned's clues before you decide what happened.",
@@ -45,7 +48,10 @@
       {"word":"wrapper","definition":"paper around candy","definitionJP":"キャンディを包む紙"},
       {"word":"pocket","definition":"a small bag on clothes","definitionJP":"服についた小さな袋"},
       {"word":"empty","definition":"nothing inside","definitionJP":"中に何もないこと"},
-      {"word":"forget","definition":"to not remember","definitionJP":"覚えていないこと"}
+      {"word":"forget","definition":"to not remember","definitionJP":"覚えていないこと"},
+      {"word":"later","definition":"after some time","definitionJP":"少しあとで"},
+      {"word":"maybe","definition":"it is possible","definitionJP":"もしかしたら"},
+      {"word":"candy","definition":"a small sweet food","definitionJP":"小さくて甘いお菓子"}
     ],
     "mechanic": {"instruction":"Connect the clues. What answer fits them all?","instructionJP":"手がかりをつなぎましょう。全部に合う答えは何ですか？","complete":"Now you know the silly truth.","completeJP":"今、小さな真実が分かりました。","items":[{"title":"The candy","titleJP":"キャンディ","caption":"Ned saved one red candy.","captionJP":"ネドは赤いキャンディを一つ取っておきました。"},{"title":"Empty pocket","titleJP":"空っぽのポケット","caption":"The candy is gone. Only the wrapper is left.","captionJP":"キャンディがなくなり、包み紙だけが残りました。"},{"title":"A funny guess","titleJP":"おもしろい考え","caption":"Maybe Ned ate it and forgot.","captionJP":"ネドは食べて忘れたのかもしれません。"}],"name":"Case Memory","nameJP":"ケースの記憶","type":"evidence-board"},
     "trailIntro": "Collect three clues. Then connect them into one case.",
@@ -65,7 +71,7 @@
     "postcard": {"chunks":["Ned saved one red candy.","The pocket was empty.","He probably ate it and forgot."],"chunksJP":["ネドは赤いキャンディを一つ取っておいた。","ポケットは空っぽだった。","彼はたぶん食べて忘れた。"],"order":[0,1,2],"savedText":"Ned saved one red candy. The pocket was empty. He probably ate it and forgot.","title":"Case memory postcard","titleJP":"ケース記憶カード","instruction":"Connect the three clues into a short case summary.","instructionJP":"三つの手がかりをつないで、短いケースのまとめを作りましょう。"}
   },
   "start": {
-    "intro":"Ned saves a red candy. The pocket is empty. He thinks he ate it and forgot.","introJP":"ネドは赤いキャンディを取っておきます。ポケットは空です。","vocabulary":[{"word":"candy","definition":"a sweet food","definitionJP":"甘い食べ物"},{"word":"red","definition":"a bright color","definitionJP":"明るい色"},{"word":"pocket","definition":"a small place in clothes","definitionJP":"服の小さな入れ物"},{"word":"empty","definition":"with nothing inside","definitionJP":"中に何もない"}],
+    "intro":"Ned saves a red candy. The pocket is empty. He thinks he ate it and forgot.","introJP":"ネドは赤いキャンディを取っておきます。ポケットは空です。","vocabulary":[{"word":"candy","definition":"a sweet food","definitionJP":"甘い食べ物"},{"word":"red","definition":"a bright color","definitionJP":"明るい色"},{"word":"pocket","definition":"a small place in clothes","definitionJP":"服の小さな入れ物"},{"word":"empty","definition":"with nothing inside","definitionJP":"中に何もない"},{"word":"save","definition":"to keep something for later","definitionJP":"あとのために取っておく"},{"word":"eat","definition":"to put food in your mouth","definitionJP":"食べ物を口に入れる"},{"word":"forget","definition":"to not remember","definitionJP":"覚えていない"},{"word":"think","definition":"to have an idea in your mind","definitionJP":"頭の中で思う"}],
     "mechanic":{"type":"evidence-board","name":"Starter Memory","nameJP":"子ども向けの記憶","instruction":"Read one small part at a time.","instructionJP":"短い場面を一つずつ読みましょう。","complete":"You remembered the whole story.","completeJP":"物語を全部思い出しました。","items":[{"title":"First","titleJP":"最初","caption":"Ned saves a red candy.","captionJP":"ネドは赤いキャンディを取っておきます。"},{"title":"Next","titleJP":"次","caption":"The pocket is empty.","captionJP":"ポケットは空です。"},{"title":"Last","titleJP":"最後","caption":"Ned may have eaten it.","captionJP":"ネドは食べたかもしれません。"}]},
     "trailIntro":"Follow the story one small step at a time.","trailIntroJP":"物語を一歩ずつ追いましょう。","trail":[{"id":"nto_candy_evidence_01","roomId":"room_05","type":"detail","label":"01 / FIRST","labelJP":"最初","title":"First part","titleJP":"最初の場面","text":"Ned saves one red candy.","hint":"The next memory is near a room where something can be put away.","hintJP":"次の記憶は何かをしまえる部屋の近くです。"},{"id":"nto_candy_evidence_02","roomId":"room_11","type":"event","label":"02 / NEXT","labelJP":"次","title":"Next part","titleJP":"次の場面","text":"The red candy is not in the pocket.","hint":"The final memory is near a room with a way out.","hintJP":"最後の記憶は出口の近くです。"},{"id":"nto_candy_evidence_03","roomId":"room_07","type":"inference","label":"03 / LAST","labelJP":"最後","title":"Last part","titleJP":"最後の場面","text":"Ned may have eaten it and forgotten.","hint":"Return to Ned with the short story.","hintJP":"短い物語を持ってネドのところへ戻りましょう。"}],
     "lines":[{"speaker":"Ned","en":"Ned saves a red candy."},{"speaker":"Narrator","en":"The pocket is empty."},{"speaker":"Ned","en":"Ned thinks he ate it and forgot."}],

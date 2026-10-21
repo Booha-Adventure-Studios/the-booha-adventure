@@ -155,13 +155,24 @@ const BoohaAdventureGame = (() => {
     soon: '',
   };
 
+  // First visit to the closet: explain once that missed skins are gone but
+  // this week's skin can still be earned.
+  const CLOSET_INTRO_KEY = 'booha_closet_intro_v1';
+  function closetIntroSeen() {
+    try { return localStorage.getItem(CLOSET_INTRO_KEY) === '1'; } catch (_) { return true; }
+  }
+
   function renderCloset(data, closet) {
     const host = document.getElementById('adv-closet');
     if (!host) return;
     const blitz = blitzCount(data);
     const got = closet.reduce((n, c) => n + c.skins.filter(s => s.collected).length, 0);
     const all = closet.reduce((n, c) => n + c.skins.length, 0);
-    const shelves = closet.map(({ season, started, skins, mascot }) => {
+    const NOW_FIRST = { wearing: 0, wearable: 0, thisweek: 0 };
+    const shelves = closet.map(({ season, started, skins: allSkins, mascot }) => {
+      // This week's skin (the one a student can still get) leads its shelf.
+      const skins = allSkins.slice().sort((a, b) => (a.state in NOW_FIRST ? 0 : 1) - (b.state in NOW_FIRST ? 0 : 1));
+      const mascotSrc = mascot && mascot.assets ? mascot.assets.static : '';
       const style = SEASON_STYLE[season.themeId] || { jp: season.name, cls: 'other' };
       const year = String(season.startDate || '').slice(0, 4);
       if (!started) {
@@ -171,7 +182,7 @@ const BoohaAdventureGame = (() => {
             <div class="closet-preview">
               ${mascot ? `<img class="closet-mascot" src="${esc(mascot.assets.static)}" alt="${esc(mascot.name)}" width="70" height="70" loading="lazy" decoding="async">` : ''}
               <div><p>${mascot ? `${esc(mascot.name)} が やってくる！ ` : ''}あたらしい スキン ${skins.length}こ</p>
-              <div class="closet-silhouettes">${skins.map(s => `<img src="${esc(s.src)}" alt="" width="26" height="26" loading="lazy" decoding="async">`).join('')}</div></div>
+              <div class="closet-silhouettes">${skins.map(s => `<img src="${esc(s.src)}" alt="" width="26" height="26" loading="lazy" decoding="async" data-fallback="${esc(mascotSrc)}">`).join('')}</div></div>
             </div>
           </div>`;
       }
@@ -186,9 +197,10 @@ const BoohaAdventureGame = (() => {
                 ? `<button type="button" class="closet-tag wearable" data-equip="${esc(s.id)}">きる</button>`
                 : `<span class="closet-tag ${s.state}">${esc(label)}</span>`;
               return `
-              <div class="closet-skin ${s.state}">
+              <div class="closet-skin ${s.state}${s.state in NOW_FIRST ? ' now' : ''}">
                 <span class="closet-hanger" aria-hidden="true"></span>
-                <img src="${esc(s.src)}" alt="${esc(s.name)} Booha${s.collected ? '' : ' (not collected)'}" width="72" height="72" loading="lazy" decoding="async">
+                ${s.state === 'thisweek' ? '<span class="closet-now-tag">こんしゅう！</span>' : ''}
+                <img src="${esc(s.src)}" alt="${esc(s.name)} Booha${s.collected ? '' : ' (not collected)'}" width="72" height="72" loading="lazy" decoding="async" data-fallback="${esc(mascotSrc)}">
                 <span class="closet-name">${esc(s.name)}</span>
                 ${action}
               </div>`;
@@ -201,17 +213,43 @@ const BoohaAdventureGame = (() => {
         <div><h2>ワードローブ</h2><span class="adv-kicker pink">SKIN CLOSET</span></div>
         <b class="adv-head-num pink">${got}/${all}</b>
       </div>
-      <p class="adv-note">こんしゅうの スキンは Blitz を 3つ クリアすると きられるよ。みのがした スキンは もう もどって こないよ！</p>
+      ${closetIntroSeen() ? '' : `<div class="closet-intro" role="note">
+        <b>スキンは 1しゅうかんに 1つ！</b>
+        <p>みのがした スキンは もう もどって こないよ。でも こんしゅうの スキンは まだ まにあう！ Blitz を 3つ クリアしよう。</p>
+        <button type="button" class="closet-intro-ok" data-closet-intro>わかった！</button>
+      </div>`}
+      <p class="adv-note"${closetIntroSeen() ? '' : ' hidden'}>こんしゅうの スキンは Blitz を 3つ クリアすると きられるよ。みのがした スキンは もう もどって こないよ！</p>
       ${shelves || '<p class="adv-note">スキンは まだ ないよ。</p>'}`;
-    // Art for later skins may not exist yet: show a mystery "?" instead of a broken image.
+    // Art for later skins may not exist yet. Show the season mascot as a
+    // dashed "coming soon" silhouette instead; if that fails too, a "?".
     host.querySelectorAll('.closet-shelf img').forEach(img => {
-      img.addEventListener('error', () => {
+      function toQuestion() {
         const q = document.createElement('span');
         q.className = img.classList.contains('closet-mascot') ? 'closet-q mascot' : 'closet-q';
         q.textContent = '?';
         q.setAttribute('aria-hidden', 'true');
         img.replaceWith(q);
-      }, { once: true });
+      }
+      img.addEventListener('error', function onError() {
+        const fb = img.getAttribute('data-fallback');
+        if (fb && img.getAttribute('src') !== fb) {
+          img.classList.add('closet-ph');
+          const skin = img.closest('.closet-skin');
+          if (skin) skin.classList.add('placeholder');
+          img.setAttribute('src', fb);
+          return;
+        }
+        img.removeEventListener('error', onError);
+        toQuestion();
+      });
+    });
+    const introOk = host.querySelector('[data-closet-intro]');
+    if (introOk) introOk.addEventListener('click', () => {
+      try { localStorage.setItem(CLOSET_INTRO_KEY, '1'); } catch (_) {}
+      const card = introOk.closest('.closet-intro');
+      if (card) card.remove();
+      const note = host.querySelector('.adv-note[hidden]');
+      if (note) note.hidden = false;
     });
     host.querySelectorAll('[data-equip]').forEach(btn => {
       btn.addEventListener('click', () => {
