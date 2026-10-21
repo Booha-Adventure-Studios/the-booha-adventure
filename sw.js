@@ -39,7 +39,9 @@ const CURRENT_CACHES = {
   // Weekly medals pass (2026-10-21): medal/level-up popups on index, maze,
   // and game results; new profile header, weekly shelf, and record book.
   // Weekly-medal popup deduplication and all-perfect Blitz rule fix.
-  pages:  'booha-pages-2026-463',
+  // Utsuroba archive redesign, gated Utsuroba portal, teacher dev switch,
+  // and Adventure closet/heart fixes (2026-10-21).
+  pages:  'booha-pages-2026-464',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -214,7 +216,8 @@ const CURRENT_CACHES = {
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
   assets: 'booha-assets-2026-580',
-  decks:  'booha-decks-2026-314',
+  // Utsuroba episodes gained vocabulary (8 words per memory per level).
+  decks:  'booha-decks-2026-315',
 };
 
 const PAGE_CACHE  = CURRENT_CACHES.pages;

@@ -10,7 +10,10 @@
     {"word":"laugh","definition":"to make a sound when something is funny","definitionJP":"面白いときに出す声"},
     {"word":"tease","definition":"to joke about someone in an unkind way","definitionJP":"人を意地悪にからかうこと"},
     {"word":"sharp","definition":"quick to say something that can hurt","definitionJP":"人を傷つけることをすぐに言う様子"},
-    {"word":"guard","definition":"to keep something safe by watching it closely","definitionJP":"よく見て何かを守ること"}
+    {"word":"guard","definition":"to keep something safe by watching it closely","definitionJP":"よく見て何かを守ること"},
+    {"word":"decide","definition":"to choose what to do","definitionJP":"どうするか決める"},
+    {"word":"pin","definition":"to put on with a small sharp pin","definitionJP":"ピンでとめる"},
+    {"word":"close","definition":"near","definitionJP":"近くに"}
   ],
   "mechanic": {"type":"evidence-board","name":"Deep Memory","nameJP":"深い記憶","instruction":"Pin the facts. Don't get sentimental about it.","instructionJP":"事実を並べよう。感傷的にならずに。","complete":"The short list is done. That's it.","completeJP":"リストは終わり。それだけだ。","items":[{"title":"The laugh","titleJP":"笑い声","caption":"Someone laughed at something Blakesly said.","captionJP":"ブレイクスリーが言ったことを、誰かが笑いました。"},{"title":"The badge","titleJP":"バッジ","caption":"Blakesly pinned on a badge that meant stay back.","captionJP":"ブレイクスリーは「近づくな」を意味するバッジをつけました。"},{"title":"The empty room","titleJP":"誰もいない部屋","caption":"Being sharp kept people away. All of them.","captionJP":"鋭くいることで人を遠ざけました。みんなを。"}]},
   "trailIntro": "Follow the facts. Don't expect them to be nice.",
@@ -45,7 +48,10 @@
       {"word":"laugh","definition":"to make a happy sound","definitionJP":"楽しいときに出す声"},
       {"word":"tease","definition":"to joke in an unkind way","definitionJP":"意地悪にからかうこと"},
       {"word":"sharp","definition":"quick, and a little unkind","definitionJP":"すばやくて、少し厳しいこと"},
-      {"word":"guard","definition":"to keep safe","definitionJP":"守ること"}
+      {"word":"guard","definition":"to keep safe","definitionJP":"守ること"},
+      {"word":"hurt","definition":"feeling sad or in pain","definitionJP":"悲しい、または いたい"},
+      {"word":"alone","definition":"with no one else","definitionJP":"ひとりで"},
+      {"word":"work","definition":"to do what it should do","definitionJP":"うまくいく"}
     ],
     "mechanic": {"instruction":"Connect the clues. What answer fits them all?","instructionJP":"手がかりをつなぎましょう。全部に合う答えは何ですか？","complete":"That is the whole story.","completeJP":"それが物語のすべてです。","items":[{"title":"The laugh","titleJP":"笑い声","caption":"Someone laughed at Blakesly.","captionJP":"誰かがブレイクスリーを笑いました。"},{"title":"The badge","titleJP":"バッジ","caption":"Blakesly wore a badge that meant: stay away.","captionJP":"ブレイクスリーは「近づくな」を意味するバッジをつけました。"},{"title":"Alone","titleJP":"一人","caption":"Now no one comes close.","captionJP":"今、誰も近づいてきません。"}],"name":"Case Memory","nameJP":"ケースの記憶","type":"evidence-board"},
     "trailIntro": "Collect three clues. Then connect them into one case.",
@@ -65,7 +71,7 @@
     "postcard": {"chunks":["Someone laughed at Blakesly.","He wore a badge that meant stay away.","Now he is alone."],"chunksJP":["誰かがブレイクスリーを笑った。","彼は「近づくな」のバッジをつけた。","今、彼は一人だ。"],"order":[0,1,2],"savedText":"Someone laughed at Blakesly. He wore a badge that meant stay away. Now he is alone.","title":"Case memory postcard","titleJP":"ケース記憶カード","instruction":"Connect the three clues into a short case summary.","instructionJP":"三つの手がかりをつないで、短いケースのまとめを作りましょう。"}
   },
   "start": {
-    "intro":"Someone laughs at Blakesly. He wears a badge that says stay away. Now he is alone.","introJP":"誰かがブレイクスリーを笑います。彼はバッジをつけます。","vocabulary":[{"word":"badge","definition":"a small pin","definitionJP":"小さなピン"},{"word":"laugh","definition":"to make a happy sound","definitionJP":"笑い声を出す"},{"word":"away","definition":"not near","definitionJP":"近くにいない"},{"word":"alone","definition":"with no one else","definitionJP":"一人で"}],
+    "intro":"Someone laughs at Blakesly. He wears a badge that says stay away. Now he is alone.","introJP":"誰かがブレイクスリーを笑います。彼はバッジをつけます。","vocabulary":[{"word":"badge","definition":"a small pin","definitionJP":"小さなピン"},{"word":"laugh","definition":"to make a happy sound","definitionJP":"笑い声を出す"},{"word":"away","definition":"not near","definitionJP":"近くにいない"},{"word":"alone","definition":"with no one else","definitionJP":"一人で"},{"word":"wear","definition":"to have something on your body","definitionJP":"体に身につける"},{"word":"someone","definition":"a person, but we do not know who","definitionJP":"だれか"},{"word":"stay","definition":"to not leave","definitionJP":"はなれずにいる"},{"word":"now","definition":"at this time","definitionJP":"今"}],
     "mechanic":{"type":"evidence-board","name":"Starter Memory","nameJP":"子ども向けの記憶","instruction":"Read one small part at a time.","instructionJP":"短い場面を一つずつ読みましょう。","complete":"You remembered the whole story.","completeJP":"物語を全部思い出しました。","items":[{"title":"First","titleJP":"最初","caption":"Someone laughs at Blakesly.","captionJP":"誰かがブレイクスリーを笑います。"},{"title":"Next","titleJP":"次","caption":"He wears a badge that says stay away.","captionJP":"彼は「近づくな」のバッジをつけます。"},{"title":"Last","titleJP":"最後","caption":"Now he is alone.","captionJP":"今、彼は一人です。"}]},
     "trailIntro":"Follow the story one small step at a time.","trailIntroJP":"物語を一歩ずつ追いましょう。","trail":[{"id":"bk_badge_evidence_01","roomId":"room_09","type":"event","label":"01 / FIRST","labelJP":"最初","title":"First part","titleJP":"最初の場面","text":"Someone laughs at Blakesly.","hint":"The next memory is near a room where something is pinned on.","hintJP":"次の記憶は何かが留められた部屋の近くです。"},{"id":"bk_badge_evidence_02","roomId":"room_04","type":"detail","label":"02 / NEXT","labelJP":"次","title":"Next part","titleJP":"次の場面","text":"Blakesly wears a badge that says stay away.","hint":"The final memory is near a quiet, empty room.","hintJP":"最後の記憶は静かな部屋の近くです。"},{"id":"bk_badge_evidence_03","roomId":"room_10","type":"inference","label":"03 / LAST","labelJP":"最後","title":"Last part","titleJP":"最後の場面","text":"Now no one comes close.","hint":"Return to Blakesly with the short story.","hintJP":"短い物語を持ってブレイクスリーのところへ戻りましょう。"}],
     "lines":[{"speaker":"Blakesly","en":"Someone laughs at Blakesly."},{"speaker":"Narrator","en":"He wears a badge that says stay away."},{"speaker":"Blakesly","en":"Now he is alone."}],

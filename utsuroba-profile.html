@@ -6,308 +6,374 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Utsuroba — Memory Archive</title>
   <link rel="manifest" href="/the-booha-adventure/manifest.json">
-  <meta name="theme-color" content="#090511">
+  <meta name="theme-color" content="#0f1522">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Booha Adventure">
   <link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@600&family=Shippori+Mincho+B1:wght@600;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <script>
+    // Japanese help is on unless this device turned it off.
+    try { if (localStorage.getItem('booha_utsu_jp') === '0') document.documentElement.classList.add('jp-off'); } catch (_) {}
+  </script>
 
   <style>
+    /* ═══ INK & LANTERN ARCHIVE ══════════════════════════════════
+       Night  #0f1522 #172033 #22304a     Paper #f2ead8 / ink #22201c
+       Lamp   #ffcf6b                     Seal  #b3301e  (stamps #d0543d)
+       Mist   #a9bccb                     Teal  #7fd3c7                  */
     :root {
-      --night: #090511;
-      --ink: #f7efff;
-      --muted: #b9a9c8;
-      --quiet: #81718f;
-      --violet: #d8a8ff;
-      --violet-soft: rgba(216,168,255,.15);
-      --mint: #9fe4ba;
-      --gold: #ffcb75;
-      --line: rgba(216,168,255,.23);
-      --panel: rgba(20,12,30,.84);
-      --font: Georgia, "Times New Roman", serif;
-      --sans: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      --night: #0f1522; --night-2: #172033; --night-3: #22304a; --line: #2c3a52; --line-2: #3a4a63;
+      --paper: #f2ead8; --paper-2: #fff9ea; --paper-edge: #c9bea5; --paper-line: #d9cdb2;
+      --ink: #22201c; --ink-soft: #6b6252;
+      --text: #f2ead8; --mist: #a9bccb; --mist-2: #c9d4de;
+      --lamp: #ffcf6b; --seal: #b3301e; --stamp: #d0543d; --teal: #7fd3c7;
+      --serif: 'Shippori Mincho B1', 'Hiragino Mincho ProN', serif;
+      --hand: 'Klee One', 'Zen Maru Gothic', sans-serif;
+      --sans: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
     }
-
     * { box-sizing: border-box; }
     html { min-height: 100%; background: var(--night); }
     body {
-      min-height: 100vh;
-      margin: 0;
-      color: var(--ink);
-      font-family: var(--font);
-      background:
-        radial-gradient(circle at 50% -10%, rgba(110,54,160,.34), transparent 42rem),
-        radial-gradient(circle at 10% 70%, rgba(30,115,93,.11), transparent 28rem),
-        linear-gradient(160deg, #11091a 0%, #090511 62%, #050308 100%);
-      overflow-x: hidden;
+      min-height: 100vh; margin: 0; color: var(--text); font-family: var(--sans); font-weight: 700;
+      -webkit-font-smoothing: antialiased;
+      background: radial-gradient(ellipse at 50% 0%, #22304a 0%, rgba(15,21,34,0) 60%), var(--night);
     }
+    html.wsheet-open { overflow: hidden; }
+    rt { font-size: .5em; color: var(--mist); }
+    button { font-family: inherit; font-weight: 700; }
+    a { color: var(--teal); }
+    html.jp-off .jp { display: none !important; }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .42;
-      background-image:
-        radial-gradient(circle at 12% 18%, #fff 0 1px, transparent 1.5px),
-        radial-gradient(circle at 83% 13%, #d8a8ff 0 1px, transparent 1.5px),
-        radial-gradient(circle at 71% 67%, #fff 0 1px, transparent 1.5px),
-        radial-gradient(circle at 24% 84%, #9fe4ba 0 1px, transparent 1.5px),
-        radial-gradient(circle at 92% 88%, #fff 0 1px, transparent 1.5px);
-      background-size: 310px 270px, 420px 360px, 510px 430px, 370px 330px, 610px 470px;
-    }
+    .page { width: min(720px, 100%); margin: 0 auto; padding: 12px 14px 48px; display: flex; flex-direction: column; gap: 30px; }
+    .kick { font-size: 10px; letter-spacing: .22em; color: var(--teal); }
+    .h2 { margin: 0; font-family: var(--serif); font-weight: 800; font-size: 24px; line-height: 1.25; color: var(--text); }
+    .sec-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+    .sec-head > div { display: flex; flex-direction: column; gap: 2px; }
+    .sec-num { font-family: var(--serif); font-size: 22px; color: var(--lamp); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sec-num small { font-size: 14px; color: var(--mist); }
+    .note { margin: 10px 0 0; font-size: 11px; line-height: 1.6; color: var(--mist); text-align: center; }
+    .jp-line { display: block; font-size: 12px; color: var(--mist); line-height: 1.7; font-family: var(--sans); font-weight: 700; }
 
-    a { color: inherit; }
-    button, a { -webkit-tap-highlight-color: transparent; }
-
-    .page { width: min(1040px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 64px; position: relative; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+    /* top bar + portals */
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; }
     .back-link {
-      display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px;
-      border: 1px solid var(--line); border-radius: 999px; color: var(--muted);
-      text-decoration: none; font-size: .78rem; background: rgba(255,255,255,.035);
-      transition: border-color .18s, color .18s, transform .18s;
+      display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px;
+      border: 1.5px solid var(--mist); color: var(--text); text-decoration: none; font-size: 13px;
     }
-    .back-link[hidden] { display: none !important; }
-    .back-link:hover, .back-link:focus-visible { color: var(--ink); border-color: var(--violet); transform: translateY(-1px); outline: none; }
-    .case-label { color: var(--quiet); font: 700 .62rem/1.3 var(--sans); letter-spacing: .18em; text-transform: uppercase; text-align: right; }
+    .back-link[hidden] { display: none; }
+    .back-link:focus-visible, .jp-toggle:focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; }
+    .case-label { font-size: 10px; letter-spacing: .2em; color: var(--teal); line-height: 1.5; }
+    .jp-toggle {
+      display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+      border: 1.5px solid var(--line-2); background: var(--night-2); color: var(--mist-2); font-size: 12px;
+    }
+    .jp-toggle[aria-pressed="true"] { border-color: var(--lamp); color: var(--lamp); }
+    .jp-toggle .dot { width: 30px; height: 18px; border-radius: 9px; background: var(--line-2); position: relative; }
+    .jp-toggle .dot::after { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--mist); transition: transform .18s; }
+    .jp-toggle[aria-pressed="true"] .dot { background: rgba(255,207,107,.35); }
+    .jp-toggle[aria-pressed="true"] .dot::after { transform: translateX(12px); background: var(--lamp); }
 
-    /* ── Output profile switcher ─────────────────────── */
     .profile-network {
-      display: flex; justify-content: center; flex-wrap: wrap; gap: 7px;
-      margin: 0 0 22px; padding: 7px;
-      border: 1px solid var(--line); border-radius: 999px;
-      background: rgba(255,255,255,.025);
+      display: flex; flex-wrap: nowrap; justify-content: center; gap: 4px; padding: 10px 4px; border-radius: 20px;
+      background: rgba(15,21,34,.8); border: 1px solid var(--line);
     }
-    .profile-network a {
-      display: inline-flex; align-items: center; gap: 6px; min-height: 38px;
-      padding: 7px 14px; border: 1px solid rgba(216,168,255,.28); border-radius: 10px;
-      color: #f1eaff; text-decoration: none; font: 900 .7rem/1.2 var(--sans);
-      letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0,0,0,.7);
-      background: linear-gradient(180deg, rgba(216,168,255,.14), rgba(10,7,17,.42));
-      box-shadow: 0 2px 0 rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.12);
-      transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s;
-    }
-    .profile-network a small { color: #d6cbe9; font: 800 .9em var(--font); letter-spacing: .02em; }
-    .profile-network a:hover, .profile-network a:focus-visible {
-      color: var(--ink); border-color: var(--violet); background: var(--violet-soft);
-      outline: none; transform: translateY(-1px); box-shadow: 0 4px 0 rgba(0,0,0,.28), 0 0 18px rgba(216,168,255,.22), inset 0 1px rgba(255,255,255,.2);
-    }
-    .profile-network a[aria-current="page"] {
-      color: #fff8ff; border-color: #e4cfff;
-      background: linear-gradient(180deg, rgba(216,168,255,.3), rgba(216,168,255,.12));
-      box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 18px rgba(216,168,255,.32), inset 0 1px rgba(255,255,255,.2);
-      animation: outputProfileButtonPulse 2.6s ease-in-out infinite;
-    }
+    .profile-network a { flex: 1 1 0; min-width: 0; max-width: 84px; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: var(--mist-2); -webkit-tap-highlight-color: transparent; }
+    .profile-network a[hidden] { display: none; }
+    .pn-orb { position: relative; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #4a5a73; background: radial-gradient(circle at 50% 40%, #2a3448, #141c2c 75%); transition: transform .18s, box-shadow .18s; }
+    .pn-orb img { object-fit: contain; }
+    .pn-orb.log { background: radial-gradient(circle at 50% 40%, #4a3414, #1b1208 75%); }
+    .pn-orb.adventure { background: radial-gradient(circle at 50% 40%, #3a1d4a, #1a0f2c 75%); }
+    .pn-orb.utsuroba { background: radial-gradient(circle at 50% 40%, #1d3340, #10161c 75%); border-color: #3a5566; }
+    .pn-orb.muenba { background: radial-gradient(circle at 50% 40%, #1f3a2f, #101a15 75%); border-color: #3a6650; }
+    .pn-label { width: 100%; overflow-wrap: anywhere; font-size: 11px; line-height: 1.2; text-align: center; }
+    .pn-label small { display: block; font-size: 7px; letter-spacing: 1px; color: var(--mist); }
+    .profile-network a:hover .pn-orb { transform: translateY(-2px); box-shadow: 0 0 14px rgba(255,207,107,.35); }
+    .profile-network a:focus-visible { outline: none; }
+    .profile-network a:focus-visible .pn-orb { outline: 3px solid var(--lamp); outline-offset: 3px; }
+    .profile-network a[aria-current="page"] { color: var(--lamp); }
+    .profile-network a[aria-current="page"] .pn-orb { border-color: transparent; animation: outputProfileButtonPulse 2.6s ease-in-out infinite; box-shadow: 0 0 0 3px var(--lamp), 0 0 14px rgba(255,207,107,.55); }
     @keyframes outputProfileButtonPulse {
-      0%, 100% { box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 13px rgba(216,168,255,.22), inset 0 1px rgba(255,255,255,.16); }
-      50% { box-shadow: 0 4px 0 rgba(0,0,0,.22), 0 0 28px rgba(216,168,255,.55), inset 0 1px rgba(255,255,255,.3); }
+      0%, 100% { box-shadow: 0 0 0 3px #ffcf6b, 0 0 14px rgba(255,207,107,.55); }
+      50% { box-shadow: 0 0 0 3px #ffcf6b, 0 0 26px rgba(255,207,107,.9); }
     }
-    @media (prefers-reduced-motion: reduce) { .profile-network a[aria-current="page"] { animation: none; } }
+    .profile-network a.is-locked { color: #7a879a; cursor: default; pointer-events: none; }
+    .profile-network a.is-locked .pn-orb { background: var(--night); border: 2px dashed #4a5a73; }
+    .profile-network a.is-locked .pn-orb img { filter: brightness(0); opacity: .55; }
+    .profile-network a.is-locked .pn-orb::after {
+      content: ''; position: absolute; right: -4px; bottom: -4px; width: 22px; height: 22px; border-radius: 50%;
+      background: #0f1522 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffcf6b' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / 15px no-repeat;
+    }
+    .profile-network a.is-locked .pn-label small { color: #7a879a; }
 
-    .hero {
-      display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: center; gap: 30px;
-      position: relative; overflow: hidden; padding: clamp(28px, 6vw, 58px) clamp(22px, 6vw, 72px);
-      border: 1px solid var(--line); border-radius: 24px;
-      background: linear-gradient(145deg, rgba(37,18,52,.9), rgba(10,7,17,.78));
-      box-shadow: 0 25px 80px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.06);
-    }
-    .hero::after {
-      content: "✦"; position: absolute; right: 7%; top: 16%; color: var(--violet);
-      opacity: .6; font-size: 2.2rem; text-shadow: 0 0 30px var(--violet);
-    }
-    .eyebrow { margin: 0 0 10px; color: var(--mint); font: 700 .68rem/1.4 var(--sans); letter-spacing: .2em; text-transform: uppercase; }
-    h1 { margin: 0; font-size: clamp(2.5rem, 9vw, 5.8rem); font-weight: 400; letter-spacing: -.045em; line-height: .92; text-shadow: 0 0 28px rgba(216,168,255,.28); }
-    .hero-jp { margin: 14px 0 0; color: #ead8f7; font-size: clamp(1rem, 2.8vw, 1.35rem); letter-spacing: .18em; }
-    .hero-copy { max-width: 590px; margin: 22px 0 0; color: var(--muted); font-size: clamp(.95rem, 2vw, 1.08rem); line-height: 1.65; }
-    .hero-copy small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
+    /* hero */
+    .hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
     .hero-art {
-      width: 280px; height: 280px; justify-self: center; display: grid; place-items: center;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(216,168,255,.18) 0 34%, rgba(159,228,186,.1) 56%, transparent 75%);
-      filter: drop-shadow(0 0 18px rgba(216,168,255,.18));
+      position: relative; width: 220px; height: 220px; border-radius: 50%; overflow: hidden;
+      background: radial-gradient(circle at 50% 45%, #2f4560, #141c2c 70%);
+      box-shadow: 0 0 0 6px var(--night-2), 0 0 0 8px var(--line-2), 0 0 50px rgba(127,211,199,.25);
     }
-    .hero-art img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 16px 12px rgba(0,0,0,.45)); }
-    .world-status-strip { display: flex; align-items: flex-start; gap: 10px; margin-top: 22px; }
-    .world-status-dot { width: 10px; height: 10px; flex: 0 0 auto; margin-top: 5px; border-radius: 50%; background: #5f566b; box-shadow: 0 0 0 3px rgba(95,86,107,.12); }
-    .world-status-dot.is-open { background: var(--mint); box-shadow: 0 0 0 3px rgba(159,228,186,.16), 0 0 14px rgba(159,228,186,.82); }
-    .world-status-copy { display: flex; flex-direction: column; gap: 3px; }
-    .world-status-en { color: #f0e6ff; font: 700 .68rem/1.25 var(--sans); letter-spacing: .09em; }
-    .world-status-jp { color: var(--quiet); font: .76rem/1.35 var(--font); }
-    .world-status-jp ruby { ruby-position: over; }
-    .world-status-jp rt { font-size: .7em; }
-
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0 28px; }
-    .stat { min-height: 106px; padding: 17px 13px; border: 1px solid var(--line); border-radius: 16px; background: rgba(20,12,30,.7); }
-    .stat-value { color: var(--gold); font-size: clamp(1.65rem, 5vw, 2.5rem); line-height: 1; }
-    .stat-label { margin-top: 9px; color: var(--muted); font: 700 .65rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-    .stat-jp { display: block; margin-top: 3px; color: var(--quiet); font: .75rem/1.4 var(--font); }
-
-    .weekly-hunt { margin-top: 16px; padding: 18px 20px; border: 1px solid rgba(216,168,255,.34); border-radius: 18px 6px 18px 6px; background: linear-gradient(120deg, rgba(52,28,68,.72), rgba(17,13,27,.74)); }
-    .weekly-hunt-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
-    .weekly-hunt-heading h2 { margin: 0; color: #f8efff; font-size: 1.15rem; font-weight: 400; }
-    .weekly-hunt-heading span { color: var(--mint); font: 700 .66rem/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
-    .weekly-hunt-copy { margin: 8px 0 14px; color: var(--muted); font-size: .84rem; line-height: 1.5; }
-    .weekly-hunt-copy small { display: block; margin-top: 4px; color: var(--quiet); font-size: .9em; }
-    .weekly-hunt-progress { display: flex; align-items: center; gap: 12px; }
-    .weekly-hunt-progress progress { width: 100%; height: 9px; accent-color: var(--mint); }
-    .weekly-hunt-count { flex: 0 0 auto; color: var(--gold); font: 700 .78rem/1.4 var(--sans); white-space: nowrap; }
-    .weekly-hunt-legend { margin: 10px 0 0; color: var(--quiet); font: .65rem/1.5 var(--sans); letter-spacing: .03em; }
-
-    .section { margin-top: 26px; }
-    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 2px 11px; }
-    .section-heading h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); font-weight: 400; }
-    .section-heading p { margin: 0; color: var(--quiet); font: .63rem/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; text-align: right; }
-
-    .echo-card { padding: 19px; border: 1px solid rgba(159,228,186,.28); border-radius: 18px; background: linear-gradient(135deg, rgba(22,54,43,.56), rgba(17,13,27,.78)); }
-    .echo-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .echo-title { margin: 0; color: #e1ffe9; font-size: 1.2rem; font-weight: 400; }
-    .echo-title small { display: block; margin-top: 4px; color: rgba(225,255,233,.55); font-size: .72em; }
-    .echo-status { color: var(--mint); font: 700 .7rem/1.3 var(--sans); letter-spacing: .08em; text-align: right; text-transform: uppercase; }
-    .echo-dots { display: flex; gap: 9px; margin-top: 18px; }
-    .echo-dot { width: 18px; height: 18px; border: 1px solid rgba(159,228,186,.54); border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 4px rgba(0,0,0,.18); }
-    .echo-dot.lit { border-color: var(--mint); background: var(--mint); box-shadow: 0 0 15px rgba(159,228,186,.7), inset 0 0 0 4px rgba(16,60,43,.2); }
-    .echo-note { margin: 14px 0 0; color: rgba(225,255,233,.63); font-size: .86rem; line-height: 1.5; }
-    .echo-permanent-note { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid rgba(159,228,186,.18); color: var(--gold); font-size: .78rem; line-height: 1.5; }
-
-    .drifter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .drifter-card { min-height: 174px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); position: relative; overflow: hidden; }
-    .drifter-card.is-weekly-restored { border-color: rgba(216,168,255,.55); background: linear-gradient(145deg, rgba(52,28,68,.78), var(--panel)); }
-    .drifter-card::after { content: ""; position: absolute; width: 86px; height: 86px; right: -28px; bottom: -30px; border-radius: 50%; background: radial-gradient(circle, rgba(216,168,255,.13), transparent 70%); pointer-events: none; }
-    .drifter-card-top { display: flex; align-items: center; gap: 10px; }
-    .drifter-avatar { width: 55px; height: 55px; object-fit: contain; object-position: center bottom; filter: grayscale(.8) saturate(.65); opacity: .55; }
-    .is-weekly-restored .drifter-avatar { filter: none; opacity: 1; }
-    .drifter-name { margin: 0; color: #fff6ff; font-size: .95rem; font-weight: 400; line-height: 1.2; }
-    .drifter-name small { display: block; margin-top: 4px; color: var(--quiet); font-size: .7rem; }
-    .drifter-state { margin: 15px 0 0; color: var(--quiet); font: 700 .61rem/1.4 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
-    .drifter-weekly-state { margin: 5px 0 0; color: var(--gold); font: 700 .61rem/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; }
-    .is-weekly-restored .drifter-weekly-state { color: var(--mint); }
-    .drifter-story { margin: 7px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.42; }
-
-    /* ── Per-tier progress pips (Starter/Case/Deep) ──────── */
-    .tier-pips { display: flex; align-items: center; gap: 5px; margin-top: 9px; }
-    .tier-pip {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 17px; height: 17px; border-radius: 5px; border: 1px solid rgba(216,168,255,.4);
-      color: var(--quiet); font: 700 .56rem/1 var(--sans); background: rgba(255,255,255,.03);
+    .hero-art img { position: absolute; inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); object-fit: contain; }
+    .hero h1 { margin: 0; font-family: var(--serif); font-weight: 800; font-size: 46px; letter-spacing: .08em; line-height: 1.1; }
+    .hero-en { font-size: 10px; letter-spacing: .24em; color: var(--teal); margin-top: 6px; }
+    .hero-hook { margin: 0; font-family: var(--hand); font-size: 17px; line-height: 1.5; }
+    .world-status-strip {
+      display: inline-flex; align-items: center; gap: 10px; margin-top: 6px; padding: 8px 16px; border-radius: 18px;
+      border: 1.5px solid var(--line-2); background: var(--night-2); color: var(--mist-2); text-align: left;
     }
-    .tier-pip.is-lit { border-color: var(--gold); background: rgba(255,203,117,.22); color: var(--gold); }
-    .tier-pip.is-current { box-shadow: 0 0 0 1px var(--violet), 0 0 10px rgba(216,168,255,.45); }
-    .tier-pips-label { margin-left: 2px; color: var(--quiet); font-size: .66rem; }
+    .world-status-strip.is-open { border-color: var(--lamp); background: rgba(255,207,107,.12); color: var(--lamp); }
+    .world-status-dot { width: 14px; height: 18px; border-radius: 6px; border: 1.5px solid var(--mist); flex: 0 0 auto; }
+    .world-status-dot.is-open { border: 0; background: var(--lamp); box-shadow: 0 0 10px var(--lamp); animation: flick 2.4s ease-in-out infinite; }
+    .world-status-copy { display: flex; flex-direction: column; gap: 2px; }
+    .world-status-en { font-size: 12px; letter-spacing: .08em; }
+    .world-status-jp { font-size: 12px; color: var(--mist); }
+    .world-status-strip.is-open .world-status-jp { color: #f0d9a0; }
+    @keyframes flick { 0%, 100% { opacity: 1; } 50% { opacity: .7; } }
 
-    .lower-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 16px; }
-    .panel { padding: 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
-    .journal-list { display: grid; gap: 10px; }
-    .journal-entry { padding: 13px 14px; border-left: 2px solid var(--violet); background: rgba(216,168,255,.055); }
-    .journal-entry h3 { margin: 0; color: #fff4ff; font-size: .98rem; font-weight: 400; }
-    .journal-entry h3 small { display: block; margin-top: 4px; color: var(--quiet); font-size: .73rem; }
-    .journal-meta { margin: 9px 0 0; color: var(--muted); font: .67rem/1.4 var(--sans); }
-    .journal-next { margin: 7px 0 0; color: var(--mint); font-size: .74rem; line-height: 1.4; }
-    .journal-next.is-done { color: var(--quiet); }
-    .journal-empty { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.55; }
-    .journal-empty small { display: block; margin-top: 6px; color: var(--quiet); font-size: .82em; }
-    .cabinet-count { color: var(--gold); font-size: 2.7rem; line-height: 1; }
-    .cabinet-label { margin: 9px 0 18px; color: var(--muted); font-size: .9rem; }
-    .word-list { display: flex; flex-wrap: wrap; gap: 6px; }
-    .word { padding: 5px 8px; border: 1px solid rgba(255,203,117,.3); border-radius: 999px; color: #ffe7b2; background: rgba(255,203,117,.07); font-size: .7rem; }
-    .word-more { color: var(--quiet); font-size: .72rem; align-self: center; }
-
-    .footer-note { margin: 30px 0 0; color: var(--quiet); font: .65rem/1.6 var(--sans); letter-spacing: .08em; text-align: center; text-transform: uppercase; }
-    .loading { padding: 44px 20px; color: var(--muted); text-align: center; }
-    .loading small { display: block; margin-top: 6px; color: var(--quiet); }
-
-    @media (max-width: 760px) {
-      .hero { grid-template-columns: 1fr; }
-      .hero-art { order: 2; width: 250px; height: 250px; margin: 4px auto 0; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .drifter-grid { grid-template-columns: repeat(2, 1fr); }
-      .lower-grid { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 460px) {
-      .page { width: min(100% - 18px, 1040px); padding-top: 15px; }
-      .topbar { margin-bottom: 15px; }
-      .case-label { display: none; }
-      .hero { border-radius: 19px; padding: 30px 20px 34px; }
-      .hero-art { width: 225px; height: 225px; }
-      .echo-top { align-items: start; flex-direction: column; gap: 10px; }
-      .echo-status { text-align: left; }
-      .drifter-grid { grid-template-columns: 1fr; }
-      .drifter-card { min-height: 140px; }
-    }
-    /* ── Reading difficulty toggle ───────────────────── */
-    .difficulty-card { padding: 17px 19px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); }
-    .difficulty-toggle { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    /* reading depth */
+    .depth { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
     .difficulty-option {
-      display: inline-flex; flex-direction: column; align-items: flex-start; gap: 3px; flex: 1 1 160px;
-      padding: 11px 15px; border: 1px solid rgba(216,168,255,.28); border-radius: 12px;
-      color: #f1eaff; font: 700 .82rem/1.2 var(--font); text-align: left; cursor: pointer;
-      background: linear-gradient(180deg, rgba(216,168,255,.1), rgba(10,7,17,.4));
-      transition: color .18s, border-color .18s, background .18s, transform .18s, box-shadow .18s;
+      min-height: 104px; border-radius: 18px; border: 1.5px solid var(--line-2); background: var(--night-2); color: var(--mist-2);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; padding: 8px 4px;
     }
-    .difficulty-option small { color: var(--quiet); font: .7rem/1.3 var(--sans); letter-spacing: .06em; }
-    .difficulty-option:hover, .difficulty-option:focus-visible {
-      color: var(--ink); border-color: var(--violet); background: var(--violet-soft); outline: none; transform: translateY(-1px);
-    }
-    .difficulty-option.is-active {
-      color: #fff8ff; border-color: #e4cfff;
-      background: linear-gradient(180deg, rgba(216,168,255,.28), rgba(216,168,255,.1));
-      box-shadow: 0 3px 0 rgba(0,0,0,.28), 0 0 16px rgba(216,168,255,.28), inset 0 1px rgba(255,255,255,.18);
-    }
-    .difficulty-option.is-active small { color: #d6cbe9; }
-    .difficulty-note { margin: 12px 2px 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
-    .difficulty-note small { display: block; margin-top: 4px; color: var(--quiet); font-size: .82em; }
+    .difficulty-option .lamps { display: flex; gap: 3px; margin-bottom: 2px; }
+    .difficulty-option .lamps i { width: 12px; height: 18px; border-radius: 6px; border: 1.5px solid #4a5a73; }
+    .difficulty-option .lamps i.on { border: 0; background: #8a97a8; }
+    .difficulty-option .d-jp { font-size: 14px; color: var(--text); }
+    .difficulty-option .d-en { font-size: 10px; letter-spacing: .06em; }
+    .difficulty-option.is-active { border: 2px solid var(--lamp); background: linear-gradient(180deg, rgba(255,207,107,.22), var(--night-2)); color: var(--lamp); box-shadow: 0 0 18px rgba(255,207,107,.3); }
+    .difficulty-option.is-active .lamps i.on { background: var(--lamp); box-shadow: 0 0 8px var(--lamp); }
+    .difficulty-option:focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; }
+    .difficulty-note { margin: 10px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--night-2); font-size: 13px; line-height: 1.6; }
 
+    /* this week's trail */
+    .weekly-hunt-copy { margin: 0; }
+    .trail { position: relative; border-radius: 22px; background: linear-gradient(180deg, var(--night-2), #121a2a); border: 1px solid var(--line); overflow: hidden; }
+    .trail > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .trail-stops { position: relative; list-style: none; margin: 0; padding: 0; }
+    .trail-stop { height: 100px; display: flex; align-items: center; gap: 10px; padding: 0 6%; }
+    .trail-stop:nth-child(even) { flex-direction: row-reverse; text-align: right; }
+    .trail-face { width: 72px; height: 72px; flex: 0 0 72px; border-radius: 50%; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; background: var(--night-2); border: 2px dashed #4a5a73; }
+    .trail-face img { height: 68px; width: auto; filter: grayscale(1) brightness(.55); }
+    .trail-stop.done .trail-face { border: 0; background: radial-gradient(circle, #6a5320, #2a2010); box-shadow: 0 0 0 3px var(--lamp), 0 0 22px rgba(255,207,107,.6); }
+    .trail-stop.done .trail-face img { filter: none; }
+    .trail-stop.active .trail-face { border: 0; background: var(--night-3); box-shadow: 0 0 0 3px var(--teal), 0 0 16px rgba(127,211,199,.5); animation: flick 2.4s ease-in-out infinite; }
+    .trail-stop.active .trail-face img { filter: none; }
+    .trail-name { display: flex; flex-direction: column; font-size: 13px; }
+    .trail-name span { font-size: 11px; color: var(--mist); }
+    .trail-stop.done .trail-name span { color: var(--lamp); }
+    .trail-stop.active .trail-name span { color: var(--teal); }
+
+    /* three echoes */
+    .echo-card { position: relative; aspect-ratio: 1 / .9; max-height: 360px; border-radius: 22px; background: radial-gradient(circle at 50% 60%, var(--night-3), #121a2a 70%); border: 1px solid var(--line); }
+    .echo-card > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .echo-node { position: absolute; width: 84px; margin-left: -42px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: var(--mist); text-align: center; }
+    .echo-node .face { width: 78px; height: 78px; border-radius: 50%; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; background: var(--night-2); border: 2px dashed #4a5a73; }
+    .echo-node .face img { height: 72px; filter: grayscale(1) brightness(.5); }
+    .echo-node.lit { color: var(--text); }
+    .echo-node.lit .face { border: 0; background: radial-gradient(circle, #6a5320, #2a2010); box-shadow: 0 0 0 3px var(--lamp), 0 0 18px rgba(255,207,107,.6); }
+    .echo-node.lit .face img { filter: none; }
+    .echo-gate { position: absolute; left: 50%; top: 52%; width: 84px; height: 84px; margin: -42px 0 0 -42px; border-radius: 16px; background: var(--night); border: 2px solid #4a5a73; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; color: var(--mist); text-align: center; }
+    .echo-gate.open { border-color: var(--teal); color: var(--teal); box-shadow: 0 0 18px rgba(127,211,199,.45); }
+    .echo-note { margin: 12px 0 0; font-family: var(--hand); font-size: 15px; line-height: 1.6; text-align: center; }
+    .echo-status { display: block; margin-top: 4px; font-family: var(--sans); font-size: 11px; color: var(--lamp); letter-spacing: .06em; }
+    .echo-permanent-note { margin: 10px 0 0; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--teal); color: var(--teal); font-size: 12px; line-height: 1.6; text-align: center; }
+
+    /* lifetime stamps */
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .stat { aspect-ratio: 1; border-radius: 50%; border: 3px solid var(--stamp); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .stat:nth-child(1) { transform: rotate(-6deg); } .stat:nth-child(2) { transform: rotate(4deg); }
+    .stat:nth-child(3) { transform: rotate(-3deg); } .stat:nth-child(4) { transform: rotate(7deg); }
+    .stat-value { font-family: var(--serif); font-size: 24px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .stat-label { font-size: 10px; color: #f0a090; }
+    .stats-en { margin: 10px 0 0; font-size: 10px; color: var(--mist); text-align: center; letter-spacing: .04em; }
+
+    /* drifter files */
+    .drifter-grid { display: flex; flex-direction: column; gap: 28px; padding-top: 14px; }
+    .drifter-card {
+      position: relative; border-radius: 6px 22px 22px 22px; padding: 14px; display: grid; grid-template-columns: 86px 1fr; gap: 6px 12px;
+      background: #1a2335; color: var(--mist-2); border: 1.5px dashed var(--line-2);
+    }
+    .drifter-card.has-lifetime-memory { background: var(--paper); color: var(--ink); border: 0; box-shadow: 0 6px 0 var(--paper-edge); }
+    .drifter-card.is-weekly-restored { box-shadow: 0 6px 0 var(--paper-edge), 0 0 0 3px var(--lamp), 0 0 22px rgba(255,207,107,.45); }
+    .drifter-card:not(.has-lifetime-memory).is-weekly-restored { box-shadow: 0 0 0 3px var(--lamp), 0 0 22px rgba(255,207,107,.45); }
+    .file-tab { position: absolute; top: -14px; left: 0; padding: 3px 12px 4px; border-radius: 8px 8px 0 0; font-size: 10px; letter-spacing: .12em; background: #1a2335; color: var(--mist); border: 1.5px dashed var(--line-2); border-bottom: 0; }
+    .has-lifetime-memory .file-tab { background: var(--paper); color: #5a5244; border: 0; }
+    .drifter-avatar-wrap { grid-row: 1 / 4; width: 86px; height: 112px; border-radius: 12px; background: #121a2a; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+    .has-lifetime-memory .drifter-avatar-wrap { background: #d9cdb2; }
+    .drifter-avatar { height: 106px; width: auto; filter: grayscale(1) brightness(.55); }
+    .has-lifetime-memory .drifter-avatar { filter: none; }
+    .drifter-name { margin: 0; font-family: var(--serif); font-weight: 800; font-size: 18px; line-height: 1.2; padding-right: 58px; }
+    .drifter-name small { display: block; font-family: var(--sans); font-size: 11px; font-weight: 700; color: var(--mist); }
+    .has-lifetime-memory .drifter-name small { color: var(--ink-soft); }
+    .tier-pips { display: flex; gap: 4px; align-items: center; }
+    .tier-pip { width: 20px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 10px; border: 1.5px solid #3a4a63; color: #6a7a90; }
+    .has-lifetime-memory .tier-pip { border-color: #b8ac90; color: #8a7e66; }
+    .tier-pip.is-lit { background: var(--lamp); border-color: #e0a83a; color: var(--ink); box-shadow: 0 0 8px rgba(255,207,107,.8); }
+    .tier-pip.is-current { outline: 2px solid currentColor; outline-offset: 1px; }
+    .tier-pips-label { display: none; }
+    .drifter-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .drifter-weekly-state { margin: 0; display: inline-flex; padding: 3px 9px; border-radius: 999px; font-size: 11px; border: 1px dashed #4a5a73; color: var(--mist); }
+    .is-weekly-restored .drifter-weekly-state { border: 0; background: var(--ink); color: var(--lamp); }
+    .drifter-weekly-state.active { border: 0; background: #d6efe9; color: #1d5a52; }
+    .drifter-state { grid-column: 1 / 3; margin: 0; font-size: 10px; letter-spacing: .04em; color: var(--mist); }
+    .has-lifetime-memory .drifter-state { color: var(--ink-soft); }
+    .seal { position: absolute; right: 12px; top: 10px; width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--seal); color: var(--seal); display: flex; flex-direction: column; align-items: center; justify-content: center; transform: rotate(12deg); font-family: var(--serif); font-weight: 800; font-size: 15px; line-height: 1.05; }
+    .seal small { font-family: var(--sans); font-size: 7px; letter-spacing: .06em; }
+    .drifter-story {
+      grid-column: 1 / 3; position: relative; margin: 8px 0 0; padding: 10px 12px; border-radius: 14px;
+      font-family: var(--hand); font-size: 15px; line-height: 1.55; background: #121a2a; border: 1.5px solid var(--line-2); color: var(--mist-2);
+    }
+    .drifter-story::before { content: ''; position: absolute; top: -9px; left: 34px; width: 14px; height: 14px; background: #121a2a; border-left: 1.5px solid var(--line-2); border-top: 1.5px solid var(--line-2); transform: rotate(45deg); }
+    .has-lifetime-memory .drifter-story { background: var(--paper-2); border-color: var(--paper-line); color: var(--ink); }
+    .has-lifetime-memory .drifter-story::before { background: var(--paper-2); border-color: var(--paper-line); }
+    .drifter-story .jp-line { color: inherit; opacity: .7; font-size: 11px; }
+    .file-open { grid-column: 1 / 3; min-height: 44px; border-radius: 12px; border: 0; background: var(--ink); color: var(--paper); font-size: 13px; cursor: pointer; }
+    .file-open:focus-visible { outline: 3px solid var(--lamp); outline-offset: 2px; }
+
+    /* opened memory sheet */
+    .wsheet { position: fixed; inset: 0; z-index: 300; display: flex; align-items: flex-end; justify-content: center; background: rgba(5,8,14,.78); }
+    .wsheet[hidden] { display: none; }
+    .wsheet-panel {
+      width: min(560px, 100%); max-height: 92vh; overflow-y: auto; padding: 14px 16px 24px; border-radius: 28px 28px 0 0;
+      background: var(--paper); color: var(--ink); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 -10px 40px rgba(0,0,0,.5);
+      animation: sheetUp .3s ease-out both;
+    }
+    @keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .wsheet-grip { align-self: center; width: 48px; height: 5px; border-radius: 3px; background: var(--paper-edge); }
+    .wsheet-top { display: flex; gap: 12px; align-items: center; }
+    .wsheet-top img { height: 84px; width: auto; }
+    .wsheet-top h3 { margin: 0; font-family: var(--serif); font-weight: 800; font-size: 21px; line-height: 1.25; }
+    .wsheet-tier { font-size: 10px; letter-spacing: .2em; color: var(--seal); }
+    .wsheet-sub { font-size: 13px; color: var(--ink-soft); }
+    .panels { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .panel-row { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--paper-2); border: 1.5px solid var(--paper-line); }
+    .panel-num { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: var(--lamp); display: flex; align-items: center; justify-content: center; font-family: var(--serif); }
+    .panel-en { font-family: var(--hand); font-size: 17px; line-height: 1.5; }
+    .panel-row .jp-line { color: var(--ink-soft); }
+    .wword { padding: 0 2px; border: 0; border-bottom: 2px dotted #b88a2a; background: rgba(255,207,107,.25); color: inherit; font: inherit; cursor: pointer; border-radius: 3px; }
+    .wword:focus-visible, .vchip:focus-visible, .wsheet-close:focus-visible, .cab-word:focus-visible { outline: 3px solid var(--seal); outline-offset: 2px; }
+    .truth { padding: 12px 14px; border-radius: 14px; background: var(--ink); color: var(--paper); }
+    .truth span { font-size: 10px; letter-spacing: .2em; color: var(--lamp); }
+    .truth p { margin: 4px 0 0; font-family: var(--hand); font-size: 16px; line-height: 1.55; }
+    .vlabel { font-size: 10px; letter-spacing: .2em; color: var(--ink-soft); }
+    .vchips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .vchip { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #b8ac90; background: transparent; color: var(--ink); font-size: 13px; cursor: pointer; }
+    .vchip[aria-pressed="true"] { background: var(--ink); color: var(--lamp); border-color: var(--ink); }
+    .vdetail { min-height: 40px; padding: 10px 12px; border-radius: 12px; background: var(--paper-2); border: 1.5px dashed var(--paper-line); font-size: 13px; line-height: 1.5; }
+    .vdetail b { font-family: var(--hand); font-size: 17px; }
+    .vdetail .jp-line { color: var(--ink-soft); }
+    .next-tier { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; border: 1.5px dashed #b8ac90; font-size: 12px; line-height: 1.5; }
+    .next-tier .jp-line { color: var(--ink-soft); }
+    .wsheet-close { min-height: 48px; border-radius: 999px; border: 0; background: var(--seal); color: var(--paper-2); font-size: 14px; cursor: pointer; }
+
+    /* postcard album */
+    .journal-list { display: flex; flex-direction: column; gap: 18px; }
+    .journal-entry { position: relative; padding: 16px 16px 14px; border-radius: 6px; background: var(--paper); color: var(--ink); box-shadow: 0 10px 24px rgba(0,0,0,.45); display: grid; grid-template-columns: 1fr 70px; gap: 8px 12px; }
+    .journal-entry:nth-child(odd) { transform: rotate(-1.2deg); }
+    .journal-entry:nth-child(even) { transform: rotate(1deg); }
+    .journal-entry::after { content: ''; position: absolute; inset: 7px; border: 1px solid var(--paper-line); border-radius: 3px; pointer-events: none; }
+    .pc-from { font-size: 10px; letter-spacing: .16em; color: var(--seal); }
+    .journal-entry h3 { margin: 4px 0 0; font-family: var(--serif); font-weight: 800; font-size: 19px; line-height: 1.25; }
+    .journal-entry h3 small { display: block; font-family: var(--sans); font-size: 12px; font-weight: 700; color: var(--ink-soft); margin-top: 4px; }
+    .postmark { width: 66px; height: 66px; border-radius: 50%; border: 2px solid var(--ink-soft); color: var(--ink-soft); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; line-height: 1.15; transform: rotate(-14deg); }
+    .postmark b { font-family: var(--serif); font-size: 18px; }
+    .pc-text { grid-column: 1 / 3; margin: 0; padding-top: 8px; border-top: 1.5px dashed var(--paper-edge); font-family: var(--hand); font-size: 16px; line-height: 1.7; }
+    .pc-foot { grid-column: 1 / 3; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--ink-soft); }
+    .journal-next.is-done { color: #2d6a4f; }
+    .journal-entry .tier-pip { border-color: #b8ac90; color: #8a7e66; }
+    .journal-entry .tier-pip.is-lit { color: var(--ink); }
+    .journal-meta { grid-column: 1 / 3; margin: 0; font-size: 11px; color: var(--ink-soft); }
+    .pc-slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+    .pc-slot { height: 92px; border-radius: 6px; border: 1.5px dashed var(--line-2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--mist); font-size: 12px; }
+    .pc-slot b { font-family: var(--serif); font-size: 26px; color: #4a5a73; }
+    .journal-empty { margin: 0; padding: 18px; border-radius: 16px; border: 1px dashed var(--line-2); text-align: center; font-size: 13px; line-height: 1.6; color: var(--mist); }
+
+    /* word cabinet */
+    .cabinet {
+      padding: 14px 12px 16px; border-radius: 18px; background: linear-gradient(180deg, #5a3d24, #3e2a18);
+      box-shadow: inset 0 0 0 3px #6e4c2e, 0 8px 0 #2a1c10;
+    }
+    .word-list { display: flex; flex-wrap: wrap; gap: 12px 6px; }
+    .cab-word { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 0; background: var(--paper); color: var(--ink); font-family: var(--hand); font-size: 16px; box-shadow: 0 3px 0 #b8ac90, 0 7px 0 #2a1c10; cursor: pointer; }
+    .cab-word[aria-pressed="true"] { background: var(--lamp); box-shadow: 0 3px 0 #b88a2a, 0 7px 0 #2a1c10; }
+    .word-more { align-self: center; color: #e8d3b0; font-size: 12px; }
+    .cabinet-detail { margin-top: 12px; display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 16px; background: var(--paper); color: var(--ink); min-height: 56px; }
+    .cabinet-detail b { font-family: var(--hand); font-size: 22px; font-weight: 600; }
+    .cabinet-detail span { display: flex; flex-direction: column; font-size: 13px; line-height: 1.45; }
+    .cabinet-detail .jp-line { color: var(--ink-soft); }
+    .cabinet-label { margin: 8px 0 0; font-size: 11px; color: var(--mist); text-align: center; }
+
+    /* memory garden */
+    .garden { padding: 18px 16px; border-radius: 22px; background: radial-gradient(circle at 50% 0%, #2c5a52, #142a2a 70%); border: 1.5px solid var(--teal); display: flex; flex-direction: column; gap: 12px; }
+    .garden q { display: block; font-family: var(--hand); font-size: 16px; line-height: 1.6; quotes: '“' '”'; }
+    .garden cite { display: block; font-style: normal; font-size: 12px; color: #a9d8d0; }
+
+    #profile-content { display: flex; flex-direction: column; gap: 34px; }
+    .loading { padding: 30px; text-align: center; color: var(--mist); }
+    .loading small { display: block; margin-top: 4px; }
+    .footer-note { margin: 0; text-align: center; font-size: 11px; line-height: 1.7; color: var(--mist); }
+
+    @media (min-width: 640px) {
+      .drifter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 14px; }
+      .hero-art { width: 260px; height: 260px; }
+    }
+    @media (max-width: 360px) {
+      .pn-orb { width: 44px; height: 44px; }
+      .hero h1 { font-size: 38px; }
+      .drifter-card { grid-template-columns: 70px 1fr; }
+      .drifter-avatar-wrap { width: 70px; height: 96px; }
+      .drifter-avatar { height: 90px; }
+    }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
     }
   </style>
 </head>
 <body>
   <main class="page">
     <div class="topbar">
-      <div class="case-label">UTSUROBA / MEMORY ARCHIVE<br><ruby>記憶<rt>きおく</rt></ruby>の<ruby>保管<rt>ほかん</rt></ruby><ruby>場所<rt>ばしょ</rt></ruby></div>
       <a class="back-link" id="utsuroba-profile-karasuki" href="karasuki.html?room=room_03" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
+      <div class="case-label">UTSUROBA / MEMORY ARCHIVE<span class="jp"><br><ruby>記憶<rt>きおく</rt></ruby>の<ruby>保管<rt>ほかん</rt></ruby><ruby>場所<rt>ばしょ</rt></ruby></span></div>
+      <button type="button" class="jp-toggle" id="jp-toggle" aria-pressed="true" aria-label="Japanese help / にほんごの ヘルプ"><span class="dot" aria-hidden="true"></span>にほんご</button>
     </div>
 
     <nav class="profile-network" aria-label="Output profiles">
-      <a href="profile.html">LOG <small>ぼうけんログ</small></a>
-      <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
-      <a href="utsuroba-profile.html" aria-current="page">UTSUROBA <small>うつろば</small></a>
-      <!-- Hidden until BoohaUnlockSystem.isMuenbaUnlocked() — see the
-           small script near the end of body that toggles this. -->
-      <a href="muenba-profile.html" id="pnet-muenba" hidden>MUENBA <small>むえんば</small></a>
-      <!-- Hidden until all nine games open the Grimmerglen world gate. -->
-      <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
+      <a href="profile.html"><span class="pn-orb log"><img src="assets/img/profile/portal-log.webp" alt="" width="44" height="44"></span><span class="pn-label">ログ<small>LOG</small></span></a>
+      <a href="adventure-profile.html"><span class="pn-orb adventure"><img src="assets/img/profile/portal-adventure.webp" alt="" width="36" height="36"></span><span class="pn-label">ぼうけん<small>ADVENTURE</small></span></a>
+      <a href="utsuroba-profile.html" aria-current="page"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="36" height="42"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
+      <!-- Shown locked (dim + padlock) until BoohaUnlockSystem.isMuenbaUnlocked(). -->
+      <a href="muenba-profile.html" id="pnet-muenba" class="is-locked" aria-disabled="true" data-label="MUENBA"><span class="pn-orb muenba"><img src="assets/img/profile/portal-muenba.webp" alt="" width="36" height="44"></span><span class="pn-label">むえんば<small>MUENBA</small></span></a>
+      <!-- Shown locked until all nine games open the Grimmerglen world gate. -->
+      <a href="grimmerglen-profile.html" id="pnet-grimmerglen" class="is-locked" aria-disabled="true" data-label="GRIMMERGLEN"><span class="pn-orb grimmerglen"><img src="assets/img/profile/portal-grimmerglen.webp" alt="" width="36" height="36"></span><span class="pn-label">グリマー<small>GRIMMERGLEN</small></span></a>
     </nav>
 
     <section class="hero" aria-labelledby="page-title">
-      <div class="hero-copy-block">
-        <p class="eyebrow">A room for what stayed</p>
-        <h1 id="page-title">Utsuroba</h1>
-        <p class="hero-jp">うつろば — <ruby>記憶<rt>きおく</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></p>
-        <p class="hero-copy">
-          Some memories disappear. Some wait for you to notice them again.
-          This is the record of the ones that stayed.
-          <small>消えてしまう<ruby>記憶<rt>きおく</rt></ruby>もあれば、もう<ruby>一度<rt>いちど</rt></ruby>気づかれるのを<ruby>待<rt>ま</rt></ruby>つ<ruby>記憶<rt>きおく</rt></ruby>もあります。</small>
-        </p>
-        <div class="world-status-strip" aria-live="polite">
-          <span class="world-status-dot" id="utsuroba-world-status-dot" aria-hidden="true"></span>
-          <span class="world-status-copy" id="utsuroba-world-status">
-            <span class="world-status-en">UTSUROBA IS LOCKED NOW.</span>
-            <span class="world-status-jp">うつろばは<ruby>今<rt>いま</rt></ruby>、<ruby>閉<rt>と</rt></ruby>じています。</span>
-          </span>
-        </div>
-      </div>
       <div class="hero-art">
         <img src="assets/img/drifters/kurobane_shizuma-profile.webp" alt="Kurobane Shizuma looking down at an extinguished lantern" width="768" height="768" decoding="async">
+      </div>
+      <span class="hero-en">UTSUROBA · A ROOM FOR WHAT STAYED</span>
+      <h1 id="page-title"><span class="jp">うつろば</span><span class="en-only" hidden>Utsuroba</span></h1>
+      <p class="hero-hook">Some memories wait for you<br>to notice them again.<span class="jp-line jp"><ruby>消<rt>き</rt></ruby>えない <ruby>記憶<rt>きおく</rt></ruby>が、また <ruby>気<rt>き</rt></ruby>づいてもらうのを <ruby>待<rt>ま</rt></ruby>っています。</span></p>
+      <div class="world-status-strip" id="utsuroba-world-status-strip" aria-live="polite">
+        <span class="world-status-dot" id="utsuroba-world-status-dot" aria-hidden="true"></span>
+        <span class="world-status-copy" id="utsuroba-world-status">
+          <span class="world-status-en">UTSUROBA IS LOCKED NOW.</span>
+          <span class="world-status-jp jp">うつろばは<ruby>今<rt>いま</rt></ruby>、<ruby>閉<rt>と</rt></ruby>じています。</span>
+        </span>
       </div>
     </section>
 
     <section id="profile-content" aria-live="polite">
-      <div class="loading">Opening the archive…<small><ruby>記録<rt>きろく</rt></ruby>をひらいています…</small></div>
+      <div class="loading">Opening the archive…<small class="jp"><ruby>記録<rt>きろく</rt></ruby>をひらいています…</small></div>
     </section>
 
-    <p class="footer-note">The stories stay after the week changes · <ruby>物語<rt>ものがたり</rt></ruby>は<ruby>週<rt>しゅう</rt></ruby>が<ruby>変<rt>か</rt></ruby>わっても<ruby>残<rt>のこ</rt></ruby>ります</p>
+    <p class="footer-note">The stories stay after the week changes<span class="jp"> · <ruby>物語<rt>ものがたり</rt></ruby>は<ruby>週<rt>しゅう</rt></ruby>が<ruby>変<rt>か</rt></ruby>わっても<ruby>残<rt>のこ</rt></ruby>ります</span></p>
   </main>
+
+  <div class="wsheet" id="memory-sheet" hidden>
+    <div class="wsheet-panel" role="dialog" aria-modal="true" aria-labelledby="wsheet-title" id="memory-sheet-panel"></div>
+  </div>
 
   <script src="./js/token.js"></script>
   <script src="./js/calendar.js"></script>
@@ -320,6 +386,7 @@
   <script src="./js/utsu-furigana.js"></script>
   <script src="./js/utsuroba-data.js"></script>
   <script src="./js/utsuroba-episodes.js"></script>
+  <script src="./js/ui/world-portals.js"></script>
 
   <script>
     (() => {
@@ -355,17 +422,31 @@
           : (window.UTSUROBA_EPISODES && window.UTSUROBA_EPISODES[id]);
       }
 
+      // ── Japanese help toggle (per device) ──────────────────────────────
+      const jpToggle = document.getElementById('jp-toggle');
+      function jpOn() { return !document.documentElement.classList.contains('jp-off'); }
+      function syncJpToggle() {
+        const on = jpOn();
+        jpToggle.setAttribute('aria-pressed', String(on));
+        document.querySelectorAll('.en-only').forEach(el => { el.hidden = on; });
+      }
+      jpToggle.addEventListener('click', () => {
+        const on = !jpOn();
+        document.documentElement.classList.toggle('jp-off', !on);
+        try { localStorage.setItem('booha_utsu_jp', on ? '1' : '0'); } catch (_) {}
+        syncJpToggle();
+      });
+      syncJpToggle();
+
       // Starter Memory / Case Memory / Deep Memory — the same three-tier
       // naming already shipped in Muenba. All three are fully authored per
-      // episode (utsuroba-episodes.js's resolveEpisode() has supported
-      // 'start'/'fresh'/'deep' since it was written), but this page used to
-      // offer only two of the three buttons, and a brand-new save defaulted
-      // straight to 'deep' — so Starter Memory was never actually reachable.
+      // episode (utsuroba-episodes.js's resolveEpisode() supports
+      // 'start'/'fresh'/'deep'); a new save starts at Starter.
       const TIERS = ['start', 'fresh', 'deep'];
       const TIER_META = {
-        start: { en: 'Starter Memory', jp: `${rb('始', 'はじ')}めの${rb('記憶', 'きおく')}`, pip: 'S', note: 'The simplest words. A good first read.', noteJP: 'いちばんやさしい言葉です。最初に読むのにぴったりです。' },
-        fresh: { en: 'Case Memory', jp: `${rb('新', 'あたら')}しい${rb('記憶', 'きおく')}`, pip: 'C', note: 'The same stories, told in shorter, simpler words.', noteJP: '同じ物語を、短くやさしい言葉で伝えます。' },
-        deep:  { en: 'Deep Memory', jp: `${rb('深', 'ふか')}い${rb('記憶', 'きおく')}`, pip: 'D', note: 'The full stories, the way they were first written.', noteJP: '最初に書かれたままの、完全な物語です。' },
+        start: { en: 'Starter Memory', short: 'STARTER', jp: 'はじめ', lamps: 1, note: 'The simplest words. A good first read.', noteJP: 'いちばん やさしい ことば。さいしょに ぴったり。' },
+        fresh: { en: 'Case Memory', short: 'CASE', jp: 'ケース', lamps: 2, note: 'The same stories in short, simple words.', noteJP: 'おなじ ものがたりを みじかく やさしい ことばで。' },
+        deep:  { en: 'Deep Memory', short: 'DEEP', jp: 'ふかい', lamps: 3, note: 'The full stories, the way they were first written.', noteJP: 'さいしょに かかれた ままの ものがたり。' },
       };
 
       function memoryModeLabel(value) {
@@ -390,18 +471,19 @@
         render();
       }
 
+      function lampsMarkup(count) {
+        return `<span class="lamps" aria-hidden="true">${[1, 2, 3].map(n => `<i class="${n <= count ? 'on' : ''}"></i>`).join('')}</span>`;
+      }
+
       function difficultyMarkup() {
         const current = getDifficulty();
         const meta = TIER_META[current];
-        return `<section class="section">
-          <div class="section-heading"><h2>How This Reads</h2><p>読み方</p></div>
-          <div class="difficulty-card">
-            <div class="difficulty-toggle" role="group" aria-label="Reading difficulty">
-              ${TIERS.map(tier => `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}" data-difficulty="${tier}" aria-pressed="${tier === current}">${esc(TIER_META[tier].en)}<small>${TIER_META[tier].jp}</small></button>`).join('')}
-            </div>
-            <p class="difficulty-note">${esc(meta.note)}<small>${esc(meta.noteJP)}</small></p>
-            <p class="difficulty-note" style="margin-top:8px;opacity:.75">Everything below — the drifters, the journal, the word cabinet, the three echoes — shows what's been restored at whichever memory you're viewing here.<small>下に表示されるドリフター・読書ノート・言葉の戸棚・三つの残響は、ここで選んだ記憶での記録を示します。</small></p>
+        return `<section class="section" aria-labelledby="depth-title">
+          <div class="sec-head"><div><span class="kick">HOW THIS READS · READING DEPTH</span><h2 class="h2" id="depth-title">どこまで ふかく よむ？</h2></div></div>
+          <div class="depth" role="group" aria-label="Reading difficulty">
+            ${TIERS.map(tier => `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}" data-difficulty="${tier}" aria-pressed="${tier === current}" aria-label="${esc(TIER_META[tier].en)}">${lampsMarkup(TIER_META[tier].lamps)}<span class="d-jp">${esc(TIER_META[tier].jp)}</span><span class="d-en">${esc(TIER_META[tier].short)}</span></button>`).join('')}
           </div>
+          <p class="difficulty-note">${esc(meta.note)}<span class="jp-line jp">${esc(meta.noteJP)}</span></p>
         </section>`;
       }
 
@@ -414,9 +496,11 @@
         const status = document.getElementById('utsuroba-world-status');
         if (status) {
           status.innerHTML = open
-            ? '<span class="world-status-en">UTSUROBA IS OPEN.</span><span class="world-status-jp">うつろばは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
-            : '<span class="world-status-en">UTSUROBA IS LOCKED NOW.</span><span class="world-status-jp">うつろばは<ruby>今<rt>いま</rt></ruby>、<ruby>閉<rt>と</rt></ruby>じています。</span>';
+            ? '<span class="world-status-en">UTSUROBA IS OPEN.</span><span class="world-status-jp jp">うつろばは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
+            : '<span class="world-status-en">UTSUROBA IS LOCKED NOW.</span><span class="world-status-jp jp">うつろばは<ruby>今<rt>いま</rt></ruby>、<ruby>閉<rt>と</rt></ruby>じています。</span>';
         }
+        const strip = document.getElementById('utsuroba-world-status-strip');
+        if (strip) strip.classList.toggle('is-open', open);
         const dot = document.getElementById('utsuroba-world-status-dot');
         if (dot) dot.classList.toggle('is-open', open);
         const karasukiLink = document.getElementById('utsuroba-profile-karasuki');
@@ -425,18 +509,13 @@
 
       // Tier-agnostic "has this ever been restored, at any memory" — used
       // for lifetime badges/pips. Matches how the convergence gate itself
-      // reads readingEchoes in js/utsuroba.js, so a drifter's card and the
-      // in-world gate never disagree about whether a memory counts.
+      // reads readingEchoes in js/utsuroba.js.
       function restoredEver(utsu, drifter) {
         return !!(drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId]);
       }
 
       // Tier-specific — "was this restored at the memory currently being
-      // viewed on this page." This is the one that was missing before: the
-      // page only ever asked restoredEver(), so every drifter that had
-      // *ever* been restored stayed lit no matter which tier you switched
-      // to, and a memory settled at Starter looked identical to one never
-      // read at all once you switched to Deep.
+      // viewed on this page."
       function restoredAtTier(utsu, drifter, tier) {
         const echo = drifter && drifter.episodeId && utsu.readingEchoes && utsu.readingEchoes[drifter.episodeId];
         return !!(echo && echo.tiers && echo.tiers[tier]);
@@ -448,10 +527,130 @@
       }
 
       function tierPipsMarkup(restoredTiers, currentTier) {
-        return `<div class="tier-pips" aria-hidden="true">${TIERS.map(tier => {
+        return `<div class="tier-pips" aria-label="${TIERS.map(tier => `${TIER_META[tier].en}: ${restoredTiers[tier] ? 'restored' : 'not yet'}`).join(', ')}">${TIERS.map(tier => {
           const lit = !!restoredTiers[tier];
-          return `<span class="tier-pip${lit ? ' is-lit' : ''}${tier === currentTier ? ' is-current' : ''}" title="${esc(TIER_META[tier].en)}${lit ? ' — restored' : ' — not yet'}">${TIER_META[tier].pip}</span>`;
+          return `<span class="tier-pip${lit ? ' is-lit' : ''}${tier === currentTier ? ' is-current' : ''}" title="${esc(TIER_META[tier].en)}${lit ? ' — restored' : ' — not yet'}">${TIER_META[tier].en[0]}</span>`;
         }).join('')}<span class="tier-pips-label">S · C · D</span></div>`;
+      }
+
+      function spriteFor(drifter) {
+        return String(drifter && drifter.sprite1 || '').replace(/^\.\//, '');
+      }
+
+      function firstSentence(text) {
+        const s = String(text || '').trim();
+        const m = s.match(/^[^.!?]*[.!?]/);
+        return m ? m[0] : s;
+      }
+
+      // ── story panels with tappable vocabulary ──────────────────────────
+      function wordHelpHTML(text, vocab) {
+        const raw = String(text || '');
+        const items = (vocab || []).filter(v => v && v.word)
+          .map((v, i) => ({ v, i }))
+          .sort((a, b) => b.v.word.length - a.v.word.length);
+        const marks = [];
+        const lower = raw.toLowerCase();
+        items.forEach(({ v, i }) => {
+          const w = v.word.toLowerCase();
+          // Allow simple endings so "wait" also lights up "waits" / "waited".
+          const re = new RegExp(`(^|[^a-z])(${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:s|es|d|ed|ing)?)(?=[^a-z]|$)`, 'i');
+          const m = re.exec(lower);
+          if (!m) return;
+          const start = m.index + m[1].length;
+          const end = start + m[2].length;
+          if (marks.some(x => start < x.end && end > x.start)) return;
+          marks.push({ start, end, i });
+        });
+        marks.sort((a, b) => a.start - b.start);
+        let out = '';
+        let pos = 0;
+        marks.forEach(m => {
+          out += esc(raw.slice(pos, m.start));
+          out += `<button type="button" class="wword" data-vocab="${m.i}">${esc(raw.slice(m.start, m.end))}</button>`;
+          pos = m.end;
+        });
+        return out + esc(raw.slice(pos));
+      }
+
+      const sheet = document.getElementById('memory-sheet');
+      const sheetPanel = document.getElementById('memory-sheet-panel');
+      let sheetReturnFocus = null;
+
+      function closeSheet() {
+        sheet.hidden = true;
+        document.documentElement.classList.remove('wsheet-open');
+        if (sheetReturnFocus && sheetReturnFocus.isConnected) sheetReturnFocus.focus();
+      }
+
+      function openSheet(drifterId, trigger) {
+        const drifters = Array.isArray(window.UTSUROBA_DATA?.drifters) ? window.UTSUROBA_DATA.drifters : [];
+        const drifter = drifters.find(d => d.id === drifterId);
+        if (!drifter) return;
+        const tier = getDifficulty();
+        const episode = episodeFor(drifter.episodeId, tier);
+        if (!episode) return;
+        const utsu = getSave().utsuroba || {};
+        const restoredTiers = tiersRestored(utsu, drifter);
+        const nextTier = TIERS.find(t => !restoredTiers[t]);
+        const card = episode.postcard || {};
+        const chunks = Array.isArray(card.chunks) && card.chunks.length ? card.chunks : (episode.lines || []).map(l => l.en);
+        const chunksJP = Array.isArray(card.chunksJP) ? card.chunksJP : [];
+        const vocab = Array.isArray(episode.vocabulary) ? episode.vocabulary : [];
+        sheetPanel.innerHTML = `
+          <span class="wsheet-grip" aria-hidden="true"></span>
+          <div class="wsheet-top">
+            <img src="${esc(spriteFor(drifter))}" alt="" width="60" height="84" decoding="async">
+            <div>
+              <span class="wsheet-tier">${esc(TIER_META[tier].en.toUpperCase())}</span>
+              <h3 id="wsheet-title">${esc(episode.title || drifter.name)}</h3>
+              <span class="wsheet-sub jp">${esc(episode.titleJP || drifter.nameKanji || '')}</span>
+            </div>
+          </div>
+          <ol class="panels">
+            ${chunks.map((chunk, i) => `<li class="panel-row"><span class="panel-num" aria-hidden="true">${i + 1}</span><span><span class="panel-en">${wordHelpHTML(chunk, vocab)}</span>${chunksJP[i] ? `<span class="jp-line jp">${esc(chunksJP[i])}</span>` : ''}</span></li>`).join('')}
+          </ol>
+          ${episode.success ? `<div class="truth"><span>THE TRUTH<span class="jp"> · わかったこと</span></span><p>${wordHelpHTML(episode.success, vocab)}</p></div>` : ''}
+          ${vocab.length ? `<div>
+            <span class="vlabel">WORDS FROM THIS MEMORY<span class="jp"> · ことば</span></span>
+            <div class="vchips" role="group" aria-label="Word help">${vocab.map((v, i) => `<button type="button" class="vchip" data-vocab="${i}" aria-pressed="false">${esc(v.word)}</button>`).join('')}</div>
+            <p class="vdetail" id="vdetail" aria-live="polite">Tap a word to see what it means.<span class="jp-line jp">ことばを タップすると いみが でるよ。</span></p>
+          </div>` : ''}
+          ${nextTier ? `<div class="next-tier">${lampsMarkup(TIER_META[nextTier].lamps)}<span>Try ${esc(TIER_META[nextTier].en)} to light the next lantern.<span class="jp-line jp">つぎは「${esc(TIER_META[nextTier].jp)}」で よんでみよう！</span></span></div>`
+            : `<div class="next-tier">${lampsMarkup(3)}<span>Every lantern is lit for this memory.<span class="jp-line jp">ぜんぶの ランタンが ついたよ！</span></span></div>`}
+          <button type="button" class="wsheet-close">とじる · Close</button>`;
+        const detail = sheetPanel.querySelector('#vdetail');
+        sheetPanel.querySelectorAll('[data-vocab]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const item = vocab[Number(btn.dataset.vocab)];
+            if (!item || !detail) return;
+            detail.innerHTML = `<b>${esc(item.word)}</b> — ${esc(item.definition)}<span class="jp-line jp">${esc(item.definitionJP || '')}</span>`;
+            sheetPanel.querySelectorAll('.vchip').forEach(chip => chip.setAttribute('aria-pressed', String(chip.dataset.vocab === btn.dataset.vocab)));
+          });
+        });
+        sheetPanel.querySelector('.wsheet-close').addEventListener('click', closeSheet);
+        sheetReturnFocus = trigger || null;
+        sheet.hidden = false;
+        document.documentElement.classList.add('wsheet-open');
+        sheetPanel.scrollTop = 0;
+        sheetPanel.querySelector('.wsheet-close').focus({ preventScroll: true });
+      }
+
+      sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
+
+      // ── trail + echoes drawings ────────────────────────────────────────
+      const STOP_H = 100;
+      function trailPath(count) {
+        const pts = [];
+        for (let i = 0; i < count; i++) pts.push([i % 2 ? 78 : 22, i * STOP_H + STOP_H / 2]);
+        if (!pts.length) return '';
+        return pts.reduce((d, p, i) => {
+          if (!i) return `M${p[0]} ${p[1]}`;
+          const prev = pts[i - 1];
+          const midY = (prev[1] + p[1]) / 2;
+          return `${d} C${prev[0]} ${midY} ${p[0]} ${midY} ${p[0]} ${p[1]}`;
+        }, '');
       }
 
       function render() {
@@ -478,8 +677,9 @@
         const weeklyRestoredCount = drifters.filter(drifter => weeklyCompletedFor(drifter)).length;
         const journal = Array.isArray(utsu.readingJournal?.entries) ? utsu.readingJournal.entries : [];
         const cabinet = Array.isArray(utsu.wordCabinet?.entries) ? utsu.wordCabinet.entries : [];
-        const convergenceIds = Array.isArray(window.UTSUROBA_DATA?.readingConvergence?.requiredDrifterIds)
-          ? window.UTSUROBA_DATA.readingConvergence.requiredDrifterIds : ['ks', 'nto', 'cg'];
+        const convergence = window.UTSUROBA_DATA?.readingConvergence || {};
+        const convergenceIds = Array.isArray(convergence.requiredDrifterIds)
+          ? convergence.requiredDrifterIds : ['ks', 'nto', 'cg'];
 
         // Plain running totals — every event counts, replays included, and
         // none of these ever go backward on a weekly rollover.
@@ -489,22 +689,60 @@
         const roomVisitsTotal = Math.max(0, Number(utsu.roomVisitsTotal) || 0);
 
         // Tier-scoped — how many of the three convergence memories are
-        // restored at the memory currently being viewed on this page. This
-        // used to be a single lifetime count that never changed no matter
-        // which tier the toggle above was set to, which is why it could
-        // read "3 of 3 found" and then never move again.
-        const echoesFoundAtTier = convergenceIds.filter(id => {
-          const drifter = drifters.find(item => item.id === id);
-          return restoredAtTier(utsu, drifter, currentTier);
-        }).length;
+        // restored at the memory currently being viewed on this page.
+        const echoFound = convergenceIds.map(id => restoredAtTier(utsu, drifters.find(item => item.id === id), currentTier));
+        const echoesFoundAtTier = echoFound.filter(Boolean).length;
         const convergenceSeen = !!utsu.flags?.convergenceSeen;
-
         const echoStatus = `${echoesFoundAtTier} of ${convergenceIds.length} found at ${currentTierMeta.en}`;
         const echoNote = echoesFoundAtTier >= convergenceIds.length
           ? `All three are restored at ${currentTierMeta.en}.`
           : 'Three memories are looking for the shape they share.';
 
-        const drifterCards = drifters.map(drifter => {
+        // ── this week's trail: restored first, then reading, then waiting
+        const trailOrder = drifters.filter(d => d.episodeId).map(d => ({
+          d, state: weeklyCompletedFor(d) ? 'done' : (weeklyActiveFor(d) ? 'active' : 'wait'),
+        })).sort((a, b) => ({ done: 0, active: 1, wait: 2 }[a.state] - { done: 0, active: 1, wait: 2 }[b.state]));
+        const trailH = trailOrder.length * STOP_H;
+        const litCount = trailOrder.filter(t => t.state === 'done').length;
+        const trailMarkup = `
+          <div class="trail" style="height:${trailH}px">
+            <svg viewBox="0 0 100 ${trailH}" preserveAspectRatio="none" aria-hidden="true">
+              <path d="${trailPath(trailOrder.length)}" fill="none" stroke="#3a4a63" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 16" vector-effect="non-scaling-stroke"></path>
+              ${litCount > 1 ? `<path d="${trailPath(litCount)}" fill="none" stroke="#ffcf6b" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 16" vector-effect="non-scaling-stroke"></path>` : ''}
+            </svg>
+            <ol class="trail-stops">
+              ${trailOrder.map(({ d, state }) => `<li class="trail-stop ${state}">
+                <span class="trail-face"><img src="${esc(spriteFor(d))}" alt="" height="68" loading="lazy" decoding="async"></span>
+                <span class="trail-name">${esc(String(d.name).split(' ')[0])}<span>${state === 'done' ? 'Restored this week<span class="jp"> · もどった ✓</span>' : state === 'active' ? 'In progress this week<span class="jp"> · よみかけ…</span>' : 'Available this week<span class="jp"> · まっている</span>'}</span></span>
+              </li>`).join('')}
+            </ol>
+          </div>`;
+
+        // ── three echoes triangle
+        const POS = [[50, 6], [18, 60], [82, 60]];
+        const EDGES = [[0, 1], [0, 2], [1, 2]];
+        const echoMarkup = `
+          <div class="echo-card" aria-label="${echoesFoundAtTier} of ${convergenceIds.length} echoes found at ${esc(currentTierMeta.en)}">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              ${EDGES.map(([a, b]) => {
+                const lit = echoFound[a] && echoFound[b];
+                return `<line x1="${POS[a][0]}" y1="${POS[a][1] + 16}" x2="${POS[b][0]}" y2="${POS[b][1] + 16}" stroke="${lit ? '#ffcf6b' : '#3a4a63'}" stroke-width="4" ${lit ? '' : 'stroke-dasharray="6 8"'} vector-effect="non-scaling-stroke"></line>`;
+              }).join('')}
+            </svg>
+            ${convergenceIds.map((id, i) => {
+              const d = drifters.find(item => item.id === id);
+              return `<div class="echo-node${echoFound[i] ? ' lit' : ''}" style="left:${POS[i][0]}%;top:${POS[i][1]}%"><span class="face"><img src="${esc(spriteFor(d))}" alt="" height="72" loading="lazy" decoding="async"></span>${esc(d ? String(d.name).split(' ')[0] : id)}</div>`;
+            }).join('')}
+            <div class="echo-gate${convergenceSeen ? ' open' : ''}">
+              ${convergenceSeen
+                ? '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 21c0-5 0-9 0-12"></path><path d="M12 13c-3 0-5-2-5-5 3 0 5 2 5 5z"></path><path d="M12 10c0-3 2-5 5-5 0 3-2 5-5 5z"></path></svg>'
+                : '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>'}
+              <span class="jp">きおくの にわ</span><span>GARDEN</span>
+            </div>
+          </div>`;
+
+        // ── drifter files
+        const drifterCards = drifters.map((drifter, index) => {
           const restoredHere = restoredAtTier(utsu, drifter, currentTier);
           const restoredTiers = tiersRestored(utsu, drifter);
           const restoredAny = restoredEver(utsu, drifter);
@@ -513,92 +751,140 @@
           const episode = drifter.episodeId ? episodeFor(drifter.episodeId, currentTier) : null;
           let storyHTML;
           if (restoredHere) {
-            storyHTML = esc(episode?.success || 'A memory has settled.');
+            storyHTML = `“${esc(episode?.success || 'A memory has settled.')}”`;
           } else if (restoredAny) {
-            storyHTML = `Restored at another memory — switch &ldquo;How This Reads&rdquo; above to see it, or find ${esc(drifter.name)} again to restore it here too.`;
+            storyHTML = `Restored at another depth — switch above to see it.<span class="jp-line jp">べつの ふかさで もどしたよ。うえで きりかえてね。</span>`;
+          } else if (episode?.intro) {
+            storyHTML = `“${esc(firstSentence(episode.intro))}” …?<span class="jp-line jp">まだ おもいだせない きおく。</span>`;
           } else {
-            storyHTML = esc('A memory is still waiting somewhere in Utsuroba.');
+            storyHTML = `A memory is still waiting somewhere in Utsuroba.<span class="jp-line jp">きおくは まだ うつろばの どこかに。</span>`;
           }
           const stateLabel = restoredHere
-            ? `Lifetime ${esc(currentTierMeta.en)} complete · ${rb('記憶', 'きおく')}が${rb('戻', 'もど')}った`
-            : (restoredAny ? `Lifetime open at ${esc(currentTierMeta.en)} · ${rb('別', 'べつ')}の${rb('記憶', 'きおく')}で${rb('戻', 'もど')}った` : `Lifetime still wandering · まださまよう`);
+            ? `Lifetime ${esc(currentTierMeta.en)} complete`
+            : (restoredAny ? `Lifetime open at another memory` : `Lifetime still wandering`);
           const weeklyStateLabel = weeklyRestored ? 'Restored this week' : (weeklyActive ? 'In progress this week' : 'Available this week');
+          const weeklyJP = weeklyRestored ? 'こんしゅう ✓' : (weeklyActive ? 'よみかけ…' : 'こんしゅう まだ');
           return `<article class="drifter-card${restoredHere ? ' has-lifetime-memory' : ''}${weeklyRestored ? ' is-weekly-restored' : ''}">
-            <div class="drifter-card-top">
-              <img class="drifter-avatar" src="${esc(drifter.sprite1 || '')}" alt="">
-              <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>
-            </div>
-            ${drifter.episodeId ? tierPipsMarkup(restoredTiers, currentTier) : ''}
-            <p class="drifter-state">${stateLabel}</p>
-            <p class="drifter-weekly-state">${weeklyStateLabel}</p>
+            <span class="file-tab">FILE ${String(index + 1).padStart(2, '0')}</span>
+            <span class="drifter-avatar-wrap"><img class="drifter-avatar" src="${esc(spriteFor(drifter))}" alt="${esc(drifter.name)}" height="106" loading="lazy" decoding="async"></span>
+            <h3 class="drifter-name">${esc(drifter.name)}<small>${esc(drifter.nameKanji || '')}</small></h3>
+            ${drifter.episodeId ? tierPipsMarkup(restoredTiers, currentTier) : '<span></span>'}
+            <div class="drifter-chips"><p class="drifter-weekly-state${weeklyActive && !weeklyRestored ? ' active' : ''}">${weeklyStateLabel}<span class="jp">&nbsp;· ${weeklyJP}</span></p></div>
+            ${restoredHere ? '<span class="seal" aria-hidden="true">戻<small>RESTORED</small></span>' : ''}
             <p class="drifter-story">${storyHTML}</p>
+            <p class="drifter-state">${stateLabel}</p>
+            ${restoredHere && episode ? `<button type="button" class="file-open" data-open-memory="${esc(drifter.id)}">Open memory ›<span class="jp"> · きおくを ひらく</span></button>` : ''}
           </article>`;
         }).join('');
 
+        // ── postcard album (reading journal)
         const journalMarkup = journal.length
           ? `<div class="journal-list">${journal.slice(0, 8).map(entry => {
-              const episode = episodeFor(entry.episodeId, currentTier);
+              const tierEpisode = episodeFor(entry.episodeId, entry.difficulty || 'start');
+              const episode = episodeFor(entry.episodeId, currentTier) || tierEpisode;
               const drifter = drifters.find(item => item.id === entry.drifterId);
               const restoredTiers = tiersRestored(utsu, drifter);
               const missingTier = TIERS.find(tier => !restoredTiers[tier]);
               const nextHint = missingTier
-                ? `Try ${esc(TIER_META[missingTier].en)} next to restore it there too.`
-                : `You've restored this memory at every level.`;
+                ? `Try ${esc(TIER_META[missingTier].en)} next.`
+                : `Restored at every level!`;
               const reviews = Math.max(1, Number(entry.reviewCount) || 1);
+              const savedText = tierEpisode?.postcard?.savedText || (tierEpisode?.postcard?.chunks || []).join(' ');
               return `<article class="journal-entry">
-                <h3>${esc(episode?.title || entry.episodeId || 'Untitled memory')}<small>${esc(episode?.titleJP || drifter?.nameKanji || '')}</small></h3>
-                ${drifter ? tierPipsMarkup(restoredTiers, currentTier) : ''}
-                <p class="journal-meta">${esc(drifter?.name || 'Utsuroba')} · ${memoryModeLabel(entry.difficulty || 'start')} · ${reviews} reading${reviews === 1 ? '' : 's'} total (every replay counted)</p>
-                <p class="journal-next${missingTier ? '' : ' is-done'}">${nextHint}</p>
+                <div>
+                  <span class="pc-from">FROM ${esc(String(drifter?.name || 'Utsuroba').split(' ')[0].toUpperCase())}</span>
+                  <h3>${esc(episode?.title || entry.episodeId || 'Untitled memory')}<small class="jp">${esc(episode?.titleJP || drifter?.nameKanji || '')}</small></h3>
+                </div>
+                <div class="postmark" aria-label="Read ${reviews} time${reviews === 1 ? '' : 's'}"><b>×${reviews}</b>READS<span class="jp">よんだ</span></div>
+                ${savedText ? `<p class="pc-text">${esc(savedText)}</p>` : ''}
+                <p class="journal-meta">${memoryModeLabel(entry.difficulty || 'start')} · ${reviews} reading${reviews === 1 ? '' : 's'}</p>
+                <div class="pc-foot">${drifter ? tierPipsMarkup(restoredTiers, currentTier) : ''}<span class="journal-next${missingTier ? '' : ' is-done'}">${nextHint}</span></div>
               </article>`;
             }).join('')}</div>`
-          : `<p class="journal-empty">No memory has settled into the journal yet.<small>${rb('記憶', 'きおく')}が${rb('戻', 'もど')}ると、ここに${rb('記録', 'きろく')}されます。</small></p>`;
+          : `<p class="journal-empty">No memory has settled into the album yet.<span class="jp-line jp">${rb('記憶', 'きおく')}が${rb('戻', 'もど')}ると、ここに はがきが とどきます。</span></p>`;
+        const emptySlots = Math.max(0, Math.min(weeklyDriftersTotal - Math.min(journal.length, 8), 4));
+        const slotsMarkup = emptySlots ? `<div class="pc-slots" aria-hidden="true">${Array.from({ length: emptySlots }, () => '<div class="pc-slot"><b>?</b><span>NOT YET<span class="jp"> · まだ とどかない</span></span></div>').join('')}</div>` : '';
 
+        // ── word cabinet
         const cabinetAtTier = cabinet.filter(entry => Array.isArray(entry.tiers) && entry.tiers.includes(currentTier));
+        const CAB_MAX = 40;
         const wordMarkup = cabinetAtTier.length
-          ? `<div class="word-list">${cabinetAtTier.slice(0, 18).map(entry => `<span class="word">${esc(entry.word)}</span>`).join('')}${cabinetAtTier.length > 18 ? `<span class="word-more">+${cabinetAtTier.length - 18} more</span>` : ''}</div>`
-          : `<p class="journal-empty">No words collected yet at ${esc(currentTierMeta.en)}.<small>${rb('物語', 'ものがたり')}の<ruby>言葉<rt>ことば</rt></ruby>が、ここに${rb('集', 'あつ')}まります。</small></p>`;
+          ? `<div class="cabinet"><div class="word-list" role="group" aria-label="Words">${cabinetAtTier.slice(0, CAB_MAX).map((entry, i) => `<button type="button" class="cab-word" data-cab="${i}" aria-pressed="false">${esc(entry.word)}</button>`).join('')}${cabinetAtTier.length > CAB_MAX ? `<span class="word-more">+${cabinetAtTier.length - CAB_MAX} more</span>` : ''}</div>
+              <div class="cabinet-detail" id="cabinet-detail" aria-live="polite"><span>Tap a word to see what it means.<span class="jp-line jp">ことばを タップしてね。</span></span></div></div>`
+          : `<p class="journal-empty">No words collected yet at ${esc(currentTierMeta.en)}.<span class="jp-line jp">${rb('物語', 'ものがたり')}の ことばが、ここに ${rb('集', 'あつ')}まります。</span></p>`;
+
+        // ── memory garden (after the Three Echoes)
+        const gardenQuotes = Array.isArray(convergence.garden?.quotes) ? convergence.garden.quotes : [];
+        const gardenMarkup = convergenceSeen && gardenQuotes.length ? `
+          <section class="garden" aria-labelledby="garden-title">
+            <span class="kick">AFTER THE THREE ECHOES</span>
+            <h2 class="h2" id="garden-title">${esc(convergence.garden.title || 'The Memory Garden')}<span class="jp"> · きおくの にわ</span></h2>
+            ${gardenQuotes.map(q => `<div><q>${esc(q.quote)}</q><cite>— ${esc(q.name)}</cite></div>`).join('')}
+          </section>` : '';
 
         host.innerHTML = `
           ${difficultyMarkup()}
 
           <section class="weekly-hunt" aria-labelledby="weekly-hunt-heading">
-            <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Trail</h2><span>Fresh every Sunday</span></div>
-            <p class="weekly-hunt-copy">Each drifter's current memory can be restored again this week. Your lifetime memory archive below stays saved.<small><ruby>今週<rt>こんしゅう</rt></ruby>は、それぞれのドリフターの<ruby>記憶<rt>きおく</rt></ruby>をもう<ruby>一度<rt>いちど</rt></ruby><ruby>戻<rt>もど</rt></ruby>せます。<ruby>記録<rt>きろく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
-            <div class="weekly-hunt-progress"><progress max="${Math.max(weeklyDriftersTotal, 1)}" value="${weeklyRestoredCount}" aria-label="${weeklyRestoredCount} of ${weeklyDriftersTotal} memories restored this week"></progress><span class="weekly-hunt-count">${weeklyRestoredCount} / ${weeklyDriftersTotal}</span></div>
-            <p class="weekly-hunt-legend">${weeklyDriftersTotal - weeklyRestoredCount ? `${weeklyDriftersTotal - weeklyRestoredCount} memory trail${weeklyDriftersTotal - weeklyRestoredCount === 1 ? '' : 's'} available this week.` : 'Every memory trail restored this week.'}</p>
+            <div class="sec-head"><div><span class="kick">THIS WEEK'S TRAIL</span><h2 class="h2" id="weekly-hunt-heading">こんしゅうの みち</h2></div><span class="sec-num" aria-label="${weeklyRestoredCount} of ${weeklyDriftersTotal} memories restored this week">${weeklyRestoredCount}<small> / ${weeklyDriftersTotal}</small></span></div>
+            ${trailMarkup}
+            <p class="note weekly-hunt-copy">Fresh every Sunday · your archive below stays saved.<span class="jp-line jp">にちようびに また あたらしい みち。きろくは のこるよ。</span></p>
           </section>
 
-          <section class="stats" aria-label="Utsuroba totals">
-            <div class="stat"><div class="stat-value">${memoriesRestoredTotal}</div><div class="stat-label">Lifetime memories restored</div><span class="stat-jp">${rb('今', 'いま')}までの${rb('記憶', 'きおく')}</span></div>
-            <div class="stat"><div class="stat-value">${journalReadsTotal}</div><div class="stat-label">Lifetime journal reads</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までの<ruby>読書<rt>どくしょ</rt></ruby></span></div>
-            <div class="stat"><div class="stat-value">${wordsTouchedTotal}</div><div class="stat-label">Lifetime words kept</div><span class="stat-jp">${rb('今', 'いま')}までに${rb('集', 'あつ')}めた<ruby>言葉<rt>ことば</rt></ruby></span></div>
-            <div class="stat"><div class="stat-value">${roomVisitsTotal}</div><div class="stat-label">Lifetime rooms visited</div><span class="stat-jp"><ruby>今<rt>いま</rt></ruby>までに<ruby>訪<rt>おとず</rt></ruby>れた<ruby>部屋<rt>へや</rt></ruby></span></div>
+          <section class="section" aria-labelledby="echo-title">
+            <div class="sec-head"><div><span class="kick">THE THREE ECHOES</span><h2 class="h2" id="echo-title"><ruby>三<rt>みっ</rt></ruby>つの <ruby>残響<rt>ざんきょう</rt></ruby></h2></div>${echoesFoundAtTier < convergenceIds.length ? `<span class="sec-num"><small>あと</small> ${convergenceIds.length - echoesFoundAtTier}</span>` : ''}</div>
+            ${echoMarkup}
+            <p class="echo-note">${esc(echoNote)}<span class="jp-line jp">${echoesFoundAtTier >= convergenceIds.length ? `${rb('三', 'みっ')}つとも ${esc(currentTierMeta.jp)}で ${rb('戻', 'もど')}りました。` : `<ruby>三<rt>みっ</rt></ruby>つの ${rb('記憶', 'きおく')}が、おなじ かたちを さがしています。`}</span><span class="echo-status">${esc(getName())} · ${esc(echoStatus)}</span></p>
+            ${convergenceSeen ? `<p class="echo-permanent-note">✦ The memory garden has opened for good.<span class="jp-line jp" style="color:inherit">${rb('記憶', 'きおく')}の にわは ずっと ひらいています。</span></p>` : ''}
           </section>
 
-          <section class="section">
-            <div class="section-heading"><h2>The Three Echoes</h2><p><ruby>三<rt>みっ</rt></ruby>つの<ruby>残響<rt>ざんきょう</rt></ruby></p></div>
-            <div class="echo-card">
-              <div class="echo-top"><h3 class="echo-title">A shape shared by three memories<small>${esc(getName())}, you have found ${echoesFoundAtTier} of ${convergenceIds.length} echoes at ${esc(currentTierMeta.en)}.</small></h3><div class="echo-status">${esc(echoStatus)}</div></div>
-              <div class="echo-dots" aria-label="${echoesFoundAtTier} of ${convergenceIds.length} echoes found at ${esc(currentTierMeta.en)}">${convergenceIds.map((_, i) => `<span class="echo-dot${i < echoesFoundAtTier ? ' lit' : ''}"></span>`).join('')}</div>
-              <p class="echo-note">${esc(echoNote)}<br><span style="opacity:.65">${echoesFoundAtTier >= convergenceIds.length ? `${rb('三', 'みっ')}つとも${esc(currentTierMeta.en)}で${rb('戻', 'もど')}りました。` : `<ruby>三<rt>みっ</rt></ruby>つの${rb('記憶', 'きおく')}が、<ruby>共通<rt>きょうつう</rt></ruby>する<ruby>形<rt>かたち</rt></ruby>を<ruby>探<rt>さが</rt></ruby>しています。`}</span></p>
-              ${convergenceSeen ? `<p class="echo-permanent-note">✦ The memory garden has opened for good — this stays true no matter which memory you're viewing above.<br><span style="opacity:.8">${rb('記憶', 'きおく')}の<ruby>庭<rt>にわ</rt></ruby>はすでに<ruby>開<rt>ひら</rt></ruby>いています。どの<ruby>記憶<rt>きおく</rt></ruby>を<ruby>見<rt>み</rt></ruby>ていても<ruby>変<rt>か</rt></ruby>わりません。</span></p>` : ''}
+          <section class="section" aria-label="Utsuroba totals">
+            <div class="sec-head"><div><span class="kick">ALWAYS KEPT</span><h2 class="h2">ずっと のこる きろく</h2></div></div>
+            <div class="stats">
+              <div class="stat"><div class="stat-value">${memoriesRestoredTotal}</div><div class="stat-label">きおく</div></div>
+              <div class="stat"><div class="stat-value">${journalReadsTotal}</div><div class="stat-label">よんだ</div></div>
+              <div class="stat"><div class="stat-value">${wordsTouchedTotal}</div><div class="stat-label">ことば</div></div>
+              <div class="stat"><div class="stat-value">${roomVisitsTotal}</div><div class="stat-label">へや</div></div>
             </div>
+            <p class="stats-en">Memories restored · Journal reads · Words kept · Rooms visited</p>
           </section>
 
-          <section class="section">
-            <div class="section-heading"><h2>The Drifters</h2><p>Weekly trail · lifetime memory</p></div>
+          <section class="section" aria-labelledby="drifters-title">
+            <div class="sec-head"><div><span class="kick">DRIFTER FILES · weekly trail · lifetime memory</span><h2 class="h2" id="drifters-title">ドリフターの ファイル</h2></div><span class="sec-num">${drifters.filter(d => restoredAtTier(utsu, d, currentTier)).length}<small> / ${drifters.length}</small></span></div>
             <div class="drifter-grid">${drifterCards || '<p class="journal-empty">The archive is quiet.</p>'}</div>
           </section>
 
-          <section class="section lower-grid">
-            <div class="panel"><div class="section-heading"><h2>Reading Journal</h2><p><ruby>読書<rt>どくしょ</rt></ruby>ノート</p></div>${journalMarkup}</div>
-            <div class="panel"><div class="section-heading"><h2>Word Cabinet</h2><p><ruby>言葉<rt>ことば</rt></ruby>の<ruby>戸棚<rt>とだな</rt></ruby></p></div><div class="cabinet-count">${cabinetAtTier.length}</div><p class="cabinet-label">words remembered at ${esc(currentTierMeta.en)}</p>${wordMarkup}</div>
-          </section>`;
+          <section class="section" aria-labelledby="journal-title">
+            <div class="sec-head"><div><span class="kick">READING JOURNAL · MEMORY POSTCARDS</span><h2 class="h2" id="journal-title">きおくの はがき</h2></div><span class="sec-num">${Math.min(journal.length, 8)}<small> / ${weeklyDriftersTotal}</small></span></div>
+            ${journalMarkup}
+            ${slotsMarkup}
+          </section>
+
+          <section class="section" aria-labelledby="cabinet-title">
+            <div class="sec-head"><div><span class="kick">WORD CABINET</span><h2 class="h2" id="cabinet-title">ことばの とだな</h2></div><span class="sec-num">${cabinetAtTier.length}<small> ことば</small></span></div>
+            ${wordMarkup}
+            <p class="cabinet-label">words remembered at ${esc(currentTierMeta.en)}</p>
+          </section>
+
+          ${gardenMarkup}`;
 
         host.querySelectorAll('[data-difficulty]').forEach(button => {
           button.addEventListener('click', () => setDifficulty(button.dataset.difficulty));
         });
+        host.querySelectorAll('[data-open-memory]').forEach(button => {
+          button.addEventListener('click', () => openSheet(button.dataset.openMemory, button));
+        });
+        const cabDetail = host.querySelector('#cabinet-detail');
+        host.querySelectorAll('[data-cab]').forEach(button => {
+          button.addEventListener('click', () => {
+            const entry = cabinetAtTier[Number(button.dataset.cab)];
+            if (!entry || !cabDetail) return;
+            const owner = drifters.find(d => d.episodeId === entry.episodeId);
+            cabDetail.innerHTML = `<b>${esc(entry.word)}</b><span>${esc(entry.definition || '')}<span class="jp-line jp">${esc(entry.definitionJP || '')}${owner ? ` · ${esc(String(owner.name).split(' ')[0])}` : ''}</span></span>`;
+            host.querySelectorAll('[data-cab]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+          });
+        });
+        syncJpToggle();
       }
 
       function boot() {
@@ -617,7 +903,7 @@
   </script>
   <script>
     // Muenba is a live output world and follows the same weekly gate as
-    // Karasuki and Utsuroba.
+    // Karasuki and Utsuroba. Locked portals stay visible (dim + padlock).
     (function () {
       const tab = document.getElementById('pnet-muenba');
       if (!tab) return;
@@ -628,7 +914,8 @@
             typeof BoohaUnlockSystem.isMuenbaUnlocked === 'function' &&
             BoohaUnlockSystem.isMuenbaUnlocked());
         } catch (_) {}
-        tab.hidden = !open;
+        if (window.BoohaPortals) BoohaPortals.setLocked(tab, !open);
+        else tab.hidden = !open;
       }
       if (window.BOOHA_READY) renderMuenbaTab();
       else document.addEventListener('booha:ready', renderMuenbaTab, { once: true });
@@ -649,7 +936,8 @@
             typeof BoohaUnlockSystem.isWeeklyWorldGateOpen === 'function' &&
             BoohaUnlockSystem.isWeeklyWorldGateOpen());
         } catch (_) {}
-        tab.hidden = !open;
+        if (window.BoohaPortals) BoohaPortals.setLocked(tab, !open);
+        else tab.hidden = !open;
       }
       if (window.BOOHA_READY) renderGrimmerglenTab();
       else document.addEventListener('booha:ready', renderGrimmerglenTab, { once: true });

@@ -4568,7 +4568,11 @@ const HAPPY_HOUSE_PORTAL = {
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
       <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
     document.body.appendChild(panel);
-    window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = false; window.__devMuenba = false; window.__devGrimmerglen = false; window.__devAllOrbs = false;
+    // The persistent teacher switch (localStorage booha_dev_worlds, read in
+    // unlock-system.js) keeps the three world flags on; otherwise start off.
+    const keepWorlds = window.__devWorldsSwitch === true;
+    window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = keepWorlds; window.__devMuenba = keepWorlds; window.__devGrimmerglen = keepWorlds; window.__devAllOrbs = false;
+    ['dev-utsuroba', 'dev-muenba', 'dev-grimmerglen'].forEach(id => { const box = document.getElementById(id); if (box) box.checked = keepWorlds; });
     document.getElementById('dev-all-games').addEventListener('change',     function() { window.__devAllGames = this.checked; });
     document.getElementById('dev-all-wanderers').addEventListener('change', function() { window.__devAllWanderers = this.checked; refreshWanderersForRoom(); });
     document.getElementById('dev-utsuroba').addEventListener('change',      function() { window.__devUtsuroba = this.checked; });
