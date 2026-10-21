@@ -62,6 +62,7 @@ for (const caseId of data.caseOrder) {
   }
 }
 assert.match(profile, /class="kw" data-kw=/, 'clue keywords must be tappable');
+assert.doesNotMatch(profile, /Review all clues/, 'case review copy must not promise every memory tier');
 
 // ── Page structure ─────────────────────────────────────────────────────────
 assert.match(profile, /id="jp-toggle"/, 'the Japanese toggle must be present');

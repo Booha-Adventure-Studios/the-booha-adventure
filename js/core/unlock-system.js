@@ -10,7 +10,7 @@ const BoohaUnlockSystem = (() => {
   'use strict';
 
   // ── Teacher test switch: every world open on THIS browser ────────────────
-  // Type in the Inspect console:
+  // Type in the Inspect console. The switch is watched live on this page:
   //   localStorage.setItem('booha_dev_worlds', '1')   // all worlds open
   //   localStorage.removeItem('booha_dev_worlds')     // back to normal gates
   // It only sets the existing __dev* flags, so the gates read as open but no
@@ -20,6 +20,7 @@ const BoohaUnlockSystem = (() => {
     try { return localStorage.getItem(DEV_WORLDS_KEY) === '1'; } catch (_) { return false; }
   }
   function showDevWorldsTag() {
+    if (typeof document === 'undefined' || !document.body || typeof document.getElementById !== 'function') return;
     if (document.getElementById('booha-dev-worlds-tag')) return;
     const tag = document.createElement('div');
     tag.id = 'booha-dev-worlds-tag';
@@ -30,14 +31,43 @@ const BoohaUnlockSystem = (() => {
       'color:#ffd700;font:700 10px/1.4 monospace;letter-spacing:.08em;';
     document.body.appendChild(tag);
   }
-  if (devWorldsOn()) {
-    window.__devWorldsSwitch = true;
-    window.__devUtsuroba = true;
-    window.__devMuenba = true;
-    window.__devGrimmerglen = true;
-    if (document.body) showDevWorldsTag();
-    else document.addEventListener('DOMContentLoaded', showDevWorldsTag, { once: true });
+  function hideDevWorldsTag() {
+    if (typeof document === 'undefined' || typeof document.getElementById !== 'function') return;
+    const tag = document.getElementById('booha-dev-worlds-tag');
+    if (tag) tag.remove();
   }
+  function syncDevWorldsSwitch() {
+    const enabled = devWorldsOn();
+    const wasEnabled = window.__devWorldsSwitch === true;
+    const changed = window.__devWorldsSwitch !== enabled;
+    window.__devWorldsSwitch = enabled;
+    if (enabled) {
+      window.__devUtsuroba = true;
+      window.__devMuenba = true;
+      window.__devGrimmerglen = true;
+    } else if (wasEnabled) {
+      // Only clear flags that this persistent switch supplied. Preserve the
+      // individual room-panel flags used by existing teacher tools/tests.
+      window.__devUtsuroba = false;
+      window.__devMuenba = false;
+      window.__devGrimmerglen = false;
+    }
+    if (enabled) {
+      if (document.body) showDevWorldsTag();
+      else document.addEventListener('DOMContentLoaded', showDevWorldsTag, { once: true });
+    } else {
+      hideDevWorldsTag();
+    }
+    if (changed && document.body && typeof document.dispatchEvent === 'function' && typeof CustomEvent === 'function') {
+      document.dispatchEvent(new CustomEvent('booha:devWorldsChanged', { detail: { enabled } }));
+    }
+    return enabled;
+  }
+  syncDevWorldsSwitch();
+  // Same-tab localStorage writes do not emit a storage event. Polling only
+  // this small developer key keeps the console switch live without writing
+  // progress or requiring a page reload.
+  if (window && typeof window.setInterval === 'function') window.setInterval(syncDevWorldsSwitch, 500);
 
   // ── Permanent achievement helpers ─────────────────────────────────────────
   function _done(curriculum, baseId) {

@@ -577,6 +577,7 @@
     else document.addEventListener('booha:ready', renderMuenbaTab, { once: true });
     document.addEventListener('booha:saved', renderMuenbaTab);
     document.addEventListener('booha:weeklyReset', renderMuenbaTab);
+    document.addEventListener('booha:devWorldsChanged', renderMuenbaTab);
   })();
 </script>
 
@@ -601,6 +602,7 @@
       document.addEventListener('booha:saved', renderGrimmerglenTab);
       document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
       document.addEventListener('booha:newWeek', renderGrimmerglenTab);
+      document.addEventListener('booha:devWorldsChanged', renderGrimmerglenTab);
     })();
   </script>
   <script>

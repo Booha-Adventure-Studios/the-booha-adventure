@@ -16,7 +16,7 @@ assert(records.includes('case-memory-badge'), 'settled and next records must exp
 assert(records.includes('case-record-resolution'), 'settled records must show a short resolution');
 assert(records.includes('<details class="case-record-review">'), 'settled clues must be collapsed behind native details');
 assert(records.includes('Review clues'), 'settled records must provide a discoverable clue-review control');
-assert(records.includes('Review all clues'), 'fully settled records must label their complete clue review');
+assert(!records.includes('Review all clues'), 'settled records must not promise every memory tier in one review');
 assert(records.includes('Find the next ghost in Muenba to open this case.'), 'next case must explain the action without naming the target ghost');
 assert(!records.includes('Find ${esc(ghost?.name || caseData.ghostId)}'), 'next case must not reveal the target ghost name');
 assert(records.includes('Case ${index + 1} · WAITING'), 'locked records must retain a clear waiting state');

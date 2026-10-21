@@ -744,8 +744,6 @@
       .juku-log-grid { grid-template-columns: 1fr; }
     }
 
-
-    
   </style>
 </head>
 <body>
@@ -891,6 +889,7 @@
     document.addEventListener('booha:saved', renderMuenbaDoor);
     document.addEventListener('booha:weeklyReset', renderMuenbaDoor);
     document.addEventListener('booha:newWeek', renderMuenbaDoor);
+    document.addEventListener('booha:devWorldsChanged', renderMuenbaDoor);
   })();
 </script>
 <script>
@@ -1030,6 +1029,7 @@
       document.addEventListener('booha:saved', renderGrimmerglenTab);
       document.addEventListener('booha:weeklyReset', renderGrimmerglenTab);
       document.addEventListener('booha:newWeek', renderGrimmerglenTab);
+      document.addEventListener('booha:devWorldsChanged', renderGrimmerglenTab);
     })();
   </script>
   <script>
