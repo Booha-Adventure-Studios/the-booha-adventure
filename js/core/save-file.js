@@ -127,6 +127,9 @@ const BoohaSaveFile = (() => {
         activeHuntGhostId: null,
         activeCaseRecoveryDone: false,
         orbsPending: 0,
+        // Orbs handed to Nuppi this week. The profile's orb jar shows this
+        // and starts empty again at the Sunday rollover.
+        orbsReturned: 0,
         huntAccepted: false,
       },
       grimmerglen: {
@@ -215,6 +218,7 @@ const BoohaSaveFile = (() => {
     if (current.muenba.activeHuntGhostId === undefined) current.muenba.activeHuntGhostId = null;
     current.muenba.activeCaseRecoveryDone = current.muenba.activeCaseRecoveryDone === true;
     if (!Number.isFinite(current.muenba.orbsPending) || current.muenba.orbsPending < 0) current.muenba.orbsPending = 0;
+    if (!Number.isFinite(current.muenba.orbsReturned) || current.muenba.orbsReturned < 0) current.muenba.orbsReturned = 0;
 
     if (!current.grimmerglen || typeof current.grimmerglen !== 'object' || Array.isArray(current.grimmerglen)) current.grimmerglen = {};
     if (!current.grimmerglen.objects || typeof current.grimmerglen.objects !== 'object' || Array.isArray(current.grimmerglen.objects)) current.grimmerglen.objects = {};
