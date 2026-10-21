@@ -7335,6 +7335,7 @@
     state.clickTarget = null;
     state.moving = false;
     playUiSfx('nuppiOpen');
+    if (window.BoohaTravelers) BoohaTravelers.record('nuppi');
     renderRoomNuppiPopup();
     lobbyOverlay.setAttribute('aria-hidden', 'false');
     lobbyOverlay.classList.add('open');

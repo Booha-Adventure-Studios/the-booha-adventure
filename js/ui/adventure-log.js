@@ -477,6 +477,8 @@ const BoohaAdventureLog = (() => {
       const paint = (c) => {
         try {
           try { localStorage.setItem('booha_profile_curr', c); } catch (_) {}
+          // The game view above the record book follows the same tab.
+          document.dispatchEvent(new CustomEvent('booha:profileCurr', { detail: { curr: c } }));
           const g = gamesFor(c);
           const reference = {
             average: recentFullWeekAverage(weekLog, keys.week, c, g),

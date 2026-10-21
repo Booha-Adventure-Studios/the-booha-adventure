@@ -88,41 +88,343 @@
     }
 
 
-  .dc-wk{margin:6px 0 4px;}
-    .dc-row{display:flex;justify-content:space-between;gap:4px;margin-bottom:14px;}
-    .dc-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
-    .dc-dow{font-size:11px;color:#7a603a;font-weight:700;}
-    .dc-dot{width:26px;height:26px;border-radius:50%;border:2px dashed rgba(58,44,26,.4);
-      display:flex;align-items:center;justify-content:center;font-size:13px;color:#8a7048;}
-    .dc-dot.done{border:3px double #2e7d4f;color:#1f5c39;background:radial-gradient(circle at 50% 42%,rgba(64,150,98,.30),rgba(64,150,98,.07) 70%);}
-    .dc-dot.skip{border-style:solid;border-color:rgba(58,44,26,.35);color:#b09068;}
-    .dc-dot.future{opacity:.35;}
-    .dc-dot.today{box-shadow:0 0 0 2px #b8892f;}
-    .dc-stats{display:flex;gap:10px;justify-content:center;}
-    .dc-stat{flex:1;max-width:120px;text-align:center;padding:8px 6px;border:1px solid #4a3820;border-radius:8px;}
-    .dc-stat-icon{display:block;height:18px;color:#b95817;filter:drop-shadow(0 0 5px #ffad55);}
-    .dc-stat-icon .profile-icon{width:16px;height:16px;}
-    .dc-stat b{display:block;font-size:22px;color:#3a2c1a;line-height:1;}
-    .dc-stat.accuracy b{font-size:clamp(14px,3.5vw,19px);white-space:nowrap;}
-    .dc-stat .lab{font-size:10px;color:#7a603a;letter-spacing:1px;margin-top:4px;font-weight:700;}
-    .dc-empty{color:#7a603a;font-size:14px;padding:6px 0 14px;}
-    .dc-today{
-      margin:14px auto 2px;padding:13px 14px;max-width:520px;border:2px solid rgba(58,44,26,.55);
-      border-radius:12px;background:rgba(255,255,255,.16);text-align:center;
+    /* ═══ GAME VIEW (top of the log) ═══════════════════════════
+       Night:   #0d0b14  #16121f  #1b1626
+       Cream:   #f3e6c8  #fff6dc   muted #b7a88a
+       Gold:    #f2b53a  #ffd77a   Teal: #5cffd0
+       Violet:  #d6b4ff  Lime glow (Halloween): #a8e63d          */
+    .pg-main { display:block; }
+    .pg-wrap {
+      max-width:680px; margin:0 auto 26px; display:flex; flex-direction:column; gap:16px;
+      color:#f3e6c8;
     }
-    .dc-today-kicker{
-      color:#7a603a;font-family:'Cinzel Decorative',serif;font-size:9px;
-      letter-spacing:2px;margin-bottom:5px;
+    .pg-kicker { font-family:'Cinzel',serif; font-size:10px; font-weight:700; letter-spacing:.18em; color:#b7a88a; }
+    .pg-kicker.gold { color:#ffd77a; }
+    .pg-note { margin:0 0 10px; font-size:12px; line-height:1.55; color:#b7a88a; }
+    .pg-note b { color:#ffd77a; }
+    .pg-note-small { font-size:11px; color:#b7a88a; }
+    .pg-section-head { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin:0 2px 8px; }
+    .pg-section-head > div { display:flex; flex-direction:column; }
+    .pg-section-head h2 { margin:0; font-size:18px; font-weight:900; color:#fff6dc; line-height:1.3; }
+    .pg-head-num { font-family:'Cinzel Decorative',serif; font-size:17px; color:#ffd77a; font-variant-numeric:tabular-nums; }
+    .pg-head-num.violet { color:#d6b4ff; }
+    .pg-card {
+      border-radius:18px; padding:12px 14px; background:#1b1626; border:1px solid #2e2540;
     }
-    .dc-today-score{color:#3a2c1a;font-size:clamp(17px,4.5vw,22px);font-weight:900;line-height:1.35;}
-    .dc-today-meta{color:#7a603a;font-size:10px;letter-spacing:1px;margin-top:3px;}
-    .dc-today-action{
-      appearance:none;border:0;border-radius:999px;margin-top:11px;padding:10px 18px;
-      background:#3a2c1a;color:#efe1c2;font:900 12px/1.2 inherit;letter-spacing:.5px;
-      cursor:pointer;box-shadow:0 3px 0 #1f160d;-webkit-tap-highlight-color:transparent;
+    .pg-fallback { background:rgba(255,255,255,.06); color:#f3e6c8; border-color:rgba(242,181,58,.4); }
+
+    /* hero */
+    .pg-hero {
+      position:relative; min-height:520px; border-radius:24px; overflow:hidden;
+      border:1px solid rgba(168,230,61,.35); box-shadow:0 0 40px rgba(155,99,232,.25);
+      background:
+        linear-gradient(180deg, rgba(13,11,20,.05) 0%, rgba(13,11,20,.35) 50%, #16121f 100%),
+        url("assets/img/profile/adventure-log-night.webp") center 40% / cover no-repeat,
+        #16121f;
     }
-    .dc-today-action:active{transform:translateY(2px);box-shadow:0 1px 0 #1f160d;}
-    .dc-today-action:disabled{opacity:.55;cursor:wait;}
+    .pg-hero-coin { position:absolute; top:12px; left:12px; display:flex; flex-direction:column; align-items:center; z-index:2; }
+    .pg-hero-coin img { width:72px; height:72px; filter:drop-shadow(0 0 10px rgba(255,215,122,.6)); }
+    .pg-hero-lv {
+      margin-top:-10px; padding:2px 10px; border-radius:999px; background:#241a10; border:1px solid #f2b53a;
+      font-family:'Cinzel',serif; font-size:12px; color:#ffd77a; font-variant-numeric:tabular-nums;
+    }
+    .pg-hero-speech {
+      position:absolute; top:18px; left:96px; right:16px; margin:0; z-index:2;
+      padding:10px 12px; border-radius:16px 16px 4px 16px;
+      background:rgba(13,11,20,.84); border:1px solid rgba(168,230,61,.6);
+      font-size:13px; line-height:1.5; color:#f3e6c8;
+    }
+    .pg-hero-speech span { color:#a8e63d; }
+    .pg-hero-stage {
+      position:absolute; top:112px; left:50%; transform:translateX(-50%);
+      width:230px; height:240px; display:flex; align-items:flex-end; justify-content:center;
+    }
+    .pg-hero-shadow {
+      position:absolute; bottom:4px; left:40px; width:150px; height:26px; border-radius:50%;
+      background:radial-gradient(ellipse, rgba(0,0,0,.65), rgba(0,0,0,0) 70%);
+    }
+    .pg-hero-sprite { position:relative; width:220px; height:220px; object-fit:contain; animation:pgBob 3s ease-in-out infinite; }
+    .pg-hero-foot {
+      position:absolute; left:16px; right:16px; bottom:16px;
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+    }
+    .pg-hero-name { margin:0; font-size:34px; font-weight:900; line-height:1; color:#fff6dc; text-shadow:0 2px 12px rgba(0,0,0,.9); }
+    .pg-hero-sub { margin:0; font-size:12px; color:#c9b9e8; }
+    .pg-level { width:100%; margin-top:4px; }
+    .pg-level-row { display:flex; justify-content:space-between; font-size:12px; color:#d9cbb0; margin-bottom:5px; }
+    .pg-level-num { font-family:'Cinzel',serif; color:#ffd77a; font-variant-numeric:tabular-nums; }
+    .pg-level-track { height:16px; border-radius:999px; background:rgba(0,0,0,.6); border:1px solid rgba(242,181,58,.5); overflow:hidden; }
+    .pg-level-track span {
+      display:block; height:100%; border-radius:999px; position:relative; overflow:hidden;
+      background:linear-gradient(90deg,#c8871c,#ffd77a); box-shadow:0 0 12px rgba(255,215,122,.7);
+      transition:width .7s ease;
+    }
+    .pg-level-track span::after { content:''; position:absolute; inset:0 auto 0 -45%; width:38%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent); animation:progressSheen 3.8s ease-in-out infinite; }
+    .pg-level-next { margin:6px 0 0; display:flex; align-items:center; justify-content:center; gap:6px; font-size:11px; color:#b7a88a; }
+    .pg-level-next img { width:22px; height:22px; }
+
+    /* weekly skin */
+    .pg-skin {
+      display:flex; align-items:center; gap:12px;
+      background:linear-gradient(135deg,#2a1f3d,#16121f 70%); border-color:rgba(155,99,232,.6);
+    }
+    .pg-skin[hidden] { display:none; }
+    .pg-skin-art img { width:64px; height:64px; object-fit:contain; filter:brightness(.35) saturate(.4); }
+    .pg-skin-art.unlocked img { filter:drop-shadow(0 0 10px rgba(214,180,255,.7)); }
+    .pg-skin-copy { flex:1; display:flex; flex-direction:column; gap:3px; }
+    .pg-skin-copy .pg-kicker { color:#d6b4ff; }
+    .pg-skin-name { font-size:15px; color:#fff6dc; }
+    .pg-skin-bar { display:flex; align-items:center; gap:4px; font-size:11px; color:#c9b9e8; }
+    .pg-skin-pip { width:34px; height:8px; border-radius:4px; background:#3a2f4d; }
+    .pg-skin-pip.on { background:#9b63e8; box-shadow:0 0 8px rgba(155,99,232,.7); }
+    .pg-skin-bar > span:last-child { margin-left:4px; }
+
+    /* daily check: lanterns + today's quest */
+    .pg-daily { padding:16px 14px; border-radius:20px; background:radial-gradient(ellipse at 50% 0%,#3a2414,#16121f 70%); border:1px solid rgba(255,140,40,.4); }
+    .dc-row { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; margin:4px 0 12px; }
+    .dc-day { display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .dc-lantern { width:44px; height:44px; object-fit:contain; filter:grayscale(1) brightness(.45); opacity:.7; transition:filter .3s ease; }
+    .dc-day.done .dc-lantern { filter:drop-shadow(0 0 10px rgba(255,170,60,.95)); opacity:1; }
+    .dc-day.future .dc-lantern { opacity:.35; }
+    .dc-dow { font-size:12px; color:#8c8070; font-weight:700; }
+    .dc-day.done .dc-dow { color:#ffd8a8; }
+    .dc-day.today .dc-dow { color:#5cffd0; border-bottom:2px solid #5cffd0; }
+    .dc-stats { display:flex; gap:8px; justify-content:center; }
+    .dc-stat { flex:1; max-width:140px; text-align:center; padding:8px 6px; border-radius:12px; background:rgba(0,0,0,.3); border:1px solid rgba(255,173,85,.25); }
+    .dc-stat-icon { display:block; height:18px; color:#ffad55; filter:drop-shadow(0 0 5px #ffad55); }
+    .dc-stat-icon .profile-icon { width:16px; height:16px; }
+    .dc-stat b { display:block; font-size:20px; color:#fff6dc; line-height:1.1; font-variant-numeric:tabular-nums; }
+    .dc-stat.accuracy b { font-size:clamp(14px,3.5vw,18px); white-space:nowrap; }
+    .dc-stat .lab { font-size:10px; color:#d9b98a; letter-spacing:.5px; margin-top:4px; font-weight:700; }
+    .dc-today {
+      margin:14px 0 0; padding:14px; border-radius:18px; display:flex; flex-direction:column; gap:10px;
+      background:linear-gradient(135deg,#1f3a35,#16121f 70%); border:2px solid #5cffd0;
+    }
+    .dc-today-head { display:flex; align-items:center; gap:12px; }
+    .dc-today-badge {
+      width:56px; height:56px; flex:0 0 56px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-size:28px; font-weight:900; color:#0d2a24;
+    }
+    .dc-today.done .dc-today-badge { background:#5cffd0; }
+    .dc-today-badge img { width:56px; height:56px; object-fit:contain; }
+    .dc-today-copy { flex:1; display:flex; flex-direction:column; gap:2px; }
+    .dc-today-kicker { font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:#5cffd0; }
+    .dc-today-score { font-size:16px; font-weight:900; color:#fff6dc; line-height:1.35; }
+    .dc-today-meta { font-size:11px; color:#b7d8cf; letter-spacing:.5px; }
+    .dc-today-scores { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .dc-today-box { padding:8px; border-radius:12px; background:rgba(0,0,0,.3); text-align:center; }
+    .dc-today-box b { display:block; font-family:'Cinzel Decorative',serif; font-size:24px; color:#f3e6c8; font-variant-numeric:tabular-nums; }
+    .dc-today-box span { font-size:11px; color:#b7d8cf; }
+    .dc-today-box.best { background:rgba(92,255,208,.12); border:1px solid rgba(92,255,208,.5); }
+    .dc-today-box.best b { color:#5cffd0; }
+    .dc-today-action {
+      appearance:none; border:0; border-radius:14px; min-height:48px; padding:10px 18px;
+      background:#5cffd0; color:#0d2a24; font:900 14px/1.2 inherit; font-family:inherit; letter-spacing:.5px;
+      cursor:pointer; box-shadow:0 4px 0 #2e9b80; -webkit-tap-highlight-color:transparent;
+    }
+    .dc-today-action.secondary { background:transparent; color:#5cffd0; border:2px solid #5cffd0; box-shadow:none; }
+    .dc-today-action:active { transform:translateY(2px); box-shadow:0 1px 0 #2e9b80; }
+    .dc-today-action:disabled { opacity:.55; cursor:wait; }
+
+    /* trail */
+    .pg-trail-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:8px; }
+    .pg-stat { padding:8px 10px; border-radius:12px; display:flex; flex-direction:column; gap:2px; }
+    .pg-stat span { font-size:11px; }
+    .pg-stat b { font-family:'Cinzel Decorative',serif; font-size:16px; font-variant-numeric:tabular-nums; }
+    .pg-stat small { font-family:'Zen Maru Gothic',sans-serif; font-size:11px; color:#b7a88a; }
+    .pg-stat.teal { background:rgba(92,255,208,.08); border:1px solid rgba(92,255,208,.45); }
+    .pg-stat.teal span { color:#b7d8cf; } .pg-stat.teal b { color:#5cffd0; }
+    .pg-stat.gold { background:rgba(255,215,122,.08); border:1px solid rgba(255,215,122,.45); }
+    .pg-stat.gold span { color:#e6d3a8; } .pg-stat.gold b { color:#ffd77a; }
+    .pg-trail-board {
+      position:relative; height:770px; border-radius:22px; overflow:hidden; border:1px solid #2e2540;
+      background:
+        linear-gradient(180deg, rgba(10,8,16,.62), rgba(10,8,16,.74)),
+        url("assets/img/profile/adventure-trail-forest.webp") center / cover no-repeat,
+        #120f1a;
+    }
+    .pg-seg { position:absolute; border-radius:4px; background:rgba(120,100,150,.35); }
+    .pg-seg.lit { background:#ffd77a; box-shadow:0 0 12px rgba(255,215,122,.9); }
+    .pg-chip {
+      position:absolute; width:44px; padding:2px 0; border-radius:999px; background:#ffd77a; color:#3a2408;
+      font-size:11px; font-weight:900; text-align:center; box-shadow:0 0 10px rgba(255,215,122,.8); z-index:2;
+    }
+    .pg-node {
+      position:absolute; width:104px; margin-left:-52px; display:flex; flex-direction:column; align-items:center; gap:2px; z-index:1;
+    }
+    .pg-disc {
+      width:58px; height:58px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-family:'Cinzel Decorative',serif; font-size:20px;
+      background:rgba(22,48,43,.92); border:3px solid #5cffd0; color:#5cffd0;
+    }
+    .pg-node.todo .pg-disc { animation:pgPulse 2.2s ease-in-out infinite; }
+    .pg-node.done .pg-disc { background:radial-gradient(circle at 40% 30%,#ffe08a,#c8871c 75%); border-color:#fff2c4; color:#3a2408; box-shadow:0 0 16px rgba(242,181,58,.55); }
+    .pg-node.one .pg-disc { background:radial-gradient(circle at 40% 30%,#f0b48a,#8a4a22 80%); border-color:#f0b48a; color:#2e1508; }
+    .pg-node.blitz .pg-disc { width:70px; height:70px; background:#1e1828; border-color:#6b4f9a; }
+    .pg-node.blitz .pg-disc img { width:52px; height:52px; object-fit:contain; filter:grayscale(.85) brightness(.6); }
+    .pg-node.blitz.done .pg-disc { background:radial-gradient(circle at 40% 30%,#ffe08a,#c8871c 75%); border-color:#fff2c4; box-shadow:0 0 16px rgba(242,181,58,.55); }
+    .pg-node.blitz.done .pg-disc img { filter:none; }
+    .pg-stars { font-size:11px; line-height:1.1; color:#5cffd0; font-family:'Cinzel',serif; text-shadow:0 1px 2px #000; white-space:nowrap; }
+    .pg-node.done .pg-stars { color:#ffd77a; font-family:inherit; letter-spacing:1px; }
+    .pg-node.one .pg-stars { color:#f0b48a; font-family:inherit; }
+    .pg-node.blitz .pg-stars { color:#c9b9e8; }
+    .pg-node.blitz.done .pg-stars { color:#ffd77a; }
+    .pg-name { font-size:10px; line-height:1.2; text-align:center; color:#cfe9e2; text-shadow:0 1px 3px #000; }
+    .pg-node.done .pg-name { color:#fff6dc; }
+    .pg-node.blitz .pg-name { color:#c9b9e8; }
+    .pg-token { position:absolute; width:42px; height:42px; object-fit:contain; z-index:3; filter:drop-shadow(0 0 8px rgba(168,230,61,.9)); animation:pgBob 3s ease-in-out infinite; }
+    .pg-gate { position:absolute; left:50%; transform:translateX(-50%); width:180px; display:flex; flex-direction:column; align-items:center; gap:2px; z-index:1; }
+    .pg-gate img { width:120px; height:80px; object-fit:contain; filter:drop-shadow(0 0 12px rgba(92,255,208,.35)); }
+    .pg-gate.open img { filter:drop-shadow(0 0 22px rgba(255,200,90,.8)); }
+    .pg-gate-title { font-size:12px; color:#5cffd0; text-shadow:0 1px 3px #000; }
+    .pg-gate.open .pg-gate-title { color:#ffd77a; }
+    .pg-gate-sub { font-size:10px; color:#cfe9e2; text-shadow:0 1px 3px #000; }
+    .pg-divider { position:absolute; left:12px; right:12px; display:flex; align-items:center; gap:8px; }
+    .pg-divider::before, .pg-divider::after { content:''; flex:1; height:1px; background:rgba(201,185,232,.4); }
+    .pg-divider span { font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:#c9b9e8; }
+    .pg-trail-skin { position:absolute; left:50%; transform:translateX(-50%); width:160px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+    .pg-trail-skin img { width:76px; height:76px; object-fit:contain; filter:brightness(.4) saturate(.5) drop-shadow(0 0 10px rgba(155,99,232,.6)); }
+    .pg-trail-skin.unlocked img { filter:drop-shadow(0 0 14px rgba(214,180,255,.9)); }
+    .pg-trail-skin span { font-size:11px; color:#d6b4ff; text-shadow:0 1px 3px #000; }
+
+    /* stars breakdown */
+    .pg-stars { display:flex; flex-direction:column; gap:6px; }
+    .pg-star-row { display:flex; justify-content:space-between; gap:10px; font-size:13px; color:#d9cbb0; }
+    .pg-star-row b { color:#ffd77a; font-variant-numeric:tabular-nums; }
+    .pg-star-row.total { padding-top:6px; border-top:1px dashed rgba(255,215,122,.3); color:#fff6dc; }
+
+    /* collection */
+    .pg-meter { height:10px; border-radius:999px; background:#241c33; overflow:hidden; margin-bottom:10px; }
+    .pg-meter span { display:block; height:100%; background:linear-gradient(90deg,#9a55c9,#d6b4ff); }
+    .pg-filters { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+    .pg-filter {
+      appearance:none; min-height:34px; padding:5px 11px; border-radius:999px; cursor:pointer;
+      border:1px solid #4a3a58; background:transparent; font:700 11px/1.2 inherit; font-family:inherit; color:#f3e6c8;
+    }
+    .pg-filter.friendly { color:#9fe6b8; } .pg-filter.mischievous { color:#ff9fd6; } .pg-filter.dangerous { color:#ff9a8a; }
+    .pg-filter[aria-pressed="true"] { border-color:currentColor; background:rgba(255,255,255,.08); }
+    .pg-filter:focus-visible, .pg-more:focus-visible, .pg-sealed-close:focus-visible { outline:3px solid #ffd966; outline-offset:2px; }
+    .pg-w-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+    .pg-w {
+      position:relative; display:flex; flex-direction:column; align-items:center; gap:3px;
+      padding:14px 4px 8px; border-radius:14px; border:2px solid; text-align:center;
+    }
+    .pg-w img { width:80px; height:80px; object-fit:contain; }
+    .pg-w.friendly { border-color:#9fe6b8; background:radial-gradient(circle at 50% 30%,#1f3a2c,#16121f 75%); }
+    .pg-w.mischievous { border-color:#ff9fd6; background:radial-gradient(circle at 50% 30%,#3d1f36,#16121f 75%); }
+    .pg-w.dangerous { border-color:#ff9a8a; background:radial-gradient(circle at 50% 30%,#3d1f22,#16121f 75%); }
+    .pg-w.unknown { border:2px dashed #3a2f4d; background:#14111b; }
+    .pg-w.top { box-shadow:0 0 16px rgba(255,215,122,.45); }
+    .pg-w-ribbon {
+      position:absolute; top:-9px; left:50%; transform:translateX(-50%); padding:1px 8px; border-radius:999px;
+      background:#ffd77a; color:#3a2408; font-size:9px; white-space:nowrap;
+    }
+    .pg-w-visits {
+      position:absolute; top:6px; right:6px; min-width:26px; padding:2px 5px; border-radius:999px;
+      background:rgba(0,0,0,.6); color:#ffd77a; font-family:'Cinzel',serif; font-size:10px;
+    }
+    .pg-w-q { width:80px; height:80px; display:flex; align-items:center; justify-content:center; font-family:'Cinzel Decorative',serif; font-size:30px; color:#6b5f80; }
+    .pg-w-name { width:100%; font-size:13px; line-height:1.2; color:#fff6dc; }
+    .pg-w.unknown .pg-w-name { color:#8c8070; }
+    .pg-w-tag { width:100%; font-size:9px; line-height:1.35; letter-spacing:.5px; color:#8c8070; }
+    .pg-w.friendly .pg-w-tag { color:#9fe6b8; } .pg-w.mischievous .pg-w-tag { color:#ff9fd6; } .pg-w.dangerous .pg-w-tag { color:#ff9a8a; }
+    .pg-more { display:block; margin-top:10px; text-align:center; font-size:12px; color:#d6b4ff; }
+
+    /* travelers */
+    .pg-tr-list { display:flex; flex-direction:column; gap:8px; }
+    .pg-tr { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px; border:2px solid; }
+    .pg-tr img { width:64px; height:64px; object-fit:contain; }
+    .pg-tr > div { flex:1; display:flex; flex-direction:column; gap:2px; }
+    .pg-tr b { font-size:15px; color:#fff6dc; }
+    .pg-tr span { font-size:11px; color:#b7a88a; }
+    .pg-tr em { font-style:normal; font-family:'Cinzel',serif; font-size:14px; }
+    .pg-tr.always { border-color:#5cffd0; background:radial-gradient(circle at 10% 50%,#1f3a35,#16121f 70%); }
+    .pg-tr.always span, .pg-tr.always em { color:#5cffd0; }
+    .pg-tr.seasonal { border-color:#b44dff; background:radial-gradient(circle at 10% 50%,#2e1a3d,#16121f 70%); }
+    .pg-tr.seasonal span, .pg-tr.seasonal em { color:#d6b4ff; }
+    .pg-tr.unknown { border:2px dashed #3a2f4d; background:#14111b; }
+    .pg-tr.unknown b, .pg-tr.unknown span { color:#8c8070; }
+    .pg-tr-q { width:64px; height:64px; flex:0 0 64px; border-radius:50%; background:#1e1828; display:flex; align-items:center; justify-content:center; font-family:'Cinzel Decorative',serif; font-size:24px; color:#6b5f80; }
+
+    /* medals */
+    .pg-shelf { padding:14px 10px 0; border-radius:18px; background:linear-gradient(180deg,#1b1626,#241a10); border:1px solid #4a3820; overflow:hidden; }
+    .pg-medal-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px 4px; }
+    .pg-medal { display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center; }
+    .pg-medal img { width:76px; height:76px; object-fit:contain; filter:grayscale(1) brightness(.32); opacity:.8; }
+    .pg-medal.on img { filter:drop-shadow(0 4px 8px rgba(0,0,0,.6)); opacity:1; }
+    .pg-medal span { font-size:10px; line-height:1.2; color:#8c8070; }
+    .pg-medal.on span { color:#f3e6c8; }
+    .pg-shelf-board { display:block; height:12px; margin:10px -10px 0; background:linear-gradient(180deg,#7a4e24,#3a2410); }
+    .pg-next-medal { margin:8px 0 0; font-size:12px; color:#5cffd0; text-align:center; line-height:1.5; }
+
+    /* record book heading */
+    .record-plate { margin-top:6px; }
+    .record-plate h2 { margin:0; font-size:clamp(20px,6vw,28px); font-weight:400; letter-spacing:2px; text-shadow:0 0 22px rgba(255,215,0,.28),0 2px 0 rgba(0,0,0,.7); }
+
+    /* week sealed */
+    .pg-sealed {
+      position:fixed; inset:0; z-index:90; display:flex; align-items:center; justify-content:center; padding:16px;
+      background:rgba(5,4,10,.86);
+    }
+    .pg-sealed[hidden] { display:none; }
+    .pg-sealed-card {
+      position:relative; overflow:hidden; width:100%; max-width:390px; max-height:100%; overflow-y:auto;
+      border-radius:24px; padding:28px 18px 20px; display:flex; flex-direction:column; align-items:center; gap:6px;
+      color:#f3e6c8; text-align:center; border:1px solid rgba(255,215,122,.45);
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(255,190,90,.35), rgba(13,11,20,.88) 60%),
+        url("assets/img/profile/adventure-log-night.webp") center / cover no-repeat, #0d0b14;
+    }
+    .pg-sealed-rays {
+      position:absolute; top:90px; left:50%; width:380px; height:380px; margin-left:-190px; border-radius:50%; pointer-events:none;
+      background:repeating-conic-gradient(rgba(255,215,122,.18) 0deg 10deg, rgba(255,215,122,0) 10deg 24deg);
+      animation:pgRays 18s linear infinite;
+    }
+    .pg-sealed-card > *:not(.pg-sealed-rays) { position:relative; }
+    .pg-sealed-card h2 { margin:0; font-size:26px; font-weight:900; color:#fff6dc; text-shadow:0 0 20px rgba(255,215,122,.6); }
+    .pg-sealed-stage { width:300px; max-width:100%; height:270px; }
+    .pg-sealed-chest { position:absolute; left:50%; bottom:0; width:260px; height:auto; transform:translateX(-50%); filter:drop-shadow(0 0 30px rgba(255,200,90,.7)); }
+    .pg-sealed-booha { position:absolute; left:50%; top:0; width:140px; height:140px; margin-left:-70px; object-fit:contain; animation:pgBob 1.6s ease-in-out infinite; }
+    .pg-sealed-score { display:flex; align-items:center; gap:14px; text-align:left; }
+    .pg-seal {
+      width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      background:radial-gradient(circle at 40% 30%,#ffe08a,#b8892f 80%); border:4px solid #fff2c4; color:#3a2408;
+      font-family:'Cinzel Decorative',serif; font-size:22px; box-shadow:0 0 24px rgba(255,215,122,.7);
+    }
+    .pg-sealed-score b { display:block; font-family:'Cinzel',serif; font-size:18px; color:#ffd77a; letter-spacing:2px; }
+    .pg-sealed-score div span { font-size:13px; color:#d9cbb0; }
+    .pg-sealed-rewards { list-style:none; margin:12px 0 0; padding:0; width:100%; display:flex; flex-direction:column; gap:8px; }
+    .pg-sealed-rewards li {
+      display:flex; align-items:center; gap:12px; padding:8px 14px; border-radius:14px; text-align:left;
+      background:rgba(27,22,38,.92); border:1px solid rgba(242,181,58,.5);
+    }
+    .pg-sealed-rewards li.skin { border-color:rgba(155,99,232,.6); }
+    .pg-sealed-rewards li img { width:34px; height:34px; object-fit:contain; }
+    .pg-sealed-rewards li span { flex:1; font-size:14px; }
+    .pg-sealed-rewards li b { font-size:12px; color:#ffd77a; }
+    .pg-sealed-rewards li.skin b { color:#d6b4ff; }
+    .pg-sealed-close {
+      margin-top:16px; width:100%; min-height:56px; border-radius:16px; border:0; cursor:pointer;
+      background:linear-gradient(180deg,#ffd77a,#e0a12e); color:#3a2408; font:900 18px/1.2 inherit; font-family:inherit;
+      box-shadow:0 5px 0 #8a5a1e;
+    }
+
+    @keyframes pgBob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-9px); } }
+    @keyframes pgPulse { 0%,100% { box-shadow:0 0 0 0 rgba(92,255,208,.5); } 50% { box-shadow:0 0 0 9px rgba(92,255,208,0); } }
+    @keyframes pgRays { to { transform:rotate(360deg); } }
+    @media (max-width:430px) {
+      .pg-hero { min-height:500px; }
+      .pg-hero-speech { font-size:12px; }
+      .pg-node { width:96px; margin-left:-48px; }
+      .pg-name { font-size:9px; }
+      .pg-medal img { width:64px; height:64px; }
+      .pg-w img, .pg-w-q { width:68px; height:68px; }
+      .dc-lantern { width:38px; height:38px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pg-hero-sprite, .pg-token, .pg-node.todo .pg-disc, .pg-sealed-rays, .pg-sealed-booha, .pg-level-track span::after { animation:none; }
+    }
+
     .dc-today-action:focus-visible,
     .juku-log-head:focus-visible { outline: 3px solid #b8892f; outline-offset: 2px; }
 
@@ -740,7 +1042,32 @@
     <a href="grimmerglen-profile.html" id="pnet-grimmerglen" hidden>GRIMMERGLEN <small>グリマーグレン</small></a>
   </nav>
 
- <main class="paper" id="profile-content">
+ <main class="pg-main" id="profile-content">
+  <!-- ═══ GAME VIEW: companion, trail, collection, medals ═══ -->
+  <div class="pg-wrap">
+    <section class="pg-hero" id="pg-hero" aria-label="Your companion and level" aria-live="polite"></section>
+    <section class="pg-card pg-skin" id="pg-skin" aria-label="This week's Blitz skin" hidden></section>
+
+    <section class="pg-block pg-daily" aria-labelledby="pg-daily-title">
+      <div class="pg-section-head">
+        <div><h2 id="pg-daily-title">ランタンのみち</h2><span class="pg-kicker">DAILY CHECK · まいにちチェック</span></div>
+      </div>
+      <div id="dc-week" role="region" aria-label="Daily check progress" aria-live="polite"></div>
+    </section>
+
+    <section class="pg-block" id="pg-trail" aria-label="This week's trail" aria-live="polite"></section>
+    <section class="pg-card pg-stars" id="pg-stars" aria-label="This week's stars"></section>
+    <section class="pg-block" id="pg-collection" aria-label="Wanderer collection"></section>
+    <section class="pg-block" id="pg-travelers" aria-label="Travelers met"></section>
+    <section class="pg-block" id="pg-medals" aria-label="Achievement shelf"></section>
+  </div>
+
+  <div class="journal-plate record-plate">
+    <h2>きろくちょう</h2>
+    <div class="plate-en">RECORD BOOK — DETAILS FOR STUDENTS, PARENTS &amp; TEACHERS</div>
+  </div>
+
+  <section class="paper" aria-label="Record book">
     <div class="profile-totals" id="profile-totals" aria-label="Progress totals">
       <div class="profile-total-card stars">
         <div class="profile-total-icon" data-profile-icon="star"></div>
@@ -764,10 +1091,6 @@
 
     <section class="profile-highlights" id="profile-highlights" aria-label="Progress highlights" aria-live="polite"></section>
 
-    <div class="ink-head">
-      <span class="jp">まいにちチェック</span><span class="en">DAILY CHECK</span>
-    </div>
-    <div id="dc-week" role="region" aria-label="Daily check progress" aria-live="polite"></div>
 
     <div class="ink-head">
       <span class="jp">こんしゅう</span><span class="en">THIS WEEK</span>
@@ -818,7 +1141,10 @@
       <span class="jp">これまでのきろく</span><span class="en">PAST WEEKS</span>
     </div>
     <div id="alog-past" role="region" aria-label="Past weeks" aria-live="polite"></div>
+  </section>
   </main>
+
+  <div class="pg-sealed" id="pg-sealed" hidden></div>
 
 <script>
   document.getElementById('alog-close').addEventListener('click', () => {
@@ -838,11 +1164,14 @@
 <script src="./js/core/score-system.js"></script>
 <script src="./js/core/unlock-system.js"></script>
 <script src="./js/core/day-record.js"></script>
+<script src="./js/core/level-stars.js"></script>
+<script src="./js/core/traveler-record.js"></script>
 <script src="./js/ui/profile-icons.js"></script>
 <script src="./js/ui/bonus-games.js"></script>
 <script src="./js/ui/adventure-log.js"></script>
 <script src="./js/ui/profile-progress.js"></script>
 <script src="./js/ui/juku-report-log.js"></script>
+<script src="./js/ui/profile-game.js"></script>
 <script src="./js/daily-check.js"></script>
 <script>
   (function () {
@@ -868,6 +1197,7 @@
 </script>
 <script>
   (function () {
+    var LANTERN = 'assets/img/blitz/medal-spooky.webp';
     function renderDailySummary() {
       var host = document.getElementById('dc-week');
       if (!host || !window.BoohaDailyCheck) return;
@@ -876,17 +1206,21 @@
       try { s = BoohaDailyCheck.weekSummary(); } catch (e) { return; }
       host.textContent = '';
 
+      // One lantern per day: lit when that day's check is recorded.
       var row = document.createElement('div'); row.className = 'dc-row';
       s.days.forEach(function (d, i) {
         var cell = document.createElement('div'); cell.className = 'dc-day';
+        var lamp = document.createElement('img');
+        lamp.className = 'dc-lantern';
+        lamp.src = LANTERN; lamp.width = 44; lamp.height = 44;
+        lamp.alt = DOW[i][0] + (d.st === 'done' ? ' — recorded' : d.isFuture ? ' — later this week' : ' — not recorded');
+        if (d.st === 'done') cell.classList.add('done');
+        else if (d.st === 'skip') cell.classList.add('skip');
+        else if (d.isFuture) cell.classList.add('future');
+        if (d.isToday) cell.classList.add('today');
         var dow = document.createElement('div'); dow.className = 'dc-dow';
         dow.innerHTML = window.UtsuFurigana ? window.UtsuFurigana.rb(DOW[i][0], DOW[i][1]) : DOW[i][0];
-        var dot = document.createElement('div'); dot.className = 'dc-dot';
-        if (d.st === 'done') { dot.classList.add('done'); dot.textContent = '✓'; }
-        else if (d.st === 'skip') { dot.classList.add('skip'); dot.textContent = '·'; }
-        else if (d.isFuture) { dot.classList.add('future'); }
-        if (d.isToday) dot.classList.add('today');
-        cell.appendChild(dow); cell.appendChild(dot); row.appendChild(cell);
+        cell.appendChild(lamp); cell.appendChild(dow); row.appendChild(cell);
       });
 
       var stats = document.createElement('div'); stats.className = 'dc-stats';
@@ -909,40 +1243,55 @@
         accuracy = s.accuracyFirst + '% → ' + s.accuracyBest + '%';
         accuracyLabel = 'さいしょ → ベスト';
       }
-      stats.appendChild(stat(s.doneCount + '/' + s.total, 'こんしゅう'));
+      stats.appendChild(stat(s.doneCount + '/' + s.total, 'ランタン +' + (s.doneCount * 2) + '★'));
       stats.appendChild(stat(s.streak, 'チェックれんぞく', 'streak', 'flame'));
       stats.appendChild(stat(accuracy, accuracyLabel, 'accuracy'));
-
       host.appendChild(row);
       host.appendChild(stats);
 
-      // This card is about today's actual assessment. The weekly percentage
-      // above stays an aggregate; the action below always opens today's check.
+      // Today's quest. The weekly numbers above stay an aggregate; the action
+      // below always opens today's check (first try, or an extra try).
       var today = BoohaDailyCheck.todaySummary();
-      var card = document.createElement('div'); card.className = 'dc-today';
+      var card = document.createElement('div');
+      card.className = 'dc-today' + (today.done ? ' done' : '');
+      var head = document.createElement('div'); head.className = 'dc-today-head';
+      var badge = document.createElement('span'); badge.className = 'dc-today-badge'; badge.setAttribute('aria-hidden', 'true');
+      if (today.done) badge.textContent = '✓';
+      else { var ff = document.createElement('img'); ff.src = 'assets/img/blitz/medal-fireflies.webp'; ff.alt = ''; badge.appendChild(ff); }
+      var copy = document.createElement('div'); copy.className = 'dc-today-copy';
       var kicker = document.createElement('div'); kicker.className = 'dc-today-kicker';
-      kicker.textContent = 'きょう / TODAY'; card.appendChild(kicker);
+      kicker.textContent = today.done ? 'TODAY’S QUEST · CLEAR' : 'TODAY’S QUEST';
       var score = document.createElement('div'); score.className = 'dc-today-score';
       var meta = document.createElement('div'); meta.className = 'dc-today-meta';
+      copy.appendChild(kicker); copy.appendChild(score); copy.appendChild(meta);
+      head.appendChild(badge); head.appendChild(copy);
+      card.appendChild(head);
+
       var action = document.createElement('button');
       action.className = 'dc-today-action'; action.type = 'button';
-
       if (today.done) {
-        if (today.first == null) score.textContent = '✓ RECORDED';
-        else score.textContent = today.hasRetakes
-          ? today.first + '% → ' + today.best + '%'
-          : today.first + '% · FIRST ATTEMPT';
+        score.textContent = today.first == null ? '✓ RECORDED' : 'きょうのチェック クリア！';
         meta.textContent = today.attempts + (today.attempts === 1 ? ' ATTEMPT' : ' ATTEMPTS') +
-          (today.curr ? ' · ' + today.curr.toUpperCase() : '');
+          (today.curr ? ' · ' + today.curr.toUpperCase() : '') + ' · +2★';
+        if (today.first != null) {
+          var scores = document.createElement('div'); scores.className = 'dc-today-scores';
+          [[today.first + '%', 'さいしょ FIRST TRY', ''], [today.best + '%', 'ベスト BEST', 'best']].forEach(function (item) {
+            var box = document.createElement('div'); box.className = 'dc-today-box ' + item[2];
+            var v = document.createElement('b'); v.textContent = item[0];
+            var l = document.createElement('span'); l.textContent = item[1];
+            box.appendChild(v); box.appendChild(l); scores.appendChild(box);
+          });
+          card.appendChild(scores);
+        }
         action.textContent = today.best >= 100
           ? 'れんしゅう / PRACTICE AGAIN'
           : 'もういちど / RETAKE TODAY';
+        action.classList.add('secondary');
       } else {
         score.textContent = 'まだ / NOT RECORDED';
-        meta.textContent = today.curr ? today.curr.toUpperCase() : '5 MINUTES';
+        meta.textContent = (today.curr ? today.curr.toUpperCase() + ' · ' : '') + '5 MINUTES · +2★';
         action.textContent = 'きょうのチェック / TAKE TODAY’S CHECK';
       }
-
       action.addEventListener('click', function () {
         action.disabled = true;
         BoohaDailyCheck.run({
@@ -954,10 +1303,9 @@
           onCancel: renderDailySummary
         });
       });
-      card.appendChild(score); card.appendChild(meta); card.appendChild(action);
+      card.appendChild(action);
       host.appendChild(card);
     }
-
     // A borrowed device must finish cloud restoration before this summary
     // reads meta.checkIn; otherwise it can paint an empty local week forever.
     if (window.BOOHA_READY) renderDailySummary();
