@@ -151,7 +151,17 @@ const BoohaProfileGame = (() => {
     const weekTotal = week.total + dailyThisWeek * L.RULES.daily;
     const levelWeekTotal = L.weekTotalAllCurricula
       ? L.weekTotalAllCurricula(weekLog[keys.week], checkIn, cw && cw.weekStart, gamesByCurr, starsFor)
-      : weekTotal;
+      : week.total + dailyThisWeek * L.RULES.daily;
+
+    // Weekly medal bonus stars come from the medal log (fresh start: only
+    // weeks since medals launched have entries) and count toward levels.
+    const W = window.BoohaWeeklyMedals;
+    const medalLog = isObject(meta.medalLog) ? meta.medalLog : {};
+    const medalStarsAll = W ? W.logStars(medalLog) : 0;
+    const medalStarsWeek = W ? W.weekStars(medalLog, keys.week) : 0;
+    life.medals = medalStarsAll;
+    life.total += medalStarsAll;
+    const weekTotalWithMedals = weekTotal + medalStarsWeek;
 
     // Most recently played maze game this week for Booha's trail token.
     const scores = isObject(data.scores) ? data.scores : {};
@@ -191,8 +201,8 @@ const BoohaProfileGame = (() => {
     const daysPlayed = Object.keys(dayLog).filter(k => isObject(dayLog[k]) && (dayLog[k].s > 0 || dayLog[k].g > 0)).length;
 
     return {
-      data, meta, keys, curr, games, week, life, weekTotal, dailyThisWeek,
-      level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - levelWeekTotal),
+      data, meta, keys, curr, games, week, life, weekTotal: weekTotalWithMedals, dailyThisWeek, medalStarsWeek,
+      level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - levelWeekTotal - medalStarsWeek),
       lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed,
       name: firstName(), sprite: heroSprite(),
     };
@@ -378,6 +388,7 @@ const BoohaProfileGame = (() => {
       ['つながり Links (+1★ × ' + (n - 1) + ')', `${s.week.linkStars} / ${n - 1}`],
       ['Blitz (+3★ × 3)', `${s.week.blitzStars} / 9`],
       ['まいにちチェック Daily (+2★ × 7)', `${s.dailyThisWeek * R.daily} / 14`],
+      ['メダル Medals (+3 / +5 / +10★)', `+${s.medalStarsWeek}`],
     ];
     host.innerHTML = `
       <span class="pg-kicker">THIS WEEK'S STARS · こんしゅうの ★</span>
@@ -502,6 +513,65 @@ const BoohaProfileGame = (() => {
   function renderMedals(s) {
     const host = document.getElementById('pg-medals');
     if (!host) return;
+    const W = window.BoohaWeeklyMedals;
+    const snap = W ? W.snapshot() : null;
+    if (!snap) { host.hidden = true; return; }
+    host.hidden = false;
+    const TIER = { bronze: ['ブロンズ', 'BRONZE'], silver: ['シルバー', 'SILVER'], gold: ['ゴールド', 'GOLD'] };
+    const rows = snap.rows.map(r => {
+      const m = W.MEDALS.find(x => x.id === r.id);
+      // A medal counts once it is in this week's log (the log never shrinks
+      // mid-week even if a score were later replaced).
+      const on = !!snap.logged[r.id] || r.earned;
+      return Object.assign({}, m, r, { on });
+    });
+    const earned = rows.filter(r => r.on);
+    const bonus = earned.reduce((sum, r) => sum + W.bonusFor(r.id), 0);
+    // Days left until the Sunday reset (Tokyo calendar).
+    let daysLeft = null;
+    try {
+      const start = Date.parse(`${snap.week.weekStart}T00:00:00+09:00`);
+      daysLeft = Math.max(1, Math.ceil((start + 7 * 86400000 - Date.now()) / 86400000));
+    } catch (_) {}
+    let lastWeekCount = 0;
+    let lastWeekKey = null;
+    try {
+      const keys = Object.keys(snap.medalLog).filter(k => k < snap.week.key).sort();
+      lastWeekKey = keys.length ? keys[keys.length - 1] : null;
+      lastWeekCount = lastWeekKey ? W.weekCount(snap.medalLog, lastWeekKey) : 0;
+    } catch (_) {}
+    host.innerHTML = `
+      <div class="pg-section-head">
+        <div><h2>こんしゅうのメダル</h2><span class="pg-kicker">WEEKLY MEDALS · ${earned.length} / ${rows.length}</span></div>
+        ${daysLeft ? `<span class="pg-reset-chip">あと${daysLeft}日 · にちようリセット</span>` : ''}
+      </div>
+      <div class="pg-meter medal" aria-hidden="true"><span style="width:${Math.round(earned.length / rows.length * 100)}%"></span></div>
+      <p class="pg-medal-key"><span class="bronze">ブロンズ +3★</span> · <span class="silver">シルバー +5★</span> · <span class="gold">ゴールド +10★</span><b>+${bonus}★</b></p>
+      <div class="pg-shelf">
+        <div class="pg-wm-grid">
+          ${rows.map(r => `
+            <div class="pg-wm ${r.tier}${r.on ? ' on' : ''}">
+              ${r.on ? '<span class="pg-wm-get">GET!</span>' : ''}
+              <img src="${IMG}${esc(r.img)}" alt="${esc(r.en)}${r.on ? ' (earned)' : ' (not yet)'}" width="96" height="96" loading="lazy" decoding="async">
+              <span class="pg-wm-name">${esc(r.jp)}</span>
+              <span class="pg-wm-tier">${TIER[r.tier][1]} · +${W.bonusFor(r.id)}★</span>
+              <span class="pg-wm-how">${esc(r.how)}</span>
+              <span class="pg-wm-bar" aria-hidden="true"><span style="width:${r.of ? Math.round(r.n / r.of * 100) : 0}%"></span></span>
+              <span class="pg-wm-count">${r.on ? `ゲット！ +${W.bonusFor(r.id)}★` : `${r.n} / ${r.of}`}</span>
+            </div>`).join('')}
+        </div>
+        <span class="pg-shelf-board" aria-hidden="true"></span>
+      </div>
+      ${lastWeekKey ? `<p class="pg-last-week">せんしゅうは ${lastWeekCount}こ ゲット！ <span>LAST WEEK · ${lastWeekCount} MEDALS · +${W.weekStars(snap.medalLog, lastWeekKey)}★</span></p>` : ''}`;
+    // The student has now seen this week's medals; clear the hub badge.
+    if (W.unseenCount() > 0 && W.markSeen()) {
+      document.dispatchEvent(new Event('booha:medalsSeen'));
+    }
+  }
+
+  function renderTrophies(s) {
+    const host = document.getElementById('pg-trophies');
+    if (!host) return;
     const U = window.BoohaUnlockSystem;
     const all = U && U.getAll ? U.getAll() : [];
     const byId = {};
@@ -520,21 +590,17 @@ const BoohaProfileGame = (() => {
     const earned = list.filter(m => m.on).length;
     const next = list.find(m => !m.on);
     host.innerHTML = `
-      <div class="pg-section-head">
-        <div><h2>メダルだな</h2><span class="pg-kicker">ACHIEVEMENT SHELF · ${earned} / ${list.length}</span></div>
+      <div class="rb-sec-head"><h3>トロフィーケース</h3><span class="rb-en">TROPHY CASE · FOREVER · ${earned} / ${list.length}</span></div>
+      <div class="rb-trophies">
+        ${list.map(m => `
+          <div class="rb-trophy${m.on ? ' on' : ''}">
+            <img src="${esc(m.img)}" alt="${esc(m.name)}${m.on ? '' : ' (locked)'}" width="60" height="60" loading="lazy" decoding="async">
+            <span>${esc(m.name)}</span>
+          </div>`).join('')}
       </div>
-      <div class="pg-shelf">
-        <div class="pg-medal-grid">
-          ${list.map(m => `
-            <div class="pg-medal${m.on ? ' on' : ''}">
-              <img src="${esc(m.img)}" alt="${esc(m.name)}${m.on ? '' : ' (locked)'}" width="76" height="76" loading="lazy" decoding="async">
-              <span>${esc(m.name)}</span>
-            </div>`).join('')}
-        </div>
-        <span class="pg-shelf-board" aria-hidden="true"></span>
-      </div>
-      ${next ? `<p class="pg-next-medal">つぎのメダル: ${esc(next.name)}${next.description ? ` — ${esc(next.description)}` : ''}</p>` : '<p class="pg-next-medal">ぜんぶ ゲット！ ALL MEDALS EARNED</p>'}`;
+      ${next ? `<p class="rb-next">つぎの トロフィー: ${esc(next.name)}${next.description ? ` — ${esc(next.description)}` : ''}</p>` : ''}`;
   }
+
 
   /* ── week sealed ────────────────────────────────────────────── */
 
@@ -609,7 +675,8 @@ const BoohaProfileGame = (() => {
       [renderStars, 'pg-stars', 'This week’s stars'],
       [renderCollection, 'pg-collection', 'Wanderer collection'],
       [renderTravelers, 'pg-travelers', 'Travelers'],
-      [renderMedals, 'pg-medals', 'Medal shelf'],
+      [renderMedals, 'pg-medals', 'Weekly medals'],
+      [renderTrophies, 'pg-trophies', 'Trophy case'],
       [maybeCelebrate, 'pg-sealed', 'Week celebration'],
     ].forEach(([fn, id, label]) => {
       try { fn(s); } catch (error) { fallback(document.getElementById(id), label, error); }
@@ -621,6 +688,7 @@ const BoohaProfileGame = (() => {
   document.addEventListener('booha:dayRecorded', render);
   document.addEventListener('booha:checkIn', render);
   document.addEventListener('booha:profileCurr', render);
+  document.addEventListener('booha:medalEarned', render);
 
   return { render, _test: { kindFor, nodePos, speech, sealedKey, MEDALS } };
 })();

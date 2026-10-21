@@ -15,7 +15,7 @@ assert.match(profile, /NOT RECORDED/, 'the daily profile empty state should desc
 assert.doesNotMatch(profile, /NOT COMPLETED/, 'the daily profile should not frame participation as a permanent completion');
 assert.match(profile, /RECORDED/, 'the canonical profile should show the recorded total');
 assert.match(profile, /CURRICULUM DETAILS/, 'the canonical profile should contain the detailed curriculum section');
-['profile-totals', 'dc-week', 'alog-week', 'curr-cards', 'unlocks-grid', 'juku-report-log', 'alog-calendar', 'alog-past']
+['dc-week', 'alog-week', 'curr-cards', 'pg-medals', 'pg-trophies', 'juku-report-log', 'alog-calendar', 'alog-past']
   .forEach(id => assert.match(profile, new RegExp(`id=\\"${id}\\"`), `the canonical profile should mount ${id}`));
 assert.match(profile, /js\/ui\/profile-progress\.js/, 'the canonical profile should load its detailed progress renderer');
 assert.match(profile, /id="profile-highlights"/, 'the canonical profile should mount its progress highlights');
@@ -25,7 +25,7 @@ assert.match(profile, /id="alog-past" role="region" aria-label="Past weeks" aria
 assert.match(profile, /\.dc-today-action:focus-visible/, 'daily check actions should have a visible focus state');
 assert.match(profile, /@media \(max-width:430px\)/, 'the profile should include a compact mobile layout');
 assert.match(profile, /js\/karasuki-wanderer-data\.js/, 'the canonical profile should load wanderer collection data');
-assert.match(profile, /aria-controls="acc-achievements-body"/, 'the achievements accordion should expose its controlled region');
+assert.match(profile, /id="pg-trophies" aria-label="Trophy case"/, 'permanent achievements should live in the labeled trophy case');
 assert.doesNotMatch(profile, /BONUS GAMES/, 'the canonical profile should not duplicate the Bonus Games shelf');
 assert.ok(profile.indexOf('id="alog-week"') < profile.indexOf('id="alog-calendar"'), 'the calendar should follow the current week section');
 assert.ok(profile.indexOf('id="alog-calendar"') < profile.indexOf('id="curr-cards"'), 'curriculum details should follow the calendar');
@@ -45,7 +45,7 @@ assert.match(adventureLog, /Choose the curriculum for this week/, 'the weekly cu
 assert.match(adventureLog, /alog-curr-tab-jp/, 'curriculum tabs should show Japanese helper text');
 assert.match(profile, /family=Cinzel:wght@600;700/, 'the profile should load a clearer supporting display font');
 assert.match(profile, /font-variant-numeric:tabular-nums/, 'profile scores should use stable number widths');
-assert.match(profile, /@keyframes stampAura/, 'completed weekly records should have a visual completion state');
+assert.match(profile, /@keyframes pgShine/, 'earned weekly medals should have a visual completion state');
 assert.match(profile, /@keyframes progressSheen/, 'progress bars should have a restrained visual shine');
 
 console.log('Profile language tests passed.');

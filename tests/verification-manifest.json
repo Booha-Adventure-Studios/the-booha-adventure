@@ -204,6 +204,11 @@
       "path": "tests/profile-game-view.test.cjs",
       "status": "verify",
       "reason": "Current Adventure Log game view: level-star rules, wanderer categories, traveler records, and profile mounts."
+    },
+    {
+      "path": "tests/weekly-medals.test.cjs",
+      "status": "verify",
+      "reason": "Current weekly medals: rules, best-curriculum counting, fresh start, one popup per medal, bonus stars, and popup page wiring."
     }
   ]
 }
