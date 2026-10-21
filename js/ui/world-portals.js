@@ -49,6 +49,7 @@ window.BoohaPortals = (function () {
     document.addEventListener('booha:saved', update);
     document.addEventListener('booha:weeklyReset', update);
     document.addEventListener('booha:newWeek', update);
+    document.addEventListener('booha:devWorldsChanged', update);
   }
 
   return { setLocked: setLocked, watch: watch };
