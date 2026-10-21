@@ -227,3 +227,21 @@ window.KARASUKI_WANDERER_DATA = {
     furigana: { "その気持ち": "そのきもち", "行き場所": "いきばしょ" }
   }
 };
+
+/*
+ * Editorial collection categories live with the character registry rather
+ * than in a profile renderer. Characters not called out below are friendly;
+ * this keeps the authored data compact while still giving every record an
+ * explicit `kind` field for filters and future collection views.
+ */
+const KARASUKI_WANDERER_KINDS = Object.freeze({
+  'ena-yamakage': 'dangerous', 'gorogui': 'dangerous', 'mikachan': 'dangerous',
+  'snakuma': 'dangerous', 'sumiyo-horaguchi': 'dangerous', 'yukan': 'dangerous',
+  'jubei-tsukigase': 'dangerous',
+  'whistler': 'mischievous', 'san': 'mischievous', 'poopika': 'mischievous',
+  'denoying': 'mischievous', 'amekuro': 'mischievous', 'jeffrey': 'mischievous',
+  'mouhitome': 'mischievous', 'nulvane': 'mischievous', 'shoganai': 'mischievous',
+});
+Object.values(window.KARASUKI_WANDERER_DATA).forEach(item => {
+  item.kind = KARASUKI_WANDERER_KINDS[item.id] || 'friendly';
+});
