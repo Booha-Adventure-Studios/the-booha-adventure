@@ -1,0 +1,629 @@
+/**
+ * profile-game.js
+ * The Booha Adventure — the game view at the top of the Adventure Log.
+ *
+ * Mounts (profile.html):
+ *   #pg-hero        companion card: seasonal/selected Booha, name, rank coin, level bar
+ *   #pg-skin        this week's Blitz skin
+ *   #pg-trail       this week's trail: 9 maze games → arcade chest → 3 Blitz → skin
+ *   #pg-stars       this week's star breakdown
+ *   #pg-collection  wanderer collection (friendly / mischievous / dangerous)
+ *   #pg-travelers   travelers the player has tapped (Nuppi, seasonal travelers)
+ *   #pg-medals      achievement shelf
+ *   #pg-sealed      one-time "week sealed" celebration
+ *
+ * Read-only: every number comes from existing save data. Levels come from
+ * BoohaLevelStars, which derives them from meta.weekLog and meta.checkIn.
+ * Each section fails soft on its own so one bad record cannot blank the page.
+ */
+const BoohaProfileGame = (() => {
+  'use strict';
+
+  const IMG = 'assets/img/profile/';
+  const LANTERN = 'assets/img/blitz/medal-spooky.webp';
+  const BLITZ_ART = {
+    vocab: 'assets/img/blitz/medal-circus.webp',
+    sentence: 'assets/img/blitz/medal-spooky.webp',
+    question: 'assets/img/blitz/medal-fireflies.webp',
+  };
+  const BLITZ_LABEL = { vocab: 'VOCAB BLITZ', sentence: 'SENTENCE BLITZ', question: 'QUESTION BLITZ' };
+  const CURR_NAME = { pb: 'Pre-Boo', br: 'Boo-riculum', bc: 'Boo-continuum' };
+
+  // Bryan's categories. Everyone not listed is friendly.
+  const WANDERER_KIND = Object.freeze({
+    'ena-yamakage': 'dangerous', 'gorogui': 'dangerous', 'mikachan': 'dangerous',
+    'snakuma': 'dangerous', 'sumiyo-horaguchi': 'dangerous', 'yukan': 'dangerous',
+    'jubei-tsukigase': 'dangerous',
+    'whistler': 'mischievous', 'san': 'mischievous', 'poopika': 'mischievous',
+    'denoying': 'mischievous', 'amekuro': 'mischievous', 'jeffrey': 'mischievous',
+    'mouhitome': 'mischievous', 'nulvane': 'mischievous', 'shoganai': 'mischievous',
+  });
+  const KIND_LABEL = {
+    friendly: ['なかま', 'FRIENDLY'],
+    mischievous: ['いたずら', 'MISCHIEVOUS'],
+    dangerous: ['きけん', 'DANGEROUS'],
+  };
+  // Same image-name exceptions as the adventure profile collection.
+  const IMAGE_SLUGS = {
+    'gorogui': 'gorogane', 'mister-happy': 'mr_happy', 'tom-katsu': 'tom_katsu',
+    'sumiyo-horaguchi': 'sumiyo_horaguchi', 'takachika-green': 'takachika_green',
+    'october-moriyama': 'october_moriyama', 'jubei-tsukigase': 'tsukigase_jubei',
+    'kara-ageha': 'kara-ageha', 'jinguru-kan': 'jinguru-kan',
+  };
+  const TRAVELERS = [
+    { id: 'nuppi', name: 'Nuppi', img: 'assets/img/wanderers/nuppi-1.webp',
+      note: 'いつも たびしている · ALWAYS TRAVELING', hint: 'からすき や むえんば で さがしてね', always: true },
+    { id: 'barba', name: 'Barba', img: 'assets/img/wanderers/barba.webp', seasonId: 'halloween-2026',
+      note: 'ハロウィン 2026 · SEASONAL', hint: 'ハロウィンの からすき に いるよ' },
+  ];
+  const MEDALS = [
+    { id: 'first_game', img: 'medal-first-step.webp', name: 'Adventure Begins!' },
+    { id: 'CURR:all_complete', img: 'medal-CURR-champion.webp', name: 'CHAMP Champion!' },
+    { id: 'muenba:first_briefing', img: 'medal-nuppi-trust.webp', name: "Nuppi's Trust" },
+    { id: 'muenba:first_ghost', img: 'medal-first-ghost.webp', name: 'First Ghost Caught' },
+    { id: 'muenba:cleared', img: 'medal-muenba-cleared.webp', name: 'Muenba Cleared' },
+    { id: 'grimmerglen:first_memory', img: 'medal-first-memory.webp', name: 'A Memory Found' },
+    { id: 'grimmerglen:all_memories', img: 'medal-memory-garden.webp', name: 'Memory Garden' },
+    { id: 'grimmerglen:rooms_explored', img: 'medal-every-corner.webp', name: 'Every Corner' },
+  ];
+
+  let collectionFilter = 'all';
+
+  /* ── helpers ─────────────────────────────────────────────────── */
+
+  function esc(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function isObject(value) {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function fallback(host, label, error) {
+    console.error(`[ProfileGame] ${label} failed:`, error);
+    if (!host) return;
+    host.innerHTML = `<div class="profile-render-fallback pg-fallback" role="status"><strong>${esc(label)} is temporarily unavailable.</strong><small>Try refreshing this page.</small></div>`;
+  }
+
+  function firstName() {
+    try {
+      const raw = (localStorage.getItem('booha_first_name') || '').trim().slice(0, 12);
+      return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function heroSprite() {
+    const S = window.BoohaSkins;
+    if (!S) return { src: 'assets/img/booha_ghost.webp', name: 'Booha' };
+    try {
+      const id = (S.selectedId && S.selectedId()) || (S.menuCharacterId && S.menuCharacterId()) || null;
+      const skin = id && S.get ? S.get(id) : null;
+      if (skin && skin.assets) {
+        return { src: skin.assets.danceWave || skin.assets.maze || skin.assets.static, name: skin.name };
+      }
+      const mascot = S.seasonMascot ? S.seasonMascot() : null;
+      if (mascot && mascot.assets && mascot.assets.static) return { src: mascot.assets.static, name: mascot.name };
+      return { src: S.BASE || 'assets/img/booha_ghost.webp', name: 'Booha' };
+    } catch (_) {
+      return { src: 'assets/img/booha_ghost.webp', name: 'Booha' };
+    }
+  }
+
+  function gamesFor(curr) {
+    const entries = BoohaGameRegistry.getForCurriculum(curr) || [];
+    return entries.map(g => {
+      const id = g.baseId || String(g.id || '').split(':').pop();
+      return { id, name: g.name || id, saveId: `${curr}:${id}` };
+    });
+  }
+
+  function starsFor(saveId, pct) {
+    return BoohaGameRegistry.starsForScore(saveId, pct);
+  }
+
+  /** Everything the sections need, gathered once per render. */
+  function snapshot() {
+    const data = BoohaAdventure.save.load() || {};
+    const meta = isObject(data.meta) ? data.meta : {};
+    const keys = BoohaDayRecord.getCurrentKeys();
+    if (!keys || typeof keys.week !== 'string') throw new Error('calendar keys unavailable');
+    const weekLog = BoohaDayRecord.getWeekLog() || {};
+    const dayLog = BoohaDayRecord.getDayLog() || {};
+    let curr = null;
+    try {
+      const saved = localStorage.getItem('booha_profile_curr');
+      if (['pb', 'br', 'bc'].includes(saved)) curr = saved;
+    } catch (_) {}
+    if (!curr && window.BoohaAdventureLog && BoohaAdventureLog._test) {
+      curr = BoohaAdventureLog._test.inferCurriculum(weekLog, keys.week);
+    }
+    if (!curr) curr = 'br';
+
+    const games = gamesFor(curr);
+    const ids = games.map(g => g.id);
+    const gamesByCurr = { pb: gamesFor('pb').map(g => g.id), br: gamesFor('br').map(g => g.id), bc: gamesFor('bc').map(g => g.id) };
+    const L = BoohaLevelStars;
+    const week = L.weekStars(weekLog[keys.week], curr, ids, starsFor);
+    const checkIn = isObject(meta.checkIn) ? meta.checkIn : {};
+    const life = L.lifetime(weekLog, checkIn, gamesByCurr, starsFor);
+    const cw = window.CALENDAR && CALENDAR.getCurrentCurriculumWeek ? CALENDAR.getCurrentCurriculumWeek() : null;
+    const dailyThisWeek = cw && cw.weekStart ? L.dailyDoneInWeek(checkIn, cw.weekStart) : 0;
+    const weekTotal = week.total + dailyThisWeek * L.RULES.daily;
+
+    // Most recently played maze game this week for Booha's trail token.
+    const scores = isObject(data.scores) ? data.scores : {};
+    let lastIndex = -1;
+    let lastAt = 0;
+    games.forEach((g, i) => {
+      const at = Number(scores[g.saveId] && scores[g.saveId].lastPlayedAt) || 0;
+      if (week.stars[i] != null && at > lastAt) { lastAt = at; lastIndex = i; }
+    });
+
+    let arcadeOpen = week.twoStarCount === games.length;
+    try {
+      if (window.BoohaUnlockSystem && BoohaUnlockSystem.BONUS_GAMES) {
+        arcadeOpen = arcadeOpen || BoohaUnlockSystem.isBonusGameUnlocked(BoohaUnlockSystem.BONUS_GAMES[0]);
+      }
+    } catch (_) {}
+
+    const adv = isObject(weekLog[keys.week] && weekLog[keys.week].adv) ? weekLog[keys.week].adv : {};
+    const pcts = games.map(g => adv[g.saveId]).filter(v => v != null && Number.isFinite(Number(v))).map(Number);
+    const weekPct = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : null;
+
+    const S = window.BoohaSkins;
+    let weeklySkin = null;
+    try {
+      const skinId = S && S.rotationCharacterId ? S.rotationCharacterId() : null;
+      const skin = skinId && S.get ? S.get(skinId) : null;
+      if (skin) {
+        weeklySkin = {
+          id: skinId,
+          name: skin.name,
+          src: skin.assets.maze || skin.assets.static,
+          unlocked: !!(S.hasCurrentBlitzTriple && S.hasCurrentBlitzTriple(data)),
+        };
+      }
+    } catch (_) {}
+
+    const daysPlayed = Object.keys(dayLog).filter(k => isObject(dayLog[k]) && (dayLog[k].s > 0 || dayLog[k].g > 0)).length;
+
+    return {
+      data, meta, keys, curr, games, week, life, weekTotal, dailyThisWeek,
+      level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - weekTotal),
+      lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed,
+      name: firstName(), sprite: heroSprite(),
+    };
+  }
+
+  /* ── hero ───────────────────────────────────────────────────── */
+
+  function speech(s) {
+    const left = s.games.length - s.week.twoStarCount;
+    if (!s.week.played) return 'きょうも いっしょに ぼうけん しよう！';
+    if (!s.arcadeOpen) return `あと ${left}つ ★★ で アーケード だよ！`;
+    if (s.week.blitzCount < 3) {
+      return s.weeklySkin
+        ? `アーケード オープン！ Blitz あと ${3 - s.week.blitzCount}つ で スキン！`
+        : `アーケード オープン！ Blitz にも ちょうせん しよう！`;
+    }
+    return 'こんしゅう ぜんぶ クリア！ すごい！';
+  }
+
+  function renderHero(s) {
+    const host = document.getElementById('pg-hero');
+    if (!host) return;
+    const lv = s.level;
+    const pct = lv.max ? 100 : Math.max(3, Math.round(lv.into / lv.span * 100));
+    const greet = s.name ? `${s.name}、おかえり！` : 'おかえり！';
+    const nextLine = lv.max
+      ? 'さいこう ランク！ MAX RANK'
+      : `Lv ${lv.level + 1} で あたらしい コイン`;
+    host.innerHTML = `
+      <div class="pg-hero-coin">
+        <img src="${IMG}rank-coin-${lv.level}.webp" alt="Rank coin, level ${lv.level}" width="72" height="72">
+        <span class="pg-hero-lv">LV ${lv.level}</span>
+      </div>
+      <p class="pg-hero-speech">${esc(greet)}<br><span>${esc(speech(s))}</span></p>
+      <div class="pg-hero-stage">
+        <span class="pg-hero-shadow" aria-hidden="true"></span>
+        <img class="pg-hero-sprite" src="${esc(s.sprite.src)}" alt="${esc(s.sprite.name)}, your companion" width="220" height="220">
+      </div>
+      <div class="pg-hero-foot">
+        <h2 class="pg-hero-name">${esc(s.name || 'Booha')}</h2>
+        <p class="pg-hero-sub">ぼうけん ${s.daysPlayed}日 · ${esc(s.sprite.name)}</p>
+        <div class="pg-level">
+          <div class="pg-level-row"><span>${lv.max ? 'ランク MAX' : `Lv ${lv.level + 1} まで`}</span><span class="pg-level-num">${lv.max ? `${s.life.total.toLocaleString()} ★` : `${s.life.total.toLocaleString()} / ${lv.next.toLocaleString()} ★`}</span></div>
+          <div class="pg-level-track" role="progressbar" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><span style="width:${pct}%"></span></div>
+          <p class="pg-level-next">${esc(nextLine)}${lv.max ? '' : ` <img src="${IMG}rank-coin-${lv.level + 1}.webp" alt="" width="22" height="22">`}</p>
+        </div>
+      </div>`;
+  }
+
+  /* ── weekly Blitz skin ──────────────────────────────────────── */
+
+  function renderSkin(s) {
+    const host = document.getElementById('pg-skin');
+    if (!host) return;
+    const skin = s.weeklySkin;
+    if (!skin) { host.hidden = true; host.innerHTML = ''; return; }
+    host.hidden = false;
+    const bars = ['vocab', 'sentence', 'question']
+      .map(t => `<span class="pg-skin-pip${s.week.blitzDone[t] ? ' on' : ''}"></span>`).join('');
+    host.innerHTML = `
+      <div class="pg-skin-art${skin.unlocked ? ' unlocked' : ''}">
+        <img src="${esc(skin.src)}" alt="This week's Blitz skin: ${esc(skin.name)}${skin.unlocked ? '' : ' (locked)'}" width="64" height="64">
+      </div>
+      <div class="pg-skin-copy">
+        <span class="pg-kicker">THIS WEEK'S SKIN</span>
+        <span class="pg-skin-name">${esc(skin.name)}</span>
+        <div class="pg-skin-bar">${bars}<span>${skin.unlocked ? 'ゲット！ UNLOCKED' : `Blitz ${s.week.blitzCount}/3`}</span></div>
+      </div>`;
+  }
+
+  /* ── trail ──────────────────────────────────────────────────── */
+
+  const COLS = [16.5, 50, 83.5];
+  const ROW_Y = [60, 180, 300];
+  const GATE_Y = 425;
+  const BLITZ_Y = 575;
+  const SKIN_Y = 690;
+
+  function nodePos(i) {
+    const row = Math.floor(i / 3);
+    const inRow = i % 3;
+    const col = row % 2 === 0 ? inRow : 2 - inRow;
+    return { x: COLS[col], y: ROW_Y[row] };
+  }
+
+  function seg(x1, y1, x2, y2, lit) {
+    const cls = `pg-seg${lit ? ' lit' : ''}`;
+    if (y1 === y2) {
+      return `<span class="${cls}" style="left:${Math.min(x1, x2)}%;top:${y1 - 4}px;width:${Math.abs(x2 - x1)}%;height:8px"></span>`;
+    }
+    return `<span class="${cls}" style="left:calc(${x1}% - 4px);top:${Math.min(y1, y2)}px;width:8px;height:${Math.abs(y2 - y1)}px"></span>`;
+  }
+
+  function renderTrail(s) {
+    const host = document.getElementById('pg-trail');
+    if (!host) return;
+    const w = s.week;
+    const parts = [];
+    // Maze links: lit only when both neighbours have ★★ or better.
+    for (let i = 0; i < s.games.length - 1; i++) {
+      const a = nodePos(i);
+      const b = nodePos(i + 1);
+      parts.push(seg(a.x, a.y, b.x, b.y, w.links[i]));
+      if (w.links[i]) {
+        const mx = (a.x + b.x) / 2;
+        const my = (a.y + b.y) / 2;
+        const style = a.y === b.y
+          ? `left:calc(${mx}% - 22px);top:${my - 28}px`
+          : `left:calc(${mx}% - 56px);top:${my - 10}px`;
+        parts.push(`<span class="pg-chip" style="${style}">+1★</span>`);
+      }
+    }
+    const last = nodePos(s.games.length - 1);
+    parts.push(seg(last.x, last.y, last.x, GATE_Y, s.arcadeOpen));
+    parts.push(seg(COLS[1], GATE_Y, last.x, GATE_Y, s.arcadeOpen));
+    // Blitz row and the skin at the end.
+    const bd = ['vocab', 'sentence', 'question'].map(t => w.blitzDone[t]);
+    parts.push(seg(COLS[0], BLITZ_Y, COLS[1], BLITZ_Y, bd[0] && bd[1]));
+    parts.push(seg(COLS[1], BLITZ_Y, COLS[2], BLITZ_Y, bd[1] && bd[2]));
+    parts.push(seg(COLS[1], BLITZ_Y, COLS[1], SKIN_Y - 40, w.blitzCount === 3));
+
+    s.games.forEach((g, i) => {
+      const p = nodePos(i);
+      const st = w.stars[i];
+      const state = st == null ? 'todo' : st >= 2 ? 'done' : 'one';
+      const starText = st == null ? 'PLAY' : st === 1 ? '★☆☆ あと1★' : '★'.repeat(st) + '☆'.repeat(3 - st);
+      const label = `${g.name}: ${st == null ? 'not played yet' : `${st} of 3 stars`}`;
+      parts.push(`
+        <div class="pg-node ${state}" style="left:${p.x}%;top:${p.y - 29}px" role="listitem" aria-label="${esc(label)}">
+          <span class="pg-disc">${i + 1}</span>
+          <span class="pg-stars">${esc(starText)}</span>
+          <span class="pg-name">${esc(g.name)}</span>
+        </div>`);
+    });
+    if (s.lastIndex >= 0) {
+      const p = nodePos(s.lastIndex);
+      parts.push(`<img class="pg-token" src="${esc(s.sprite.src)}" alt="" aria-hidden="true" style="left:calc(${p.x}% + 20px);top:${p.y - 50}px" width="42" height="42">`);
+    }
+    parts.push(`
+      <div class="pg-gate${s.arcadeOpen ? ' open' : ''}" style="top:${GATE_Y - 50}px">
+        <img src="${IMG}treasure-chest-${s.arcadeOpen ? 'open' : 'closed'}.webp" alt="Arcade chest${s.arcadeOpen ? ' (open)' : ' (locked)'}" width="120" height="80">
+        <span class="pg-gate-title">${s.arcadeOpen ? 'アーケード オープン！' : 'アーケード たからばこ'}</span>
+        <span class="pg-gate-sub">${s.arcadeOpen ? 'ARCADE GAMES UNLOCKED' : 'ぜんぶ ★★ で ひらく'}</span>
+      </div>
+      <div class="pg-divider" style="top:${GATE_Y + 72}px" aria-hidden="true"><span>BLITZ · SKIN</span></div>`);
+    ['vocab', 'sentence', 'question'].forEach((t, i) => {
+      const done = w.blitzDone[t];
+      parts.push(`
+        <div class="pg-node blitz${done ? ' done' : ''}" style="left:${COLS[i]}%;top:${BLITZ_Y - 35}px" role="listitem" aria-label="${BLITZ_LABEL[t]}: ${done ? 'cleared' : 'not cleared yet'}">
+          <span class="pg-disc"><img src="${BLITZ_ART[t]}" alt="" width="52" height="52"></span>
+          <span class="pg-stars">${done ? 'CLEAR · +3★' : 'PLAY'}</span>
+          <span class="pg-name">${BLITZ_LABEL[t]}</span>
+        </div>`);
+    });
+    if (s.weeklySkin) {
+      parts.push(`
+        <div class="pg-trail-skin${s.weeklySkin.unlocked ? ' unlocked' : ''}" style="top:${SKIN_Y - 40}px">
+          <img src="${esc(s.weeklySkin.src)}" alt="${esc(s.weeklySkin.name)}${s.weeklySkin.unlocked ? '' : ' (locked)'}" width="76" height="76">
+          <span>${esc(s.weeklySkin.name)} · ${s.weeklySkin.unlocked ? 'ゲット！' : `${w.blitzCount}/3`}</span>
+        </div>`);
+    }
+
+    host.innerHTML = `
+      <div class="pg-section-head">
+        <div><h2>こんしゅうのぼうけん</h2><span class="pg-kicker">THIS WEEK'S TRAIL · ${esc(CURR_NAME[s.curr] || s.curr.toUpperCase())}</span></div>
+        <span class="pg-head-num">${s.weekTotal}★</span>
+      </div>
+      <p class="pg-note">どの じゅんばんでも OK！ となりどうしが ★★ に なると みちが ひかって <b>+1★</b>。</p>
+      <div class="pg-trail-stats">
+        <div class="pg-stat teal"><span>アーケードまで ★★×${s.games.length}</span><b>${w.twoStarCount} / ${s.games.length}</b></div>
+        <div class="pg-stat gold"><span>つながりボーナス</span><b>+${w.linkStars}★ <small>(${w.linkCount}/${s.games.length - 1})</small></b></div>
+      </div>
+      <div class="pg-trail-board" role="list" aria-label="This week's games">${parts.join('')}</div>`;
+  }
+
+  function renderStars(s) {
+    const host = document.getElementById('pg-stars');
+    if (!host) return;
+    const R = BoohaLevelStars.RULES;
+    const n = s.games.length;
+    const rows = [
+      ['めいろゲーム Maze (3★ × ' + n + ')', `${s.week.maze} / ${n * 3}`],
+      ['つながり Links (+1★ × ' + (n - 1) + ')', `${s.week.linkStars} / ${n - 1}`],
+      ['Blitz (+3★ × 3)', `${s.week.blitzStars} / 9`],
+      ['まいにちチェック Daily (+2★ × 7)', `${s.dailyThisWeek * R.daily} / 14`],
+    ];
+    host.innerHTML = `
+      <span class="pg-kicker">THIS WEEK'S STARS · こんしゅうの ★</span>
+      ${rows.map(r => `<div class="pg-star-row"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join('')}
+      <div class="pg-star-row total"><span>ごうけい TOTAL</span><b>${s.weekTotal}★</b></div>`;
+  }
+
+  /* ── collection ─────────────────────────────────────────────── */
+
+  function wandererImage(id) {
+    return `assets/img/wanderers/${IMAGE_SLUGS[id] || id.replace(/-/g, '_')}-1.webp`;
+  }
+
+  function renderCollection(s) {
+    const host = document.getElementById('pg-collection');
+    if (!host) return;
+    const source = window.KARASUKI_WANDERER_DATA || {};
+    const records = isObject(s.data.collection) && isObject(s.data.collection.wanderers) ? s.data.collection.wanderers : {};
+    const items = Object.keys(source).map(name => {
+      const id = source[name].id;
+      const rec = records[id];
+      return {
+        id, name,
+        kind: WANDERER_KIND[id] || 'friendly',
+        found: !!rec,
+        visits: rec ? Math.max(1, Number(rec.visits) || 1) : 0,
+      };
+    });
+    const total = items.length;
+    const found = items.filter(i => i.found);
+    const count = kind => ({
+      found: found.filter(i => i.kind === kind).length,
+      total: items.filter(i => i.kind === kind).length,
+    });
+    const c = { friendly: count('friendly'), mischievous: count('mischievous'), dangerous: count('dangerous') };
+    const shown = found
+      .filter(i => collectionFilter === 'all' || i.kind === collectionFilter)
+      .sort((a, b) => b.visits - a.visits || a.name.localeCompare(b.name));
+    const topId = found.length ? found.slice().sort((a, b) => b.visits - a.visits)[0].id : null;
+    const cards = shown.slice(0, 9).map(i => `
+      <article class="pg-w ${i.kind}${i.id === topId ? ' top' : ''}">
+        ${i.id === topId ? '<span class="pg-w-ribbon">いちばん なかよし</span>' : ''}
+        <span class="pg-w-visits" aria-label="${i.visits} visits">×${i.visits}</span>
+        <img src="${esc(wandererImage(i.id))}" alt="${esc(i.name)}" width="80" height="80" loading="lazy" decoding="async">
+        <span class="pg-w-name">${esc(i.name)}</span>
+        <span class="pg-w-tag">${KIND_LABEL[i.kind][0]}<br>${KIND_LABEL[i.kind][1]}</span>
+      </article>`);
+    const missing = collectionFilter === 'all'
+      ? total - found.length
+      : c[collectionFilter].total - c[collectionFilter].found;
+    for (let k = 0; k < Math.min(3, missing) && cards.length < 9; k++) {
+      cards.push(`
+      <article class="pg-w unknown" aria-label="Not found yet">
+        <span class="pg-w-q" aria-hidden="true">?</span>
+        <span class="pg-w-name">???</span>
+        <span class="pg-w-tag">ヒント<br>からすき</span>
+      </article>`);
+    }
+    const chip = (key, label, n) =>
+      `<button type="button" class="pg-filter ${key}" data-pg-filter="${key}" aria-pressed="${collectionFilter === key}">${label}${n ? ` · ${n}` : ''}</button>`;
+    host.innerHTML = `
+      <div class="pg-section-head">
+        <div><h2>たびびとずかん</h2><span class="pg-kicker">WANDERER COLLECTION</span></div>
+        <span class="pg-head-num violet">${found.length}/${total}</span>
+      </div>
+      <div class="pg-meter violet" aria-hidden="true"><span style="width:${total ? Math.round(found.length / total * 100) : 0}%"></span></div>
+      <div class="pg-filters" role="group" aria-label="Filter wanderers">
+        ${chip('all', 'ぜんぶ', '')}
+        ${chip('friendly', 'なかま FRIENDLY', `${c.friendly.found}/${c.friendly.total}`)}
+        ${chip('mischievous', 'いたずら MISCHIEVOUS', `${c.mischievous.found}/${c.mischievous.total}`)}
+        ${chip('dangerous', 'きけん DANGEROUS', `${c.dangerous.found}/${c.dangerous.total}`)}
+      </div>
+      <div class="pg-w-grid">${cards.join('') || '<p class="pg-note">からすき で たびびと を さがそう！</p>'}</div>
+      <a class="pg-more" href="adventure-profile.html">ずかん を ぜんぶ みる · FULL COLLECTION →</a>`;
+    host.querySelectorAll('[data-pg-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        collectionFilter = btn.getAttribute('data-pg-filter');
+        try { renderCollection(s); } catch (e) { fallback(host, 'Wanderer collection', e); }
+        const again = host.querySelector(`[data-pg-filter="${collectionFilter}"]`);
+        if (again) again.focus();
+      });
+    });
+  }
+
+  function renderTravelers(s) {
+    const host = document.getElementById('pg-travelers');
+    if (!host) return;
+    const met = window.BoohaTravelers ? BoohaTravelers.all() : {};
+    let season = null;
+    try { season = window.BoohaSkins && BoohaSkins.seasonIdForDate ? BoohaSkins.seasonIdForDate() : null; } catch (_) {}
+    const rows = TRAVELERS
+      .filter(t => t.always || met[t.id] || t.seasonId === season)
+      .map(t => {
+        const rec = met[t.id];
+        if (!rec) {
+          return `
+          <div class="pg-tr unknown">
+            <span class="pg-tr-q" aria-hidden="true">?</span>
+            <div><b>???</b><span>${esc(t.hint)}</span></div>
+          </div>`;
+        }
+        return `
+          <div class="pg-tr ${t.always ? 'always' : 'seasonal'}">
+            <img src="${esc(t.img)}" alt="${esc(t.name)}" width="64" height="64" loading="lazy" decoding="async">
+            <div><b>${esc(t.name)}</b><span>${esc(t.note)}</span></div>
+            <em aria-label="${Number(rec.visits) || 1} visits">×${Number(rec.visits) || 1}</em>
+          </div>`;
+      });
+    rows.push(`
+      <div class="pg-tr unknown">
+        <span class="pg-tr-q" aria-hidden="true">?</span>
+        <div><b>???</b><span>つぎの きせつに あえるかも · NEXT SEASON</span></div>
+      </div>`);
+    host.innerHTML = `
+      <div class="pg-section-head">
+        <div><h2>たびのきろく</h2><span class="pg-kicker">TRAVELERS MET</span></div>
+        <span class="pg-note-small">タップして あいさつ</span>
+      </div>
+      <div class="pg-tr-list">${rows.join('')}</div>`;
+  }
+
+  function renderMedals(s) {
+    const host = document.getElementById('pg-medals');
+    if (!host) return;
+    const U = window.BoohaUnlockSystem;
+    const all = U && U.getAll ? U.getAll() : [];
+    const byId = {};
+    all.forEach(u => { byId[u.id] = u; });
+    const champ = { pb: 'PB', br: 'BR', bc: 'BC' }[s.curr] || 'BR';
+    const list = MEDALS.map(m => {
+      const id = m.id.replace('CURR', s.curr);
+      return {
+        id,
+        img: IMG + m.img.replace('CURR', s.curr),
+        name: m.name.replace('CHAMP', champ),
+        on: !!(U && U.isUnlocked && U.isUnlocked(id)),
+        description: byId[id] ? byId[id].description : '',
+      };
+    });
+    const earned = list.filter(m => m.on).length;
+    const next = list.find(m => !m.on);
+    host.innerHTML = `
+      <div class="pg-section-head">
+        <div><h2>メダルだな</h2><span class="pg-kicker">ACHIEVEMENT SHELF · ${earned} / ${list.length}</span></div>
+      </div>
+      <div class="pg-shelf">
+        <div class="pg-medal-grid">
+          ${list.map(m => `
+            <div class="pg-medal${m.on ? ' on' : ''}">
+              <img src="${esc(m.img)}" alt="${esc(m.name)}${m.on ? '' : ' (locked)'}" width="76" height="76" loading="lazy" decoding="async">
+              <span>${esc(m.name)}</span>
+            </div>`).join('')}
+        </div>
+        <span class="pg-shelf-board" aria-hidden="true"></span>
+      </div>
+      ${next ? `<p class="pg-next-medal">つぎのメダル: ${esc(next.name)}${next.description ? ` — ${esc(next.description)}` : ''}</p>` : '<p class="pg-next-medal">ぜんぶ ゲット！ ALL MEDALS EARNED</p>'}`;
+  }
+
+  /* ── week sealed ────────────────────────────────────────────── */
+
+  function sealedKey(s) {
+    let user = '';
+    try { user = localStorage.getItem('booha_userid') || ''; } catch (_) {}
+    return `${user}|${s.keys.week}|${s.curr}`;
+  }
+
+  function maybeCelebrate(s) {
+    const host = document.getElementById('pg-sealed');
+    if (!host) return;
+    const complete = s.week.twoStarCount === s.games.length && s.week.blitzCount === 3;
+    if (!complete) return;
+    let seen = '';
+    try { seen = localStorage.getItem('booha_week_sealed_seen') || ''; } catch (_) {}
+    if (seen === sealedKey(s)) return;
+    const pct = s.weekPct == null ? '—' : `${s.weekPct}%`;
+    const tier = s.weekPct == null ? 'SEAL' : s.weekPct >= 90 ? 'GOLD SEAL' : s.weekPct >= 75 ? 'SILVER SEAL' : 'BRONZE SEAL';
+    const rewards = [
+      `<li class="gold"><span>こんしゅうの ★</span><b>+${s.weekTotal}★</b></li>`,
+    ];
+    if (s.level.level > s.levelBefore.level) {
+      rewards.push(`<li class="coin"><img src="${IMG}rank-coin-${s.level.level}.webp" alt="" width="34" height="34"><span>レベルアップ！ Lv ${s.levelBefore.level} → ${s.level.level}</span><b>NEW COIN</b></li>`);
+    }
+    if (s.weeklySkin && s.weeklySkin.unlocked) {
+      rewards.push(`<li class="skin"><img src="${esc(s.weeklySkin.src)}" alt="" width="34" height="34"><span>${esc(s.weeklySkin.name)} ゲット！</span><b>BLITZ 3/3</b></li>`);
+    }
+    host.innerHTML = `
+      <div class="pg-sealed-card" role="dialog" aria-modal="true" aria-labelledby="pg-sealed-title">
+        <span class="pg-sealed-rays" aria-hidden="true"></span>
+        <span class="pg-kicker gold">WEEK SEALED</span>
+        <h2 id="pg-sealed-title">${esc(s.name ? `${s.name}、` : '')}こんしゅう クリア！</h2>
+        <div class="pg-sealed-stage">
+          <img class="pg-sealed-chest" src="${IMG}treasure-chest-open.webp" alt="Open treasure chest" width="280" height="187">
+          <img class="pg-sealed-booha" src="${esc(s.sprite.src)}" alt="${esc(s.sprite.name)} cheering" width="150" height="150">
+        </div>
+        <div class="pg-sealed-score"><span class="pg-seal">${esc(pct)}</span><div><b>${tier}</b><span>12/12 クリア</span></div></div>
+        <ul class="pg-sealed-rewards">${rewards.join('')}</ul>
+        <button type="button" class="pg-sealed-close">やったー！ ログにもどる</button>
+      </div>`;
+    host.hidden = false;
+    const close = () => {
+      host.hidden = true;
+      host.innerHTML = '';
+      try { localStorage.setItem('booha_week_sealed_seen', sealedKey(s)); } catch (_) {}
+      document.removeEventListener('keydown', onKey);
+    };
+    const onKey = e => { if (e.key === 'Escape') close(); };
+    host.querySelector('.pg-sealed-close').addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+    host.querySelector('.pg-sealed-close').focus();
+  }
+
+  /* ── boot ───────────────────────────────────────────────────── */
+
+  function render() {
+    let s;
+    try {
+      if (!window.BoohaAdventure || !window.BoohaDayRecord || !window.BoohaGameRegistry || !window.BoohaLevelStars) {
+        throw new Error('profile dependencies are unavailable');
+      }
+      s = snapshot();
+    } catch (error) {
+      fallback(document.getElementById('pg-hero'), 'Your adventure card', error);
+      return;
+    }
+    [
+      [renderHero, 'pg-hero', 'Your adventure card'],
+      [renderSkin, 'pg-skin', 'This week’s skin'],
+      [renderTrail, 'pg-trail', 'This week’s trail'],
+      [renderStars, 'pg-stars', 'This week’s stars'],
+      [renderCollection, 'pg-collection', 'Wanderer collection'],
+      [renderTravelers, 'pg-travelers', 'Travelers'],
+      [renderMedals, 'pg-medals', 'Medal shelf'],
+      [maybeCelebrate, 'pg-sealed', 'Week celebration'],
+    ].forEach(([fn, id, label]) => {
+      try { fn(s); } catch (error) { fallback(document.getElementById(id), label, error); }
+    });
+  }
+
+  if (window.BOOHA_READY) render();
+  else document.addEventListener('booha:ready', render, { once: true });
+  document.addEventListener('booha:dayRecorded', render);
+  document.addEventListener('booha:checkIn', render);
+  document.addEventListener('booha:profileCurr', render);
+
+  return { render, _test: { WANDERER_KIND, nodePos, speech, MEDALS } };
+})();
+
+window.BoohaProfileGame = BoohaProfileGame;
