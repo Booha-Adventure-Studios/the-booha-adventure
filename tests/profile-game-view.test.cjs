@@ -105,7 +105,7 @@ const profile = read('profile.html');
   .forEach(id => assert.match(profile, new RegExp(`id="${id}"`), `profile must mount ${id}`));
 assert(profile.indexOf('js/core/level-stars.js') < profile.indexOf('js/ui/profile-game.js'),
   'level stars must load before the game view');
-assert(profile.indexOf('id="pg-hero"') < profile.indexOf('id="profile-totals"'),
+assert(profile.indexOf('id="pg-hero"') < profile.indexOf('id="profile-highlights"'),
   'the game view must sit above the record book');
 ['karasuki.html', 'muenba.html'].forEach(page => {
   assert.match(read(page), /js\/core\/traveler-record\.js/, `${page} must load the traveler recorder`);

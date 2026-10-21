@@ -18,13 +18,13 @@ const sw = read('sw.js');
 
 // A single bad data/rendering section must leave a useful visible state.
 assert(profileProgress.includes('function showRenderFallback'), 'profile progress must provide a visible render fallback');
-assert((profileProgress.match(/showRenderFallback\(/g) || []).length >= 4, 'profile progress must isolate highlights, totals, curriculum, and achievement failures');
+assert((profileProgress.match(/showRenderFallback\(/g) || []).length >= 3, 'profile progress must isolate highlight and game-record failures');
 assert(profileProgress.includes("document.addEventListener('booha:dayRecorded', render)"), 'profile progress must repaint after a recorded day');
 assert(adventureLog.includes("document.addEventListener('booha:dayRecorded', init)"), 'adventure log must repaint after a recorded day');
 assert(profile.includes('id="profile-highlights"'), 'profile must mount progress highlights');
-assert(profile.includes('id="profile-totals"'), 'profile must mount progress totals');
+assert(profile.includes('id="pg-medals"'), 'profile must mount the weekly medal shelf');
 assert(profile.includes('id="curr-cards"'), 'profile must mount curriculum progress');
-assert(profile.includes('id="unlocks-grid"'), 'profile must mount achievements');
+assert(profile.includes('id="pg-trophies"'), 'profile must mount the permanent trophy case');
 assert(profile.includes('profile-render-fallback'), 'profile must style the fail-soft renderer state');
 
 // Keep the install-time core asset set comfortably bounded. This is a byte
