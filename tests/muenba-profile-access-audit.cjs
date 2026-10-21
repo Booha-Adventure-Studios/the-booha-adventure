@@ -44,12 +44,13 @@ assert(profile.includes('class="hero-art"'), 'Muenba hero must retain the Nuppi 
 assert(profile.includes('class="hero-art"><img src="assets/img/muenba/nuppi_profile.webp"'),
   'Muenba hero must use the profile Nuppi asset');
 assert(profile.includes('decoding="async"'), 'Nuppi profile image must decode asynchronously');
-assert(profile.includes('grid-template-columns: minmax(0, 1fr) 280px'),
-  'Muenba hero must use a two-column desktop layout');
-assert(profile.includes('@media (max-width: 760px)') && profile.includes('.hero { grid-template-columns: 1fr; }'),
-  'Muenba hero must stack on narrow screens');
-assert(profile.includes('width: 280px; height: 280px'),
-  'Nuppi profile art must use the larger Marietta-matched footprint');
+// Field-kit redesign: Nuppi floats centered over the ghost-orb background.
+assert(profile.includes('url("assets/img/muenba/ghost-orb-background-v1.webp")'),
+  'Muenba hero must use the ghost-orb background');
+assert(profile.includes('.hero { position: relative; display: flex; flex-direction: column; align-items: center;'),
+  'Muenba hero must center Nuppi in one column');
+assert(profile.includes('.hero-art { width: 210px; height: 210px;'),
+  'Nuppi profile art must keep a fixed, centered footprint');
 
 assert(fs.existsSync(assetPath), 'Nuppi profile WebP must exist');
 const asset = fs.readFileSync(assetPath);

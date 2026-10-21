@@ -41,7 +41,8 @@ const CURRENT_CACHES = {
   // Weekly-medal popup deduplication and all-perfect Blitz rule fix.
   // Utsuroba archive redesign, gated Utsuroba portal, teacher dev switch,
   // and Adventure closet/heart fixes (2026-10-21).
-  pages:  'booha-pages-2026-464',
+  // Muenba field-kit profile, weekly orb jar, and case keyword help (2026-10-21).
+  pages:  'booha-pages-2026-465',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

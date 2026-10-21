@@ -11,6 +11,11 @@
   },
   "exceptions": [
     {
+      "path": "tests/muenba-field-kit.test.cjs",
+      "status": "verify",
+      "reason": "Current Muenba field-kit profile: weekly orb jar (resets Sunday), Jerks, case keyword help, Japanese toggle, and all-time ledger."
+    },
+    {
       "path": "tests/utsuroba-archive-redesign.test.cjs",
       "status": "verify",
       "reason": "Current Utsuroba archive profile, Japanese toggle, gated Utsuroba portal, teacher world switch, Utsuroba vocabulary, and Adventure closet/heart follow-ups."
