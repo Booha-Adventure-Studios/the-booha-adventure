@@ -22,6 +22,10 @@
   var IMG = ROOT + 'assets/img/profile/';
   var DISPLAY_MS = 4200;
   var queue = [];
+  // A check can fire while earlier medals are still waiting in the queue.
+  // Reserve each week/id pair at enqueue time so queued medals cannot be
+  // added a second time before their popup begins and marks them as shown.
+  var queuedMedalKeys = new Set();
   var showing = false;
   var host = null;
 
@@ -126,6 +130,11 @@
 
   function enqueueMedal(m) {
     var W = window.BoohaWeeklyMedals;
+    var snap = W && typeof W.snapshot === 'function' ? W.snapshot() : null;
+    var weekKey = snap && snap.week ? snap.week.key : '';
+    var medalKey = weekKey + '|' + m.id;
+    if (queuedMedalKeys.has(medalKey)) return;
+    queuedMedalKeys.add(medalKey);
     var tierJp = { bronze: 'ブロンズ', silver: 'シルバー', gold: 'ゴールド' }[m.tier] || '';
     queue.push({
       tier: m.tier,
