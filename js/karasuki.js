@@ -5897,6 +5897,7 @@ const NUPPI_LINES = [
     nuppiPopEl.style.background = 'rgba(10,0,8,0.92)';
     state.clickTarget = null;
     if (window.UtsuSfx && typeof window.UtsuSfx.nuppiOpen === 'function') window.UtsuSfx.nuppiOpen();
+    if (window.BoohaTravelers) BoohaTravelers.record('nuppi');
   }
  
   function closeNuppiPop() {
@@ -6159,6 +6160,9 @@ const NUPPI_LINES = [
     barbaPopEl.style.background = 'rgba(8,0,15,.92)';
     state.clickTarget = null;
     if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
+    if (window.BoohaTravelers) {
+      BoohaTravelers.record('barba', { seasonId: window.BoohaSkins?.seasonIdForDate?.() || null });
+    }
   }
 
   function closeBarbaPop() {

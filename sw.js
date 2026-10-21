@@ -33,7 +33,10 @@ const CURRENT_CACHES = {
   // scheduled Batty/Mummington popups reach returning clients.
   // Booha spelling consistency pass (2026-10-08): refresh the precached
   // shells after standardizing the Japanese name to ブーハー.
-  pages:  'booha-pages-2026-459',
+  // Adventure Log game view (2026-10-21): companion hero, weekly trail,
+  // lantern Daily Check, collection, travelers, and medal shelf on profile.html;
+  // traveler records on karasuki.html and muenba.html.
+  pages:  'booha-pages-2026-460',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

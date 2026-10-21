@@ -199,6 +199,11 @@
       "path": "tests/serve-preview.cjs",
       "status": "manual",
       "reason": "Local preview-server utility used by browser/manual QA, not a test."
+    },
+    {
+      "path": "tests/profile-game-view.test.cjs",
+      "status": "verify",
+      "reason": "Current Adventure Log game view: level-star rules, wanderer categories, traveler records, and profile mounts."
     }
   ]
 }
