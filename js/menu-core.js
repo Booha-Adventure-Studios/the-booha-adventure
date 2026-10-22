@@ -32,7 +32,7 @@
     'vocab-tap': 'Match them up!', 'spell-word': "Let's spell!", 'vocab-speed': 'Fast, fast!',
     'sentence-tap': 'Tap the pairs!', 'sentence-order': 'Line them up!', 'sentence-speed': 'Zoom!',
     'say-word': 'Listen closely!', 'say-sentence': 'Ears ready?', 'ask-question': 'Listen and choose!',
-    'booha-bites': 'I ate a word! Find it!',
+    'booha-bites': 'I ate a word! Find it!', 'echo': 'Listen, then type it!',
   };
   var MONTHS = { jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June',
     jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December' };
@@ -177,7 +177,7 @@
     extras.forEach(function (g) {
       var a = el('a', 'tile tile-extra', g.name);
       a.setAttribute('data-extra', g.gameKey);
-      a.setAttribute('data-hira', 'ぬけた ことばを さがそう');
+      if (g.hira) a.setAttribute('data-hira', g.hira);
       a._saveId = g.saveId;
       xl.appendChild(a);
       extraTiles.push(a);

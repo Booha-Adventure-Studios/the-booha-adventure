@@ -140,11 +140,14 @@ const BoohaDayRecord = (() => {
   function getDayLog()  { return { ...(_meta().dayLog)  }; }
   function getWeekLog() { return { ...(_meta().weekLog) }; }
 
-  /** Weekly understanding %: mean of best adventure pcts (null if none). */
+  /** Weekly understanding %: mean of the nine curriculum games' best pcts
+      (null if none). Bonus arcade scores and extra games are excluded. */
   function weeklyPct(weekKey) {
     const wk = _meta().weekLog[weekKey];
     if (!wk) return null;
-    const vals = Object.values(wk.adv || {});
+    const vals = Object.entries(wk.adv || {})
+      .filter(([id, v]) => /^(pb|br|bc):/.test(id) && Number.isFinite(v))
+      .map(([, v]) => v);
     if (!vals.length) return null;
     return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
   }
