@@ -1512,12 +1512,25 @@ function revealResults(runTime) {
     resultFxTimers.push(setTimeout(() => fireConfetti(true),  900));
   }
    
-  if (CFG.sfxBase && tier.sound) {
-    resultAudio = new Audio(CFG.sfxBase + tier.sound);
-    resultAudio.setAttribute('playsinline', '');
-    resultAudio.setAttribute('webkit-playsinline', '');
-    resultAudio.play().catch(() => {});
-  }
+  /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
+     sound and its buttons press this game's own ssp-replay / ssp-back. */
+  U.showScorecard(Object.assign({
+    gameId:   `${CFG.curriculum}:sentence_speed`,
+    title:    'Sentence Speed',
+    correct:  score,
+    total:    15,
+    pct,
+    replayId: 'ssp-replay',
+    backId:   'ssp-back',
+  }, {
+      stats: [
+        { label: 'Correct / せいかい', value: `${score} / 15` },
+        { label: 'Missed / まちがい', value: String(mistakes) },
+        { label: 'Run time / じかん', value: `${Math.round(runTime / 1000)}s` },
+      ],
+      reviewItems: missedItems,
+      audioBase: CFG.audioBase,
+    }));
 }
 
 /* ══════════════════════════════════════════════════════════════

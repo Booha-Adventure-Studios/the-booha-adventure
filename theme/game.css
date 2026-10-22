@@ -1039,3 +1039,86 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 .answer-box.pulsing{ box-shadow: 0 0 0 0 rgba(168,85,247,0.8), 0 0 18px 6px rgba(168,85,247,0.4); }
 .mic-btn.pulsing{ box-shadow: 0 0 0 0 rgba(168,85,247,0.8), 0 0 18px 6px rgba(168,85,247,0.4); }
 
+
+/* ══════════════════════════════════════════════════════════════
+   SHARED SCORE CARD — Games Pass 3 (js/game-scorecard.js)
+   The nine engines' own results panels are hidden; their showResults()
+   still runs (score, save, Replay/Back wiring) and then opens this card.
+   ══════════════════════════════════════════════════════════════ */
+#vt-results-wrap, #st-results-wrap, #ssp-results-wrap,
+#vs-results, #so-results, #sw-results,
+.aq-results-outer, .sas-results-outer, .stw-results-outer { display: none !important; }
+
+.bsc-overlay {
+  position: fixed; inset: 0; z-index: 1500;
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: calc(18px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px))
+           calc(24px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--game-bg) 94%, transparent);
+}
+.bsc-card {
+  --bsc-c: var(--game-amber);
+  position: relative; width: 100%; max-width: 540px; margin: auto 0;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  padding: 22px 20px 20px; border-radius: 30px;
+  background-color: var(--game-bg); background-image: var(--game-card-bg);
+  border: 1.5px solid color-mix(in srgb, var(--bsc-c) 55%, var(--game-card-border));
+  box-shadow: 0 0 60px color-mix(in srgb, var(--bsc-c) 22%, transparent), var(--game-shadow);
+  color: var(--game-ink); font-family: var(--game-font-body);
+  animation: bscRise .42s cubic-bezier(.2,.9,.3,1.15) both;
+}
+.bsc-tier-try     { --bsc-c: #ff8a7a; }
+.bsc-tier-keep    { --bsc-c: #ffb35c; }
+.bsc-tier-great   { --bsc-c: #ffd166; }
+.bsc-tier-perfect { --bsc-c: #ffe08a; }
+.bsc-tier-legend  { --bsc-c: #fff1c2; }
+@keyframes bscRise { from { opacity: 0; transform: translateY(26px) scale(.96); } to { opacity: 1; transform: none; } }
+
+.bsc-head { width: 100%; display: flex; justify-content: space-between; gap: 10px;
+  font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--game-muted); }
+.bsc-crown { width: 64px; height: 48px; margin-top: 4px; animation: bscPop .5s cubic-bezier(.3,1.6,.5,1) .1s both; }
+.bsc-crown path { fill: #ffd96b; stroke: #fff3c4; stroke-width: 1; stroke-linejoin: round; }
+.bsc-stars { display: flex; align-items: flex-end; justify-content: center; gap: 8px; height: 124px; margin-top: 4px; }
+.bsc-star { width: 84px; height: 84px; overflow: visible; animation: bscPop .46s cubic-bezier(.3,1.6,.5,1) var(--d, 0ms) both; }
+.bsc-star-mid { width: 108px; height: 108px; margin-bottom: 12px; }
+.bsc-star path { stroke-linejoin: round; stroke-width: 1; }
+.bsc-star.on { filter: drop-shadow(0 0 10px rgba(255,190,60,.7)); }
+.bsc-star.on path { fill: #ffc94a; stroke: #fff1c2; }
+.bsc-star.off path { fill: color-mix(in srgb, var(--game-ink) 6%, transparent); stroke: color-mix(in srgb, var(--game-ink) 30%, transparent); }
+@keyframes bscPop { from { opacity: 0; transform: scale(.2) rotate(-20deg); } to { opacity: 1; transform: none; } }
+
+.bsc-tier { font-family: var(--game-font-title); font-weight: 400; font-size: clamp(40px, 9vw, 60px);
+  line-height: 1; letter-spacing: .03em; color: var(--bsc-c);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--bsc-c) 45%, transparent); margin-top: 2px; }
+[data-curriculum="pb"] .bsc-tier { text-shadow: 0 3px 0 color-mix(in srgb, var(--game-primary) 40%, transparent); color: var(--game-primary); }
+.bsc-jp { font-family: var(--game-font-jp); font-size: clamp(15px, 3.4vw, 18px); font-weight: 800; color: var(--game-ink); }
+.bsc-en { font-size: clamp(13px, 2.8vw, 15px); font-weight: 700; color: var(--game-muted); }
+.bsc-score { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 6px 14px; margin: 6px 0 2px;
+  font-variant-numeric: tabular-nums; }
+.bsc-correct { font-family: var(--game-font-title); font-weight: 400; font-size: clamp(26px, 6vw, 34px); color: var(--game-ink); }
+.bsc-pct { font-size: 17px; font-weight: 900; color: var(--game-muted); }
+.bsc-best { font-size: 13px; font-weight: 900; letter-spacing: .06em; padding: 4px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--game-ink) 8%, transparent); color: var(--game-muted); }
+.bsc-best.bsc-new { background: #ffc94a; color: #2b1a05; }
+.bsc-points { display: flex; align-items: baseline; gap: 10px; font-variant-numeric: tabular-nums; }
+.bsc-points-label { font-size: 12px; font-weight: 900; letter-spacing: .12em; color: var(--game-muted); }
+.bsc-points-value { font-family: var(--game-font-title); font-weight: 400; font-size: 30px; color: #ffc94a; }
+.bsc-details { width: 100%; }
+.bsc-details .game-result-details { margin: 4px auto 6px; }
+.bsc-actions { width: 100%; display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-top: 6px; }
+.bsc-btn { min-height: 58px; border: none; cursor: pointer; border-radius: 18px; padding: 10px 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  font-family: var(--game-font-body); font-size: 17px; font-weight: 900; line-height: 1.15; transition: transform .15s; }
+.bsc-btn small { font-size: 12px; font-weight: 800; opacity: .8; letter-spacing: .02em; }
+.bsc-card:focus { outline: none; }
+.bsc-btn:active { transform: scale(.96); }
+.bsc-btn:focus-visible { outline: 3px solid var(--bsc-c); outline-offset: 3px; }
+.bsc-btn-primary { background: linear-gradient(135deg, var(--game-primary), var(--game-secondary)); color: #0b0614;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--game-secondary) 55%, #000); }
+[data-curriculum="pb"] .bsc-btn-primary { color: #fff; }
+.bsc-btn-ghost { background: color-mix(in srgb, var(--game-ink) 8%, transparent); color: var(--game-ink);
+  box-shadow: inset 0 0 0 1.5px var(--game-border); }
+@media (max-width: 420px) {
+  .bsc-star { width: 68px; height: 68px; } .bsc-star-mid { width: 88px; height: 88px; } .bsc-stars { height: 104px; }
+}

@@ -122,11 +122,12 @@ function playListen(mp3) {
   if (!U.playSFX) return;
   const _orig = U.playSFX.bind(U);
   U.playSFX = function(name, onEnd) {
+    /* Pass 3: only a function is a chain callback; options objects such as
+       { rate } (score-card star dings) pass straight through. */
+    if (typeof onEnd !== 'function') return _orig(name, onEnd);
     _orig(name);
-    if (onEnd) {
-      /* Approximate ding ~650 ms, fart ~500 ms */
-      setTimeout(onEnd, name === 'ding' ? 680 : 520);
-    }
+    /* Approximate ding ~650 ms, fart ~500 ms (pacing, not the real length) */
+    setTimeout(onEnd, name === 'ding' ? 680 : 520);
   };
 })();
 
@@ -1300,23 +1301,36 @@ function showResults() {
     scoreEl.textContent = '0';
     allCards = U.shuffle(allCards);
     showCard();
-  });
+  }, { once: true });
 
   if (backBtn) backBtn.addEventListener('click', () => {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
-  });
+  }, { once: true });
 
   if (score === allCards.length) {
     setTimeout(() => fireConfetti(false), 400);
     setTimeout(() => fireConfetti(true),  900);
   }
 
- if (CFG.sfxBase && tier.sound) {
-    const snd = new Audio(CFG.sfxBase + tier.sound);
-    snd.setAttribute('playsinline', '');
-    snd.setAttribute('webkit-playsinline', '');
-    snd.play().catch(() => {});
-  }
+  /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
+     sound and its buttons press this game's own sw-replay / sw-back. */
+  U.showScorecard(Object.assign({
+    gameId:   `${CFG.curriculum}:spell_word`,
+    title:    'Spell the Word',
+    correct:  score,
+    total:    allCards.length,
+    pct,
+    replayId: 'sw-replay',
+    backId:   'sw-back',
+  }, {
+      stats: [
+        { label: 'Score / スコア', value: `${formatScore(score)} / ${total}` },
+        { label: 'Recovered / かいふく', value: String(recoveredCount) },
+        { label: 'Boosts / ボーナス', value: String(recoveryBoostCount) },
+      ],
+      reviewItems: missedItems,
+      audioBase: CFG.audioBase,
+    }));
 }
 /* ══════════════════════════════════════════════════════════════
    GO
