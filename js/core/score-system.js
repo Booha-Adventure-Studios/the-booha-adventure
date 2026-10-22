@@ -25,6 +25,8 @@ const BoohaScoreSystem = (() => {
       lastLines:    0,
       bestLevel:    0,
       bestCombo:    0,
+      bestPoints:   0,       // Games Pass 4: best combo/sharp points
+      crowns:       0,       // Games Pass 4: 15/15 first-try runs (lifetime)
       totalScore:   0,
       totalLines:   0,
       recentRuns:   [],
@@ -66,6 +68,17 @@ const BoohaScoreSystem = (() => {
     if (Number.isFinite(opts.level)) entry.bestLevel = Math.max(entry.bestLevel || 0, opts.level);
     if (Number.isFinite(opts.maxCombo)) entry.bestCombo = Math.max(entry.bestCombo || 0, opts.maxCombo);
 
+    // Games Pass 4: points and crowns are a reward layer on top of stars.
+    // They never feed stars, completion, unlocks or medals.
+    const points = Number.isFinite(opts.points) ? Math.max(0, Math.round(opts.points)) : null;
+    let isBestPoints = false;
+    if (points !== null && points > (entry.bestPoints || 0)) {
+      entry.bestPoints = points;
+      isBestPoints = true;
+    }
+    const crowned = opts.crown === true;
+    if (crowned) entry.crowns = (entry.crowns || 0) + 1;
+
     // Optional run memory for arcade games. The shared score entry remains
     // compact, but can still recall a player's recent attempts and lifetime
     // totals without creating a second unscoped save system in each game.
@@ -92,6 +105,8 @@ const BoohaScoreSystem = (() => {
     const wStars       = weekly.gameStars       || {};
     const wCompleted   = weekly.completedGames  || {};
     const wWanderers   = weekly.wanderers       || [];
+    const wPoints      = weekly.gamePoints      || {};
+    const wCrowns      = weekly.gameCrowns      || {};
 
     const wasNewGame = !(wScores[gameId]);   // wScores is fresh from the new load()
 
@@ -110,6 +125,12 @@ const BoohaScoreSystem = (() => {
     if (opts.completed) {
       wCompleted[gameId] = true;
     }
+
+    // Weekly best points and crowns (Games Pass 4; reset with the week)
+    if (points !== null && (!wPoints[gameId] || points > wPoints[gameId])) {
+      wPoints[gameId] = points;
+    }
+    if (crowned) wCrowns[gameId] = true;
 
     // ── 3. Unlock wanderer for this game ───────────────────────────────────
     if (wasNewGame) {
@@ -132,6 +153,8 @@ const BoohaScoreSystem = (() => {
     data.weekly.gameStars      = wStars;
     data.weekly.completedGames = wCompleted;
     data.weekly.wanderers      = wWanderers;
+    data.weekly.gamePoints     = wPoints;
+    data.weekly.gameCrowns     = wCrowns;
 
     // ── 5. Update meta.allTimeStars ────────────────────────────────────────
     // Only add the improvement in stars (delta) to avoid double-counting.
@@ -145,7 +168,7 @@ const BoohaScoreSystem = (() => {
     BoohaAdventure.save.save(data);
 
     // ── 6. Fire events ─────────────────────────────────────────────────────
-    const detail = { gameId, score, isHighScore, isBestTime, stars: entry.stars, wasCompleted };
+    const detail = { gameId, score, isHighScore, isBestTime, stars: entry.stars, wasCompleted, points, isBestPoints, crown: crowned };
     document.dispatchEvent(new CustomEvent('booha:scoreSubmitted', { detail }));
 
     // Trigger unlock checks (achievements + bonus games)
@@ -224,6 +247,19 @@ const BoohaScoreSystem = (() => {
 
   function weeklyScoreForGame(saveId) {
     return (_getWeekly().gameScores || {})[saveId] || 0;
+  }
+
+  // Games Pass 4 read helpers
+  function getBestPoints(saveId) { return getEntry(saveId).bestPoints || 0; }
+  function weeklyPointsForGame(saveId) {
+    return (_getWeekly().gamePoints || {})[saveId] || 0;
+  }
+  function weeklyCrownForGame(saveId) {
+    return !!(_getWeekly().gameCrowns || {})[saveId];
+  }
+  function weeklyCrownsFor(curriculum) {
+    return Object.keys(_getWeekly().gameCrowns || {})
+      .filter(id => id.startsWith(`${curriculum}:`)).length;
   }
 
   function isCompletedWeekly(saveId) {
@@ -318,6 +354,7 @@ const BoohaScoreSystem = (() => {
     totalStars, totalStarsFor, totalCompleted, totalCompletedFor,
     weeklyStars, weeklyStarsFor, weeklyCompleted, weeklyCompletedFor,
     weeklyStarsForGame, weeklyScoreForGame, isCompletedWeekly,
+    getBestPoints, weeklyPointsForGame, weeklyCrownForGame, weeklyCrownsFor,
     allTimeStars,
     weeklySummaryFor, weeklySummaryAll,
     summaryFor, summaryAll,

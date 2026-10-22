@@ -23,6 +23,9 @@ const CFG = window.GAME_CONFIG;
 const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
+/* Games Pass 4: combo / sharp / points. A fixed answer after a miss earns +50. */
+const run = U.createRun({ total: 15, recoverPoints: 50 });
+
 U.unlockAudio();
 
 /* ══════════════════════════════════════════════════════════════
@@ -969,6 +972,7 @@ function showCard() {
   buildTiles();
   renderAnswer();
   updateAnswerControls();
+  run.ready(2500 + 900 * tokens.length);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1090,6 +1094,7 @@ function resolveCorrect(chips) {
   });
 
   const isRecovery = recoveryActive;
+  if (isRecovery) run.recover(); else run.hit();
   const bankBefore = recoveryBank;
   if (isRecovery) {
     recoveredItems.add(idx);
@@ -1142,6 +1147,7 @@ function resolveCorrect(chips) {
 }
 
 function resolveWrong() {
+  run.miss();
   locked = true;
   updateAnswerControls();
   if (currentCard && !missedItems.some(item => item.jp === currentCard.jp)) missedItems.push(currentCard);
@@ -1274,6 +1280,7 @@ function fireSparkles(originEl, big = false) {
    RESULTS
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
+  const runSum = run.summary();   /* Games Pass 4 */
   /* Hide gameplay elements — leave .so-header and .so-dots-row visible */
   document.getElementById('so-jp-box').style.display    = 'none';
   document.getElementById('so-answer').style.display    = 'none';
@@ -1298,6 +1305,7 @@ function showResults() {
 
   /* ── Save score to Booha Adventure save system ── */
   U.emitGameEnd({
+    points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
       saveId:    `${CFG.curriculum}:sentence_order`,
       score:     pct,
       completed: true,
@@ -1351,6 +1359,7 @@ function showResults() {
     recoveredCount = 0;
     recoveryBoostCount = 0;
     missedItems = [];
+    run.reset();
     recoveredItems.clear();
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');
@@ -1374,6 +1383,7 @@ function showResults() {
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own so-replay / so-back. */
   U.showScorecard(Object.assign({
+    run:      runSum,
     gameId:   `${CFG.curriculum}:sentence_order`,
     title:    'Sentence Order',
     correct:  score,

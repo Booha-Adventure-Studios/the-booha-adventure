@@ -49,7 +49,9 @@ const CURRENT_CACHES = {
   // reduced-motion / low-power tier); game.css motion rules changed.
   // Games Pass 3 (2026-10-22): shared score card (js/game-scorecard.js,
   // game.css .bsc-*) replaces the nine engine results panels.
-  pages:  'booha-pages-2026-470',
+  // Games Pass 4 (2026-10-22): combo / sharp / points / crown tracker in
+  // game-utils, weekly gamePoints/gameCrowns in the save, LEGEND tier.
+  pages:  'booha-pages-2026-471',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -223,7 +225,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-583',
+  assets: 'booha-assets-2026-584',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

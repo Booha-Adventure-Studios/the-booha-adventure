@@ -21,6 +21,9 @@ const CFG = window.GAME_CONFIG;
 const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
+/* Games Pass 4: combo / sharp / points. A fixed answer after a miss earns +50. */
+const run = U.createRun({ total: 15, recoverPoints: 50 });
+
 U.unlockAudio();
 
 /* ══════════════════════════════════════════════════════════════
@@ -896,6 +899,7 @@ function showCard() {
   updateDots();
   buildTiles(card);
   buildSlots(card);
+  run.ready(1500 + 450 * answerChars(card).length);
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1033,6 +1037,7 @@ function resolveCorrect(card, slotEls) {
   });
 
   const isRecovery = recoveryActive;
+  if (isRecovery) run.recover(); else run.hit();
   const bankBefore = recoveryBank;
   if (isRecovery) {
     recoveredItems.add(idx);
@@ -1088,6 +1093,7 @@ function resolveCorrect(card, slotEls) {
 }
 
 function resolveWrong(card, slotEls) {
+  run.miss();
   locked = true;
   updateAnswerControls();
   if (card && !missedItems.some(item => item.jp === card.jp)) missedItems.push(card);
@@ -1219,6 +1225,7 @@ function fireConfetti(big = false) {
    RESULTS
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
+  const runSum = run.summary();   /* Games Pass 4 */
   /* Hide gameplay elements — leave .sw-header and .sw-dots-row visible */
   document.getElementById('sw-jp-box').style.display   = 'none';
   document.getElementById('sw-slots').style.display    = 'none';
@@ -1244,6 +1251,7 @@ function showResults() {
 
   /* ── Save score to Booha Adventure save system ── */
  U.emitGameEnd({
+    points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
       saveId:    `${CFG.curriculum}:spell_word`,
       score:     pct,
       completed: true,
@@ -1297,6 +1305,7 @@ function showResults() {
     recoveredCount = 0;
     recoveryBoostCount = 0;
     missedItems = [];
+    run.reset();
     recoveredItems.clear();
     scoreEl.textContent = '0';
     allCards = U.shuffle(allCards);
@@ -1315,6 +1324,7 @@ function showResults() {
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own sw-replay / sw-back. */
   U.showScorecard(Object.assign({
+    run:      runSum,
     gameId:   `${CFG.curriculum}:spell_word`,
     title:    'Spell the Word',
     correct:  score,
