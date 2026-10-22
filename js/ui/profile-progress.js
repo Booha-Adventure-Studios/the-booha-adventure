@@ -138,7 +138,10 @@
       const weekLog = window.BoohaDayRecord ? BoohaDayRecord.getWeekLog() : {};
       week = keys && weekLog && weekLog[keys.week] && weekLog[keys.week].adv ? weekLog[keys.week].adv : {};
     } catch (_) {}
-    const games = R.getForCurriculum(curr) || [];
+    // Record book rows follow the maze order (Vocab Tap first).
+    const games = (typeof R.getForCurriculumInMazeOrder === 'function'
+      ? R.getForCurriculumInMazeOrder(curr)
+      : R.getForCurriculum(curr)) || [];
     const info = CURR_INFO[curr];
     const rows = games.map(g => {
       const id = g.baseId || String(g.id || '').split(':').pop();

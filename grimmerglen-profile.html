@@ -4,210 +4,312 @@
 <link rel="icon" type="image/png" href="/the-booha-adventure/icons/icon-192.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#ffd7ec">
+  <meta name="theme-color" content="#fbf4ff">
   <title>Grimmerglen — The Booha Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <script>
+    // Japanese help is shared with the Utsuroba and Muenba profiles.
+    try { if (localStorage.getItem('booha_utsu_jp') === '0') document.documentElement.classList.add('jp-off'); } catch (_) {}
+  </script>
+  <!--
+    Grimmerglen profile — "cotton-candy memory scrapbook". The one light
+    profile: cream, lavender, pink and mint to match Marietta and the plush
+    collectibles. This week (tiers, scrapbook, jar) comes first and starts
+    fresh every Sunday; the all-time totals sit underneath the jar.
+  -->
   <style>
     :root {
-      --ink:#4f355e; --muted:#886e91; --pink:#ff9fc9; --pink-deep:#d85d9a;
-      --lilac:#c8b4ff; --mint:#a9eadb; --cream:#fffaf4; --yellow:#ffe792;
-      --line:rgba(104,70,119,.16); --shadow:0 18px 50px rgba(116,71,124,.16);
-      font-family:ui-rounded,"Avenir Next Rounded","Nunito","Trebuchet MS",sans-serif;
+      --bg: #fbf4ff; --card: #ffffff; --ink: #4a2d5c; --muted: #7a6390; --faint: #9d89ad;
+      --line: #ecdcf5; --line-2: #e2d3ee;
+      --pink: #ff8fc8; --pink-deep: #c2357f; --heart: #e0458f;
+      --lilac: #b89cf0; --lilac-deep: #6a4bb3; --mint: #7fd6c2; --mint-deep: #1f7a68; --butter: #ffe28b;
+      --display: 'Kiwi Maru', 'Zen Maru Gothic', serif;
+      --sans: 'Zen Maru Gothic', ui-rounded, 'Hiragino Maru Gothic ProN', sans-serif;
+      --shadow: 0 8px 22px rgba(106,75,179,.14);
     }
-    * { box-sizing:border-box; }
-    body { margin:0; min-height:100vh; color:var(--ink); background:
-      radial-gradient(circle at 12% 8%,rgba(255,255,255,.92) 0 4%,transparent 22%),
-      radial-gradient(circle at 90% 18%,rgba(255,231,146,.45) 0 6%,transparent 26%),
-      linear-gradient(135deg,#ffdce9 0%,#eee3ff 48%,#d9f8ef 100%); }
-    body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.24;
-      background-image:radial-gradient(#fff 1px,transparent 1px); background-size:22px 22px; }
-    a { color:inherit; }
-    .page { width:min(1120px,calc(100% - 28px)); margin:0 auto; padding:22px 0 56px; position:relative; }
-    .topbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:15px; }
-    .back-link { display:inline-flex; align-items:center; gap:7px; padding:10px 14px; border:2px solid rgba(216,93,154,.28); border-radius:999px; background:rgba(255,255,255,.65); text-decoration:none; font-weight:900; font-size:.77rem; letter-spacing:.04em; box-shadow:0 5px 0 rgba(216,93,154,.12); transition:transform .16s,box-shadow .16s; }
-    .back-link:hover,.network a:hover { transform:translateY(-2px); box-shadow:0 8px 0 rgba(216,93,154,.12); }
-    .back-link[hidden] { display:none; }
-    .case-label { text-align:right; color:var(--muted); font-size:.68rem; font-weight:900; letter-spacing:.17em; line-height:1.55; }
-    .network { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:0 auto 16px; }
-    .network a { padding:8px 13px; border:2px solid var(--line); border-radius:999px; background:rgba(255,255,255,.54); text-decoration:none; font-size:.67rem; font-weight:950; letter-spacing:.08em; transition:transform .16s,box-shadow .16s; }
-    .network a[aria-current="page"] { color:#fff; background:linear-gradient(135deg,var(--pink-deep),#9d73d9); border-color:transparent; box-shadow:0 6px 0 rgba(121,72,145,.2); }
-    .network small { display:block; margin-top:2px; font-size:.62rem; letter-spacing:0; text-align:center; opacity:.76; }
-    .hero { display:grid; grid-template-columns:1fr 280px; align-items:center; gap:26px; padding:35px clamp(20px,5vw,66px) 30px; border:2px solid rgba(255,255,255,.82); border-radius:34px; background:linear-gradient(135deg,rgba(255,255,255,.8),rgba(255,238,249,.72)); box-shadow:var(--shadow); overflow:hidden; position:relative; }
-    .hero::after { content:"✦ ｡ﾟ ✧ ｡ﾟ ✦"; position:absolute; right:28px; top:20px; color:#f09abd; font-size:1.2rem; letter-spacing:.55em; transform:rotate(8deg); }
-    .eyebrow { color:var(--pink-deep); font-size:.72rem; font-weight:950; letter-spacing:.18em; text-transform:uppercase; }
-    h1 { margin:4px 0 4px; font-size:clamp(3.2rem,8vw,6.2rem); line-height:.9; letter-spacing:-.07em; color:#684479; text-shadow:4px 4px 0 rgba(255,255,255,.8); }
-    .hero-jp { margin:0 0 17px; color:#aa75b3; font-size:1.13rem; font-weight:800; }
-    .hero-copy { max-width:650px; margin:0; font-size:1.03rem; line-height:1.65; font-weight:650; }
-    .hero-copy small { display:block; margin-top:8px; color:var(--muted); font-size:.8rem; line-height:1.7; }
-    .mascot { justify-self:center; width:245px; height:245px; padding:12px; border-radius:50%; background:radial-gradient(circle,#fff 0 50%,#ffd8eb 51% 67%,rgba(255,255,255,0) 68%); filter:drop-shadow(0 14px 10px rgba(113,67,130,.18)); }
-    .mascot img { width:100%; height:100%; object-fit:contain; }
-    .status-strip { margin:17px 0 0; display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
-    .status-pill { display:inline-flex; align-items:center; gap:7px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.7); font-size:.72rem; font-weight:900; }
-    .world-status-copy { display:flex; flex-direction:column; gap:2px; }
-    .world-status-en { font-size:.68rem; letter-spacing:.06em; }
-    .world-status-jp { color:var(--muted); font-size:.7rem; font-weight:700; }
-    .world-status-jp ruby { ruby-position:over; }
-    .world-status-jp rt { font-size:.7em; }
-    .status-dot { width:9px; height:9px; border-radius:50%; background:#ed80b0; box-shadow:0 0 0 4px rgba(237,128,176,.14); }
-    .status-dot.open { background:#54cba9; box-shadow:0 0 0 4px rgba(84,203,169,.17); }
-    .section { margin-top:22px; padding:24px; border:2px solid rgba(255,255,255,.78); border-radius:27px; background:rgba(255,255,255,.62); box-shadow:0 10px 30px rgba(116,71,124,.1); }
-    .section-head { display:flex; justify-content:space-between; align-items:end; gap:12px; margin-bottom:17px; }
-    .section-head h2 { margin:0; font-size:1.4rem; letter-spacing:-.04em; }
-    .section-head p { margin:0; color:var(--muted); font-size:.77rem; font-weight:800; }
-    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-    .stat { padding:15px 12px; text-align:center; border:2px solid rgba(255,255,255,.92); border-radius:20px; background:linear-gradient(160deg,#fff,#fff5fa); }
-    .stat:nth-child(2){background:linear-gradient(160deg,#fff,#f1edff)} .stat:nth-child(3){background:linear-gradient(160deg,#fff,#f0fffa)} .stat:nth-child(4){background:linear-gradient(160deg,#fff,#fff8d9)}
-    .stat-value { font-size:1.8rem; font-weight:950; line-height:1; color:#76518a; }
-    .stat-label { margin-top:6px; font-size:.65rem; font-weight:950; letter-spacing:.06em; text-transform:uppercase; }
-    .stat-jp { display:block; margin-top:3px; color:var(--muted); font-size:.66rem; }
-    .weekly-hunt { margin-top:22px; padding:18px 20px; border:2px solid rgba(84,203,169,.28); border-radius:22px; background:linear-gradient(135deg,rgba(230,255,247,.78),rgba(255,255,255,.68)); }
-    .weekly-hunt-heading { display:flex; align-items:baseline; justify-content:space-between; gap:14px; }
-    .weekly-hunt-heading h2 { margin:0; color:#684479; font-size:1.2rem; letter-spacing:-.03em; }
-    .weekly-hunt-heading span { color:#4ba98f; font-size:.66rem; font-weight:950; letter-spacing:.08em; text-transform:uppercase; }
-    .weekly-hunt-copy { margin:8px 0 14px; color:#765e6c; font-size:.82rem; line-height:1.5; }
-    .weekly-hunt-copy small { display:block; margin-top:4px; color:var(--muted); font-size:.9em; }
-    .weekly-hunt-progress { display:flex; align-items:center; gap:12px; }
-    .weekly-hunt-progress progress { width:100%; height:9px; accent-color:#54cba9; }
-    .weekly-hunt-count { flex:0 0 auto; color:#d27b51; font-size:.78rem; font-weight:950; white-space:nowrap; }
-    .weekly-hunt-legend { margin:10px 0 0; color:var(--muted); font-size:.68rem; font-weight:800; }
-    .difficulty-card { padding:17px 19px; border:2px solid rgba(216,93,154,.22); border-radius:22px; background:linear-gradient(135deg,rgba(255,249,253,.88),rgba(241,235,255,.72)); }
-    .difficulty-intro { margin:0 0 13px; color:#765e6c; font-size:.82rem; line-height:1.5; }
-    .difficulty-intro small { display:block; margin-top:4px; color:var(--muted); font-size:.9em; }
-    .difficulty-toggle { display:flex; flex-wrap:wrap; gap:8px; }
-    .difficulty-option { display:inline-flex; flex:1 1 170px; flex-direction:column; align-items:flex-start; gap:3px; padding:11px 15px; border:2px solid rgba(216,93,154,.22); border-radius:14px; color:#684479; background:rgba(255,255,255,.58); font:800 .82rem/1.2 ui-rounded,"Avenir Next Rounded","Nunito","Trebuchet MS",sans-serif; text-align:left; cursor:pointer; transition:color .16s,border-color .16s,background .16s,transform .16s,box-shadow .16s; }
-    .difficulty-option[data-tier-state="complete"] { border-color:rgba(84,203,169,.52); background:linear-gradient(180deg,rgba(230,255,247,.88),rgba(255,255,255,.62)); }
-    .difficulty-option[data-tier-state="in-progress"] { border-color:rgba(216,93,154,.4); }
-    .difficulty-option small { color:var(--muted); font-size:.72rem; font-weight:700; }
-    .difficulty-option-name { font:inherit; }
-    .difficulty-progress { margin-top:5px; color:#d27b51; font-size:.68rem; font-weight:950; letter-spacing:.03em; }
-    .difficulty-progress-status { display:flex; flex-direction:column; gap:2px; color:#4ba98f; font-size:.62rem; font-weight:900; letter-spacing:.05em; text-transform:uppercase; }
-    .difficulty-progress-status small { color:inherit; font-size:.9em; font-weight:700; letter-spacing:0; text-transform:none; }
-    .difficulty-progress-status ruby { ruby-position:over; }
-    .difficulty-progress-status rt { font-size:.7em; letter-spacing:0; text-transform:none; }
-    .difficulty-option[data-tier-state="not-started"] .difficulty-progress-status { color:var(--muted); }
-    .difficulty-option.is-next { box-shadow:0 0 0 2px rgba(243,203,103,.35),0 5px 0 rgba(216,93,154,.08); }
-    .difficulty-option.is-next::after { content:'NEXT RECOMMENDED'; align-self:flex-end; margin-top:-2px; color:#c17b36; font-size:.52rem; font-weight:950; letter-spacing:.08em; }
-    .difficulty-option:hover,.difficulty-option:focus-visible { border-color:var(--pink-deep); background:rgba(255,255,255,.9); outline:none; transform:translateY(-1px); box-shadow:0 5px 0 rgba(216,93,154,.1); }
-    .difficulty-option.is-active { color:#fff; border-color:transparent; background:linear-gradient(135deg,var(--pink-deep),#9d73d9); box-shadow:0 6px 0 rgba(121,72,145,.18),0 0 16px rgba(216,93,154,.2); }
-    .difficulty-option.is-active small { color:#ffeaf5; }
-    .difficulty-option.is-active .difficulty-progress,.difficulty-option.is-active .difficulty-progress-status { color:#fff4fa; }
-    .difficulty-note { margin:12px 2px 0; color:#765e6c; font-size:.76rem; line-height:1.5; }
-    .difficulty-note small { display:block; margin-top:4px; color:var(--muted); font-size:.9em; }
-    .difficulty-help { margin:12px 2px 0; padding-top:9px; border-top:1px dashed rgba(104,70,119,.2); }
-    .difficulty-help summary { display:flex; align-items:center; justify-content:space-between; gap:8px; color:#765e6c; font-size:.7rem; font-weight:900; cursor:pointer; list-style:none; }
-    .difficulty-help summary::-webkit-details-marker { display:none; }
-    .difficulty-help summary small { display:block; margin-top:2px; color:var(--muted); font-size:.88em; font-weight:700; }
-    .difficulty-help summary::after { content:'+'; color:#b97a9b; font-size:.9rem; line-height:1; }
-    .difficulty-help[open] summary::after { content:'−'; }
-    .difficulty-help summary:focus-visible,.memory-details summary:focus-visible { outline:3px solid rgba(216,93,154,.42); outline-offset:4px; border-radius:8px; }
-    .difficulty-help .difficulty-note { margin:8px 0 0; }
-    .tier-next-step { margin:12px 2px 0; padding:10px 12px; border-left:3px solid #e5b85b; border-radius:0 12px 12px 0; color:#785735; background:rgba(255,246,209,.68); font-size:.75rem; font-weight:850; line-height:1.5; }
-    .tier-next-step small { display:block; margin-top:3px; color:#9a7850; font-size:.88em; font-weight:700; }
-    .memories { display:grid; grid-template-columns:repeat(4,1fr); gap:13px; }
-    .memory-card { min-height:0; padding:14px; position:relative; overflow:hidden; border:2px solid rgba(255,255,255,.9); border-radius:22px; background:linear-gradient(155deg,rgba(255,255,255,.94),rgba(255,239,248,.72)); transition:transform .16s,box-shadow .16s; }
-    .memory-card:hover { transform:translateY(-3px) rotate(-.4deg); box-shadow:0 11px 22px rgba(116,71,124,.13); }
-    .memory-card::before { content:""; position:absolute; width:72px; height:72px; right:-23px; top:-23px; border-radius:50%; background:var(--memory-color,#ffb3d4); opacity:.5; }
-    .memory-art { width:82px; height:82px; object-fit:contain; display:block; margin:-3px auto 7px; filter:drop-shadow(0 6px 4px rgba(98,55,115,.16)); }
-    .memory-name { margin:0; text-align:center; font-size:1.03rem; letter-spacing:-.03em; }
-    .memory-kana { margin:2px 0 0; text-align:center; color:var(--muted); font-size:.68rem; }
-    .memory-status { display:flex; align-items:center; justify-content:space-between; gap:7px; margin-top:12px; padding-top:10px; border-top:1px solid rgba(104,70,119,.14); font-size:.65rem; font-weight:950; }
-    .memory-status-label { display:flex; flex-direction:column; gap:2px; color:#705878; }
-    .memory-status-label small { color:var(--muted); font-size:.88em; font-weight:700; }
-    .dots { display:flex; gap:4px; }
-    .dot { width:10px; height:10px; border-radius:50%; border:2px solid #dbb4cc; background:#fff; }
-    .dot.found { border-color:#e781ae; background:#e781ae; box-shadow:inset 0 0 0 2px #fff; }
-    .memory-details { margin-top:10px; padding-top:9px; border-top:1px dashed rgba(104,70,119,.2); }
-    .memory-details summary { display:flex; align-items:center; justify-content:space-between; gap:8px; color:var(--pink-deep); font-size:.65rem; font-weight:950; cursor:pointer; list-style:none; }
-    .memory-details summary small { display:block; margin-top:2px; color:var(--muted); font-size:.88em; font-weight:700; }
-    .memory-details summary::-webkit-details-marker { display:none; }
-    .memory-details summary::after { content:'+'; color:#b97a9b; font-size:.9rem; line-height:1; }
-    .memory-details[open] summary::after { content:'−'; }
-    .memory-details-body { padding-top:2px; }
-    .memory-story { margin:8px 0 0; color:#705878; font-size:.74rem; line-height:1.45; }
-    .memory-story-jp { margin:4px 0 0; color:var(--muted); font-size:.68rem; line-height:1.55; }
-    .memory-lifetime { margin:8px 0 0; color:var(--muted); font-size:.61rem; font-weight:800; }
-    .memory-lifetime small { display:block; margin-top:2px; font-size:.9em; font-weight:700; }
-    .memory-tier { margin:5px 0 0; color:var(--pink-deep); font-size:.61rem; font-weight:900; }
-    .memory-card.weekly-complete { --memory-color:#9ee8d3; background:linear-gradient(155deg,#fff,rgba(220,255,245,.85)); }
-    .memory-card[data-found="false"] .memory-art { filter:grayscale(.45) saturate(.55) drop-shadow(0 6px 4px rgba(98,55,115,.12)); opacity:.72; }
-    .memory-card[data-found="true"] .memory-art { filter:drop-shadow(0 6px 4px rgba(98,55,115,.16)); opacity:1; }
-    .memory-card.active { outline:3px solid rgba(216,93,154,.35); outline-offset:2px; }
-    .memory-card.active::after { content:"ACTIVE MEMORY"; position:absolute; top:10px; left:-26px; transform:rotate(-32deg); padding:3px 27px; color:#fff; background:#db74a8; font-size:.5rem; font-weight:950; letter-spacing:.08em; }
-    .memory-locked-state { grid-column:1 / -1; padding:30px 22px; border:2px dashed rgba(216,93,154,.28); border-radius:22px; background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,237,248,.72)); text-align:center; }
-    .memory-locked-state-mark { color:#d85d9a; font-size:1.7rem; line-height:1; }
-    .memory-locked-state h3 { margin:10px 0 5px; font-size:1rem; }
-    .memory-locked-state p { margin:0; color:var(--muted); font-size:.78rem; line-height:1.55; }
-    .memory-locked-state p + p { margin-top:5px; font-size:.7rem; }
-    .lower-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
-    .note { padding:18px; border-radius:19px; background:linear-gradient(135deg,#fff4b9,#fff); border:2px solid rgba(243,203,103,.42); }
-    .note strong { display:block; font-size:.85rem; }
-    .note p { margin:7px 0 0; color:#765e6c; font-size:.78rem; line-height:1.55; }
-    .achievements { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    .achievement { padding:13px; border-radius:17px; background:rgba(255,255,255,.72); border:2px solid rgba(255,255,255,.9); }
-    .achievement-icon { font-size:1.35rem; }
-    .achievement strong { display:block; margin-top:5px; font-size:.78rem; }
-    .achievement small { display:block; margin-top:4px; color:var(--muted); font-size:.67rem; line-height:1.35; }
-    .achievement.locked { filter:grayscale(.6); opacity:.58; }
-    .empty-state { margin:0; padding:19px; border-radius:17px; color:var(--muted); background:rgba(255,255,255,.6); font-size:.83rem; line-height:1.6; }
-    .footer-note { margin:24px 0 0; text-align:center; color:#8c7196; font-size:.72rem; font-weight:800; }
-    @media (max-width:850px) { .hero{grid-template-columns:1fr 180px}.mascot{width:175px;height:175px}.memories{grid-template-columns:repeat(2,1fr)} }
-    @media (max-width:560px) { .page{width:min(100% - 18px,1120px);padding-top:12px}.topbar{align-items:flex-start}.case-label{font-size:.55rem}.hero{display:block;padding:27px 20px 22px}.mascot{width:170px;height:170px;margin:15px auto -8px}.hero::after{right:9px}.stats{grid-template-columns:repeat(2,1fr)}.section{padding:16px}.memories{gap:9px}.memory-card{padding:11px}.memory-art{width:72px;height:72px}.lower-grid{display:block}.lower-grid>*+*{margin-top:12px}.achievements{grid-template-columns:1fr}.network a{font-size:.6rem;padding:7px 9px} }
-    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      margin: 0; min-height: 100vh; color: var(--ink); font-family: var(--sans); font-weight: 700; -webkit-font-smoothing: antialiased;
+      background: radial-gradient(ellipse at 20% 0%, #ffe3f1 0%, rgba(255,227,241,0) 45%), radial-gradient(ellipse at 90% 30%, #e3f7f1 0%, rgba(227,247,241,0) 40%), var(--bg);
+    }
+    html.gsheet-open { overflow: hidden; }
+    rt { font-size: .5em; color: var(--muted); }
+    button { font-family: inherit; font-weight: 700; }
+    a { color: var(--lilac-deep); }
+    html.jp-off .jp { display: none !important; }
+    .page { width: min(720px, 100%); margin: 0 auto; padding: 12px 14px 48px; display: flex; flex-direction: column; gap: 30px; }
+    .kick { font-size: 10px; letter-spacing: .22em; color: #8a5cc9; }
+    .h2 { margin: 0; font-family: var(--display); font-weight: 500; font-size: 22px; line-height: 1.3; color: var(--ink); }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+    .section-head > div { display: flex; flex-direction: column; gap: 2px; }
+    .sec-num { font-family: var(--display); font-size: 24px; color: var(--pink-deep); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sec-num small { font-size: 14px; color: var(--muted); }
+    .jp-line { display: block; font-size: 12px; color: var(--muted); line-height: 1.7; }
+    .note-line { margin: 10px 0 0; text-align: center; font-size: 12px; line-height: 1.6; color: var(--muted); }
+
+    /* top bar + portals */
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; }
+    .case-label { flex: 1 1 auto; min-width: 0; font-size: 9px; letter-spacing: .14em; color: #8a5cc9; line-height: 1.5; }
+    .back-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--card); border: 1.5px solid var(--line-2); color: var(--ink); text-decoration: none; font-size: 13px; }
+    .back-link[hidden] { display: none; }
+    .jp-toggle { flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; cursor: pointer; border: 1.5px solid var(--line-2); background: var(--card); color: var(--muted); font-size: 12px; }
+    .jp-toggle[aria-pressed="true"] { border-color: var(--lilac); color: var(--lilac-deep); }
+    .jp-toggle .dot { width: 30px; height: 18px; border-radius: 9px; background: var(--line-2); position: relative; }
+    .jp-toggle .dot::after { content: ''; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform .18s; }
+    .jp-toggle[aria-pressed="true"] .dot { background: var(--lilac); }
+    .jp-toggle[aria-pressed="true"] .dot::after { transform: translateX(12px); }
+    .back-link:focus-visible, .jp-toggle:focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+
+    .profile-network { display: flex; flex-wrap: nowrap; justify-content: center; gap: 4px; padding: 10px 4px; border-radius: 20px; background: rgba(255,255,255,.85); border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(106,75,179,.08); }
+    .profile-network a { flex: 1 1 0; min-width: 0; max-width: 84px; display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: #6b5a78; -webkit-tap-highlight-color: transparent; }
+    .profile-network a[hidden] { display: none; }
+    .pn-orb { position: relative; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #d9c7e6; background: radial-gradient(circle at 50% 40%, #3a2a48, #1a1020 75%); transition: transform .18s, box-shadow .18s; }
+    .pn-orb img { object-fit: contain; }
+    .pn-orb.log { background: radial-gradient(circle at 50% 40%, #4a3414, #1b1208 75%); }
+    .pn-orb.adventure { background: radial-gradient(circle at 50% 40%, #3a1d4a, #1a0f2c 75%); }
+    .pn-orb.utsuroba { background: radial-gradient(circle at 50% 40%, #1d3340, #10161c 75%); }
+    .pn-orb.muenba { background: radial-gradient(circle at 50% 40%, #1f3a2f, #101a15 75%); }
+    .pn-orb.grimmerglen { background: #ffe3f1; }
+    .pn-label { width: 100%; overflow-wrap: anywhere; font-size: 11px; line-height: 1.2; text-align: center; }
+    .pn-label small { display: block; font-size: 7px; letter-spacing: 1px; color: var(--faint); }
+    .profile-network a:hover .pn-orb { transform: translateY(-2px); box-shadow: 0 0 14px rgba(255,143,200,.4); }
+    .profile-network a:focus-visible { outline: none; }
+    .profile-network a:focus-visible .pn-orb { outline: 3px solid var(--pink); outline-offset: 3px; }
+    .profile-network a[aria-current="page"] { color: var(--pink-deep); }
+    .profile-network a[aria-current="page"] .pn-orb { border-color: transparent; animation: outputProfileButtonPulse 2.6s ease-in-out infinite; box-shadow: 0 0 0 3px var(--pink), 0 0 14px rgba(255,143,200,.55); }
+    @keyframes outputProfileButtonPulse {
+      0%, 100% { box-shadow: 0 0 0 3px #ff8fc8, 0 0 14px rgba(255,143,200,.55); }
+      50% { box-shadow: 0 0 0 3px #ff8fc8, 0 0 26px rgba(255,143,200,.9); }
+    }
+    .profile-network a.is-locked { color: var(--faint); cursor: default; pointer-events: none; }
+    .profile-network a.is-locked .pn-orb { background: #f6eefb; border: 2px dashed var(--line-2); }
+    .profile-network a.is-locked .pn-orb img { filter: brightness(0); opacity: .35; }
+    .profile-network a.is-locked .pn-orb::after {
+      content: ''; position: absolute; right: -4px; bottom: -4px; width: 22px; height: 22px; border-radius: 50%;
+      background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c2357f' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center / 15px no-repeat;
+    }
+
+    /* hero: pastel garden, Marietta center */
+    .hero { position: relative; min-height: 440px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 0 16px 18px; border-radius: 28px; overflow: hidden; text-align: center; background: #f3e8fb url("assets/img/grimmerglen/grimmerglen-profile-background-web.webp") center / cover no-repeat; box-shadow: 0 10px 30px rgba(106,75,179,.18); }
+    .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(251,244,255,0) 28%, rgba(251,244,255,.86) 62%, #fbf4ff 92%); }
+    .hero > * { position: relative; }
+    .mascot { width: 200px; height: 200px; margin-bottom: 4px; animation: bob 3.2s ease-in-out infinite; }
+    .mascot img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 18px rgba(106,75,179,.35)); }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    .eyebrow { font-size: 10px; letter-spacing: .22em; color: #8a5cc9; }
+    .hero h1 { margin: 4px 0 0; font-family: var(--display); font-weight: 500; font-size: 38px; line-height: 1.1; }
+    .hero-copy { margin: 8px 0 0; font-size: 14px; line-height: 1.5; }
+    .status-strip { margin-top: 10px; }
+    .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 16px; background: var(--card); border: 1.5px solid var(--line-2); color: var(--muted); text-align: left; }
+    .status-pill.open { border-color: var(--mint); color: var(--mint-deep); }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line-2); flex: 0 0 auto; }
+    .status-dot.open { background: var(--mint); box-shadow: 0 0 8px var(--mint); }
+    .world-status-copy { display: flex; flex-direction: column; gap: 1px; }
+    .world-status-en { font-size: 12px; letter-spacing: .06em; }
+    .world-status-jp { font-size: 11px; color: var(--muted); }
+
+    /* memory tiers as bubbles */
+    .difficulty-toggle { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .difficulty-option { position: relative; min-height: 150px; border-radius: 22px; border: 1.5px solid var(--line-2); background: rgba(255,255,255,.75); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; padding: 10px 4px; }
+    .difficulty-option.is-active { border: 2.5px solid var(--pink); background: var(--card); box-shadow: 0 6px 18px rgba(255,143,200,.35); }
+    .difficulty-option[data-tier-state="complete"] { border-color: var(--mint); background: linear-gradient(180deg, #e9faf5, #ffffff); }
+    .difficulty-option.is-active[data-tier-state="complete"] { border-color: var(--pink); }
+    .difficulty-option.is-next::after { content: 'NEXT RECOMMENDED'; position: absolute; top: -9px; right: -4px; padding: 2px 7px; border-radius: 999px; background: var(--butter); color: #6b4a00; font-size: 8px; letter-spacing: .06em; transform: rotate(6deg); }
+    .difficulty-option:focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+    .tier-ring { --pct: 0%; --ring: var(--pink); width: 66px; height: 66px; border-radius: 50%; background: conic-gradient(var(--ring) 0 var(--pct), #f1e4f7 var(--pct) 100%); display: flex; align-items: center; justify-content: center; }
+    .tier-ring span { width: 52px; height: 52px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 14px; }
+    .tier-ring small { font-size: 10px; color: var(--muted); }
+    .difficulty-option-name { font-size: 14px; }
+    .difficulty-short { font-size: 10px; letter-spacing: .06em; color: var(--muted); }
+    .difficulty-progress { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .difficulty-progress-status { font-size: 10px; color: var(--muted); text-align: center; line-height: 1.3; }
+    .difficulty-progress-status small { display: block; }
+    .difficulty-note { margin: 10px 0 0; padding: 12px 14px; border-radius: 16px; background: var(--card); font-size: 13px; line-height: 1.6; }
+    .tier-next-step { margin: 8px 0 0; padding: 10px 14px; border-radius: 16px; background: #f3e8fb; border: 1.5px dashed var(--lilac); font-size: 12px; line-height: 1.6; }
+    .difficulty-help { margin-top: 8px; }
+    .difficulty-help summary { min-height: 40px; display: flex; align-items: center; cursor: pointer; font-size: 12px; color: var(--lilac-deep); list-style: none; }
+    .difficulty-help summary::-webkit-details-marker { display: none; }
+    .difficulty-help summary::before { content: '♡'; margin-right: 6px; }
+    .difficulty-help summary:focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; border-radius: 8px; }
+    .difficulty-help p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
+
+    /* this week's scrapbook */
+    .blooms { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; margin-bottom: 8px; }
+    .blooms span { font-size: 13px; color: var(--line-2); }
+    .blooms span.on { color: var(--pink); }
+    .weekly-hunt-progress { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .weekly-hunt-copy { margin: 10px 0 0; text-align: center; font-size: 12px; line-height: 1.6; color: var(--muted); }
+    .weekly-hunt-legend { margin: 4px 0 0; text-align: center; font-size: 12px; color: var(--pink-deep); }
+    .memories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; padding-top: 10px; }
+    .memory-card { position: relative; padding: 10px 10px 12px; border-radius: 6px; background: var(--card); box-shadow: 0 6px 16px rgba(106,75,179,.18); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+    .memory-card:nth-child(4n+1) { transform: rotate(-2deg); } .memory-card:nth-child(4n+2) { transform: rotate(1.5deg); }
+    .memory-card:nth-child(4n+3) { transform: rotate(1deg); } .memory-card:nth-child(4n) { transform: rotate(-1.5deg); }
+    .memory-card::before { content: ''; position: absolute; top: -9px; left: 50%; margin-left: -26px; width: 52px; height: 16px; background: rgba(184,156,240,.55); transform: rotate(-4deg); }
+    .memory-card.active { outline: 3px solid var(--pink); outline-offset: 2px; }
+    .memory-photo { width: 100%; height: 104px; border-radius: 4px; background: var(--memory-color, #f3e8fb); display: flex; align-items: center; justify-content: center; }
+    .memory-art { height: 84px; max-width: 110px; object-fit: contain; }
+    .memory-card[data-found="false"] .memory-art { filter: grayscale(.8); opacity: .55; }
+    .memory-card[data-found="true"] .memory-art { filter: drop-shadow(0 6px 4px rgba(98,55,115,.16)); opacity: 1; }
+    .memory-name { margin: 0; font-family: var(--display); font-weight: 500; font-size: 15px; }
+    .memory-kana { margin: 0; font-size: 11px; color: var(--muted); }
+    .memory-status { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .memory-status-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .hearts { display: flex; gap: 4px; font-size: 16px; color: #d9c7e6; }
+    .hearts .on { color: var(--heart); }
+    .memory-tag { position: absolute; top: -8px; right: -6px; z-index: 1; padding: 3px 9px; border-radius: 999px; font-size: 10px; transform: rotate(8deg); }
+    .memory-card.weekly-complete .memory-tag { background: var(--mint); color: #1d4d44; }
+    .memory-card.active .memory-tag { background: var(--pink); color: #4a1032; box-shadow: 0 0 12px rgba(255,143,200,.8); }
+    .memory-open { min-height: 36px; margin-top: 4px; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--lilac); background: transparent; color: var(--lilac-deep); font-size: 12px; cursor: pointer; }
+    .memory-open:focus-visible { outline: 3px solid var(--pink); outline-offset: 2px; }
+    .memory-locked-state { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px; border-radius: 22px; background: var(--card); text-align: center; }
+    .memory-locked-state h3 { margin: 0; font-family: var(--display); font-weight: 500; font-size: 18px; }
+    .memory-locked-state p { margin: 0; font-size: 13px; line-height: 1.6; }
+    .locked-slots { display: grid; grid-template-columns: repeat(4, 58px); gap: 8px; }
+    .locked-slots span { height: 58px; border-radius: 8px; border: 2px dashed var(--line-2); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 22px; color: #d9c7e6; }
+
+    /* opened memory sheet */
+    .gsheet { position: fixed; inset: 0; z-index: 300; display: flex; align-items: flex-end; justify-content: center; background: rgba(74,45,92,.45); }
+    .gsheet[hidden] { display: none; }
+    .gsheet-panel { width: min(560px, 100%); max-height: 92vh; overflow-y: auto; padding: 14px 16px 24px; border-radius: 28px 28px 0 0; background: var(--card); display: flex; flex-direction: column; gap: 14px; box-shadow: 0 -10px 40px rgba(74,45,92,.35); animation: sheetUp .3s ease-out both; }
+    @keyframes sheetUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    .gsheet-grip { align-self: center; width: 48px; height: 5px; border-radius: 3px; background: var(--line-2); }
+    .gsheet-top { display: flex; gap: 14px; align-items: center; }
+    .gsheet-photo { flex: 0 0 auto; transform: rotate(-3deg); padding: 8px 8px 10px; border-radius: 6px; background: #fff; box-shadow: 0 6px 16px rgba(106,75,179,.2); }
+    .gsheet-photo div { width: 104px; height: 104px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+    .gsheet-photo img { max-height: 90px; max-width: 96px; object-fit: contain; }
+    .gsheet-top h3 { margin: 2px 0; font-family: var(--display); font-weight: 500; font-size: 24px; }
+    .say { display: grid; grid-template-columns: 74px 1fr; gap: 10px; align-items: end; }
+    .say img { width: 74px; }
+    .bubble { padding: 12px 14px; border-radius: 18px 18px 18px 4px; background: #ffe3f1; font-family: var(--display); font-size: 16px; line-height: 1.55; }
+    .bubble .jp-line { font-family: var(--sans); }
+    .written { padding: 14px; border-radius: 18px; background: #f3e8fb; border: 2px dashed var(--lilac); }
+    .written span.k { font-size: 10px; letter-spacing: .2em; color: var(--lilac-deep); }
+    .written p { margin: 6px 0 0; font-family: var(--display); font-size: 20px; line-height: 1.45; }
+    .next-tip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; background: #e3f7f1; font-size: 12px; line-height: 1.5; }
+    .next-tip b { color: var(--mint-deep); font-size: 20px; }
+    .gsheet-close { min-height: 48px; border-radius: 999px; border: 0; background: var(--pink); color: #4a1032; font-size: 14px; cursor: pointer; box-shadow: 0 4px 0 #d9649f; }
+    .gsheet-close:focus-visible { outline: 3px solid var(--lilac-deep); outline-offset: 2px; }
+
+    /* rule as three steps */
+    .rule-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .rule-step { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 16px; background: var(--card); border: 1.5px solid var(--line); text-align: center; font-size: 11px; line-height: 1.4; }
+    .rule-step:last-child { border-color: var(--pink); }
+    .rule-step .h { color: var(--heart); font-size: 18px; letter-spacing: 1px; }
+    .rule-step b { font-family: var(--display); font-weight: 500; font-size: 13px; }
+    .rule-step .s { color: var(--pink-deep); font-size: 12px; }
+    .rule-say { margin-top: 8px; display: grid; grid-template-columns: 1fr 64px; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 18px; background: var(--card); font-size: 13px; line-height: 1.5; }
+    .rule-say img { width: 64px; }
+
+    /* memory jar (this week) + all-time labels */
+    .jar-card { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: center; padding: 14px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow); }
+    .jar { position: relative; width: 150px; height: 207px; }
+    .jar img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 16px; }
+    .jar svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .jar-count { font-family: var(--display); font-size: 40px; line-height: 1; color: var(--pink-deep); }
+    .jar-label { font-size: 13px; line-height: 1.4; }
+    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+    .stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 14px; }
+    .stat:nth-child(1) { background: #ffe3f1; } .stat:nth-child(2) { background: #f3e8fb; } .stat:nth-child(3) { background: #e3f7f1; } .stat:nth-child(4) { background: #fff3cc; }
+    .stat-value { font-family: var(--display); font-size: 22px; line-height: 1.1; }
+    .stat-label { font-size: 11px; color: var(--muted); }
+    .stat-jp { font-size: 10px; color: var(--faint); }
+    html.jp-off .stat-jp { display: none; }
+
+    /* sticker achievements */
+    .achievements { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 14px 10px; border-radius: 24px; background: repeating-linear-gradient(0deg, #ffffff 0 26px, #f6eefb 26px 27px); }
+    .achievement { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; text-align: center; font-size: 11px; line-height: 1.4; }
+    .achievement-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; background: var(--pink); color: #fff; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(106,75,179,.25); transform: rotate(-6deg); }
+    .achievement strong { font-family: var(--display); font-weight: 500; font-size: 13px; }
+    .achievement small { color: var(--pink-deep); }
+    .achievement.locked .achievement-icon { background: #f1e4f7; color: #c9b6d9; border: 3px dashed #d9c7e6; box-shadow: none; transform: none; }
+    .achievement.locked strong, .achievement.locked small { color: var(--faint); }
+
+    .footer-note { margin: 0; text-align: center; font-size: 11px; line-height: 1.7; color: var(--muted); }
+
+    @media (min-width: 640px) {
+      .memories { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (max-width: 360px) {
+      .pn-orb { width: 44px; height: 44px; }
+      .jar-card { grid-template-columns: 120px 1fr; }
+      .jar { width: 120px; height: 166px; }
+      .hero h1 { font-size: 32px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
   </style>
 </head>
 <body>
   <main class="page">
     <div class="topbar">
-      <div class="case-label">GRIMMERGLEN / MEMORY CASE FILE<br><ruby>記憶<rt>きおく</rt></ruby>の<ruby>事件簿<rt>じけんぼ</rt></ruby></div>
-      <a class="back-link" id="grimmerglen-profile-karasuki" href="karasuki.html?room=room_14" hidden aria-label="Enter Karasuki / カラスキへ">Karasuki / カラスキへ →</a>
+      <a class="back-link" id="grimmerglen-profile-karasuki" href="karasuki.html?room=room_14" hidden aria-label="Enter Karasuki / カラスキへ">からすきへ →</a>
+      <div class="case-label">GRIMMERGLEN / MEMORY CASE FILE<span class="jp"><br><ruby>記憶<rt>きおく</rt></ruby>の<ruby>事件簿<rt>じけんぼ</rt></ruby></span></div>
+      <button type="button" class="jp-toggle" id="jp-toggle" aria-pressed="true" aria-label="Japanese help / にほんごの ヘルプ"><span class="dot" aria-hidden="true"></span>にほんご</button>
     </div>
 
-    <nav class="network" aria-label="Output profiles">
-      <a href="profile.html">LOG <small>ぼうけんログ</small></a>
-      <a href="adventure-profile.html">ADVENTURE <small>ぼうけん</small></a>
-      <a href="utsuroba-profile.html">UTSUROBA <small>うつろば</small></a>
-      <a href="muenba-profile.html">MUENBA <small>むえんば</small></a>
-      <a href="grimmerglen-profile.html" aria-current="page">GRIMMERGLEN <small>グリマーグレン</small></a>
+    <nav class="profile-network" aria-label="Output profiles">
+      <a href="profile.html"><span class="pn-orb log"><img src="assets/img/profile/portal-log.webp" alt="" width="44" height="44"></span><span class="pn-label">ログ<small>LOG</small></span></a>
+      <a href="adventure-profile.html"><span class="pn-orb adventure"><img src="assets/img/profile/portal-adventure.webp" alt="" width="36" height="36"></span><span class="pn-label">ぼうけん<small>ADVENTURE</small></span></a>
+      <!-- Shown locked until the weekly world gate opens (same gate as the Utsuroba world). -->
+      <a href="utsuroba-profile.html" id="pnet-utsuroba" class="is-locked" aria-disabled="true" data-label="UTSUROBA"><span class="pn-orb utsuroba"><img src="assets/img/profile/portal-utsuroba.webp" alt="" width="36" height="42"></span><span class="pn-label">うつろば<small>UTSUROBA</small></span></a>
+      <!-- Shown locked until BoohaUnlockSystem.isMuenbaUnlocked(). -->
+      <a href="muenba-profile.html" id="pnet-muenba" class="is-locked" aria-disabled="true" data-label="MUENBA"><span class="pn-orb muenba"><img src="assets/img/profile/portal-muenba.webp" alt="" width="36" height="44"></span><span class="pn-label">むえんば<small>MUENBA</small></span></a>
+      <a href="grimmerglen-profile.html" aria-current="page"><span class="pn-orb grimmerglen"><img src="assets/img/profile/portal-grimmerglen-tree.webp" alt="" width="46" height="46" style="border-radius:50%"></span><span class="pn-label">グリマー<small>GRIMMERGLEN</small></span></a>
     </nav>
 
     <section class="hero" aria-labelledby="page-title">
-      <div>
-        <div class="eyebrow">A case file for the memories that wobble</div>
-        <h1 id="page-title">Grimmerglen</h1>
-        <p class="hero-jp">グリマーグレン — ふわふわの<ruby>記憶<rt>きおく</rt></ruby></p>
-        <p class="hero-copy">Marietta remembers the feeling, but not always the thing. Bring her the pastel clues Booha finds, then help her hold each little memory long enough to write it down.
-          <small>マリエッタは<ruby>気持<rt>きも</rt></ruby>ちは<ruby>覚<rt>おぼ</rt></ruby>えているけれど、ものを<ruby>忘<rt>わす</rt></ruby>れてしまうことがあります。</small>
-        </p>
-        <div class="status-strip">
-          <span class="status-pill"><i class="status-dot" id="world-dot"></i><span id="world-status" class="world-status-copy"><span class="world-status-en">GRIMMERGLEN IS LOCKED</span><span class="world-status-jp">グリマーグレンは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span></span></span>
-        </div>
+      <div class="mascot"><img src="assets/img/grimmerglen/marietta/marietta_04.webp" alt="Pastel horned chipmunk Marietta waving" width="200" height="200" decoding="async"></div>
+      <div class="eyebrow">GRIMMERGLEN · MEMORIES THAT WOBBLE</div>
+      <h1 id="page-title"><span class="jp">グリマーグレン</span><span class="en-only" hidden>Grimmerglen</span></h1>
+      <p class="hero-copy">Marietta remembers the feeling,<br>but not always the thing.<span class="jp-line jp">マリエッタは きもちは おぼえている。でも ものを わすれちゃう。</span></p>
+      <div class="status-strip">
+        <span class="status-pill" id="world-pill"><i class="status-dot" id="world-dot"></i><span id="world-status" class="world-status-copy"><span class="world-status-en">GRIMMERGLEN IS LOCKED</span><span class="world-status-jp jp">グリマーグレンは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span></span></span>
       </div>
-      <div class="mascot"><img src="assets/img/grimmerglen/marietta/marietta_04.webp" alt="Pastel horned chipmunk Marietta waving"></div>
+    </section>
+
+    <section id="memory-tier-selector" class="section" aria-labelledby="memory-tier-title">
+      <div class="section-head"><div><span class="kick">CHOOSE A MEMORY TIER · each keeps its own week</span><h2 class="h2" id="memory-tier-title"><span class="jp">どの おもいで に する？</span><span class="en-only" hidden>Choose a memory tier</span></h2></div></div>
+      <div id="memory-tier-selector-mount"></div>
     </section>
 
     <section id="weekly-progress" class="weekly-hunt" aria-labelledby="weekly-hunt-heading" aria-live="polite"></section>
 
-    <section id="memory-tier-selector" class="section" aria-labelledby="memory-tier-title">
-      <div class="section-head"><h2 id="memory-tier-title">Choose a memory tier</h2><p><ruby>記憶<rt>きおく</rt></ruby>の<ruby>段階<rt>だんかい</rt></ruby></p></div>
-      <div id="memory-tier-selector-mount"></div>
-    </section>
-
-    <section class="section" aria-labelledby="stats-title">
-      <div class="section-head"><h2 id="stats-title">Marietta’s memory jar</h2><p>ちいさな<ruby>思<rt>おも</rt></ruby>い<ruby>出<rt>で</rt></ruby>のびん</p></div>
-      <div class="stats" id="stats"></div>
-    </section>
-
     <section class="section" aria-labelledby="memories-title">
-      <div class="section-head"><h2 id="memories-title">The memory objects</h2><p>three items per memory · fresh weekly</p></div>
+      <div class="section-head"><div><span class="kick">THE MEMORY OBJECTS · three items per memory · fresh weekly</span><h2 class="h2" id="memories-title">こんしゅうの おもいで</h2></div></div>
       <div class="memories" id="memories" aria-live="polite"></div>
     </section>
 
-    <section class="section lower-grid">
-      <div class="note"><strong>Marietta’s rule for remembering</strong><p>She will tell Booha a story that hints at the object. The first return has friendly helpers, the second has fewer, and the final sentence stands on its own. The same memory gets a little hazier each time.</p><p>マリエッタの<ruby>話<rt>はなし</rt></ruby>をよく<ruby>聞<rt>き</rt></ruby>いてね。</p></div>
-      <div><div class="section-head"><h2>Sweet little achievements</h2><p>じっせき</p></div><div class="achievements" id="achievements"></div></div>
+    <section class="section" aria-labelledby="rule-title">
+      <div class="section-head"><div><span class="kick">MARIETTA'S RULE FOR REMEMBERING</span><h2 class="h2" id="rule-title">3かい もどすと おもいだす</h2></div></div>
+      <div class="rule-steps">
+        <div class="rule-step"><span class="h" aria-hidden="true">♥♡♡</span><b>1st return</b><span class="s">friendly helpers</span><span class="jp">ヒント いっぱい</span></div>
+        <div class="rule-step"><span class="h" aria-hidden="true">♥♥♡</span><b>2nd return</b><span class="s">fewer helpers</span><span class="jp">ヒント すこし</span></div>
+        <div class="rule-step"><span class="h" aria-hidden="true">♥♥♥</span><b>3rd return</b><span class="s">on your own!</span><span class="jp">じぶんで かこう</span></div>
+      </div>
+      <div class="rule-say"><span>“Listen to my story! Each time, my memory gets a little hazier.”<span class="jp-line jp">マリエッタの はなしを よく きいてね。</span></span><img src="assets/img/grimmerglen/marietta/marietta_05.webp" alt="" width="64" height="64" loading="lazy" decoding="async"></div>
     </section>
 
-    <p class="footer-note">Cute clues, wobbly memories, and one very determined Booha · かわいい<ruby>手<rt>て</rt></ruby>がかりと、がんばるブーハー</p>
+    <section class="section" aria-labelledby="stats-title">
+      <div class="section-head"><div><span class="kick">MARIETTA'S MEMORY JAR · THIS WEEK</span><h2 class="h2" id="stats-title"><span class="jp">おもいでの びん</span><span class="en-only" hidden>Marietta’s memory jar</span></h2></div></div>
+      <div id="memory-jar"></div>
+      <div class="stats" id="stats" aria-label="All-time totals"></div>
+      <p class="note-line">The jar starts empty every Sunday · the four totals are all-time.<span class="jp-line jp">びんは まいしゅう にちようびに からっぽに なるよ。</span></p>
+    </section>
+
+    <section class="section" aria-labelledby="ach-title">
+      <div class="section-head"><div><span class="kick">SWEET LITTLE ACHIEVEMENTS</span><h2 class="h2" id="ach-title">シール ちょう</h2></div></div>
+      <div class="achievements" id="achievements"></div>
+    </section>
+
+    <p class="footer-note">Cute clues, wobbly memories, and one very determined Booha<span class="jp"> · かわいい<ruby>手<rt>て</rt></ruby>がかりと、がんばるブーハー</span></p>
   </main>
+
+  <div class="gsheet" id="memory-sheet" hidden>
+    <div class="gsheet-panel" role="dialog" aria-modal="true" aria-labelledby="gsheet-title" id="memory-sheet-panel"></div>
+  </div>
 
   <script src="./js/token.js"></script>
   <script src="./js/calendar.js"></script>
@@ -218,6 +320,7 @@
   <script src="./js/core/score-system.js"></script>
   <script src="./js/core/unlock-system.js"></script>
   <script src="./js/grimmerglen-data.js"></script>
+  <script src="./js/ui/world-portals.js"></script>
   <script>
     (() => {
       'use strict';
@@ -226,7 +329,7 @@
         banner:['Banner','かざり'], ticket:['Ticket','チケット'], pillow:['Pillow','まくら'], backpack:['Backpack','リュック'],
         book:['Book','ほん'], teddyBear:['Teddy bear','ぬいぐるみ'], toGoCoffeeCup:['Coffee cup','コーヒー'], ball:['Ball','ボール']
       };
-      const colors = ['#ffb4d5','#ffe28b','#a9e8dc','#c7b4ff','#ffbd9c','#b5ddff','#e4acef','#ffc89d'];
+      const colors = ['#ffd3e8','#fff0b8','#d5f3ec','#e6dcff','#ffe0d0','#d8ecff','#f6dcf8','#ffe6cf'];
       const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
       const saveData = () => {
         try { return (window.BoohaSaveFile && BoohaSaveFile.load()) || {}; } catch (_) { return {}; }
@@ -251,14 +354,30 @@
       };
       const MEMORY_TIER_CHOICES = ['start', 'case', 'deep'];
       const MEMORY_TIER_META = {
-        start: { en:'Starter Memory', jp:'<ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby>', note:'The simplest words. A good first memory to hold.', noteJP:'いちばんやさしい<ruby>言葉<rt>ことば</rt></ruby>です。<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>にぴったりです。' },
-        case: { en:'Case Memory', jp:'<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>', note:'More detail to connect across the memory garden.', noteJP:'<ruby>記憶<rt>きおく</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりをつなげて<ruby>読<rt>よ</rt></ruby>みます。' },
-        deep: { en:'Deep Memory', jp:'<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>', note:'The fullest stories for a deeper challenge.', noteJP:'もっと<ruby>詳<rt>くわ</rt></ruby>しい<ruby>物語<rt>ものがたり</rt></ruby>に<ruby>挑戦<rt>ちょうせん</rt></ruby>します。' }
+        start: { en:'Starter Memory', short:'はじめ', ring:'#ff8fc8', jp:'<ruby>始<rt>はじ</rt></ruby>めの<ruby>記憶<rt>きおく</rt></ruby>', note:'The simplest words. A good first memory to hold.', noteJP:'いちばん やさしい ことば。さいしょの おもいでに ぴったり。' },
+        case: { en:'Case Memory', short:'ケース', ring:'#b89cf0', jp:'<ruby>事件<rt>じけん</rt></ruby>の<ruby>記憶<rt>きおく</rt></ruby>', note:'More detail to connect across the memory garden.', noteJP:'てがかりを つなげて よもう。' },
+        deep: { en:'Deep Memory', short:'ふかい', ring:'#7fd6c2', jp:'<ruby>深<rt>ふか</rt></ruby>い<ruby>記憶<rt>きおく</rt></ruby>', note:'The fullest stories for a deeper challenge.', noteJP:'いちばん ながい おはなしに チャレンジ。' }
       };
       const getMemoryTierPreference = () => {
         const value = lifetimeBucket().memoryTier;
         return MEMORY_TIER_CHOICES.includes(value) ? value : 'start';
       };
+
+      // ── Japanese help toggle (shared with Utsuroba and Muenba) ──────────
+      const jpToggle = document.getElementById('jp-toggle');
+      const jpOn = () => !document.documentElement.classList.contains('jp-off');
+      function syncJpToggle() {
+        const on = jpOn();
+        jpToggle.setAttribute('aria-pressed', String(on));
+        document.querySelectorAll('.en-only').forEach(el => { el.hidden = on; });
+      }
+      jpToggle.addEventListener('click', () => {
+        const on = !jpOn();
+        document.documentElement.classList.toggle('jp-off', !on);
+        try { localStorage.setItem('booha_utsu_jp', on ? '1' : '0'); } catch (_) {}
+        syncJpToggle();
+      });
+      syncJpToggle();
 
       function setMemoryTierPreference(value) {
         if (!MEMORY_TIER_CHOICES.includes(value)) return;
@@ -281,9 +400,9 @@
       }
 
       function weeklyTierState(stats) {
-        return stats.complete ? { key: 'complete', en: 'Complete this week', jp: '<ruby>今週<rt>こんしゅう</rt></ruby>は<ruby>完了<rt>かんりょう</rt></ruby>' }
-          : stats.found > 0 ? { key: 'in-progress', en: 'In progress', jp: '<ruby>進行中<rt>しんこうちゅう</rt></ruby>' }
-            : { key: 'not-started', en: 'Not started', jp: '<ruby>未開始<rt>みかいし</rt></ruby>' };
+        return stats.complete ? { key: 'complete', en: 'Complete this week', jp: 'こんしゅう クリア！' }
+          : stats.found > 0 ? { key: 'in-progress', en: 'In progress', jp: 'すすめてる' }
+            : { key: 'not-started', en: 'Not started', jp: 'まだ' };
       }
 
       function nextTierFor(current, statsByTier) {
@@ -318,10 +437,11 @@
         const status = document.getElementById('world-status');
         if (status) {
           status.innerHTML = open
-            ? '<span class="world-status-en">GRIMMERGLEN IS OPEN</span><span class="world-status-jp">グリマーグレンは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
-            : '<span class="world-status-en">GRIMMERGLEN IS LOCKED</span><span class="world-status-jp">グリマーグレンは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span>';
+            ? '<span class="world-status-en">GRIMMERGLEN IS OPEN</span><span class="world-status-jp jp">グリマーグレンは<ruby>開<rt>ひら</rt></ruby>いています。</span>'
+            : '<span class="world-status-en">GRIMMERGLEN IS LOCKED</span><span class="world-status-jp jp">グリマーグレンは<ruby>今<rt>いま</rt></ruby>は<ruby>閉<rt>と</rt></ruby>じています。</span>';
         }
         document.getElementById('world-dot')?.classList.toggle('open', open);
+        document.getElementById('world-pill')?.classList.toggle('open', open);
       }
 
       function renderWorldBack() {
@@ -337,11 +457,55 @@
 
       function renderStats() {
         document.getElementById('stats').innerHTML = [
-          [lifetimeTotal('cluesReturnedTotal'), 'Lifetime clues returned','手がかり'],
-          [lifetimeTotal('memoriesRestoredTotal'), 'Lifetime memories restored','覚えている'],
-          [lifetimeTotal('roomVisitsTotal'), 'Lifetime rooms explored','部屋'],
-          [lifetimeTotal('gardenVisitsTotal'), 'Lifetime garden visits','訪れた回数']
+          [lifetimeTotal('cluesReturnedTotal'), 'Lifetime clues returned','てがかり'],
+          [lifetimeTotal('memoriesRestoredTotal'), 'Lifetime memories restored','おもいだした'],
+          [lifetimeTotal('roomVisitsTotal'), 'Lifetime rooms explored','へや'],
+          [lifetimeTotal('gardenVisitsTotal'), 'Lifetime garden visits','にわに きた']
         ].map(item => `<div class="stat"><div class="stat-value">${esc(item[0])}</div><div class="stat-label">${esc(item[1])}</div><span class="stat-jp">${item[2]}</span></div>`).join('');
+      }
+
+      // ── memory jar: one star per clue returned this week, all three tiers.
+      // Slots sit inside the glass of grimmerglen-memory-jar-crop.webp
+      // (300 × 413 units), filling from the bottom.
+      const JAR_SLOTS = (() => {
+        const slots = [];
+        for (let k = 0; k < 11; k++) {
+          const y = 345 - k * 22;
+          const [start, end] = k === 0 ? [64, 208] : k % 2 ? [52, 244] : [64, 232];
+          for (let x = start; x <= end; x += 24) slots.push([x, y]);
+        }
+        return slots;
+      })();
+      const STAR_COLORS = ['#ff8fc8', '#b89cf0', '#7fd6c2', '#ffd36b'];
+      function starPath(cx, cy, r) {
+        const pts = [];
+        for (let i = 0; i < 10; i++) {
+          const a = -Math.PI / 2 + i * Math.PI / 5;
+          const rr = i % 2 ? r * .45 : r;
+          pts.push(`${(cx + Math.cos(a) * rr).toFixed(1)},${(cy + Math.sin(a) * rr).toFixed(1)}`);
+        }
+        return pts.join(' ');
+      }
+      function renderJar() {
+        const weekStars = MEMORY_TIER_CHOICES.reduce((sum, tier) => sum + weeklyTierStats(tier).found, 0);
+        const shown = Math.min(weekStars, JAR_SLOTS.length);
+        let seed = 11;
+        const rand = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+        const stars = JAR_SLOTS.slice(0, shown).map(([x, y], i) => {
+          const r = 10 + rand() * 2;
+          return `<polygon points="${starPath(x + rand() * 4 - 2, y + rand() * 4 - 2, r)}" fill="${STAR_COLORS[i % STAR_COLORS.length]}" stroke="#ffffff" stroke-width="1.5"></polygon>`;
+        }).join('');
+        document.getElementById('memory-jar').innerHTML = `
+          <div class="jar-card">
+            <div class="jar">
+              <img src="assets/img/grimmerglen/grimmerglen-memory-jar-crop.webp" alt="" width="440" height="606" decoding="async">
+              <svg viewBox="0 0 300 413" role="img" aria-label="${weekStars} memory star${weekStars === 1 ? '' : 's'} in the jar this week"><g style="filter:drop-shadow(0 2px 3px rgba(106,75,179,.35))">${stars}</g></svg>
+            </div>
+            <div>
+              <div class="jar-count">${weekStars}</div>
+              <div class="jar-label">clues returned this week<span class="jp-line jp">こんしゅう もどした てがかり（ぜんぶの おもいで）</span></div>
+            </div>
+          </div>`;
       }
 
       function renderWeeklyProgress() {
@@ -350,10 +514,11 @@
         const remaining = Math.max(totalSlots - found, 0);
         const tierLabel = MEMORY_TIER_META[selectedWeeklyTier()]?.en || 'Starter Memory';
         document.getElementById('weekly-progress').innerHTML = `
-          <div class="weekly-hunt-heading"><h2 id="weekly-hunt-heading">This Week's Garden · ${esc(tierLabel)}</h2><span>Fresh every Sunday</span></div>
-          <p class="weekly-hunt-copy">Find three items for each memory in the ${esc(tierLabel)} tier this week. Your lifetime memory jar below stays saved.<small>今週は、${esc(tierLabel)}の<ruby>記憶<rt>きおく</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりを<ruby>三つ<rt>みっつ</rt></ruby>ずつ<ruby>見<rt>み</rt></ruby>つけられます。<ruby>記録<rt>きろく</rt></ruby>は<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
+          <div class="section-head"><div><span class="kick">This Week's Garden · ${esc(tierLabel)} · Fresh every Sunday</span><h2 class="h2" id="weekly-hunt-heading">こんしゅうの にわ</h2></div><span class="sec-num">${found}<small> / ${totalSlots}</small></span></div>
+          <div class="blooms" aria-hidden="true">${Array.from({ length: totalSlots }, (_, i) => `<span class="${i < found ? 'on' : ''}">✿</span>`).join('')}</div>
           <div class="weekly-hunt-progress"><progress max="${Math.max(totalSlots, 1)}" value="${found}" aria-label="${found} of ${totalSlots} clues returned this week"></progress><span class="weekly-hunt-count">${found} / ${totalSlots}</span></div>
-          <p class="weekly-hunt-legend">${remaining ? `${remaining} clue return${remaining === 1 ? '' : 's'} available this week.` : 'Every clue return completed this week.'}</p>`;
+          <p class="weekly-hunt-copy">Find three items for each memory in the ${esc(tierLabel)} tier this week. Your lifetime memory jar below stays saved.<span class="jp-line jp">こんしゅうは おもいで ひとつに てがかりを 3つずつ。</span></p>
+          <p class="weekly-hunt-legend">${remaining ? `${remaining} clue return${remaining === 1 ? '' : 's'} available this week.` : 'Every clue return completed this week!'}</p>`;
       }
 
       function renderMemoryTierSelector() {
@@ -365,39 +530,83 @@
         const suggestedNext = nextTierFor(current, statsByTier);
         const currentStats = statsByTier[current];
         const allTiersComplete = MEMORY_TIER_CHOICES.every(tier => statsByTier[tier].complete);
+        const left = Math.max(0, currentStats.total - currentStats.found);
         const readiness = suggestedNext
-          ? { en: `${meta.en} complete! ${MEMORY_TIER_META[suggestedNext].en} is the next recommended challenge.`, jp: `${meta.en}が<ruby>完了<rt>かんりょう</rt></ruby>しました。<ruby>次<rt>つぎ</rt></ruby>は${MEMORY_TIER_META[suggestedNext].en}に<ruby>挑戦<rt>ちょうせん</rt></ruby>できます。` }
+          ? { en: `${meta.en} complete! ${MEMORY_TIER_META[suggestedNext].en} is the next recommended challenge.`, jp: `つぎは「${MEMORY_TIER_META[suggestedNext].short}」に チャレンジ！` }
           : allTiersComplete
-            ? { en: 'Every memory tier is complete this week. The garden is ready for a fresh Sunday.', jp: 'すべての<ruby>段階<rt>だんかい</rt></ruby>が<ruby>今週<rt>こんしゅう</rt></ruby>は<ruby>完了<rt>かんりょう</rt></ruby>しました。<ruby>日曜日<rt>にちようび</rt></ruby>にまた<ruby>新<rt>あたら</rt></ruby>しく<ruby>始<rt>はじ</rt></ruby>まります。' }
+            ? { en: 'Every memory tier is complete this week. The garden is ready for a fresh Sunday.', jp: 'こんしゅうは ぜんぶ クリア！ にちようびに また はじまるよ。' }
             : current === 'deep' && currentStats.complete
-            ? { en: 'Deep Memory is complete. You can revisit another tier or keep your eye on the next Sunday reset.', jp: 'Deep Memoryが<ruby>完了<rt>かんりょう</rt></ruby>しました。ほかの<ruby>段階<rt>だんかい</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>したり、<ruby>次<rt>つぎ</rt></ruby>の<ruby>日曜日<rt>にちようび</rt></ruby>を<ruby>待<rt>ま</rt></ruby>ったりできます。' }
+            ? { en: 'Deep Memory is complete. You can revisit another tier or keep your eye on the next Sunday reset.', jp: '「ふかい」クリア！ ほかの おもいでも あそべるよ。' }
             : currentStats.complete
-              ? { en: `${meta.en} is complete. You can revisit it or explore another tier.`, jp: `${meta.en}は<ruby>完了<rt>かんりょう</rt></ruby>です。もう<ruby>一度<rt>いちど</rt></ruby><ruby>遊<rt>あそ</rt></ruby>ぶか、ほかの<ruby>段階<rt>だんかい</rt></ruby>を<ruby>選<rt>えら</rt></ruby>んで<ruby>探検<rt>たんけん</rt></ruby>しましょう。` }
+              ? { en: `${meta.en} is complete. You can revisit it or explore another tier.`, jp: `「${meta.short}」クリア！ もういちど あそぶか、ほかを えらぼう。` }
             : current === 'deep'
-              ? { en: 'Keep exploring Deep Memory. Complete all 24 clues to finish this tier for the week.', jp: 'Deep Memoryを<ruby>続<rt>つづ</rt></ruby>けよう。24の<ruby>手<rt>て</rt></ruby>がかりを<ruby>集<rt>あつ</rt></ruby>めると、<ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>段階<rt>だんかい</rt></ruby>が<ruby>完了<rt>かんりょう</rt></ruby>します。' }
-              : { en: `Keep exploring ${meta.en}. Complete all 24 clues to see the next recommendation.`, jp: `${meta.en}を<ruby>続<rt>つづ</rt></ruby>けよう。24の<ruby>手<rt>て</rt></ruby>がかりを<ruby>集<rt>あつ</rt></ruby>めると、<ruby>次<rt>つぎ</rt></ruby>のおすすめが<ruby>見<rt>み</rt></ruby>えます。` };
+              ? { en: `Keep exploring Deep Memory — ${left} more clue${left === 1 ? '' : 's'} to finish it this week.`, jp: `あと ${left}こで こんしゅうの「ふかい」クリア！` }
+              : { en: `Keep exploring ${meta.en} — ${left} more clue${left === 1 ? '' : 's'} this week.`, jp: `あと ${left}こで こんしゅうの「${meta.short}」クリア！` };
         mount.innerHTML = `
-          <div class="difficulty-card">
-            <p class="difficulty-intro">Choose which memory tier to explore. Each tier keeps its own weekly progress.<small>どの<ruby>記憶<rt>きおく</rt></ruby>の<ruby>段階<rt>だんかい</rt></ruby>を<ruby>探<rt>さが</rt></ruby>すか<ruby>選<rt>えら</rt></ruby>んでね。それぞれの<ruby>記録<rt>きろく</rt></ruby>は<ruby>別<rt>べつ</rt></ruby>に<ruby>残<rt>のこ</rt></ruby>ります。</small></p>
-            <div class="difficulty-toggle" role="group" aria-label="Grimmerglen memory tier">
-              ${MEMORY_TIER_CHOICES.map(tier => {
-                const stats = weeklyTierStats(tier);
-                const state = weeklyTierState(stats);
-                return `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}${tier === suggestedNext ? ' is-next' : ''}" data-memory-tier="${tier}" data-tier-state="${state.key}" aria-pressed="${tier === current}"><span class="difficulty-option-name">${esc(MEMORY_TIER_META[tier].en)}</span><small>${MEMORY_TIER_META[tier].jp}</small><span class="difficulty-progress">${stats.found} / ${stats.total} this week</span><span class="difficulty-progress-status"><span>${state.en}</span><small>${state.jp}</small></span></button>`;
-              }).join('')}
-            </div>
-            <p class="difficulty-note">${esc(meta.note)}<small>${meta.noteJP}</small></p>
-            <p class="tier-next-step" role="status">${readiness.en}<small>${readiness.jp}</small></p>
-            <details class="difficulty-help"><summary><span>How do memory tiers work?<small><ruby>記憶<rt>きおく</rt></ruby>の<ruby>段階<rt>だんかい</rt></ruby>のしくみ</small></span></summary><div><p class="difficulty-note">Each tier has its own 24-clue weekly track. Finish Starter, then choose Case or Deep when you’re ready.<small>それぞれの<ruby>段階<rt>だんかい</rt></ruby>に、<ruby>別々<rt>べつべつ</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりがあります。まず Starter、その<ruby>後<rt>あと</rt></ruby>で Case や Deep に<ruby>挑戦<rt>ちょうせん</rt></ruby>できます。</small></p></div></details>
-          </div>`;
+          <div class="difficulty-toggle" role="group" aria-label="Grimmerglen memory tier">
+            ${MEMORY_TIER_CHOICES.map(tier => {
+              const stats = weeklyTierStats(tier);
+              const state = weeklyTierState(stats);
+              const pct = stats.total ? Math.round(stats.found / stats.total * 100) : 0;
+              return `<button type="button" class="difficulty-option${tier === current ? ' is-active' : ''}${tier === suggestedNext ? ' is-next' : ''}" data-memory-tier="${tier}" data-tier-state="${state.key}" aria-pressed="${tier === current}" aria-label="${esc(MEMORY_TIER_META[tier].en)}: ${stats.found} of ${stats.total} this week"><span class="tier-ring" style="--pct:${pct}%;--ring:${MEMORY_TIER_META[tier].ring}"><span>${stats.found}<small>/${stats.total}</small></span></span><span class="difficulty-option-name">${esc(MEMORY_TIER_META[tier].short)}</span><span class="difficulty-short">${esc(MEMORY_TIER_META[tier].en.replace(' Memory', '').toUpperCase())}</span><span class="difficulty-progress">${stats.found} / ${stats.total} this week</span><span class="difficulty-progress-status"><span>${state.en}</span><small class="jp">${state.jp}</small></span></button>`;
+            }).join('')}
+          </div>
+          <p class="difficulty-note">${esc(meta.note)}<span class="jp-line jp">${meta.noteJP}</span></p>
+          <p class="tier-next-step" role="status">${readiness.en}<span class="jp-line jp">${readiness.jp}</span></p>
+          <details class="difficulty-help"><summary>How do memory tiers work?<span class="jp">&nbsp;· しくみ</span></summary><p>Each tier has its own 24-clue weekly track. Finish Starter, then choose Case or Deep when you’re ready.<span class="jp-line jp">それぞれの おもいでに 24こずつ てがかりが あるよ。</span></p></details>`;
         mount.querySelectorAll('[data-memory-tier]').forEach(button => {
           button.addEventListener('click', () => setMemoryTierPreference(button.dataset.memoryTier));
         });
       }
 
+      // ── opened memory sheet ────────────────────────────────────────────
+      const sheet = document.getElementById('memory-sheet');
+      const sheetPanel = document.getElementById('memory-sheet-panel');
+      let sheetReturn = null;
+      function closeSheet() {
+        sheet.hidden = true;
+        document.documentElement.classList.remove('gsheet-open');
+        if (sheetReturn && sheetReturn.isConnected) sheetReturn.focus();
+      }
+      function openMemory(type, trigger) {
+        const currentTier = selectedWeeklyTier();
+        const index = (DATA.objectTypes || []).indexOf(type);
+        const tierMemory = DATA.tierMemories?.[type]?.[currentTier] || {};
+        const story = tierMemory.story?.en || DATA.stories?.[type]?.en || 'A little memory is waiting.';
+        const storyJP = tierMemory.story?.jp || DATA.stories?.[type]?.jp || '';
+        const name = labels[type] || [type, type];
+        const weeklyFound = weeklyFoundFor(type);
+        const found = foundFor(type);
+        const nextTier = MEMORY_TIER_CHOICES[MEMORY_TIER_CHOICES.indexOf(currentTier) + 1];
+        sheetPanel.innerHTML = `
+          <span class="gsheet-grip" aria-hidden="true"></span>
+          <div class="gsheet-top">
+            <div class="gsheet-photo"><div style="background:${colors[index % colors.length]}"><img src="${esc(DATA.collectibles?.[type] || '')}" alt=""></div></div>
+            <div>
+              <span class="kick" style="color:var(--pink-deep)">${esc((MEMORY_TIER_META[currentTier]?.en || 'Starter Memory').toUpperCase())}</span>
+              <h3 id="gsheet-title">${esc(name[0])}</h3>
+              <span class="jp" style="font-size:12px;color:var(--muted)">${esc(name[1])}</span>
+              <div class="hearts" aria-label="This week: ${weeklyFound} of 3 returned">${[0, 1, 2].map(i => `<span class="${i < weeklyFound ? 'on' : ''}">${i < weeklyFound ? '♥' : '♡'}</span>`).join('')}</div>
+            </div>
+          </div>
+          <div class="say"><img src="assets/img/grimmerglen/marietta/marietta_02.webp" alt="Marietta" width="74" height="74"><div class="bubble">“${esc(story)}”${storyJP ? `<span class="jp-line jp">${esc(storyJP)}</span>` : ''}</div></div>
+          ${tierMemory.target ? `<div class="written"><span class="k">MEMORY WRITTEN DOWN<span class="jp"> · かいた おもいで</span></span><p>${esc(tierMemory.target)}</p>${tierMemory.jp ? `<span class="jp-line jp">${esc(tierMemory.jp)}</span>` : ''}</div>` : ''}
+          <p style="margin:0;font-size:12px;color:var(--muted)">Lifetime: ${found} of 3 returned<span class="jp"> · これまで ${found}/3</span></p>
+          ${nextTier ? `<div class="next-tip"><b aria-hidden="true">✿</b><span>Try ${esc(MEMORY_TIER_META[nextTier].en)} — the story gets a little longer.<span class="jp-line jp" style="color:var(--mint-deep)">つぎは「${esc(MEMORY_TIER_META[nextTier].short)}」で もっと ながい おもいで！</span></span></div>` : ''}
+          <button type="button" class="gsheet-close">とじる · Close</button>`;
+        sheetPanel.querySelector('.gsheet-close').addEventListener('click', closeSheet);
+        sheetReturn = trigger || null;
+        sheet.hidden = false;
+        document.documentElement.classList.add('gsheet-open');
+        sheetPanel.scrollTop = 0;
+        sheetPanel.querySelector('.gsheet-close').focus({ preventScroll: true });
+      }
+      sheet.addEventListener('click', event => { if (event.target === sheet) closeSheet(); });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape' && !sheet.hidden) closeSheet(); });
+
       function renderMemories() {
         if (!memoryQuestAccepted()) {
-          document.getElementById('memories').innerHTML = `<div class="memory-locked-state" role="status"><div class="memory-locked-state-mark" aria-hidden="true">✦</div><h3>Memory clues are tucked away</h3><p>Accept Marietta’s memory quest in Grimmerglen to reveal them.</p><p>マリエッタのクエストを受けると、<ruby>記憶<rt>きおく</rt></ruby>の<ruby>手<rt>て</rt></ruby>がかりが<ruby>見<rt>み</rt></ruby>えるよ。</p></div>`;
+          document.getElementById('memories').innerHTML = `<div class="memory-locked-state" role="status"><div class="locked-slots" aria-hidden="true"><span>?</span><span>?</span><span>?</span><span>?</span></div><h3>Memory clues are tucked away</h3><p>Accept Marietta’s memory quest in Grimmerglen to reveal them.<span class="jp-line jp">マリエッタの クエストを うけると、てがかりが みえるよ。</span></p></div>`;
           return;
         }
         const currentTier = selectedWeeklyTier();
@@ -407,17 +616,19 @@
           const weeklyFound = weeklyFoundFor(type);
           const tierStory = DATA.tierMemories?.[type]?.[currentTier]?.story;
           const story = DATA.tierMemories?.[type]?.[currentTier]?.story?.en || DATA.stories?.[type]?.en || 'A little memory is waiting.';
-          const storyJP = tierStory?.jp || DATA.stories?.[type]?.jp || '';
           const canReview = weeklyFound >= 3 || found >= 3;
-          const tier = `${MEMORY_TIER_META[currentTier]?.en || 'Starter Memory'} · ${weeklyFound} of 3 returned`;
-          const reviewHTML = canReview ? `<details class="memory-details"><summary><span>Review memory<small><ruby>記憶<rt>きおく</rt></ruby>を<ruby>見直<rt>みなお</rt></ruby>す</small></span></summary><div class="memory-details-body"><p class="memory-story">${esc(story)}</p>${storyJP ? `<p class="memory-story-jp">${esc(storyJP)}</p>` : ''}<p class="memory-lifetime">Lifetime: ${found} of 3 returned<small><ruby>生涯<rt>しょうがい</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></small></p><p class="memory-tier">${esc(tier)}</p></div></details>` : '';
-          return `<article class="memory-card${weeklyFound >= 3 ? ' weekly-complete' : ''}${found >= 3 ? ' has-lifetime-memory' : ''}${active === type ? ' active' : ''}" data-found="${weeklyFound > 0}" data-reviewable="${canReview}" style="--memory-color:${colors[index % colors.length]}">
-            <img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}">
-            <h3 class="memory-name">${esc(name[0])}</h3><p class="memory-kana">${esc(name[1])}</p>
-            <div class="memory-status"><span class="memory-status-label"><span>This week: ${weeklyFound} of 3 returned</span><small><ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby></small></span><span class="dots" aria-hidden="true">${[0,1,2].map(i => `<i class="dot${i < weeklyFound ? ' found' : ''}"></i>`).join('')}</span></div>
-            ${reviewHTML}
+          const tag = weeklyFound >= 3 ? '<span class="memory-tag">おもいだした ✓</span>' : active === type ? '<span class="memory-tag">さがしてる!</span>' : '';
+          return `<article class="memory-card${weeklyFound >= 3 ? ' weekly-complete' : ''}${found >= 3 ? ' has-lifetime-memory' : ''}${active === type ? ' active' : ''}" data-found="${weeklyFound > 0}" data-reviewable="${canReview}" data-story-ready="${tierStory || story ? 'true' : 'false'}" style="--memory-color:${colors[index % colors.length]}">
+            ${tag}
+            <div class="memory-photo"><img class="memory-art" src="${esc(DATA.collectibles?.[type] || '')}" alt="${esc(name[0])}" loading="lazy" decoding="async"></div>
+            <h3 class="memory-name">${esc(name[0])}</h3><p class="memory-kana jp">${esc(name[1])}</p>
+            <div class="memory-status"><span class="memory-status-label"><span>This week: ${weeklyFound} of 3 returned</span></span><span class="hearts" aria-hidden="true">${[0,1,2].map(i => `<span class="${i < weeklyFound ? 'on' : ''}">${i < weeklyFound ? '♥' : '♡'}</span>`).join('')}</span></div>
+            ${canReview ? `<button type="button" class="memory-open" data-open-memory="${esc(type)}">Review memory<span class="jp"> · みる</span></button>` : ''}
           </article>`;
         }).join('');
+        document.querySelectorAll('[data-open-memory]').forEach(button => {
+          button.addEventListener('click', () => openMemory(button.dataset.openMemory, button));
+        });
       }
 
       function renderAchievements() {
@@ -426,18 +637,30 @@
         try { all = BoohaUnlockSystem.getAll(); } catch (_) {}
         const byId = new Map(all.map(item => [item.id,item]));
         const icons = ['♡','✦','✿'];
+        const tints = ['#ff8fc8', '#b89cf0', '#7fd6c2'];
         document.getElementById('achievements').innerHTML = ids.map((id,index) => {
           const item = byId.get(id) || { name:'A secret achievement', description:'Keep exploring.', unlocked:false };
-          return `<div class="achievement${item.unlocked ? '' : ' locked'}"><div class="achievement-icon">${item.unlocked ? icons[index] : '✧'}</div><strong>${esc(item.name)}</strong><small>${esc(item.unlocked ? item.description : 'Still tucked inside the dream.')}</small></div>`;
+          return `<div class="achievement${item.unlocked ? '' : ' locked'}"><div class="achievement-icon" style="${item.unlocked ? `background:${tints[index]}` : ''}">${item.unlocked ? icons[index] : '✧'}</div><strong>${esc(item.name)}</strong><small>${item.unlocked ? 'ゲット！' : 'Still tucked inside the dream.'}</small></div>`;
         }).join('');
       }
 
-      function render() { renderWorldStatus(); renderWorldBack(); renderWeeklyProgress(); renderMemoryTierSelector(); renderStats(); renderMemories(); renderAchievements(); }
+      function render() { renderWorldStatus(); renderWorldBack(); renderMemoryTierSelector(); renderWeeklyProgress(); renderMemories(); renderJar(); renderStats(); renderAchievements(); syncJpToggle(); }
       document.addEventListener('pointerdown', event => { if (event.target.closest('a,button')) clickTone(); }, { passive:true });
       ['booha:saved','booha:unlocked','booha:weeklyReset','booha:newWeek'].forEach(name => document.addEventListener(name, render));
       if (window.BOOHA_READY) render(); else document.addEventListener('booha:ready', render, { once:true });
       render();
     })();
+  </script>
+  <script>
+    // Utsuroba and Muenba follow their own weekly gates; locked portals stay visible.
+    if (window.BoohaPortals) {
+      BoohaPortals.watch('pnet-utsuroba', function () {
+        return window.BoohaUnlockSystem && BoohaUnlockSystem.isWeeklyWorldGateOpen();
+      });
+      BoohaPortals.watch('pnet-muenba', function () {
+        return window.BoohaUnlockSystem && BoohaUnlockSystem.isMuenbaUnlocked();
+      });
+    }
   </script>
 </body>
 </html>
