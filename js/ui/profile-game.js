@@ -569,19 +569,16 @@ const BoohaProfileGame = (() => {
     }
   }
 
-  // Extra Arcade (おまけ): Booha Bites, Echo and the Week Boss, kept apart
-  // from the nine. Their stars and points are weekly and never enter the
-  // ★ / 27 tally or the 9-game unlock. The boss opens once all nine have
-  // been played this week (same rule as the game menu).
-  const ARCADE_ICON = {
+  // Bonus Games (ボーナス ゲーム): Booha Bites, Echo and the Week Boss as
+  // record cards, not launchers (students play them from the game menu).
+  // Each shows this week's bonus stars and done / not-yet, plus the
+  // lifetime best and times played. None of it enters ★ / 27 or the 9-game
+  // unlock. The boss opens once all nine are played this week (menu rule).
+  const BONUS_ICON = {
     'booha-bites': '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="3"/><path d="M27 9a6 6 0 0 0 4 9 6 6 0 0 0 3 4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M13 21h9" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 3"/></svg>',
     echo: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 16h6l8-6v20l-8-6H8z" fill="currentColor"/><path d="M27 14a8 8 0 0 1 0 12M31 10a13 13 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
   };
-  function arcadeWeek(curr) {
-    const cw = window.CALENDAR && CALENDAR.getCurrentCurriculumWeek ? CALENDAR.getCurrentCurriculumWeek() : null;
-    return cw && cw.monthSlug ? `${curr}_${String(cw.monthSlug).slice(0, 3)}_w${cw.weekNumber}` : '';
-  }
-  function renderArcade(s) {
+  function renderBonusGames(s) {
     const host = document.getElementById('pg-extras');
     if (!host) return;
     const R = window.BoohaGameRegistry;
@@ -589,41 +586,51 @@ const BoohaProfileGame = (() => {
     if (!games.length) { host.hidden = true; return; }
     host.hidden = false;
     const scores = window.BoohaAdventure && BoohaAdventure.scores;
-    const week = arcadeWeek(s.curr);
     const call = (fn, id) => { try { return scores && typeof scores[fn] === 'function' ? scores[fn](id) : 0; } catch (_) { return 0; } };
+    let weekly = {};
+    try { weekly = (BoohaAdventure.save.load().weekly || {}).gameScores || {}; } catch (_) {}
     let played = 0;
     try { played = scores && scores.weeklyPlayedFor ? Math.min(9, scores.weeklyPlayedFor(s.curr) || 0) : 0; } catch (_) {}
     const card = g => {
       const stars = Math.max(0, Math.min(3, call('weeklyStarsForGame', g.saveId) || 0));
-      const pts = call('weeklyPointsForGame', g.saveId) || 0;
       const crown = !!call('weeklyCrownForGame', g.saveId);
-      const open = !!week && (!g.boss || played >= 9);
-      const href = open ? `game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(g.gameKey)}` : '';
-      const starRow = `<span class="pg-x-stars" aria-label="${stars} of 3 stars this week">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</span>`;
-      const best = pts > 0 ? `<span class="pg-x-best">BEST ${pts.toLocaleString('en-US')}</span>` : '';
-      const tag = g.boss
-        ? (open ? (crown ? '<span class="pg-x-tag win">♛ たおした！ BEATEN</span>' : '<span class="pg-x-tag open">OPEN! ひらいた！</span>')
-                : `<span class="pg-x-tag lock">🔒 ${played} / 9 played · あと ${9 - played}</span>`)
-        : (crown ? '<span class="pg-x-tag win">♛</span>' : '');
+      const done = Object.prototype.hasOwnProperty.call(weekly, g.saveId);
+      const entry = (scores && scores.getEntry ? call('getEntry', g.saveId) : null) || {};
+      const best = Number(entry.bestPoints) || Number(entry.highScore) || 0;
+      const times = Number(entry.attempts) || 0;
+      const open = !g.boss || played >= 9;
+      const status = g.boss && !open ? `<span class="pg-x-tag lock">🔒 ${played} / 9 played · あと ${9 - played}</span>`
+        : g.boss && crown ? '<span class="pg-x-tag win">♛ たおした！ BEATEN</span>'
+        : done ? '<span class="pg-x-tag done">✓ クリア · DONE</span>'
+        : g.boss ? '<span class="pg-x-tag open">OPEN! ひらいた！</span>'
+        : '<span class="pg-x-tag skip">まだ · NOT YET</span>';
       const art = g.boss
         ? `<img class="pg-x-boss" src="${IMG}arcade-week-boss.webp" alt="" width="72" height="80" loading="lazy" decoding="async">`
-        : `<span class="pg-x-icon">${ARCADE_ICON[g.gameKey] || ''}</span>`;
-      const inner = `${art}<span class="pg-x-copy"><b>${esc(g.name)}</b><span class="pg-x-hira">${esc(g.hira || '')}</span>${starRow}${best}${tag}</span>${open ? '<span class="pg-x-play" aria-hidden="true">▶</span>' : ''}`;
-      const cls = `pg-x-card${g.boss ? ' boss' : ''}${open ? '' : ' locked'}`;
-      const label = `${g.name}${open ? '' : g.boss ? ' (locked: play all 9 games first)' : ' (opens on this week’s page)'}`;
-      return open
-        ? `<a class="${cls}" href="${esc(href)}" aria-label="${esc(label)}">${inner}</a>`
-        : `<div class="${cls}" aria-disabled="true" aria-label="${esc(label)}">${inner}</div>`;
+        : `<span class="pg-x-icon">${BONUS_ICON[g.gameKey] || ''}</span>`;
+      const label = `${g.name}: ${stars} of 3 bonus stars this week${done ? ', done' : ''}; best ${best}; played ${times} times`;
+      return `
+        <div class="pg-x-card${g.boss ? ' boss' : ''}${open ? '' : ' locked'}${done || crown ? ' done' : ''}" role="listitem" aria-label="${esc(label)}">
+          ${art}
+          <span class="pg-x-copy">
+            <b>${esc(g.name)}${!g.boss && crown ? ' <i class="pg-x-crown">♛</i>' : ''}</b>
+            <span class="pg-x-hira">${esc(g.hira || '')}</span>
+            <span class="pg-x-starline"><span class="pg-x-stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</span><span class="pg-x-bonus">BONUS</span></span>
+            ${status}
+            <span class="pg-x-rec"><span>ベスト <b>${best ? best.toLocaleString('en-US') : '—'}</b></span><span>あそんだ <b>${times}</b>かい</span></span>
+          </span>
+        </div>`;
     };
     const small = games.filter(g => !g.boss);
     const boss = games.filter(g => g.boss);
     host.innerHTML = `
       <div class="pg-section-head">
-        <div><h2>おまけ アーケード</h2><span class="pg-kicker">EXTRA ARCADE · ${esc(CURR_NAME[s.curr] || s.curr.toUpperCase())} · THIS WEEK</span></div>
+        <div><h2>ボーナス ゲーム</h2><span class="pg-kicker">BONUS GAMES · ${esc(CURR_NAME[s.curr] || s.curr.toUpperCase())} · THIS WEEK</span></div>
       </div>
-      <p class="pg-x-note">Bonus practice — these games do not change the 9-game unlock. <span>ボーナス れんしゅう — 9ゲームの じょうけんは かわらないよ</span></p>
-      <div class="pg-x-row">${small.map(card).join('')}</div>
-      ${boss.map(card).join('')}`;
+      <p class="pg-x-note">Bonus practice — these games do not change the 9-game unlock. <span>ボーナス れんしゅう — ★ と 9ゲームの じょうけんには はいらないよ</span></p>
+      <div class="pg-x-list" role="list" aria-label="Bonus games">
+        <div class="pg-x-row">${small.map(card).join('')}</div>
+        ${boss.map(card).join('')}
+      </div>`;
   }
 
   // Adventure Tokens (the permanent Trophy Case). The tokens themselves (groups, art, rules,
@@ -740,7 +747,7 @@ const BoohaProfileGame = (() => {
       [renderHero, 'pg-hero', 'Your adventure card'],
       [renderSkin, 'pg-skin', 'This week’s skin'],
       [renderTrail, 'pg-trail', 'This week’s trail'],
-      [renderArcade, 'pg-extras', 'Extra arcade'],
+      [renderBonusGames, 'pg-extras', 'Bonus games'],
       [renderStars, 'pg-stars', 'This week’s stars'],
       [renderCollection, 'pg-collection', 'Wanderer collection'],
       [renderTravelers, 'pg-travelers', 'Travelers'],
