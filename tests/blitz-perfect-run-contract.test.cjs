@@ -92,11 +92,14 @@ for (const file of listContentFiles('content')) {
 }
 assert.deepEqual(furiganaContentProblems, [], 'content Furigana audit found invalid or unreadable cards');
 
+// The shared score card (js/game-scorecard.js) renders the score/best/star
+// summary and the learning summary; each engine hands it the data.
+const scorecard = fs.readFileSync('js/game-scorecard.js', 'utf8');
+assert.match(scorecard, /U\.renderResultDetails\(details, \{ stats: opts\.stats/, 'the score card renders the learning summary');
 for (const source of weeklyEngines) {
-  assert.match(source, /U\.renderResultMeta\(/,
-    'every weekly engine must render the shared score/best/star summary');
-  assert.match(source, /U\.renderResultDetails\(/,
-    'every weekly engine must render the Pass 2 learning summary');
+  assert.match(source, /U\.showScorecard\(/, 'every weekly engine must open the shared score card');
+  assert.match(source, /stats: \[/, 'every weekly engine must pass its learning stats to the card');
+  assert.match(source, /reviewItems: missedItems/, 'every weekly engine must pass its review items to the card');
   assert.match(source, /audioBase:\s*CFG\.audioBase/,
     'every weekly engine must pass its content audio base to the review drawer');
 }

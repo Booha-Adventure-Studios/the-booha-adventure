@@ -34,34 +34,7 @@ await Promise.all([
   U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
-/* ═══ TIERS ═══ */
-const TIERS = [
-  { min:0,  max:5,  sound:'result_0-5.mp3',
-    label:'KEEP LISTENING',
-    en:'Keep playing — your ear will get sharper!',
-    kanji:'続けよう！だんだん聞き取れるようになるよ！',
-    jp:'もっと練習して聞き取れるようになろう！',
-    color:'#f43f5e' },
-  { min:6,  max:10, sound:'result_6-10.mp3',
-    label:'GOOD LISTENING!',
-    en:'You are picking up the sounds — great effort!',
-    kanji:'音が聞き取れてきた！素晴らしい努力！',
-    jp:'だんだん聞き取れてきてるよ！すごい！',
-    color:'#f97316' },
-  { min:11, max:14, sound:'result_11-14.mp3',
-    label:'SHARP EARS!',
-    en:'Your listening is strong and accurate!',
-    kanji:'しっかり聞き取れてる！',
-    jp:'聞き取りがとても上手！すごく上手！',
-    color:'#10b981' },
-  { min:15, max:15, sound:'result_15.mp3',
-    label:'PERFECT LISTENING!',
-    en:'Every question answered perfectly — incredible!',
-    kanji:'全問完璧！最高の聞き取り力！',
-    jp:'全部の問題に完璧に答えられた！すごい！',
-    color:'#ffcc00' },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 
 /* ═══ LABEL HELPERS ═══ */
 function curriculumLabel() {
@@ -176,27 +149,8 @@ S.textContent = `
 .aq-help-btn:hover{border-color:#ffcc00;color:#ffcc00;transform:scale(1.08)}
 [data-curriculum="bc"] .aq-help-btn:hover{border-color:#00ddaa;color:#00ddaa}
 [data-curriculum="pb"] .aq-help-btn{background:#fff;border-color:#ff9966;color:#cc5522;box-shadow:0 3px 0 #ffccaa}
-/* ── Results ── */
-.aq-results-outer{max-width:660px;margin:0 auto;padding:0 1rem;box-sizing:border-box;width:100%}
-.aq-results{display:none;text-align:center;width:100%;padding:2.4rem 1.4rem 2rem;border-radius:32px;position:relative;overflow:hidden;border:2.5px solid var(--aq-tier-color,#ffcc00);background:color-mix(in srgb,var(--aq-tier-color,#ffcc00) 6%,var(--game-bg));box-shadow:0 0 56px color-mix(in srgb,var(--aq-tier-color,#ffcc00) 22%,transparent),0 22px 44px rgba(0,0,0,.4);box-sizing:border-box}
-.aq-results.show{display:block;animation:aqResultIn .5s cubic-bezier(.22,.8,.36,1) both}
 @keyframes aqResultIn{from{opacity:0;transform:scale(.84) translateY(24px)}to{opacity:1;transform:none}}
-.aq-results::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#ffcc00,#ff8800,#ffee44,#ff6600,#ffcc00);background-size:220% auto;animation:aqRainbow 2.4s linear infinite}
-[data-curriculum="bc"] .aq-results::before{background:linear-gradient(90deg,#00e8b0,#0088ff,#00ddaa,#0055cc,#00e8b0);background-size:220% auto}
-[data-curriculum="pb"] .aq-results::before{background:linear-gradient(90deg,#ff8844,#ffcc44,#ff6622,#ffaa22,#ff8844);background-size:220% auto}
-.aq-results::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 22% 78%,color-mix(in srgb,var(--aq-tier-color,#ffcc00) 12%,transparent) 0%,transparent 50%),radial-gradient(circle at 78% 22%,color-mix(in srgb,#22ddff 8%,transparent) 0%,transparent 50%)}
-.aq-res-inner{position:relative;z-index:1}
-.aq-res-score{font-family:var(--game-font-title);font-size:clamp(58px,14vw,96px);line-height:1;color:var(--aq-tier-color,#ffcc00);text-shadow:0 0 26px var(--aq-tier-color,#ffcc00);margin-bottom:4px;animation:aqScorePop .5s cubic-bezier(.22,.8,.36,1) .3s both}
 @keyframes aqScorePop{from{transform:scale(.58) rotate(-5deg);opacity:0}50%{transform:scale(1.08) rotate(2deg)}to{transform:none;opacity:1}}
-.aq-res-pct{font-size:clamp(13px,2.2vw,17px);color:var(--game-muted);font-weight:700;margin-bottom:10px;animation:aqFadeUp .4s ease .5s both}
-.aq-res-label{font-family:var(--game-font-title);font-size:clamp(22px,4.8vw,38px);color:var(--aq-tier-color,#ffcc00);margin-bottom:10px;letter-spacing:.05em;text-shadow:0 0 16px color-mix(in srgb,var(--aq-tier-color,#ffcc00) 55%,transparent);animation:aqFadeUp .4s ease .52s both}
-.aq-res-divider{width:60px;height:3px;border-radius:99px;background:linear-gradient(90deg,#ffcc00,#ff8800,#ffee44);margin:0 auto 12px;opacity:.6;animation:aqFadeUp .4s ease .56s both}
-[data-curriculum="bc"] .aq-res-divider{background:linear-gradient(90deg,#00e8b0,#0088ff,#00ddaa)}
-[data-curriculum="pb"] .aq-res-divider{background:linear-gradient(90deg,#ff8844,#ffcc44,#ff6622)}
-.aq-res-en{font-family:var(--game-font-body);font-weight:900;font-size:clamp(13px,2.2vw,17px);color:var(--game-ink);margin-bottom:4px;animation:aqFadeUp .4s ease .6s both}
-.aq-res-kanji{font-family:var(--game-font-jp);font-size:clamp(13px,2vw,17px);color:var(--game-muted);margin-bottom:3px;animation:aqFadeUp .4s ease .64s both}
-.aq-res-jp{font-family:var(--game-font-jp);font-size:clamp(11px,1.7vw,14px);color:var(--game-muted);opacity:.75;margin-bottom:1.3rem;animation:aqFadeUp .4s ease .68s both}
-.aq-res-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:aqFadeUp .4s ease .76s both}
 @keyframes aqFadeUp{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 @keyframes aqConfetti{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}100%{transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(0);opacity:0}}
 .aq-confetti-piece{position:fixed;pointer-events:none;z-index:9999;border-radius:2px;animation:aqConfetti 1.1s ease-out forwards}
@@ -255,22 +209,10 @@ U.mount(`
     <button class="aq-help-btn" id="aq-help">？</button>
   </div>
 </div>
-<div class="aq-results-outer">
-<div class="aq-results" id="aq-results">
-  <div class="aq-res-inner">
-    <div class="aq-res-score" id="aq-rs"></div>
-    <div class="aq-res-pct"   id="aq-rp"></div>
-    <div class="aq-res-label" id="aq-rl"></div>
-    <div class="aq-res-divider"></div>
-    <div class="aq-res-en"    id="aq-re"></div>
-    <div class="aq-res-kanji" id="aq-rk"></div>
-    <div class="aq-res-jp"    id="aq-rj"></div>
-    <div class="aq-res-actions">
-      <button class="game-btn game-btn-primary"   id="aq-replay">もう一度</button>
-      <button class="game-btn game-btn-secondary" id="aq-back">メニューへ</button>
-    </div>
-  </div>
-</div>
+<!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="aq-actions" hidden>
+  <button type="button" id="aq-replay">もう一度</button>
+  <button type="button" id="aq-back">メニューへ</button>
 </div>
 <div class="aq-modal-overlay" id="aq-modal-overlay">
   <div class="aq-modal" role="dialog" aria-modal="true">
@@ -309,7 +251,6 @@ const aqCard     = document.getElementById('aq-card');
 const playBtn    = document.getElementById('aq-play');
 const choicesEl  = document.getElementById('aq-choices');
 const helpBtn    = document.getElementById('aq-help');
-const results    = document.getElementById('aq-results');
 const dotsRow    = document.getElementById('aq-dots');
 const modalOver  = document.getElementById('aq-modal-overlay');
 const togKanji   = document.getElementById('aq-tog-kanji');
@@ -340,7 +281,9 @@ let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
 let missedItems = [];
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
-let showKanji = true; // toggle state — persists for entire game
+// Pre-Boo starts in hiragana (small children need not read kanji); the switch still works.
+const KANJI_DEFAULT = CFG.curriculum !== 'pb';
+let showKanji = KANJI_DEFAULT; // toggle state — persists for entire game
 
 function updateStreak(n) {
   streak = n;
@@ -362,6 +305,7 @@ function applyToggle() {
 
 togKanji.addEventListener('click', () => { showKanji = true;  applyToggle(); });
 togHira.addEventListener('click',  () => { showKanji = false; applyToggle(); });
+applyToggle();   // show the right switch state from the first card (Pre-Boo: ひらがな)
 
 /* ═══ ADVANCE ═══ */
 let advancedThisCard = false;
@@ -517,28 +461,9 @@ function showResults() {
     if (d) d.className = 'aq-dot done';
   }
   mainWrap.style.display = 'none';
-  const outer = document.querySelector('.aq-results-outer');
-  if (outer) outer.style.display = '';
-  results.classList.add('show');
-  const tier = getTier(score), pct = Math.round((score / 15) * 100);
+  const pct = Math.round((score / 15) * 100);
   U.emitGameEnd({
     points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo, saveId: `${CFG.curriculum}:ask_question`, score: pct, completed: pct >= 40 });
-  results.style.setProperty('--aq-tier-color', tier.color);
-  document.getElementById('aq-rs').textContent = `${score} / 15`;
-  document.getElementById('aq-rp').textContent = `${pct}%`;
-  document.getElementById('aq-rl').textContent = tier.label;
-  document.getElementById('aq-re').textContent = tier.en;
-  document.getElementById('aq-rk').textContent = tier.kanji;
-  document.getElementById('aq-rj').textContent = tier.jp;
-  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:ask_question`, score: pct });
-  U.renderResultDetails(results, {
-    stats: [
-      { label: 'First-try correct / せいかい', value: `${score} / 15` },
-      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own aq-replay / aq-back. */
@@ -563,7 +488,6 @@ function showResults() {
 
 /* ═══ REPLAY / BACK ═══ */
 document.getElementById('aq-replay').addEventListener('click', () => {
-  results.classList.remove('show');
   mainWrap.style.display = '';
   idx = 0; score = 0; streak = 0;
   missedItems = [];
@@ -573,7 +497,7 @@ document.getElementById('aq-replay').addEventListener('click', () => {
   answered = false; firstTry = true; pickCooldown = false;
   advancedThisCard = false; isBusy = false;
   // reset toggle to kanji on replay
-  showKanji = true; applyToggle();
+  showKanji = KANJI_DEFAULT; applyToggle();
    
   order = U.shuffle(order);
   showCard();

@@ -1042,12 +1042,10 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 
 /* ══════════════════════════════════════════════════════════════
    SHARED SCORE CARD — Games Pass 3 (js/game-scorecard.js)
-   The nine engines' own results panels are hidden; their showResults()
-   still runs (score, save, Replay/Back wiring) and then opens this card.
+   Every game ends here. The old per-engine results panels were removed
+   (Open-issues pass); each engine keeps only two hidden buttons,
+   {prefix}-replay and {prefix}-back, which this card presses.
    ══════════════════════════════════════════════════════════════ */
-#vt-results-wrap, #st-results-wrap, #ssp-results-wrap,
-#vs-results, #so-results, #sw-results,
-.aq-results-outer, .sas-results-outer, .stw-results-outer { display: none !important; }
 
 .bsc-overlay {
   position: fixed; inset: 0; z-index: 1500;

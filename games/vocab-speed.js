@@ -73,27 +73,9 @@ let lastPickAt = 0;
 const PICK_DEBOUNCE_MS = 320;
 
 /* ══════════════════════════════════════════════════════════════
-   DATA / TIERS
+   DATA
    ══════════════════════════════════════════════════════════════ */
-const TIERS = [
-  { min:0,  max:5,  sound:'result_0-5.mp3',
-    label:'TRY AGAIN', en:"Rough start — but you've got this!",
-    jp:'もう一回やってみよう！', kanji:'もう一回挑戦！',
-    color:'#ef4444', glow:'rgba(239,68,68,0.4)' },
-  { min:6,  max:10, sound:'result_6-10.mp3',
-    label:'KEEP GOING', en:'Nice effort. You are getting stronger!',
-    jp:'いい感じ！どんどん上手！', kanji:'良い調子！どんどん上達！',
-    color:'#f97316', glow:'rgba(249,115,22,0.4)' },
-  { min:11, max:14, sound:'result_11-14.mp3',
-    label:'SO CLOSE!', en:'Almost perfect. Really strong work!',
-    jp:'おしい！すごく上手！', kanji:'惜しい！とても上手！',
-    color:'#22ddff', glow:'rgba(34,221,255,0.4)' },
-  { min:15, max:15, sound:'result_15.mp3',
-    label:'PERFECT!', en:'Flawless! Every single word!',
-    jp:'パーフェクト！全問正解！', kanji:'完璧！全問正解！',
-    color:'#ffcc00', glow:'rgba(255,204,0,0.5)' },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 
 const STREAK_LEVELS = [
   { min:0, max:2, level:0 },
@@ -897,63 +879,15 @@ S.textContent = `
 }
 .vs-modal-close:hover{ transform:scale(1.03); }
 .vs-modal-close:active{ transform:scale(.96); }
-
-/* ══════════════════════════════════════════════════════════════
-   RESULTS PANEL
-   ══════════════════════════════════════════════════════════════ */
-.vs-results{
-  display:none; text-align:center;
-  max-width:560px; margin:1.5rem auto;
-  padding:2.6rem 1.6rem 2rem;
-  border-radius:32px; position:relative; overflow:hidden;
-  border:2.5px solid var(--tier-color, var(--game-primary));
-  background:color-mix(in srgb, var(--tier-color,var(--game-primary)) 6%, var(--game-bg));
-  box-shadow:0 0 60px color-mix(in srgb,var(--tier-color,var(--game-primary)) 22%,transparent),0 24px 48px rgba(0,0,0,.4);
-}
-.vs-results.show{ display:block; animation:vsResultIn .55s cubic-bezier(.22,.8,.36,1) both; }
 @keyframes vsResultIn{
   from{ opacity:0; transform:scale(.82) translateY(28px); }
   to{ opacity:1; transform:none; }
-}
-.vs-results::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:5px;
-  background:linear-gradient(90deg,var(--game-primary),var(--game-secondary),var(--game-accent),var(--game-primary));
-  background-size:220% auto; animation:vsRainbow 2.4s linear infinite;
-}
-.vs-results::after{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(circle at 20% 80%, color-mix(in srgb,var(--tier-color,var(--game-primary)) 12%,transparent) 0%,transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in srgb,var(--game-secondary) 8%,transparent) 0%,transparent 50%);
-}
-.vs-res-inner{ position:relative; z-index:1; }
-.vs-res-score{
-  font-family:var(--game-font-title); font-size:clamp(62px,16vw,98px);
-  line-height:1; color:var(--tier-color,var(--game-primary));
-  text-shadow:0 0 28px var(--tier-color,var(--game-primary)); margin-bottom:4px;
-  animation:vsScorePop .55s cubic-bezier(.22,.8,.36,1) .3s both;
 }
 @keyframes vsScorePop{
   from{ transform:scale(.55) rotate(-6deg); opacity:0; }
   50%{ transform:scale(1.08) rotate(2deg); }
   to{ transform:none; opacity:1; }
 }
-.vs-res-pct{ font-size:clamp(14px,2.6vw,19px); color:var(--game-muted); font-weight:700; margin-bottom:12px; animation:vsFadeUp .4s ease .5s both; }
-.vs-res-label{
-  font-family:var(--game-font-title); font-size:clamp(26px,5.5vw,40px);
-  color:var(--tier-color,var(--game-primary)); margin-bottom:10px; letter-spacing:.05em;
-  text-shadow:0 0 18px color-mix(in srgb,var(--tier-color,var(--game-primary)) 55%,transparent);
-  animation:vsFadeUp .4s ease .52s both;
-}
-.vs-res-divider{
-  width:60px; height:3px; border-radius:99px;
-  background:linear-gradient(90deg,var(--game-primary),var(--game-secondary));
-  margin:0 auto 12px; opacity:.6; animation:vsFadeUp .4s ease .56s both;
-}
-.vs-res-en{ font-family:var(--game-font-body); font-weight:900; font-size:clamp(14px,2.4vw,18px); color:var(--game-ink); margin-bottom:4px; animation:vsFadeUp .4s ease .6s both; }
-.vs-res-jp{ font-family:var(--game-font-jp); font-size:clamp(14px,2.2vw,17px); color:var(--game-muted); margin-bottom:3px; animation:vsFadeUp .4s ease .64s both; }
-.vs-res-kanji{ font-family:var(--game-font-jp); font-size:clamp(11px,1.8vw,14px); color:var(--game-muted); opacity:.7; margin-bottom:1.4rem; animation:vsFadeUp .4s ease .68s both; }
-.vs-res-actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; animation:vsFadeUp .4s ease .76s both; }
 @keyframes vsFadeUp{ from{ transform:translateY(14px); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* confetti pieces */
@@ -1018,21 +952,10 @@ U.mount(`
   </div>
 </div>
 
-<!-- RESULTS — separate from main wrap so header stays visible above it -->
-<div class="vs-results" id="vs-results">
-  <div class="vs-res-inner">
-    <div class="vs-res-score"  id="vs-rs"></div>
-    <div class="vs-res-pct"    id="vs-rp"></div>
-    <div class="vs-res-label"  id="vs-rl"></div>
-    <div class="vs-res-divider"></div>
-    <div class="vs-res-en"     id="vs-re"></div>
-    <div class="vs-res-jp"     id="vs-rj"></div>
-    <div class="vs-res-kanji"  id="vs-rk"></div>
-    <div class="vs-res-actions">
-      <button class="game-btn game-btn-primary"   id="vs-replay">もう一度</button>
-      <button class="game-btn game-btn-secondary" id="vs-back">メニューへ</button>
-    </div>
-  </div>
+<!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="vs-actions" hidden>
+  <button type="button" id="vs-replay">もう一度</button>
+  <button type="button" id="vs-back">メニューへ</button>
 </div>
 
 <!-- HELP BUTTON (fixed) -->
@@ -1131,7 +1054,6 @@ const streakBanner= document.getElementById('vs-streak-banner');
 const bannerEn    = document.getElementById('vs-banner-en');
 const bannerJp    = document.getElementById('vs-banner-jp');
 const bannerKanji = document.getElementById('vs-banner-kanji');
-const results     = document.getElementById('vs-results');
 const dotsRow     = document.getElementById('vs-dots');
 const startOverlay= document.getElementById('vs-start-overlay');
 const helpBtn     = document.getElementById('vs-help');
@@ -1532,10 +1454,6 @@ function fireConfetti(big = false) {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   RESULTS  ← FIXED: uses vs-* IDs, hides main wrap, dispatches
-             booha:gameEnd with correct saveId for vocab_speed
-   ══════════════════════════════════════════════════════════════ */
 function showResults() {
   if (idx !== 15 || feedbackState !== 'playing') return;
   feedbackState = 'complete';
@@ -1570,30 +1488,10 @@ function revealResults(runTime) {
   /* Hide the gameplay area */
   mainWrap.style.display = 'none';
 
-  /* Show results card */
-  results.classList.add('show');
 
-  const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
   /* Populate before submitting: save/unlock listeners can be synchronous. */
-  results.style.setProperty('--tier-color', tier.color);
-  document.getElementById('vs-rs').textContent = `${score} / 15`;
-  document.getElementById('vs-rp').textContent = `${pct}%`;
-  document.getElementById('vs-rl').textContent = tier.label;
-  document.getElementById('vs-re').textContent = tier.en;
-  document.getElementById('vs-rj').textContent = tier.jp;
-  document.getElementById('vs-rk').textContent = tier.kanji;
-  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:vocab_speed`, score: pct });
-  U.renderResultDetails(results, {
-    stats: [
-      { label: 'Correct / せいかい', value: `${score} / 15` },
-      { label: 'Missed / まちがい', value: String(mistakes) },
-      { label: 'Run time / じかん', value: `${Math.round(runTime / 1000)}s` },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
 
   U.emitGameEnd({
     points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
@@ -1643,7 +1541,6 @@ document.getElementById('vs-replay').addEventListener('click', () => {
   finalClimax.classList.remove('show');
   finalClimax.hidden = true;
   finalClimax.setAttribute('aria-hidden', 'true');
-  results.classList.remove('show');
   mainWrap.style.display = '';
 
   streakBanner.className = 'vs-streak-banner';

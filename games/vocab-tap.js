@@ -100,63 +100,9 @@ function buildShuffledDeck() {
 let allCards = buildShuffledDeck();
 
 /* ══════════════════════════════════════════════════════════════
-   TIERS
+   RESULT TIERS → js/game-scorecard.js
    ══════════════════════════════════════════════════════════════ */
-const TIERS = [
-  {
-    min: 0,  max: 5,  sound: 'result_0-5.mp3',
-    label: 'TRY AGAIN',
-    en:    "Rough start — but you've got this!",
-    jp:    'もう一回やってみよう！',
-    kanji: 'もう一回挑戦！',
-    color: '#ef4444',
-    glow:  'rgba(239,68,68,0.4)',
-    actions: [
-      { id:'vt-replay', label:'もう一度', cls:'game-btn-danger' },
-      { id:'vt-back',   label:'メニューへ', cls:'game-btn-ghost' },
-    ],
-  },
-  {
-    min: 6,  max: 10, sound: 'result_6-10.mp3',
-    label: 'KEEP GOING',
-    en:    'Nice effort. You are getting stronger!',
-    jp:    'いい感じ！どんどん上手！',
-    kanji: '良い調子！どんどん上達！',
-    color: '#f97316',
-    glow:  'rgba(249,115,22,0.4)',
-    actions: [
-      { id:'vt-replay', label:'もう一度', cls:'game-btn-warning' },
-      { id:'vt-back',   label:'メニューへ', cls:'game-btn-ghost' },
-    ],
-  },
-  {
-    min: 11, max: 14, sound: 'result_11-14.mp3',
-    label: 'SO CLOSE!',
-    en:    'Almost perfect. Really strong work!',
-    jp:    'おしい！すごく上手！',
-    kanji: '惜しい！とても上手！',
-    color: '#22ddff',
-    glow:  'rgba(34,221,255,0.4)',
-    actions: [
-      { id:'vt-replay', label:'もう一度', cls:'game-btn-cyan' },
-      { id:'vt-back',   label:'メニューへ', cls:'game-btn-ghost' },
-    ],
-  },
-  {
-    min: 15, max: 15, sound: 'result_15.mp3',
-    label: 'PERFECT!',
-    en:    'Flawless! Every single word matched!',
-    jp:    'パーフェクト！全問正解！',
-    kanji: '完璧！全問正解！',
-    color: '#ffcc00',
-    glow:  'rgba(255,204,0,0.5)',
-    actions: [
-      { id:'vt-replay', label:'もう一度', cls:'game-btn-gold' },
-      { id:'vt-back',   label:'メニューへ', cls:'game-btn-ghost' },
-    ],
-  },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
@@ -329,8 +275,6 @@ S.textContent = `
   background:rgba(0,240,255,.04);
   border-color:rgba(0,240,255,.14);
 }
-
-
 
 /* ══════════════════════════════════════════════════════════════
    ENGLISH CARDS
@@ -582,7 +526,6 @@ body.hira-mode .vt-jp-hira-text{ display:block; }
   85%{ transform:translateX(3px)  rotate(.5deg); }
 }
 
-
 /* ── pulse overlay on wrong ── */
 .vt-wrong-flash{
   position:fixed; inset:0; z-index:9000;
@@ -717,121 +660,12 @@ body.hira-mode .vt-hira-icon{ transform:rotate(180deg); }
 .vt-how-jp{ font-family:var(--game-font-jp); font-size:clamp(11px,1.8vw,13px); color:var(--game-muted); margin-top:2px; line-height:1.4; }
 .vt-modal-close{ display:block; width:100%; margin-top:1.2rem; font-family:var(--game-font-title); font-size:clamp(15px,2.8vw,19px); letter-spacing:.06em; padding:13px; border-radius:999px; border:none; cursor:pointer; background:linear-gradient(135deg,var(--game-primary),var(--game-secondary)); color:#000; font-weight:900; transition:transform .15s; }
 .vt-modal-close:hover{ transform:scale(1.03); }
-
-/* ══════════════════════════════════════════════════════════════
-   RESULTS — centered with header above
-   ══════════════════════════════════════════════════════════════ */
-.vt-results-wrap{
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  padding:0 .75rem 6rem;
-  box-sizing:border-box;
-  width:100%;
-}
-.vt-results-wrap.show{ display:flex; }
-
-.vt-results{
-  width:100%;
-  max-width:520px;
-  text-align:center;
-  padding:2.4rem 1.4rem 2rem;
-  border-radius:32px;
-  position:relative; overflow:hidden;
-  border:2.5px solid var(--tier-color,var(--game-primary));
-  background:color-mix(in srgb, var(--tier-color,var(--game-primary)) 6%, var(--game-bg));
-  box-shadow:0 0 60px color-mix(in srgb, var(--tier-color,var(--game-primary)) 22%, transparent),0 24px 48px rgba(0,0,0,.4);
-  animation:vtResultIn .5s cubic-bezier(.22,.8,.36,1) both;
-}
 @keyframes vtResultIn{
   from{ opacity:0; transform:scale(.84) translateY(24px); }
   to{ opacity:1; transform:none; }
 }
-.vt-results::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:5px;
-  background:linear-gradient(90deg,var(--game-primary),var(--game-secondary),var(--game-accent),var(--game-primary));
-  background-size:220% auto; animation:vtRainbowShift 2.4s linear infinite;
-}
-.vt-results::after{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--tier-color,var(--game-primary)) 12%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--game-secondary) 8%, transparent) 0%, transparent 50%);
-}
-.vt-res-inner{ position:relative; z-index:1; }
-
-.vt-res-score{
-  font-family:var(--game-font-title);
-  font-size:clamp(56px,15vw,98px);
-  line-height:1; color:var(--tier-color,var(--game-primary));
-  text-shadow:0 0 28px var(--tier-color,var(--game-primary));
-  margin-bottom:4px;
-  animation:vtScoreCount .5s cubic-bezier(.22,.8,.36,1) .35s both;
-}
 @keyframes vtScoreCount{ from{ transform:scale(.6); opacity:0; } to{ transform:none; opacity:1; } }
-
-.vt-res-pct{ font-size:clamp(13px,2.4vw,18px); color:var(--game-muted); font-weight:700; margin-bottom:10px; }
-.vt-res-label{
-  font-family:var(--game-font-title);
-  font-size:clamp(24px,5vw,40px);
-  color:var(--tier-color,var(--game-primary)); margin-bottom:10px; letter-spacing:.05em;
-  text-shadow:0 0 18px color-mix(in srgb, var(--tier-color,var(--game-primary)) 55%, transparent);
-  animation:vtLabelSlide .45s ease .5s both;
-}
 @keyframes vtLabelSlide{ from{ transform:translateY(12px); opacity:0; } to{ transform:none; opacity:1; } }
-
-.vt-res-divider{ width:60px; height:3px; border-radius:99px; background:linear-gradient(90deg,var(--game-primary),var(--game-secondary)); margin:0 auto 12px; opacity:.6; }
-.vt-res-en{ font-family:var(--game-font-body); font-weight:900; font-size:clamp(13px,2.2vw,17px); color:var(--game-ink); margin-bottom:4px; animation:vtLabelSlide .45s ease .6s both; }
-.vt-res-jp{ font-family:var(--game-font-jp); font-size:clamp(13px,2vw,17px); color:var(--game-muted); margin-bottom:3px; animation:vtLabelSlide .45s ease .65s both; }
-.vt-res-kanji{ font-family:var(--game-font-jp); font-size:clamp(11px,1.7vw,14px); color:var(--game-muted); opacity:.7; margin-bottom:1.4rem; animation:vtLabelSlide .45s ease .7s both; }
-
-/* ── Colorful action buttons ── */
-.vt-res-actions{
-  display:flex; gap:10px; justify-content:center; flex-wrap:wrap;
-  animation:vtLabelSlide .45s ease .8s both;
-}
-.vt-res-btn{
-  font-family:var(--game-font-title);
-  font-size:clamp(13px,2.4vw,17px);
-  font-weight:900; letter-spacing:.05em;
-  padding:12px 24px; border-radius:999px; border:none;
-  cursor:pointer; display:flex; align-items:center; gap:8px;
-  position:relative; overflow:hidden;
-  transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;
-  touch-action:manipulation;
-}
-.vt-res-btn:hover{ transform:translateY(-3px) scale(1.06); }
-.vt-res-btn:active{ transform:scale(.94); }
-
-/* Replay variants per tier */
-.vt-res-btn.game-btn-danger{
-  background:linear-gradient(135deg,#ef4444,#ff6060);
-  color:#fff;
-  box-shadow:0 4px 0 #b91c1c, 0 0 20px rgba(239,68,68,.45);
-}
-.vt-res-btn.game-btn-warning{
-  background:linear-gradient(135deg,#f97316,#fbbf24);
-  color:#1a0500;
-  box-shadow:0 4px 0 #b45309, 0 0 20px rgba(249,115,22,.45);
-}
-.vt-res-btn.game-btn-cyan{
-  background:linear-gradient(135deg,#06b6d4,#22ddff);
-  color:#001418;
-  box-shadow:0 4px 0 #0e7490, 0 0 20px rgba(34,221,255,.4);
-}
-.vt-res-btn.game-btn-gold{
-  background:linear-gradient(135deg,#f59e0b,#ffcc00);
-  color:#1a0c00;
-  box-shadow:0 4px 0 #b45309, 0 0 24px rgba(255,204,0,.55);
-}
-.vt-res-btn.game-btn-ghost{
-  background:transparent;
-  border:2px solid rgba(255,255,255,.28);
-  color:var(--game-muted);
-  box-shadow:none;
-}
-.vt-res-btn.game-btn-ghost:hover{ border-color:rgba(255,255,255,.55); color:var(--game-ink); }
-[data-curriculum="pb"] .vt-res-btn.game-btn-ghost{ border-color:rgba(58,26,46,.25); color:rgba(58,26,46,.6); }
 
 /* ── confetti ── */
 @keyframes vtConfetti{
@@ -903,24 +737,10 @@ U.mount(`
 
 </div>
 
-<!-- RESULTS (separate from main wrap so centering is independent) -->
-<div class="vt-results-wrap" id="vt-results-wrap">
-  <div class="vt-header" style="text-align:center;padding:.6rem 1rem .8rem;width:100%;max-width:520px;">
-    <div class="vt-curriculum">${curriculumLabel()}</div>
-    <div class="vt-date">${titleDateLabel()}</div>
-  </div>
-  <div class="vt-results" id="vt-results">
-    <div class="vt-res-inner">
-      <div class="vt-res-score" id="vt-rs"></div>
-      <div class="vt-res-pct"   id="vt-rp"></div>
-      <div class="vt-res-label" id="vt-rl"></div>
-      <div class="vt-res-divider"></div>
-      <div class="vt-res-en"    id="vt-re"></div>
-      <div class="vt-res-jp"    id="vt-rj"></div>
-      <div class="vt-res-kanji" id="vt-rk"></div>
-      <div class="vt-res-actions" id="vt-res-actions"></div>
-    </div>
-  </div>
+<!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="vt-actions" hidden>
+  <button type="button" id="vt-replay">もう一度</button>
+  <button type="button" id="vt-back">メニューへ</button>
 </div>
 
 <!-- HOW TO PLAY MODAL -->
@@ -975,8 +795,6 @@ const checkBtn     = document.getElementById('vt-check');
 const gameEl       = document.getElementById('vt-game');
 const mainWrap     = document.getElementById('vt-main-wrap');
 const bottomBar    = document.getElementById('vt-bottom-bar');
-const resultsWrap  = document.getElementById('vt-results-wrap');
-const resActions   = document.getElementById('vt-res-actions');
 const hiraBtn      = document.getElementById('vt-hira-toggle');
 const hiraLabel    = document.getElementById('vt-hira-label');
 const helpBtn      = document.getElementById('vt-help');
@@ -1271,26 +1089,11 @@ function fireConfetti() {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   DROP-IN REPLACEMENT for showResults() in vocab-tap.js
-   Replace the entire showResults function (from `function showResults() {`
-   through its closing `}`) with this block.
-
-   WHAT CHANGED:
-   1. BoohaAdventure reference is now safely guarded with optional
-      chaining + fallback — no more "Can't find variable: BoohaAdventure"
-      crash that was killing the whole function and hiding the results panel.
-   2. Fixed resultsWrap selector (was using hard-coded 'vt-results-wrap'
-      which is already correct, but the display logic is now explicit).
-   3. No other game logic changed.
-   ══════════════════════════════════════════════════════════════ */
 function showResults() {
   const runSum = run.summary();   /* Games Pass 4 */
   updateDots(3);
   mainWrap.style.display = 'none';
-  resultsWrap.classList.add('show');
 
-  const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
   /* ── Save score to Booha Adventure save system ─────────────────────────
@@ -1304,40 +1107,12 @@ function showResults() {
   });
   /* ────────────────────────────────────────────────────────────────────── */
 
-  const resEl = document.getElementById('vt-results');
-  resEl.style.setProperty('--tier-color', tier.color);
-  document.getElementById('vt-rs').textContent = `${score} / 15`;
-  document.getElementById('vt-rp').textContent = `${pct}%`;
-  document.getElementById('vt-rl').textContent = tier.label;
-  document.getElementById('vt-re').textContent = tier.en;
-  document.getElementById('vt-rj').textContent = tier.jp;
-  document.getElementById('vt-rk').textContent = tier.kanji;
-  U.renderResultMeta(resEl, { gameId: `${CFG.curriculum}:vocab_tap`, score: pct });
-  U.renderResultDetails(resEl, {
-    stats: [
-      { label: 'Correct pairs / せいかい', value: `${score} / 15` },
-      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
-
-  /* Build colorful action buttons */
-  resActions.innerHTML = '';
-  tier.actions.forEach(act => {
-    const btn = document.createElement('button');
-    btn.id        = act.id;
-    btn.className = `vt-res-btn ${act.cls}`;
-    btn.innerHTML = `<span>${act.label}</span>`;
-    resActions.appendChild(btn);
-  });
 
   /* Wire up actions */
   const replayBtn = document.getElementById('vt-replay');
   const backBtn   = document.getElementById('vt-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
-    resultsWrap.classList.remove('show');
     mainWrap.style.display = '';
     /* Re-shuffle everything on replay */
     allCards = buildShuffledDeck();
@@ -1349,11 +1124,11 @@ function showResults() {
     hiraMode            = false;
     hiraLabel.textContent = 'ひらがな';
     startRound(0);
-  });
+  }, { once: true });
 
   if (backBtn) backBtn.addEventListener('click', () => {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
-  });
+  }, { once: true });
 
   if (score === 15) {
     setTimeout(fireConfetti, 400);

@@ -135,25 +135,11 @@ function playListen(mp3) {
 })();
 
 /* ══════════════════════════════════════════════════════════════
-   DATA / TIERS
+   DATA
    ══════════════════════════════════════════════════════════════ */
 let allCards = U.shuffle(CFG.cards.slice(0, 15));
 
-const TIERS = [
-  { min:0,  max:5.5,  sound:'result_0-5.mp3',
-    label:'TRY AGAIN', en:"Rough start — but you've got this!",
-    jp:'もう一回やってみよう！', kanji:'もう一回挑戦！', color:'#ef4444' },
-  { min:6,  max:10.5, sound:'result_6-10.mp3',
-    label:'KEEP GOING', en:'Nice effort. You are getting stronger!',
-    jp:'いい感じ！どんどん上手！', kanji:'良い調子！どんどん上達！', color:'#f97316' },
-  { min:11, max:14.5, sound:'result_11-14.mp3',
-    label:'SO CLOSE!', en:'Almost perfect. Really strong work!',
-    jp:'おしい！すごく上手！', kanji:'惜しい！とても上手！', color:'#22ddff' },
-  { min:15, max:15, sound:'result_15.mp3',
-    label:'PERFECT!', en:'Flawless! Every single word!',
-    jp:'パーフェクト！全問正解！', kanji:'完璧！全問正解！', color:'#ffcc00' },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 const formatScore = s => Number.isInteger(s) ? String(s) : s.toFixed(1);
 
 /* ══════════════════════════════════════════════════════════════
@@ -626,56 +612,8 @@ S.textContent = `
   color:#000; font-weight:900; transition:transform .15s;
 }
 .sw-modal-close:hover{ transform:scale(1.03); }
-
-/* ── RESULTS ── */
-.sw-results{
-  display:none; text-align:center; max-width:500px;
-  margin:.8rem auto 1.5rem; padding:1.9rem 1.2rem 1.5rem;
-  border-radius:26px; position:relative; overflow:hidden;
-  border:2.5px solid var(--tier-color,var(--game-primary));
-  background:color-mix(in srgb,var(--tier-color,var(--game-primary)) 7%,var(--game-bg));
-  box-shadow:0 0 52px color-mix(in srgb,var(--tier-color,var(--game-primary)) 28%,transparent),0 20px 42px rgba(0,0,0,.4);
-}
-.sw-results.show{ display:block; animation:swResultIn .5s cubic-bezier(.22,.8,.36,1) both; }
 @keyframes swResultIn{ from{ opacity:0; transform:scale(.82) translateY(24px); } to{ opacity:1; transform:none; } }
-.sw-results::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:5px;
-  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
-  background-size:220% auto; animation:swRainbow 2.4s linear infinite;
-}
-.sw-results::after{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(circle at 18% 80%,color-mix(in srgb,var(--tier-color,var(--game-primary)) 14%,transparent) 0%,transparent 55%),
-    radial-gradient(circle at 82% 18%,color-mix(in srgb,#22ddff 10%,transparent) 0%,transparent 55%),
-    radial-gradient(circle at 50% 50%,color-mix(in srgb,#cc88ff 5%,transparent) 0%,transparent 70%);
-}
-.sw-res-inner{ position:relative; z-index:1; }
-.sw-res-score{
-  font-family:var(--game-font-title); font-size:clamp(50px,13vw,88px);
-  line-height:1; color:var(--tier-color,var(--game-primary));
-  text-shadow:0 0 28px var(--tier-color,var(--game-primary)),0 0 52px var(--tier-color,var(--game-primary));
-  margin-bottom:4px; animation:swScorePop .5s cubic-bezier(.22,.8,.36,1) .3s both;
-}
 @keyframes swScorePop{ from{ transform:scale(.55) rotate(-6deg); opacity:0; } 50%{ transform:scale(1.08) rotate(2deg); } to{ transform:none; opacity:1; } }
-.sw-res-pct{ font-size:clamp(11px,2.1vw,15px); color:var(--game-muted); font-weight:700; margin-bottom:9px; animation:swFadeUp .4s ease .5s both; }
-.sw-res-recovery{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:swFadeUp .4s ease .54s both; }
-.sw-res-label{
-  font-family:var(--game-font-title); font-size:clamp(21px,5vw,36px);
-  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
-  background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-  animation:swRainbow 2s linear infinite, swFadeUp .4s ease .52s both;
-  margin-bottom:9px; letter-spacing:.06em;
-}
-.sw-res-divider{
-  width:80px; height:3px; border-radius:99px;
-  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff);
-  margin:0 auto 10px; opacity:.85; animation:swFadeUp .4s ease .56s both;
-}
-.sw-res-en{ font-family:var(--game-font-body); font-weight:900; font-size:clamp(12px,2vw,16px); color:var(--game-ink); margin-bottom:4px; animation:swFadeUp .4s ease .6s both; }
-.sw-res-jp{ font-family:var(--game-font-jp); font-size:clamp(12px,1.9vw,15px); color:var(--game-muted); margin-bottom:3px; animation:swFadeUp .4s ease .64s both; }
-.sw-res-kanji{ font-family:var(--game-font-jp); font-size:clamp(9px,1.5vw,12px); color:var(--game-muted); opacity:.7; margin-bottom:1rem; animation:swFadeUp .4s ease .68s both; }
-.sw-res-actions{ display:flex; gap:9px; justify-content:center; flex-wrap:wrap; animation:swFadeUp .4s ease .76s both; }
 @keyframes swFadeUp{ from{ transform:translateY(12px); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* confetti */
@@ -720,22 +658,11 @@ U.mount(`
     <button class="sw-help-btn"    id="sw-help">?</button>
   </div>
   <div class="sw-feedback" id="sw-feedback"></div>
-  <div class="sw-results" id="sw-results">
-    <div class="sw-res-inner">
-      <div class="sw-res-score" id="sw-rs"></div>
-      <div class="sw-res-pct"   id="sw-rp"></div>
-      <div class="sw-res-recovery" id="sw-ra"></div>
-      <div class="sw-res-label" id="sw-rl"></div>
-      <div class="sw-res-divider"></div>
-      <div class="sw-res-en"    id="sw-re"></div>
-      <div class="sw-res-jp"    id="sw-rj"></div>
-      <div class="sw-res-kanji" id="sw-rk"></div>
-      <div class="sw-res-actions">
-        <button class="game-btn game-btn-primary"   id="sw-replay">もう一度</button>
-        <button class="game-btn game-btn-secondary" id="sw-back">メニューへ</button>
-      </div>
-    </div>
-  </div>
+  <!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="sw-actions" hidden>
+  <button type="button" id="sw-replay">もう一度</button>
+  <button type="button" id="sw-back">メニューへ</button>
+</div>
 </div>
 <div class="sw-modal-overlay" id="sw-modal-overlay">
   <div class="sw-modal" role="dialog" aria-modal="true">
@@ -793,7 +720,6 @@ const clearBtn   = document.getElementById('sw-clear');
 const speakerBtn = document.getElementById('sw-speaker');
 const helpBtn    = document.getElementById('sw-help');
 const dotsRow    = document.getElementById('sw-dots');
-const results    = document.getElementById('sw-results');
 const modalOverlay = document.getElementById('sw-modal-overlay');
 
 for (let i = 0; i < 15; i++) {
@@ -1225,26 +1151,6 @@ function fireConfetti(big = false) {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   DROP-IN REPLACEMENT for showResults() in spell-word.js
-
-   REPLACE everything from `function showResults() {` through
-   the final `showCard();` and `})();` with this block.
-
-   BUGS THAT WERE THERE:
-   1. BoohaAdventure direct reference → ReferenceError crash.
-   2. mainWrap.style.display = 'none' → mainWrap doesn't exist
-      in this game. Results live inside .sw-wrap, not a separate
-      wrapper. The card elements hide individually.
-   3. resultsWrap.classList.add('show') → resultsWrap doesn't
-      exist. #sw-results hides/shows itself directly.
-   4. resActions.innerHTML / tier.actions → this game uses
-      hardcoded game-btn buttons in the HTML, not a dynamic
-      resActions container. Wired by getElementById directly.
-   5. buildShuffledDeck(), startRound(), hiraMode, hiraLabel →
-      none of these exist in spell-word. Replay uses allCards,
-      idx, score, showCard().
-   ══════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════════════════════════
    RESULTS
@@ -1267,10 +1173,7 @@ function showResults() {
   }
 
    
-  /* Show results card */
-  results.classList.add('show');
 
-  const tier = getTier(score);
   const total = allCards.length;
   const pct  = Math.round((score / total) * 100);
 
@@ -1285,24 +1188,6 @@ function showResults() {
   });
 
   /* Populate scorecard — sw-* IDs matching this game's HTML */
-  results.style.setProperty('--tier-color', tier.color);
-  document.getElementById('sw-rs').textContent = `${formatScore(score)} / ${total}`;
-  document.getElementById('sw-rp').textContent = `${pct}% score`;
-  document.getElementById('sw-ra').textContent = `${total} / ${total} completed • ${recoveredCount} recovered • ${recoveryBoostCount} boosts`;
-  document.getElementById('sw-rl').textContent = tier.label;
-  document.getElementById('sw-re').textContent = tier.en;
-  document.getElementById('sw-rj').textContent = tier.jp;
-  document.getElementById('sw-rk').textContent = tier.kanji;
-  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:spell_word`, score: pct });
-  U.renderResultDetails(results, {
-    stats: [
-      { label: 'Score / スコア', value: `${formatScore(score)} / ${total}` },
-      { label: 'Recovered / かいふく', value: String(recoveredCount) },
-      { label: 'Boosts / ボーナス', value: String(recoveryBoostCount) },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
 
   /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('sw-replay');
@@ -1317,7 +1202,6 @@ function showResults() {
     document.querySelector('.sw-bottom-bar').style.display = '';
     document.querySelector('.sw-hud').style.display      = '';
     /* .sw-dots-row was never hidden, no need to restore */
-    results.classList.remove('show');
 
     /* Reset state — spell-word uses idx/score/allCards/showCard */
     idx   = 0;
