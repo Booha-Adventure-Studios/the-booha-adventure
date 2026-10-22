@@ -197,7 +197,7 @@ const GAME_LANES = {
   'echo':           ['extra',     'Echo'],
   'week-boss':      ['extra',     'Week Boss'],
 };
-const V2_LANES = new Set(['words', 'sentences']);
+const V2_LANES = new Set(['words', 'sentences', 'listen']);
 const [lane, gameTitle] = GAME_LANES[gameName] || ['extra', gameName];
 document.documentElement.setAttribute('data-lane', lane);
 if (V2_LANES.has(lane)) document.documentElement.setAttribute('data-skin', 'v2');
