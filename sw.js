@@ -81,7 +81,10 @@ const CURRENT_CACHES = {
   // question and can no longer play over it.
   // Week Boss arena (2026-10-22): moving boss, entrance, hits, attacks with
   // taunts, anger phases, KO, synth boss sounds; Japanese instructions.
-  pages:  'booha-pages-2026-485',
+  // Trophy Case pass (2026-10-22): grouped, data-driven permanent trophies
+  // (js/core/trophy-case.js), tier rings, progress, secret trophies, and
+  // first-visit world recording for World Traveler.
+  pages:  'booha-pages-2026-486',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -255,7 +258,8 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-599',
+  // Trophy Case pass: nine new medal WebPs and the new trophy stylesheet.
+  assets: 'booha-assets-2026-600',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

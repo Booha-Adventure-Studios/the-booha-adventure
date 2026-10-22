@@ -1893,6 +1893,13 @@ else
   bad "Performance asset-budget audit failed"
 fi
 
+echo "[profile] Trophy Case audit"
+if node tests/profile-trophy-case-audit.cjs >/dev/null 2>&1; then
+  ok "Trophy Case groups, tiers, secrets, world visits and wiring pass"
+else
+  bad "Trophy Case audit failed"
+fi
+
 echo "[family-room] state-machine audit"
 if family_room_output=$(node tests/family-room-state.test.cjs 2>&1); then
   ok "Family Room hidden progression, lantern, marking, and gameEnd contracts pass"
