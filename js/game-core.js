@@ -132,15 +132,20 @@ const weekCards = cards.slice(base15, base15 + 15);
 if (!weekCards.length) { showError(`No cards for week ${weekNum}.`); return; }
 
 /* ── Extra decks (same 15-card week slice) ── */
+// A deck that fails to load (offline, cache miss, 404) becomes [] and is
+// listed in alsoMissing, so each engine can fall back or show a friendly state.
 const alsoCards = {};
+const alsoMissing = [];
 for (const type of (GAME_ALSO_JSON[gameName] || [])) {
   try {
     const r = await fetch(contentBase + type + '.json');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     alsoCards[type] = (d.cards || []).slice(base15, base15 + 15);
   } catch (e) {
-    alsoCards[type] = [];   // the engine falls back to words from the sentences
+    alsoCards[type] = [];
   }
+  if (alsoCards[type].length < 15) alsoMissing.push(type);
 }
 
 /* ── Build audio base URL ── */
@@ -162,6 +167,7 @@ window.GAME_CONFIG = {
   jsonType,
   cards:      weekCards,   // 15 items [{id,en,jp,hira,mp3,readings?}, ...]
   alsoCards,               // { vocab: [...] } for games listed in GAME_ALSO_JSON
+  alsoMissing,             // decks from GAME_ALSO_JSON that did not load in full
   audioBase,               // R2 URL prefix for content audio
   sfxBase,                 // /assets/audio/ for ding/fart/results
   navTarget:  reg.navTarget,

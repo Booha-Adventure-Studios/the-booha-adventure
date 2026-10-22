@@ -230,6 +230,23 @@ const VOCAB = CFG.cards.slice(0, 15);
 const SENT = ((CFG.alsoCards && CFG.alsoCards.sentences) || []).slice(0, 15);
 const QUES = ((CFG.alsoCards && CFG.alsoCards.questions) || []).slice(0, 15);
 const audioFor = kind => CFG.audioBase.replace(/\/vocab\/$/, '/' + kind + '/');
+// Sentences are required (MATCH and SPOT); without questions the HEAR rounds
+// fall back to MATCH. A missing deck shows a friendly retry screen.
+if (SENT.length < 4) {
+  U.mount(`<style>${STYLE}</style>
+<div class="wb-wrap"><div class="wb-card wb-lock">
+  <img class="wb-face" src="${BOSS_IMG}" alt="">
+  <h2>The boss couldn’t load this week’s sentences</h2>
+  <p>Check your internet connection, then try again.<br>インターネットを たしかめて、もう いちど ためしてね。</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <button type="button" class="wb-go" id="wb-retry">Try again · もう いちど</button>
+    <button type="button" class="wb-go" id="wb-lock-back" style="background:var(--game-surface-2);color:var(--game-ink)">Back · もどる</button>
+  </div>
+</div></div>`);
+  document.getElementById('wb-retry').addEventListener('click', () => window.location.reload());
+  document.getElementById('wb-lock-back').addEventListener('click', backToMenu);
+  return;
+}
 const POOL = [...new Set([].concat(...SENT.map(s => contentWordsOf(s.en)), VOCAB.filter(v => !/\s/.test(v.en)).map(v => v.en)))];
 
 U.mount(`
@@ -365,8 +382,8 @@ function showRound() {
       resolve(right ? 'hit' : 'miss', card);
     }));
   } else if (r.kind === 'SPOT') {
-    cardEl.innerHTML = `<span class="wb-kind">ROUND ${idx + 1} · SPOT THE WRONG WORD</span>
-      <p class="wb-ask">One word doesn’t belong. Tap it! · まちがいを タップ！</p>
+    cardEl.innerHTML = `<span class="wb-kind">ROUND ${idx + 1} · DOES IT MATCH THE JAPANESE?</span>
+      <p class="wb-ask">Read the Japanese. Tap the English word that doesn’t match. · にほんごと ちがう ことばを タップ！</p>
       <p class="wb-jp">${esc(jpOf(card))}</p>
       <div class="wb-words">${r.spot.tokens.map((t, i) => `<button type="button" class="wb-word" data-i="${i}">${esc(t)}</button>`).join('')}</div>
       <p class="wb-fb" id="wb-fb"></p>`;
