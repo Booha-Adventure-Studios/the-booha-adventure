@@ -1676,6 +1676,13 @@ else
   bad "Nine-engine motion audit failed"
 fi
 
+echo "[games] shared score card audit"
+if node tests/games-scorecard-audit.cjs >/dev/null 2>&1; then
+  ok "Shared score card audit passed"
+else
+  bad "Shared score card audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

@@ -496,11 +496,24 @@ function showResults() {
     audioBase: CFG.audioBase,
   });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
-  if (CFG.sfxBase && tier.sound) {
-    const snd = new Audio(CFG.sfxBase + tier.sound);
-    snd.setAttribute('playsinline',''); snd.setAttribute('webkit-playsinline','');
-    snd.play().catch(() => {});
-  }
+  /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
+     sound and its buttons press this game's own sas-replay / sas-back. */
+  U.showScorecard(Object.assign({
+    gameId:   `${CFG.curriculum}:say_sentence`,
+    title:    'Say the Sentence',
+    correct:  score,
+    total:    15,
+    pct,
+    replayId: 'sas-replay',
+    backId:   'sas-back',
+  }, {
+      stats: [
+        { label: 'First-try correct / せいかい', value: `${score} / 15` },
+        { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
+      ],
+      reviewItems: missedItems,
+      audioBase: CFG.audioBase,
+    }));
 }
 
 /* ═══ REPLAY / BACK ═══ */
