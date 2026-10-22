@@ -68,7 +68,10 @@ const CURRENT_CACHES = {
   // Games Pass 11 (2026-10-22): Sentences lane on notebook paper; Sentence
   // Speed start screen fixed (unclosed results wrapper hid it since Pass 3).
   // Menu forest backgrounds re-encoded to stay under the deployed image budget.
-  pages:  'booha-pages-2026-479',
+  // Fixes pass (2026-10-22): selected-card glow, Spell the Word keeps words
+  // together, synth ding/fart (no recordings), Blitz → skin path rerouted,
+  // rank-coin flicker.
+  pages:  'booha-pages-2026-480',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -242,7 +245,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-593',
+  assets: 'booha-assets-2026-594',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

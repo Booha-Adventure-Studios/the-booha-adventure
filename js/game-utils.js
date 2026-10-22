@@ -73,8 +73,69 @@ const UTILS = {
     } catch(e) {}
   },
 
+  /* ── Synth cues (Fixes pass) ──────────────────────────────────────
+     "ding" and "fart" are no longer recordings: they are synthesized on
+     the same Web Audio context as the combo chime, so nothing overlaps.
+       ding → a bright bell "ting" that climbs a little with the streak
+       fart → a soft low "bonk" (three pitches in rotation)
+     A combo milestone chime replaces the ting, and a combo-break crack
+     replaces the bonk (see createRun), instead of playing on top. */
+  SYNTH_CUES: { ding: 0.42, fart: 0.36 },   // name → length in seconds
+  _synthHold: { ding: 0, fart: 0 },         // performance.now() until which a cue is replaced
+  _synthVoice: { ding: null, fart: null },
+  _synthCtx() {
+    const engine = this._engine();
+    try {
+      const c = engine ? engine.context() : (this._ensureCtx(), this._ctx);
+      if (c && c.state !== 'running') c.resume().catch(() => {});
+      return c || null;
+    } catch (_) { return null; }
+  },
+  _synthPlay(name, vol, rate) {
+    const c = this._synthCtx();
+    if (!c || c.state !== 'running') return false;
+    const t = c.currentTime + 0.005;
+    const out = c.createGain();
+    out.gain.value = Math.max(0, Math.min(1, vol == null ? 1 : vol));
+    out.connect(c.destination);
+    const tone = (type, f, start, dur, peak, toF) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, start);
+      if (toF) o.frequency.exponentialRampToValueAtTime(toF, start + dur * 0.6);
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(peak, start + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      o.connect(g); g.connect(out); o.start(start); o.stop(start + dur + 0.02);
+    };
+    if (name === 'ding') {
+      // Bell: fundamental + inharmonic partial; pitch climbs with the streak (max +7 semitones).
+      const streak = Math.min(7, Math.max(0, (window.__brunCombo || 0)));
+      const f = Math.min(2400, 1046.5 * Math.pow(2, streak / 12) * (rate || 1));   // C6 upward, capped
+      tone('sine', f, t, 0.42, 0.22);
+      tone('sine', f * 2.76, t, 0.16, 0.06);
+      tone('triangle', f * 1.5, t + 0.045, 0.3, 0.08);
+    } else {
+      // Bonk: a soft pitched thump, not harsh.
+      const f = 210 * (rate || 1);
+      tone('sine', f, t, 0.34, 0.32, f * 0.5);
+      tone('triangle', f * 1.5, t, 0.12, 0.08, f * 0.7);
+    }
+    this._synthVoice[name] = { out, until: t + this.SYNTH_CUES[name] };
+    return true;
+  },
+  /* Called by createRun just before a milestone chime / combo crack:
+     cuts the cue that is already sounding and swallows the next one. */
+  _synthReplace(name, ms = 260) {
+    this._synthHold[name] = performance.now() + ms;
+    const v = this._synthVoice[name], c = this._synthCtx();
+    if (v && c && c.currentTime < v.until) {
+      try { v.out.gain.setTargetAtTime(0.0001, c.currentTime, 0.015); } catch (_) {}
+    }
+  },
+
   /* Resolves when the sound is ready (or could not load). Never rejects. */
   async loadSFX(name, url) {
+    if (this.SYNTH_CUES[name]) { this._synthCtx(); return true; }   // nothing to download
     const engine = this._engine();
     if (engine) return engine.load(name, url);
     this._ensureCtx();
@@ -116,6 +177,15 @@ const UTILS = {
     const last = this._sfxLastPlayed.get(name) || 0;
     if (now - last < 140) { finish(); return false; }
     this._sfxLastPlayed.set(name, now);
+
+    if (this.SYNTH_CUES[name]) {
+      // A milestone chime or combo crack already covers this moment.
+      if (performance.now() < this._synthHold[name]) { if (onEnd) setTimeout(onEnd, 120); return false; }
+      if (rate === null && name === 'fart') rate = [1, 0.92, 1.08][this._fartIdx++ % 3];
+      const ok = this._synthPlay(name, vol, rate);
+      if (onEnd) setTimeout(onEnd, ok ? Math.round(this.SYNTH_CUES[name] * 1000 / (rate || 1)) : 0);
+      return ok;
+    }
 
     const engine = this._engine();
     if (engine) {
@@ -837,6 +907,7 @@ const UTILS = {
         document.body.appendChild(hudEl);
       }
       const m = MULT(st.combo);
+      window.__brunCombo = st.combo;   // the synth ting climbs with the streak
       hudEl.querySelector('.brun-mult').textContent = st.combo >= 3 ? `COMBO ×${m}` : (st.combo ? `${st.combo} in a row` : '');
       hudEl.querySelector('.brun-pts').textContent = st.points.toLocaleString('en-US');
       hudEl.querySelectorAll('.brun-meter i').forEach((dot, i) => dot.classList.toggle('on', i < Math.min(10, st.combo)));
@@ -845,6 +916,7 @@ const UTILS = {
       const bump = (el, cls, ms) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
       if (fx.gained) bump(hudEl.querySelector('.brun-pts'), 'pop', 400);
       if (fx.milestone) {
+        if (typeof UTILS !== 'undefined') UTILS._synthReplace('ding');
         bump(hudEl, 'pulse', 450);
         fxBanner(fx.milestone);
         fxChime(fx.milestone);
@@ -853,6 +925,7 @@ const UTILS = {
         fxParticles(fxOrigin(), 5, 'brun-spark', 60);
       }
       if (fx.broke) {
+        if (typeof UTILS !== 'undefined') UTILS._synthReplace('fart');
         bump(hudEl, 'break', 500);
         fxCrack();
         const r = hudEl.getBoundingClientRect();

@@ -236,7 +236,7 @@ const BoohaProfileGame = (() => {
       : `Lv ${lv.level + 1} で あたらしい コイン`;
     host.innerHTML = `
       <div class="pg-hero-coin">
-        <img src="${IMG}rank-coin-${lv.level}.webp" alt="Rank coin, level ${lv.level}" width="72" height="72">
+        <span class="pg-coin-face"><img src="${IMG}rank-coin-${lv.level}.webp" alt="Rank coin, level ${lv.level}" width="72" height="72"></span>
         <span class="pg-hero-lv">LV ${lv.level}</span>
       </div>
       <p class="pg-hero-speech">${esc(greet)}<br><span>${esc(speech(s))}</span></p>
@@ -282,7 +282,8 @@ const BoohaProfileGame = (() => {
   const ROW_Y = [60, 180, 300];
   const GATE_Y = 425;
   const BLITZ_Y = 575;
-  const SKIN_Y = 690;
+  const SKIN_Y = 720;
+  const SKIN_ELBOW_Y = BLITZ_Y + 86;   // below every Blitz label
 
   function nodePos(i) {
     const row = Math.floor(i / 3);
@@ -325,7 +326,13 @@ const BoohaProfileGame = (() => {
     const bd = ['vocab', 'sentence', 'question'].map(t => w.blitzDone[t]);
     parts.push(seg(COLS[0], BLITZ_Y, COLS[1], BLITZ_Y, bd[0] && bd[1]));
     parts.push(seg(COLS[1], BLITZ_Y, COLS[2], BLITZ_Y, bd[1] && bd[2]));
-    parts.push(seg(COLS[1], BLITZ_Y, COLS[1], SKIN_Y - 40, w.blitzCount === 3));
+    // The skin path drops from the gaps between the Blitz nodes, never
+    // through a node's labels, and joins below them (a funnel).
+    const allBlitz = w.blitzCount === 3;
+    const GAPS = [(COLS[0] + COLS[1]) / 2, (COLS[1] + COLS[2]) / 2];
+    GAPS.forEach(x => parts.push(seg(x, BLITZ_Y, x, SKIN_ELBOW_Y + 4, allBlitz)));
+    parts.push(seg(GAPS[0], SKIN_ELBOW_Y, GAPS[1], SKIN_ELBOW_Y, allBlitz));
+    parts.push(seg(COLS[1], SKIN_ELBOW_Y, COLS[1], SKIN_Y - 40, allBlitz));
 
     s.games.forEach((g, i) => {
       const p = nodePos(i);

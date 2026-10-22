@@ -45,11 +45,20 @@ function splitSelectors(sel) {
 }
 assert(selectors.length > 60, `expected the skin rules, found ${selectors.length}`);
 for (const sel of selectors) {
+  if (sel.startsWith('@keyframes')) continue;
   for (const part of splitSelectors(sel)) {
     assert(/^html\[data-skin="v2"\]/.test(part.trim()), `unscoped selector in game-skin.css: ${part.trim()}`);
   }
 }
-assert(!/@keyframes/.test(css), 'the skin adds no animations of its own');
+// The skin's only animation is the selected-card ring: opacity + transform only.
+for (const m of css.matchAll(/@keyframes\s+([\w-]+)\s*\{([\s\S]*?\})\s*\}/g)) {
+  for (const prop of [...m[2].matchAll(/([a-z-]+)\s*:/g)].map(x => x[1])) {
+    assert(['opacity', 'transform'].includes(prop), `@keyframes ${m[1]} animates ${prop}; only opacity/transform allowed`);
+  }
+}
+// Fixes pass: a selected card turns solid lane colour (never green/orange) and pulses.
+assert.match(css, /:is\(\.vt-en-card, \.st-en-card\)\.selected,[\s\S]{0,120}background: var\(--lane\);/, 'a selected card fills with the lane colour');
+assert.match(css, /animation: skinSelectRing 1\.1s ease-in-out infinite;/, 'the selected card ring breathes until paired');
 
 // World art exists (paths are relative to theme/) and stays within the menu-art budget.
 for (const m of css.matchAll(/url\("\.\.\/(assets\/img\/menu\/[a-z-]+\.webp)"\)/g)) {

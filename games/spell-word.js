@@ -295,8 +295,15 @@ S.textContent = `
    ANSWER SLOTS
    ══════════════════════════════════════════════════════════════ */
 .sw-slots{
-  display:flex; flex-wrap:wrap; gap:5px; justify-content:center;
+  display:flex; flex-wrap:wrap; gap:8px clamp(12px,3vw,24px); justify-content:center;
   margin:0 0 .6rem; min-height:54px;
+}
+.sw-word{ display:inline-flex; flex-wrap:nowrap; gap:var(--sw-gap,5px); }
+.sw-slots.sw-word-wrap .sw-word{ flex-wrap:wrap; justify-content:center; row-gap:8px; }
+.sw-slots[style*="--sw-slot-w"] .sw-slot{
+  width:var(--sw-slot-w); height:calc(var(--sw-slot-w) * 1.12);
+  font-size:calc(var(--sw-slot-w) * .5);
+  border-radius:calc(var(--sw-slot-w) * .22);
 }
 .sw-slot{
   width:clamp(36px,8vw,55px);
@@ -935,20 +942,38 @@ function buildSlots(card) {
   const chars = Array.from(String(card.en || '').toLowerCase());
   placed = new Array(answerChars(card).length).fill(null);
   let slotIndex = 0;
-  chars.forEach(ch => {
-    if (/\s/.test(ch)) {
-      const gap = document.createElement('span');
-      gap.className = 'sw-space-gap';
-      gap.setAttribute('aria-hidden', 'true');
-      slotsEl.appendChild(gap);
-      return;
-    }
-    const slot = document.createElement('button');
-    slot.type = 'button'; slot.className = 'sw-slot empty'; slot.dataset.idx = slotIndex;
-    attachSlot(slot, slotIndex);
-    slotsEl.appendChild(slot);
-    slotIndex++;
+  /* Each word's slots stay together in one group, so a phrase like
+     "first aid kit" only breaks between words, never inside one. */
+  // A hyphenated word may break after its hyphen ("transit-" / "oriented").
+  const words = chars.join('').split(/\s+/).filter(Boolean)
+    .flatMap(w => w.replace(/-(?=.)/g, '-\n').split('\n'));   // no lookbehind: older iPads can't parse it
+  words.forEach(word => {
+    const group = document.createElement('span');
+    group.className = 'sw-word';
+    Array.from(word).forEach(() => {
+      const slot = document.createElement('button');
+      slot.type = 'button'; slot.className = 'sw-slot empty'; slot.dataset.idx = slotIndex;
+      group.appendChild(slot);
+      attachSlot(slot, slotIndex);
+      slotIndex++;
+    });
+    slotsEl.appendChild(group);
   });
+  fitSlots(words);
+}
+
+/* Shrink the slots just enough that the longest word fits on one line. */
+function fitSlots(words) {
+  const longest = Math.max(1, ...words.map(w => w.length));
+  const avail = Math.max(240, (slotsEl.clientWidth || slotsEl.parentElement.clientWidth || 340) - 8);
+  const gap = longest >= 12 ? 3 : 5;
+  const fit = Math.floor((avail - gap * (longest - 1)) / longest);
+  const w = Math.max(18, Math.min(55, fit));
+  slotsEl.style.setProperty('--sw-gap', gap + 'px');
+  if (fit < 55) slotsEl.style.setProperty('--sw-slot-w', w + 'px');
+  else slotsEl.style.removeProperty('--sw-slot-w');
+  // Only on a very narrow screen may a single long word wrap, never run off the edge.
+  slotsEl.classList.toggle('sw-word-wrap', fit < 18);
 }
 
 /* ══════════════════════════════════════════════════════════════
