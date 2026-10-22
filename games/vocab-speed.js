@@ -422,10 +422,7 @@ S.textContent = `
 .vs-timer-fill.warning{
   animation:vsTimerPulse .55s ease-in-out infinite;
 }
-@keyframes vsTimerPulse{
-  0%,100%{ filter:brightness(1); }
-  50%{ filter:brightness(1.5) saturate(1.6); }
-}
+@keyframes vsTimerPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
 
 /* ══════════════════════════════════════════════════════════════
    JP PROMPT BOX
@@ -471,14 +468,8 @@ S.textContent = `
 .vs-prompt-box.streak-4{
   animation:vsBoxPulse4 .9s ease-in-out infinite;
 }
-@keyframes vsBoxPulse3{
-  0%,100%{ box-shadow:0 8px 40px rgba(255,80,0,.28), 0 0 60px rgba(255,80,0,.08); }
-  50%{     box-shadow:0 8px 60px rgba(255,80,0,.5),  0 0 80px rgba(255,80,0,.18); }
-}
-@keyframes vsBoxPulse4{
-  0%,100%{ box-shadow:0 8px 60px rgba(255,200,0,.45), 0 0 100px rgba(255,200,0,.18); border-color:rgba(255,200,0,.5); }
-  50%{     box-shadow:0 8px 80px rgba(255,200,0,.8),  0 0 130px rgba(255,200,0,.35); border-color:rgba(255,200,0,.9); }
-}
+@keyframes vsBoxPulse3{ 0%,100%{ opacity:1; } 50%{ opacity:.94; } }
+@keyframes vsBoxPulse4{ 0%,100%{ opacity:1; } 50%{ opacity:.94; } }
 
 .vs-jp{
   font-family:var(--game-font-jp);
@@ -663,10 +654,7 @@ S.textContent = `
 .vs-wrap.streak-level-3 .vs-choice,
 .vs-wrap.streak-level-4 .vs-choice{ box-shadow:0 0 18px rgba(255,120,0,.2), 0 6px 20px rgba(0,0,0,.35); }
 .vs-wrap.streak-level-4 .vs-choice{ box-shadow:0 0 24px rgba(255,200,0,.32), 0 6px 20px rgba(0,0,0,.35); }
-@keyframes vsChargedBreath{
-  0%,100%{ filter:brightness(1); }
-  50%{ filter:brightness(1.07); }
-}
+@keyframes vsChargedBreath{ 0%,100%{ opacity:1; } 50%{ opacity:.94; } }
 .vs-prompt-box.vs-hit{ animation:vsPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
 .vs-dot.vs-hit{ animation:vsDotHit 300ms cubic-bezier(.2,.9,.25,1) both; }
 .vs-wrap .vs-prompt-box.vs-hit{ animation:vsPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
@@ -742,30 +730,21 @@ S.textContent = `
   --banner-glow:rgba(255,120,0,.2);
   animation:vsBannerPulse2 2.2s ease-in-out infinite;
 }
-@keyframes vsBannerPulse2{
-  0%,100%{ box-shadow:0 0 28px rgba(255,120,0,.2); }
-  50%{     box-shadow:0 0 50px rgba(255,120,0,.45); }
-}
+@keyframes vsBannerPulse2{ 0%,100%{ scale:1; } 50%{ scale:1.035; } }
 .vs-streak-banner.slvl-3{
   --banner-border:rgba(255,60,0,.6);
   --banner-bg:rgba(255,60,0,.13);
   --banner-glow:rgba(255,60,0,.25);
   animation:vsBannerPulse3 1.4s ease-in-out infinite;
 }
-@keyframes vsBannerPulse3{
-  0%,100%{ box-shadow:0 0 40px rgba(255,60,0,.3), 0 0 80px rgba(255,60,0,.1); }
-  50%{     box-shadow:0 0 70px rgba(255,60,0,.6), 0 0 110px rgba(255,60,0,.25); }
-}
+@keyframes vsBannerPulse3{ 0%,100%{ scale:1; } 50%{ scale:1.035; } }
 .vs-streak-banner.slvl-4{
   --banner-border:rgba(255,200,0,.8);
   --banner-bg:rgba(255,180,0,.18);
   --banner-glow:rgba(255,200,0,.4);
   animation:vsBannerFlare 0.8s ease-in-out infinite;
 }
-@keyframes vsBannerFlare{
-  0%,100%{ box-shadow:0 0 60px rgba(255,200,0,.5), 0 0 110px rgba(255,100,0,.2); border-color:rgba(255,200,0,.8); }
-  50%{     box-shadow:0 0 100px rgba(255,200,0,.9),0 0 160px rgba(255,100,0,.4); border-color:rgba(255,255,100,1); }
-}
+@keyframes vsBannerFlare{ 0%,100%{ scale:1; } 50%{ scale:1.035; } }
 .vs-banner-en{
   font-family:var(--game-font-title);
   font-size:clamp(16px,3.2vw,24px);
@@ -1293,14 +1272,17 @@ function startHeat() {
   const lv = getStreakLevel(streak);
   heatDur  = HEAT_DURATIONS[lv] ?? 5000;
   heatStart = performance.now();
-  heatEl.style.width = '100%';
+  /* Pass 2: shrink with transform (compositor) instead of width (layout
+     every frame). transform-origin is already left center. */
+  heatEl.style.willChange = 'transform';
+  heatEl.style.transform = 'scaleX(1)';
   heatEl.classList.remove('warning');
 
   const tick = (t) => {
     if (locked) { heatRAF = requestAnimationFrame(tick); return; }
     const p = 1 - (t - heatStart) / heatDur;
     const pct = Math.max(0, p);
-    heatEl.style.width = `${pct * 100}%`;
+    heatEl.style.transform = `scaleX(${pct})`;
     if (pct < 0.2) heatEl.classList.add('warning');
     else heatEl.classList.remove('warning');
     if (pct <= 0) { onTimeout(); return; }

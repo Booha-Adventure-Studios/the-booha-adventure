@@ -50,7 +50,9 @@
       master = ctx.createGain();
       master.gain.value = 1;
       master.connect(ctx.destination);
-      var onState = function () { if (ctx.state !== 'running') arm(); };
+      // Interrupted → re-arm the tap unlock; running again (including an
+      // async resume finishing after the tap) → remove the listeners.
+      var onState = function () { if (ctx.state === 'running') disarm(); else arm(); };
       if (ctx.addEventListener) ctx.addEventListener('statechange', onState);
       else ctx.onstatechange = onState;
     }

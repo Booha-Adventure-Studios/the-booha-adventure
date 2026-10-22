@@ -121,8 +121,8 @@ S.textContent = `
 .sas-play-btn.playing{background:radial-gradient(circle at 30% 30%,#a8f0c8,#22c55e 60%,#16a34a 100%);box-shadow:0 0 0 4px rgba(34,197,94,.3),0 0 28px rgba(34,197,94,.7),0 5px 0 rgba(10,80,30,.4);animation:sasPlayingPulse 1s ease-in-out infinite}
 [data-curriculum="bc"] .sas-play-btn{background:radial-gradient(circle at 30% 30%,#a8f0e8,#00ddaa 60%,#009977 100%);box-shadow:0 0 0 3px rgba(0,221,170,.3),0 0 24px rgba(0,221,170,.55),0 5px 0 rgba(0,60,50,.4)}
 [data-curriculum="pb"] .sas-play-btn{background:radial-gradient(circle at 30% 30%,#ffd0b8,#ff9966 60%,#ff6622 100%);box-shadow:0 0 0 3px rgba(255,153,102,.3),0 0 24px rgba(255,153,102,.55),0 5px 0 #ffccaa;color:#fff}
-@keyframes sasGoldPulse{0%,100%{box-shadow:0 0 0 3px rgba(255,213,120,.25),0 0 10px rgba(255,214,120,.35),0 5px 0 rgba(140,80,0,.4)}50%{box-shadow:0 0 0 4px rgba(255,213,120,.5),0 0 28px rgba(255,214,120,.9),0 5px 0 rgba(140,80,0,.4)}}
-@keyframes sasPlayingPulse{0%,100%{box-shadow:0 0 0 4px rgba(34,197,94,.2),0 0 20px rgba(34,197,94,.5),0 5px 0 rgba(10,80,30,.4)}50%{box-shadow:0 0 0 8px rgba(34,197,94,.35),0 0 36px rgba(34,197,94,.8),0 5px 0 rgba(10,80,30,.4)}}
+@keyframes sasGoldPulse{ 0%,100%{ scale:1; } 50%{ scale:1.05; } }
+@keyframes sasPlayingPulse{ 0%,100%{ scale:1; } 50%{ scale:1.05; } }
 
 /* ── Toggle ── */
 .sas-toggle-wrap{display:flex;align-items:center;justify-content:center;gap:0;border-radius:999px;overflow:hidden;border:1.5px solid var(--game-border);background:var(--game-surface)}

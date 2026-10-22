@@ -10,6 +10,9 @@ const CFG = window.GAME_CONFIG;
 const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
+/* Check reveal pacing (Games Pass 2: was 700 / 750 / 500 ms). */
+const REVEAL_OK_MS = 220, REVEAL_MISS_MS = 300, REVEAL_END_MS = 350;
+
 U.unlockAudio();
 
 /* ══════════════════════════════════════════════════════════════
@@ -573,9 +576,6 @@ body.hira-mode .vt-jp-hira-text{ display:block; }
   85%{ transform:translateX(3px)  rotate(.5deg); }
 }
 
-  60%{ transform:translate(-50%,-150%) scale(1.3) rotate(var(--rot)); opacity:1; }
-  100%{ transform:translate(-50%,-260%) scale(.8) rotate(var(--rot)); opacity:0; }
-}
 
 /* ── pulse overlay on wrong ── */
 .vt-wrong-flash{
@@ -1177,6 +1177,7 @@ async function gradeRound() {
      Slots are rendered in roundJpOrder, so we iterate that. */
   const slotEls = [...jpSlots.querySelectorAll('.vt-jp-slot')];
   let roundScore = 0;
+  let dingStep = 0;
 
   for (let i = 0; i < slotEls.length; i++) {
     const el     = slotEls[i];
@@ -1188,25 +1189,26 @@ async function gradeRound() {
 
     if (correct) {
       el.classList.add('slot-correct');
-      /* Stagger: play ding, wait a beat, then next */
-      U.playSFX('ding');
-       
+      /* Pass 2: quick cascade; each correct answer in a row dings a step higher */
+      U.playSFX('ding', { rate: Math.min(1.5, 1 + dingStep * 0.06) });
+      dingStep++;
       roundScore++;
-      await new Promise(r => setTimeout(r, 700));
+      await new Promise(r => setTimeout(r, REVEAL_OK_MS));
     } else {
       el.classList.add('slot-wrong');
       if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
       U.playSFX('fart');
        
       flashWrong();
-      await new Promise(r => setTimeout(r, 750));
+      dingStep = 0;
+      await new Promise(r => setTimeout(r, REVEAL_MISS_MS));
     }
   }
 
   score += roundScore;
   scoreEl.textContent = String(score);
 
-  await new Promise(r => setTimeout(r, 500));
+  await new Promise(r => setTimeout(r, REVEAL_END_MS));
 
   isGrading    = false;
   globalLocked = false;
