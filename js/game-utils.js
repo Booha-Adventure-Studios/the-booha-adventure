@@ -98,11 +98,19 @@ const UTILS = {
    * playSFX(name)              play once
    * playSFX(name, onEnd)       onEnd fires when the sound finishes
    * playSFX(name, vol, onEnd)
+   * playSFX(name, { volume, rate, onEnd })   rate > 1 = higher pitch
    * A repeat of the same sound within 140 ms is dropped (anti-mash), but
    * onEnd still fires so an answer chain can never stall on a sound.
    */
   playSFX(name, vol = 1, onEnd = null) {
+    let rate = null;
     if (typeof vol === 'function') { onEnd = vol; vol = 1; }
+    else if (vol && typeof vol === 'object') {
+      const opts = vol;
+      onEnd = typeof opts.onEnd === 'function' ? opts.onEnd : onEnd;
+      rate = Number(opts.rate) > 0 ? Number(opts.rate) : null;
+      vol = opts.volume == null ? 1 : opts.volume;
+    }
     const finish = () => { if (onEnd) setTimeout(onEnd, 0); };
     const now = Date.now();
     const last = this._sfxLastPlayed.get(name) || 0;
@@ -112,7 +120,7 @@ const UTILS = {
     const engine = this._engine();
     if (engine) {
       // Three fart pitches in rotation so repeats don't sound identical.
-      const rate = name === 'fart' ? [1, 0.92, 1.08][this._fartIdx++ % 3] : 1;
+      if (rate === null) rate = name === 'fart' ? [1, 0.92, 1.08][this._fartIdx++ % 3] : 1;
       return engine.play(name, { volume: vol, rate, onEnd }) > 0;
     }
 
@@ -126,6 +134,7 @@ const UTILS = {
     g.gain.value = Math.max(0, Math.min(1, vol));
     src.connect(g);
     g.connect(this._master);
+    if (rate) src.playbackRate.value = rate;
     if (onEnd) src.onended = () => onEnd();
     try { src.start(0); } catch(e) { finish(); return false; }
     return true;
@@ -230,6 +239,9 @@ const UTILS = {
      CONFETTI BURST
      ══════════════════════════════ */
   confetti(el, count = 60) {
+    const motion = window.BoohaMotion;
+    if (motion && motion.reduced()) return;
+    if (motion && motion.lowPower()) count = Math.min(count, 24);
     const r = el ? el.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2, width: 0, height: 0 };
     const cx = r.left + r.width / 2;
     const cy = r.top  + r.height / 2;

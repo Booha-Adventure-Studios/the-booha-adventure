@@ -514,10 +514,7 @@ S.textContent = `
 .sw-speaker-btn:active:not(:disabled){ transform:scale(.91); }
 
 @keyframes swSpeakerIn{ from{ transform:scale(0) rotate(-15deg); opacity:0; } to{ transform:none; opacity:1; } }
-@keyframes swSpeakerGlowPb{
-  0%,100%{ box-shadow:0 0 10px 2px rgba(255,100,180,.55),0 4px 0 rgba(160,0,80,.5); }
-  50%{     box-shadow:0 0 26px 6px rgba(255,100,180,.95),0 4px 0 rgba(160,0,80,.5); }
-}
+@keyframes swSpeakerGlowPb{ 0%,100%{ scale:1; } 50%{ scale:1.05; } }
 
 /* BC — cyan speaker */
 [data-curriculum="bc"] .sw-speaker-btn{
@@ -527,10 +524,7 @@ S.textContent = `
 [data-curriculum="bc"] .sw-speaker-btn.visible{
   animation:swSpeakerGlowBc 1.6s ease-in-out infinite, swSpeakerIn .28s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes swSpeakerGlowBc{
-  0%,100%{ box-shadow:0 0 10px 2px rgba(0,200,180,.55),0 4px 0 rgba(0,60,50,.6); }
-  50%{     box-shadow:0 0 26px 6px rgba(0,220,180,.95),0 4px 0 rgba(0,60,50,.6); }
-}
+@keyframes swSpeakerGlowBc{ 0%,100%{ scale:1; } 50%{ scale:1.05; } }
 
 /* BR — amber speaker */
 [data-curriculum="br"] .sw-speaker-btn{
@@ -540,10 +534,7 @@ S.textContent = `
 [data-curriculum="br"] .sw-speaker-btn.visible{
   animation:swSpeakerGlowBr 1.6s ease-in-out infinite, swSpeakerIn .28s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes swSpeakerGlowBr{
-  0%,100%{ box-shadow:0 0 10px 2px rgba(255,160,0,.55),0 4px 0 rgba(120,50,0,.5); }
-  50%{     box-shadow:0 0 26px 6px rgba(255,160,0,.95),0 4px 0 rgba(120,50,0,.5); }
-}
+@keyframes swSpeakerGlowBr{ 0%,100%{ scale:1; } 50%{ scale:1.05; } }
 
 /* HELP */
 .sw-help-btn{
