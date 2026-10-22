@@ -32,6 +32,7 @@
     'vocab-tap': 'Match them up!', 'spell-word': "Let's spell!", 'vocab-speed': 'Fast, fast!',
     'sentence-tap': 'Tap the pairs!', 'sentence-order': 'Line them up!', 'sentence-speed': 'Zoom!',
     'say-word': 'Listen closely!', 'say-sentence': 'Ears ready?', 'ask-question': 'Listen and choose!',
+    'booha-bites': 'I ate a word! Find it!',
   };
   var MONTHS = { jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June',
     jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December' };
@@ -160,12 +161,40 @@
     lanesEl.appendChild(lane);
   });
 
+  // Extra games (Games Pass 6+): built from the registry, outside the nine.
+  // They use data-extra (not data-game) and their own saveId, so nothing that
+  // counts the nine — this menu's tally included — ever sees them.
+  var R = window.BoohaGameRegistry;
+  var extras = R && typeof R.getExtraForCurriculum === 'function' ? R.getExtraForCurriculum(CURR) : [];
+  var extraTiles = [];
+  if (extras.length) {
+    var xl = el('section', 'bm-lane bm-lane-extra');
+    xl.setAttribute('aria-label', 'Extra games');
+    var xlab = el('div', 'bm-lane-label');
+    xlab.appendChild(el('b', null, 'EXTRA'));
+    xlab.appendChild(el('span', null, 'おまけ'));
+    xl.appendChild(xlab);
+    extras.forEach(function (g) {
+      var a = el('a', 'tile tile-extra', g.name);
+      a.setAttribute('data-extra', g.gameKey);
+      a.setAttribute('data-hira', 'ぬけた ことばを さがそう');
+      a._saveId = g.saveId;
+      xl.appendChild(a);
+      extraTiles.push(a);
+    });
+    var note = el('p', 'bm-extra-note', 'Extra games don’t change the 9-game bonus unlock. · ボーナスの じょうけんは 9つの ゲームだけ');
+    xl.appendChild(note);
+    lanesEl.appendChild(xl);
+  }
+
   // Upgrade each static link in place (keeps .tile[data-game] for every consumer).
-  tiles.forEach(function (t, i) {
+  var allTiles = tiles.concat(extraTiles);
+  allTiles.forEach(function (t, i) {
     var name = t.textContent.trim(), hira = t.getAttribute('data-hira') || '';
+    var gameKey = t.dataset.game || t.dataset.extra;
     t.textContent = '';
     t.style.setProperty('--i', i);
-    t.href = BASE + '/game.html?week=' + encodeURIComponent(week) + '&game=' + encodeURIComponent(t.dataset.game);
+    t.href = BASE + '/game.html?week=' + encodeURIComponent(week) + '&game=' + encodeURIComponent(gameKey);
     var stars = el('div', 'bm-stars'); stars.setAttribute('role', 'img');
     for (var s = 0; s < 3; s++) stars.appendChild(svg(STAR, 'bm-star off' + (s === 1 ? ' mid' : '')));
     t.appendChild(stars);
@@ -206,6 +235,25 @@
     });
     if (firstOpen >= 0) tiles[firstOpen].appendChild(el('span', 'bm-tag', 'Try me!'));
 
+    // Extra tiles: same live-week rule, their own save ids, never in the tally.
+    extraTiles.forEach(function (t) {
+      var id = t._saveId, n = 0, crowned = false, pts = 0;
+      if (live && scores) {
+        try { n = Math.max(0, Math.min(3, scores.weeklyStarsForGame(id) || 0)); } catch (_) {}
+        try { crowned = !!(scores.weeklyCrownForGame && scores.weeklyCrownForGame(id)); } catch (_) {}
+        try { pts = (scores.weeklyPointsForGame && scores.weeklyPointsForGame(id)) || 0; } catch (_) {}
+      }
+      var starEls = t._bm.stars.children;
+      for (var s = 0; s < 3; s++) starEls[s].setAttribute('class', 'bm-star ' + (s < n ? 'on' : 'off') + (s === 1 ? ' mid' : ''));
+      t._bm.stars.setAttribute('aria-label', n + ' of 3 stars this week');
+      t.classList.toggle('gold3', n === 3);
+      var oc = t.querySelector('.bm-crown'); if (oc) oc.remove();
+      if (crowned) { var cr = svg(CROWN, 'bm-crown', '0 0 26 20'); cr.setAttribute('role', 'img'); cr.setAttribute('aria-label', 'Crown'); t.insertBefore(cr, t.firstChild); }
+      t._bm.best.textContent = live && pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : '';
+      var ot = t.querySelector('.bm-tag'); if (ot) ot.remove();
+      if (live && n === 0 && pts === 0) t.appendChild(el('span', 'bm-tag', 'NEW'));
+    });
+
     tally.textContent = '';
     if (!live) {
       tally.className = 'bm-practice';
@@ -240,13 +288,14 @@
   /* ── Interaction ── */
   var locked = false;
   var swipe = document.getElementById('swipeScreen');
-  tiles.forEach(function (t, i) {
+  allTiles.forEach(function (t, i) {
+    var key = t.dataset.game || t.dataset.extra;
     t.addEventListener('pointerenter', function (e) {
       if (e.pointerType !== 'mouse') return;
-      bubble.textContent = LINES[t.dataset.game] || t._bm.name;
+      bubble.textContent = LINES[key] || t._bm.name;
       var now = Date.now(); if (now - lastHover > 70) { lastHover = now; cue('hover', i); }
     });
-    t.addEventListener('focus', function () { bubble.textContent = LINES[t.dataset.game] || t._bm.name; });
+    t.addEventListener('focus', function () { bubble.textContent = LINES[key] || t._bm.name; });
     t.addEventListener('click', function (e) {
       e.preventDefault();
       if (locked) return;
@@ -275,6 +324,6 @@
   });
   // Coming back from a game with the browser Back button (bfcache).
   window.addEventListener('pageshow', function (e) {
-    if (e.persisted) { locked = false; if (swipe) swipe.classList.remove('go'); tiles.forEach(function (t) { t.classList.remove('is-picked'); }); paint(); }
+    if (e.persisted) { locked = false; if (swipe) swipe.classList.remove('go'); allTiles.forEach(function (t) { t.classList.remove('is-picked'); }); paint(); }
   });
 })();
