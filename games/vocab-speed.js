@@ -10,6 +10,9 @@ const CFG = window.GAME_CONFIG;
 const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
+/* Games Pass 4: combo / sharp / points. Sharp = inside 60% of the current heat timer. */
+const run = U.createRun({ total: 15, recoverPoints: 0 });
+
 U.unlockAudio();
 
 /* ══════════════════════════════════════════════════════════════
@@ -1181,7 +1184,7 @@ function doStart() {
   unlockAllAudio();
   feedbackState = 'playing';
   order = U.shuffle(CFG.cards.slice(0, 15));
-  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
+  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0; run.reset();
   runStartedAt = performance.now();
   startOverlay.classList.add('hiding');
   setTimeout(() => { startOverlay.style.display = 'none'; }, 380);
@@ -1391,6 +1394,7 @@ function renderQ() {
       locked = false;
       setAnswerInputEnabled(true);
       startHeat();
+      run.ready(heatDur * 0.6);
     });
   }
 }
@@ -1415,6 +1419,7 @@ function handlePick(btn, en) {
 
   if (correct) {
     btn.classList.add('vs-correct');
+    run.hit();
     U.playSFX('ding');
 
     score++;
@@ -1433,6 +1438,7 @@ function handlePick(btn, en) {
 
   } else {
     btn.classList.add('vs-wrong');
+    run.miss();
     if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     streak   = 0;
     updateStreakUI();
@@ -1450,6 +1456,7 @@ function handlePick(btn, en) {
 function onTimeout() {
   if (locked || feedbackState !== 'playing') return;
   stopHeat();
+  run.miss();
   locked   = true;
   streak   = 0;
   updateStreakUI();
@@ -1546,6 +1553,7 @@ function showResults() {
 }
 
 function revealResults(runTime) {
+  const runSum = run.summary();   /* Games Pass 4 */
   feedbackState = 'complete';
   clearResultEffects();
   locked = true;
@@ -1588,6 +1596,7 @@ function revealResults(runTime) {
   });
 
   U.emitGameEnd({
+    points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
     saveId:    `${CFG.curriculum}:vocab_speed`,
     score:     pct,
     completed: true,
@@ -1605,6 +1614,7 @@ function revealResults(runTime) {
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own vs-replay / vs-back. */
   U.showScorecard(Object.assign({
+    run:      runSum,
     gameId:   `${CFG.curriculum}:vocab_speed`,
     title:    'Vocab Speed',
     correct:  score,
@@ -1638,7 +1648,7 @@ document.getElementById('vs-replay').addEventListener('click', () => {
 
   streakBanner.className = 'vs-streak-banner';
 
-  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0;
+  idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0; run.reset();
   missedItems = [];
   feedbackState = 'playing';
   recoveryPending = false;

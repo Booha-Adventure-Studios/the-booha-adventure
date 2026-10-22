@@ -1122,3 +1122,36 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 @media (max-width: 420px) {
   .bsc-star { width: 68px; height: 68px; } .bsc-star-mid { width: 88px; height: 88px; } .bsc-stars { height: 104px; }
 }
+
+/* ── Score card: points layer (Games Pass 4) ── */
+.bsc-points { flex-wrap: wrap; justify-content: center; }
+.bsc-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.bsc-chip { font-size: 12px; font-weight: 900; letter-spacing: .04em; padding: 4px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--game-ink) 8%, transparent); color: var(--game-muted); font-variant-numeric: tabular-nums; }
+.bsc-chip-crown { background: #ffd96b; color: #2b1a05; }
+
+/* ── In-game combo pill (GAME_UTILS.createRun) ── */
+.brun-hud {
+  position: fixed; z-index: 60; pointer-events: none;
+  left: max(12px, env(safe-area-inset-left, 0px)); top: calc(14px + env(safe-area-inset-top, 0px));
+  display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--game-bg) 80%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--game-border);
+  font-family: var(--game-font-body); font-size: 13px; font-weight: 900; color: var(--game-ink);
+  font-variant-numeric: tabular-nums;
+}
+.brun-mult:empty { display: none; }
+.brun-hud.hot { box-shadow: inset 0 0 0 1.5px #ffc94a, 0 0 16px rgba(255,190,60,.35); }
+.brun-hud.hot .brun-mult { color: #e0a21a; }
+[data-curriculum="br"] .brun-hud.hot .brun-mult, [data-curriculum="bc"] .brun-hud.hot .brun-mult { color: #ffc94a; }
+.brun-hud.pulse { animation: brunPulse .42s cubic-bezier(.3,1.6,.5,1); }
+@keyframes brunPulse { 40% { transform: scale(1.16); } }
+html.bsc-open .brun-hud { display: none; }
+@media (max-height: 860px) {
+  .bsc-card { gap: 6px; padding: 16px 18px 16px; }
+  .bsc-stars { height: 96px; margin-top: 0; }
+  .bsc-star { width: 64px; height: 64px; } .bsc-star-mid { width: 84px; height: 84px; margin-bottom: 10px; }
+  .bsc-crown { width: 48px; height: 36px; margin-top: 0; }
+  .bsc-tier { font-size: clamp(34px, 7vw, 50px); }
+  .bsc-details .game-result-details { margin: 2px auto 4px; }
+}

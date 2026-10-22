@@ -10,8 +10,8 @@
 
    Five tiers by correct answers out of 15 (half points supported):
      0–5 TRY AGAIN · 6–10 KEEP GOING · 11–14 GREAT · 15 PERFECT
-     LEGEND = 15 and opts.fullCombo === true (engines send that from
-     Pass 4; until then a perfect run shows PERFECT).
+     LEGEND = 15 and a full combo (every answer right on the first try),
+     from opts.run (GAME_UTILS.createRun summary, Games Pass 4).
    Stars are unchanged: BoohaGameRegistry.starsForScore(gameId, pct).
    ══════════════════════════════════════════════════════════════ */
 (function () {
@@ -52,6 +52,17 @@
       var scores = window.BoohaAdventure && window.BoohaAdventure.scores;
       if (scores && typeof scores.getHighScore === 'function') {
         var v = Number(scores.getHighScore(gameId));
+        return Number.isFinite(v) ? v : 0;
+      }
+    } catch (_) {}
+    return 0;
+  }
+
+  function priorWeeklyPoints(gameId) {
+    try {
+      var scores = window.BoohaAdventure && window.BoohaAdventure.scores;
+      if (scores && typeof scores.weeklyPointsForGame === 'function') {
+        var v = Number(scores.weeklyPointsForGame(gameId));
         return Number.isFinite(v) ? v : 0;
       }
     } catch (_) {}
@@ -118,7 +129,9 @@
     var total = Number(opts.total) > 0 ? Number(opts.total) : 15;
     var correct = Math.max(0, Number(opts.correct) || 0);
     var pct = Number.isFinite(Number(opts.pct)) ? Math.round(Number(opts.pct)) : Math.round(correct / total * 100);
-    var key = tierFor(correct, total, opts.fullCombo);
+    var run = opts.run && typeof opts.run === 'object' ? opts.run : null;
+    var fullCombo = opts.fullCombo === true || !!(run && run.fullCombo);
+    var key = tierFor(correct, total, fullCombo);
     var tier = TIERS[key];
     var stars = starsFor(opts.gameId, pct);
     var before = priorBest(opts.gameId);
@@ -169,11 +182,37 @@
     score.appendChild(el('span', newBest ? 'bsc-best bsc-new' : 'bsc-best', newBest ? 'NEW BEST!' : 'Best ' + best + '%'));
     card.appendChild(score);
 
-    if (opts.points != null) {
+    var pointsValue = run ? run.points : opts.points;
+    if (pointsValue != null && Number.isFinite(Number(pointsValue))) {
+      // Points reward knowing it first try, and quickly. Stars never depend on them.
+      var weekBest = priorWeeklyPoints(opts.gameId);
+      var pv = Math.round(Number(pointsValue));
       var pts = el('div', 'bsc-points');
       pts.appendChild(el('span', 'bsc-points-label', 'POINTS'));
-      pts.appendChild(el('b', 'bsc-points-value', Number(opts.points).toLocaleString('en-US')));
+      var pvEl = el('b', 'bsc-points-value', calm ? pv.toLocaleString('en-US') : '0');
+      pts.appendChild(pvEl);
+      if (weekBest > 0 && pv > weekBest) pts.appendChild(el('span', 'bsc-best bsc-new', 'NEW WEEK BEST!'));
+      else if (weekBest > 0) pts.appendChild(el('span', 'bsc-best', 'Week best ' + weekBest.toLocaleString('en-US')));
       card.appendChild(pts);
+      if (!calm && pv > 0) {
+        // Count up while the stars land.
+        var t0 = null, dur = 900;
+        var step = function (t) {
+          if (!overlay) return;
+          if (t0 === null) t0 = t;
+          var k = Math.min(1, (t - t0) / dur);
+          pvEl.textContent = Math.round(pv * (1 - Math.pow(1 - k, 3))).toLocaleString('en-US');
+          if (k < 1) requestAnimationFrame(step);
+        };
+        timers.push(setTimeout(function () { requestAnimationFrame(step); }, 300));
+      }
+      if (run) {
+        var chips = el('div', 'bsc-chips');
+        chips.appendChild(el('span', 'bsc-chip', 'Best combo ' + run.maxCombo));
+        chips.appendChild(el('span', 'bsc-chip', 'Sharp ' + run.sharp));
+        if (fullCombo) chips.appendChild(el('span', 'bsc-chip bsc-chip-crown', '♛ Crown'));
+        card.appendChild(chips);
+      }
     }
 
     var details = el('div', 'bsc-details');
@@ -222,6 +261,12 @@
       }
     }
     var soundAt = calm ? 0 : 250 + stars * 260 + 120;
+    if (key === 'legend' && playSFX) {
+      // LEGEND: a bright rising run of dings on top of the PERFECT stinger.
+      [1.5, 1.68, 1.89, 2].forEach(function (r, n) {
+        timers.push(setTimeout(function () { playSFX('ding', { rate: r, volume: 0.8 }); }, soundAt + 500 + n * 160));
+      });
+    }
     if (cfg.sfxBase && tier.sound) {
       timers.push(setTimeout(function () {
         try {

@@ -681,6 +681,129 @@ const UTILS = {
     if (el) el.textContent = gameName;
   },
 
+  /* ══════════════════════════════
+     RUN TRACKER — combo, sharp answers, points, crown (Games Pass 4)
+     Stars stay accuracy-only (registry thresholds); this layer only
+     rewards students who knew it first try, and quickly.
+
+       const run = U.createRun({ total: 15 });
+       run.reset()                     new game / replay
+       run.ready(parMs, { at, minMs, waitAudio })
+                                       item is answerable (waitAudio: the
+                                       sharp clock starts at audioDone())
+       run.audioDone()                 listening games: clip finished
+       run.hit(at?)                    first-try right answer
+       run.miss()                      wrong answer (ends the combo)
+       run.recover()                   right on a later try
+       run.summary()                   { points, maxCombo, firstTry, sharp,
+                                         recovered, misses, fullCombo }
+
+     Combo multiplier ×1 → ×1.5 at 3 → ×2 at 6 → ×3 at 10 in a row.
+     Sharp (+25): answered inside the par time, but not faster than minMs
+     (default 0.4 s: too fast to have read it). A miss scores 0 and resets
+     the combo; recover() earns recoverPoints (0 in multiple-choice games
+     so tapping every option never pays).
+     ══════════════════════════════ */
+  createRun({ total = 15, recoverPoints = 50, minMs = 400, hud = true, now = null } = {}) {
+    const clock = typeof now === 'function' ? now : () => performance.now();
+    const MULT = c => (c >= 10 ? 3 : c >= 6 ? 2 : c >= 3 ? 1.5 : 1);
+    let st = null;
+    let item = null;
+    let hudEl = null;
+    let pulseTimer = 0;
+
+    const paint = (pulse) => {
+      if (!hud || typeof document === 'undefined' || !document.body) return;
+      if (!hudEl && !st.items) return;   // appears once play starts
+      if (!hudEl) {
+        hudEl = document.createElement('div');
+        hudEl.className = 'brun-hud';
+        hudEl.setAttribute('aria-live', 'polite');
+        hudEl.innerHTML = '<span class="brun-mult"></span><b class="brun-pts"></b>';
+        document.body.appendChild(hudEl);
+      }
+      const m = MULT(st.combo);
+      hudEl.querySelector('.brun-mult').textContent = st.combo >= 3 ? `COMBO ×${m}` : (st.combo ? `${st.combo} in a row` : '');
+      hudEl.querySelector('.brun-pts').textContent = st.points.toLocaleString('en-US');
+      hudEl.classList.toggle('hot', st.combo >= 3);
+      hudEl.dataset.level = String(m);
+      if (pulse) {
+        hudEl.classList.remove('pulse'); void hudEl.offsetWidth; hudEl.classList.add('pulse');
+        clearTimeout(pulseTimer);
+        pulseTimer = setTimeout(() => hudEl && hudEl.classList.remove('pulse'), 450);
+      }
+    };
+
+    const api = {
+      reset() {
+        st = { points: 0, combo: 0, maxCombo: 0, firstTry: 0, sharp: 0, recovered: 0, misses: 0, items: 0 };
+        item = null;
+        paint(false);
+        return api;
+      },
+      ready(parMs = 2500, opts = {}) {
+        item = {
+          readyAt: opts.waitAudio ? null : (Number.isFinite(opts.at) ? opts.at : clock()),
+          par: Number(parMs) > 0 ? Number(parMs) : 2500,
+          min: Number.isFinite(opts.minMs) ? opts.minMs : minMs,
+          missed: false,
+          resolved: false,
+        };
+        st.items++;
+        return api;
+      },
+      audioDone() {
+        if (item && !item.resolved && item.readyAt === null) item.readyAt = clock();
+      },
+      hit(at) {
+        if (!item) api.ready();
+        if (item.resolved) return null;
+        if (item.missed) return api.recover();
+        const before = MULT(st.combo);
+        st.combo++;
+        st.maxCombo = Math.max(st.maxCombo, st.combo);
+        st.firstTry++;
+        const mult = MULT(st.combo);
+        const t = Number.isFinite(at) ? at : clock();
+        const elapsed = item.readyAt === null ? Infinity : t - item.readyAt;
+        const sharp = elapsed >= item.min && elapsed <= item.par;
+        const pts = Math.round(100 * mult) + (sharp ? 25 : 0);
+        if (sharp) st.sharp++;
+        st.points += pts;
+        item.resolved = true;
+        paint(mult > before);
+        return { pts, combo: st.combo, mult, sharp };
+      },
+      miss() {
+        if (!item) api.ready();
+        if (item.resolved || item.missed) return;
+        item.missed = true;
+        st.misses++;
+        const hadCombo = st.combo >= 3;
+        st.combo = 0;
+        paint(hadCombo);
+      },
+      recover() {
+        if (!item || item.resolved) return null;
+        if (!item.missed) return api.hit();
+        item.resolved = true;
+        st.recovered++;
+        st.points += recoverPoints;
+        paint(false);
+        return { pts: recoverPoints, combo: 0, mult: 1, sharp: false };
+      },
+      summary() {
+        return {
+          points: st.points, maxCombo: st.maxCombo, firstTry: st.firstTry,
+          sharp: st.sharp, recovered: st.recovered, misses: st.misses, items: st.items,
+          fullCombo: st.firstTry >= total && st.misses === 0 && st.recovered === 0,
+        };
+      },
+      hideHud() { if (hudEl) { hudEl.remove(); hudEl = null; } },
+    };
+    return api.reset();
+  },
+
   /* ── Result sound paths (from sfxBase) ── */
   resultSoundFor(score, sfxBase) {
     if (score <= 5)  return sfxBase + 'result_0-5.mp3';

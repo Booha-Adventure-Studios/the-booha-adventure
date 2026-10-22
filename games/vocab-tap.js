@@ -13,6 +13,12 @@ if (!CFG || !U) return;
 /* Check reveal pacing (Games Pass 2: was 700 / 750 / 500 ms). */
 const REVEAL_OK_MS = 220, REVEAL_MISS_MS = 300, REVEAL_END_MS = 350;
 
+/* Games Pass 4: combo / sharp / points. Each pair is one item; sharp = the
+   whole round of 5 matched inside the par time (but not under 2 s). */
+const run = U.createRun({ total: 15, recoverPoints: 0 });
+const ROUND_PAR_MS = 12000;
+let roundStartedAt = 0;
+
 U.unlockAudio();
 
 /* ══════════════════════════════════════════════════════════════
@@ -1024,6 +1030,7 @@ function updateDots(ri) {
    ══════════════════════════════════════════════════════════════ */
 function startRound(ri) {
   roundIdx      = ri;
+  roundStartedAt = performance.now();
   roundCards    = allCards.slice(ri * 5, ri * 5 + 5);
   /* Shuffle JP slots independently so they're never aligned with EN */
   roundJpOrder  = U.shuffle(roundCards.slice());
@@ -1168,6 +1175,7 @@ function flashWrong() {
 async function gradeRound() {
   if (isGrading) return;
   isGrading     = true;
+  const checkedAt = performance.now();
   globalLocked  = true;
   checkBtn.disabled = true;
   checkBtn.classList.add('grading');
@@ -1189,6 +1197,8 @@ async function gradeRound() {
 
     if (correct) {
       el.classList.add('slot-correct');
+      run.ready(ROUND_PAR_MS, { at: roundStartedAt, minMs: 2000 });
+      run.hit(checkedAt);
       /* Pass 2: quick cascade; each correct answer in a row dings a step higher */
       U.playSFX('ding', { rate: Math.min(1.5, 1 + dingStep * 0.06) });
       dingStep++;
@@ -1196,6 +1206,8 @@ async function gradeRound() {
       await new Promise(r => setTimeout(r, REVEAL_OK_MS));
     } else {
       el.classList.add('slot-wrong');
+      run.ready(ROUND_PAR_MS, { at: roundStartedAt, minMs: 2000 });
+      run.miss();
       if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
       U.playSFX('fart');
        
@@ -1273,6 +1285,7 @@ function fireConfetti() {
    3. No other game logic changed.
    ══════════════════════════════════════════════════════════════ */
 function showResults() {
+  const runSum = run.summary();   /* Games Pass 4 */
   updateDots(3);
   mainWrap.style.display = 'none';
   resultsWrap.classList.add('show');
@@ -1284,6 +1297,7 @@ function showResults() {
      Guard with optional chaining so the game never crashes if
      BoohaAdventure isn't mounted yet (e.g. standalone testing).        */
   U.emitGameEnd({
+    points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
     saveId:    `${CFG.curriculum}:vocab_tap`,
     score:     pct,
     completed: pct >= 40,
@@ -1329,6 +1343,7 @@ function showResults() {
     allCards = buildShuffledDeck();
     score    = 0;
     missedItems = [];
+    run.reset();
     scoreEl.textContent = '0';
     document.body.classList.remove('hira-mode');
     hiraMode            = false;
@@ -1348,6 +1363,7 @@ function showResults() {
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own vt-replay / vt-back. */
   U.showScorecard(Object.assign({
+    run:      runSum,
     gameId:   `${CFG.curriculum}:vocab_tap`,
     title:    'Vocabulary Tap',
     correct:  score,
