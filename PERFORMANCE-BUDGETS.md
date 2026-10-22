@@ -9,7 +9,7 @@ These are enforceable file/cache limits or runtime targets, not claims about eve
 | Maximum deployed image file | 700 KiB (2 MiB only for explicit lossless allowlist) |
 | Maximum decoded room neighborhood cache | current room + direct exits |
 | Maximum decoded Wanderer cache | 48 MiB |
-| Maximum deployed image payload | 52 MiB (all rasters under assets/img; unreferenced PNG source originals excluded) |
+| Maximum deployed image payload | 52 MiB (every raster under assets/img counts) |
 | Profile medal / trophy art | 48 KiB and 256 px per file |
 | Profile, Blitz, Menu image directories | 1.6 / 1.4 / 0.5 MiB |
 | Lossless WebP policy | explicit allowlist only; all other deployed WebP images must be lossy |
@@ -56,9 +56,10 @@ or tablet when one is available.
 ## Trophy Case pass (2026-10-22)
 
 The global image total moved from 50 MiB to 52 MiB, and it now counts every
-PNG/JPG/GIF under `assets/img`, not only WebP. Ten PNG source originals that
-have WebP twins are excluded, but the audit fails if anything in the app
-starts referencing them, so no device downloads them.
+PNG/JPG/GIF under `assets/img`, not only WebP. The ten unreferenced PNG
+source originals (13 MB, all with WebP twins) were deleted from the repo; the
+only remaining non-WebP raster is the 70 KB Juku logo, allowlisted with its
+own ceiling.
 
 The total is not what makes the app smooth. Frame time and memory come from
 the per-file ceilings (700 KiB, 48 KiB for medals), per-directory budgets,
