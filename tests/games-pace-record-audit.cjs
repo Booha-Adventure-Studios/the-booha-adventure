@@ -211,7 +211,12 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
 {
   const sc = read('js/game-scorecard.js');
   assert(/U\.readyPace\(run\.pace, opts\.gameId\)/.test(sc) && /bsc-rainbow/.test(sc), 'score card turns earned stars rainbow');
-  assert(/Rainbow stars = ready pace · じゅんび OK/.test(sc) && /booha_rainbow_seen/.test(sc), 'score card explains it (fuller the first time)');
+  assert(/READY PACE · じゅんび OK/.test(sc), 'score card shows a short rainbow chip');
+  // Shared iPads: "first rainbow ever" must be per student, read from the
+  // student's own synced save, never from a device-wide flag.
+  assert(!/booha_rainbow_seen/.test(sc) && !/localStorage/.test(sc.slice(sc.indexOf('function firstRainbowEver'), sc.indexOf('var overlay'))),
+    'the first-rainbow explanation is not keyed on a device-wide flag');
+  assert(/BoohaAdventure\.save\.load\(\)\.scores/.test(sc) && /\.rainbows\) > 0/.test(sc), 'first rainbow = no rainbows yet in this student\'s save');
   const css = read('theme/game.css');
   assert(/\.bsc-rainbow \.bsc-star\.on path \{ fill: url\(#booha-rainbow\)/.test(css), 'rainbow fill on score-card stars');
   assert(/@keyframes bscSheen \{[^}]*translateX/.test(css), 'the sheen moves by transform only');
