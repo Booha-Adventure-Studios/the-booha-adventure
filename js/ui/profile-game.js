@@ -305,9 +305,11 @@ const BoohaProfileGame = (() => {
       if (w.links[i]) {
         const mx = (a.x + b.x) / 2;
         const my = (a.y + b.y) / 2;
+        // Vertical links: the chip sits on the line in the gap between the
+        // upper node's nameplate and the lower disc, never over a name.
         const style = a.y === b.y
           ? `left:calc(${mx}% - 22px);top:${my - 28}px`
-          : `left:calc(${mx}% - 56px);top:${my - 10}px`;
+          : `left:calc(${a.x}% - 22px);top:${Math.min(a.y, b.y) + 64}px`;
         parts.push(`<span class="pg-chip" style="${style}">+1★</span>`);
       }
     }
@@ -336,8 +338,7 @@ const BoohaProfileGame = (() => {
       parts.push(`
         <div class="pg-node ${state}${rainbow ? ' rainbow' : ''}" style="left:${p.x}%;top:${p.y - 29}px" role="listitem" aria-label="${esc(label + (rainbow ? ', rainbow stars: ready pace' : ''))}">
           <span class="pg-disc">${i + 1}</span>
-          <span class="pg-stars">${esc(starText)}</span>
-          <span class="pg-name">${esc(g.name)}</span>
+          <span class="pg-label"><span class="pg-stars">${esc(starText)}</span><span class="pg-name">${esc(g.name)}</span></span>
         </div>`);
     });
     if (s.lastIndex >= 0) {
