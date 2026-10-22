@@ -452,15 +452,63 @@ const UTILS = {
    * keeping that work off the result reveal prevents a half-filled card from
    * looking frozen when storage or sync is slow.
    */
+  /* ══════════════════════════════
+     READY PACE → RAINBOW STARS (Rainbow Pass B)
+     Gold stars = completed. Rainbow stars = prepared pace: enough answers
+     right on the first try, at a steady "ready" pace, with no frantic
+     tapping. Notebook checks are fine: the rule uses the MEDIAN pace, so a
+     few long pauses never cost the rainbow. Pace is time ÷ the item's par
+     (par already scales with word / sentence length).
+
+     These zones are first defaults. Tune them from real class data with
+       node tools/pace-report.cjs <Wix saves export>
+     (pick the zone where about the top third of runs qualify).
+     null = pace not judged (speed games already set the pace).
+     ══════════════════════════════ */
+  PACE_RULE: { firstTry: 0.75, maxFrantic: 2, minTimed: 5, preBooSlack: 1.3 },
+  PACE_ZONES: {
+    vocab_tap: 1.5, spell_word: 1.25, vocab_speed: null,
+    sentence_tap: 1.5, sentence_order: 1.25, sentence_speed: null,
+    say_word: 1.5, say_sentence: 1.5, ask_question: 1.5,
+    booha_bites: 1.25, echo: 1.5, week_boss: 1.5,
+  },
+  readyPace(pace, saveId) {
+    if (!pace || pace.v !== 1 || !Array.isArray(pace.t) || !pace.t.length) return false;
+    const R = UTILS.PACE_RULE;
+    const id = String(saveId || '');
+    const game = id.slice(id.indexOf(':') + 1);
+    if (!Object.prototype.hasOwnProperty.call(UTILS.PACE_ZONES, game)) return false;
+    const f = String(pace.f || '');
+    const n = pace.t.length;
+    let right = 0;
+    for (let i = 0; i < n; i++) if (f[i] === '1') right++;
+    if (right / n < R.firstTry) return false;
+    if ((Number(pace.fr) || 0) > R.maxFrantic) return false;
+    let zone = UTILS.PACE_ZONES[game];
+    if (zone === null) return true;
+    if (id.indexOf('pb') === 0) zone *= R.preBooSlack;
+    const ratios = [];
+    for (let i = 0; i < n; i++) {
+      if (f[i] === '1' && pace.t[i] != null && pace.p[i] > 0) ratios.push(pace.t[i] / pace.p[i]);
+    }
+    if (ratios.length < R.minTimed) return false;
+    ratios.sort((a, b) => a - b);
+    const m = ratios.length >> 1;
+    const med = ratios.length % 2 ? ratios[m] : (ratios[m - 1] + ratios[m]) / 2;
+    return med <= zone;
+  },
+
   emitGameEnd(detail) {
     // Rainbow Pass A: attach the pace record from the run that just ended
-    // (summary() is always called right before this). Silent; saved inside
+    // (summary() is always called right before this). It is saved inside
     // recentRun, which the score system keeps for the last 8 runs per game.
+    // Pass B: the same record decides rainbow stars (score system stores it).
     const lp = UTILS._lastPace;
     UTILS._lastPace = null;
     if (lp && lp.pace && Date.now() - lp.at < 60000 && detail && typeof detail === 'object') {
       const rr = detail.recentRun && typeof detail.recentRun === 'object' ? detail.recentRun : {};
       if (!rr.pace) detail = { ...detail, recentRun: { ...rr, pace: lp.pace } };
+      if (detail.rainbow === undefined) detail = { ...detail, rainbow: detail.completed !== false && UTILS.readyPace(lp.pace, detail.saveId) };
     }
     const send = () => {
       try {
@@ -787,6 +835,8 @@ const UTILS = {
                                        item is answerable (waitAudio: the
                                        sharp clock starts at audioDone())
        run.audioDone()                 listening games: clip finished
+       run.pauseClock()                listening games: a replay started; the
+                                       clock resumes at the next audioDone()
        run.hit(at?)                    first-try right answer
        run.miss()                      wrong answer (ends the combo)
        run.recover()                   right on a later try
@@ -980,12 +1030,19 @@ const UTILS = {
       _first(t, ok) {
         if (!item || item.first) return;
         item.first = true;
-        const el = item.readyAt === null ? null : Math.max(0, t - item.readyAt);
+        const el = item.readyAt === null ? (Number.isFinite(item.acc) ? item.acc : null) : Math.max(0, t - item.readyAt);
         st.pace.push([el, item.par, ok]);
         if (!ok && el !== null && el < item.min) st.frantic++;
       },
       audioDone() {
-        if (item && !item.resolved && item.readyAt === null) item.readyAt = clock();
+        if (item && !item.resolved && item.readyAt === null) item.readyAt = clock() - (Number.isFinite(item.acc) ? item.acc : 0);
+      },
+      // Rainbow Pass B: a replay is listening, not hesitating. Bank the time
+      // so far and stop the clock until the replayed clip ends.
+      pauseClock() {
+        if (!item || item.resolved || item.first || item.readyAt === null) return;
+        item.acc = (Number.isFinite(item.acc) ? item.acc : 0) + Math.max(0, clock() - item.readyAt);
+        item.readyAt = null;
       },
       hit(at) {
         if (!item) api.ready();

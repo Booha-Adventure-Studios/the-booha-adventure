@@ -339,6 +339,7 @@ function playSuccessThenAdvance(mp3) {
 playBtn.addEventListener('click', () => {
   if (playBtn.disabled) return;
   const card = order[idx]; if (!card.mp3) return;
+  run.pauseClock();   // a replay is listening time, not answer time
   playBtn.disabled = true;
   playBtn.classList.add('playing');
   playBtn.textContent = '♪';

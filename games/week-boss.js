@@ -555,7 +555,7 @@ function showRound() {
     run.ready(3000, { waitAudio: true });
     let heard = false;
     const playBtn = $('wb-play');
-    const play = () => playClip(audioFor('questions') + card.mp3, playBtn, () => { if (!heard) { heard = true; run.audioDone(); } });
+    const play = () => { run.pauseClock(); playClip(audioFor('questions') + card.mp3, playBtn, () => { heard = true; run.audioDone(); }); };
     playBtn.addEventListener('click', play);
     play();
     cardEl.querySelectorAll('.wb-opt').forEach(b => b.addEventListener('click', () => {
