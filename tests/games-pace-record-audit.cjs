@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Rainbow Pass A (2026-10-22): the run tracker silently records each item's
-// first response vs par, and emitGameEnd carries it to the save in
-// recentRun.pace. Nothing about pace may be shown to students yet.
+// Rainbow Pass A (2026-10-22): the run tracker records each item's first
+// response vs par, and emitGameEnd carries it to the save in recentRun.pace.
+// Pass B: GAME_UTILS.readyPace turns that record into rainbow stars (weekly +
+// lifetime in the save) shown on the score card, menu tile and profile.
 'use strict';
 
 const assert = require('assert');
@@ -82,14 +83,9 @@ function load() {
   const src = read(`games/${g}.js`);
   assert(/run\.summary\(\)/.test(src) && /U\.emitGameEnd\(/.test(src), `${g} must summarise the run and emit through U.emitGameEnd`);
   assert(src.indexOf('run.summary()') < src.lastIndexOf('U.emitGameEnd('), `${g} must call summary() before emitGameEnd`);
-  assert(!/\.pace\b/.test(src), `${g} must not display pace yet (Pass A is silent)`);
 });
 assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(read('js/core/score-system.js')),
   'the save path keeps recentRun (last 8 runs per game)');
-['js/game-scorecard.js', 'js/menu-core.js', 'js/ui/profile-game.js'].forEach(f => {
-  assert(!/\.pace\b/.test(read(f)), `${f} must not show pace yet`);
-});
-
 /* ── the calibration report reads saves, including stringified exports ── */
 {
   const tmp = path.join(require('os').tmpdir(), `pace-${process.pid}.json`);
@@ -106,5 +102,127 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   assert.strictEqual(g.runs, 2);
   assert.strictEqual(g.rainbowShareAt['0.8'], 0.5, 'the steady run qualifies at ≤0.8 of par; the frantic run never does');
 }
+{
+  const tmp = path.join(require('os').tmpdir(), `pace-${process.pid}.csv`);
+  const save = { scores: { 'pb:spell_word': { recentRuns: [{ pace: { v: 1, t: [10, 10], p: [20, 20], f: '11', fr: 0 } }] } } };
+  fs.writeFileSync(tmp, 'ID,Owner,saveData\r\n' + `x1,u1,"${JSON.stringify(save).replace(/"/g, '""')}"\r\n`);
+  const out = JSON.parse(execFileSync('node', [path.join(ROOT, 'tools/pace-report.cjs'), tmp, '--json'], { encoding: 'utf8' }));
+  fs.unlinkSync(tmp);
+  assert.strictEqual(out.games[0].game, 'pb:spell_word', 'a CSV export (Wix) is read too');
+}
 
-console.log('Pace record audit passed: first responses vs par, frantic misses, audio wait, save wiring, silent UI, calibration report.');
+/* ══ Pass B: ready-pace rule ══ */
+{
+  const { U } = load();
+  const P = (t, p, f, fr = 0) => ({ v: 1, t, p, f, fr });
+  const fifteen = x => Array.from({ length: 15 }, () => x);
+  // steady: 15 right, all at 1.0× par → rainbow
+  assert.strictEqual(U.readyPace(P(fifteen(20), fifteen(20), '1'.repeat(15)), 'br:spell_word'), true, 'steady first-try run earns rainbow');
+  // notebook pauses: three answers at 10× par still pass on the median
+  const t = fifteen(20); t[2] = 200; t[7] = 250; t[11] = 300;
+  assert.strictEqual(U.readyPace(P(t, fifteen(20), '1'.repeat(15)), 'br:spell_word'), true, 'a few long notebook pauses do not cost the rainbow');
+  // slow throughout → no
+  assert.strictEqual(U.readyPace(P(fifteen(40), fifteen(20), '1'.repeat(15)), 'br:spell_word'), false, 'slow throughout stays gold');
+  // first-try under 75% → no
+  assert.strictEqual(U.readyPace(P(fifteen(10), fifteen(20), '111111111110000'), 'br:spell_word'), false, 'fewer than 75% first-try right stays gold');
+  // frantic tapping → no
+  assert.strictEqual(U.readyPace(P(fifteen(10), fifteen(20), '1'.repeat(15), 3), 'br:spell_word'), false, 'more than two frantic taps stays gold');
+  // speed games: pace not judged, accuracy only
+  assert.strictEqual(U.readyPace(P(fifteen(90), fifteen(20), '1'.repeat(15)), 'bc:vocab_speed'), true, 'speed games judge first-try accuracy only');
+  // Pre-Boo slack: 1.5× par fails spell_word for br, passes for pb (1.25 × 1.3)
+  assert.strictEqual(U.readyPace(P(fifteen(31), fifteen(20), '1'.repeat(15)), 'br:spell_word'), false);
+  assert.strictEqual(U.readyPace(P(fifteen(31), fifteen(20), '1'.repeat(15)), 'pb:spell_word'), true, 'Pre-Boo gets wider zones');
+  // too few timed answers (answered before clips finished) → no
+  assert.strictEqual(U.readyPace(P([null, null, null, null, 10, 10, 10, 10], Array(8).fill(20), '11111111'), 'br:say_word'), false, 'needs at least 5 timed answers');
+  assert.strictEqual(U.readyPace(P(fifteen(10), fifteen(20), '1'.repeat(15)), 'br:unknown_game'), false, 'unknown games never get rainbow');
+  assert.strictEqual(U.readyPace(null, 'br:spell_word'), false);
+  // extras use their own ids
+  assert.strictEqual(U.readyPace(P(fifteen(20), fifteen(20), '1'.repeat(15)), 'br-extra:booha_bites'), true, 'extra games can be rainbow too');
+}
+/* ══ Pass B: replays pause the clock ══ */
+{
+  const { U, at } = load();
+  const run = U.createRun({ total: 1, hud: false });
+  at(0); run.ready(3000, { waitAudio: true }); at(2000); run.audioDone();   // clip ends at 2 s
+  at(3000); run.pauseClock();                                               // 1 s of thinking, then replay
+  at(9000); run.audioDone();                                                // replay ends 6 s later
+  at(10500); run.hit();                                                     // 1.5 s more
+  assert.deepStrictEqual(Array.from(run.summary().pace.t), [25], 'replay time is excluded; thinking time before and after counts');
+}
+{
+  const { U, at } = load();
+  const run = U.createRun({ total: 1, hud: false });
+  at(0); run.ready(3000, { waitAudio: true }); at(1000); run.audioDone(); at(1500); run.pauseClock(); at(1700); run.hit();
+  assert.deepStrictEqual(Array.from(run.summary().pace.t), [5], 'answering during a replay counts the banked time');
+}
+['say-word', 'say-sentence', 'ask-question', 'echo', 'week-boss'].forEach(g => {
+  assert(/run\.pauseClock\(\)/.test(read(`games/${g}.js`)), `${g} must pause the pace clock on replay`);
+});
+/* ══ Pass B: emitGameEnd decides rainbow; incomplete runs never do ══ */
+{
+  const { U, events, at } = load();
+  const run = U.createRun({ total: 6, hud: false });
+  for (let i = 0; i < 6; i++) { at(i * 10000); run.ready(2000); at(i * 10000 + 1500); run.hit(); }
+  run.summary();
+  U.emitGameEnd({ saveId: 'br:vocab_tap', score: 100, completed: true });
+  assert.strictEqual(events[0].detail.rainbow, true, 'a ready-pace run is sent as rainbow');
+  run.summary();
+  U.emitGameEnd({ saveId: 'br:vocab_tap', score: 100, completed: false });
+  assert.strictEqual(events[1].detail.rainbow, false, 'an unfinished run is never rainbow');
+}
+/* ══ Pass B: the save keeps weekly + lifetime rainbow, needs ≥1 star ══ */
+{
+  const key = 'booha_save:v3:rainbow-student';
+  let stored = { version: 2, scores: {}, unlocks: {}, meta: { lastWeeklyKey: '2026-10-25|october-w4', allTimeStars: 0 }, weekly: {} };
+  const localStorage = {
+    getItem(n) { if (n === 'booha_userid') return 'rainbow-student'; if (n === key) return JSON.stringify(stored); return null; },
+    setItem(n, v) { if (n === key) stored = JSON.parse(v); }, removeItem() {},
+  };
+  const listeners = {};
+  const document = { readyState: 'loading', addEventListener(t, f) { (listeners[t] = listeners[t] || []).push(f); }, dispatchEvent(e) { (listeners[e.type] || []).forEach(f => f(e)); } };
+  class CustomEvent { constructor(t, i = {}) { this.type = t; this.detail = i.detail; } }
+  class Event { constructor(t) { this.type = t; } }
+  const context = {
+    window: { BOOHA_SYNC_READY: false, CALENDAR: {
+      getCurrentCurriculumWeek() { return { year: 2026, monthSlug: 'october', weekNumber: 4, weekId: 'october-w4', weekStart: '2026-10-25', occurrenceKey: '2026-10-25|october-w4' }; },
+      getCurriculumWeekOccurrenceKey(cw) { return cw.occurrenceKey; }, getTodayKey() { return '2026-10-27'; },
+    } },
+    localStorage, document, CustomEvent, Event, console: { log() {}, warn() {}, error: console.error }, Date, setTimeout, clearTimeout,
+  };
+  context.window.BoohaSync = { checkpoint() {} }; context.BoohaSync = context.window.BoohaSync; context.CALENDAR = context.window.CALENDAR;
+  vm.createContext(context);
+  for (const f of ['js/core/adventure-core.js', 'js/core/save-file.js', 'js/core/game-registry.js', 'js/core/score-system.js', 'js/core/unlock-system.js', 'js/core/day-record.js']) {
+    vm.runInContext(read(f), context, { filename: f });
+  }
+  const BA = context.window.BoohaAdventure;
+  BA.init();
+  const fire = d => document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail: d }));
+  fire({ saveId: 'br:spell_word', score: 93, completed: true, rainbow: true });
+  fire({ saveId: 'br:spell_word', score: 60, completed: true, rainbow: false });
+  fire({ saveId: 'br:vocab_tap', score: 10, completed: true, rainbow: true });   // 0 stars: no rainbow
+  const S = BA.scores;
+  assert.strictEqual(S.weeklyRainbowForGame('br:spell_word'), true, 'a rainbow run this week stays rainbow for the week');
+  assert.strictEqual(S.weeklyRainbowForGame('br:vocab_tap'), false, 'rainbow needs at least one star');
+  assert.strictEqual(stored.scores['br:spell_word'].rainbows, 1, 'lifetime rainbow count');
+  assert(stored.scores['br:spell_word'].firstRainbowAt > 0, 'first rainbow time is kept');
+  assert.strictEqual(S.weeklyStarsFor('br'), 3, 'rainbow adds no stars to the weekly total');
+}
+/* ══ Pass B: shown everywhere it was promised ══ */
+{
+  const sc = read('js/game-scorecard.js');
+  assert(/U\.readyPace\(run\.pace, opts\.gameId\)/.test(sc) && /bsc-rainbow/.test(sc), 'score card turns earned stars rainbow');
+  assert(/Rainbow stars = ready pace · じゅんび OK/.test(sc) && /booha_rainbow_seen/.test(sc), 'score card explains it (fuller the first time)');
+  const css = read('theme/game.css');
+  assert(/\.bsc-rainbow \.bsc-star\.on path \{ fill: url\(#booha-rainbow\)/.test(css), 'rainbow fill on score-card stars');
+  assert(/@keyframes bscSheen \{[^}]*translateX/.test(css), 'the sheen moves by transform only');
+  assert(/prefers-reduced-motion: reduce\) \{ \.bsc-rainbow::after \{ animation: none/.test(css), 'reduced motion keeps the rainbow still');
+  const menu = read('js/menu-core.js');
+  assert(/setRainbow\(t, rainbow\)/.test(menu) && /setRainbow\(t, xr\)/.test(menu) && /weeklyRainbowForGame/.test(menu), 'menu tiles (nine + extras) show weekly rainbow');
+  assert(/\.tile\.rainbow::after[\s\S]*mask/.test(read('theme/menu.css')), 'rainbow tiles get a prism edge');
+  const pg = read('js/ui/profile-game.js');
+  assert(/pg-node \$\{state\}\$\{rainbow \? ' rainbow' : ''\}/.test(pg), 'profile trail node keeps the rainbow');
+  assert(/pg-x-stars\$\{rainbow \? ' rainbow' : ''\}/.test(pg), 'bonus game cards show rainbow stars');
+  assert(/pg-rainbow-key/.test(pg), 'the trail explains rainbow when one shows');
+}
+
+console.log('Pace + rainbow audit passed: first responses vs par, replay pause, ready-pace rule, weekly/lifetime rainbow, score card / menu / profile, calibration report.');

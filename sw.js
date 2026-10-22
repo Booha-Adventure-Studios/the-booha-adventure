@@ -93,7 +93,9 @@ const CURRENT_CACHES = {
   // the arcade shelf; "Bonus Games" means only the three extra games.
   // Rainbow Pass A (2026-10-22): js/game-utils.js silently records each
   // run's pace (first response vs par) into recentRun for calibration.
-  pages:  'booha-pages-2026-490',
+  // Rainbow Pass B (2026-10-22): ready-pace runs turn stars rainbow on the
+  // score card, menu tiles and profile; replays pause the pace clock.
+  pages:  'booha-pages-2026-491',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -269,7 +271,8 @@ const CURRENT_CACHES = {
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
   // Trophy Case pass: nine new medal WebPs and the new trophy stylesheet.
   // Round token art for the nine new tokens and the arcade boss thumbnail.
-  assets: 'booha-assets-2026-601',
+  // Rainbow Pass B: theme/game.css + theme/menu.css rainbow star styles.
+  assets: 'booha-assets-2026-602',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

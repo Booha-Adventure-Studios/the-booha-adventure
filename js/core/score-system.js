@@ -87,6 +87,15 @@ const BoohaScoreSystem = (() => {
     }
     const crowned = opts.crown === true;
     if (crowned) entry.crowns = (entry.crowns || 0) + 1;
+    // Rainbow Pass B: ready-pace run (decided by GAME_UTILS.readyPace). It is
+    // a look for the stars, not more stars: it needs at least one star from
+    // this run and never feeds totals, unlocks or medals.
+    const runStars = registry ? registry.starsForScore(gameId, score) : 0;
+    const rainbow = opts.rainbow === true && runStars >= 1;
+    if (rainbow) {
+      entry.rainbows = (entry.rainbows || 0) + 1;
+      if (!entry.firstRainbowAt) entry.firstRainbowAt = Date.now();
+    }
 
     // Optional run memory for arcade games. The shared score entry remains
     // compact, but can still recall a player's recent attempts and lifetime
@@ -116,6 +125,7 @@ const BoohaScoreSystem = (() => {
     const wWanderers   = weekly.wanderers       || [];
     const wPoints      = weekly.gamePoints      || {};
     const wCrowns      = weekly.gameCrowns      || {};
+    const wRainbow     = weekly.gameRainbow     || {};
 
     const wasNewGame = !(wScores[gameId]);   // wScores is fresh from the new load()
 
@@ -140,6 +150,7 @@ const BoohaScoreSystem = (() => {
       wPoints[gameId] = points;
     }
     if (crowned) wCrowns[gameId] = true;
+    if (rainbow) wRainbow[gameId] = true;
 
     // ── 3. Unlock wanderer for this game ───────────────────────────────────
     if (wasNewGame) {
@@ -164,6 +175,7 @@ const BoohaScoreSystem = (() => {
     data.weekly.wanderers      = wWanderers;
     data.weekly.gamePoints     = wPoints;
     data.weekly.gameCrowns     = wCrowns;
+    data.weekly.gameRainbow    = wRainbow;
 
     // ── 5. Update meta.allTimeStars ────────────────────────────────────────
     // Only add the improvement in stars (delta) to avoid double-counting.
@@ -177,7 +189,7 @@ const BoohaScoreSystem = (() => {
     BoohaAdventure.save.save(data);
 
     // ── 6. Fire events ─────────────────────────────────────────────────────
-    const detail = { gameId, score, isHighScore, isBestTime, stars: entry.stars, wasCompleted, points, isBestPoints, crown: crowned };
+    const detail = { gameId, score, isHighScore, isBestTime, stars: entry.stars, wasCompleted, points, isBestPoints, crown: crowned, rainbow };
     document.dispatchEvent(new CustomEvent('booha:scoreSubmitted', { detail }));
 
     // Trigger unlock checks (achievements + bonus games)
@@ -272,6 +284,9 @@ const BoohaScoreSystem = (() => {
   }
   function weeklyCrownForGame(saveId) {
     return !!(_getWeekly().gameCrowns || {})[saveId];
+  }
+  function weeklyRainbowForGame(saveId) {
+    return !!(_getWeekly().gameRainbow || {})[saveId];
   }
   function weeklyCrownsFor(curriculum) {
     return Object.keys(_getWeekly().gameCrowns || {})
@@ -370,7 +385,7 @@ const BoohaScoreSystem = (() => {
     totalStars, totalStarsFor, totalCompleted, totalCompletedFor,
     weeklyStars, weeklyStarsFor, weeklyCompleted, weeklyCompletedFor, weeklyPlayedFor,
     weeklyStarsForGame, weeklyScoreForGame, isCompletedWeekly,
-    getBestPoints, weeklyPointsForGame, weeklyCrownForGame, weeklyCrownsFor,
+    getBestPoints, weeklyPointsForGame, weeklyCrownForGame, weeklyCrownsFor, weeklyRainbowForGame,
     isExtraId,
     allTimeStars,
     weeklySummaryFor, weeklySummaryAll,

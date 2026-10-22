@@ -10,9 +10,10 @@
  *   node tools/pace-report.cjs saves/*.json
  *   node tools/pace-report.cjs export.json --json > pace.json
  *
- * Input: any JSON file(s) holding saves: one save, an array of saves, or an
- * export where saves sit under some field, even as JSON strings (as a CMS or
- * Wix export does). Every object with a `scores` map is treated as a save.
+ * Input: JSON or CSV file(s) holding saves: one save, an array of saves, or
+ * an export where saves sit in some field, even as JSON strings (a Wix
+ * collection export as CSV or JSON works). Every object with a `scores` map
+ * is treated as a save.
  *
  * Times are compared with each item's par (par already scales with word or
  * sentence length), so a pace of 0.80 means "answered in 80% of par".
@@ -46,9 +47,28 @@ function scan(v, depth = 0) {
     Object.values(v).forEach(x => scan(x, depth + 1));
   }
 }
+// CSV (e.g. a Wix collection export): quoted fields with "" escapes.
+function csvFields(text) {
+  const out = [];
+  let field = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else field += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',' || c === '\n' || c === '\r') { out.push(field); field = ''; }
+    else field += c;
+  }
+  out.push(field);
+  return out;
+}
 files.forEach(f => {
-  try { scan(JSON.parse(fs.readFileSync(f, 'utf8'))); }
-  catch (e) { console.error(`skip ${f}: ${e.message}`); }
+  let text;
+  try { text = fs.readFileSync(f, 'utf8'); } catch (e) { console.error(`skip ${f}: ${e.message}`); return; }
+  try { scan(JSON.parse(text)); }
+  catch (_) { csvFields(text).forEach(v => scan(v)); }
 });
 
 /* ── gather runs per game ─────────────────────────────────────────── */

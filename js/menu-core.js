@@ -211,6 +211,26 @@
   if (staticNav) staticNav.remove();
   if (!reducedMotion) { mainEl.classList.add('bm-enter'); setTimeout(function () { mainEl.classList.remove('bm-enter'); }, 1400); }
 
+  /* Rainbow Pass B: a ready-pace run this week turns the tile's stars rainbow
+     and gives it a prism edge. One shared SVG gradient for every star. */
+  function setRainbow(t, on) {
+    t.classList.toggle('rainbow', !!on);
+    if (on && !document.getElementById('booha-rainbow-defs')) {
+      var ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
+      s.id = 'booha-rainbow-defs'; s.setAttribute('aria-hidden', 'true');
+      s.setAttribute('width', '0'); s.setAttribute('height', '0'); s.style.position = 'absolute';
+      s.innerHTML = '<defs><linearGradient id="booha-rainbow" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0%" stop-color="#ff5f6d"/><stop offset="17%" stop-color="#ffb347"/><stop offset="33%" stop-color="#fff36b"/><stop offset="50%" stop-color="#5cffb0"/><stop offset="67%" stop-color="#5cc8ff"/><stop offset="83%" stop-color="#a77bff"/><stop offset="100%" stop-color="#ff7ad9"/>' +
+        '</linearGradient></defs>';
+      document.body.appendChild(s);
+    }
+    var lab = t._bm && t._bm.stars;
+    if (lab) {
+      var base = (lab.getAttribute('aria-label') || '').replace(/, rainbow: ready pace$/, '');
+      lab.setAttribute('aria-label', base + (on ? ', rainbow: ready pace' : ''));
+    }
+  }
+
   /* ── Fill from the save (after booha:ready) ── */
   function paint() {
     var BA = window.BoohaAdventure, scores = BA && BA.scores, live = week === liveWeekSlug(CURR, window.CALENDAR);
@@ -225,6 +245,9 @@
       for (var s = 0; s < 3; s++) starEls[s].setAttribute('class', 'bm-star ' + (s < n ? 'on' : 'off') + (s === 1 ? ' mid' : ''));
       t._bm.stars.setAttribute('aria-label', n + ' of 3 stars this week');
       t.classList.toggle('gold3', n === 3);
+      var rainbow = false;
+      if (live && scores && scores.weeklyRainbowForGame) { try { rainbow = n > 0 && !!scores.weeklyRainbowForGame(id); } catch (_) {} }
+      setRainbow(t, rainbow);
       var crowned = false, pts = 0;
       if (live && scores) {
         try { crowned = !!(scores.weeklyCrownForGame && scores.weeklyCrownForGame(id)); } catch (_) {}
@@ -251,6 +274,9 @@
       for (var s = 0; s < 3; s++) starEls[s].setAttribute('class', 'bm-star ' + (s < n ? 'on' : 'off') + (s === 1 ? ' mid' : ''));
       t._bm.stars.setAttribute('aria-label', n + ' of 3 stars this week');
       t.classList.toggle('gold3', n === 3);
+      var xr = false;
+      if (live && scores && scores.weeklyRainbowForGame) { try { xr = n > 0 && !!scores.weeklyRainbowForGame(id); } catch (_) {} }
+      setRainbow(t, xr);
       var oc = t.querySelector('.bm-crown'); if (oc) oc.remove();
       if (crowned) { var cr = svg(CROWN, 'bm-crown', '0 0 26 20'); cr.setAttribute('role', 'img'); cr.setAttribute('aria-label', 'Crown'); t.insertBefore(cr, t.firstChild); }
       t._bm.best.textContent = live && pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : '';

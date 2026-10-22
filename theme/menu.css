@@ -119,6 +119,13 @@ html.bm-nojs .bm-static { display: grid; }
 .bm-star.on { filter: drop-shadow(0 0 6px rgba(255,190,60,.7)); }
 .bm-star.on path { fill: var(--bm-gold); stroke: var(--bm-gold-hi); }
 .bm-star.off path { fill: rgba(255,255,255,.05); stroke: rgba(246,236,216,.3); }
+/* Rainbow Pass B: ready-pace tile — rainbow stars and a prism edge. */
+.bmenu .tile.rainbow .bm-star.on path { fill: url(#booha-rainbow); stroke: #fff; }
+.bmenu .tile.rainbow .bm-star.on { filter: drop-shadow(0 0 6px rgba(255,120,220,.6)) drop-shadow(0 0 10px rgba(92,200,255,.4)); }
+.bmenu .tile.rainbow::after { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 2px; pointer-events: none;
+  background: linear-gradient(125deg, #ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); opacity: .9; }
 .bm-crown { position: absolute; top: 9px; left: 50%; width: 26px; height: 20px; margin-left: -13px; }
 .bm-crown path { fill: var(--bm-crown); stroke: #fff3c4; stroke-width: 1; stroke-linejoin: round; }
 .bm-name { font-family: var(--bm-font-display); font-weight: 400; font-size: 21px; line-height: 1.05; text-wrap: balance; }
