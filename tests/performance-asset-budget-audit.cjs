@@ -145,6 +145,9 @@ const directoryBudgets = new Map([
   ['muenba', 9.2 * 1024 * 1024],
   ['utsuroba', 5.75 * 1024 * 1024],
   ['wanderers', 11.5 * 1024 * 1024],
+  ['profile', 1.6 * 1024 * 1024],
+  ['blitz', 1.4 * 1024 * 1024],
+  ['menu', 0.5 * 1024 * 1024],
 ]);
 for (const [directory, budget] of directoryBudgets) {
   const bytes = records
@@ -164,8 +167,75 @@ records.forEach(record => {
   }
 });
 
-const totalBytes = records.reduce((sum, record) => sum + record.bytes, 0);
-assert(totalBytes <= 50 * 1024 * 1024, `deployed image payload exceeds the 50 MiB performance budget (got ${totalBytes})`);
+// Trophy Case pass (2026-10-22): count every raster under assets/img, not
+// only WebP. Source PNG originals that have a WebP twin are allowed to stay in
+// the repo only while nothing in the app references them (so no device ever
+// downloads them); any other PNG/JPG/GIF counts toward the budget like a WebP.
+const sourceOriginals = new Set([
+  'muenba/ghost-orb-background-v1.png',
+  'muenba/ghost-orb-jar-v1.png',
+  'family-room/flashlight.png',
+  'tree-arch.png',
+  'hw-background-1.png',
+  'uhibon/uhi-w.png',
+  'uhibon/uhi-t1.png',
+  'uhibon/uhi-t2.png',
+  'uhibon/uhi-st.png',
+  'uhibon/chat-uhi.png',
+]);
+const countedRasters = new Map([['juku-logo.png', 100 * 1024]]);
+function rasters(dir) {
+  const result = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) result.push(...rasters(file));
+    else if (/\.(png|jpe?g|gif)$/i.test(entry.name)) result.push(file);
+  }
+  return result;
+}
+function runtimeSources(dir, out = []) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (['.git', 'node_modules', 'tests', 'assets', 'docs', 'tmp'].includes(entry.name)) continue;
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) runtimeSources(file, out);
+    else if (/\.(js|html|css|json|webmanifest)$/i.test(entry.name)) out.push(file);
+  }
+  return out;
+}
+const runtimeText = runtimeSources(root).map(file => fs.readFileSync(file, 'utf8')).join('\n');
+let rasterBytes = 0;
+for (const file of rasters(imageRoot)) {
+  const relative = path.relative(imageRoot, file);
+  const bytes = fs.statSync(file).size;
+  if (sourceOriginals.has(relative)) {
+    assert(!runtimeText.includes(path.basename(relative)),
+      `${relative} is a source original and must stay unreferenced (use its WebP twin)`);
+    continue;
+  }
+  assert(countedRasters.has(relative), `${relative} is a non-WebP image; convert it to WebP or allowlist it with a ceiling`);
+  assert(bytes <= countedRasters.get(relative), `${relative} exceeds its raster ceiling`);
+  rasterBytes += bytes;
+}
+
+// Permanent trophy and weekly medal art is drawn at 72px (≈216px on a 3x
+// phone): keep every medal small so the profile shelf decodes instantly.
+records
+  .filter(record => /^profile\/medal-[^/]+\.webp$/.test(path.relative(imageRoot, record.file)))
+  .forEach(record => {
+    const relative = path.relative(imageRoot, record.file);
+    assert(record.bytes <= 48 * 1024, `${relative} exceeds the 48 KiB medal ceiling`);
+    const [w, h] = childProcess.execFileSync('ffprobe', [
+      '-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
+      '-of', 'csv=p=0:s=x', record.file,
+    ], { encoding: 'utf8' }).trim().split('x').map(Number);
+    assert(w <= 256 && h <= 256, `${relative} must be at most 256px (got ${w}x${h})`);
+  });
+
+// Smoothness comes from the per-file, per-directory and decode ceilings above
+// plus lazy loading; the global total only bounds what a full visit of every
+// world eventually downloads. 52 MiB keeps ~1.8 MiB of headroom over today.
+const totalBytes = records.reduce((sum, record) => sum + record.bytes, 0) + rasterBytes;
+assert(totalBytes <= 52 * 1024 * 1024, `deployed image payload exceeds the 52 MiB performance budget (got ${totalBytes})`);
 
 // Family Room lives outside assets/img, but its images are deployed just the
 // same. Keep the six small authored Genkan overlays lossless for crisp alpha
