@@ -162,3 +162,11 @@ html.bm-nojs .bm-static { display: grid; }
 }
 html[data-power="reduced"] .bm-fly, html[data-power="minimal"] .bm-fly { display: none; }
 html[data-power="reduced"] *, html[data-power="minimal"] * { animation-iteration-count: 1 !important; }
+
+/* ── Extra games row (Games Pass 6+) ── */
+.bm-extra-note { grid-column: 3 / -1; align-self: center; font-size: 12px; font-weight: 700; line-height: 1.5;
+  color: var(--bm-muted); padding: 0 6px; }
+.bmenu .tile-extra { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bm-accent) 45%, transparent), 0 14px 30px rgba(0,0,0,.45); }
+@media (max-width: 720px) {
+  .bm-extra-note { grid-column: 2 / -1; font-size: 10px; }
+}

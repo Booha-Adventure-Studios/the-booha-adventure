@@ -1697,6 +1697,13 @@ else
   bad "Shared curriculum menu audit failed"
 fi
 
+echo "[games] extra games (outside the nine) audit"
+if node tests/games-extras-audit.cjs >/dev/null 2>&1; then
+  ok "Extra games audit passed"
+else
+  bad "Extra games audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

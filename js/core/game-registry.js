@@ -155,6 +155,37 @@ const BoohaGameRegistry = (() => {
     },
   ];
 
+  // ── Extra curriculum games (Games Pass 6+) ───────────────────────────────
+  // Optional games that use the week's cards but are NOT part of the nine.
+  // They save under "{curriculum}-extra:{id}" so every per-curriculum count
+  // (completedFor, starsFor, the 9-game bonus unlock, the world gate, level
+  // stars) — all of which filter on the "{curriculum}:" prefix — ignore them
+  // by construction. getForCurriculum() keeps returning exactly the nine.
+  const EXTRA_BASE_GAMES = [
+    {
+      id:             'booha_bites',
+      gameKey:        'booha-bites',
+      name:           'Booha Bites',
+      file:           'games/booha-bites.js',
+      category:       'context',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
+  ];
+  const EXTRA_GAMES = [];
+  CURRICULUMS.forEach(curriculum => {
+    EXTRA_BASE_GAMES.forEach(base => {
+      EXTRA_GAMES.push({
+        ...base,
+        curriculum,
+        core:      false,
+        extra:     true,
+        saveId:    `${curriculum}-extra:${base.id}`,
+        indexFile: `curriculum/${curriculum}/games-index.html`,
+      });
+    });
+  });
+
   // ── Build full entries (9 games × 3 curriculums = 27) ────────────────────
   const GAMES = [];
   CURRICULUMS.forEach(curriculum => {
@@ -184,6 +215,12 @@ const BoohaGameRegistry = (() => {
   });
 
   BONUS_GAMES.forEach(g => { _bySaveId[g.saveId] = g; });
+  EXTRA_GAMES.forEach(g => { _bySaveId[g.saveId] = g; });
+
+  /** Extra (non-core) games for one curriculum; never counted in the nine. */
+  function getExtraForCurriculum(curriculum) {
+    return EXTRA_GAMES.filter(g => g.curriculum === curriculum);
+  }
 
   // ── Public API ────────────────────────────────────────────────────────────
 
@@ -268,6 +305,8 @@ const BoohaGameRegistry = (() => {
     getAllVariants,
     getBaseGames,
     getBonusGames,
+    EXTRA_GAMES,
+    getExtraForCurriculum,
     getAllSaveIds,
     saveId,
     starsForScore,
