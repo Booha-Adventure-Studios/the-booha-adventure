@@ -414,6 +414,7 @@ html[data-skin="v2"][data-curriculum="pb"] :is(.so-feedback, .sw-feedback)[style
 html[data-skin="v2"] { --lane-on: #2b1a05; }
 html[data-skin="v2"][data-lane="sentences"] { --lane-on: #08182b; }
 html[data-skin="v2"][data-lane="listen"] { --lane-on: #1d1240; }
+html[data-skin="v2"][data-lane="extra"] { --lane-on: #2a0610; }
 html[data-skin="v2"][data-curriculum="pb"][data-lane="listen"] { --lane-on: #ffffff; }
 html[data-skin="v2"][data-curriculum] :is(.vt-en-card, .st-en-card).selected,
 html[data-skin="v2"][data-curriculum] :is(.vt-en-card, .st-en-card).selected[data-ci] {
@@ -520,3 +521,84 @@ html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice):
 }
 html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).correct::before { content: '✓'; }
 html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).wrong::before { content: '✗'; }
+
+/* ══════════════════════════════════════════════════════════════
+   EXTRA LANE: Booha Bites, Echo, Week Boss (Games Pass 13)
+   These were built on the shared tokens, so the world and rose lane
+   carry most of the look. Below: the page header they use, the meaning
+   colours they hard-coded, and their play buttons as rose speakers.
+   ══════════════════════════════════════════════════════════════ */
+html[data-skin="v2"][data-curriculum] .game-title {
+  color: var(--world-ink); text-shadow: 0 2px 14px rgba(0,0,0,.35); letter-spacing: .02em;
+}
+html[data-skin="v2"][data-curriculum="pb"] .game-title { text-shadow: none; }
+html[data-skin="v2"][data-curriculum] .game-week { color: var(--game-muted); }
+html[data-skin="v2"] .game-header .game-lane-chip { margin: 0 auto 6px; }
+
+/* Cards: world surface + lane ring */
+html[data-skin="v2"][data-curriculum] :is(.bb-card, .ec-card, .wb-card, .wb-boss) {
+  background: var(--game-surface); border: none;
+  box-shadow: inset 0 0 0 2px var(--lane-ring), 0 10px 28px rgba(0,0,0,.28);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+html[data-skin="v2"][data-curriculum="pb"] :is(.bb-card, .ec-card, .wb-card, .wb-boss) { box-shadow: inset 0 0 0 2px var(--lane-ring), 0 8px 20px rgba(120,30,60,.1); }
+
+/* Word choices are playing cards (cream face, edge underneath) */
+html[data-skin="v2"][data-curriculum] :is(.bb-choice, .wb-opt, .wb-word) {
+  background: var(--card-face); color: var(--card-ink); border: none;
+  box-shadow: 0 5px 0 var(--card-edge), 0 10px 18px rgba(0,0,0,.24);
+}
+html[data-skin="v2"][data-curriculum] :is(.bb-choice, .wb-opt, .wb-word):hover:not(:disabled) { transform: translateY(-3px); }
+
+/* Meaning: green fill + ✓, orange fill + ✗ */
+html[data-skin="v2"][data-curriculum] :is(.bb-choice.correct, .wb-opt.ok, .wb-word.ok) {
+  background: var(--ok); color: var(--ok-ink); box-shadow: 0 5px 0 var(--ok-edge), 0 0 24px var(--ok-glow);
+}
+html[data-skin="v2"][data-curriculum] :is(.bb-choice.wrong, .wb-opt.bad, .wb-word.bad) {
+  background: var(--bad); color: var(--bad-ink); box-shadow: 0 5px 0 var(--bad-edge), 0 0 20px var(--bad-glow);
+}
+html[data-skin="v2"][data-curriculum] .bb-choice.wrong { opacity: .82; }
+/* (Week Boss Match/No-match buttons already carry ✓ / ✗ in their label.) */
+html[data-skin="v2"][data-curriculum] :is(.bb-choice.correct, .wb-opt.ok:not([data-v]), .wb-word.ok)::before { content: '✓ '; white-space: pre; }
+html[data-skin="v2"][data-curriculum] :is(.bb-choice.wrong, .wb-opt.bad:not([data-v]), .wb-word.bad)::before { content: '✗ '; white-space: pre; }
+html[data-skin="v2"][data-curriculum] :is(.bb-dot, .ec-dot).miss { background: var(--bad); }
+html[data-skin="v2"][data-curriculum] :is(.bb-dot, .ec-dot).done { background: #22c55e; }
+html[data-skin="v2"][data-curriculum] :is(.bb-dot, .ec-dot):is(.now) { background: var(--lane); }
+html[data-skin="v2"][data-curriculum] .ec-input.ok { border-color: #22c55e; }
+html[data-skin="v2"][data-curriculum] .ec-input.bad { border-color: var(--bad); }
+html[data-skin="v2"][data-curriculum] .ec-input:focus { border-color: var(--lane); }
+html[data-skin="v2"][data-curriculum] :is(.ec-feedback, .wb-fb).ok, html[data-skin="v2"][data-curriculum] .ec-typed b { color: #4ade80; }
+html[data-skin="v2"][data-curriculum] :is(.ec-feedback, .wb-fb).bad, html[data-skin="v2"][data-curriculum] .ec-typed s { color: #ff9a6b; }
+html[data-skin="v2"][data-curriculum="pb"] :is(.ec-feedback, .wb-fb).ok, html[data-skin="v2"][data-curriculum="pb"] .ec-typed b { color: var(--ok); }
+html[data-skin="v2"][data-curriculum="pb"] :is(.ec-feedback, .wb-fb).bad, html[data-skin="v2"][data-curriculum="pb"] .ec-typed s { color: var(--bad-edge); }
+
+/* Primary actions: solid lane colour, dark text */
+html[data-skin="v2"][data-curriculum] :is(.ec-check, .wb-go) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lane) 80%, #fff), var(--lane)); color: var(--lane-on);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--lane) 55%, #000), 0 8px 18px rgba(0,0,0,.25);
+}
+html[data-skin="v2"][data-curriculum] :is(.ec-slow, .ec-tool) { background: var(--game-surface); color: var(--game-ink); border: 1.5px solid var(--game-border); }
+
+/* Echo and Week Boss play buttons: rose speakers, rippling while they play */
+html[data-skin="v2"][data-curriculum] :is(.ec-play, .wb-play) {
+  position: relative; overflow: visible; color: #2a0610;
+  background: radial-gradient(circle at 35% 30%, #ffe3ea, #ff8fab 58%, #d6456b);
+  box-shadow: 0 0 0 4px rgba(255,111,145,.25), 0 0 26px rgba(255,111,145,.5), 0 5px 0 #8a1736;
+}
+html[data-skin="v2"][data-curriculum] :is(.ec-play, .wb-play)::before {
+  content: ''; position: absolute; inset: -14px; border-radius: 50%; pointer-events: none;
+  border: 2px solid var(--lane-ring); opacity: .5;
+}
+html[data-skin="v2"][data-curriculum] :is(.ec-play, .wb-play).playing {
+  background: radial-gradient(circle at 35% 30%, #ffffff, #ffc2d1 55%, #ff6f91);
+  box-shadow: 0 0 0 5px rgba(255,194,209,.45), 0 0 40px rgba(255,111,145,.8), 0 5px 0 #8a1736;
+  animation: skinSpeakerThrob .5s ease-in-out infinite;
+}
+html[data-skin="v2"][data-curriculum] :is(.ec-play, .wb-play).playing::before { animation: skinRipple 1.2s ease-out infinite; border-color: var(--lane); }
+
+html[data-skin="v2"][data-curriculum] .ec-audio { gap: 40px; }   /* room for the speaker ring */
+/* Phones: the combo counter sits top-left, so the lane chip drops below it. */
+@media (max-width: 560px) {
+  html[data-skin="v2"] .game-lane-chip { margin-top: calc(52px + env(safe-area-inset-top, 0px)); }
+  html[data-skin="v2"] .game-header .game-lane-chip { margin-top: 38px; }
+}
