@@ -277,6 +277,12 @@ assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-
   assert(/\.bm-tree-crown/.test(mcss) && /is-locked/.test(mcss), 'menu.css must style the locked boss tile and tree crown');
   assert.match(menu, /scores\.weeklyPlayedFor\(CURR\)/, 'the menu must open the boss tile from weeklyPlayedFor');
   assert.match(menu, /if \(t\.classList\.contains\('is-locked'\)\) \{/, 'a locked boss tile must not launch');
+  assert.match(menu, /bubble\.textContent = t\._bossLive\s*\?/, 'practice weeks must say the boss is this week only, not "play all 9"');
+  assert.match(gameCore, /if \(!r\.ok\) throw/, 'a 404 or offline page must count as a missing deck');
+  assert.match(gameCore, /alsoMissing,/, 'game-core must tell engines which decks are missing');
+  assert(boss.indexOf('if (SENT.length < 4) {') > -1 && boss.indexOf('if (SENT.length < 4) {') < boss.indexOf('const POOL = ['), 'without sentences the boss must show the retry screen before building rounds');
+  assert(boss.includes("window.location.reload()"), 'the missing-deck screen must offer a retry');
+  assert(boss.includes('DOES IT MATCH THE JAPANESE?'), 'the SPOT prompt says what the student is solving');
 
   const ctx = { window: {}, console };
   vm.createContext(ctx);
