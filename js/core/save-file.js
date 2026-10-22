@@ -94,6 +94,8 @@ const BoohaSaveFile = (() => {
         completedGames:    {},   // { [saveId]: true }
         gameScores:        {},   // { [saveId]: highScore this week }
         gameStars:         {},   // { [saveId]: stars this week }
+        gamePoints:        {},   // { [saveId]: best points this week } (Games Pass 4)
+        gameCrowns:        {},   // { [saveId]: true } 15/15 first-try run this week
         unlockedBonusGames:{},   // { booha_invaders: true, booha_blocks: true, ... }
         unlockedBoohaSkins:{},   // { batty: { unlockedAt } } — temporary cosmetic unlocks
         wanderers:         [],   // [ wandererId, ... ] unlocked this week (index = order)
@@ -340,6 +342,8 @@ const BoohaSaveFile = (() => {
         completedGames:     {},
         gameScores:         {},
         gameStars:          {},
+        gamePoints:         {},
+        gameCrowns:         {},
         unlockedBonusGames: {},
         unlockedBoohaSkins: {},
         wanderers:          [],
@@ -348,6 +352,9 @@ const BoohaSaveFile = (() => {
     }
     if (!save.weekly.unlockedBoohaSkins || typeof save.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(save.weekly.unlockedBoohaSkins)) {
       save.weekly.unlockedBoohaSkins = {};
+    }
+    for (const key of ['gamePoints', 'gameCrowns']) {
+      if (!save.weekly[key] || typeof save.weekly[key] !== 'object' || Array.isArray(save.weekly[key])) save.weekly[key] = {};
     }
 
     // Batty Booha was originally introduced as a permanent unlock. Do not
@@ -470,6 +477,8 @@ const BoohaSaveFile = (() => {
       completedGames:     {},
       gameScores:         {},
       gameStars:          {},
+      gamePoints:         {},
+      gameCrowns:         {},
       unlockedBonusGames: {},
       unlockedBoohaSkins:{},
       wanderers:          [],

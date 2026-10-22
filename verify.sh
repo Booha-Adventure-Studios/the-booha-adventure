@@ -1683,6 +1683,13 @@ else
   bad "Shared score card audit failed"
 fi
 
+echo "[games] combo, points and crown audit"
+if node tests/games-points-audit.cjs >/dev/null 2>&1; then
+  ok "Combo/points/crown audit passed"
+else
+  bad "Combo/points/crown audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

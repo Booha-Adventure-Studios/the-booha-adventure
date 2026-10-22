@@ -14,6 +14,10 @@ const CFG = window.GAME_CONFIG;
 const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
+/* Games Pass 4: combo / sharp / points. Multiple choice → a second try earns 0. */
+const run = U.createRun({ total: 15, recoverPoints: 0 });
+const LISTEN_PAR_MS = 3000;   // sharp window after the clip finishes
+
 U.setTitle('Ask the Question');
 U.unlockAudio();
 
@@ -399,6 +403,7 @@ playBtn.addEventListener('click', () => {
     const a = new Audio(CFG.audioBase + card.mp3);
     a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
     const done = () => {
+      run.audioDone();
       playBtn.disabled = false;
       playBtn.classList.remove('playing');
       playBtn.textContent = '▶';
@@ -450,6 +455,7 @@ function handleChoice(btn, card) {
 
   const correct = card.jp === order[idx].jp;
   if (correct) {
+    if (firstTry) run.hit(); else run.recover();
     isBusy = true;
     answered = true;
     btn.classList.add('correct');
@@ -460,6 +466,7 @@ function handleChoice(btn, card) {
     playSuccessThenAdvance(null);
   } else {
     firstTry = false;
+    run.miss();
     if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     updateStreak(0);
     btn.classList.add('wrong');
@@ -486,6 +493,7 @@ function showCard() {
   numEl.textContent = idx + 1;
   updateDots();
   buildChoices(order[idx]);
+  run.ready(LISTEN_PAR_MS, { waitAudio: true });
 }
 
 /* ═══ CONFETTI ═══ */
@@ -503,6 +511,7 @@ function fireConfetti(big = false) {
 
 /* ═══ RESULTS ═══ */
 function showResults() {
+  const runSum = run.summary();   /* Games Pass 4 */
   for (let i = 0; i < 15; i++) {
     const d = document.getElementById(`aq-d${i}`);
     if (d) d.className = 'aq-dot done';
@@ -512,7 +521,8 @@ function showResults() {
   if (outer) outer.style.display = '';
   results.classList.add('show');
   const tier = getTier(score), pct = Math.round((score / 15) * 100);
-  U.emitGameEnd({ saveId: `${CFG.curriculum}:ask_question`, score: pct, completed: pct >= 40 });
+  U.emitGameEnd({
+    points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo, saveId: `${CFG.curriculum}:ask_question`, score: pct, completed: pct >= 40 });
   results.style.setProperty('--aq-tier-color', tier.color);
   document.getElementById('aq-rs').textContent = `${score} / 15`;
   document.getElementById('aq-rp').textContent = `${pct}%`;
@@ -533,6 +543,7 @@ function showResults() {
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own aq-replay / aq-back. */
   U.showScorecard(Object.assign({
+    run:      runSum,
     gameId:   `${CFG.curriculum}:ask_question`,
     title:    'Ask the Question',
     correct:  score,
@@ -556,6 +567,7 @@ document.getElementById('aq-replay').addEventListener('click', () => {
   mainWrap.style.display = '';
   idx = 0; score = 0; streak = 0;
   missedItems = [];
+    run.reset();
   scoreEl.textContent = '0';
   const se = document.getElementById('aq-streak'); if (se) se.textContent = '0';
   answered = false; firstTry = true; pickCooldown = false;
