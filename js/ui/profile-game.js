@@ -158,6 +158,8 @@ const BoohaProfileGame = (() => {
 
     // Most recently played maze game this week for Booha's trail token.
     const scores = isObject(data.scores) ? data.scores : {};
+    // Rainbow Pass B: ready-pace runs this week (weekly bucket, live week).
+    const rainbow = isObject(data.weekly) && isObject(data.weekly.gameRainbow) ? data.weekly.gameRainbow : {};
     let lastIndex = -1;
     let lastAt = 0;
     games.forEach((g, i) => {
@@ -196,7 +198,7 @@ const BoohaProfileGame = (() => {
     return {
       data, meta, keys, curr, games, week, life, weekTotal: weekTotalWithMedals, dailyThisWeek, medalStarsWeek,
       level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - levelWeekTotal - medalStarsWeek),
-      lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed,
+      lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed, rainbow,
       name: firstName(), sprite: heroSprite(),
     };
   }
@@ -328,10 +330,11 @@ const BoohaProfileGame = (() => {
       const p = nodePos(i);
       const st = w.stars[i];
       const state = st == null ? 'todo' : st >= 2 ? 'done' : 'one';
+      const rainbow = st != null && st >= 1 && !!s.rainbow[g.saveId];
       const starText = st == null ? 'PLAY' : st === 1 ? '★☆☆ あと1★' : '★'.repeat(st) + '☆'.repeat(3 - st);
       const label = `${g.name}: ${st == null ? 'not played yet' : `${st} of 3 stars`}`;
       parts.push(`
-        <div class="pg-node ${state}" style="left:${p.x}%;top:${p.y - 29}px" role="listitem" aria-label="${esc(label)}">
+        <div class="pg-node ${state}${rainbow ? ' rainbow' : ''}" style="left:${p.x}%;top:${p.y - 29}px" role="listitem" aria-label="${esc(label + (rainbow ? ', rainbow stars: ready pace' : ''))}">
           <span class="pg-disc">${i + 1}</span>
           <span class="pg-stars">${esc(starText)}</span>
           <span class="pg-name">${esc(g.name)}</span>
@@ -375,6 +378,7 @@ const BoohaProfileGame = (() => {
         <div class="pg-stat teal"><span>アーケードまで ★★×${s.games.length}</span><b>${w.twoStarCount} / ${s.games.length}</b></div>
         <div class="pg-stat gold"><span>つながりボーナス</span><b>+${w.linkStars}★ <small>(${w.linkCount}/${s.games.length - 1})</small></b></div>
       </div>
+      ${s.games.some((g, i) => w.stars[i] != null && s.rainbow[g.saveId]) ? '<p class="pg-rainbow-key"><b>🌈 ★★★</b> Rainbow stars = ready pace · じゅんび OK</p>' : ''}
       <div class="pg-trail-board" role="list" aria-label="This week's games">${parts.join('')}</div>`;
   }
 
@@ -594,6 +598,7 @@ const BoohaProfileGame = (() => {
     const card = g => {
       const stars = Math.max(0, Math.min(3, call('weeklyStarsForGame', g.saveId) || 0));
       const crown = !!call('weeklyCrownForGame', g.saveId);
+      const rainbow = stars >= 1 && !!call('weeklyRainbowForGame', g.saveId);
       const done = Object.prototype.hasOwnProperty.call(weekly, g.saveId);
       const entry = (scores && scores.getEntry ? call('getEntry', g.saveId) : null) || {};
       const best = Number(entry.bestPoints) || Number(entry.highScore) || 0;
@@ -614,7 +619,7 @@ const BoohaProfileGame = (() => {
           <span class="pg-x-copy">
             <b>${esc(g.name)}${!g.boss && crown ? ' <i class="pg-x-crown">♛</i>' : ''}</b>
             <span class="pg-x-hira">${esc(g.hira || '')}</span>
-            <span class="pg-x-starline"><span class="pg-x-stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</span><span class="pg-x-bonus">BONUS</span></span>
+            <span class="pg-x-starline"><span class="pg-x-stars${rainbow ? ' rainbow' : ''}">${'★'.repeat(stars)}</span>${stars < 3 ? `<span class="pg-x-stars off">${'☆'.repeat(3 - stars)}</span>` : ''}<span class="pg-x-bonus">BONUS</span></span>
             ${status}
             <span class="pg-x-rec"><span>ベスト <b>${best ? best.toLocaleString('en-US') : '—'}</b></span><span>あそんだ <b>${times}</b>かい</span></span>
           </span>

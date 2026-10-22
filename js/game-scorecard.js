@@ -13,6 +13,9 @@
      LEGEND = 15 and a full combo (every answer right on the first try),
      from opts.run (GAME_UTILS.createRun summary, Games Pass 4).
    Stars are unchanged: BoohaGameRegistry.starsForScore(gameId, pct).
+   Rainbow Pass B: earned stars turn RAINBOW for a ready-pace run
+   (GAME_UTILS.readyPace on run.pace). Gold = completed, rainbow = prepared.
+   The first rainbow ever shows a short explanation; after that a chip.
    ══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -27,6 +30,19 @@
   };
   var STAR_PATH = 'M12 2.2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.4l-6.1 3.4 1.4-6.8-5.1-4.7 6.9-.8z';
   var CROWN_PATH = 'M2 17h22l-2-12-5.5 5L13 2 9.5 10 4 5z';
+
+  var RAINBOW_SEEN = 'booha_rainbow_seen';
+  function rainbowDefs() {
+    if (document.getElementById('booha-rainbow-defs')) return;
+    var ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
+    s.id = 'booha-rainbow-defs'; s.setAttribute('aria-hidden', 'true');
+    s.setAttribute('width', '0'); s.setAttribute('height', '0');
+    s.style.position = 'absolute';
+    s.innerHTML = '<defs><linearGradient id="booha-rainbow" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0%" stop-color="#ff5f6d"/><stop offset="17%" stop-color="#ffb347"/><stop offset="33%" stop-color="#fff36b"/><stop offset="50%" stop-color="#5cffb0"/><stop offset="67%" stop-color="#5cc8ff"/><stop offset="83%" stop-color="#a77bff"/><stop offset="100%" stop-color="#ff7ad9"/>' +
+      '</linearGradient></defs>';
+    document.body.appendChild(s);
+  }
 
   var overlay = null;
   var tierAudio = null;
@@ -134,6 +150,7 @@
     var key = tierFor(correct, total, fullCombo);
     var tier = TIERS[key];
     var stars = starsFor(opts.gameId, pct);
+    var rainbow = stars >= 1 && !!(run && run.pace && U && typeof U.readyPace === 'function' && U.readyPace(run.pace, opts.gameId));
     var before = priorBest(opts.gameId);
     var best = Math.max(before, pct);
     var newBest = pct > before && before > 0;
@@ -159,15 +176,29 @@
       card.appendChild(crown);
     }
 
-    var starRow = el('div', 'bsc-stars');
+    var starRow = el('div', 'bsc-stars' + (rainbow ? ' bsc-rainbow' : ''));
     starRow.setAttribute('role', 'img');
-    starRow.setAttribute('aria-label', stars + ' of 3 stars');
+    starRow.setAttribute('aria-label', stars + ' of 3 stars' + (rainbow ? ', rainbow: ready pace' : ''));
+    if (rainbow) rainbowDefs();
     for (var i = 0; i < 3; i++) {
       var st = svg(STAR_PATH, 'bsc-star' + (i === 1 ? ' bsc-star-mid' : '') + (i < stars ? ' on' : ' off'));
       st.style.setProperty('--d', (calm ? 0 : 250 + i * 260) + 'ms');
       starRow.appendChild(st);
     }
     card.appendChild(starRow);
+    if (rainbow) {
+      var firstRainbow = false;
+      try { firstRainbow = !localStorage.getItem(RAINBOW_SEEN); localStorage.setItem(RAINBOW_SEEN, '1'); } catch (_) {}
+      var rb = el('div', 'bsc-rainbow-chip' + (firstRainbow ? ' first' : ''));
+      rb.appendChild(el('b', null, '🌈 Rainbow stars = ready pace · じゅんび OK'));
+      if (firstRainbow) {
+        rb.appendChild(el('span', null, kana
+          ? 'じゅんびして きたね！ さいしょで せいかい、いい ペース。'
+          : '準備してきたね！最初で正解、いいペース。'));
+        rb.appendChild(el('span', null, 'You came ready: right first try, at a steady pace.'));
+      }
+      card.appendChild(rb);
+    }
 
     var h = el('h2', 'bsc-tier', tier.label);
     h.id = 'bsc-tier';
@@ -265,6 +296,13 @@
       }
     }
     var soundAt = calm ? 0 : 250 + stars * 260 + 120;
+    if (rainbow && playSFX && !calm) {
+      // Rainbow: a quick sparkling run above the star dings.
+      [2, 2.25, 2.52, 3].forEach(function (r, n) {
+        timers.push(setTimeout(function () { playSFX('ding', { rate: r, volume: 0.55 }); }, 250 + stars * 260 + n * 70));
+      });
+      soundAt += 260;
+    }
     if (key === 'legend' && playSFX) {
       // LEGEND: a bright rising run of dings on top of the PERFECT stinger.
       [1.5, 1.68, 1.89, 2].forEach(function (r, n) {
@@ -282,7 +320,7 @@
         } catch (_) {}
       }, soundAt));
     }
-    return { tier: key, stars: stars, close: close };
+    return { tier: key, stars: stars, rainbow: rainbow, close: close };
   }
 
   var api = { show: show, close: close, tierFor: tierFor, TIERS: TIERS };

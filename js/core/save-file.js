@@ -96,6 +96,7 @@ const BoohaSaveFile = (() => {
         gameStars:         {},   // { [saveId]: stars this week }
         gamePoints:        {},   // { [saveId]: best points this week } (Games Pass 4)
         gameCrowns:        {},   // { [saveId]: true } 15/15 first-try run this week
+        gameRainbow:       {},   // { [saveId]: true } ready-pace (rainbow stars) run this week
         unlockedBonusGames:{},   // { booha_invaders: true, booha_blocks: true, ... }
         unlockedBoohaSkins:{},   // { batty: { unlockedAt } } — temporary cosmetic unlocks
         wanderers:         [],   // [ wandererId, ... ] unlocked this week (index = order)
@@ -344,6 +345,7 @@ const BoohaSaveFile = (() => {
         gameStars:          {},
         gamePoints:         {},
         gameCrowns:         {},
+        gameRainbow:        {},
         unlockedBonusGames: {},
         unlockedBoohaSkins: {},
         wanderers:          [],
@@ -353,7 +355,7 @@ const BoohaSaveFile = (() => {
     if (!save.weekly.unlockedBoohaSkins || typeof save.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(save.weekly.unlockedBoohaSkins)) {
       save.weekly.unlockedBoohaSkins = {};
     }
-    for (const key of ['gamePoints', 'gameCrowns']) {
+    for (const key of ['gamePoints', 'gameCrowns', 'gameRainbow']) {
       if (!save.weekly[key] || typeof save.weekly[key] !== 'object' || Array.isArray(save.weekly[key])) save.weekly[key] = {};
     }
 
@@ -479,6 +481,7 @@ const BoohaSaveFile = (() => {
       gameStars:          {},
       gamePoints:         {},
       gameCrowns:         {},
+      gameRainbow:        {},
       unlockedBonusGames: {},
       unlockedBoohaSkins:{},
       wanderers:          [],

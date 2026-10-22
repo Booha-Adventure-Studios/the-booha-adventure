@@ -205,6 +205,7 @@ function play(rate) {
   const card = order[idx];
   if (!card || !card.mp3) return;
   const myIdx = idx;
+  run.pauseClock();   // a replay is listening time, not answer time
   U.unlockAudio();
   const a = new Audio(CFG.audioBase + card.mp3);
   a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
@@ -213,7 +214,7 @@ function play(rate) {
   const end = () => {
     if (myIdx !== idx) return;            // a clip from an earlier card: ignore
     playBtn.classList.remove('playing');
-    if (!heard) { heard = true; run.audioDone(); }
+    heard = true; run.audioDone();   // also resumes the clock after a replay
     if (!done) { try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); } }
   };
   if (!voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end })) end();

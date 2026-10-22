@@ -300,6 +300,15 @@
     .pg-node.blitz.done .pg-stars { color:#ffd77a; }
     .pg-name { font-size:10px; line-height:1.2; text-align:center; color:#cfe9e2; text-shadow:0 1px 3px #000; }
     .pg-node.done .pg-name { color:#fff6dc; }
+    /* Rainbow Pass B: ready-pace node (rainbow ring + rainbow stars, static). */
+    .pg-node.rainbow .pg-disc { border:3px solid transparent;
+      background:radial-gradient(circle at 40% 30%,#ffe08a,#c8871c 75%) padding-box, linear-gradient(135deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9) border-box;
+      box-shadow:0 0 14px rgba(255,120,220,.5), 0 0 22px rgba(92,200,255,.35); }
+    .pg-node.rainbow .pg-stars, .pg-x-stars.rainbow { background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9);
+      -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:none; }
+    .pg-x-stars.off { color:#6b5560; margin-left:-4px; }
+    .pg-rainbow-key { margin:6px 2px 0; font-size:11px; font-weight:800; color:#e9d9ff; }
+    .pg-rainbow-key b { background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); -webkit-background-clip:text; background-clip:text; color:transparent; }
     .pg-node.blitz .pg-name { color:#c9b9e8; }
     .pg-token { position:absolute; width:42px; height:42px; object-fit:contain; z-index:3; filter:drop-shadow(0 0 8px rgba(168,230,61,.9)); animation:pgBob 3s ease-in-out infinite; }
     .pg-gate { position:absolute; left:50%; transform:translateX(-50%); width:180px; display:flex; flex-direction:column; align-items:center; gap:2px; z-index:1; }

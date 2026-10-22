@@ -1084,6 +1084,22 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 .bsc-star.on { filter: drop-shadow(0 0 10px rgba(255,190,60,.7)); }
 .bsc-star.on path { fill: #ffc94a; stroke: #fff1c2; }
 .bsc-star.off path { fill: color-mix(in srgb, var(--game-ink) 6%, transparent); stroke: color-mix(in srgb, var(--game-ink) 30%, transparent); }
+/* Rainbow Pass B: ready-pace stars. Static rainbow fill (SVG gradient) plus a
+   light sheen that sweeps across with transform only, so old iPads stay smooth.
+   data-power="reduced"/"minimal" stops the loop; reduced motion keeps it still. */
+.bsc-rainbow { position: relative; }
+.bsc-rainbow .bsc-star.on path { fill: url(#booha-rainbow); stroke: #ffffff; }
+.bsc-rainbow .bsc-star.on { filter: drop-shadow(0 0 10px rgba(255,120,220,.55)) drop-shadow(0 0 18px rgba(92,200,255,.45)); }
+.bsc-rainbow::after { content: ''; position: absolute; inset: -6px 10%; pointer-events: none; border-radius: 40px;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%);
+  mix-blend-mode: soft-light; transform: translateX(-120%); animation: bscSheen 2.4s ease-in-out 1.2s infinite; }
+@keyframes bscSheen { 0% { transform: translateX(-120%); } 55%, 100% { transform: translateX(120%); } }
+.bsc-rainbow-chip { margin: 4px auto 0; max-width: 92%; padding: 6px 12px; border-radius: 14px; text-align: center;
+  background: linear-gradient(90deg, #ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); color: #2a1030; }
+.bsc-rainbow-chip b { display: block; font-size: 13px; font-weight: 900; }
+.bsc-rainbow-chip span { display: block; font-size: 12px; line-height: 1.35; font-weight: 700; }
+.bsc-rainbow-chip.first { padding: 8px 14px; }
+@media (prefers-reduced-motion: reduce) { .bsc-rainbow::after { animation: none; display: none; } }
 @keyframes bscPop { from { opacity: 0; transform: scale(.2) rotate(-20deg); } to { opacity: 1; transform: none; } }
 
 .bsc-tier { font-family: var(--game-font-title); font-weight: 400; font-size: clamp(40px, 9vw, 60px);
