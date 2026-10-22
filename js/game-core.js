@@ -95,6 +95,13 @@ const GAME_JSON = {
   'sentence-speed': 'sentences',
   'say-sentence':   'sentences',
   'ask-question':   'questions',
+  // Extra games (Games Pass 6+): outside the nine, see game-registry EXTRA_GAMES
+  'booha-bites':    'sentences',
+};
+
+/* Extra decks a game needs besides its main one (same week's 15 cards). */
+const GAME_ALSO_JSON = {
+  'booha-bites': ['vocab'],
 };
 
 const jsonType = GAME_JSON[gameName];
@@ -121,6 +128,18 @@ const weekCards = cards.slice(base15, base15 + 15);
 
 if (!weekCards.length) { showError(`No cards for week ${weekNum}.`); return; }
 
+/* ── Extra decks (same 15-card week slice) ── */
+const alsoCards = {};
+for (const type of (GAME_ALSO_JSON[gameName] || [])) {
+  try {
+    const r = await fetch(contentBase + type + '.json');
+    const d = await r.json();
+    alsoCards[type] = (d.cards || []).slice(base15, base15 + 15);
+  } catch (e) {
+    alsoCards[type] = [];   // the engine falls back to words from the sentences
+  }
+}
+
 /* ── Build audio base URL ── */
 const audioBase = `${AUDIO_ROOT}/${monthShort}/${reg.audioFolder}/${jsonType}/`;
 const sfxBase   = `${BASE}/assets/audio/`;
@@ -139,6 +158,7 @@ window.GAME_CONFIG = {
   monthFull,
   jsonType,
   cards:      weekCards,   // 15 items [{id,en,jp,hira,mp3,readings?}, ...]
+  alsoCards,               // { vocab: [...] } for games listed in GAME_ALSO_JSON
   audioBase,               // R2 URL prefix for content audio
   sfxBase,                 // /assets/audio/ for ding/fart/results
   navTarget:  reg.navTarget,

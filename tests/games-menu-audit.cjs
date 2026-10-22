@@ -37,7 +37,8 @@ for (const c of ['pb', 'br', 'bc']) {
 }
 
 // Engine contracts
-assert.match(core, /BASE \+ '\/game\.html\?week=' \+ encodeURIComponent\(week\) \+ '&game=' \+ encodeURIComponent\(t\.dataset\.game\)/,
+assert.match(core, /var gameKey = t\.dataset\.game \|\| t\.dataset\.extra;/, 'core tiles launch their data-game, extras their data-extra');
+assert.match(core, /BASE \+ '\/game\.html\?week=' \+ encodeURIComponent\(week\) \+ '&game=' \+ encodeURIComponent\(gameKey\)/,
   'tiles must launch game.html?week=…&game=…');
 assert.match(core, /sessionStorage\.setItem\('booha_reopen_popup', '1'\)/, 'back must ask the maze to reopen its popup');
 assert.match(core, /sessionStorage\.setItem\('booha_return_week', week\)/, 'back must hand the week back to the maze');
