@@ -26,7 +26,29 @@ assert.match(utils, /setTimeout\(finish, timeoutMs\)/,
 for (const file of ['ask-question.js', 'say-word.js', 'say-sentence.js']) {
   assert.match(games[file], /createAudioGate\(\{ cooldownMs: 650/,
     `${file} must use the shared listen-button audio gate`);
-  assert.match(games[file], /lastSfxAt/, `${file} must throttle its HTML SFX clones`);
+}
+
+// Games Pass 1: every engine plays ding/fart through the shared Web Audio
+// engine (js/booha-sfx.js via GAME_UTILS), never through cloned <audio>.
+const gameShell = fs.readFileSync('game.html', 'utf8');
+const sfxEngine = fs.readFileSync('js/booha-sfx.js', 'utf8');
+assert(gameShell.indexOf('js/booha-sfx.js') > -1 &&
+  gameShell.indexOf('js/booha-sfx.js') < gameShell.indexOf('js/game-utils.js'),
+  'game.html must load js/booha-sfx.js before js/game-utils.js');
+assert.match(sfxEngine, /statechange/, 'SFX engine must re-arm the tap unlock after an interruption');
+assert.match(sfxEngine, /visibilitychange/, 'SFX engine must try to resume when the page becomes visible');
+assert.match(sfxEngine, /decodeAudioData\(arrayBuffer, resolve/,
+  'SFX engine must use the callback form of decodeAudioData for older iPad Safari');
+assert.doesNotMatch(utils, /this\._unlocked = true/,
+  'unlockAudio must not latch before a real tap has unlocked audio');
+assert.match(utils, /window\.BoohaSFX/, 'GAME_UTILS audio must delegate to the shared SFX engine');
+for (const file of files) {
+  assert.match(games[file], /U\.loadSFX\('ding', CFG\.sfxBase \+ 'ding\.mp3'\)/,
+    `${file} must load ding through the shared SFX engine`);
+  assert.match(games[file], /U\.loadSFX\('fart', CFG\.sfxBase \+ 'fart\.mp3'\)/,
+    `${file} must load fart through the shared SFX engine`);
+  assert.doesNotMatch(games[file], /SFX\[['"](?:ding|fart)['"]\]\.cloneNode/,
+    `${file} must not clone <audio> elements for ding/fart`);
 }
 
 assert.match(games['vocab-tap.js'], /if \(wordLocked\) return/,
@@ -51,4 +73,4 @@ for (const file of files) {
 assert.match(verify, /tests\/games-audio-polish-audit\.cjs/,
   'verify.sh must run the nine-engine audio abuse audit');
 
-console.log('Nine-engine audio polish audit passed: shared cooldown, active-clip protection, SFX throttling, and streak-audio caching are covered.');
+console.log('Nine-engine audio polish audit passed: shared cooldown, active-clip protection, SFX throttling, shared Web Audio ding/fart, and streak-audio caching are covered.');
