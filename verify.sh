@@ -1893,6 +1893,13 @@ else
   bad "Performance asset-budget audit failed"
 fi
 
+echo "[games] Pace record audit (Rainbow Pass A, silent)"
+if node tests/games-pace-record-audit.cjs >/dev/null 2>&1; then
+  ok "Run tracker records first responses vs par; saved silently in recentRun; report tool reads saves"
+else
+  bad "Pace record audit failed"
+fi
+
 echo "[profile] Trophy Case audit"
 if node tests/profile-trophy-case-audit.cjs >/dev/null 2>&1; then
   ok "Adventure Tokens (round, tiered, secret) and Bonus Games record cards pass"
