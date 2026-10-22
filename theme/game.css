@@ -1130,23 +1130,73 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
   background: color-mix(in srgb, var(--game-ink) 8%, transparent); color: var(--game-muted); font-variant-numeric: tabular-nums; }
 .bsc-chip-crown { background: #ffd96b; color: #2b1a05; }
 
-/* ── In-game combo pill (GAME_UTILS.createRun) ── */
+/* ── In-game combo HUD + celebration (GAME_UTILS.createRun, Games Pass 9) ── */
 .brun-hud {
   position: fixed; z-index: 60; pointer-events: none;
   left: max(12px, env(safe-area-inset-left, 0px)); top: calc(14px + env(safe-area-inset-top, 0px));
-  display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
-  background: color-mix(in srgb, var(--game-bg) 80%, transparent);
-  box-shadow: inset 0 0 0 1.5px var(--game-border);
-  font-family: var(--game-font-body); font-size: 13px; font-weight: 900; color: var(--game-ink);
-  font-variant-numeric: tabular-nums;
+  display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px;
+  background: color-mix(in srgb, var(--game-bg) 84%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--game-border), 0 4px 14px rgba(0,0,0,.25);
+  font-family: var(--game-font-body); font-size: 14px; font-weight: 900; color: var(--game-ink);
+  font-variant-numeric: tabular-nums; transform-origin: left center;
 }
 .brun-mult:empty { display: none; }
-.brun-hud.hot { box-shadow: inset 0 0 0 1.5px #ffc94a, 0 0 16px rgba(255,190,60,.35); }
+.brun-meter { display: inline-flex; gap: 3px; align-items: flex-end; height: 16px; }
+.brun-meter i { width: 5px; height: 7px; border-radius: 2px; background: color-mix(in srgb, var(--game-ink) 18%, transparent); transform-origin: bottom center; transition: transform .2s ease, background-color .2s; }
+.brun-meter i:nth-child(n+4) { height: 10px; } .brun-meter i:nth-child(n+7) { height: 13px; } .brun-meter i:nth-child(10) { height: 16px; }
+.brun-meter i.on { background: #ffc94a; }
+.brun-meter i.on:nth-child(n+7) { background: #ff9a3c; } .brun-meter i.on:nth-child(10) { background: #ff5e5e; }
+.brun-pts { display: inline-block; min-width: 3ch; text-align: right; }
+.brun-pts.pop { animation: brunPop .38s cubic-bezier(.3,1.7,.5,1); }
+@keyframes brunPop { 40% { transform: scale(1.35); } }
+.brun-hud.hot { font-size: 16px; box-shadow: inset 0 0 0 2px #ffc94a, 0 0 18px rgba(255,190,60,.45); }
 .brun-hud.hot .brun-mult { color: #e0a21a; }
+.brun-hud[data-level="3"] { box-shadow: inset 0 0 0 2px #ff9a3c, 0 0 24px rgba(255,120,40,.55); }
 [data-curriculum="br"] .brun-hud.hot .brun-mult, [data-curriculum="bc"] .brun-hud.hot .brun-mult { color: #ffc94a; }
-.brun-hud.pulse { animation: brunPulse .42s cubic-bezier(.3,1.6,.5,1); }
-@keyframes brunPulse { 40% { transform: scale(1.16); } }
-html.bsc-open .brun-hud { display: none; }
+.brun-hud.pulse { animation: brunPulse .45s cubic-bezier(.3,1.6,.5,1); }
+@keyframes brunPulse { 40% { transform: scale(1.22); } }
+.brun-hud.break { animation: brunBreak .45s ease; }
+@keyframes brunBreak { 15% { transform: translateX(-7px) rotate(-3deg); } 35% { transform: translateX(6px) rotate(2deg); } 60% { transform: translateX(-3px); } }
+
+/* Milestone banner: sweeps across the middle, never blocks a tap. */
+.brun-banner {
+  position: fixed; z-index: 70; left: 50%; top: calc(13% + env(safe-area-inset-top, 0px)); pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 14px 30px 12px; border-radius: 22px; white-space: nowrap;
+  background: linear-gradient(135deg, #ffe39a, #ffc94a 50%, #ff9a3c); color: #2b1a05;
+  box-shadow: 0 10px 34px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.55);
+  transform: translate(-50%, -50%); opacity: 0;
+  animation: brunBanner 1.05s cubic-bezier(.2,.9,.25,1) forwards;
+}
+.brun-banner b { font-family: var(--game-font-title); font-size: clamp(30px, 8vw, 54px); line-height: 1; letter-spacing: .02em; }
+.brun-banner span { font-size: clamp(13px, 3vw, 17px); font-weight: 900; letter-spacing: .08em; }
+.brun-banner.lv2 { background: linear-gradient(135deg, #fff1b8, #ffb347 50%, #ff7a3c); }
+.brun-banner.lv3 { background: linear-gradient(135deg, #ffe39a, #ff8a3c 45%, #ff4f6d); color: #2a0610; }
+.brun-banner.lv3 b { font-size: clamp(36px, 10vw, 64px); }
+@keyframes brunBanner {
+  0%   { opacity: 0; transform: translate(-120%, -50%) skewX(-12deg) scale(.9); }
+  18%  { opacity: 1; transform: translate(-50%, -50%) skewX(0) scale(1.08); }
+  30%  { transform: translate(-50%, -50%) scale(1); }
+  70%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(20%, -50%) skewX(10deg) scale(.95); }
+}
+.brun-banner.still { animation: none; opacity: 1; }
+
+/* Sparks from the answered button; shards from a broken combo meter. */
+.brun-spark, .brun-shard { position: fixed; z-index: 69; pointer-events: none; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; }
+.brun-spark { background: radial-gradient(circle, #fff 0 30%, #ffd96b 31% 60%, rgba(255,160,40,0) 61%); animation: brunSpark .7s cubic-bezier(.15,.7,.3,1) forwards; }
+.brun-spark:nth-child(3n) { width: 9px; height: 9px; background: #fff3c4; }
+@keyframes brunSpark { 0% { opacity: 1; transform: translate(0,0) scale(.6); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.2); } }
+.brun-shard { width: 12px; height: 6px; border-radius: 1px; background: #ffc94a; animation: brunShard .8s cubic-bezier(.3,.1,.6,1) forwards; }
+@keyframes brunShard { 0% { opacity: 1; transform: translate(0,0) rotate(0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)); } }
+
+/* ×3: a gold edge around the screen for the rest of the streak. */
+.brun-edge { position: fixed; inset: 0; z-index: 58; pointer-events: none; opacity: 0; transition: opacity .4s ease;
+  box-shadow: inset 0 0 0 3px rgba(255,201,74,.85), inset 0 0 60px rgba(255,150,40,.45); }
+.brun-edge.on { opacity: 1; animation: brunEdge 1.6s ease-in-out infinite; }
+@keyframes brunEdge { 50% { opacity: .55; } }
+
+html.bsc-open .brun-hud, html.bsc-open .brun-banner, html.bsc-open .brun-edge { display: none; }
 @media (max-height: 860px) {
   .bsc-card { gap: 6px; padding: 16px 18px 16px; }
   .bsc-stars { height: 96px; margin-top: 0; }

@@ -61,7 +61,9 @@ const CURRENT_CACHES = {
   // played this week), week crown on the menu tree; Echo audio/hira fixes.
   // Games Pass 8b (2026-10-22): forest menu art, missing-deck retry screen,
   // practice-week boss message, "Does it match the Japanese?" prompt.
-  pages:  'booha-pages-2026-476',
+  // Games Pass 9 (2026-10-22): combo celebration (banner, chime, sparks,
+  // ×3 gold edge, combo-break crack) in game-utils createRun + game.css.
+  pages:  'booha-pages-2026-477',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -235,7 +237,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-589',
+  assets: 'booha-assets-2026-590',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
