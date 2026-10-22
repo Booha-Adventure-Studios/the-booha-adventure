@@ -196,15 +196,22 @@ function renderDots() {
   }
 }
 
+function stopVoice() {
+  voiceGate.stop();                       // stop() never fires the old onEnd
+  playBtn.classList.remove('playing');
+}
+
 function play(rate) {
   const card = order[idx];
   if (!card || !card.mp3) return;
+  const myIdx = idx;
   U.unlockAudio();
   const a = new Audio(CFG.audioBase + card.mp3);
   a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
   try { a.playbackRate = rate || 1; a.preservesPitch = true; a.webkitPreservesPitch = true; } catch (_) {}
   playBtn.classList.add('playing');
   const end = () => {
+    if (myIdx !== idx) return;            // a clip from an earlier card: ignore
     playBtn.classList.remove('playing');
     if (!heard) { heard = true; run.audioDone(); }
     if (!done) { try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); } }
@@ -213,11 +220,13 @@ function play(rate) {
 }
 
 function showCard() {
+  stopVoice();
   const card = order[idx];
   tries = 0; hinted = false; heard = false; done = false;
   numEl.textContent = idx + 1;
   renderDots();
-  jpEl.textContent = card.jp || '';
+  // Pre-Boo shows hiragana: small children should not need to read kanji.
+  jpEl.textContent = (CFG.curriculum === 'pb' ? (card.hira || card.jp) : card.jp) || '';
   hintEl.textContent = '';
   input.value = '';
   input.className = 'ec-input';

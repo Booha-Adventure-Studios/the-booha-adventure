@@ -32,7 +32,7 @@
     'vocab-tap': 'Match them up!', 'spell-word': "Let's spell!", 'vocab-speed': 'Fast, fast!',
     'sentence-tap': 'Tap the pairs!', 'sentence-order': 'Line them up!', 'sentence-speed': 'Zoom!',
     'say-word': 'Listen closely!', 'say-sentence': 'Ears ready?', 'ask-question': 'Listen and choose!',
-    'booha-bites': 'I ate a word! Find it!', 'echo': 'Listen, then type it!',
+    'booha-bites': 'I ate a word! Find it!', 'echo': 'Listen, then type it!', 'week-boss': 'Beat the boss for the week crown!',
   };
   var MONTHS = { jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June',
     jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December' };
@@ -135,6 +135,7 @@
   var back = el('button', 'bm-back'); back.type = 'button'; back.setAttribute('aria-label', 'Back to the maze / もどる');
   back.appendChild(icon('M15 5l-7 7 7 7', 20));
   var tree = el('img', 'bm-tree'); tree.src = BASE + '/' + art.tree; tree.alt = ''; tree.decoding = 'async';
+  var treeWrap = el('span', 'bm-tree-wrap'); treeWrap.appendChild(tree);   // the Week Boss crown sits on the tree
   var titles = el('div', 'bm-titles');
   titles.appendChild(el('h1', 'bm-title', art.title));
   titles.appendChild(el('div', 'bm-sub', art.jp + ' · ' + wl.en + ' · ' + wl.jp));
@@ -149,7 +150,7 @@
   var paintSound = function () { sound.setAttribute('aria-pressed', muted ? 'false' : 'true'); sound.setAttribute('aria-label', muted ? 'Sound off / おと なし' : 'Sound on / おと あり'); };
   paintSound();
   tools.appendChild(tally); tools.appendChild(booha); tools.appendChild(sound);
-  head.appendChild(back); head.appendChild(tree); head.appendChild(titles); head.appendChild(tools);
+  head.appendChild(back); head.appendChild(treeWrap); head.appendChild(titles); head.appendChild(tools);
 
   var lanesEl = el('div', 'bm-lanes');
   LANES.forEach(function (L) {
@@ -179,6 +180,7 @@
       a.setAttribute('data-extra', g.gameKey);
       if (g.hira) a.setAttribute('data-hira', g.hira);
       a._saveId = g.saveId;
+      if (g.boss) { a._boss = true; a.classList.add('tile-boss'); }
       xl.appendChild(a);
       extraTiles.push(a);
     });
@@ -214,6 +216,8 @@
   function paint() {
     var BA = window.BoohaAdventure, scores = BA && BA.scores, live = week === liveWeekSlug(CURR, window.CALENDAR);
     var total = 0, atTwo = 0, crowns = 0, firstOpen = -1;
+    var playedIds = {};   // any score this week, even 0 (the Week Boss counts these)
+    if (live) { try { playedIds = (BA.save.load().weekly || {}).gameScores || {}; } catch (_) {} }
     tiles.forEach(function (t, i) {
       var game = t.dataset.game, id = saveIdFor(CURR, game);
       var n = tileStars(CURR, week, game, window.CALENDAR, scores);
@@ -229,9 +233,10 @@
       }
       var oldCrown = t.querySelector('.bm-crown'); if (oldCrown) oldCrown.remove();
       if (crowned) { crowns++; var c = svg(CROWN, 'bm-crown', '0 0 26 20'); c.setAttribute('role', 'img'); c.setAttribute('aria-label', 'Crown'); t.insertBefore(c, t.firstChild); }
-      t._bm.best.textContent = !live ? '' : pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : (n ? '' : 'NOT PLAYED YET');
+      var played = Object.prototype.hasOwnProperty.call(playedIds, id);
+      t._bm.best.textContent = !live ? '' : pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : (n || played ? '' : 'NOT PLAYED YET');
       var oldTag = t.querySelector('.bm-tag'); if (oldTag) oldTag.remove();
-      if (live && n === 0 && firstOpen < 0) firstOpen = i;
+      if (live && n === 0 && !played && firstOpen < 0) firstOpen = i;
     });
     if (firstOpen >= 0) tiles[firstOpen].appendChild(el('span', 'bm-tag', 'Try me!'));
 
@@ -251,6 +256,23 @@
       if (crowned) { var cr = svg(CROWN, 'bm-crown', '0 0 26 20'); cr.setAttribute('role', 'img'); cr.setAttribute('aria-label', 'Crown'); t.insertBefore(cr, t.firstChild); }
       t._bm.best.textContent = live && pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : '';
       var ot = t.querySelector('.bm-tag'); if (ot) ot.remove();
+      if (t._boss) {
+        // Week Boss: opens once all nine are played this week, live week only.
+        var played = 0;
+        try { played = live && scores && scores.weeklyPlayedFor ? Math.min(9, scores.weeklyPlayedFor(CURR)) : 0; } catch (_) {}
+        var open = live && played >= 9;
+        t._bossLeft = 9 - played;
+        t.classList.toggle('is-locked', !open);
+        if (open) t.removeAttribute('aria-disabled'); else t.setAttribute('aria-disabled', 'true');
+        if (!open) t._bm.best.textContent = live ? played + ' / 9 played · あと ' + (9 - played) : 'This week only · こんしゅうだけ';
+        else if (pts === 0) t.appendChild(el('span', 'bm-tag', 'OPEN!'));
+        var oldTc = treeWrap.querySelector('.bm-tree-crown'); if (oldTc) oldTc.remove();
+        if (live && crowned) {
+          var tc = svg(CROWN, 'bm-tree-crown', '0 0 26 20'); tc.setAttribute('role', 'img'); tc.setAttribute('aria-label', 'Week crown: boss beaten');
+          treeWrap.appendChild(tc);
+        }
+        return;
+      }
       if (live && n === 0 && pts === 0) t.appendChild(el('span', 'bm-tag', 'NEW'));
     });
 
@@ -298,6 +320,13 @@
     t.addEventListener('focus', function () { bubble.textContent = LINES[key] || t._bm.name; });
     t.addEventListener('click', function (e) {
       e.preventDefault();
+      if (t.classList.contains('is-locked')) {
+        bubble.textContent = t._bossLeft > 0
+          ? 'Play all 9 games first! あと ' + t._bossLeft + 'つ！'
+          : 'The boss is only on this week’s page! / こんしゅうだけ！';
+        t.classList.remove('nope'); void t.offsetWidth; t.classList.add('nope');
+        return;
+      }
       if (locked) return;
       locked = true;
       cue('select', i);

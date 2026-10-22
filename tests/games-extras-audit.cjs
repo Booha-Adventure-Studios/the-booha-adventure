@@ -105,6 +105,19 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
   assert.strictEqual(advLog['pb-extra:booha_bites'], 100, 'the log still records the extra game');
   assert.strictEqual(DR.weeklyPct(wkKey), 100, 'weeklyPct must average only the nine curriculum games');
 
+  // Week Boss gate: "played" counts any score, even 0, and never opens an unlock.
+  assert.strictEqual(s.weeklyPlayedFor('pb'), 8, 'an extra game must not count as one of the nine played');
+  fire({ saveId: 'pb:ask_question', score: 0, completed: false });
+  assert.strictEqual(s.weeklyPlayedFor('pb'), 9, 'a 0% run still counts as played for the Week Boss');
+  assert.strictEqual(s.weeklyCompletedFor('pb'), 8, 'a 0% run is played, not completed');
+  assert.strictEqual(BA.unlocks.isWeeklyWorldGateOpen(), false, 'the boss gate must not open the world gate');
+  fire({ saveId: 'pb-extra:week_boss', score: 93, completed: true, points: 4200, crown: true });
+  assert.strictEqual(s.weeklyCrownForGame('pb-extra:week_boss'), true, 'beating the boss saves the week crown');
+  assert.strictEqual(s.weeklyCrownsFor('pb'), 0, 'the boss crown must stay out of the nine-game crown count');
+  assert.strictEqual(s.weeklyStarsFor('pb'), 24, 'boss stars must stay out of the curriculum star total');
+  assert(!(stored.weekly.unlockedBonusGames || {}).booha_invaders, 'the boss must not unlock the bonus games');
+  globalThis.__bossScores = s;
+
   fire({ saveId: 'pb:ask_question', score: 100, completed: true });
   assert.strictEqual(s.weeklyCompletedFor('pb'), 9, 'the ninth core game completes the nine');
   assert.strictEqual(BA.unlocks.isWeeklyWorldGateOpen(), true, 'the nine core games open the world gate as before');
@@ -202,6 +215,10 @@ assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-
   assert.strictEqual(E.hintFor('car'), 'c _ _');
 
   const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+  // Known content exceptions: two cards in one week share a typed answer.
+  // Acceptable only if their audio differs; not a clean dictation test.
+  const SHARED_ANSWERS = new Set(['pb/june w3: plan | plan／think']);
+  const sharedSeen = new Set();
   let items = 0;
   for (const c of ['pb', 'br', 'bc']) {
     for (const m of months) {
@@ -216,9 +233,16 @@ assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-
           const first = String(v.en).split(/[／/]/)[0];
           assert.strictEqual(E.check(v.en, v.en), 'exact', `${c}/${m}: "${v.en}" typed exactly must pass`);
           assert.strictEqual(E.check(v.en, first.toUpperCase()), 'exact', `${c}/${m}: "${v.en}" must ignore case`);
-          // A different word from the same week must never be accepted as exact.
+          // A different word from the same week must never be accepted as exact,
+          // except the content pairs listed by name in SHARED_ANSWERS.
           for (const o of week) {
-            if (E.targetsOf(o.en).some(x => E.targetsOf(v.en).includes(x))) continue;   // e.g. "plan" and "plan／think" share an answer
+            if (o === v || E.normalize(o.en) === E.normalize(v.en)) continue;
+            if (E.targetsOf(o.en).some(x => E.targetsOf(v.en).includes(x))) {
+              const key = `${c}/${m} w${w + 1}: ${[o.en, v.en].sort().join(' | ')}`;
+              assert(SHARED_ANSWERS.has(key), `unlisted shared dictation answer ${key} (fix the content or add it to SHARED_ANSWERS)`);
+              sharedSeen.add(key);
+              continue;
+            }
             assert.notStrictEqual(E.check(v.en, o.en), 'exact', `${c}/${m}: "${o.en}" must not pass for "${v.en}"`);
           }
         }
@@ -226,6 +250,107 @@ assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-
     }
   }
   assert(items >= 2000, `expected the full year of vocab, checked ${items}`);
+  assert.deepStrictEqual([...sharedSeen].sort(), [...SHARED_ANSWERS].sort(), 'SHARED_ANSWERS must list only exceptions still in the content');
+
+  // Echo: a newer card owns the audio; Pre-Boo reads hiragana.
+  assert.match(echo, /function showCard\(\) \{\s*stopVoice\(\);/, 'showCard must stop the previous clip first');
+  assert.match(echo, /if \(myIdx !== idx\) return;/, 'an old clip’s onEnd must not mark the new card heard');
+  assert.match(echo, /CFG\.curriculum === 'pb' \? \(card\.hira \|\| card\.jp\)/, 'Pre-Boo must show hiragana under the audio');
 }
 
-console.log('Games extras audit passed: the nine stay nine, unlocks untouched by extras, Booha Bites wired and fair on every week, Echo strict and fair on every vocab item.');
+// ── 6. Week Boss: gate, fair rounds on every week, damage rules ─────────────
+{
+  const boss = read('games/week-boss.js');
+  assert.match(gameCore, /'week-boss':\s+'vocab'/, 'game-core must load vocab for the Week Boss');
+  assert.match(gameCore, /'week-boss':\s+\['sentences', 'questions'\]/, 'game-core must also load sentences and questions');
+  assert.match(boss, /const SAVE_ID = `\$\{CFG\.curriculum\}-extra:week_boss`;/, 'the boss must save under the extra id');
+  assert.match(boss, /crown: beaten/, 'beating the boss is what earns its crown');
+  assert.match(boss, /if \(!gate\.open\) \{/, 'the game page must enforce the gate too (direct links)');
+  assert(boss.indexOf("addEventListener('booha:ready'") < boss.indexOf('const gate = gateFor('), 'the gate must wait for the save to boot (weekly reset) first');
+  for (const call of ['run.hit()', 'run.miss()', 'run.recover()', 'run.reset()', 'run.audioDone()', 'U.showScorecard(', 'U.emitGameEnd(', 'voiceGate.stop()']) {
+    assert(boss.includes(call), `Week Boss must use ${call}`);
+  }
+  assert(/if \(my !== token\) return;/.test(boss), 'an old clip must not touch a newer round');
+  assert(!/@keyframes[^{]*\{[^}]*(box-shadow|filter|width)\s*:/.test(boss), 'boss animations must stay transform/opacity');
+  assert(/hpFill\.style\.transform = `scaleX/.test(boss), 'the HP bar must animate with transform');
+  const mcss = read('theme/menu.css');
+  assert(/\.bm-tree-crown/.test(mcss) && /is-locked/.test(mcss), 'menu.css must style the locked boss tile and tree crown');
+  assert.match(menu, /scores\.weeklyPlayedFor\(CURR\)/, 'the menu must open the boss tile from weeklyPlayedFor');
+  assert.match(menu, /if \(t\.classList\.contains\('is-locked'\)\) \{/, 'a locked boss tile must not launch');
+
+  const ctx = { window: {}, console };
+  vm.createContext(ctx);
+  vm.runInContext(boss, ctx, { filename: 'games/week-boss.js' });
+  const B = ctx.window.WeekBossLogic;
+  const E = (() => { const c2 = { window: {}, console }; vm.createContext(c2); vm.runInContext(read('games/echo.js'), c2); return c2.window.EchoLogic; })();
+  assert(B, 'the Week Boss must export its logic');
+
+  // Gate
+  const cal = { getCurrentCurriculumWeek: () => ({ monthSlug: 'october', weekNumber: 4 }) };
+  const sc = n => ({ weeklyPlayedFor: () => n });
+  assert.strictEqual(B.gateFor('pb', 'pb_oct_w4', cal, sc(8)).open, false, '8 played keeps the boss closed');
+  assert.strictEqual(B.gateFor('pb', 'pb_oct_w4', cal, sc(9)).open, true, '9 played opens the boss');
+  assert.strictEqual(B.gateFor('pb', 'pb_oct_w3', cal, sc(9)).open, false, 'practice weeks never open the boss');
+  assert.strictEqual(B.gateFor('pb', 'pb_oct_w4', cal, null).open, false, 'no save means closed');
+  assert.strictEqual(B.gateFor('pb', 'pb_oct_w4', cal, globalThis.__bossScores).open, true, 'the real score system opens the gate at nine played');
+
+  // Damage: a perfect run wins, a 12/15 run with short streaks does not.
+  const runDamage = pattern => { let combo = 0, dmg = 0; for (const ch of pattern) { if (ch === 'x') { combo = 0; continue; } if (ch === 'r') { combo = 0; dmg += B.damageFor('recover', 0); continue; } combo++; dmg += B.damageFor('hit', combo); } return dmg; };
+  assert(runDamage('ooooooooooooooo') >= B.BOSS_HP, 'a perfect run beats the boss');
+  assert(runDamage('oooxoooxoooxooo') < B.BOSS_HP, '12/15 with short streaks must not beat the boss');
+  assert(runDamage('ooooxooooxooooo') >= B.BOSS_HP, '13/15 with streaks beats the boss');
+  assert(runDamage('ooooooooooxxxxx') < B.BOSS_HP, '10/15 must not beat the boss');
+
+  // Plan: 15 rounds, 4/4/3/4, never the same format three times in a row.
+  for (let k = 0; k < 300; k++) {
+    const p = Array.from(B.planRounds());
+    assert.strictEqual(p.length, 15);
+    const count = x => p.filter(y => y === x).length;
+    assert.deepStrictEqual([count('CHECK'), count('TYPE'), count('SPOT'), count('HEAR')], [4, 4, 3, 4]);
+    p.forEach((x, i) => assert(i < 2 || !(p[i - 1] === x && p[i - 2] === x), 'no format three times in a row'));
+  }
+
+  // Typed answers follow Echo’s rules exactly.
+  for (const [t, typed] of [['car', 'Car'], ['train', 'trian'], ['bus', 'bas'], ['plan／think', 'think'], ['round-trip ticket', 'round trip ticket'], ['contactless payment', 'contactles paymnt'], ['Maintain a balanced diet.', 'maintain a balanced diet']]) {
+    assert.strictEqual(B.check(t, typed), E.check(t, typed), `boss and Echo must agree on ${t} / ${typed}`);
+  }
+  assert.strictEqual(B.skeleton('contactless payment'), 'c _ _ _ _ _ _ _ _ _ _   p _ _ _ _ _ _', 'TYPE shows the first letter of each word');
+
+  // Every real week: SPOT swaps exactly one word for a word not in the sentence.
+  const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+  let spots = 0, weeks = 0;
+  let seed = 7; const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (const c of ['pb', 'br', 'bc']) {
+    for (const m of months) {
+      const dir = path.join(ROOT, `content/${c}/${m}`);
+      if (!fs.existsSync(path.join(dir, 'sentences.json'))) continue;
+      const V = JSON.parse(fs.readFileSync(path.join(dir, 'vocab.json'), 'utf8')).cards;
+      const S = JSON.parse(fs.readFileSync(path.join(dir, 'sentences.json'), 'utf8')).cards;
+      const Q = JSON.parse(fs.readFileSync(path.join(dir, 'questions.json'), 'utf8')).cards;
+      for (let w = 0; w < 4; w++) {
+        weeks++;
+        const vs = V.slice(w * 15, w * 15 + 15), ss = S.slice(w * 15, w * 15 + 15), qs = Q.slice(w * 15, w * 15 + 15);
+        assert(ss.length === 15 && qs.length >= 4 && vs.length === 15, `${c}/${m} w${w + 1}: the boss needs a full week`);
+        assert(qs.every(q => q.mp3 && q.en), `${c}/${m} w${w + 1}: every question needs text and audio`);
+        assert.strictEqual(new Set(qs.map(q => q.en)).size, qs.length, `${c}/${m} w${w + 1}: HEAR options must be distinct`);
+        const pool = [...new Set([].concat(...ss.map(x => B.contentWordsOf(x.en)), vs.filter(v => !/\s/.test(v.en)).map(v => v.en)))];
+        let built = 0;
+        for (const x of ss) {
+          const sp = B.makeSpot(x.en, pool.filter(p => !B.contentWordsOf(x.en).includes(p)), rand);
+          if (!sp) continue;
+          built++; spots++;
+          const orig = x.en.split(/\s+/).filter(Boolean);
+          assert.strictEqual(sp.tokens.length, orig.length, `${c}/${m}: SPOT keeps the word count`);
+          const diff = Array.from(sp.tokens).map((t, i) => (t !== orig[i] ? i : -1)).filter(i => i >= 0);
+          assert.deepStrictEqual(diff, [sp.at], `${c}/${m}: SPOT changes exactly one word in "${x.en}"`);
+          assert(!orig.map(t => t.toLowerCase().replace(/[^a-z']/g, '')).includes(sp.swapped.toLowerCase()), `${c}/${m}: the swapped word must not already be in "${x.en}"`);
+          assert(!B.STOP.has(sp.original.toLowerCase()), `${c}/${m}: SPOT must swap a content word`);
+        }
+        assert(built >= 3, `${c}/${m} w${w + 1}: at least 3 sentences must make a SPOT round (got ${built})`);
+      }
+    }
+  }
+  assert(weeks >= 140 && spots >= 1500, `expected the full year, got ${weeks} weeks / ${spots} spot rounds`);
+}
+
+console.log('Games extras audit passed: the nine stay nine, unlocks untouched by extras, Booha Bites wired and fair on every week, Echo strict and fair on every vocab item, Week Boss gated and fair on every week.');
