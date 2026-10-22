@@ -79,7 +79,9 @@ const CURRENT_CACHES = {
   // removed from the nine engines; Pre-Boo Listen games start in hiragana.
   // Listen fix (2026-10-22): the previous clip is stopped on every new
   // question and can no longer play over it.
-  pages:  'booha-pages-2026-484',
+  // Week Boss arena (2026-10-22): moving boss, entrance, hits, attacks with
+  // taunts, anger phases, KO, synth boss sounds; Japanese instructions.
+  pages:  'booha-pages-2026-485',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -253,7 +255,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-598',
+  assets: 'booha-assets-2026-599',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
