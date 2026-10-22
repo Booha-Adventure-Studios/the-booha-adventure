@@ -1690,6 +1690,13 @@ else
   bad "Combo/points/crown audit failed"
 fi
 
+echo "[games] fixes-pass audit"
+if node tests/games-fixes-pass-audit.cjs >/dev/null 2>&1; then
+  ok "Fixes-pass audit passed"
+else
+  bad "Fixes-pass audit failed"
+fi
+
 echo "[games] engine markup audit"
 if node tests/games-markup-audit.cjs >/dev/null 2>&1; then
   ok "Engine markup audit passed"
