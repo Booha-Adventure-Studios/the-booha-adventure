@@ -97,6 +97,7 @@ const GAME_JSON = {
   'ask-question':   'questions',
   // Extra games (Games Pass 6+): outside the nine, see game-registry EXTRA_GAMES
   'booha-bites':    'sentences',
+  'echo':           'vocab',
 };
 
 /* Extra decks a game needs besides its main one (same week's 15 cards). */

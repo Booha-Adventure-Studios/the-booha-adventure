@@ -63,7 +63,7 @@ window.KarasukiAtmos = (() => {
     const d = readSave();
     const stars = (d && d.meta && typeof d.meta.allTimeStars === 'number') ? d.meta.allTimeStars : 0;
     const cg    = d && d.weekly && d.weekly.completedGames;
-    const games = (cg && typeof cg === 'object') ? Object.keys(cg).length : 0;
+    const games = (cg && typeof cg === 'object') ? Object.keys(cg).filter(k => !/^[a-z]+-extra:/.test(k)).length : 0;
     S.baseline = 0.45 * Math.min(1, stars / 27);
     S.weekly   = 0.55 * Math.min(1, games / 9);
     const next = Math.max(0, Math.min(1, S.baseline + S.weekly));

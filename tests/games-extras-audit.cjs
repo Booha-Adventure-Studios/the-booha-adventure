@@ -31,6 +31,8 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
     }
   }
   assert.strictEqual(R.getAll().length, 27, 'getAll keeps the 27 core entries');
+  const all = R.getAllSaveIds();
+  for (const c of ['pb', 'br', 'bc']) assert(all.includes(`${c}-extra:booha_bites`), 'getAllSaveIds must list the extra games too');
 }
 
 // ── 2. Save: an extra game moves none of the nine-game counts ────────────
@@ -54,13 +56,15 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
     window: { BOOHA_SYNC_READY: false, CALENDAR: {
       getCurrentCurriculumWeek() { return { year: 2026, monthSlug: 'october', weekNumber: 4, weekId: 'october-w4', weekStart: '2026-10-25', occurrenceKey: '2026-10-25|october-w4' }; },
       getCurriculumWeekOccurrenceKey(cw) { return cw.occurrenceKey; },
+      getTodayKey() { return '2026-10-27'; },
     } },
     localStorage, document, CustomEvent, Event, console: { log() {}, warn() {}, error: console.error }, Date, setTimeout, clearTimeout,
   };
   context.window.BoohaSync = { checkpoint() {} };
   context.BoohaSync = context.window.BoohaSync;
+  context.CALENDAR = context.window.CALENDAR;   // day-record reads the bare global
   vm.createContext(context);
-  for (const f of ['js/core/adventure-core.js', 'js/core/save-file.js', 'js/core/game-registry.js', 'js/core/score-system.js', 'js/core/unlock-system.js']) {
+  for (const f of ['js/core/adventure-core.js', 'js/core/save-file.js', 'js/core/game-registry.js', 'js/core/score-system.js', 'js/core/unlock-system.js', 'js/core/day-record.js']) {
     vm.runInContext(read(f), context, { filename: f });
   }
   const BA = context.window.BoohaAdventure;
@@ -80,6 +84,26 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
   assert(!(stored.weekly.unlockedBonusGames || {}).booha_invaders, 'eight core games + an extra must not unlock the bonus games');
   assert.strictEqual(s.weeklyStarsForGame('pb-extra:booha_bites'), 3, 'the extra game still records its own stars');
   assert.strictEqual(s.weeklyPointsForGame('pb-extra:booha_bites'), 3625, 'the extra game still records its own points');
+
+  // Unfiltered aggregates must not count extras either.
+  assert.strictEqual(s.totalStars(), 24, 'totalStars must skip extra games');
+  assert.strictEqual(s.weeklyStars(), 24, 'weeklyStars must skip extra games');
+  assert.strictEqual(s.totalCompleted(), 8, 'totalCompleted must skip extra games');
+  assert.strictEqual(s.weeklyCompleted(), 8, 'weeklyCompleted must skip extra games');
+  assert.strictEqual(stored.meta.allTimeStars, 24, 'meta.allTimeStars must not grow from extra games');
+  assert.strictEqual(s.isExtraId('pb-extra:booha_bites'), true);
+  assert.strictEqual(s.isExtraId('pb:vocab_tap'), false);
+  assert.strictEqual(s.isExtraId('bonus:booha_blocks'), false, 'bonus games keep their existing behaviour');
+
+  // Weekly understanding % averages the nine only (not extras, not bonus raw scores).
+  fire({ saveId: 'bonus:booha_blocks', score: 25000, completed: true });
+  const DR = context.window.BoohaDayRecord || context.BoohaDayRecord;
+  assert(DR && typeof DR.weeklyPct === 'function', 'day-record must load in the harness');
+  const wkKey = DR.getCurrentKeys().week;
+  const advLog = stored.meta.weekLog[wkKey].adv;
+  assert.strictEqual(advLog['bonus:booha_blocks'], 25000, 'the log still records the bonus raw score');
+  assert.strictEqual(advLog['pb-extra:booha_bites'], 100, 'the log still records the extra game');
+  assert.strictEqual(DR.weeklyPct(wkKey), 100, 'weeklyPct must average only the nine curriculum games');
 
   fire({ saveId: 'pb:ask_question', score: 100, completed: true });
   assert.strictEqual(s.weeklyCompletedFor('pb'), 9, 'the ninth core game completes the nine');
@@ -101,6 +125,9 @@ assert(!/@keyframes[^{]*\{[^}]*(box-shadow|filter)\s*:/.test(bites), 'Booha Bite
 assert.match(bites, /gap\.textContent = '\\u00a0';/, 'the gap must be empty until answered (no hidden answer for screen readers or text selection)');
 assert.match(bites, /gapEl\.textContent = r\.bite\.word;/, 'the word appears only once it is chosen');
 assert(!/\.bb-gap\{[^}]*color:transparent/.test(bites), 'the answer must never sit in the gap as transparent text');
+const progress = read('js/ui/profile-progress.js');
+assert.match(progress, /filter\(\(\[id, value\]\) => \/\^\(pb\|br\|bc\):\/\.test\(id\)/,
+  'Best week average must use the nine curriculum games only');
 const menu = read('js/menu-core.js');
 assert.match(menu, /getExtraForCurriculum\(CURR\)/, 'the menu must list extras from the registry');
 assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-game (keeps the nine contract)');
@@ -142,4 +169,63 @@ assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-
   assert(rounds >= 2000, `expected the full year of content, checked ${rounds} rounds`);
 }
 
-console.log('Games extras audit passed: the nine stay nine, unlocks untouched by extras, Booha Bites wired and fair on every week.');
+// ── 5. Echo: wiring and a strict-but-fair checker on every vocab item ────
+{
+  const echo = read('games/echo.js');
+  assert.match(gameCore, /'echo':\s+'vocab'/, 'game-core must load vocab for Echo');
+  assert.match(echo, /const SAVE_ID = `\$\{CFG\.curriculum\}-extra:echo`;/, 'Echo must save under the extra id');
+  assert.match(echo, /U\.createRun\(\{ total: 15, recoverPoints: 50 \}\)/, 'Echo second tries earn +50 (typing cannot be guessed)');
+  assert.match(echo, /run\.ready\(2500 \+ 900 \* words, \{ waitAudio: true \}\)/, 'the sharp window starts after the clip');
+  for (const call of ['run.hit()', 'run.miss()', 'run.recover()', 'run.reset()', 'run.audioDone()', 'U.showScorecard(', 'U.emitGameEnd(', "U.loadSFX('fart'", 'autocorrect="off"', 'spellcheck="false"', 'autocapitalize="off"']) {
+    assert(echo.includes(call), `Echo must use ${call}`);
+  }
+  assert.match(echo, /hinted = true;[\s\S]{0,80}run\.miss\(\)/, 'a hint must end the combo (never a first-try answer)');
+  assert(!/@keyframes[^{]*\{[^}]*(box-shadow|filter)\s*:/.test(echo), 'Echo animations must stay transform/opacity');
+  assert(/font:800 18px/.test(echo), 'the Echo input must be ≥16px so iOS does not zoom');
+  assert.match(menu, /if \(g\.hira\) a\.setAttribute\('data-hira', g\.hira\)/, 'extra tiles take their Japanese line from the registry');
+
+  const ctx = { window: {}, console };
+  vm.createContext(ctx);
+  vm.runInContext(echo, ctx, { filename: 'games/echo.js' });
+  const E = ctx.window.EchoLogic;
+  assert(E, 'Echo must export its checker');
+  const cases = [
+    ['car', 'car', 'exact'], ['car', 'Car', 'exact'], ['car', '  car. ', 'exact'], ['car', 'cat', 'wrong'],
+    ['train', 'trian', 'near'], ['train', 'tran', 'near'], ['train', 'plane', 'wrong'], ['bus', 'bas', 'wrong'],
+    ['plan／think', 'think', 'exact'], ['plan／think', 'plan', 'exact'], ['plan／think', 'plan think', 'wrong'],
+    ['Maintain a balanced diet.', 'maintain a balanced diet', 'exact'], ['Maintain a balanced diet.', 'maintain a balanced deit', 'near'],
+    ["don't", 'don’t', 'exact'], ['round-trip ticket', 'round trip ticket', 'exact'], ['contactless payment', 'contactles paymnt', 'near'],
+    ['contactless payment', 'contact payment', 'wrong'], ['car', '', 'wrong'],
+  ];
+  for (const [t, typed, want] of cases) assert.strictEqual(E.check(t, typed), want, `check(${JSON.stringify(t)}, ${JSON.stringify(typed)})`);
+  assert.strictEqual(E.rightPrefix('train', 'trian'), 2);
+  assert.strictEqual(E.hintFor('car'), 'c _ _');
+
+  const months = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+  let items = 0;
+  for (const c of ['pb', 'br', 'bc']) {
+    for (const m of months) {
+      const vf = path.join(ROOT, `content/${c}/${m}/vocab.json`);
+      if (!fs.existsSync(vf)) continue;
+      const V = JSON.parse(fs.readFileSync(vf, 'utf8')).cards;
+      for (let w = 0; w < 4; w++) {
+        const week = V.slice(w * 15, w * 15 + 15);
+        for (const v of week) {
+          items++;
+          assert(v.mp3, `${c}/${m}: "${v.en}" needs audio for Echo`);
+          const first = String(v.en).split(/[／/]/)[0];
+          assert.strictEqual(E.check(v.en, v.en), 'exact', `${c}/${m}: "${v.en}" typed exactly must pass`);
+          assert.strictEqual(E.check(v.en, first.toUpperCase()), 'exact', `${c}/${m}: "${v.en}" must ignore case`);
+          // A different word from the same week must never be accepted as exact.
+          for (const o of week) {
+            if (E.targetsOf(o.en).some(x => E.targetsOf(v.en).includes(x))) continue;   // e.g. "plan" and "plan／think" share an answer
+            assert.notStrictEqual(E.check(v.en, o.en), 'exact', `${c}/${m}: "${o.en}" must not pass for "${v.en}"`);
+          }
+        }
+      }
+    }
+  }
+  assert(items >= 2000, `expected the full year of vocab, checked ${items}`);
+}
+
+console.log('Games extras audit passed: the nine stay nine, unlocks untouched by extras, Booha Bites wired and fair on every week, Echo strict and fair on every vocab item.');

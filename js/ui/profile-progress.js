@@ -69,8 +69,13 @@
     return best;
   }
 
+  // Weekly understanding: mean of the nine curriculum games' best % only.
+  // weekLog.adv also holds bonus arcade raw scores and extra games, which
+  // must not move this average.
   function weekAverage(week) {
-    const values = Object.values((week && week.adv) || {}).filter(value => Number.isFinite(value));
+    const values = Object.entries((week && week.adv) || {})
+      .filter(([id, value]) => /^(pb|br|bc):/.test(id) && Number.isFinite(value))
+      .map(([, value]) => value);
     return values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length) : null;
   }
 
