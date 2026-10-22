@@ -673,7 +673,18 @@ const UTILS = {
     const el = document.getElementById('game-loading');
     if (el) el.remove();
     const mount = document.getElementById('game-mount');
-    if (mount) mount.innerHTML = html;
+    if (!mount) return;
+    mount.innerHTML = html;
+    // Games Pass 10: v2 games get the lane chip and their own name as the title.
+    const root = document.documentElement, cfg = window.GAME_CONFIG || {};
+    if (root.getAttribute('data-skin') === 'v2') {
+      const LANE_LABEL = { words: 'WORDS · たんご', sentences: 'SENTENCES · ぶん', listen: 'LISTEN · きく', extra: 'EXTRA · おまけ' };
+      const chip = document.createElement('div');
+      chip.className = 'game-lane-chip';
+      chip.textContent = LANE_LABEL[root.getAttribute('data-lane')] || LANE_LABEL.extra;
+      mount.insertBefore(chip, mount.firstChild);
+      if (cfg.gameTitle) mount.querySelectorAll('.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum').forEach(t => { t.textContent = cfg.gameTitle; });
+    }
   },
 
   setTitle(gameName) {

@@ -179,6 +179,31 @@ window.GAME_CONFIG = {
 /* ── Apply curriculum theme to <html> ── */
 document.documentElement.setAttribute('data-curriculum', curriculum);
 
+/* ── Games Pass 10: colour layers (theme/game-skin.css) ──
+   Every game belongs to a lane (the menu's WORDS / SENTENCES / LISTEN /
+   EXTRA rows). A lane switches to the v2 skin only once its play surface
+   is built, so no game looks half-converted. */
+const GAME_LANES = {
+  'vocab-tap':      ['words',     'Vocabulary Tap'],
+  'spell-word':     ['words',     'Spell the Word'],
+  'vocab-speed':    ['words',     'Vocab Speed'],
+  'sentence-tap':   ['sentences', 'Sentence Tap'],
+  'sentence-order': ['sentences', 'Sentence Order'],
+  'sentence-speed': ['sentences', 'Sentence Speed'],
+  'say-word':       ['listen',    'Say the Word'],
+  'say-sentence':   ['listen',    'Say the Sentence'],
+  'ask-question':   ['listen',    'Ask the Question'],
+  'booha-bites':    ['extra',     'Booha Bites'],
+  'echo':           ['extra',     'Echo'],
+  'week-boss':      ['extra',     'Week Boss'],
+};
+const V2_LANES = new Set(['words', 'sentences']);
+const [lane, gameTitle] = GAME_LANES[gameName] || ['extra', gameName];
+document.documentElement.setAttribute('data-lane', lane);
+if (V2_LANES.has(lane)) document.documentElement.setAttribute('data-skin', 'v2');
+window.GAME_CONFIG.lane = lane;
+window.GAME_CONFIG.gameTitle = gameTitle;
+
 /* ── Update any week-label placeholders already in the shell ── */
 document.querySelectorAll('[data-week-label]').forEach(el => el.textContent = weekLabel);
 document.querySelectorAll('[data-week-label-jp]').forEach(el => el.textContent = weekLabelJP);
