@@ -57,7 +57,9 @@ const CURRENT_CACHES = {
   // EXTRA_GAMES, "{curriculum}-extra:" save ids) and Booha Bites.
   // Games Pass 7 (2026-10-22): Echo (hear it, type it) as a second extra;
   // extras skipped by aggregates and the nine-game week average.
-  pages:  'booha-pages-2026-474',
+  // Games Pass 8 (2026-10-22): Week Boss extra (opens after all nine are
+  // played this week), week crown on the menu tree; Echo audio/hira fixes.
+  pages:  'booha-pages-2026-475',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -231,7 +233,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-587',
+  assets: 'booha-assets-2026-588',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

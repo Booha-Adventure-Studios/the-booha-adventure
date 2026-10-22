@@ -98,11 +98,13 @@ const GAME_JSON = {
   // Extra games (Games Pass 6+): outside the nine, see game-registry EXTRA_GAMES
   'booha-bites':    'sentences',
   'echo':           'vocab',
+  'week-boss':      'vocab',
 };
 
 /* Extra decks a game needs besides its main one (same week's 15 cards). */
 const GAME_ALSO_JSON = {
   'booha-bites': ['vocab'],
+  'week-boss':   ['sentences', 'questions'],
 };
 
 const jsonType = GAME_JSON[gameName];

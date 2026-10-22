@@ -182,6 +182,17 @@ const BoohaGameRegistry = (() => {
       scoreMax:       100,
       starThresholds: [40, 70, 90],
     },
+    {
+      id:             'week_boss',
+      gameKey:        'week-boss',
+      name:           'Week Boss',
+      file:           'games/week-boss.js',
+      category:       'boss',
+      hira:           'ボスを たおそう！',
+      boss:           true,      // opens once all nine are played this week (live week only)
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
   ];
   const EXTRA_GAMES = [];
   CURRICULUMS.forEach(curriculum => {
