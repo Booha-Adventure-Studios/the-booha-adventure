@@ -183,7 +183,7 @@
       xl.appendChild(a);
       extraTiles.push(a);
     });
-    var note = el('p', 'bm-extra-note', 'Extra games don’t change the 9-game bonus unlock. · ボーナスの じょうけんは 9つの ゲームだけ');
+    var note = el('p', 'bm-extra-note', 'Extra games don’t change the 9-game arcade unlock. · アーケードの じょうけんは 9つの ゲームだけ');
     xl.appendChild(note);
     lanesEl.appendChild(xl);
   }
@@ -292,7 +292,7 @@
     var bonus = el('div', 'bm-tally-bonus');
     var unlocked = false;
     try { var w = BA.save.load().weekly || {}; unlocked = !!(w.unlockedBonusGames && w.unlockedBonusGames.booha_invaders); } catch (_) {}
-    var row = el('div', 'bm-row'); row.appendChild(el('span', null, 'Bonus games'));
+    var row = el('div', 'bm-row'); row.appendChild(el('span', null, 'Arcade'));
     row.appendChild(el('b', null, unlocked ? 'Open ✓' : atTwo + ' / 9 at ★★'));
     var bar = el('div', 'bm-bar'); var fill = el('i'); bar.appendChild(fill);
     bonus.appendChild(row); bonus.appendChild(bar);
@@ -300,8 +300,8 @@
     tally.appendChild(bonus);
     requestAnimationFrame(function () { requestAnimationFrame(function () { fill.style.setProperty('--p', unlocked ? 1 : atTwo / 9); }); });
     bubble.textContent = total === 27 ? 'Perfect week! 27 stars! / パーフェクト！'
-      : unlocked ? 'Bonus games are open! / ボーナス オープン！'
-      : (9 - atTwo) + ' more at ★★ for bonus games! / あと ' + (9 - atTwo) + ' つ！';
+      : unlocked ? 'The arcade is open! / アーケード オープン！'
+      : (9 - atTwo) + ' more at ★★ for the arcade! / あと ' + (9 - atTwo) + ' つ！';
   }
   paint();
   document.addEventListener('booha:ready', paint);
