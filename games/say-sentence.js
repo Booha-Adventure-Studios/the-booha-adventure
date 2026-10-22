@@ -32,34 +32,7 @@ await Promise.all([
   U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
-/* ═══ TIERS ═══ */
-const TIERS = [
-  { min:0,  max:5,  sound:'result_0-5.mp3',
-    label:'KEEP LISTENING',
-    en:'Keep playing — your ear will get sharper!',
-    kanji:'続けよう！だんだん聞き取れるようになるよ！',
-    jp:'もっと練習して聞き取れるようになろう！',
-    color:'#f43f5e' },
-  { min:6,  max:10, sound:'result_6-10.mp3',
-    label:'GOOD LISTENING!',
-    en:'You are picking up the sounds — great effort!',
-    kanji:'音が聞き取れてきた！素晴らしい努力！',
-    jp:'だんだん聞き取れてきてるよ！すごい！',
-    color:'#f97316' },
-  { min:11, max:14, sound:'result_11-14.mp3',
-    label:'SHARP EARS!',
-    en:'Your listening is strong and accurate!',
-    kanji:'しっかり聞き取れてる！',
-    jp:'聞き取りがとても上手！すごく上手！',
-    color:'#22d3ee' },
-  { min:15, max:15, sound:'result_15.mp3',
-    label:'PERFECT LISTENING!',
-    en:'Every sentence answered perfectly — incredible!',
-    kanji:'全問完璧！最高の聞き取り力！',
-    jp:'全部の問題に完璧に答えられた！すごい！',
-    color:'#a78bfa' },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 
 /* ═══ LABEL HELPERS ═══ */
 function curriculumLabel() {
@@ -174,28 +147,8 @@ S.textContent = `
 .sas-help-btn:hover{border-color:#a78bfa;color:#a78bfa;transform:scale(1.08)}
 [data-curriculum="bc"] .sas-help-btn:hover{border-color:#00ddff;color:#00ddff}
 [data-curriculum="pb"] .sas-help-btn{background:#fff;border-color:#cc88ff;color:#aa44cc;box-shadow:0 3px 0 #ddb8ff}
-
-/* ── Results ── */
-.sas-results-outer{max-width:660px;margin:0 auto;padding:0 1rem;box-sizing:border-box;width:100%}
-.sas-results{display:none;text-align:center;width:100%;padding:2.4rem 1.4rem 2rem;border-radius:32px;position:relative;overflow:hidden;border:2.5px solid var(--sas-tier-color,#a78bfa);background:color-mix(in srgb,var(--sas-tier-color,#a78bfa) 6%,var(--game-bg));box-shadow:0 0 56px color-mix(in srgb,var(--sas-tier-color,#a78bfa) 22%,transparent),0 22px 44px rgba(0,0,0,.4);box-sizing:border-box}
-.sas-results.show{display:block;animation:sasResultIn .5s cubic-bezier(.22,.8,.36,1) both}
 @keyframes sasResultIn{from{opacity:0;transform:scale(.84) translateY(24px)}to{opacity:1;transform:none}}
-.sas-results::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#a78bfa,#ff2288,#ffcc00,#22ddff,#a78bfa);background-size:220% auto;animation:sasRainbow 2.4s linear infinite}
-[data-curriculum="bc"] .sas-results::before{background:linear-gradient(90deg,#00f0ff,#4455ff,#aa00ff,#00f0ff);background-size:220% auto}
-[data-curriculum="pb"] .sas-results::before{background:linear-gradient(90deg,#ff6eb4,#cc88ff,#44ccff,#ffcc44,#ff6eb4);background-size:220% auto}
-.sas-results::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 22% 78%,color-mix(in srgb,var(--sas-tier-color,#a78bfa) 12%,transparent) 0%,transparent 50%),radial-gradient(circle at 78% 22%,color-mix(in srgb,#22ddff 8%,transparent) 0%,transparent 50%)}
-.sas-res-inner{position:relative;z-index:1}
-.sas-res-score{font-family:var(--game-font-title);font-size:clamp(58px,14vw,96px);line-height:1;color:var(--sas-tier-color,#a78bfa);text-shadow:0 0 26px var(--sas-tier-color,#a78bfa);margin-bottom:4px;animation:sasScorePop .5s cubic-bezier(.22,.8,.36,1) .3s both}
 @keyframes sasScorePop{from{transform:scale(.58) rotate(-5deg);opacity:0}50%{transform:scale(1.08) rotate(2deg)}to{transform:none;opacity:1}}
-.sas-res-pct{font-size:clamp(13px,2.2vw,17px);color:var(--game-muted);font-weight:700;margin-bottom:10px;animation:sasFadeUp .4s ease .5s both}
-.sas-res-label{font-family:var(--game-font-title);font-size:clamp(22px,4.8vw,38px);color:var(--sas-tier-color,#a78bfa);margin-bottom:10px;letter-spacing:.05em;text-shadow:0 0 16px color-mix(in srgb,var(--sas-tier-color,#a78bfa) 55%,transparent);animation:sasFadeUp .4s ease .52s both}
-.sas-res-divider{width:60px;height:3px;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#ff2288,#22ddff);margin:0 auto 12px;opacity:.6;animation:sasFadeUp .4s ease .56s both}
-[data-curriculum="bc"] .sas-res-divider{background:linear-gradient(90deg,#00f0ff,#4455ff,#aa00ff)}
-[data-curriculum="pb"] .sas-res-divider{background:linear-gradient(90deg,#ff6eb4,#cc88ff,#44ccff)}
-.sas-res-en{font-family:var(--game-font-body);font-weight:900;font-size:clamp(13px,2.2vw,17px);color:var(--game-ink);margin-bottom:4px;animation:sasFadeUp .4s ease .6s both}
-.sas-res-kanji{font-family:var(--game-font-jp);font-size:clamp(13px,2vw,17px);color:var(--game-muted);margin-bottom:3px;animation:sasFadeUp .4s ease .64s both}
-.sas-res-jp{font-family:var(--game-font-jp);font-size:clamp(11px,1.7vw,14px);color:var(--game-muted);opacity:.75;margin-bottom:1.3rem;animation:sasFadeUp .4s ease .68s both}
-.sas-res-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:sasFadeUp .4s ease .76s both}
 @keyframes sasFadeUp{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 @keyframes sasConfetti{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}100%{transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(0);opacity:0}}
 .sas-confetti-piece{position:fixed;pointer-events:none;z-index:9999;border-radius:2px;animation:sasConfetti 1.1s ease-out forwards}
@@ -253,22 +206,10 @@ U.mount(`
     <button class="sas-help-btn" id="sas-help">？</button>
   </div>
 </div>
-<div class="sas-results-outer">
-<div class="sas-results" id="sas-results">
-  <div class="sas-res-inner">
-    <div class="sas-res-score" id="sas-rs"></div>
-    <div class="sas-res-pct"   id="sas-rp"></div>
-    <div class="sas-res-label" id="sas-rl"></div>
-    <div class="sas-res-divider"></div>
-    <div class="sas-res-en"    id="sas-re"></div>
-    <div class="sas-res-kanji" id="sas-rk"></div>
-    <div class="sas-res-jp"    id="sas-rj"></div>
-    <div class="sas-res-actions">
-      <button class="game-btn game-btn-primary"   id="sas-replay">もう一度</button>
-      <button class="game-btn game-btn-secondary" id="sas-back">メニューへ</button>
-    </div>
-  </div>
-</div>
+<!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="sas-actions" hidden>
+  <button type="button" id="sas-replay">もう一度</button>
+  <button type="button" id="sas-back">メニューへ</button>
 </div>
 <div class="sas-modal-overlay" id="sas-modal-overlay">
   <div class="sas-modal" role="dialog" aria-modal="true">
@@ -307,7 +248,6 @@ const sasCard   = document.getElementById('sas-card');
 const playBtn   = document.getElementById('sas-play');
 const choicesEl = document.getElementById('sas-choices');
 const helpBtn   = document.getElementById('sas-help');
-const results   = document.getElementById('sas-results');
 const dotsRow   = document.getElementById('sas-dots');
 const modalOver = document.getElementById('sas-modal-overlay');
 const togKanji  = document.getElementById('sas-tog-kanji');
@@ -339,7 +279,9 @@ let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
 let missedItems = [];
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
-let showKanji = true;
+// Pre-Boo starts in hiragana (small children need not read kanji); the switch still works.
+const KANJI_DEFAULT = CFG.curriculum !== 'pb';
+let showKanji = KANJI_DEFAULT;
 
 function updateStreak(n) {
   streak = n;
@@ -360,6 +302,7 @@ function applyToggle() {
 }
 togKanji.addEventListener('click', () => { showKanji = true;  applyToggle(); });
 togHira.addEventListener('click',  () => { showKanji = false; applyToggle(); });
+applyToggle();   // show the right switch state from the first card (Pre-Boo: ひらがな)
 
 /* ═══ ADVANCE ═══ */
 let advancedThisCard = false;
@@ -483,28 +426,9 @@ function showResults() {
   const runSum = run.summary();   /* Games Pass 4 */
   for (let i = 0; i < 15; i++) { const d = document.getElementById(`sas-d${i}`); if (d) d.className = 'sas-dot done'; }
   mainWrap.style.display = 'none';
-  const outer = document.querySelector('.sas-results-outer');
-  if (outer) outer.style.display = '';
-  results.classList.add('show');
-  const tier = getTier(score), pct = Math.round((score / 15) * 100);
+  const pct = Math.round((score / 15) * 100);
   U.emitGameEnd({
     points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo, saveId:`${CFG.curriculum}:say_sentence`, score:pct, completed:pct >= 40 });
-  results.style.setProperty('--sas-tier-color', tier.color);
-  document.getElementById('sas-rs').textContent = `${score} / 15`;
-  document.getElementById('sas-rp').textContent = `${pct}%`;
-  document.getElementById('sas-rl').textContent = tier.label;
-  document.getElementById('sas-re').textContent = tier.en;
-  document.getElementById('sas-rk').textContent = tier.kanji;
-  document.getElementById('sas-rj').textContent = tier.jp;
-  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:say_sentence`, score: pct });
-  U.renderResultDetails(results, {
-    stats: [
-      { label: 'First-try correct / せいかい', value: `${score} / 15` },
-      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own sas-replay / sas-back. */
@@ -529,7 +453,7 @@ function showResults() {
 
 /* ═══ REPLAY / BACK ═══ */
 document.getElementById('sas-replay').addEventListener('click', () => {
-  results.classList.remove('show'); mainWrap.style.display = '';
+  mainWrap.style.display = '';
   idx = 0; score = 0; streak = 0;
   missedItems = [];
     run.reset();
@@ -538,7 +462,7 @@ document.getElementById('sas-replay').addEventListener('click', () => {
   answered = false; firstTry = true; pickCooldown = false;
   advancedThisCard = false; isBusy = false;
    
-  showKanji = true; applyToggle();
+  showKanji = KANJI_DEFAULT; applyToggle();
   order = U.shuffle(order); showCard();
    
 });

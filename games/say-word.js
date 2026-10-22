@@ -32,34 +32,7 @@ await Promise.all([
   U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
-/* ═══ TIERS ═══ */
-const TIERS = [
-  { min:0,  max:5,  sound:'result_0-5.mp3',
-    label:'KEEP LISTENING',
-    en:'Keep playing — your ear will get sharper!',
-    kanji:'続けよう！だんだん聞き取れるようになるよ！',
-    jp:'もっと練習して聞き取れるようになろう！',
-    color:'#f43f5e' },
-  { min:6,  max:10, sound:'result_6-10.mp3',
-    label:'GOOD LISTENING!',
-    en:'You are picking up the sounds — great effort!',
-    kanji:'音が聞き取れてきた！素晴らしい努力！',
-    jp:'だんだん聞き取れてきてるよ！すごい！',
-    color:'#f97316' },
-  { min:11, max:14, sound:'result_11-14.mp3',
-    label:'SHARP EARS!',
-    en:'Your listening is strong and accurate!',
-    kanji:'しっかり聞き取れてる！',
-    jp:'聞き取りがとても上手！すごく上手！',
-    color:'#22d3ee' },
-  { min:15, max:15, sound:'result_15.mp3',
-    label:'PERFECT LISTENING!',
-    en:'Every word answered perfectly — incredible!',
-    kanji:'全問完璧！最高の聞き取り力！',
-    jp:'全部の問題に完璧に答えられた！すごい！',
-    color:'#a78bfa' },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 
 /* ═══ LABEL HELPERS ═══ */
 function curriculumLabel() {
@@ -175,28 +148,8 @@ S.textContent = `
 .stw-help-btn:hover{border-color:#a78bfa;color:#a78bfa;transform:scale(1.08)}
 [data-curriculum="bc"] .stw-help-btn:hover{border-color:#00ddff;color:#00ddff}
 [data-curriculum="pb"] .stw-help-btn{background:#fff;border-color:#cc88ff;color:#aa44cc;box-shadow:0 3px 0 #ddb8ff}
-
-/* ── Results ── */
-.stw-results-outer{max-width:660px;margin:0 auto;padding:0 1rem;box-sizing:border-box;width:100%}
-.stw-results{display:none;text-align:center;width:100%;padding:2.4rem 1.4rem 2rem;border-radius:32px;position:relative;overflow:hidden;border:2.5px solid var(--stw-tier-color,#a78bfa);background:color-mix(in srgb,var(--stw-tier-color,#a78bfa) 6%,var(--game-bg));box-shadow:0 0 56px color-mix(in srgb,var(--stw-tier-color,#a78bfa) 22%,transparent),0 22px 44px rgba(0,0,0,.4);box-sizing:border-box}
-.stw-results.show{display:block;animation:stwResultIn .5s cubic-bezier(.22,.8,.36,1) both}
 @keyframes stwResultIn{from{opacity:0;transform:scale(.84) translateY(24px)}to{opacity:1;transform:none}}
-.stw-results::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#a78bfa,#ff2288,#ffcc00,#aaff22,#22ddff,#a78bfa);background-size:220% auto;animation:stwRainbow 2.4s linear infinite}
-[data-curriculum="bc"] .stw-results::before{background:linear-gradient(90deg,#00f0ff,#4455ff,#aa00ff,#00f0ff);background-size:220% auto}
-[data-curriculum="pb"] .stw-results::before{background:linear-gradient(90deg,#ff6eb4,#cc88ff,#44ccff,#ffcc44,#ff6eb4);background-size:220% auto}
-.stw-results::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 22% 78%,color-mix(in srgb,var(--stw-tier-color,#a78bfa) 12%,transparent) 0%,transparent 50%),radial-gradient(circle at 78% 22%,color-mix(in srgb,#22ddff 8%,transparent) 0%,transparent 50%)}
-.stw-res-inner{position:relative;z-index:1}
-.stw-res-score{font-family:var(--game-font-title);font-size:clamp(58px,14vw,96px);line-height:1;color:var(--stw-tier-color,#a78bfa);text-shadow:0 0 26px var(--stw-tier-color,#a78bfa);margin-bottom:4px;animation:stwScorePop .5s cubic-bezier(.22,.8,.36,1) .3s both}
 @keyframes stwScorePop{from{transform:scale(.58) rotate(-5deg);opacity:0}50%{transform:scale(1.08) rotate(2deg)}to{transform:none;opacity:1}}
-.stw-res-pct{font-size:clamp(13px,2.2vw,17px);color:var(--game-muted);font-weight:700;margin-bottom:10px;animation:stwFadeUp .4s ease .5s both}
-.stw-res-label{font-family:var(--game-font-title);font-size:clamp(22px,4.8vw,38px);color:var(--stw-tier-color,#a78bfa);margin-bottom:10px;letter-spacing:.05em;text-shadow:0 0 16px color-mix(in srgb,var(--stw-tier-color,#a78bfa) 55%,transparent);animation:stwFadeUp .4s ease .52s both}
-.stw-res-divider{width:60px;height:3px;border-radius:99px;background:linear-gradient(90deg,#a78bfa,#ff2288,#22ddff);margin:0 auto 12px;opacity:.6;animation:stwFadeUp .4s ease .56s both}
-[data-curriculum="bc"] .stw-res-divider{background:linear-gradient(90deg,#00f0ff,#4455ff,#aa00ff)}
-[data-curriculum="pb"] .stw-res-divider{background:linear-gradient(90deg,#ff6eb4,#cc88ff,#44ccff)}
-.stw-res-en{font-family:var(--game-font-body);font-weight:900;font-size:clamp(13px,2.2vw,17px);color:var(--game-ink);margin-bottom:4px;animation:stwFadeUp .4s ease .6s both}
-.stw-res-kanji{font-family:var(--game-font-jp);font-size:clamp(13px,2vw,17px);color:var(--game-muted);margin-bottom:3px;animation:stwFadeUp .4s ease .64s both}
-.stw-res-jp{font-family:var(--game-font-jp);font-size:clamp(11px,1.7vw,14px);color:var(--game-muted);opacity:.75;margin-bottom:1.3rem;animation:stwFadeUp .4s ease .68s both}
-.stw-res-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:stwFadeUp .4s ease .76s both}
 @keyframes stwFadeUp{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
 @keyframes stwConfetti{0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1}100%{transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(0);opacity:0}}
 .stw-confetti-piece{position:fixed;pointer-events:none;z-index:9999;border-radius:2px;animation:stwConfetti 1.1s ease-out forwards}
@@ -254,22 +207,10 @@ U.mount(`
     <button class="stw-help-btn" id="stw-help">？</button>
   </div>
 </div>
-<div class="stw-results-outer">
-<div class="stw-results" id="stw-results">
-  <div class="stw-res-inner">
-    <div class="stw-res-score" id="stw-rs"></div>
-    <div class="stw-res-pct"   id="stw-rp"></div>
-    <div class="stw-res-label" id="stw-rl"></div>
-    <div class="stw-res-divider"></div>
-    <div class="stw-res-en"    id="stw-re"></div>
-    <div class="stw-res-kanji" id="stw-rk"></div>
-    <div class="stw-res-jp"    id="stw-rj"></div>
-    <div class="stw-res-actions">
-      <button class="game-btn game-btn-primary"   id="stw-replay">もう一度</button>
-      <button class="game-btn game-btn-secondary" id="stw-back">メニューへ</button>
-    </div>
-  </div>
-</div>
+<!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="stw-actions" hidden>
+  <button type="button" id="stw-replay">もう一度</button>
+  <button type="button" id="stw-back">メニューへ</button>
 </div>
 <div class="stw-modal-overlay" id="stw-modal-overlay">
   <div class="stw-modal" role="dialog" aria-modal="true">
@@ -308,7 +249,6 @@ const stwCard   = document.getElementById('stw-card');
 const playBtn   = document.getElementById('stw-play');
 const choicesEl = document.getElementById('stw-choices');
 const helpBtn   = document.getElementById('stw-help');
-const results   = document.getElementById('stw-results');
 const dotsRow   = document.getElementById('stw-dots');
 const modalOver = document.getElementById('stw-modal-overlay');
 const togKanji  = document.getElementById('stw-tog-kanji');
@@ -339,7 +279,9 @@ let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
 let missedItems = [];
 let answered = false, firstTry = true, pickCooldown = false, isBusy = false;
-let showKanji = true;
+// Pre-Boo starts in hiragana (small children need not read kanji); the switch still works.
+const KANJI_DEFAULT = CFG.curriculum !== 'pb';
+let showKanji = KANJI_DEFAULT;
 
 function updateStreak(n) {
   streak = n;
@@ -360,6 +302,7 @@ function applyToggle() {
 }
 togKanji.addEventListener('click', () => { showKanji = true;  applyToggle(); });
 togHira.addEventListener('click',  () => { showKanji = false; applyToggle(); });
+applyToggle();   // show the right switch state from the first card (Pre-Boo: ひらがな)
 
 /* ═══ ADVANCE ═══ */
 let advancedThisCard = false;
@@ -483,28 +426,9 @@ function showResults() {
   const runSum = run.summary();   /* Games Pass 4 */
   for (let i = 0; i < 15; i++) { const d = document.getElementById(`stw-d${i}`); if (d) d.className = 'stw-dot done'; }
   mainWrap.style.display = 'none';
-  const outer = document.querySelector('.stw-results-outer');
-  if (outer) outer.style.display = '';
-  results.classList.add('show');
-  const tier = getTier(score), pct = Math.round((score / 15) * 100);
+  const pct = Math.round((score / 15) * 100);
   U.emitGameEnd({
     points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo, saveId:`${CFG.curriculum}:say_word`, score:pct, completed:pct >= 40 });
-  results.style.setProperty('--stw-tier-color', tier.color);
-  document.getElementById('stw-rs').textContent = `${score} / 15`;
-  document.getElementById('stw-rp').textContent = `${pct}%`;
-  document.getElementById('stw-rl').textContent = tier.label;
-  document.getElementById('stw-re').textContent = tier.en;
-  document.getElementById('stw-rk').textContent = tier.kanji;
-  document.getElementById('stw-rj').textContent = tier.jp;
-  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:say_word`, score: pct });
-  U.renderResultDetails(results, {
-    stats: [
-      { label: 'First-try correct / せいかい', value: `${score} / 15` },
-      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
   if (score === 15) { fireConfetti(false); setTimeout(() => fireConfetti(true), 500); }
   /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
      sound and its buttons press this game's own stw-replay / stw-back. */
@@ -529,7 +453,7 @@ function showResults() {
 
 /* ═══ REPLAY / BACK ═══ */
 document.getElementById('stw-replay').addEventListener('click', () => {
-  results.classList.remove('show'); mainWrap.style.display = '';
+  mainWrap.style.display = '';
   idx = 0; score = 0; streak = 0;
   missedItems = [];
     run.reset();
@@ -537,7 +461,7 @@ document.getElementById('stw-replay').addEventListener('click', () => {
   const se = document.getElementById('stw-streak'); if (se) se.textContent = '0';
   answered = false; firstTry = true; pickCooldown = false;
   advancedThisCard = false; isBusy = false;
-  showKanji = true; applyToggle();
+  showKanji = KANJI_DEFAULT; applyToggle();
   order = U.shuffle(order); showCard();
 });
 document.getElementById('stw-back').addEventListener('click', () => {

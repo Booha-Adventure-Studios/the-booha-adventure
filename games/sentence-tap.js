@@ -98,59 +98,9 @@ function buildShuffledDeck() {
 let allCards = buildShuffledDeck();
 
 /* ══════════════════════════════════════════════════════════════
-   TIERS
+   RESULT TIERS → js/game-scorecard.js
    ══════════════════════════════════════════════════════════════ */
-const TIERS = [
-  {
-    min: 0,  max: 5,  sound: 'result_0-5.mp3',
-    label: 'TRY AGAIN',
-    en:    "Sentences are tough — keep at it!",
-    jp:    '文は難しい！あきらめないで！',
-    kanji: '文章は難しい！諦めないで！',
-    color: '#ef4444',
-    actions: [
-      { id:'st-replay', label:'もう一度', cls:'st-res-btn game-btn-danger' },
-      { id:'st-back',   label:'メニューへ', cls:'st-res-btn game-btn-ghost' },
-    ],
-  },
-  {
-    min: 6,  max: 10, sound: 'result_6-10.mp3',
-    label: 'KEEP READING',
-    en:    "Good effort! Those sentences are sinking in.",
-    jp:    'いい感じ！もっと練習しよう！',
-    kanji: '良い調子！もっと練習しよう！',
-    color: '#f97316',
-    actions: [
-      { id:'st-replay', label:'もう一度', cls:'st-res-btn game-btn-warning' },
-      { id:'st-back',   label:'メニューへ', cls:'st-res-btn game-btn-ghost' },
-    ],
-  },
-  {
-    min: 11, max: 14, sound: 'result_11-14.mp3',
-    label: 'ALMOST FLUENT',
-    en:    "Your Japanese is really flowing now!",
-    jp:    'ほぼペラペラ！惜しい！',
-    kanji: 'ほぼ流暢！惜しい！',
-    color: '#22ddff',
-    actions: [
-      { id:'st-replay', label:'もう一度', cls:'st-res-btn game-btn-cyan' },
-      { id:'st-back',   label:'メニューへ', cls:'st-res-btn game-btn-ghost' },
-    ],
-  },
-  {
-    min: 15, max: 15, sound: 'result_15.mp3',
-    label: 'FLUENT!',
-    en:    "Every sentence matched perfectly!",
-    jp:    'ペラペラ！全文正解！すごい！',
-    kanji: '流暢！全問正解！',
-    color: '#ffcc00',
-    actions: [
-      { id:'st-replay', label:'もう一度', cls:'st-res-btn game-btn-gold' },
-      { id:'st-back',   label:'メニューへ', cls:'st-res-btn game-btn-ghost' },
-    ],
-  },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 
 /* ══════════════════════════════════════════════════════════════
    LABEL HELPERS
@@ -476,7 +426,6 @@ body.hira-mode .st-jp-hira-text{ display:block; }
   85%{ transform:translateX(3px)  rotate(.5deg); }
 }
 
-
 /* wrong flash */
 .st-wrong-flash{
   position:fixed; inset:0; z-index:9000;
@@ -578,62 +527,9 @@ body.hira-mode .st-hira-icon{ transform:rotate(180deg); }
 [data-curriculum="pb"] .st-how-jp{ color:rgba(58,26,46,.55); }
 .st-modal-close{ display:block; width:100%; margin-top:1.2rem; font-family:var(--game-font-title); font-size:clamp(15px,2.8vw,19px); letter-spacing:.06em; padding:13px; border-radius:999px; border:none; cursor:pointer; background:linear-gradient(135deg,var(--game-primary),var(--game-secondary)); color:#000; font-weight:900; transition:transform .15s; }
 .st-modal-close:hover{ transform:scale(1.03); }
-
-/* ══════════════════════════════════════════════════════════════
-   RESULTS — centered with header
-   ══════════════════════════════════════════════════════════════ */
-.st-results-wrap{
-  display:none; flex-direction:column; align-items:center;
-  padding:0 .75rem 6rem; box-sizing:border-box; width:100%;
-}
-.st-results-wrap.show{ display:flex; }
-
-.st-results{
-  width:100%; max-width:520px;
-  text-align:center; padding:2.4rem 1.4rem 2rem;
-  border-radius:32px; position:relative; overflow:hidden;
-  border:2.5px solid var(--tier-color,var(--game-primary));
-  background:color-mix(in srgb, var(--tier-color,var(--game-primary)) 6%, var(--game-bg));
-  box-shadow:0 0 60px color-mix(in srgb, var(--tier-color,var(--game-primary)) 22%, transparent),0 24px 48px rgba(0,0,0,.4);
-  animation:stResultIn .5s cubic-bezier(.22,.8,.36,1) both;
-}
 @keyframes stResultIn{ from{ opacity:0; transform:scale(.84) translateY(24px); } to{ opacity:1; transform:none; } }
-.st-results::before{ content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--game-primary),var(--game-secondary),var(--game-accent),var(--game-primary)); background-size:220% auto; animation:stRainbow 2.4s linear infinite; }
-.st-results::after{ content:''; position:absolute; inset:0; z-index:0; pointer-events:none; background:radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--tier-color,var(--game-primary)) 12%, transparent) 0%, transparent 50%),radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--game-secondary) 8%, transparent) 0%, transparent 50%); }
-.st-res-inner{ position:relative; z-index:1; }
-
-.st-res-score{ font-family:var(--game-font-title); font-size:clamp(56px,15vw,98px); line-height:1; color:var(--tier-color,var(--game-primary)); text-shadow:0 0 28px var(--tier-color,var(--game-primary)); margin-bottom:4px; animation:stScorePop .5s cubic-bezier(.22,.8,.36,1) .35s both; }
 @keyframes stScorePop{ from{ transform:scale(.6); opacity:0; } to{ transform:none; opacity:1; } }
-.st-res-pct{ font-size:clamp(13px,2.4vw,18px); color:var(--game-muted); font-weight:700; margin-bottom:10px; }
-.st-res-label{ font-family:var(--game-font-title); font-size:clamp(24px,5vw,40px); color:var(--tier-color,var(--game-primary)); margin-bottom:10px; letter-spacing:.05em; text-shadow:0 0 18px color-mix(in srgb, var(--tier-color,var(--game-primary)) 55%, transparent); animation:stLabelSlide .45s ease .5s both; }
 @keyframes stLabelSlide{ from{ transform:translateY(12px); opacity:0; } to{ transform:none; opacity:1; } }
-.st-res-divider{ width:60px; height:3px; border-radius:99px; background:linear-gradient(90deg,var(--game-primary),var(--game-secondary)); margin:0 auto 12px; opacity:.6; }
-.st-res-en{ font-family:var(--game-font-body); font-weight:900; font-size:clamp(13px,2.2vw,17px); color:var(--game-ink); margin-bottom:4px; animation:stLabelSlide .45s ease .6s both; }
-.st-res-jp{ font-family:var(--game-font-jp); font-size:clamp(13px,2vw,17px); color:var(--game-muted); margin-bottom:3px; animation:stLabelSlide .45s ease .65s both; }
-.st-res-kanji{ font-family:var(--game-font-jp); font-size:clamp(11px,1.7vw,14px); color:var(--game-muted); opacity:.7; margin-bottom:1.4rem; animation:stLabelSlide .45s ease .7s both; }
-
-/* ── Colorful action buttons ── */
-.st-res-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; animation:stLabelSlide .45s ease .8s both; }
-
-.st-res-btn{
-  font-family:var(--game-font-title); font-size:clamp(13px,2.4vw,17px);
-  font-weight:900; letter-spacing:.05em;
-  padding:12px 22px; border-radius:999px; border:none;
-  cursor:pointer; display:flex; align-items:center; gap:8px;
-  position:relative; overflow:hidden;
-  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
-  touch-action:manipulation;
-}
-.st-res-btn:hover{ transform:translateY(-3px) scale(1.06); }
-.st-res-btn:active{ transform:scale(.94); }
-
-.st-res-btn.game-btn-danger{ background:linear-gradient(135deg,#ef4444,#ff6060); color:#fff; box-shadow:0 4px 0 #b91c1c,0 0 20px rgba(239,68,68,.45); }
-.st-res-btn.game-btn-warning{ background:linear-gradient(135deg,#f97316,#fbbf24); color:#1a0500; box-shadow:0 4px 0 #b45309,0 0 20px rgba(249,115,22,.45); }
-.st-res-btn.game-btn-cyan{ background:linear-gradient(135deg,#06b6d4,#22ddff); color:#001418; box-shadow:0 4px 0 #0e7490,0 0 20px rgba(34,221,255,.4); }
-.st-res-btn.game-btn-gold{ background:linear-gradient(135deg,#f59e0b,#ffcc00); color:#1a0c00; box-shadow:0 4px 0 #b45309,0 0 24px rgba(255,204,0,.55); }
-.st-res-btn.game-btn-ghost{ background:transparent; border:2px solid rgba(255,255,255,.28); color:var(--game-muted); box-shadow:none; }
-.st-res-btn.game-btn-ghost:hover{ border-color:rgba(255,255,255,.55); color:var(--game-ink); }
-[data-curriculum="pb"] .st-res-btn.game-btn-ghost{ border-color:rgba(58,26,46,.25); color:rgba(58,26,46,.6); }
 
 /* ── confetti ── */
 @keyframes stConfetti{ 0%{ transform:translate(0,0) rotate(0deg) scale(1); opacity:1; } 100%{ transform:translate(var(--cx),var(--cy)) rotate(var(--cr)) scale(0); opacity:0; } }
@@ -700,24 +596,10 @@ U.mount(`
 
 </div>
 
-<!-- RESULTS (separate from main wrap) -->
-<div class="st-results-wrap" id="st-results-wrap">
-  <div class="st-header" style="text-align:center;padding:.6rem 1rem .8rem;width:100%;max-width:520px;">
-    <div class="st-curriculum">${curriculumLabel()}</div>
-    <div class="st-date">${titleDateLabel()}</div>
-  </div>
-  <div class="st-results" id="st-results">
-    <div class="st-res-inner">
-      <div class="st-res-score" id="st-rs"></div>
-      <div class="st-res-pct"   id="st-rp"></div>
-      <div class="st-res-label" id="st-rl"></div>
-      <div class="st-res-divider"></div>
-      <div class="st-res-en"    id="st-re"></div>
-      <div class="st-res-jp"    id="st-rj"></div>
-      <div class="st-res-kanji" id="st-rk"></div>
-      <div class="st-res-actions" id="st-res-actions"></div>
-    </div>
-  </div>
+<!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="st-actions" hidden>
+  <button type="button" id="st-replay">もう一度</button>
+  <button type="button" id="st-back">メニューへ</button>
 </div>
 
 <!-- HOW TO PLAY MODAL -->
@@ -772,8 +654,6 @@ const checkBtn    = document.getElementById('st-check');
 const gameEl      = document.getElementById('st-game');
 const mainWrap    = document.getElementById('st-main-wrap');
 const bottomBar   = document.getElementById('st-bottom-bar');
-const resultsWrap = document.getElementById('st-results-wrap');
-const resActions  = document.getElementById('st-res-actions');
 const hiraBtn     = document.getElementById('st-hira-toggle');
 const hiraLabel   = document.getElementById('st-hira-label');
 const helpBtn     = document.getElementById('st-help');
@@ -1059,17 +939,6 @@ function fireConfetti() {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   DROP-IN REPLACEMENT for showResults() in sentence-tap.js
-
-   REPLACE from `function showResults() {` through the final
-   `startRound(0);` and `})();` with this entire block.
-
-   WHAT WAS BROKEN:
-   1. BoohaAdventure direct reference → ReferenceError crash.
-   2. getElementById('vt-results') — wrong prefix, should be 'st-results'.
-      All other IDs (st-rs, st-rp … st-rk) were already correct.
-   ══════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════════════════════════
    RESULTS
@@ -1078,9 +947,7 @@ function showResults() {
   const runSum = run.summary();   /* Games Pass 4 */
   updateDots(3);
   mainWrap.style.display = 'none';
-  resultsWrap.classList.add('show');
 
-  const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
   /* ── Save score to Booha Adventure save system ── */
@@ -1091,41 +958,12 @@ U.emitGameEnd({
       completed: pct >= 40,
   });
 
-  /* ✅ Fixed: was 'vt-results' (vocab-tap leftover), now 'st-results' */
-  const resEl = document.getElementById('st-results');
-  resEl.style.setProperty('--tier-color', tier.color);
-  document.getElementById('st-rs').textContent = `${score} / 15`;
-  document.getElementById('st-rp').textContent = `${pct}%`;
-  document.getElementById('st-rl').textContent = tier.label;
-  document.getElementById('st-re').textContent = tier.en;
-  document.getElementById('st-rj').textContent = tier.jp;
-  document.getElementById('st-rk').textContent = tier.kanji;
-  U.renderResultMeta(resEl, { gameId: `${CFG.curriculum}:sentence_tap`, score: pct });
-  U.renderResultDetails(resEl, {
-    stats: [
-      { label: 'Correct pairs / せいかい', value: `${score} / 15` },
-      { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
-
-  /* Build colorful action buttons */
-  resActions.innerHTML = '';
-  tier.actions.forEach(act => {
-    const btn = document.createElement('button');
-    btn.id        = act.id;
-    btn.className = `st-res-btn ${act.cls}`;
-    btn.innerHTML = `<span>${act.label}</span>`;
-    resActions.appendChild(btn);
-  });
 
   /* Wire up actions */
   const replayBtn = document.getElementById('st-replay');
   const backBtn   = document.getElementById('st-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
-    resultsWrap.classList.remove('show');
     mainWrap.style.display = '';
     allCards = buildShuffledDeck();
     score    = 0;
@@ -1136,11 +974,11 @@ U.emitGameEnd({
     hiraMode              = false;
     hiraLabel.textContent = 'ひらがな';
     startRound(0);
-  });
+  }, { once: true });
 
   if (backBtn) backBtn.addEventListener('click', () => {
     window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
-  });
+  }, { once: true });
 
   if (score === 15) {
     setTimeout(fireConfetti, 400);
