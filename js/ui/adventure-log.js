@@ -491,7 +491,9 @@ const BoohaAdventureLog = (() => {
           || typeof BoohaGameRegistry.getForCurriculum !== 'function') {
           throw new Error('curriculum lookup is unavailable');
         }
-        const entries = BoohaGameRegistry.getForCurriculum(c);
+        const entries = typeof BoohaGameRegistry.getForCurriculumInMazeOrder === 'function'
+          ? BoohaGameRegistry.getForCurriculumInMazeOrder(c)
+          : BoohaGameRegistry.getForCurriculum(c);
         if (!Array.isArray(entries) || !entries.length) {
           throw new Error(`curriculum ${c} has no game registry entries`);
         }
