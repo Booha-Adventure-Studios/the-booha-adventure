@@ -178,15 +178,12 @@ const BoohaAdventure = (() => {
       }
     });
 
-    // Trophy Case "World Traveler": note the first visit to each world page.
-    // One small write per world, ever; later visits read and return.
+    // Adventure Tokens "World Traveler": trophy-case.js owns the save write
+    // (recordWorldVisit); the four world pages load it, and this just says
+    // which world booted. It writes once per world, ever.
     try {
       const m = (location.pathname || '').match(/(muenba|grimmerglen|utsuroba|karasuki)\.html$/);
-      const S = getSystem('saveFile');
-      if (m && S) {
-        const visited = ((S.load() || {}).meta || {}).worldsVisited || {};
-        if (!visited[m[1]]) S.patchDeep('meta', 'worldsVisited', { [m[1]]: Date.now() });
-      }
+      if (m && window.BoohaTrophies && BoohaTrophies.recordWorldVisit) BoohaTrophies.recordWorldVisit(m[1]);
     } catch (_) {}
 
     window.BOOHA_READY = true;
