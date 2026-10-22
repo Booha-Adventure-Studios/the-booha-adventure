@@ -95,7 +95,9 @@ const CURRENT_CACHES = {
   // run's pace (first response vs par) into recentRun for calibration.
   // Rainbow Pass B (2026-10-22): ready-pace runs turn stars rainbow on the
   // score card, menu tiles and profile; replays pause the pace clock.
-  pages:  'booha-pages-2026-491',
+  // Rainbow fix: the first-rainbow explanation is per student (read from the
+  // synced save, not a device flag); shorter READY PACE chip.
+  pages:  'booha-pages-2026-492',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

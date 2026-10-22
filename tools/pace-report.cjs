@@ -2,10 +2,10 @@
 /*
  * pace-report.cjs — Rainbow Pass A calibration report.
  *
- * Reads student saves and summarises the silent pace records that the game
- * engines now store (score entry → recentRuns[].pace, last 8 runs per game).
- * Use it after a week or two of real class play to choose each game's
- * "ready pace" zone before rainbow stars are switched on.
+ * Reads student saves and summarises the pace records the game engines
+ * store (score entry → recentRuns[].pace, last 8 runs per game). Rainbow
+ * stars are live with first-guess zones (PACE_ZONES in js/game-utils.js);
+ * run this on real classroom data to tune those zones, then edit the table.
  *
  *   node tools/pace-report.cjs saves/*.json
  *   node tools/pace-report.cjs export.json --json > pace.json

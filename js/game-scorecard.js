@@ -15,7 +15,10 @@
    Stars are unchanged: BoohaGameRegistry.starsForScore(gameId, pct).
    Rainbow Pass B: earned stars turn RAINBOW for a ready-pace run
    (GAME_UTILS.readyPace on run.pace). Gold = completed, rainbow = prepared.
-   The first rainbow ever shows a short explanation; after that a chip.
+   A student's first rainbow ever shows a short explanation; after that a
+   chip. "First ever" is read from that student's own synced save (no
+   rainbows recorded yet in any game), so it holds on shared iPads and
+   across devices. The run being shown is saved just after the card opens.
    ══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -31,7 +34,12 @@
   var STAR_PATH = 'M12 2.2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.4l-6.1 3.4 1.4-6.8-5.1-4.7 6.9-.8z';
   var CROWN_PATH = 'M2 17h22l-2-12-5.5 5L13 2 9.5 10 4 5z';
 
-  var RAINBOW_SEEN = 'booha_rainbow_seen';
+  function firstRainbowEver() {
+    try {
+      var sc = window.BoohaAdventure.save.load().scores || {};
+      return !Object.keys(sc).some(function (id) { return sc[id] && Number(sc[id].rainbows) > 0; });
+    } catch (_) { return false; }
+  }
   function rainbowDefs() {
     if (document.getElementById('booha-rainbow-defs')) return;
     var ns = 'http://www.w3.org/2000/svg', s = document.createElementNS(ns, 'svg');
@@ -187,10 +195,9 @@
     }
     card.appendChild(starRow);
     if (rainbow) {
-      var firstRainbow = false;
-      try { firstRainbow = !localStorage.getItem(RAINBOW_SEEN); localStorage.setItem(RAINBOW_SEEN, '1'); } catch (_) {}
+      var firstRainbow = firstRainbowEver();
       var rb = el('div', 'bsc-rainbow-chip' + (firstRainbow ? ' first' : ''));
-      rb.appendChild(el('b', null, '🌈 Rainbow stars = ready pace · じゅんび OK'));
+      rb.appendChild(el('b', null, '🌈 READY PACE · じゅんび OK'));
       if (firstRainbow) {
         rb.appendChild(el('span', null, kana
           ? 'じゅんびして きたね！ さいしょで せいかい、いい ペース。'
