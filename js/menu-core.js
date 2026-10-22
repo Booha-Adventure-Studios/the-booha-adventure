@@ -16,12 +16,11 @@
 
   var BASE = '/the-booha-adventure';
 
-  /* Placeholder art: swap these paths for the new grove backgrounds and
-     tree art when they are ready (keep each image under 700 KB). */
+  /* Menu art: one forest per curriculum (keep each image under 700 KB). */
   var MENU_ART = {
-    pb: { title: 'Pre-Boo', jp: 'プレ・ブー ゲームズ', tree: 'assets/img/pre-boo.webp', bg: 'assets/img/maze.webp', bgPos: 'center 30%' },
-    br: { title: 'Boo-riculum', jp: 'ブー・リキュラム ゲームズ', tree: 'assets/img/boo-tree.webp', bg: 'assets/img/profile/adventure-trail-forest.webp', bgPos: 'center 40%' },
-    bc: { title: 'Boo-Continuum', jp: 'ブー・コンティニュアム ゲームズ', tree: 'assets/img/cont-tree.webp', bg: 'assets/img/maze.webp', bgPos: 'center 75%' },
+    pb: { title: 'Pre-Boo', jp: 'プレ・ブー ゲームズ', tree: 'assets/img/pre-boo.webp', bg: 'assets/img/menu/pre-boo-forest.webp', bgPos: 'center 22%' },
+    br: { title: 'Boo-riculum', jp: 'ブー・リキュラム ゲームズ', tree: 'assets/img/boo-tree.webp', bg: 'assets/img/menu/boo-riculum-forest.webp', bgPos: 'center 30%' },
+    bc: { title: 'Boo-Continuum', jp: 'ブー・コンティニュアム ゲームズ', tree: 'assets/img/cont-tree.webp', bg: 'assets/img/menu/boo-continuum-forest.webp', bgPos: 'center 28%' },
   };
   var LANES = [
     { en: 'WORDS', jp: 'たんご', from: 0 },
@@ -262,6 +261,7 @@
         try { played = live && scores && scores.weeklyPlayedFor ? Math.min(9, scores.weeklyPlayedFor(CURR)) : 0; } catch (_) {}
         var open = live && played >= 9;
         t._bossLeft = 9 - played;
+        t._bossLive = live;
         t.classList.toggle('is-locked', !open);
         if (open) t.removeAttribute('aria-disabled'); else t.setAttribute('aria-disabled', 'true');
         if (!open) t._bm.best.textContent = live ? played + ' / 9 played · あと ' + (9 - played) : 'This week only · こんしゅうだけ';
@@ -321,7 +321,7 @@
     t.addEventListener('click', function (e) {
       e.preventDefault();
       if (t.classList.contains('is-locked')) {
-        bubble.textContent = t._bossLeft > 0
+        bubble.textContent = t._bossLive
           ? 'Play all 9 games first! あと ' + t._bossLeft + 'つ！'
           : 'The boss is only on this week’s page! / こんしゅうだけ！';
         t.classList.remove('nope'); void t.offsetWidth; t.classList.add('nope');
