@@ -333,9 +333,12 @@ playBtn.addEventListener('click', () => {
   try {
     const a = new Audio(CFG.audioBase + card.mp3);
     a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
+    const myIdx = idx;   // the card this clip belongs to
     const done = () => {
+      if (myIdx !== idx) return;   // a clip from an earlier question: ignore it
       run.audioDone(); playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶'; };
-    const started = voiceGate.play(a, { button: playBtn, onEnd: done });
+    // A new press always replaces whatever is still sounding.
+    const started = voiceGate.play(a, { button: playBtn, onEnd: done, replace: true, ignoreCooldown: true });
     if (!started) done();
   } catch(e) { playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶'; }
 });
@@ -378,6 +381,7 @@ function handleChoice(btn, card) {
   if (correct) {
     if (firstTry) run.hit(); else run.recover();
     isBusy = true; answered = true;
+    voiceGate.stop();   // answered: the clip is done, move on cleanly
     btn.classList.add('correct');
     Array.from(choicesEl.children).forEach(b => b.classList.add('locked'));
     if (firstTry) { score++; scoreEl.textContent = score; }
@@ -398,6 +402,7 @@ function handleChoice(btn, card) {
 
 /* ═══ SHOW CARD ═══ */
 function showCard() {
+  voiceGate.stop();   // never let the previous word play on the new question
   isBusy = false; answered = false; firstTry = true;
   pickCooldown = false; advancedThisCard = false;
   playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶';
