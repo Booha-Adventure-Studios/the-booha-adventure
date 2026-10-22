@@ -1669,6 +1669,13 @@ else
   bad "Nine-engine audio polish audit failed"
 fi
 
+echo "[games] nine-engine motion and smoothness audit"
+if node tests/games-motion-audit.cjs >/dev/null 2>&1; then
+  ok "Nine-engine motion audit passed"
+else
+  bad "Nine-engine motion audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

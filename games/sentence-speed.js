@@ -352,7 +352,7 @@ S.textContent = `
 }
 @keyframes sspTimerShimmer{ from{ background-position:200% 0; } to{ background-position:-200% 0; } }
 .ssp-timer-fill.warning{ animation:sspTimerPulse .55s ease-in-out infinite; }
-@keyframes sspTimerPulse{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.6) saturate(1.8); } }
+@keyframes sspTimerPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
 
 /* ══ JP PROMPT BOX ══ */
 .ssp-prompt-box{
@@ -424,14 +424,8 @@ S.textContent = `
 .ssp-prompt-box.streak-2{ box-shadow:0 8px 40px rgba(0,150,255,.22); }
 .ssp-prompt-box.streak-3{ animation:sspBoxPulse3 1.8s ease-in-out infinite; }
 .ssp-prompt-box.streak-4{ animation:sspBoxPulse4 .9s ease-in-out infinite; }
-@keyframes sspBoxPulse3{
-  0%,100%{ box-shadow:0 8px 40px rgba(0,140,255,.28), 0 0 60px rgba(0,140,255,.08); }
-  50%{     box-shadow:0 8px 60px rgba(0,140,255,.5),  0 0 80px rgba(0,140,255,.18); }
-}
-@keyframes sspBoxPulse4{
-  0%,100%{ box-shadow:0 8px 60px rgba(0,220,255,.45), 0 0 100px rgba(0,220,255,.18); border-color:rgba(0,220,255,.5); }
-  50%{     box-shadow:0 8px 80px rgba(0,220,255,.8),  0 0 130px rgba(0,220,255,.35); border-color:rgba(0,255,255,.9); }
-}
+@keyframes sspBoxPulse3{ 0%,100%{ opacity:1; } 50%{ opacity:.94; } }
+@keyframes sspBoxPulse4{ 0%,100%{ opacity:1; } 50%{ opacity:.94; } }
 
 .ssp-jp{
   font-family:var(--game-font-jp); font-weight:900;
@@ -585,10 +579,7 @@ S.textContent = `
 .ssp-wrap.streak-level-3 .ssp-choice,
 .ssp-wrap.streak-level-4 .ssp-choice{ box-shadow:0 0 18px rgba(0,180,255,.2), 0 6px 20px rgba(0,0,0,.35); }
 .ssp-wrap.streak-level-4 .ssp-choice{ box-shadow:0 0 24px rgba(180,240,255,.32), 0 6px 20px rgba(0,0,0,.35); }
-@keyframes sspChargedBreath{
-  0%,100%{ filter:brightness(1); }
-  50%{ filter:brightness(1.07); }
-}
+@keyframes sspChargedBreath{ 0%,100%{ opacity:1; } 50%{ opacity:.94; } }
 .ssp-prompt-box.ssp-hit{ animation:sspPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
 .ssp-dot.ssp-hit{ animation:sspDotHit 300ms cubic-bezier(.2,.9,.25,1) both; }
 .ssp-wrap .ssp-prompt-box.ssp-hit{ animation:sspPromptHit 300ms cubic-bezier(.2,.9,.25,1) both; }
@@ -660,23 +651,17 @@ S.textContent = `
   --ssp-bb:rgba(0,200,255,.5); --ssp-bg:rgba(0,185,255,.12); --ssp-glow:rgba(0,200,255,.2);
   animation:sspBannerIn .38s cubic-bezier(.34,1.56,.64,1), sspBannerPulse2 2.2s ease-in-out .4s infinite;
 }
-@keyframes sspBannerPulse2{ 0%,100%{ box-shadow:0 0 28px rgba(0,200,255,.2); } 50%{ box-shadow:0 0 54px rgba(0,200,255,.5); } }
+@keyframes sspBannerPulse2{ 0%,100%{ scale:1; } 50%{ scale:1.035; } }
 .ssp-streak-banner.slvl-3{
   --ssp-bb:rgba(60,140,255,.65); --ssp-bg:rgba(40,110,255,.14); --ssp-glow:rgba(60,140,255,.28);
   animation:sspBannerIn .38s cubic-bezier(.34,1.56,.64,1), sspBannerPulse3 1.4s ease-in-out .4s infinite;
 }
-@keyframes sspBannerPulse3{
-  0%,100%{ box-shadow:0 0 40px rgba(60,140,255,.3), 0 0 80px rgba(60,140,255,.1); }
-  50%{     box-shadow:0 0 72px rgba(60,140,255,.65), 0 0 120px rgba(60,140,255,.25); }
-}
+@keyframes sspBannerPulse3{ 0%,100%{ scale:1; } 50%{ scale:1.035; } }
 .ssp-streak-banner.slvl-4{
   --ssp-bb:rgba(180,240,255,.9); --ssp-bg:rgba(160,230,255,.18); --ssp-glow:rgba(180,240,255,.45);
   animation:sspBannerIn .38s cubic-bezier(.34,1.56,.64,1), sspBannerFlare .8s ease-in-out .4s infinite;
 }
-@keyframes sspBannerFlare{
-  0%,100%{ box-shadow:0 0 60px rgba(100,220,255,.55), 0 0 110px rgba(60,180,255,.2); border-color:rgba(180,240,255,.9); }
-  50%{     box-shadow:0 0 100px rgba(180,240,255,1),  0 0 160px rgba(100,220,255,.45); border-color:#ffffff; }
-}
+@keyframes sspBannerFlare{ 0%,100%{ scale:1; } 50%{ scale:1.035; } }
 /* PB streaks warm candy */
 [data-curriculum="pb"] .ssp-streak-banner.slvl-1{ --ssp-bb:rgba(255,170,50,.4);  --ssp-bg:rgba(255,160,30,.1);  --ssp-glow:rgba(255,170,50,.15); }
 [data-curriculum="pb"] .ssp-streak-banner.slvl-2{ --ssp-bb:rgba(255,100,180,.5); --ssp-bg:rgba(255,80,160,.12); --ssp-glow:rgba(255,100,180,.22); }
@@ -1168,14 +1153,17 @@ function startHeat() {
   const lv = getStreakLevel(streak);
   heatDur   = HEAT_DURATIONS[lv] ?? 7000;
   heatStart = performance.now();
-  heatEl.style.width = '100%';
+  /* Pass 2: shrink with transform (compositor) instead of width (layout
+     every frame). transform-origin is already left center. */
+  heatEl.style.willChange = 'transform';
+  heatEl.style.transform = 'scaleX(1)';
   heatEl.classList.remove('warning');
 
   const tick = (t) => {
     if (locked) { heatRAF = requestAnimationFrame(tick); return; }
     const p = 1 - (t - heatStart) / heatDur;
     const pct = Math.max(0, p);
-    heatEl.style.width = `${pct * 100}%`;
+    heatEl.style.transform = `scaleX(${pct})`;
     if (pct < 0.2) heatEl.classList.add('warning');
     else heatEl.classList.remove('warning');
     if (pct <= 0) { onTimeout(); return; }
