@@ -164,17 +164,21 @@ assert.deepStrictEqual(writers, ['js/core/trophy-case.js'], 'exactly one file wr
   });
 }
 
-/* ── Extra Arcade: launch panel, apart from the nine ── */
+/* ── Bonus Games: record cards, apart from the nine, not launchers ── */
 assert(profile.indexOf('id="pg-trail"') < profile.indexOf('id="pg-extras"') &&
-  profile.indexOf('id="pg-extras"') < profile.indexOf('id="pg-stars"'), 'the Extra Arcade sits right after the nine-game trail');
-const arc = pg.slice(pg.indexOf('function renderArcade'), pg.indexOf('// Adventure Tokens'));
-assert(/getExtraForCurriculum\(s\.curr\)/.test(arc), 'arcade cards come from the registry extras');
+  profile.indexOf('id="pg-extras"') < profile.indexOf('id="pg-stars"'), 'Bonus Games sit right after the nine-game trail');
+assert(/id="pg-extras" aria-label="Bonus games"/.test(profile), 'the panel is labelled Bonus games');
+const arc = pg.slice(pg.indexOf('function renderBonusGames'), pg.indexOf('// Adventure Tokens'));
+assert(/getExtraForCurriculum\(s\.curr\)/.test(arc), 'cards come from the registry extras');
+assert(/ボーナス ゲーム/.test(arc) && /BONUS GAMES/.test(arc) && !/アーケード|ARCADE/.test(arc), 'named Bonus Games, not Arcade (the arcade is the chest)');
+assert(!/<a\b|href=|game\.html/.test(arc), 'bonus cards are records, not links to the games');
+assert(/pg-x-bonus">BONUS</.test(arc), 'stars carry a BONUS badge so they read apart from ★ / 27');
+assert(/attempts/.test(arc) && /bestPoints/.test(arc), 'cards show the lifetime best and times played');
 assert(/played >= 9/.test(arc) && /weeklyPlayedFor\(s\.curr\)/.test(arc), 'Week Boss opens only after all nine are played this week');
-assert(/these games do not change the 9-game unlock/.test(arc), 'the panel says the extras do not change the 9-game unlock');
-assert(!/27/.test(arc), 'arcade stars never join the ★ / 27 tally');
-assert(/game\.html\?week=/.test(arc), 'open cards launch the game');
-assert(/\[renderArcade, 'pg-extras'/.test(pg), 'renderArcade is part of the profile render');
+assert(/these games do not change the 9-game unlock/.test(arc), 'the note says the extras do not change the 9-game unlock');
+assert(!/27/.test(arc), 'bonus stars never join the ★ / 27 tally');
+assert(/\[renderBonusGames, 'pg-extras'/.test(pg), 'renderBonusGames is part of the profile render');
 assert(fs.statSync(path.join(ROOT, 'assets/img/profile/arcade-week-boss.webp')).size <= 24 * 1024, 'the boss card art is a small thumbnail');
 assert(!/\(\?<[=!]/.test(SRC) && !/\(\?<[=!]/.test(pg), 'no regex lookbehind (older iPads)');
 
-console.log('Adventure Tokens + Extra Arcade audit passed: groups, tiers, secrets, round tokens, one world-visit writer, arcade panel.');
+console.log('Adventure Tokens + Bonus Games audit passed: groups, tiers, secrets, round tokens, one world-visit writer, bonus record cards.');

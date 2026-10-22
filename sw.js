@@ -87,7 +87,11 @@ const CURRENT_CACHES = {
   // Adventure Tokens + Extra Arcade (2026-10-22): round tokens, profile
   // launch panel for Booha Bites / Echo / Week Boss; world pages load
   // trophy-case.js for the first-visit record.
-  pages:  'booha-pages-2026-487',
+  // Bonus Games (2026-10-22): the profile's extra-games panel becomes record
+  // cards (BONUS stars, done / not yet, best, times played); no launch links.
+  // Naming pass: the 9-game ★★ unlock reads "Arcade" in the game menu and
+  // the arcade shelf; "Bonus Games" means only the three extra games.
+  pages:  'booha-pages-2026-489',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
