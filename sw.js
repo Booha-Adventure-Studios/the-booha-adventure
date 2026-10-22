@@ -91,7 +91,9 @@ const CURRENT_CACHES = {
   // cards (BONUS stars, done / not yet, best, times played); no launch links.
   // Naming pass: the 9-game ★★ unlock reads "Arcade" in the game menu and
   // the arcade shelf; "Bonus Games" means only the three extra games.
-  pages:  'booha-pages-2026-489',
+  // Rainbow Pass A (2026-10-22): js/game-utils.js silently records each
+  // run's pace (first response vs par) into recentRun for calibration.
+  pages:  'booha-pages-2026-490',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

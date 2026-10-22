@@ -453,6 +453,15 @@ const UTILS = {
    * looking frozen when storage or sync is slow.
    */
   emitGameEnd(detail) {
+    // Rainbow Pass A: attach the pace record from the run that just ended
+    // (summary() is always called right before this). Silent; saved inside
+    // recentRun, which the score system keeps for the last 8 runs per game.
+    const lp = UTILS._lastPace;
+    UTILS._lastPace = null;
+    if (lp && lp.pace && Date.now() - lp.at < 60000 && detail && typeof detail === 'object') {
+      const rr = detail.recentRun && typeof detail.recentRun === 'object' ? detail.recentRun : {};
+      if (!rr.pace) detail = { ...detail, recentRun: { ...rr, pace: lp.pace } };
+    }
     const send = () => {
       try {
         document.dispatchEvent(new CustomEvent('booha:gameEnd', { detail }));
@@ -782,13 +791,23 @@ const UTILS = {
        run.miss()                      wrong answer (ends the combo)
        run.recover()                   right on a later try
        run.summary()                   { points, maxCombo, firstTry, sharp,
-                                         recovered, misses, fullCombo }
+                                         recovered, misses, fullCombo, pace }
 
      Combo multiplier ×1 → ×1.5 at 3 → ×2 at 6 → ×3 at 10 in a row.
      Sharp (+25): answered inside the par time, but not faster than minMs
      (default 0.4 s: too fast to have read it). A miss scores 0 and resets
      the combo; recover() earns recoverPoints (0 in multiple-choice games
      so tapping every option never pays).
+
+     Pace record (Rainbow Pass A, silent): each item's FIRST response is
+     logged as elapsed time vs that item's par (par already scales with word
+     length), whether it was right, and whether it was a frantic miss (wrong
+     faster than minMs). summary().pace rides along to the save inside
+     recentRun (see emitGameEnd); nothing is shown to students. It exists to
+     calibrate the "ready pace" zones before rainbow stars are switched on.
+       pace = { v:1, t:[ds|null...], p:[ds...], f:'1011…', fr }
+       t = first-response time in tenths of a second (null: clip unfinished)
+       p = par in tenths, f = first try right (1) / wrong (0), fr = frantic
      ══════════════════════════════ */
   createRun({ total = 15, recoverPoints = 50, minMs = 400, hud = true, now = null } = {}) {
     const clock = typeof now === 'function' ? now : () => performance.now();
@@ -941,7 +960,7 @@ const UTILS = {
 
     const api = {
       reset() {
-        st = { points: 0, combo: 0, maxCombo: 0, firstTry: 0, sharp: 0, recovered: 0, misses: 0, items: 0 };
+        st = { points: 0, combo: 0, maxCombo: 0, firstTry: 0, sharp: 0, recovered: 0, misses: 0, items: 0, pace: [], frantic: 0 };
         item = null;
         paint();
         return api;
@@ -953,9 +972,17 @@ const UTILS = {
           min: Number.isFinite(opts.minMs) ? opts.minMs : minMs,
           missed: false,
           resolved: false,
+          first: false,
         };
         st.items++;
         return api;
+      },
+      _first(t, ok) {
+        if (!item || item.first) return;
+        item.first = true;
+        const el = item.readyAt === null ? null : Math.max(0, t - item.readyAt);
+        st.pace.push([el, item.par, ok]);
+        if (!ok && el !== null && el < item.min) st.frantic++;
       },
       audioDone() {
         if (item && !item.resolved && item.readyAt === null) item.readyAt = clock();
@@ -964,6 +991,7 @@ const UTILS = {
         if (!item) api.ready();
         if (item.resolved) return null;
         if (item.missed) return api.recover();
+        api._first(Number.isFinite(at) ? at : clock(), true);
         const before = MULT(st.combo);
         st.combo++;
         st.maxCombo = Math.max(st.maxCombo, st.combo);
@@ -982,6 +1010,7 @@ const UTILS = {
       miss() {
         if (!item) api.ready();
         if (item.resolved || item.missed) return;
+        api._first(clock(), false);
         item.missed = true;
         st.misses++;
         const hadCombo = st.combo >= 3;
@@ -999,10 +1028,20 @@ const UTILS = {
       },
       summary() {
         fxEdge(false);   // the score card takes over
+        const ds = ms => (ms === null || !Number.isFinite(ms) ? null : Math.round(ms / 100));
+        const pace = {
+          v: 1,
+          t: st.pace.map(r => ds(r[0])),
+          p: st.pace.map(r => ds(r[1])),
+          f: st.pace.map(r => (r[2] ? '1' : '0')).join(''),
+          fr: st.frantic,
+        };
+        if (typeof UTILS !== 'undefined') UTILS._lastPace = { pace, at: Date.now() };
         return {
           points: st.points, maxCombo: st.maxCombo, firstTry: st.firstTry,
           sharp: st.sharp, recovered: st.recovered, misses: st.misses, items: st.items,
           fullCombo: st.firstTry >= total && st.misses === 0 && st.recovered === 0,
+          pace,
         };
       },
       hideHud() { if (hudEl) { hudEl.remove(); hudEl = null; } fxEdge(false); },
