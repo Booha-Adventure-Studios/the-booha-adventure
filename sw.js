@@ -43,7 +43,9 @@ const CURRENT_CACHES = {
   // and Adventure closet/heart fixes (2026-10-21).
   // Muenba field-kit profile, weekly orb jar, and case keyword help (2026-10-21).
   // Grimmerglen scrapbook profile, tree portal icon, maze-order trail (2026-10-22).
-  pages:  'booha-pages-2026-467',
+  // Games Pass 1 (2026-10-22): game.html loads the shared js/booha-sfx.js
+  // sound engine so ding/fart unlock reliably on iPad.
+  pages:  'booha-pages-2026-468',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -217,7 +219,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-580',
+  assets: 'booha-assets-2026-581',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

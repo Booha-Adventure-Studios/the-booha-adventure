@@ -17,31 +17,15 @@ if (!CFG || !U) return;
 U.setTitle('Say the Sentence');
 U.unlockAudio();
 
-/* ═══ PRE-LOAD SFX — clone pattern ═══ */
-const SFX = {};
+/* ═══ SFX — shared Web Audio engine (js/booha-sfx.js via GAME_UTILS) ═══
+   Decoded once, starts instantly, and re-unlocks on every tap on iPad.
+   The 140 ms repeat guard now lives in GAME_UTILS.playSFX. */
 const voiceGate = U.createAudioGate({ cooldownMs: 650, timeoutMs: 8000 });
-const lastSfxAt = Object.create(null);
-function loadSfx(name, url) {
-  return new Promise(resolve => {
-    const a = new Audio(url);
-    a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-    a.addEventListener('canplaythrough', () => { SFX[name] = a; resolve(); }, { once:true });
-    a.addEventListener('error', resolve, { once:true });
-    a.load();
-    setTimeout(() => { if (!SFX[name]) { SFX[name] = a; resolve(); } }, 2000);
-  });
-}
-function playSfx(name) {
-  const src = SFX[name]; if (!src) return;
-  const now = Date.now();
-  if (now - (lastSfxAt[name] || 0) < 140) return;
-  lastSfxAt[name] = now;
-  try { const c = src.cloneNode(); c.setAttribute('playsinline',''); c.setAttribute('webkit-playsinline',''); c.play().catch(()=>{}); } catch(e) {}
-}
+function playSfx(name, onEnd) { return U.playSFX(name, onEnd); }
 
 await Promise.all([
-  loadSfx('ding', CFG.sfxBase + 'ding.mp3'),
-  loadSfx('fart', CFG.sfxBase + 'fart.mp3'),
+  U.loadSFX('ding', CFG.sfxBase + 'ding.mp3'),
+  U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
 /* ═══ TIERS ═══ */
@@ -385,14 +369,10 @@ function advanceToNextCard() {
 }
 function playSuccessThenAdvance() {
   const goNext = () => setTimeout(advanceToNextCard, 220);
-  const ding = SFX['ding'] ? SFX['ding'].cloneNode() : null;
-  if (!ding) { goNext(); return; }
-  ding.setAttribute('playsinline',''); ding.setAttribute('webkit-playsinline','');
   let dingDone = false;
   const afterDing = () => { if (dingDone) return; dingDone = true; goNext(); };
-  ding.onended = afterDing; ding.onerror = afterDing;
+  playSfx('ding', afterDing);
   setTimeout(afterDing, 450);
-  ding.play().catch(afterDing);
 }
 
 /* ═══ PLAY BUTTON ═══ */
