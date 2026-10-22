@@ -752,7 +752,12 @@ const UTILS = {
       const chip = document.createElement('div');
       chip.className = 'game-lane-chip';
       chip.textContent = LANE_LABEL[root.getAttribute('data-lane')] || LANE_LABEL.extra;
-      mount.insertBefore(chip, mount.firstChild);
+      document.querySelectorAll('.game-lane-chip').forEach(c => c.remove());
+      // The extra games use the page header (the nine draw their own and hide it).
+      const header = document.querySelector('.game-header');
+      const headerShown = header && getComputedStyle(header).display !== 'none';
+      if (headerShown) header.insertBefore(chip, header.firstChild);
+      else mount.insertBefore(chip, mount.firstChild);
       if (cfg.gameTitle) mount.querySelectorAll('.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum, .stw-curriculum, .sas-curriculum, .aq-curriculum').forEach(t => { t.textContent = cfg.gameTitle; });
     }
   },

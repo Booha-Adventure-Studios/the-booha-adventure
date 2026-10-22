@@ -43,9 +43,15 @@ function splitSelectors(sel) {
   out.push(cur);
   return out;
 }
+// Rules inside @media blocks must be scoped too.
+for (const m of body.matchAll(/@media[^{]*\{([\s\S]*?\})\s*\}/g)) {
+  for (const r of m[1].matchAll(/([^{}]+)\{[^}]*\}/g)) {
+    for (const part of splitSelectors(r[1].trim())) assert(/^html\[data-skin="v2"\]/.test(part.trim()), `unscoped selector in @media: ${part.trim()}`);
+  }
+}
 assert(selectors.length > 60, `expected the skin rules, found ${selectors.length}`);
 for (const sel of selectors) {
-  if (sel.startsWith('@keyframes')) continue;
+  if (sel.startsWith('@keyframes') || sel.startsWith('@media')) continue;
   for (const part of splitSelectors(sel)) {
     assert(/^html\[data-skin="v2"\]/.test(part.trim()), `unscoped selector in game-skin.css: ${part.trim()}`);
   }
@@ -74,7 +80,13 @@ assert(/\[data-power="minimal"\] body::before \{ filter: none; \}/.test(css), 's
 const lanes = Object.fromEntries([...core.matchAll(/'([a-z-]+)':\s+\['(words|sentences|listen|extra)'/g)].map(m => [m[1], m[2]]));
 const expected = { 'vocab-tap': 'words', 'spell-word': 'words', 'vocab-speed': 'words', 'sentence-tap': 'sentences', 'sentence-order': 'sentences', 'sentence-speed': 'sentences', 'say-word': 'listen', 'say-sentence': 'listen', 'ask-question': 'listen', 'booha-bites': 'extra', 'echo': 'extra', 'week-boss': 'extra' };
 assert.deepStrictEqual(lanes, expected, 'game-core lanes must match the menu lanes');
-assert.match(core, /const V2_LANES = new Set\(\['words', 'sentences', 'listen'\]\);/, 'Words, Sentences and Listen are on v2');
+assert.match(core, /const V2_LANES = new Set\(\['words', 'sentences', 'listen', 'extra'\]\);/, 'all four lanes are on v2');
+// Pass 13: extra games — meaning colours with icons, rose speakers, header chip.
+assert.match(css, /:is\(\.bb-choice\.correct, \.wb-opt\.ok:not\(\[data-v\]\), \.wb-word\.ok\)::before \{ content: '✓ '/);
+assert.match(css, /:is\(\.bb-choice\.wrong, \.wb-opt\.bad:not\(\[data-v\]\), \.wb-word\.bad\)::before \{ content: '✗ '/);
+assert.match(css, /@media \(max-width: 560px\) \{\s*html\[data-skin="v2"\] \.game-lane-chip \{ margin-top: calc\(52px/, 'on phones the lane chip sits below the combo counter');
+assert.match(css, /:is\(\.ec-play, \.wb-play\)\.playing \{[^}]*#ffc2d1/, 'Echo and the boss speakers play in rose, never green');
+assert.match(utils, /if \(headerShown\) header\.insertBefore\(chip, header\.firstChild\);/, 'the extra games show the lane chip in their header');
 // Pass 12: Listen lane sound stage; "playing" is never green, answers carry icons.
 assert.match(css, /:is\(\.stw-play-btn, \.sas-play-btn, \.aq-play-btn\)\.playing \{[^}]*#cdbcff/, 'the playing speaker brightens in violet, not green');
 assert.match(css, /\.playing::before \{ animation: skinRipple/, 'rings ripple outward while a clip plays');

@@ -73,7 +73,9 @@ const CURRENT_CACHES = {
   // rank-coin flicker.
   // Games Pass 12 (2026-10-22): Listen lane on the v2 skin: violet sound
   // stage with rippling rings while a clip plays; answers with ✓ / ✗.
-  pages:  'booha-pages-2026-481',
+  // Games Pass 13 (2026-10-22): Booha Bites, Echo and Week Boss on the v2
+  // skin (rose Extra lane); lane chip below the combo counter on phones.
+  pages:  'booha-pages-2026-482',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -247,7 +249,7 @@ const CURRENT_CACHES = {
   // Batty Booha photoreal static-sprite refresh (2026-09-18).
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
-  assets: 'booha-assets-2026-595',
+  assets: 'booha-assets-2026-596',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
