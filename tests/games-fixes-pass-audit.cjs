@@ -100,4 +100,13 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
   assert.match(html, /\.pg-hero-coin::before \{ animation:none;/, 'reduced motion stops the flicker');
 }
 
-console.log('Fixes-pass audit passed: synth ding/fart without overlap, Spell the Word word groups, Blitz path clear of labels, rank-coin flicker and badge.');
+// ── 5. Listen games: the previous word never plays on the new question ──
+for (const f of ['say-word', 'say-sentence', 'ask-question']) {
+  const src = read(`games/${f}.js`);
+  assert.match(src, /function showCard\(\) \{\n  voiceGate\.stop\(\);/, `${f}: a new question stops the previous clip first`);
+  assert.match(src, /if \(myIdx !== idx\) return;/, `${f}: a clip from an earlier question cannot mark the new one heard`);
+  assert.match(src, /voiceGate\.play\(a, \{ button: playBtn, onEnd: done, replace: true, ignoreCooldown: true \}\)/, `${f}: a new press replaces anything still sounding`);
+  assert.match(src, /answered = true;\n    voiceGate\.stop\(\);/, `${f}: a correct answer ends the clip`);
+}
+
+console.log('Fixes-pass audit passed: synth ding/fart without overlap, Spell the Word word groups, Blitz path clear of labels, rank-coin flicker and badge, Listen clips never carry over.');
