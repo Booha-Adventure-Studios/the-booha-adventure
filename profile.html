@@ -647,13 +647,41 @@
     .gr-best .sp { font-size:11px; color:#4a3a58; } .gr-best .sp.lit { color:#ffd77a; }
 
     /* trophy case */
-    .rb-trophies { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px 4px; padding:12px 8px; border-radius:18px; background:linear-gradient(180deg,#241a10,#16121f); border:1px solid #4a3820; }
-    .rb-trophy { display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center; }
-    .rb-trophy img { width:60px; height:60px; object-fit:contain; filter:grayscale(1) brightness(.32); opacity:.8; }
-    .rb-trophy.on img { filter:drop-shadow(0 4px 8px rgba(0,0,0,.6)); opacity:1; }
-    .rb-trophy span { font-size:9px; line-height:1.2; color:#8c8070; }
-    .rb-trophy.on span { color:#f3e6c8; }
+    /* Trophy Case — grouped shelves; static styling only (no filters that
+       animate, no per-card shadows on locked items) so it scrolls smoothly. */
+    .rb-tgroup { margin:0 0 10px; }
+    .rb-tgroup h4 { margin:0 0 6px 4px; font-size:13px; font-weight:800; color:#f3e6c8; letter-spacing:.02em; }
+    .rb-tgroup h4 span { font-size:9px; letter-spacing:.14em; color:#a8916a; margin-left:4px; }
+    .rb-tg-secret h4 { color:#ffd76a; }
+    .rb-trophies { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px 6px; padding:12px 8px; border-radius:18px; background:linear-gradient(180deg,#241a10,#16121f); border:1px solid #4a3820; }
+    .rb-trophy { display:flex; flex-direction:column; align-items:center; gap:2px; text-align:center; min-width:0; }
+    .rb-tframe { display:grid; place-items:center; width:78px; height:78px; max-width:100%; border-radius:50%; border:3px solid transparent; }
+    .rb-trophy img { width:72px; height:72px; max-width:100%; object-fit:contain; filter:grayscale(1) brightness(.34); opacity:.8; }
+    .rb-trophy.on img { filter:none; opacity:1; }
+    .rb-trophy.on .rb-tframe { background:radial-gradient(circle,rgba(255,226,150,.22),transparent 68%); }
+    .rb-trophy.t-bronze .rb-tframe { border-color:#c27a3e; }
+    .rb-trophy.t-silver .rb-tframe { border-color:#d6dbe4; }
+    .rb-trophy.t-gold .rb-tframe   { border-color:#ffcf3f; }
+    .rb-trophy.t-legend .rb-tframe { border-color:#ff8ad8; box-shadow:0 0 0 2px #6a3cff inset; }
+    .rb-tjp { font-size:10px; line-height:1.2; color:#8c8070; font-weight:800; overflow-wrap:anywhere; }
+    .rb-ten { font-size:8.5px; line-height:1.15; color:#7a6f60; overflow-wrap:anywhere; }
+    .rb-trophy.on .rb-tjp { color:#f3e6c8; }
+    .rb-trophy.on .rb-ten { color:#cbb994; }
+    .rb-bar { display:block; width:80%; height:5px; border-radius:3px; background:#3a2c1a; overflow:hidden; margin-top:2px; }
+    .rb-bar b { display:block; height:100%; background:#5cffd0; border-radius:3px; }
+    .rb-count { font-size:9px; color:#a8916a; font-variant-numeric:tabular-nums; }
+    .rb-trophy.on .rb-count { color:#ffd76a; }
+    .rb-pips, .rb-dots { display:flex; gap:3px; justify-content:center; margin-top:2px; }
+    .rb-pips i { width:7px; height:7px; border-radius:50%; background:#3a2c1a; }
+    .rb-pips i.on { background:#ffcf3f; }
+    .rb-dots { flex-wrap:wrap; max-width:64px; gap:2px; }
+    .rb-dots i { width:5px; height:5px; border-radius:50%; background:#3a2c1a; }
+    .rb-dots i.on { background:#5cffd0; }
     .rb-next { margin:0; font-size:12px; line-height:1.5; color:#5cffd0; text-align:center; }
+    .rb-next span { display:block; font-size:10px; color:#8fbfae; }
+    @media (max-width:380px) {
+      .rb-trophies { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    }
 
     @keyframes pgShine { 0%,100% { filter:drop-shadow(0 0 6px rgba(255,215,122,.45)); } 50% { filter:drop-shadow(0 0 16px rgba(255,215,122,.95)); } }
     @keyframes profileValuePop { 0% { transform:scale(1); } 45% { transform:scale(1.12); filter:brightness(1.3); } 100% { transform:scale(1); } }
@@ -891,6 +919,7 @@
 <script src="./js/core/level-stars.js"></script>
 <script src="./js/core/traveler-record.js"></script>
 <script src="./js/core/weekly-medals.js"></script>
+<script src="./js/core/trophy-case.js"></script>
 <script src="./js/ui/profile-icons.js"></script>
 <script src="./js/ui/bonus-games.js"></script>
 <script src="./js/ui/adventure-log.js"></script>

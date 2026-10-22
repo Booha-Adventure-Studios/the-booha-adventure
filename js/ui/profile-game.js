@@ -48,16 +48,6 @@ const BoohaProfileGame = (() => {
     { id: 'barba', name: 'Barba', img: 'assets/img/wanderers/barba.webp', seasonId: 'halloween-2026',
       note: 'ハロウィン 2026 · SEASONAL', hint: 'ハロウィンの からすき に いるよ' },
   ];
-  const MEDALS = [
-    { id: 'first_game', img: 'medal-first-step.webp', name: 'Adventure Begins!' },
-    { id: 'CURR:all_complete', img: 'medal-CURR-champion.webp', name: 'CHAMP Champion!' },
-    { id: 'muenba:first_briefing', img: 'medal-nuppi-trust.webp', name: "Nuppi's Trust" },
-    { id: 'muenba:first_ghost', img: 'medal-first-ghost.webp', name: 'First Ghost Caught' },
-    { id: 'muenba:cleared', img: 'medal-muenba-cleared.webp', name: 'Muenba Cleared' },
-    { id: 'grimmerglen:first_memory', img: 'medal-first-memory.webp', name: 'A Memory Found' },
-    { id: 'grimmerglen:all_memories', img: 'medal-memory-garden.webp', name: 'Memory Garden' },
-    { id: 'grimmerglen:rooms_explored', img: 'medal-every-corner.webp', name: 'Every Corner' },
-  ];
 
   let collectionFilter = 'all';
 
@@ -552,7 +542,7 @@ const BoohaProfileGame = (() => {
     } catch (_) {}
     host.innerHTML = `
       <div class="pg-section-head">
-        <div><h2>こんしゅうのメダル</h2><span class="pg-kicker">WEEKLY MEDALS · ${earned.length} / ${rows.length}</span></div>
+        <div><h2>こんしゅうのメダル</h2><span class="pg-kicker">WEEKLY MEDALS · THIS WEEK · ${earned.length} / ${rows.length}</span></div>
         ${daysLeft ? `<span class="pg-reset-chip">あと${daysLeft}日 · にちようリセット</span>` : ''}
       </div>
       <div class="pg-meter medal" aria-hidden="true"><span style="width:${Math.round(earned.length / rows.length * 100)}%"></span></div>
@@ -579,36 +569,47 @@ const BoohaProfileGame = (() => {
     }
   }
 
+  // Permanent Trophy Case. The trophies themselves (groups, art, rules,
+  // tiers) live in js/core/trophy-case.js; this only draws what it returns.
+  function trophyProgress(t) {
+    if (t.dots) {
+      return `<span class="rb-dots" aria-label="${t.n} / 9">${t.dots.map(d => `<i${d ? ' class="on"' : ''}></i>`).join('')}</span>`;
+    }
+    if (t.tiers) {
+      const pips = Array.from({ length: t.tiers }, (_, i) => `<i${i < t.tier ? ' class="on"' : ''}></i>`).join('');
+      const count = t.maxed ? 'MAX' : `${t.n} / ${t.of}`;
+      return `<span class="rb-pips" aria-hidden="true">${pips}</span><span class="rb-count">${count}</span>`;
+    }
+    if (!t.on && t.of) {
+      return `<span class="rb-bar" aria-hidden="true"><b style="width:${Math.round(Math.min(1, t.n / t.of) * 100)}%"></b></span><span class="rb-count">${t.n} / ${t.of}</span>`;
+    }
+    return '';
+  }
+
   function renderTrophies(s) {
     const host = document.getElementById('pg-trophies');
     if (!host) return;
-    const U = window.BoohaUnlockSystem;
-    const all = U && U.getAll ? U.getAll() : [];
-    const byId = {};
-    all.forEach(u => { byId[u.id] = u; });
-    const champ = { pb: 'PB', br: 'BR', bc: 'BC' }[s.curr] || 'BR';
-    const list = MEDALS.map(m => {
-      const id = m.id.replace('CURR', s.curr);
-      return {
-        id,
-        img: IMG + m.img.replace('CURR', s.curr),
-        name: m.name.replace('CHAMP', champ),
-        on: !!(U && U.isUnlocked && U.isUnlocked(id)),
-        description: byId[id] ? byId[id].description : '',
-      };
-    });
-    const earned = list.filter(m => m.on).length;
-    const next = list.find(m => !m.on);
+    const T = window.BoohaTrophies;
+    if (!T || !T.evaluate) { host.innerHTML = ''; return; }
+    const res = T.evaluate(s.curr);
+    const next = res.items.find(t => !t.on && !t.secret)
+      || res.items.find(t => t.tiers && !t.maxed && !t.secret);
     host.innerHTML = `
-      <div class="rb-sec-head"><h3>トロフィーケース</h3><span class="rb-en">TROPHY CASE · FOREVER · ${earned} / ${list.length}</span></div>
-      <div class="rb-trophies">
-        ${list.map(m => `
-          <div class="rb-trophy${m.on ? ' on' : ''}">
-            <img src="${esc(m.img)}" alt="${esc(m.name)}${m.on ? '' : ' (locked)'}" width="60" height="60" loading="lazy" decoding="async">
-            <span>${esc(m.name)}</span>
-          </div>`).join('')}
-      </div>
-      ${next ? `<p class="rb-next">つぎの トロフィー: ${esc(next.name)}${next.description ? ` — ${esc(next.description)}` : ''}</p>` : ''}`;
+      <div class="rb-sec-head"><h3>トロフィーケース</h3><span class="rb-en">TROPHY CASE · ずっと のこる · ${res.earned} / ${res.shown}</span></div>
+      ${res.groups.map(g => `
+        <div class="rb-tgroup rb-tg-${esc(g.id)}">
+          <h4>${esc(g.jp)} <span>${esc(g.en)}</span></h4>
+          <div class="rb-trophies">
+            ${g.items.map(t => `
+              <div class="rb-trophy${t.on ? ' on' : ''}${t.tierName ? ' t-' + t.tierName : ''}${t.secret ? ' secret' : ''}" title="${esc(t.how)}">
+                <span class="rb-tframe"><img src="${esc(IMG + t.img)}" alt="${esc(t.en)}${t.on ? '' : ' (locked)'}" width="72" height="72" loading="lazy" decoding="async"></span>
+                <b class="rb-tjp">${esc(t.jp)}</b>
+                <span class="rb-ten">${esc(t.en)}</span>
+                ${trophyProgress(t)}
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}
+      ${next ? `<p class="rb-next">つぎの トロフィー: <b>${esc(next.jp)}</b> — ${esc(next.howJp || '')} <span>${esc(next.en)} · ${esc(next.how)}</span></p>` : ''}`;
   }
 
 
@@ -700,7 +701,7 @@ const BoohaProfileGame = (() => {
   document.addEventListener('booha:profileCurr', render);
   document.addEventListener('booha:medalEarned', render);
 
-  return { render, _test: { kindFor, nodePos, speech, sealedKey, MEDALS } };
+  return { render, _test: { kindFor, nodePos, speech, sealedKey } };
 })();
 
 window.BoohaProfileGame = BoohaProfileGame;
