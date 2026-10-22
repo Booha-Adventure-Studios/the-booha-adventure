@@ -1690,6 +1690,20 @@ else
   bad "Combo/points/crown audit failed"
 fi
 
+echo "[games] engine markup audit"
+if node tests/games-markup-audit.cjs >/dev/null 2>&1; then
+  ok "Engine markup audit passed"
+else
+  bad "Engine markup audit failed"
+fi
+
+echo "[games] v2 colour system audit"
+if node tests/games-skin-audit.cjs >/dev/null 2>&1; then
+  ok "Colour system audit passed"
+else
+  bad "Colour system audit failed"
+fi
+
 echo "[games] combo celebration audit"
 if node tests/games-combo-fx-audit.cjs >/dev/null 2>&1; then
   ok "Combo celebration audit passed"
