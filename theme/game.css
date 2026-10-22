@@ -1155,3 +1155,4 @@ html.bsc-open .brun-hud { display: none; }
   .bsc-tier { font-size: clamp(34px, 7vw, 50px); }
   .bsc-details .game-result-details { margin: 2px auto 4px; }
 }
+.bsc-best.bsc-first { background: color-mix(in srgb, var(--game-primary) 20%, transparent); color: var(--game-ink); }
