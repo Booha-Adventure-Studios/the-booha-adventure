@@ -1602,9 +1602,25 @@ function revealResults(runTime) {
     resultFxTimers.push(setTimeout(() => fireConfetti(false), 400));
     resultFxTimers.push(setTimeout(() => fireConfetti(true),  900));
   }
-  resultAudio = new Audio(CFG.sfxBase + tier.sound);
-  resultAudio.setAttribute('playsinline', '');
-  resultAudio.play().catch(() => {});
+  /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
+     sound and its buttons press this game's own vs-replay / vs-back. */
+  U.showScorecard(Object.assign({
+    gameId:   `${CFG.curriculum}:vocab_speed`,
+    title:    'Vocab Speed',
+    correct:  score,
+    total:    15,
+    pct,
+    replayId: 'vs-replay',
+    backId:   'vs-back',
+  }, {
+      stats: [
+        { label: 'Correct / せいかい', value: `${score} / 15` },
+        { label: 'Missed / まちがい', value: String(mistakes) },
+        { label: 'Run time / じかん', value: `${Math.round(runTime / 1000)}s` },
+      ],
+      reviewItems: missedItems,
+      audioBase: CFG.audioBase,
+    }));
 }
 
 /* ══════════════════════════════════════════════════════════════

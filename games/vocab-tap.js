@@ -1345,9 +1345,24 @@ function showResults() {
     setTimeout(fireConfetti, 900);
   }
 
-  const snd = new Audio(CFG.sfxBase + tier.sound);
-  snd.setAttribute('playsinline', '');
-  snd.play().catch(() => {});
+  /* Games Pass 3: shared score card (js/game-scorecard.js). It plays the tier
+     sound and its buttons press this game's own vt-replay / vt-back. */
+  U.showScorecard(Object.assign({
+    gameId:   `${CFG.curriculum}:vocab_tap`,
+    title:    'Vocabulary Tap',
+    correct:  score,
+    total:    15,
+    pct,
+    replayId: 'vt-replay',
+    backId:   'vt-back',
+  }, {
+      stats: [
+        { label: 'Correct pairs / せいかい', value: `${score} / 15` },
+        { label: 'Review items / ふくしゅう', value: String(missedItems.length) },
+      ],
+      reviewItems: missedItems,
+      audioBase: CFG.audioBase,
+    }));
 }
 /* ══════════════════════════════════════════════════════════════
    GO
