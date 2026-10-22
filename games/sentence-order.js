@@ -148,25 +148,11 @@ function displayChip(token, isFirst, isLast) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   DATA / TIERS
+   DATA
    ══════════════════════════════════════════════════════════════ */
 let allCards = U.shuffle(CFG.cards.slice(0, 15));
 
-const TIERS = [
-  { min:0,  max:5.5,  sound:'result_0-5.mp3',
-    label:'TRY AGAIN', en:"Sentences are tricky — keep at it!",
-    jp:'文は難しい！あきらめないで！', kanji:'文章は難しい！諦めないで！', color:'#ef4444' },
-  { min:6,  max:10.5, sound:'result_6-10.mp3',
-    label:'KEEP GOING', en:"Good effort! The order is clicking!",
-    jp:'いい感じ！もっと練習しよう！', kanji:'良い調子！もっと練習しよう！', color:'#f97316' },
-  { min:11, max:14.5, sound:'result_11-14.mp3',
-    label:'SO CLOSE!', en:"Your word order is really flowing!",
-    jp:'ほぼペラペラ！惜しい！', kanji:'ほぼ流暢！惜しい！', color:'#22ddff' },
-  { min:15, max:15, sound:'result_15.mp3',
-    label:'PERFECT!', en:"Every sentence in perfect order!",
-    jp:'パーフェクト！全問正解！', kanji:'完璧！全問正解！', color:'#ffcc00' },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 const formatScore = s => Number.isInteger(s) ? String(s) : s.toFixed(1);
 
 /* ══════════════════════════════════════════════════════════════
@@ -646,56 +632,8 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
   color:#000; font-weight:900; transition:transform .15s;
 }
 .so-modal-close:hover{ transform:scale(1.03); }
-
-/* ── RESULTS ── */
-.so-results{
-  display:none; text-align:center; max-width:500px;
-  margin:.8rem auto 1.5rem; padding:1.9rem 1.2rem 1.5rem;
-  border-radius:26px; position:relative; overflow:hidden;
-  border:2.5px solid var(--tier-color,var(--game-primary));
-  background:color-mix(in srgb,var(--tier-color,var(--game-primary)) 7%,var(--game-bg));
-  box-shadow:0 0 52px color-mix(in srgb,var(--tier-color,var(--game-primary)) 28%,transparent),0 20px 42px rgba(0,0,0,.4);
-}
-.so-results.show{ display:block; animation:soResultIn .5s cubic-bezier(.22,.8,.36,1) both; }
 @keyframes soResultIn{ from{ opacity:0; transform:scale(.82) translateY(24px); } to{ opacity:1; transform:none; } }
-.so-results::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:5px;
-  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
-  background-size:220% auto; animation:soRainbow 2.4s linear infinite;
-}
-.so-results::after{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(circle at 18% 80%,color-mix(in srgb,var(--tier-color,var(--game-primary)) 14%,transparent) 0%,transparent 55%),
-    radial-gradient(circle at 82% 18%,color-mix(in srgb,#22ddff 10%,transparent) 0%,transparent 55%),
-    radial-gradient(circle at 50% 50%,color-mix(in srgb,#cc88ff 5%,transparent) 0%,transparent 70%);
-}
-.so-res-inner{ position:relative; z-index:1; }
-.so-res-score{
-  font-family:var(--game-font-title); font-size:clamp(50px,13vw,88px);
-  line-height:1; color:var(--tier-color,var(--game-primary));
-  text-shadow:0 0 28px var(--tier-color,var(--game-primary)),0 0 52px var(--tier-color,var(--game-primary));
-  margin-bottom:4px; animation:soScorePop .5s cubic-bezier(.22,.8,.36,1) .3s both;
-}
 @keyframes soScorePop{ from{ transform:scale(.55) rotate(-6deg); opacity:0; } 50%{ transform:scale(1.08) rotate(2deg); } to{ transform:none; opacity:1; } }
-.so-res-pct{ font-size:clamp(11px,2.1vw,15px); color:var(--game-muted); font-weight:700; margin-bottom:9px; animation:soFadeUp .4s ease .5s both; }
-.so-res-recovery{ font-size:clamp(11px,2vw,14px); color:var(--game-muted); font-weight:800; margin-bottom:12px; animation:soFadeUp .4s ease .54s both; }
-.so-res-label{
-  font-family:var(--game-font-title); font-size:clamp(21px,5vw,36px);
-  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff,#ff2288);
-  background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-  animation:soRainbow 2s linear infinite, soFadeUp .4s ease .52s both;
-  margin-bottom:9px; letter-spacing:.06em;
-}
-.so-res-divider{
-  width:80px; height:3px; border-radius:99px;
-  background:linear-gradient(90deg,#ff2288,#ffcc00,#aaff22,#22ddff,#cc88ff);
-  margin:0 auto 10px; opacity:.85; animation:soFadeUp .4s ease .56s both;
-}
-.so-res-en{ font-family:var(--game-font-body); font-weight:900; font-size:clamp(12px,2vw,16px); color:var(--game-ink); margin-bottom:4px; animation:soFadeUp .4s ease .6s both; }
-.so-res-jp{ font-family:var(--game-font-jp); font-size:clamp(12px,1.9vw,15px); color:var(--game-muted); margin-bottom:3px; animation:soFadeUp .4s ease .64s both; }
-.so-res-kanji{ font-family:var(--game-font-jp); font-size:clamp(9px,1.5vw,12px); color:var(--game-muted); opacity:.7; margin-bottom:1rem; animation:soFadeUp .4s ease .68s both; }
-.so-res-actions{ display:flex; gap:9px; justify-content:center; flex-wrap:wrap; animation:soFadeUp .4s ease .76s both; }
 @keyframes soFadeUp{ from{ transform:translateY(12px); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* sparkles */
@@ -750,22 +688,11 @@ U.mount(`
     <button class="so-help-btn"    id="so-help">?</button>
   </div>
   <div class="so-feedback" id="so-feedback"></div>
-  <div class="so-results" id="so-results">
-    <div class="so-res-inner">
-      <div class="so-res-score" id="so-rs"></div>
-      <div class="so-res-pct"   id="so-rp"></div>
-      <div class="so-res-recovery" id="so-ra"></div>
-      <div class="so-res-label" id="so-rl"></div>
-      <div class="so-res-divider"></div>
-      <div class="so-res-en"    id="so-re"></div>
-      <div class="so-res-jp"    id="so-rj"></div>
-      <div class="so-res-kanji" id="so-rk"></div>
-      <div class="so-res-actions">
-        <button class="game-btn game-btn-primary"   id="so-replay">もう一度</button>
-        <button class="game-btn game-btn-secondary" id="so-back">メニューへ</button>
-      </div>
-    </div>
-  </div>
+  <!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="so-actions" hidden>
+  <button type="button" id="so-replay">もう一度</button>
+  <button type="button" id="so-back">メニューへ</button>
+</div>
 </div>
 <div class="so-modal-overlay" id="so-modal-overlay">
   <div class="so-modal" role="dialog" aria-modal="true">
@@ -831,7 +758,6 @@ const helpBtn    = document.getElementById('so-help');
 const hiraBtn    = document.getElementById('so-hira-toggle');
 const hiraLabel  = document.getElementById('so-hira-label');
 const dotsRow    = document.getElementById('so-dots');
-const results    = document.getElementById('so-results');
 const modalOverlay = document.getElementById('so-modal-overlay');
 
 for (let i = 0; i < 15; i++) {
@@ -1258,23 +1184,6 @@ function fireSparkles(originEl, big = false) {
   }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   DROP-IN REPLACEMENT for the END of sentence-order.js
-
-   REPLACE everything from `function showResults() {` all the way
-   to the end of the file (including the stray so-replay / so-back
-   listeners and the final showCard() call) with this entire block.
-
-   WHAT WAS BROKEN:
-   1. BoohaAdventure direct reference → ReferenceError crash → results
-      panel never shown, no scores displayed.
-   2. showResults() was populating vt-* element IDs (copy-pasted from
-      vocab-tap) — those elements don't exist in sentence-order, so
-      the scorecard was invisible even if it did open.
-   3. Duplicate replay/back listeners existed both inside showResults()
-      and again below it as loose event listeners — double-firing on
-      every replay. Removed the loose ones; showResults() owns them.
-   ══════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════════════════════════
    RESULTS
@@ -1296,10 +1205,7 @@ function showResults() {
     if (d) d.className = `so-dot ${recoveredItems.has(i) ? 'recovered' : 'done'}`;
   }
 
-  /* Show results card */
-  results.classList.add('show');
 
-  const tier = getTier(score);
   const total = allCards.length;
   const pct  = Math.round((score / total) * 100);
 
@@ -1314,24 +1220,6 @@ function showResults() {
   });
 
   /* Populate scorecard */
-  results.style.setProperty('--tier-color', tier.color);
-  document.getElementById('so-rs').textContent = `${formatScore(score)} / ${total}`;
-  document.getElementById('so-rp').textContent = `${pct}% score`;
-  document.getElementById('so-ra').textContent = `${total} / ${total} completed • ${recoveredCount} recovered • ${recoveryBoostCount} boosts`;
-  document.getElementById('so-rl').textContent = tier.label;
-  document.getElementById('so-re').textContent = tier.en;
-  document.getElementById('so-rj').textContent = tier.jp;
-  document.getElementById('so-rk').textContent = tier.kanji;
-  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:sentence_order`, score: pct });
-  U.renderResultDetails(results, {
-    stats: [
-      { label: 'Score / スコア', value: `${formatScore(score)} / ${total}` },
-      { label: 'Recovered / かいふく', value: String(recoveredCount) },
-      { label: 'Boosts / ボーナス', value: String(recoveryBoostCount) },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
 
   /* Wire the hardcoded buttons already in the HTML */
   const replayBtn = document.getElementById('so-replay');
@@ -1346,7 +1234,6 @@ function showResults() {
     document.querySelector('.so-bottom-bar').style.display = '';
     document.querySelector('.so-hud').style.display       = '';
 
-    results.classList.remove('show');
 
     /* Reset state */
     idx   = 0;

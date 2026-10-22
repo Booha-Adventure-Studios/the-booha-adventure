@@ -2,7 +2,7 @@
 /* ══════════════════════════════════════════════════════════════
    sentence-speed.js  —  Sentence Speed  v2
    JP sentence → pick the English. Heat bar timer. Fire streaks.
-   Full results scorecard + booha:gameEnd, distinct from vocab-speed.
+   Shared score card + booha:gameEnd, distinct from vocab-speed.
    ══════════════════════════════════════════════════════════════ */
 (async function () {
 
@@ -69,37 +69,11 @@ let lastPickAt = 0;
 const PICK_DEBOUNCE_MS = 320;
 
 /* ══════════════════════════════════════════════════════════════
-   TIERS — distinct wording from vocab-speed
+   RESULT TIERS → js/game-scorecard.js
    (Vocab: "Try Again / Keep Going / So Close / Perfect")
    (Sentence: "Keep Trying / Good Work / Almost There / Flawless")
    ══════════════════════════════════════════════════════════════ */
-const TIERS = [
-  { min:0,  max:5,  sound:'result_0-5.mp3',
-    label:'KEEP TRYING',
-    en:"Sentences are tough — you'll crack them!",
-    jp:'むずかしいけど、きっとできる！',
-    kanji:'難しいけど、絶対できる！',
-    color:'#f43f5e', glow:'rgba(244,63,94,0.4)' },
-  { min:6,  max:10, sound:'result_6-10.mp3',
-    label:'GOOD WORK',
-    en:"You're reading Japanese sentences — amazing!",
-    jp:'日本語の文が読める！すごい！',
-    kanji:'日本語の文が読めてすごい！',
-    color:'#f97316', glow:'rgba(249,115,22,0.4)' },
-  { min:11, max:14, sound:'result_11-14.mp3',
-    label:'ALMOST THERE',
-    en:'One more push — a perfect score is close!',
-    jp:'あとちょっと！パーフェクトまであと少し！',
-    kanji:'惜しい！完璧まで目前！',
-    color:'#06b6d4', glow:'rgba(6,182,212,0.4)' },
-  { min:15, max:15, sound:'result_15.mp3',
-    label:'FLAWLESS!',
-    en:'You understood every sentence perfectly!',
-    jp:'全部の文がわかった！完璧！',
-    kanji:'全文完璧！驚異の理解力！',
-    color:'#22d3ee', glow:'rgba(34,211,238,0.55)' },
-];
-const getTier = s => TIERS.find(t => s >= t.min && s <= t.max) ?? TIERS[0];
+/* Result tiers now live in js/game-scorecard.js (shared score card). */
 
 /* ══════════════════════════════════════════════════════════════
    STREAK — same thresholds as vocab-speed, different messages
@@ -762,78 +736,12 @@ S.textContent = `
 }
 .ssp-modal-close:hover{ transform:scale(1.03); }
 .ssp-modal-close:active{ transform:scale(.96); }
-
-/* ══ RESULTS PANEL — cyan/teal palette ══ */
-
-.ssp-results-wrap{
-  max-width:760px; margin:0 auto;
-  padding:0 1rem; box-sizing:border-box;
-}
-
-.ssp-results{
-  display:none; text-align:center;
-  max-width:560px; margin:1.5rem auto;
-  padding:2.6rem 1.6rem 2rem;
-  border-radius:32px; position:relative; overflow:hidden;
-  border:2.5px solid var(--ssp-tier-color, #00ddff);
-  background:color-mix(in srgb, var(--ssp-tier-color,#00ddff) 6%, var(--game-bg));
-  box-shadow:0 0 60px color-mix(in srgb,var(--ssp-tier-color,#00ddff) 22%,transparent), 0 24px 48px rgba(0,0,0,.4);
-}
-.ssp-results.show{ display:block; animation:sspResultIn .55s cubic-bezier(.22,.8,.36,1) both; }
 @keyframes sspResultIn{ from{ opacity:0; transform:scale(.82) translateY(28px); } to{ opacity:1; transform:none; } }
-
-/* Top bar — teal sweep for sentence-speed */
-.ssp-results::before{
-  content:''; position:absolute; top:0; left:0; right:0; height:5px;
-  background:linear-gradient(90deg,#00f0dd,#0088ff,#aa44ff,#00ddff,#00f0dd);
-  background-size:220% auto; animation:sspCyan 2.4s linear infinite;
-}
-[data-curriculum="bc"] .ssp-results::before{
-  background:linear-gradient(90deg,#ff8800,#ff3300,#cc0055,#ff8800);
-  background-size:220% auto;
-}
-[data-curriculum="pb"] .ssp-results::before{
-  background:linear-gradient(90deg,#ffee44,#ff9922,#ff4488,#cc44ff,#ffee44);
-  background-size:220% auto;
-}
-
-.ssp-results::after{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(circle at 20% 80%, color-mix(in srgb,var(--ssp-tier-color,#00ddff) 12%,transparent) 0%,transparent 50%),
-    radial-gradient(circle at 80% 20%, color-mix(in srgb,var(--game-secondary) 8%,transparent) 0%,transparent 50%);
-}
-.ssp-res-inner{ position:relative; z-index:1; }
-.ssp-res-score{
-  font-family:var(--game-font-title); font-size:clamp(62px,16vw,98px);
-  line-height:1; color:var(--ssp-tier-color,#00ddff);
-  text-shadow:0 0 28px var(--ssp-tier-color,#00ddff); margin-bottom:4px;
-  animation:sspScorePop .55s cubic-bezier(.22,.8,.36,1) .3s both;
-}
 @keyframes sspScorePop{
   from{ transform:scale(.55) rotate(6deg); opacity:0; }
   50%{ transform:scale(1.08) rotate(-2deg); }
   to{ transform:none; opacity:1; }
 }
-.ssp-res-pct{ font-size:clamp(14px,2.6vw,19px); color:var(--game-muted); font-weight:700; margin-bottom:12px; animation:sspFadeUp .4s ease .5s both; }
-.ssp-res-label{
-  font-family:var(--game-font-title); font-size:clamp(26px,5.5vw,40px);
-  color:var(--ssp-tier-color,#00ddff); margin-bottom:10px; letter-spacing:.05em;
-  text-shadow:0 0 18px color-mix(in srgb,var(--ssp-tier-color,#00ddff) 55%,transparent);
-  animation:sspFadeUp .4s ease .52s both;
-}
-.ssp-res-divider{
-  width:60px; height:3px; border-radius:99px;
-  background:linear-gradient(90deg,#00f0dd,#0088ff,#aa44ff);
-  margin:0 auto 12px; opacity:.6; animation:sspFadeUp .4s ease .56s both;
-}
-[data-curriculum="bc"] .ssp-res-divider{ background:linear-gradient(90deg,#ff8800,#ff3300,#cc0055); }
-[data-curriculum="pb"] .ssp-res-divider{ background:linear-gradient(90deg,#ffee44,#ff9922,#ff4488); }
-
-.ssp-res-en{ font-family:var(--game-font-body); font-weight:900; font-size:clamp(14px,2.4vw,18px); color:var(--game-ink); margin-bottom:4px; animation:sspFadeUp .4s ease .6s both; }
-.ssp-res-jp{ font-family:var(--game-font-jp); font-size:clamp(14px,2.2vw,17px); color:var(--game-muted); margin-bottom:3px; animation:sspFadeUp .4s ease .64s both; }
-.ssp-res-kanji{ font-family:var(--game-font-jp); font-size:clamp(11px,1.8vw,14px); color:var(--game-muted); opacity:.7; margin-bottom:1.4rem; animation:sspFadeUp .4s ease .68s both; }
-.ssp-res-actions{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; animation:sspFadeUp .4s ease .76s both; }
 @keyframes sspFadeUp{ from{ transform:translateY(14px); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* confetti */
@@ -898,24 +806,11 @@ U.mount(`
   </div>
 </div>
 
-<!-- RESULTS — separate from main so header stays visible above it -->
-<div class="ssp-results-wrap" id="ssp-results-wrap">
-<div class="ssp-results" id="ssp-results">
-  <div class="ssp-res-inner">
-    <div class="ssp-res-score"  id="ssp-rs"></div>
-    <div class="ssp-res-pct"    id="ssp-rp"></div>
-    <div class="ssp-res-label"  id="ssp-rl"></div>
-    <div class="ssp-res-divider"></div>
-    <div class="ssp-res-en"     id="ssp-re"></div>
-    <div class="ssp-res-jp"     id="ssp-rj"></div>
-    <div class="ssp-res-kanji"  id="ssp-rk"></div>
-    <div class="ssp-res-actions">
-      <button class="game-btn game-btn-primary"   id="ssp-replay">もう一度</button>
-      <button class="game-btn game-btn-secondary" id="ssp-back">メニューへ</button>
-    </div>
+<!-- The shared score card (js/game-scorecard.js) presses these two. -->
+<div class="ssp-actions" hidden>
+  <button type="button" id="ssp-replay">もう一度</button>
+  <button type="button" id="ssp-back">メニューへ</button>
 </div>
-</div>
-</div><!-- /ssp-results-wrap: was never closed, which put the start screen inside the hidden results panel -->
 
 <!-- HELP BUTTON -->
 <button class="ssp-help-btn" id="ssp-help">？</button>
@@ -1013,7 +908,6 @@ const streakBanner= document.getElementById('ssp-streak-banner');
 const bannerEn    = document.getElementById('ssp-banner-en');
 const bannerJp    = document.getElementById('ssp-banner-jp');
 const bannerKanji = document.getElementById('ssp-banner-kanji');
-const results     = document.getElementById('ssp-results');
 const dotsRow     = document.getElementById('ssp-dots');
 const startOverlay= document.getElementById('ssp-start-overlay');
 const helpBtn     = document.getElementById('ssp-help');
@@ -1480,30 +1374,10 @@ function revealResults(runTime) {
   /* Hide gameplay */
   mainWrap.style.display = 'none';
 
-  /* Show results card */
-  results.classList.add('show');
 
-  const tier = getTier(score);
   const pct  = Math.round((score / 15) * 100);
 
   /* Populate before submitting: save/unlock listeners can be synchronous. */
-  results.style.setProperty('--ssp-tier-color', tier.color);
-  document.getElementById('ssp-rs').textContent = `${score} / 15`;
-  document.getElementById('ssp-rp').textContent = `${pct}%`;
-  document.getElementById('ssp-rl').textContent = tier.label;
-  document.getElementById('ssp-re').textContent = tier.en;
-  document.getElementById('ssp-rj').textContent = tier.jp;
-  document.getElementById('ssp-rk').textContent = tier.kanji;
-  U.renderResultMeta(results, { gameId: `${CFG.curriculum}:sentence_speed`, score: pct });
-  U.renderResultDetails(results, {
-    stats: [
-      { label: 'Correct / せいかい', value: `${score} / 15` },
-      { label: 'Missed / まちがい', value: String(mistakes) },
-      { label: 'Run time / じかん', value: `${Math.round(runTime / 1000)}s` },
-    ],
-    reviewItems: missedItems,
-    audioBase: CFG.audioBase,
-  });
 
   U.emitGameEnd({
     points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
@@ -1554,7 +1428,6 @@ document.getElementById('ssp-replay').addEventListener('click', () => {
   finalClimax.classList.remove('show');
   finalClimax.hidden = true;
   finalClimax.setAttribute('aria-hidden', 'true');
-  results.classList.remove('show');
   mainWrap.style.display = '';
 
   streakBanner.className = 'ssp-streak-banner';

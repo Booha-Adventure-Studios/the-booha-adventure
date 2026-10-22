@@ -43,10 +43,16 @@ for (const [file, [id, px]] of Object.entries(ENGINES)) {
   assert(sc > -1 && emit > -1, `${file} must still submit its result and open the card`);
 }
 
-// The old per-engine panels stay hidden.
-for (const sel of ['#vt-results-wrap', '#st-results-wrap', '#ssp-results-wrap', '#vs-results',
-  '#so-results', '#sw-results', '.aq-results-outer', '.sas-results-outer', '.stw-results-outer']) {
-  assert(css.includes(sel), `game.css must hide the old ${sel} panel`);
+// The old per-engine panels and tier tables are gone; only the two hidden
+// buttons the card presses remain.
+for (const [file, px] of [['vocab-tap.js', 'vt'], ['sentence-tap.js', 'st'], ['sentence-speed.js', 'ssp'], ['vocab-speed.js', 'vs'],
+  ['sentence-order.js', 'so'], ['spell-word.js', 'sw'], ['ask-question.js', 'aq'], ['say-sentence.js', 'sas'], ['say-word.js', 'stw']]) {
+  const src = read(`games/${file}`);
+  assert(!src.includes(`${px}-results`), `${file}: the old results panel must be removed`);
+  assert(!/const TIERS = \[|getTier\(/.test(src), `${file}: tier tables live in game-scorecard.js only`);
+  assert(!/renderResultMeta|renderResultDetails/.test(src), `${file}: the card renders details, not the engine`);
+  assert(new RegExp(`<div class="${px}-actions" hidden>\\s*<button type="button" id="${px}-replay">[^<]*</button>\\s*<button type="button" id="${px}-back">`).test(src),
+    `${file}: keeps hidden ${px}-replay / ${px}-back for the score card`);
 }
 assert.match(css, /\.bsc-overlay \{[^}]*z-index: 1500/, 'score card must sit above gameplay but below confetti and medals');
 
