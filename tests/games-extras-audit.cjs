@@ -273,6 +273,17 @@ assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-
   assert(/if \(my !== token\) return;/.test(boss), 'an old clip must not touch a newer round');
   assert(!/@keyframes[^{]*\{[^}]*(box-shadow|filter|width)\s*:/.test(boss), 'boss animations must stay transform/opacity');
   assert(/hpFill\.style\.transform = `scaleX/.test(boss), 'the HP bar must animate with transform');
+  // Final-boss arena: it moves, reacts, attacks, gets angry, and can be knocked out.
+  for (const cls of ['wbDrift', 'wbBob', 'wbHurt', 'wbAttack', 'wbKO', 'wbEnter', 'wbShake']) assert(boss.includes(`@keyframes ${cls}`), `the boss needs ${cls}`);
+  for (const m of boss.matchAll(/@keyframes\s+(wb\w+)\s*\{([\s\S]*?\})\s*\}/g)) {
+    for (const prop of [...m[2].matchAll(/([a-z-]+)\s*:/g)].map(x => x[1])) assert(['opacity', 'transform'].includes(prop), `@keyframes ${m[1]} animates ${prop}`);
+  }
+  assert.match(boss, /if \(left <= 1 \/ 3\) setPhase\(3\); else if \(left <= 2 \/ 3\) setPhase\(2\);/, 'anger phases at two thirds and one third');
+  assert.match(boss, /run\.miss\(\); addMissed\(card, typeOf\(rounds\[idx\]\.kind\)\); bossAttack\(\);/, 'a miss makes the boss attack');
+  assert.match(boss, /setTimeout\(\(\) => \{ if \(my === token\) showRound\(\); \}, reducedFx\(\) \? 500 : 1700\);/, 'the entrance plays before round 1 (and is short under reduced motion)');
+  assert.match(boss, /html\[data-motion="reduced"\] \.wb-drift/, 'reduced motion stops the boss drifting');
+  for (const jp of ['あってる？', 'ちがう ことば', 'どれかな？', 'かいてみよう', 'ボス あらわる！', 'ボスが おこった！', 'さいごの ちから！', 'ボスを たおした！']) assert(boss.includes(jp), `Japanese line missing: ${jp}`);
+  assert.match(boss, /PB \? `<span class="jp">/, 'Pre-Boo reads the Japanese instruction first');
   const mcss = read('theme/menu.css');
   assert(/\.bm-tree-crown/.test(mcss) && /is-locked/.test(mcss), 'menu.css must style the locked boss tile and tree crown');
   assert.match(menu, /scores\.weeklyPlayedFor\(CURR\)/, 'the menu must open the boss tile from weeklyPlayedFor');
