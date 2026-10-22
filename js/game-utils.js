@@ -710,35 +710,151 @@ const UTILS = {
     let st = null;
     let item = null;
     let hudEl = null;
-    let pulseTimer = 0;
 
-    const paint = (pulse) => {
+    /* ── Celebration layer (Games Pass 9) ─────────────────────────────
+       Milestones (×1.5 at 3, ×2 at 6, ×3 at 10) get a centre banner, a
+       rising chime and sparks from the button just answered; ×3 lights a
+       gold screen edge for the rest of the streak; losing a combo of 3+
+       cracks and shatters the meter. Everything is pointer-events:none
+       and never delays the next answer. Reduced motion: banner only, held
+       still. Minimal power: no particles. */
+    const BM = () => (typeof window !== 'undefined' && window.BoohaMotion) || null;
+    const fxReduced = () => { const m = BM(); return !!(m && m.reduced && m.reduced()); };
+    const fxPower = () => { const m = BM(); return (m && m.power && m.power()) || 'full'; };
+    if (hud && typeof document !== 'undefined' && !window.__brunTap) {
+      window.__brunTap = { el: null, t: 0 };
+      document.addEventListener('pointerdown', e => {
+        const t = e.target && e.target.closest ? (e.target.closest('button,a,[role="button"],input') || e.target) : null;
+        window.__brunTap = { el: t, t: performance.now() };
+      }, { capture: true, passive: true });
+    }
+    const fxOrigin = () => {
+      const tap = window.__brunTap || {};
+      let el = tap.el && tap.el.isConnected && performance.now() - tap.t < 2500 ? tap.el : null;
+      if (!el && document.activeElement && document.activeElement !== document.body) el = document.activeElement;
+      if (!el) el = document.getElementById('game-mount');
+      const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+      return r && r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : { x: innerWidth / 2, y: innerHeight / 2 };
+    };
+    const fxCtx = () => {
+      const S = typeof window !== 'undefined' && window.BoohaSFX;
+      try { const c = S && S.context && S.context(); return c && c.state === 'running' ? c : null; } catch (_) { return null; }
+    };
+    const fxTone = (c, t, f, d, type, vol) => {
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(g); g.connect(c.destination);
+      o.start(t); o.stop(t + d + 0.03);
+    };
+    const fxChime = level => {
+      const c = fxCtx(); if (!c) return;
+      const steps = level >= 3 ? [0, 4, 7, 12, 16, 19] : level >= 2 ? [0, 4, 7, 12] : [0, 4, 7];
+      const t0 = c.currentTime + 0.02, base = 659.25;   // E5, major arpeggio upward
+      steps.forEach((st, i) => {
+        const f = base * Math.pow(2, st / 12), t = t0 + i * 0.065;
+        fxTone(c, t, f, 0.32, 'triangle', 0.15);
+        fxTone(c, t, f * 2, 0.22, 'sine', 0.05);
+      });
+    };
+    const fxCrack = () => {
+      const c = fxCtx(); if (!c) return;
+      const t = c.currentTime + 0.01, n = Math.floor(c.sampleRate * 0.16);
+      const buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+      const src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = buf; bp.type = 'bandpass'; bp.frequency.value = 1900; bp.Q.value = 0.9; g.gain.value = 0.22;
+      src.connect(bp); bp.connect(g); g.connect(c.destination); src.start(t);
+      const o = c.createOscillator(), og = c.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(240, t); o.frequency.exponentialRampToValueAtTime(80, t + 0.22);
+      og.gain.setValueAtTime(0.07, t); og.gain.exponentialRampToValueAtTime(0.0001, t + 0.24);
+      o.connect(og); og.connect(c.destination); o.start(t); o.stop(t + 0.26);
+    };
+    const fxParticles = (at, count, cls, spread) => {
+      if (fxReduced() || fxPower() === 'minimal') return;
+      if (fxPower() === 'reduced') count = Math.ceil(count / 2);
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('i');
+        p.className = cls;
+        const a = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+        const dist = spread * (0.6 + Math.random() * 0.6);
+        p.style.left = at.x + 'px'; p.style.top = at.y + 'px';
+        p.style.setProperty('--dx', Math.cos(a) * dist + 'px');
+        p.style.setProperty('--dy', Math.sin(a) * dist + (cls === 'brun-shard' ? 60 : 0) + 'px');
+        p.style.setProperty('--r', Math.round(Math.random() * 360) + 'deg');
+        p.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 900);
+      }
+    };
+    const BANNER = { 1.5: ['NICE!', 'いいね！'], 2: ['AMAZING!', 'すごい！'], 3: ['ON FIRE!', 'さいこう！'] };
+    const fxBanner = m => {
+      document.querySelectorAll('.brun-banner').forEach(b => b.remove());
+      const el = document.createElement('div');
+      el.className = 'brun-banner lv' + String(m).replace('.', '');
+      el.setAttribute('aria-hidden', 'true');
+      const words = BANNER[m] || BANNER[1.5];
+      el.innerHTML = `<b>COMBO ×${m}</b><span>${words[0]} · ${words[1]}</span>`;
+      if (fxReduced()) el.classList.add('still');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), fxReduced() ? 900 : 1100);
+    };
+    let edgeEl = null;
+    const fxEdge = on => {
+      if (typeof document === 'undefined' || !document.body) return;
+      if (on && !edgeEl) {
+        edgeEl = document.createElement('div');
+        edgeEl.className = 'brun-edge';
+        edgeEl.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(edgeEl);
+        void edgeEl.offsetWidth;
+      }
+      if (edgeEl) edgeEl.classList.toggle('on', !!on);
+    };
+
+    const paint = (fx = {}) => {
       if (!hud || typeof document === 'undefined' || !document.body) return;
       if (!hudEl && !st.items) return;   // appears once play starts
       if (!hudEl) {
         hudEl = document.createElement('div');
         hudEl.className = 'brun-hud';
         hudEl.setAttribute('aria-live', 'polite');
-        hudEl.innerHTML = '<span class="brun-mult"></span><b class="brun-pts"></b>';
+        hudEl.innerHTML = '<span class="brun-mult"></span><span class="brun-meter" aria-hidden="true">' +
+          '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b class="brun-pts"></b>';
         document.body.appendChild(hudEl);
       }
       const m = MULT(st.combo);
       hudEl.querySelector('.brun-mult').textContent = st.combo >= 3 ? `COMBO ×${m}` : (st.combo ? `${st.combo} in a row` : '');
       hudEl.querySelector('.brun-pts').textContent = st.points.toLocaleString('en-US');
+      hudEl.querySelectorAll('.brun-meter i').forEach((dot, i) => dot.classList.toggle('on', i < Math.min(10, st.combo)));
       hudEl.classList.toggle('hot', st.combo >= 3);
       hudEl.dataset.level = String(m);
-      if (pulse) {
-        hudEl.classList.remove('pulse'); void hudEl.offsetWidth; hudEl.classList.add('pulse');
-        clearTimeout(pulseTimer);
-        pulseTimer = setTimeout(() => hudEl && hudEl.classList.remove('pulse'), 450);
+      const bump = (el, cls, ms) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
+      if (fx.gained) bump(hudEl.querySelector('.brun-pts'), 'pop', 400);
+      if (fx.milestone) {
+        bump(hudEl, 'pulse', 450);
+        fxBanner(fx.milestone);
+        fxChime(fx.milestone);
+        fxParticles(fxOrigin(), fx.milestone >= 3 ? 18 : 14, 'brun-spark', fx.milestone >= 3 ? 130 : 100);
+      } else if (fx.gained && st.combo >= 3) {
+        fxParticles(fxOrigin(), 5, 'brun-spark', 60);
       }
+      if (fx.broke) {
+        bump(hudEl, 'break', 500);
+        fxCrack();
+        const r = hudEl.getBoundingClientRect();
+        fxParticles({ x: r.left + r.width / 2, y: r.top + r.height / 2 }, 8, 'brun-shard', 70);
+      }
+      fxEdge(st.combo >= 10);
     };
 
     const api = {
       reset() {
         st = { points: 0, combo: 0, maxCombo: 0, firstTry: 0, sharp: 0, recovered: 0, misses: 0, items: 0 };
         item = null;
-        paint(false);
+        paint();
         return api;
       },
       ready(parMs = 2500, opts = {}) {
@@ -771,7 +887,7 @@ const UTILS = {
         if (sharp) st.sharp++;
         st.points += pts;
         item.resolved = true;
-        paint(mult > before);
+        paint({ gained: pts, milestone: mult > before ? mult : 0 });
         return { pts, combo: st.combo, mult, sharp };
       },
       miss() {
@@ -781,7 +897,7 @@ const UTILS = {
         st.misses++;
         const hadCombo = st.combo >= 3;
         st.combo = 0;
-        paint(hadCombo);
+        paint({ broke: hadCombo });
       },
       recover() {
         if (!item || item.resolved) return null;
@@ -789,17 +905,18 @@ const UTILS = {
         item.resolved = true;
         st.recovered++;
         st.points += recoverPoints;
-        paint(false);
+        paint({ gained: recoverPoints });
         return { pts: recoverPoints, combo: 0, mult: 1, sharp: false };
       },
       summary() {
+        fxEdge(false);   // the score card takes over
         return {
           points: st.points, maxCombo: st.maxCombo, firstTry: st.firstTry,
           sharp: st.sharp, recovered: st.recovered, misses: st.misses, items: st.items,
           fullCombo: st.firstTry >= total && st.misses === 0 && st.recovered === 0,
         };
       },
-      hideHud() { if (hudEl) { hudEl.remove(); hudEl = null; } },
+      hideHud() { if (hudEl) { hudEl.remove(); hudEl = null; } fxEdge(false); },
     };
     return api.reset();
   },
