@@ -12,6 +12,15 @@ const BoohaScoreSystem = (() => {
     return BoohaAdventure.save.load().scores || {};
   }
 
+  // Extra games (Games Pass 6+, "{curriculum}-extra:{id}") record their own
+  // score, stars, points and crowns, but stay out of every aggregate below
+  // (all-time stars, totals, weekly totals) so nothing built on them can
+  // count an extra as one of the nine. Bonus-game behaviour is unchanged.
+  function isExtraId(id) { return /^[a-z]+-extra:/.test(String(id || '')); }
+  function _aggregateEntries() {
+    return Object.entries(_getScores()).filter(([id]) => !isExtraId(id));
+  }
+
   function _defaultEntry(gameId) {
     return {
       gameId,
@@ -159,7 +168,7 @@ const BoohaScoreSystem = (() => {
     // ── 5. Update meta.allTimeStars ────────────────────────────────────────
     // Only add the improvement in stars (delta) to avoid double-counting.
     const starDelta = entry.stars - prevStars;
-    if (starDelta > 0) {
+    if (starDelta > 0 && !isExtraId(gameId)) {
       if (!data.meta) data.meta = { lastWeeklyKey: '', allTimeStars: 0 };
       if (typeof data.meta.allTimeStars !== 'number') data.meta.allTimeStars = 0;
       data.meta.allTimeStars += starDelta;
@@ -198,7 +207,7 @@ const BoohaScoreSystem = (() => {
   }
 
   function totalStars() {
-    return Object.values(_getScores()).reduce((s, e) => s + (e.stars || 0), 0);
+    return _aggregateEntries().reduce((s, [, e]) => s + (e.stars || 0), 0);
   }
   function totalStarsFor(curriculum) {
     return Object.entries(_getScores())
@@ -206,7 +215,7 @@ const BoohaScoreSystem = (() => {
       .reduce((s, [,e]) => s + (e.stars || 0), 0);
   }
   function totalCompleted() {
-    return Object.values(_getScores()).filter(e => e.completed).length;
+    return _aggregateEntries().filter(([, e]) => e.completed).length;
   }
   function totalCompletedFor(curriculum) {
     return Object.entries(_getScores())
@@ -222,7 +231,7 @@ const BoohaScoreSystem = (() => {
 
   function weeklyStars() {
     const wStars = _getWeekly().gameStars || {};
-    return Object.values(wStars).reduce((s, n) => s + (n || 0), 0);
+    return Object.entries(wStars).filter(([id]) => !isExtraId(id)).reduce((s, [, n]) => s + (n || 0), 0);
   }
 
   function weeklyStarsFor(curriculum) {
@@ -233,7 +242,7 @@ const BoohaScoreSystem = (() => {
   }
 
   function weeklyCompleted() {
-    return Object.keys(_getWeekly().completedGames || {}).length;
+    return Object.keys(_getWeekly().completedGames || {}).filter(id => !isExtraId(id)).length;
   }
 
   function weeklyCompletedFor(curriculum) {
@@ -355,6 +364,7 @@ const BoohaScoreSystem = (() => {
     weeklyStars, weeklyStarsFor, weeklyCompleted, weeklyCompletedFor,
     weeklyStarsForGame, weeklyScoreForGame, isCompletedWeekly,
     getBestPoints, weeklyPointsForGame, weeklyCrownForGame, weeklyCrownsFor,
+    isExtraId,
     allTimeStars,
     weeklySummaryFor, weeklySummaryAll,
     summaryFor, summaryAll,

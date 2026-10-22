@@ -168,6 +168,17 @@ const BoohaGameRegistry = (() => {
       name:           'Booha Bites',
       file:           'games/booha-bites.js',
       category:       'context',
+      hira:           'ぬけた ことばを みつけよう！',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
+    {
+      id:             'echo',
+      gameKey:        'echo',
+      name:           'Echo',
+      file:           'games/echo.js',
+      category:       'dictation',
+      hira:           'きいて、かこう！',
       scoreMax:       100,
       starThresholds: [40, 70, 90],
     },
@@ -260,9 +271,9 @@ const BoohaGameRegistry = (() => {
   /** Bonus games, kept separate from curriculum game summaries */
   function getBonusGames() { return [...BONUS_GAMES]; }
 
-  /** All valid save IDs, including bonus games */
+  /** All valid save IDs, including bonus and extra games */
   function getAllSaveIds() {
-    return [...GAMES, ...BONUS_GAMES].map(g => g.saveId);
+    return [...GAMES, ...BONUS_GAMES, ...EXTRA_GAMES].map(g => g.saveId);
   }
 
   /**
