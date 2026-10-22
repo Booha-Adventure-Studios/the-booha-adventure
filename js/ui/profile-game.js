@@ -110,7 +110,10 @@ const BoohaProfileGame = (() => {
   }
 
   function gamesFor(curr) {
-    const entries = BoohaGameRegistry.getForCurriculum(curr) || [];
+    // Trail stops follow the maze (Vocab Tap first), not the registry order.
+    const entries = (typeof BoohaGameRegistry.getForCurriculumInMazeOrder === 'function'
+      ? BoohaGameRegistry.getForCurriculumInMazeOrder(curr)
+      : BoohaGameRegistry.getForCurriculum(curr)) || [];
     return entries.map(g => {
       const id = g.baseId || String(g.id || '').split(':').pop();
       return { id, name: g.name || id, saveId: `${curr}:${id}` };

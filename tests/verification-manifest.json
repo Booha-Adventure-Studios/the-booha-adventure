@@ -11,6 +11,11 @@
   },
   "exceptions": [
     {
+      "path": "tests/grimmerglen-scrapbook.test.cjs",
+      "status": "verify",
+      "reason": "Current Grimmerglen scrapbook profile, tree portal icon on every profile, weekly memory jar, and maze-order trail and record book."
+    },
+    {
       "path": "tests/muenba-field-kit.test.cjs",
       "status": "verify",
       "reason": "Current Muenba field-kit profile: weekly orb jar (resets Sunday), Jerks, case keyword help, Japanese toggle, and all-time ledger."

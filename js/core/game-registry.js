@@ -196,6 +196,24 @@ const BoohaGameRegistry = (() => {
   /** All entries for one curriculum e.g. getForCurriculum('bc') */
   function getForCurriculum(curriculum) { return _byCurriculum[curriculum] || []; }
 
+  /**
+   * The order students meet the nine games in the maze (curriculum
+   * games-index tiles). BASE_GAMES is stored in a different order, so any
+   * screen that shows "game 1 → game 9" should use this.
+   */
+  const MAZE_ORDER = Object.freeze([
+    'vocab_tap', 'spell_word', 'vocab_speed',
+    'sentence_tap', 'sentence_order', 'sentence_speed',
+    'say_word', 'say_sentence', 'ask_question',
+  ]);
+  function getForCurriculumInMazeOrder(curriculum) {
+    const rank = id => {
+      const i = MAZE_ORDER.indexOf(id);
+      return i < 0 ? MAZE_ORDER.length : i;
+    };
+    return getForCurriculum(curriculum).slice().sort((a, b) => rank(a.baseId || a.id) - rank(b.baseId || b.id));
+  }
+
   /** All curriculum variants of one base game e.g. getAllVariants('vocab_tap') */
   function getAllVariants(baseId) { return _byBaseId[baseId] || []; }
 
@@ -245,6 +263,8 @@ const BoohaGameRegistry = (() => {
     getAll,
     getById,
     getForCurriculum,
+    getForCurriculumInMazeOrder,
+    MAZE_ORDER,
     getAllVariants,
     getBaseGames,
     getBonusGames,
