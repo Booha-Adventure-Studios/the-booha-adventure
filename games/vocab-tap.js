@@ -18,21 +18,12 @@ U.unlockAudio();
    the first gesture. We avoid that by NOT pre-playing every file.
    Instead we decode/load them silently via load() only.
    ══════════════════════════════════════════════════════════════ */
-// AFTER
-const SFX = {};
-function loadSfx(name, url) {
-  return new Promise(resolve => {
-    const a = new Audio(url);
-    a.setAttribute('playsinline',''); a.setAttribute('webkit-playsinline','');
-    a.addEventListener('canplaythrough', () => { SFX[name] = a; resolve(); }, { once:true });
-    a.addEventListener('error', resolve, { once:true });
-    a.load();
-    setTimeout(() => { if (!SFX[name]) { SFX[name] = a; resolve(); } }, 2000);
-  });
-}
+/* Ding/fart use the shared Web Audio engine (js/booha-sfx.js via
+   GAME_UTILS): decoded once, instant, and safe to fire after the awaits
+   in the Check reveal below (cloned <audio> elements were not, on iPad). */
 await Promise.all([
-  loadSfx('ding', CFG.sfxBase + 'ding.mp3'),
-  loadSfx('fart', CFG.sfxBase + 'fart.mp3'),
+  U.loadSFX('ding', CFG.sfxBase + 'ding.mp3'),
+  U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
 ]);
 
 /* Build audio cache — load() only, never play() during warm-up */
@@ -1198,16 +1189,14 @@ async function gradeRound() {
     if (correct) {
       el.classList.add('slot-correct');
       /* Stagger: play ding, wait a beat, then next */
-      const dingClone = SFX['ding'] ? SFX['ding'].cloneNode() : null;
-      if (dingClone) { dingClone.setAttribute('playsinline',''); dingClone.setAttribute('webkit-playsinline',''); dingClone.play().catch(()=>{}); }
+      U.playSFX('ding');
        
       roundScore++;
       await new Promise(r => setTimeout(r, 700));
     } else {
       el.classList.add('slot-wrong');
       if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
-      const fartClone = SFX['fart'] ? SFX['fart'].cloneNode() : null;
-      if (fartClone) { fartClone.setAttribute('playsinline',''); fartClone.setAttribute('webkit-playsinline',''); fartClone.play().catch(()=>{}); }
+      U.playSFX('fart');
        
       flashWrong();
       await new Promise(r => setTimeout(r, 750));

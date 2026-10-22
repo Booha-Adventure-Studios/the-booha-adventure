@@ -30,17 +30,25 @@ const UTILS = {
   },
 
   /* ══════════════════════════════
-     AUDIO — WebAudio context SFX
+     AUDIO — short SFX (ding / fart)
+     Delegates to the shared engine in js/booha-sfx.js, which game.html
+     loads first. The fallback paths below only run if that file is
+     missing, and keep the previous behaviour.
      ══════════════════════════════ */
   _ctx: null,
   _master: null,
   _buf: new Map(),
-  _unlocked: false,
   _sfxLastPlayed: new Map(),
+  _fartIdx: 0,
+
+  _engine() { return window.BoohaSFX || null; },
 
   _ensureCtx() {
+    const engine = this._engine();
+    if (engine) { this._ctx = engine.context(); return; }
     if (!this._ctx) {
       const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return;
       this._ctx = new C();
       this._master = this._ctx.createGain();
       this._master.gain.value = 1;
@@ -48,46 +56,78 @@ const UTILS = {
     }
   },
 
+  /* Safe to call any number of times. Only a call made inside a tap can
+     unlock iPad audio, so this never latches as "already unlocked". */
   unlockAudio() {
+    const engine = this._engine();
+    if (engine) { engine.unlock(); return; }
     this._ensureCtx();
-    if (this._unlocked) return;
-    this._unlocked = true;
-    if (this._ctx.state === 'suspended') this._ctx.resume().catch(() => {});
-    const b = this._ctx.createBuffer(1, 1, 22050);
-    const s = this._ctx.createBufferSource();
-    s.buffer = b;
-    s.connect(this._master);
-    try { s.start(0); } catch(e) {}
+    if (!this._ctx) return;
+    if (this._ctx.state !== 'running') this._ctx.resume().catch(() => {});
+    try {
+      const b = this._ctx.createBuffer(1, 1, 22050);
+      const s = this._ctx.createBufferSource();
+      s.buffer = b;
+      s.connect(this._master);
+      s.start(0);
+    } catch(e) {}
   },
 
+  /* Resolves when the sound is ready (or could not load). Never rejects. */
   async loadSFX(name, url) {
+    const engine = this._engine();
+    if (engine) return engine.load(name, url);
     this._ensureCtx();
+    if (!this._ctx) return false;
     try {
       const res = await fetch(url, { cache: 'force-cache' });
       const arr = await res.arrayBuffer();
-      const buf = await this._ctx.decodeAudioData(arr);
+      const buf = await new Promise((resolve, reject) => {
+        const p = this._ctx.decodeAudioData(arr, resolve, reject);
+        if (p && p.then) p.then(resolve, reject);
+      });
       this._buf.set(name, buf);
+      return true;
     } catch(e) {
       console.warn('[game-utils] Could not load SFX:', name, url);
+      return false;
     }
   },
 
-  playSFX(name, vol = 1) {
-    if (!this._ctx) return;
-    const buf = this._buf.get(name);
-    if (!buf) return;
+  /*
+   * playSFX(name)              play once
+   * playSFX(name, onEnd)       onEnd fires when the sound finishes
+   * playSFX(name, vol, onEnd)
+   * A repeat of the same sound within 140 ms is dropped (anti-mash), but
+   * onEnd still fires so an answer chain can never stall on a sound.
+   */
+  playSFX(name, vol = 1, onEnd = null) {
+    if (typeof vol === 'function') { onEnd = vol; vol = 1; }
+    const finish = () => { if (onEnd) setTimeout(onEnd, 0); };
     const now = Date.now();
     const last = this._sfxLastPlayed.get(name) || 0;
-    if (now - last < 140) return false;
+    if (now - last < 140) { finish(); return false; }
     this._sfxLastPlayed.set(name, now);
-    if (this._ctx.state === 'suspended') this._ctx.resume().catch(() => {});
+
+    const engine = this._engine();
+    if (engine) {
+      // Three fart pitches in rotation so repeats don't sound identical.
+      const rate = name === 'fart' ? [1, 0.92, 1.08][this._fartIdx++ % 3] : 1;
+      return engine.play(name, { volume: vol, rate, onEnd }) > 0;
+    }
+
+    if (!this._ctx) { finish(); return false; }
+    const buf = this._buf.get(name);
+    if (!buf) { finish(); return false; }
+    if (this._ctx.state !== 'running') this._ctx.resume().catch(() => {});
     const src = this._ctx.createBufferSource();
     src.buffer = buf;
     const g = this._ctx.createGain();
     g.gain.value = Math.max(0, Math.min(1, vol));
     src.connect(g);
     g.connect(this._master);
-    try { src.start(0); } catch(e) { return false; }
+    if (onEnd) src.onended = () => onEnd();
+    try { src.start(0); } catch(e) { finish(); return false; }
     return true;
   },
 
