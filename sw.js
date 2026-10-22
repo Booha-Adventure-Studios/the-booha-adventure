@@ -97,7 +97,9 @@ const CURRENT_CACHES = {
   // score card, menu tiles and profile; replays pause the pace clock.
   // Rainbow fix: the first-rainbow explanation is per student (read from the
   // synced save, not a device flag); shorter READY PACE chip.
-  pages:  'booha-pages-2026-492',
+  // Trail fix: nameplates keep labels readable where vertical links pass;
+  // vertical +1★ chips sit between the label and the next disc.
+  pages:  'booha-pages-2026-493',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
