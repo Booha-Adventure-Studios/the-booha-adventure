@@ -250,6 +250,13 @@ const BoohaScoreSystem = (() => {
       .filter(id => id.startsWith(`${curriculum}:`)).length;
   }
 
+  // Games Pass 8: how many of a curriculum's nine have been played this week
+  // (any score, even 0). Opens the Week Boss; never part of any unlock.
+  function weeklyPlayedFor(curriculum) {
+    return Object.keys(_getWeekly().gameScores || {})
+      .filter(id => id.startsWith(`${curriculum}:`)).length;
+  }
+
   function weeklyStarsForGame(saveId) {
     return (_getWeekly().gameStars || {})[saveId] || 0;
   }
@@ -361,7 +368,7 @@ const BoohaScoreSystem = (() => {
     getEntry, getHighScore, getStars, isCompleted,
     getBestTime, getLastTime, formatTime, getAll,
     totalStars, totalStarsFor, totalCompleted, totalCompletedFor,
-    weeklyStars, weeklyStarsFor, weeklyCompleted, weeklyCompletedFor,
+    weeklyStars, weeklyStarsFor, weeklyCompleted, weeklyCompletedFor, weeklyPlayedFor,
     weeklyStarsForGame, weeklyScoreForGame, isCompletedWeekly,
     getBestPoints, weeklyPointsForGame, weeklyCrownForGame, weeklyCrownsFor,
     isExtraId,
