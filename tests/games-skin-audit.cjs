@@ -74,7 +74,14 @@ assert(/\[data-power="minimal"\] body::before \{ filter: none; \}/.test(css), 's
 const lanes = Object.fromEntries([...core.matchAll(/'([a-z-]+)':\s+\['(words|sentences|listen|extra)'/g)].map(m => [m[1], m[2]]));
 const expected = { 'vocab-tap': 'words', 'spell-word': 'words', 'vocab-speed': 'words', 'sentence-tap': 'sentences', 'sentence-order': 'sentences', 'sentence-speed': 'sentences', 'say-word': 'listen', 'say-sentence': 'listen', 'ask-question': 'listen', 'booha-bites': 'extra', 'echo': 'extra', 'week-boss': 'extra' };
 assert.deepStrictEqual(lanes, expected, 'game-core lanes must match the menu lanes');
-assert.match(core, /const V2_LANES = new Set\(\['words', 'sentences'\]\);/, 'Words (Pass 10) and Sentences (Pass 11) are on v2');
+assert.match(core, /const V2_LANES = new Set\(\['words', 'sentences', 'listen'\]\);/, 'Words, Sentences and Listen are on v2');
+// Pass 12: Listen lane sound stage; "playing" is never green, answers carry icons.
+assert.match(css, /:is\(\.stw-play-btn, \.sas-play-btn, \.aq-play-btn\)\.playing \{[^}]*#cdbcff/, 'the playing speaker brightens in violet, not green');
+assert.match(css, /\.playing::before \{ animation: skinRipple/, 'rings ripple outward while a clip plays');
+assert.match(css, /opacity: 1;   \/\* the engine disables the button while it plays/, 'a playing (disabled) speaker stays at full brightness');
+assert.match(css, /:is\(\.stw-choice, \.sas-choice, \.aq-choice\)\.correct::before \{ content: '✓'; \}/);
+assert.match(css, /:is\(\.stw-choice, \.sas-choice, \.aq-choice\)\.wrong::before \{ content: '✗'; \}/);
+assert.match(utils, /\.stw-curriculum, \.sas-curriculum, \.aq-curriculum/, 'Listen games get their own name as the title');
 // Pass 11: Sentences lane on notebook paper
 for (const sel of ['.so-answer-zone', '.so-placed-chip.so-correct', '.so-placed-chip.so-wrong', '.st-en-card', '.st-jp-slot.slot-correct', '.st-jp-slot.slot-wrong', '.ssp-choice.ssp-correct', '.ssp-choice.ssp-wrong']) {
   assert(css.includes(`html[data-skin="v2"][data-curriculum] ${sel}`), `the Sentences surface must style ${sel}`);
