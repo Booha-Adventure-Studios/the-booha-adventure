@@ -59,6 +59,11 @@ for (const file of ['spell-word.js', 'sentence-order.js']) {
   assert.strictEqual((src.match(re) || []).length, 2, `${file} replay/back handlers re-added per game must be { once: true }`);
 }
 
+// A first run is labelled as a start, never as a record (percent and points).
+assert.strictEqual((cardSrc.match(/FIRST SCORE · はじめて/g) || []).length, 2,
+  'score card must show FIRST SCORE · はじめて for a first percent and a first weekly points result');
+assert.match(cardSrc, /if \(before <= 0\)[^\n]*FIRST SCORE/, 'NEW BEST must be reserved for beating an earlier score');
+
 // Tier mapping (half points supported; LEGEND needs a full combo).
 const sandbox = { window: {}, document: {}, console };
 sandbox.window.window = sandbox.window;

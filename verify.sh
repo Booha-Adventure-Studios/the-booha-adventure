@@ -1690,6 +1690,13 @@ else
   bad "Combo/points/crown audit failed"
 fi
 
+echo "[games] shared curriculum menu audit"
+if node tests/games-menu-audit.cjs >/dev/null 2>&1; then
+  ok "Shared curriculum menu audit passed"
+else
+  bad "Shared curriculum menu audit failed"
+fi
+
 echo "[profile] Utsuroba physical-entry audit"
 if node tests/utsuroba-profile-access-audit.cjs >/dev/null 2>&1; then
   ok "Utsuroba world gate, Karasuki route, status, and Kurobane asset contracts pass"

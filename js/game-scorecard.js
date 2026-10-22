@@ -179,7 +179,10 @@
     var shown = Math.round(correct * 2) / 2;
     score.appendChild(el('b', 'bsc-correct', shown + ' / ' + total));
     score.appendChild(el('span', 'bsc-pct', pct + '%'));
-    score.appendChild(el('span', newBest ? 'bsc-best bsc-new' : 'bsc-best', newBest ? 'NEW BEST!' : 'Best ' + best + '%'));
+    // NEW BEST only for beating a real earlier score; a first run is celebrated
+    // as a start, never presented as a record.
+    if (before <= 0) score.appendChild(el('span', 'bsc-best bsc-first', 'FIRST SCORE · はじめて'));
+    else score.appendChild(el('span', newBest ? 'bsc-best bsc-new' : 'bsc-best', newBest ? 'NEW BEST!' : 'Best ' + best + '%'));
     card.appendChild(score);
 
     var pointsValue = run ? run.points : opts.points;
@@ -191,8 +194,9 @@
       pts.appendChild(el('span', 'bsc-points-label', 'POINTS'));
       var pvEl = el('b', 'bsc-points-value', calm ? pv.toLocaleString('en-US') : '0');
       pts.appendChild(pvEl);
-      if (weekBest > 0 && pv > weekBest) pts.appendChild(el('span', 'bsc-best bsc-new', 'NEW WEEK BEST!'));
-      else if (weekBest > 0) pts.appendChild(el('span', 'bsc-best', 'Week best ' + weekBest.toLocaleString('en-US')));
+      if (weekBest <= 0) pts.appendChild(el('span', 'bsc-best bsc-first', 'FIRST SCORE · はじめて'));
+      else if (pv > weekBest) pts.appendChild(el('span', 'bsc-best bsc-new', 'NEW WEEK BEST!'));
+      else pts.appendChild(el('span', 'bsc-best', 'Week best ' + weekBest.toLocaleString('en-US')));
       card.appendChild(pts);
       if (!calm && pv > 0) {
         // Count up while the stars land.

@@ -9,49 +9,27 @@ const vm = require('vm');
 const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
 
-function overlaySource(file) {
-  const source = read(file);
-  const marker = '/* ── Weekly star overlay';
-  const start = source.indexOf(marker);
-  assert.ok(start >= 0, `${file} must contain the weekly star overlay`);
-  const match = source.slice(start).match(/\(function \(\) \{[\s\S]*?\}\)\(\);/);
-  assert.ok(match, `${file} weekly star overlay must remain executable`);
-  return match[0];
+// Games Pass 5: the three menus share js/menu-core.js. Each page must still
+// load it with its own data-curriculum, and the shared tile-star rule must
+// show weekly stars on the live week only (never last or next week).
+function menuStars(file, curriculum, selectedWeek, currentWeek) {
+  const page = read(file);
+  assert.match(page, new RegExp(`<html[^>]*data-curriculum="${curriculum}"`), `${file} must declare data-curriculum="${curriculum}"`);
+  assert.ok(page.includes('/the-booha-adventure/js/menu-core.js'), `${file} must load the shared menu engine`);
+  assert.ok(page.indexOf('js/core/score-system.js') < page.indexOf('js/menu-core.js'), `${file} must load the score system before the menu`);
+  const context = { window: {}, URLSearchParams };
+  vm.createContext(context);
+  vm.runInContext(read('js/menu-core.js'), context, { filename: 'js/menu-core.js' });
+  const menu = context.window.BoohaMenu;
+  assert.ok(menu && typeof menu.tileStars === 'function', 'menu-core must expose BoohaMenu.tileStars');
+  const calendar = { getCurrentCurriculumWeek() { return currentWeek; } };
+  const scores = { weeklyStarsForGame() { return 3; } };
+  return menu.tileStars(curriculum, selectedWeek, 'vocab-tap', calendar, scores) > 0 ? 1 : 0;
 }
 
 function runOverlay(file, selectedWeek, currentWeek) {
-  let ready;
-  const badges = [];
-  const tiles = [{
-    dataset: { game: 'vocab-tap' },
-    appendChild(node) { badges.push(node); },
-    classList: { add() {} },
-  }];
-  const window = {
-    location: { search: `?week=${selectedWeek}` },
-    CALENDAR: { getCurrentCurriculumWeek() { return currentWeek; } },
-    BoohaAdventure: {
-      scores: { weeklyStarsForGame() { return 3; } },
-    },
-  };
-  const document = {
-    addEventListener(type, listener) {
-      if (type === 'booha:ready') ready = listener;
-    },
-    querySelectorAll() { return tiles; },
-    createElement() { return {}; },
-  };
-  const context = {
-    window,
-    document,
-    BoohaAdventure: window.BoohaAdventure,
-    URLSearchParams,
-  };
-  vm.createContext(context);
-  vm.runInContext(overlaySource(file), context, { filename: file });
-  assert.strictEqual(typeof ready, 'function', `${file} must wait for booha:ready`);
-  ready();
-  return badges.length;
+  const curriculum = file.split('/')[1];
+  return menuStars(file, curriculum, selectedWeek, currentWeek);
 }
 
 const current = {
