@@ -915,6 +915,7 @@ U.mount(`
     </div>
 </div>
 </div>
+</div><!-- /ssp-results-wrap: was never closed, which put the start screen inside the hidden results panel -->
 
 <!-- HELP BUTTON -->
 <button class="ssp-help-btn" id="ssp-help">？</button>

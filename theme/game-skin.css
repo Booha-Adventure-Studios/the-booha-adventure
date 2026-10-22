@@ -1,0 +1,407 @@
+/* ══════════════════════════════════════════════════════════════
+   game-skin.css — Games Pass 10: the v2 in-game colour system
+   Loaded after game.css. Everything here is scoped to
+   html[data-skin="v2"], which game-core sets only for games whose lane
+   has been moved over (Pass 10: the Words lane). Other games keep the
+   old look until their lane pass, so nothing looks half-converted.
+
+   Three layers, one job each:
+     1. WORLD   (curriculum)   backdrop art + accent: where am I?
+     2. LANE    (kind of game) chip, prompt ring, dots: what am I doing?
+     3. MEANING (never themed) correct / wrong / combo / crown
+   Then the Words-lane play surface: playing cards.
+
+   Selectors start with html[data-skin="v2"][data-curriculum] (0,2,1) so
+   they beat the engines' [data-curriculum="x"] .cls rules (0,2,0)–(0,3,0).
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── 1. WORLD tokens ───────────────────────────────────────────── */
+html[data-skin="v2"] {
+  /* lane defaults (overridden per lane below) */
+  --lane: #f5b83d; --lane-ink: #ffd27a; --lane-soft: rgba(245,184,61,.2); --lane-ring: rgba(245,184,61,.55);
+  /* meaning: fixed everywhere; differ in lightness and icon, not hue alone */
+  --ok: #1f7a46;  --ok-edge: #0f4a29;  --ok-ink: #ffffff;  --ok-glow: rgba(34,197,94,.45);
+  --bad: #ff7a45; --bad-edge: #b8461c; --bad-ink: #2a0d02; --bad-glow: rgba(255,122,69,.45);
+  /* playing cards */
+  --card-face: #fff8e6; --card-ink: #2b1a05; --card-edge: #c99a3a; --card-line: rgba(43,26,5,.12);
+  /* notebook paper (Sentences lane) */
+  --paper: linear-gradient(180deg, #f8efdc, #efe2c6); --paper-ink: #2d2418; --paper-rule: rgba(92,140,200,.45); --paper-edge: #cdb98f;
+  --chip: #dceeff; --chip-ink: #12365c; --chip-edge: #5c8fc4;
+}
+html[data-skin="v2"][data-curriculum="br"] {
+  --world: #5fd6ad; --world-ink: #8ff0cc;
+  --world-art: url("../assets/img/menu/boo-riculum-forest.webp");
+  --world-veil: linear-gradient(180deg, rgba(6,14,10,.58), rgba(6,12,9,.9) 55%, rgba(5,10,8,.95));
+  --game-bg: #07120d; --game-ink: #eef6ea; --game-muted: rgba(238,246,234,.66);
+  --game-surface: rgba(10,20,15,.74); --game-surface-2: rgba(16,30,23,.9); --game-border: rgba(127,230,192,.22);
+  --game-pill-bg: rgba(10,20,15,.72); --game-pill-border: rgba(238,246,234,.2); --game-pill-text: #eef6ea;
+  --jp-card: rgba(22,30,20,.9);
+}
+html[data-skin="v2"][data-curriculum="bc"] {
+  --world: #f29cc4; --world-ink: #f7b8d4;
+  --world-art: url("../assets/img/menu/boo-continuum-forest.webp");
+  --world-veil: linear-gradient(180deg, rgba(18,8,20,.52), rgba(14,6,16,.9) 55%, rgba(12,5,14,.95));
+  --game-bg: #120814; --game-ink: #fff0f8; --game-muted: rgba(255,240,248,.66);
+  --game-surface: rgba(22,10,24,.74); --game-surface-2: rgba(30,14,32,.9); --game-border: rgba(242,156,196,.24);
+  --game-pill-bg: rgba(22,10,24,.72); --game-pill-border: rgba(255,240,248,.2); --game-pill-text: #fff0f8;
+  --jp-card: rgba(32,18,30,.9);
+}
+/* Pre-Boo: dawn. Light cream surfaces for small readers. */
+html[data-skin="v2"][data-curriculum="pb"] {
+  --world: #e0692a; --world-ink: #c2551f;
+  --world-art: url("../assets/img/menu/pre-boo-forest.webp");
+  --world-veil: linear-gradient(180deg, rgba(255,246,234,.7), rgba(255,244,230,.88) 55%, rgba(255,243,228,.94));
+  --lane: #e5a21d; --lane-ink: #7a4b00; --lane-soft: rgba(229,162,29,.22); --lane-ring: rgba(229,162,29,.6);
+  --game-bg: #fff6ea; --game-ink: #3a1f12; --game-muted: rgba(58,31,18,.6);
+  --game-surface: rgba(255,250,242,.9); --game-surface-2: #fffaf2; --game-border: rgba(229,162,29,.35);
+  --game-pill-bg: #fffaf2; --game-pill-border: rgba(229,162,29,.45); --game-pill-text: #3a1f12;
+  --game-meter-bg: rgba(58,31,18,.1);
+  --card-face: #ffffff; --card-edge: #e5b25a;
+  --jp-card: #fffaf2;
+}
+
+/* ── 2. LANE tokens ────────────────────────────────────────────── */
+html[data-skin="v2"][data-lane="sentences"] { --lane: #5cb2ff; --lane-ink: #a9d4ff; --lane-soft: rgba(92,178,255,.18); --lane-ring: rgba(92,178,255,.55); }
+html[data-skin="v2"][data-lane="listen"]    { --lane: #a98bff; --lane-ink: #cdbcff; --lane-soft: rgba(169,139,255,.2); --lane-ring: rgba(169,139,255,.55); }
+html[data-skin="v2"][data-lane="extra"]     { --lane: #ff6f91; --lane-ink: #ffb3c4; --lane-soft: rgba(255,111,145,.2); --lane-ring: rgba(255,111,145,.55); }
+html[data-skin="v2"][data-curriculum="pb"][data-lane="sentences"] { --lane: #2f8fe0; --lane-ink: #134b80; }
+html[data-skin="v2"][data-curriculum="pb"][data-lane="listen"]    { --lane: #7a5ce0; --lane-ink: #3d2a85; }
+html[data-skin="v2"][data-curriculum="pb"][data-lane="extra"]     { --lane: #e0466e; --lane-ink: #8a1736; }
+
+/* The engines' own tokens follow the layers: primary = lane, secondary = world. */
+html[data-skin="v2"][data-curriculum] {
+  --game-primary: var(--lane);
+  --game-secondary: var(--world);
+  --game-accent: var(--world);
+  --game-amber: #ffc94a;
+  --game-meter-fill: linear-gradient(90deg, var(--lane), #ffc94a);
+  --game-tile-bg: var(--card-face); --game-tile-text: var(--card-ink); --game-tile-subtext: rgba(43,26,5,.65);
+  --game-answer-bg: var(--card-face); --game-answer-text: var(--card-ink);
+}
+
+/* ── World backdrop: the menu forest, blurred and veiled ───────── */
+html[data-skin="v2"] body { background: var(--game-bg); }
+html[data-skin="v2"] body::before {
+  content: ''; position: fixed; inset: -28px; z-index: -2; pointer-events: none;
+  background: var(--world-art) center 28% / cover no-repeat;
+  filter: blur(7px) saturate(1.08);
+  transform: translateZ(0);
+}
+html[data-skin="v2"] body::after {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--world-veil);
+}
+/* Slow devices: no blur, a heavier veil instead. */
+html[data-skin="v2"][data-power="minimal"] body::before { filter: none; }
+html[data-skin="v2"][data-power="minimal"][data-curriculum="br"] body::after { background: rgba(6,12,9,.9); }
+html[data-skin="v2"][data-power="minimal"][data-curriculum="bc"] body::after { background: rgba(14,6,16,.9); }
+html[data-skin="v2"][data-power="minimal"][data-curriculum="pb"] body::after { background: rgba(255,245,232,.93); }
+
+/* ── Shared chrome ─────────────────────────────────────────────── */
+html[data-skin="v2"] .game-lane-chip {
+  display: block; width: max-content; margin: calc(10px + env(safe-area-inset-top, 0px)) auto -4px;
+  font: 900 12px/1 var(--game-font-body); letter-spacing: .14em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 999px; background: var(--lane-soft); color: var(--lane-ink);
+  box-shadow: inset 0 0 0 1px var(--lane-ring);
+}
+html[data-skin="v2"][data-curriculum] .game-close {
+  background: var(--game-surface); color: var(--game-ink);
+  border: 1.5px solid var(--game-border); box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+/* Game name in the world colour instead of the rainbow curriculum banner. */
+html[data-skin="v2"][data-curriculum] :is(.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum) {
+  background: none; -webkit-text-fill-color: currentColor; color: var(--world-ink);
+  animation: none; letter-spacing: .04em; text-transform: none; text-shadow: 0 2px 14px rgba(0,0,0,.35);
+}
+html[data-skin="v2"][data-curriculum="pb"] :is(.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum) { text-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-date, .sw-date, .vs-date, .st-date, .so-date, .ssp-date) { color: var(--game-muted); }
+
+/* Progress dots: lane for "now", meaning-green for done. */
+html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot) { background: var(--game-meter-bg); border-color: transparent; box-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot).active { background: var(--lane); border-color: var(--lane); box-shadow: 0 0 10px var(--lane-ring); }
+html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot).done { background: #22c55e; border-color: #22c55e; box-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.sw-dot, .so-dot).recovered { background: #ffc94a; border-color: #ffc94a; }
+
+/* Pills */
+html[data-skin="v2"][data-curriculum] :is(.vt-score-pill, .sw-pill, .vs-pill, .vs-streak-pill, .st-score-pill, .so-pill, .ssp-pill, .ssp-streak-pill) {
+  background: var(--game-pill-bg); border: 1.5px solid var(--game-pill-border); color: var(--game-pill-text);
+  box-shadow: 0 3px 10px rgba(0,0,0,.18); text-shadow: none;
+}
+html[data-skin="v2"][data-curriculum] :is(.vt-score-pill, .sw-pill, .vs-pill, .vs-streak-pill, .st-score-pill, .so-pill, .ssp-pill, .ssp-streak-pill) b { color: var(--lane-ink); text-shadow: none; }
+
+/* Prompt cards: world surface with the lane ring. No rainbow bar. */
+html[data-skin="v2"][data-curriculum] :is(.sw-jp-box, .vs-prompt-box, .so-jp-box, .ssp-prompt-box) {
+  background: var(--game-surface); border: none;
+  box-shadow: inset 0 0 0 2px var(--lane-ring), 0 10px 28px rgba(0,0,0,.28);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+html[data-skin="v2"][data-curriculum="pb"] :is(.sw-jp-box, .vs-prompt-box, .so-jp-box, .ssp-prompt-box) { box-shadow: inset 0 0 0 2px var(--lane-ring), 0 8px 20px rgba(120,60,10,.14); }
+html[data-skin="v2"][data-curriculum] :is(.sw-jp-box, .vs-prompt-box, .so-jp-box, .ssp-prompt-box)::before { display: none; }
+html[data-skin="v2"][data-curriculum] :is(.sw-jp-kanji, .vs-jp, .so-jp-kanji, .ssp-jp) { color: var(--game-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.sw-jp-hira, .vs-hira, .sw-jp-label, .so-jp-hira, .ssp-hira, .so-jp-label) { color: var(--game-muted); }
+
+/* Panels behind the card columns */
+html[data-skin="v2"][data-curriculum] :is(.vt-panel, .st-panel) {
+  background: var(--game-surface); border: 1px solid var(--game-border);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+
+/* Primary action: the lane colour, dark text. */
+html[data-skin="v2"][data-curriculum] :is(.vt-check-btn, .sw-check-btn, .st-check-btn, .so-check-btn) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lane) 82%, #fff), var(--lane));
+  color: #2b1a05; text-shadow: none;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--lane) 55%, #000), 0 8px 20px rgba(0,0,0,.28);
+}
+html[data-skin="v2"][data-curriculum] :is(.vt-check-btn, .sw-check-btn, .st-check-btn, .so-check-btn)::after { display: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-check-btn, .sw-check-btn, .st-check-btn, .so-check-btn):disabled { opacity: .45; box-shadow: 0 4px 0 color-mix(in srgb, var(--lane) 40%, #000); }
+html[data-skin="v2"][data-curriculum] :is(.vt-hira-btn, .vt-help-btn, .sw-help-btn, .sw-clear-btn, .vs-help-btn, .sw-speaker-btn, .st-hira-btn, .st-help-btn, .so-hira-btn, .so-help-btn, .so-clear-btn, .so-speaker-btn, .ssp-help-btn) {
+  background: var(--game-surface); color: var(--game-ink); border: 1.5px solid var(--game-border); box-shadow: 0 3px 10px rgba(0,0,0,.18);
+}
+/* How-to-play dialogs follow the world. */
+html[data-skin="v2"][data-curriculum] :is(.vt-modal, .sw-modal, .vs-modal, .vs-start-card, .st-modal, .so-modal, .ssp-modal, .ssp-start-card) {
+  background: var(--game-surface-2); border: 2px solid var(--lane-ring); box-shadow: 0 16px 40px rgba(0,0,0,.4);
+}
+html[data-skin="v2"][data-curriculum] :is(.vt-modal-title, .sw-modal-title, .vs-modal-title, .vs-start-title, .st-modal-title, .so-modal-title, .ssp-modal-title, .ssp-start-title) {
+  background: none; -webkit-text-fill-color: currentColor; color: var(--world-ink); text-shadow: none; animation: none;
+}
+html[data-skin="v2"][data-curriculum] :is(.vt-how-num, .sw-how-num, .vs-start-num, .st-how-num, .so-how-num, .ssp-how-num, .ssp-start-num) { background: var(--lane); color: #2b1a05; box-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-how-en, .sw-how-en, .vs-start-en, .st-how-en, .so-how-en, .ssp-how-en, .ssp-start-en) { color: var(--game-ink); }
+html[data-skin="v2"][data-curriculum] :is(.vt-how-jp, .sw-how-jp, .vs-start-jp, .vs-start-subtitle, .vt-modal-title-jp, .sw-modal-title-jp, .vs-modal-title-jp, .st-how-jp, .so-how-jp, .ssp-how-jp, .ssp-start-jp, .ssp-start-subtitle, .st-modal-title-jp, .so-modal-title-jp, .ssp-modal-title-jp) { color: var(--game-muted); }
+html[data-skin="v2"][data-curriculum] :is(.vs-start-btn, .ssp-start-btn) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lane) 82%, #fff), var(--lane)); color: #2b1a05; text-shadow: none;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--lane) 55%, #000), 0 10px 22px rgba(0,0,0,.3);
+}
+html[data-skin="v2"][data-curriculum] :is(.vs-start-btn, .ssp-start-btn)::after { display: none; }
+
+/* ══════════════════════════════════════════════════════════════
+   WORDS LANE SURFACE: playing cards
+   Thick cream cards with a gold edge underneath and a slight tilt.
+   Japanese cards are dark with a lane-gold ring (cream on Pre-Boo).
+   ══════════════════════════════════════════════════════════════ */
+
+/* Vocabulary Tap: English cards */
+html[data-skin="v2"][data-curriculum] .vt-en-card,
+html[data-skin="v2"][data-curriculum] .vt-en-card[data-ci] {
+  filter: none; background: var(--card-face); border: none; border-radius: 16px;
+  box-shadow: 0 5px 0 var(--card-edge), 0 10px 20px rgba(0,0,0,.28);
+  transform: rotate(var(--tilt, 0deg));
+}
+html[data-skin="v2"][data-curriculum] .vt-en-card:nth-child(odd)  { --tilt: -1.2deg; }
+html[data-skin="v2"][data-curriculum] .vt-en-card:nth-child(even) { --tilt: 1deg; }
+html[data-skin="v2"][data-curriculum] .vt-en-card::before,
+html[data-skin="v2"][data-curriculum] .vt-en-card::after { display: none; }
+html[data-skin="v2"][data-curriculum] .vt-en-card .vt-en-text,
+html[data-skin="v2"][data-curriculum] .vt-en-card[data-ci] .vt-en-text { color: var(--card-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] .vt-en-card:hover { transform: rotate(var(--tilt, 0deg)) translateY(-4px); box-shadow: 0 9px 0 var(--card-edge), 0 16px 26px rgba(0,0,0,.3); }
+html[data-skin="v2"][data-curriculum] .vt-en-card:active { transform: rotate(var(--tilt, 0deg)) translateY(2px); box-shadow: 0 2px 0 var(--card-edge), 0 6px 12px rgba(0,0,0,.25); }
+html[data-skin="v2"][data-curriculum] .vt-en-card.selected,
+html[data-skin="v2"][data-curriculum] .vt-en-card.selected[data-ci] {
+  background: var(--card-face); transform: rotate(0deg) translateY(-6px) scale(1.04);
+  box-shadow: 0 0 0 3px var(--lane), 0 0 22px var(--lane-ring), 0 9px 0 var(--card-edge), 0 16px 26px rgba(0,0,0,.3);
+}
+html[data-skin="v2"][data-curriculum] .vt-en-card.selected .vt-en-text { color: var(--card-ink); }
+
+/* Vocabulary Tap: Japanese cards (the slots) */
+html[data-skin="v2"][data-curriculum] .vt-jp-slot {
+  background: var(--jp-card); border: none; border-radius: 16px;
+  box-shadow: inset 0 0 0 2px var(--lane-ring), 0 5px 0 rgba(0,0,0,.35), 0 10px 20px rgba(0,0,0,.24);
+  transform: rotate(var(--tilt, 0deg));
+}
+html[data-skin="v2"][data-curriculum="pb"] .vt-jp-slot { box-shadow: inset 0 0 0 2px var(--lane-ring), 0 5px 0 #f0d6a8, 0 8px 16px rgba(120,60,10,.12); }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot:nth-child(odd)  { --tilt: 1deg; }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot:nth-child(even) { --tilt: -1.2deg; }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot:hover { box-shadow: inset 0 0 0 2px var(--lane), 0 5px 0 rgba(0,0,0,.35), 0 10px 20px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] :is(.vt-jp-kanji, .vt-jp-hira-text) { color: var(--game-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] .vt-drop.empty { border: 2px dashed var(--lane-ring); color: var(--game-muted); background: transparent; }
+/* Paired but not yet checked: the lane colour (never orange, which means wrong). */
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.has-pair {
+  box-shadow: inset 0 0 0 3px var(--lane), 0 0 18px var(--lane-ring), 0 5px 0 rgba(0,0,0,.35);
+  background: var(--jp-card);
+}
+html[data-skin="v2"][data-curriculum="pb"] .vt-jp-slot.has-pair { box-shadow: inset 0 0 0 3px var(--lane), 0 0 14px var(--lane-ring), 0 5px 0 #f0d6a8; }
+html[data-skin="v2"][data-curriculum] .vt-drop.filled {
+  background: var(--card-face); color: var(--card-ink); border: none; border-radius: 8px;
+  box-shadow: 0 2px 0 var(--card-edge);
+}
+/* Meaning: correct = green fill + light text; wrong = orange fill + dark text */
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-correct { background: var(--ok); box-shadow: 0 5px 0 var(--ok-edge), 0 0 26px var(--ok-glow); }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-correct :is(.vt-jp-kanji, .vt-jp-hira-text) { color: var(--ok-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-correct .vt-drop { background: rgba(255,255,255,.92); color: var(--ok-edge); }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-wrong { background: var(--bad); box-shadow: 0 5px 0 var(--bad-edge), 0 0 22px var(--bad-glow); }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-wrong :is(.vt-jp-kanji, .vt-jp-hira-text) { color: var(--bad-ink); }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-wrong .vt-drop { background: rgba(255,255,255,.9); color: var(--bad-edge); }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-correct .vt-drop::after { content: ' ✓'; }
+html[data-skin="v2"][data-curriculum] .vt-jp-slot.slot-wrong .vt-drop::after { content: ' ✗'; }
+
+/* Spell the Word: letters are little playing cards */
+html[data-skin="v2"][data-curriculum] .sw-tile,
+html[data-skin="v2"][data-curriculum] .sw-tile[data-ti] {
+  background: var(--card-face) !important; color: var(--card-ink) !important; border: none !important;
+  text-shadow: none !important; border-radius: 12px;
+  box-shadow: 0 5px 0 var(--card-edge), 0 8px 14px rgba(0,0,0,.26) !important;
+  transform: rotate(var(--tilt, 0deg));
+}
+html[data-skin="v2"][data-curriculum] .sw-tile:nth-child(3n+1) { --tilt: -2deg; }
+html[data-skin="v2"][data-curriculum] .sw-tile:nth-child(3n+2) { --tilt: 1.5deg; }
+html[data-skin="v2"][data-curriculum] .sw-tile::after { display: none; }
+html[data-skin="v2"][data-curriculum] .sw-tile:hover { transform: rotate(var(--tilt, 0deg)) translateY(-3px); }
+html[data-skin="v2"][data-curriculum] .sw-tile:active { transform: rotate(var(--tilt, 0deg)) translateY(2px); box-shadow: 0 2px 0 var(--card-edge), 0 4px 8px rgba(0,0,0,.2) !important; }
+html[data-skin="v2"][data-curriculum] .sw-slot.empty { background: transparent; border: 2.5px dashed var(--lane-ring); color: transparent; }
+html[data-skin="v2"][data-curriculum] .sw-slot.filled {
+  background: var(--card-face); color: var(--card-ink); border: none; text-shadow: none;
+  box-shadow: 0 4px 0 var(--card-edge), 0 6px 12px rgba(0,0,0,.24);
+}
+html[data-skin="v2"][data-curriculum] .sw-slot.sw-correct { background: var(--ok) !important; color: var(--ok-ink) !important; border: none !important; box-shadow: 0 4px 0 var(--ok-edge), 0 0 18px var(--ok-glow) !important; }
+html[data-skin="v2"][data-curriculum] .sw-slot.sw-wrong { background: var(--bad) !important; color: var(--bad-ink) !important; border: none !important; box-shadow: 0 4px 0 var(--bad-edge), 0 0 18px var(--bad-glow) !important; }
+
+/* Vocab Speed: the four choices are playing cards */
+html[data-skin="v2"][data-curriculum] .vs-choice,
+html[data-skin="v2"][data-curriculum] .vs-choice[data-ci] {
+  background: var(--card-face); color: var(--card-ink); border: none; filter: none; text-shadow: none;
+  box-shadow: 0 6px 0 var(--card-edge), 0 12px 22px rgba(0,0,0,.28);
+  transform: rotate(var(--tilt, 0deg));
+}
+html[data-skin="v2"][data-curriculum] .vs-choice[data-ci="0"] { --tilt: -1.2deg; }
+html[data-skin="v2"][data-curriculum] .vs-choice[data-ci="1"] { --tilt: 1deg; }
+html[data-skin="v2"][data-curriculum] .vs-choice[data-ci="2"] { --tilt: .8deg; }
+html[data-skin="v2"][data-curriculum] .vs-choice[data-ci="3"] { --tilt: -1deg; }
+html[data-skin="v2"][data-curriculum] .vs-choice::after { display: none; }
+html[data-skin="v2"][data-curriculum] .vs-choice:hover { filter: none; transform: rotate(var(--tilt, 0deg)) translateY(-4px); box-shadow: 0 10px 0 var(--card-edge), 0 18px 28px rgba(0,0,0,.3); }
+html[data-skin="v2"][data-curriculum] .vs-choice:active { transform: rotate(var(--tilt, 0deg)) translateY(3px); box-shadow: 0 2px 0 var(--card-edge), 0 6px 12px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] .vs-choice.vs-correct {
+  background: var(--ok) !important; color: var(--ok-ink) !important; border: none !important;
+  box-shadow: 0 6px 0 var(--ok-edge), 0 0 30px var(--ok-glow) !important; filter: none !important;
+}
+html[data-skin="v2"][data-curriculum] .vs-choice.vs-wrong {
+  background: var(--bad) !important; color: var(--bad-ink) !important; border: none !important;
+  box-shadow: 0 6px 0 var(--bad-edge), 0 0 24px var(--bad-glow) !important; filter: none !important;
+}
+html[data-skin="v2"][data-curriculum] .vs-choice.vs-correct::before { content: '✓ '; white-space: pre; }
+html[data-skin="v2"][data-curriculum] .vs-choice.vs-wrong::before { content: '✗ '; white-space: pre; }
+html[data-skin="v2"][data-curriculum] .vs-choice.vs-locked:not(.vs-correct):not(.vs-wrong) { opacity: .55; }
+html[data-skin="v2"][data-curriculum] :is(.vs-timer-track, .ssp-timer-track) { background: var(--game-meter-bg); border-color: transparent; }
+html[data-skin="v2"][data-curriculum] :is(.vs-timer-fill, .ssp-timer-fill) { background: linear-gradient(90deg, #ffc94a, var(--lane)); box-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vs-timer-fill, .ssp-timer-fill).warning { background: var(--bad); }
+html[data-skin="v2"][data-curriculum] :is(.vs-timer-label, .vt-hira-btn span, .ssp-timer-label, .st-hira-btn span, .so-hira-btn span) { color: var(--game-muted); }
+html[data-skin="v2"][data-curriculum] :is(.vs-streak-banner, .ssp-streak-banner) { --banner-border: var(--lane-ring); --banner-bg: var(--game-surface); --banner-glow: transparent; }
+html[data-skin="v2"][data-curriculum] :is(.vs-banner-jp, .vs-banner-en, .ssp-banner-jp, .ssp-banner-en) { color: var(--game-ink); }
+html[data-skin="v2"][data-curriculum] :is(.vs-banner-kanji, .ssp-banner-kanji) { color: var(--game-muted); }
+
+/* ══════════════════════════════════════════════════════════════
+   SENTENCES LANE SURFACE: notebook paper (Games Pass 11)
+   Sentences are written on ruled paper, so building one reads like
+   writing, not sorting tiles. Sky-blue chips sit on the ruled lines.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Sentence Order: the answer zone is a ruled notebook strip. Rows are
+   40px chips + 10px gaps, and the rules sit just under each row. */
+html[data-skin="v2"][data-curriculum] .so-answer-zone,
+html[data-skin="v2"][data-curriculum] .so-answer-zone.has-words {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 48px, var(--paper-rule) 48px 50px) 0 4px / 100% 100% no-repeat,
+    var(--paper);
+  border: none; border-radius: 6px; padding: 8px 14px 12px; gap: 10px 7px; min-height: 66px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.32), inset 0 0 0 1px rgba(0,0,0,.05);
+  transform: rotate(-.6deg);
+}
+html[data-skin="v2"][data-curriculum="pb"] :is(.so-answer-zone, .so-answer-zone.has-words) { box-shadow: 0 8px 18px rgba(120,60,10,.16), inset 0 0 0 1px rgba(0,0,0,.05); }
+html[data-skin="v2"][data-curriculum] .so-answer-empty-hint { color: rgba(45,36,24,.42); }
+html[data-skin="v2"][data-curriculum] :is(.so-placed-chip, .so-answer-slot) { height: 40px; min-height: 40px; }
+html[data-skin="v2"][data-curriculum] .so-placed-chip {
+  background: var(--chip); color: var(--chip-ink); border: none; border-radius: 10px; font-weight: 800;
+  box-shadow: 0 3px 0 var(--chip-edge); text-shadow: none;
+}
+html[data-skin="v2"][data-curriculum] .so-answer-slot { border: 2px dashed var(--chip-edge); background: rgba(92,178,255,.08); }
+html[data-skin="v2"][data-curriculum] .so-placed-chip.so-correct { background: var(--ok) !important; color: var(--ok-ink) !important; border: none !important; box-shadow: 0 3px 0 var(--ok-edge), 0 0 14px var(--ok-glow) !important; }
+html[data-skin="v2"][data-curriculum] .so-placed-chip.so-wrong { background: var(--bad) !important; color: var(--bad-ink) !important; border: none !important; box-shadow: 0 3px 0 var(--bad-edge), 0 0 14px var(--bad-glow) !important; }
+/* The word tray: loose chips with a sky ring, waiting to be written down. */
+html[data-skin="v2"][data-curriculum] .so-tile,
+html[data-skin="v2"][data-curriculum] .so-tile[data-ti] {
+  background: rgba(92,178,255,.14) !important; color: var(--game-ink) !important; border: none !important; text-shadow: none !important;
+  box-shadow: inset 0 0 0 1.5px var(--lane-ring), 0 4px 0 rgba(0,0,0,.3) !important; border-radius: 12px;
+}
+html[data-skin="v2"][data-curriculum="pb"] .so-tile,
+html[data-skin="v2"][data-curriculum="pb"] .so-tile[data-ti] { background: #ffffff !important; box-shadow: inset 0 0 0 1.5px var(--lane-ring), 0 4px 0 #c9dcf0 !important; }
+html[data-skin="v2"][data-curriculum] .so-tile::after { display: none; }
+html[data-skin="v2"][data-curriculum] .so-tile:hover { transform: translateY(-3px); }
+
+/* Sentence Tap: English sentences are torn paper strips. */
+html[data-skin="v2"][data-curriculum] .st-en-card,
+html[data-skin="v2"][data-curriculum] .st-en-card[data-ci] {
+  filter: none; border: none; border-radius: 4px;
+  background:
+    linear-gradient(to bottom, transparent calc(100% - 12px), var(--paper-rule) calc(100% - 12px) calc(100% - 10px), transparent calc(100% - 10px)),
+    var(--paper);
+  box-shadow: 0 4px 0 var(--paper-edge), 0 10px 20px rgba(0,0,0,.28);
+  transform: rotate(var(--tilt, 0deg));
+}
+html[data-skin="v2"][data-curriculum] .st-en-card:nth-child(odd)  { --tilt: -.8deg; }
+html[data-skin="v2"][data-curriculum] .st-en-card:nth-child(even) { --tilt: .7deg; }
+html[data-skin="v2"][data-curriculum] .st-en-card::before,
+html[data-skin="v2"][data-curriculum] .st-en-card::after { display: none; }
+html[data-skin="v2"][data-curriculum] .st-en-card .st-en-text,
+html[data-skin="v2"][data-curriculum] .st-en-card[data-ci] .st-en-text { color: var(--paper-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] .st-en-card:hover { transform: rotate(var(--tilt, 0deg)) translateY(-3px); }
+html[data-skin="v2"][data-curriculum] .st-en-card:active { transform: rotate(var(--tilt, 0deg)) translateY(2px); box-shadow: 0 1px 0 var(--paper-edge), 0 5px 10px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] .st-en-card.selected,
+html[data-skin="v2"][data-curriculum] .st-en-card.selected[data-ci] {
+  transform: rotate(0deg) translateY(-5px) scale(1.03);
+  box-shadow: 0 0 0 3px var(--lane), 0 0 22px var(--lane-ring), 0 6px 0 var(--paper-edge), 0 14px 24px rgba(0,0,0,.3);
+}
+html[data-skin="v2"][data-curriculum] .st-en-card.selected .st-en-text { color: var(--paper-ink); }
+
+/* Sentence Tap: Japanese slots, same rules as Vocabulary Tap with the sky lane. */
+html[data-skin="v2"][data-curriculum] .st-jp-slot {
+  background: var(--jp-card); border: none; border-radius: 14px;
+  box-shadow: inset 0 0 0 2px var(--lane-ring), 0 5px 0 rgba(0,0,0,.35), 0 10px 20px rgba(0,0,0,.24);
+}
+html[data-skin="v2"][data-curriculum="pb"] .st-jp-slot { box-shadow: inset 0 0 0 2px var(--lane-ring), 0 5px 0 #c9dcf0, 0 8px 16px rgba(20,60,110,.1); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot:hover { box-shadow: inset 0 0 0 2px var(--lane), 0 5px 0 rgba(0,0,0,.35), 0 10px 20px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] :is(.st-jp-kanji, .st-jp-hira-text) { color: var(--game-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] .st-drop.empty { border: 2px dashed var(--lane-ring); color: var(--game-muted); background: transparent; }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.has-pair { background: var(--jp-card); box-shadow: inset 0 0 0 3px var(--lane), 0 0 18px var(--lane-ring), 0 5px 0 rgba(0,0,0,.35); }
+html[data-skin="v2"][data-curriculum="pb"] .st-jp-slot.has-pair { box-shadow: inset 0 0 0 3px var(--lane), 0 0 14px var(--lane-ring), 0 5px 0 #c9dcf0; }
+html[data-skin="v2"][data-curriculum] .st-drop.filled { background: var(--paper); color: var(--paper-ink); border: none; border-radius: 4px; box-shadow: 0 2px 0 var(--paper-edge); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-correct { background: var(--ok); box-shadow: 0 5px 0 var(--ok-edge), 0 0 26px var(--ok-glow); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-correct :is(.st-jp-kanji, .st-jp-hira-text) { color: var(--ok-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-correct .st-drop { background: rgba(255,255,255,.92); color: var(--ok-edge); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-wrong { background: var(--bad); box-shadow: 0 5px 0 var(--bad-edge), 0 0 22px var(--bad-glow); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-wrong :is(.st-jp-kanji, .st-jp-hira-text) { color: var(--bad-ink); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-wrong .st-drop { background: rgba(255,255,255,.9); color: var(--bad-edge); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-correct .st-drop::after { content: ' ✓'; }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.slot-wrong .st-drop::after { content: ' ✗'; }
+
+/* Sentence Speed: each choice is a paper strip. */
+html[data-skin="v2"][data-curriculum] .ssp-choice,
+html[data-skin="v2"][data-curriculum] .ssp-choice[data-ci] {
+  border: none; filter: none; text-shadow: none; border-radius: 4px; color: var(--paper-ink);
+  background:
+    linear-gradient(to bottom, transparent calc(100% - 12px), var(--paper-rule) calc(100% - 12px) calc(100% - 10px), transparent calc(100% - 10px)),
+    var(--paper);
+  box-shadow: 0 5px 0 var(--paper-edge), 0 12px 22px rgba(0,0,0,.28);
+  transform: rotate(var(--tilt, 0deg));
+}
+html[data-skin="v2"][data-curriculum] .ssp-choice[data-ci="0"] { --tilt: -.7deg; }
+html[data-skin="v2"][data-curriculum] .ssp-choice[data-ci="1"] { --tilt: .6deg; }
+html[data-skin="v2"][data-curriculum] .ssp-choice[data-ci="2"] { --tilt: .5deg; }
+html[data-skin="v2"][data-curriculum] .ssp-choice[data-ci="3"] { --tilt: -.6deg; }
+html[data-skin="v2"][data-curriculum] .ssp-choice::after { display: none; }
+html[data-skin="v2"][data-curriculum] .ssp-choice:hover { filter: none; transform: rotate(var(--tilt, 0deg)) translateY(-3px); }
+html[data-skin="v2"][data-curriculum] .ssp-choice:active { transform: rotate(var(--tilt, 0deg)) translateY(3px); box-shadow: 0 1px 0 var(--paper-edge), 0 6px 12px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-correct {
+  background: var(--ok) !important; color: var(--ok-ink) !important; border: none !important;
+  box-shadow: 0 5px 0 var(--ok-edge), 0 0 30px var(--ok-glow) !important; filter: none !important;
+}
+html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-wrong {
+  background: var(--bad) !important; color: var(--bad-ink) !important; border: none !important;
+  box-shadow: 0 5px 0 var(--bad-edge), 0 0 24px var(--bad-glow) !important; filter: none !important;
+}
+html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-correct::before { content: '✓ '; white-space: pre; }
+html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-wrong::before { content: '✗ '; white-space: pre; }
+
+/* Engine hint lines set an inline red for "try again"; in v2 that is the
+   meaning orange (dark orange on Pre-Boo's cream, for contrast). */
+html[data-skin="v2"][data-curriculum] :is(.so-feedback, .sw-feedback)[style*="239, 68, 68"],
+html[data-skin="v2"][data-curriculum] :is(.so-feedback, .sw-feedback)[style*="#ef4444"] { color: #ff9a6b !important; }
+html[data-skin="v2"][data-curriculum="pb"] :is(.so-feedback, .sw-feedback)[style*="239, 68, 68"],
+html[data-skin="v2"][data-curriculum="pb"] :is(.so-feedback, .sw-feedback)[style*="#ef4444"] { color: #b8461c !important; }
