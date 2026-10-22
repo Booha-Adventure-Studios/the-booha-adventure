@@ -109,25 +109,25 @@ html[data-skin="v2"][data-curriculum] .game-close {
   border: 1.5px solid var(--game-border); box-shadow: 0 4px 14px rgba(0,0,0,.25);
 }
 /* Game name in the world colour instead of the rainbow curriculum banner. */
-html[data-skin="v2"][data-curriculum] :is(.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum) {
+html[data-skin="v2"][data-curriculum] :is(.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum, .stw-curriculum, .sas-curriculum, .aq-curriculum) {
   background: none; -webkit-text-fill-color: currentColor; color: var(--world-ink);
   animation: none; letter-spacing: .04em; text-transform: none; text-shadow: 0 2px 14px rgba(0,0,0,.35);
 }
-html[data-skin="v2"][data-curriculum="pb"] :is(.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum) { text-shadow: none; }
-html[data-skin="v2"][data-curriculum] :is(.vt-date, .sw-date, .vs-date, .st-date, .so-date, .ssp-date) { color: var(--game-muted); }
+html[data-skin="v2"][data-curriculum="pb"] :is(.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum, .stw-curriculum, .sas-curriculum, .aq-curriculum) { text-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-date, .sw-date, .vs-date, .st-date, .so-date, .ssp-date, .stw-date, .sas-date, .aq-date) { color: var(--game-muted); }
 
 /* Progress dots: lane for "now", meaning-green for done. */
-html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot) { background: var(--game-meter-bg); border-color: transparent; box-shadow: none; }
-html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot).active { background: var(--lane); border-color: var(--lane); box-shadow: 0 0 10px var(--lane-ring); }
-html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot).done { background: #22c55e; border-color: #22c55e; box-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot, .stw-dot, .sas-dot, .aq-dot) { background: var(--game-meter-bg); border-color: transparent; box-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot, .stw-dot, .sas-dot, .aq-dot).active { background: var(--lane); border-color: var(--lane); box-shadow: 0 0 10px var(--lane-ring); }
+html[data-skin="v2"][data-curriculum] :is(.vt-dot, .sw-dot, .vs-dot, .st-dot, .so-dot, .ssp-dot, .stw-dot, .sas-dot, .aq-dot).done { background: #22c55e; border-color: #22c55e; box-shadow: none; }
 html[data-skin="v2"][data-curriculum] :is(.sw-dot, .so-dot).recovered { background: #ffc94a; border-color: #ffc94a; }
 
 /* Pills */
-html[data-skin="v2"][data-curriculum] :is(.vt-score-pill, .sw-pill, .vs-pill, .vs-streak-pill, .st-score-pill, .so-pill, .ssp-pill, .ssp-streak-pill) {
+html[data-skin="v2"][data-curriculum] :is(.vt-score-pill, .sw-pill, .vs-pill, .vs-streak-pill, .st-score-pill, .so-pill, .ssp-pill, .ssp-streak-pill, .stw-pill, .sas-pill, .aq-pill) {
   background: var(--game-pill-bg); border: 1.5px solid var(--game-pill-border); color: var(--game-pill-text);
   box-shadow: 0 3px 10px rgba(0,0,0,.18); text-shadow: none;
 }
-html[data-skin="v2"][data-curriculum] :is(.vt-score-pill, .sw-pill, .vs-pill, .vs-streak-pill, .st-score-pill, .so-pill, .ssp-pill, .ssp-streak-pill) b { color: var(--lane-ink); text-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-score-pill, .sw-pill, .vs-pill, .vs-streak-pill, .st-score-pill, .so-pill, .ssp-pill, .ssp-streak-pill, .stw-pill, .sas-pill, .aq-pill) b { color: var(--lane-ink); text-shadow: none; }
 
 /* Prompt cards: world surface with the lane ring. No rainbow bar. */
 html[data-skin="v2"][data-curriculum] :is(.sw-jp-box, .vs-prompt-box, .so-jp-box, .ssp-prompt-box) {
@@ -154,19 +154,19 @@ html[data-skin="v2"][data-curriculum] :is(.vt-check-btn, .sw-check-btn, .st-chec
 }
 html[data-skin="v2"][data-curriculum] :is(.vt-check-btn, .sw-check-btn, .st-check-btn, .so-check-btn)::after { display: none; }
 html[data-skin="v2"][data-curriculum] :is(.vt-check-btn, .sw-check-btn, .st-check-btn, .so-check-btn):disabled { opacity: .45; box-shadow: 0 4px 0 color-mix(in srgb, var(--lane) 40%, #000); }
-html[data-skin="v2"][data-curriculum] :is(.vt-hira-btn, .vt-help-btn, .sw-help-btn, .sw-clear-btn, .vs-help-btn, .sw-speaker-btn, .st-hira-btn, .st-help-btn, .so-hira-btn, .so-help-btn, .so-clear-btn, .so-speaker-btn, .ssp-help-btn) {
+html[data-skin="v2"][data-curriculum] :is(.vt-hira-btn, .vt-help-btn, .sw-help-btn, .sw-clear-btn, .vs-help-btn, .sw-speaker-btn, .st-hira-btn, .st-help-btn, .so-hira-btn, .so-help-btn, .so-clear-btn, .so-speaker-btn, .ssp-help-btn, .stw-help-btn, .sas-help-btn, .aq-help-btn) {
   background: var(--game-surface); color: var(--game-ink); border: 1.5px solid var(--game-border); box-shadow: 0 3px 10px rgba(0,0,0,.18);
 }
 /* How-to-play dialogs follow the world. */
-html[data-skin="v2"][data-curriculum] :is(.vt-modal, .sw-modal, .vs-modal, .vs-start-card, .st-modal, .so-modal, .ssp-modal, .ssp-start-card) {
+html[data-skin="v2"][data-curriculum] :is(.vt-modal, .sw-modal, .vs-modal, .vs-start-card, .st-modal, .so-modal, .ssp-modal, .ssp-start-card, .stw-modal, .sas-modal, .aq-modal) {
   background: var(--game-surface-2); border: 2px solid var(--lane-ring); box-shadow: 0 16px 40px rgba(0,0,0,.4);
 }
-html[data-skin="v2"][data-curriculum] :is(.vt-modal-title, .sw-modal-title, .vs-modal-title, .vs-start-title, .st-modal-title, .so-modal-title, .ssp-modal-title, .ssp-start-title) {
+html[data-skin="v2"][data-curriculum] :is(.vt-modal-title, .sw-modal-title, .vs-modal-title, .vs-start-title, .st-modal-title, .so-modal-title, .ssp-modal-title, .ssp-start-title, .stw-modal-title, .sas-modal-title, .aq-modal-title) {
   background: none; -webkit-text-fill-color: currentColor; color: var(--world-ink); text-shadow: none; animation: none;
 }
-html[data-skin="v2"][data-curriculum] :is(.vt-how-num, .sw-how-num, .vs-start-num, .st-how-num, .so-how-num, .ssp-how-num, .ssp-start-num) { background: var(--lane); color: #2b1a05; box-shadow: none; }
-html[data-skin="v2"][data-curriculum] :is(.vt-how-en, .sw-how-en, .vs-start-en, .st-how-en, .so-how-en, .ssp-how-en, .ssp-start-en) { color: var(--game-ink); }
-html[data-skin="v2"][data-curriculum] :is(.vt-how-jp, .sw-how-jp, .vs-start-jp, .vs-start-subtitle, .vt-modal-title-jp, .sw-modal-title-jp, .vs-modal-title-jp, .st-how-jp, .so-how-jp, .ssp-how-jp, .ssp-start-jp, .ssp-start-subtitle, .st-modal-title-jp, .so-modal-title-jp, .ssp-modal-title-jp) { color: var(--game-muted); }
+html[data-skin="v2"][data-curriculum] :is(.vt-how-num, .sw-how-num, .vs-start-num, .st-how-num, .so-how-num, .ssp-how-num, .ssp-start-num, .stw-how-num, .sas-how-num, .aq-how-num) { background: var(--lane); color: #2b1a05; box-shadow: none; }
+html[data-skin="v2"][data-curriculum] :is(.vt-how-en, .sw-how-en, .vs-start-en, .st-how-en, .so-how-en, .ssp-how-en, .ssp-start-en, .stw-how-en, .sas-how-en, .aq-how-en) { color: var(--game-ink); }
+html[data-skin="v2"][data-curriculum] :is(.vt-how-jp, .sw-how-jp, .vs-start-jp, .vs-start-subtitle, .vt-modal-title-jp, .sw-modal-title-jp, .vs-modal-title-jp, .st-how-jp, .so-how-jp, .ssp-how-jp, .ssp-start-jp, .ssp-start-subtitle, .st-modal-title-jp, .so-modal-title-jp, .ssp-modal-title-jp, .stw-how-jp, .sas-how-jp, .aq-how-jp, .stw-modal-title-jp, .sas-modal-title-jp, .aq-modal-title-jp) { color: var(--game-muted); }
 html[data-skin="v2"][data-curriculum] :is(.vs-start-btn, .ssp-start-btn) {
   background: linear-gradient(180deg, color-mix(in srgb, var(--lane) 82%, #fff), var(--lane)); color: #2b1a05; text-shadow: none;
   box-shadow: 0 5px 0 color-mix(in srgb, var(--lane) 55%, #000), 0 10px 22px rgba(0,0,0,.3);
@@ -413,6 +413,8 @@ html[data-skin="v2"][data-curriculum="pb"] :is(.so-feedback, .sw-feedback)[style
    ══════════════════════════════════════════════════════════════ */
 html[data-skin="v2"] { --lane-on: #2b1a05; }
 html[data-skin="v2"][data-lane="sentences"] { --lane-on: #08182b; }
+html[data-skin="v2"][data-lane="listen"] { --lane-on: #1d1240; }
+html[data-skin="v2"][data-curriculum="pb"][data-lane="listen"] { --lane-on: #ffffff; }
 html[data-skin="v2"][data-curriculum] :is(.vt-en-card, .st-en-card).selected,
 html[data-skin="v2"][data-curriculum] :is(.vt-en-card, .st-en-card).selected[data-ci] {
   background: var(--lane); overflow: visible;
@@ -431,3 +433,90 @@ html[data-skin="v2"][data-curriculum] :is(.vt-en-card, .st-en-card).selected::af
   animation: skinSelectRing 1.1s ease-in-out infinite;
 }
 @keyframes skinSelectRing { 0%, 100% { opacity: .9; transform: scale(1); } 50% { opacity: .25; transform: scale(1.04); } }
+
+/* ══════════════════════════════════════════════════════════════
+   LISTEN LANE SURFACE: the sound stage (Games Pass 12)
+   The speaker is the hero: a big violet button with rings around it.
+   While a clip plays the rings ripple outward (opacity + transform only)
+   and the button brightens. Never green: green means "correct".
+   ══════════════════════════════════════════════════════════════ */
+html[data-skin="v2"][data-curriculum] :is(.stw-card, .sas-card, .aq-card) {
+  background: var(--game-surface); border: none; padding-top: 2.6rem; padding-bottom: 2.4rem;
+  box-shadow: inset 0 0 0 2px var(--lane-ring), 0 10px 28px rgba(0,0,0,.28);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); overflow: visible;
+}
+html[data-skin="v2"][data-curriculum="pb"] :is(.stw-card, .sas-card, .aq-card) { box-shadow: inset 0 0 0 2px var(--lane-ring), 0 8px 20px rgba(60,30,120,.12); }
+html[data-skin="v2"][data-curriculum] :is(.stw-card, .sas-card, .aq-card)::before { display: none; }
+html[data-skin="v2"][data-curriculum] :is(.stw-card, .sas-card, .aq-card).wrong-state {
+  border: none !important; box-shadow: inset 0 0 0 3px var(--bad), 0 0 26px var(--bad-glow) !important;
+}
+html[data-skin="v2"][data-curriculum] :is(.stw-play-label, .sas-play-label, .aq-play-label) { color: var(--game-muted); opacity: 1; letter-spacing: .1em; }
+html[data-skin="v2"][data-curriculum] :is(.stw-play-wrap, .sas-play-wrap, .aq-play-wrap) { gap: 2.1rem; }   /* room for the rings */
+
+/* The speaker */
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn) {
+  position: relative; overflow: visible; width: 96px; height: 96px; font-size: 32px;
+  color: #1d1240;
+  background: radial-gradient(circle at 35% 30%, #efe8ff, #a98bff 58%, #6a4cd6);
+  box-shadow: 0 0 0 4px rgba(169,139,255,.28), 0 0 30px rgba(169,139,255,.55), 0 6px 0 #3d2a85;
+  animation: none;
+}
+html[data-skin="v2"][data-curriculum="pb"] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn) {
+  color: #ffffff; background: radial-gradient(circle at 35% 30%, #c9b8ff, #7a5ce0 60%, #4b2fb0);
+  box-shadow: 0 0 0 4px rgba(122,92,224,.22), 0 0 22px rgba(122,92,224,.35), 0 6px 0 #3d2a85;
+}
+/* Two resting rings; they ripple outward while the clip plays. */
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn)::before,
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn)::after {
+  content: ''; position: absolute; inset: -16px; border-radius: 50%; pointer-events: none;
+  border: 2px solid var(--lane-ring); opacity: .55;
+}
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn)::after { inset: -34px; opacity: .28; }
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn).playing {
+  color: #1d1240;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #cdbcff 55%, #8f6cff);
+  box-shadow: 0 0 0 5px rgba(205,188,255,.45), 0 0 44px rgba(169,139,255,.85), 0 6px 0 #3d2a85;
+  opacity: 1;   /* the engine disables the button while it plays; keep it bright */
+  animation: skinSpeakerThrob .5s ease-in-out infinite;
+}
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn).playing::before { animation: skinRipple 1.2s ease-out infinite; border-color: var(--lane); }
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn).playing::after { animation: skinRipple 1.2s ease-out .6s infinite; border-color: var(--lane); }
+html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn):disabled:not(.playing) { opacity: .45; }
+@keyframes skinRipple { 0% { opacity: .8; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.45); } }
+@keyframes skinSpeakerThrob { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+/* Kanji / hiragana switch: lane colour when active */
+html[data-skin="v2"][data-curriculum] :is(.stw-toggle-wrap, .sas-toggle-wrap, .aq-toggle-wrap) { background: var(--game-surface); border: 1.5px solid var(--game-border); }
+html[data-skin="v2"][data-curriculum] :is(.stw-toggle-btn, .sas-toggle-btn, .aq-toggle-btn) { color: var(--game-muted); }
+html[data-skin="v2"][data-curriculum] :is(.stw-toggle-btn, .sas-toggle-btn, .aq-toggle-btn).active { background: var(--lane); color: var(--lane-on); }
+
+/* The answers: violet-ringed panels */
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice),
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice)[data-ci] {
+  background: color-mix(in srgb, var(--lane) 12%, var(--jp-card)); color: var(--game-ink); border: none; filter: none;
+  box-shadow: inset 0 0 0 2px var(--lane-ring), 0 5px 0 rgba(0,0,0,.35), 0 10px 18px rgba(0,0,0,.22);
+}
+html[data-skin="v2"][data-curriculum="pb"] :is(.stw-choice, .sas-choice, .aq-choice),
+html[data-skin="v2"][data-curriculum="pb"] :is(.stw-choice, .sas-choice, .aq-choice)[data-ci] {
+  background: #ffffff; box-shadow: inset 0 0 0 2px var(--lane-ring), 0 5px 0 #d9cff5, 0 8px 14px rgba(60,30,120,.08);
+}
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice)::after { display: none; }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice):hover { filter: none; transform: translateY(-3px); box-shadow: inset 0 0 0 2px var(--lane), 0 8px 0 rgba(0,0,0,.35), 0 14px 22px rgba(0,0,0,.25); }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice-kanji, .sas-choice-kanji, .aq-choice-kanji) { color: var(--game-ink); }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice-hira, .sas-choice-hira, .aq-choice-hira) { color: var(--game-muted); }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).correct {
+  background: var(--ok) !important; color: var(--ok-ink) !important; border: none !important;
+  box-shadow: 0 5px 0 var(--ok-edge), 0 0 28px var(--ok-glow) !important;
+}
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).correct :is(.stw-choice-kanji, .sas-choice-kanji, .aq-choice-kanji) { color: var(--ok-ink) !important; }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).correct :is(.stw-choice-hira, .sas-choice-hira, .aq-choice-hira) { color: rgba(255,255,255,.82) !important; }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).wrong {
+  background: var(--bad) !important; color: var(--bad-ink) !important; border: none !important;
+  box-shadow: 0 5px 0 var(--bad-edge), 0 0 22px var(--bad-glow) !important;
+}
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).wrong :is(.stw-choice-kanji, .sas-choice-kanji, .aq-choice-kanji, .stw-choice-hira, .sas-choice-hira, .aq-choice-hira) { color: var(--bad-ink) !important; }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice):is(.correct, .wrong)::before {
+  position: absolute; top: 8px; right: 10px; font: 900 16px/1 var(--game-font-body);
+}
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).correct::before { content: '✓'; }
+html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice).wrong::before { content: '✗'; }

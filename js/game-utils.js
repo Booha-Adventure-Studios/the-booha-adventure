@@ -753,7 +753,7 @@ const UTILS = {
       chip.className = 'game-lane-chip';
       chip.textContent = LANE_LABEL[root.getAttribute('data-lane')] || LANE_LABEL.extra;
       mount.insertBefore(chip, mount.firstChild);
-      if (cfg.gameTitle) mount.querySelectorAll('.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum').forEach(t => { t.textContent = cfg.gameTitle; });
+      if (cfg.gameTitle) mount.querySelectorAll('.vt-curriculum, .sw-curriculum, .vs-curriculum, .st-curriculum, .so-curriculum, .ssp-curriculum, .stw-curriculum, .sas-curriculum, .aq-curriculum').forEach(t => { t.textContent = cfg.gameTitle; });
     }
   },
 
