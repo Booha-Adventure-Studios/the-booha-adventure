@@ -1895,7 +1895,7 @@ fi
 
 echo "[profile] Trophy Case audit"
 if node tests/profile-trophy-case-audit.cjs >/dev/null 2>&1; then
-  ok "Trophy Case groups, tiers, secrets, world visits and wiring pass"
+  ok "Adventure Tokens (round, tiered, secret) and Extra Arcade panel pass"
 else
   bad "Trophy Case audit failed"
 fi

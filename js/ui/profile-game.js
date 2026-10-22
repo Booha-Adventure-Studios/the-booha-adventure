@@ -569,7 +569,64 @@ const BoohaProfileGame = (() => {
     }
   }
 
-  // Permanent Trophy Case. The trophies themselves (groups, art, rules,
+  // Extra Arcade (おまけ): Booha Bites, Echo and the Week Boss, kept apart
+  // from the nine. Their stars and points are weekly and never enter the
+  // ★ / 27 tally or the 9-game unlock. The boss opens once all nine have
+  // been played this week (same rule as the game menu).
+  const ARCADE_ICON = {
+    'booha-bites': '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="3"/><path d="M27 9a6 6 0 0 0 4 9 6 6 0 0 0 3 4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M13 21h9" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 3"/></svg>',
+    echo: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 16h6l8-6v20l-8-6H8z" fill="currentColor"/><path d="M27 14a8 8 0 0 1 0 12M31 10a13 13 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+  };
+  function arcadeWeek(curr) {
+    const cw = window.CALENDAR && CALENDAR.getCurrentCurriculumWeek ? CALENDAR.getCurrentCurriculumWeek() : null;
+    return cw && cw.monthSlug ? `${curr}_${String(cw.monthSlug).slice(0, 3)}_w${cw.weekNumber}` : '';
+  }
+  function renderArcade(s) {
+    const host = document.getElementById('pg-extras');
+    if (!host) return;
+    const R = window.BoohaGameRegistry;
+    const games = R && R.getExtraForCurriculum ? R.getExtraForCurriculum(s.curr) : [];
+    if (!games.length) { host.hidden = true; return; }
+    host.hidden = false;
+    const scores = window.BoohaAdventure && BoohaAdventure.scores;
+    const week = arcadeWeek(s.curr);
+    const call = (fn, id) => { try { return scores && typeof scores[fn] === 'function' ? scores[fn](id) : 0; } catch (_) { return 0; } };
+    let played = 0;
+    try { played = scores && scores.weeklyPlayedFor ? Math.min(9, scores.weeklyPlayedFor(s.curr) || 0) : 0; } catch (_) {}
+    const card = g => {
+      const stars = Math.max(0, Math.min(3, call('weeklyStarsForGame', g.saveId) || 0));
+      const pts = call('weeklyPointsForGame', g.saveId) || 0;
+      const crown = !!call('weeklyCrownForGame', g.saveId);
+      const open = !!week && (!g.boss || played >= 9);
+      const href = open ? `game.html?week=${encodeURIComponent(week)}&game=${encodeURIComponent(g.gameKey)}` : '';
+      const starRow = `<span class="pg-x-stars" aria-label="${stars} of 3 stars this week">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</span>`;
+      const best = pts > 0 ? `<span class="pg-x-best">BEST ${pts.toLocaleString('en-US')}</span>` : '';
+      const tag = g.boss
+        ? (open ? (crown ? '<span class="pg-x-tag win">♛ たおした！ BEATEN</span>' : '<span class="pg-x-tag open">OPEN! ひらいた！</span>')
+                : `<span class="pg-x-tag lock">🔒 ${played} / 9 played · あと ${9 - played}</span>`)
+        : (crown ? '<span class="pg-x-tag win">♛</span>' : '');
+      const art = g.boss
+        ? `<img class="pg-x-boss" src="${IMG}arcade-week-boss.webp" alt="" width="72" height="80" loading="lazy" decoding="async">`
+        : `<span class="pg-x-icon">${ARCADE_ICON[g.gameKey] || ''}</span>`;
+      const inner = `${art}<span class="pg-x-copy"><b>${esc(g.name)}</b><span class="pg-x-hira">${esc(g.hira || '')}</span>${starRow}${best}${tag}</span>${open ? '<span class="pg-x-play" aria-hidden="true">▶</span>' : ''}`;
+      const cls = `pg-x-card${g.boss ? ' boss' : ''}${open ? '' : ' locked'}`;
+      const label = `${g.name}${open ? '' : g.boss ? ' (locked: play all 9 games first)' : ' (opens on this week’s page)'}`;
+      return open
+        ? `<a class="${cls}" href="${esc(href)}" aria-label="${esc(label)}">${inner}</a>`
+        : `<div class="${cls}" aria-disabled="true" aria-label="${esc(label)}">${inner}</div>`;
+    };
+    const small = games.filter(g => !g.boss);
+    const boss = games.filter(g => g.boss);
+    host.innerHTML = `
+      <div class="pg-section-head">
+        <div><h2>おまけ アーケード</h2><span class="pg-kicker">EXTRA ARCADE · ${esc(CURR_NAME[s.curr] || s.curr.toUpperCase())} · THIS WEEK</span></div>
+      </div>
+      <p class="pg-x-note">Bonus practice — these games do not change the 9-game unlock. <span>ボーナス れんしゅう — 9ゲームの じょうけんは かわらないよ</span></p>
+      <div class="pg-x-row">${small.map(card).join('')}</div>
+      ${boss.map(card).join('')}`;
+  }
+
+  // Adventure Tokens (the permanent Trophy Case). The tokens themselves (groups, art, rules,
   // tiers) live in js/core/trophy-case.js; this only draws what it returns.
   function trophyProgress(t) {
     if (t.dots) {
@@ -595,7 +652,7 @@ const BoohaProfileGame = (() => {
     const next = res.items.find(t => !t.on && !t.secret)
       || res.items.find(t => t.tiers && !t.maxed && !t.secret);
     host.innerHTML = `
-      <div class="rb-sec-head"><h3>トロフィーケース</h3><span class="rb-en">TROPHY CASE · ずっと のこる · ${res.earned} / ${res.shown}</span></div>
+      <div class="rb-sec-head"><h3>ぼうけん トークン</h3><span class="rb-en">ADVENTURE TOKENS · ずっと のこる · ${res.earned} / ${res.shown}</span></div>
       ${res.groups.map(g => `
         <div class="rb-tgroup rb-tg-${esc(g.id)}">
           <h4>${esc(g.jp)} <span>${esc(g.en)}</span></h4>
@@ -609,7 +666,7 @@ const BoohaProfileGame = (() => {
               </div>`).join('')}
           </div>
         </div>`).join('')}
-      ${next ? `<p class="rb-next">つぎの トロフィー: <b>${esc(next.jp)}</b> — ${esc(next.howJp || '')} <span>${esc(next.en)} · ${esc(next.how)}</span></p>` : ''}`;
+      ${next ? `<p class="rb-next">つぎの トークン: <b>${esc(next.jp)}</b> — ${esc(next.howJp || '')} <span>${esc(next.en)} · ${esc(next.how)}</span></p>` : ''}`;
   }
 
 
@@ -683,6 +740,7 @@ const BoohaProfileGame = (() => {
       [renderHero, 'pg-hero', 'Your adventure card'],
       [renderSkin, 'pg-skin', 'This week’s skin'],
       [renderTrail, 'pg-trail', 'This week’s trail'],
+      [renderArcade, 'pg-extras', 'Extra arcade'],
       [renderStars, 'pg-stars', 'This week’s stars'],
       [renderCollection, 'pg-collection', 'Wanderer collection'],
       [renderTravelers, 'pg-travelers', 'Travelers'],

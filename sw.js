@@ -84,7 +84,10 @@ const CURRENT_CACHES = {
   // Trophy Case pass (2026-10-22): grouped, data-driven permanent trophies
   // (js/core/trophy-case.js), tier rings, progress, secret trophies, and
   // first-visit world recording for World Traveler.
-  pages:  'booha-pages-2026-486',
+  // Adventure Tokens + Extra Arcade (2026-10-22): round tokens, profile
+  // launch panel for Booha Bites / Echo / Week Boss; world pages load
+  // trophy-case.js for the first-visit record.
+  pages:  'booha-pages-2026-487',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -259,7 +262,8 @@ const CURRENT_CACHES = {
   // Halloween six-week skin schedule, dynamic unlock copy, and landing-menu
   // Batty decoration pass (2026-09-23): invalidate cached shells/runtime.
   // Trophy Case pass: nine new medal WebPs and the new trophy stylesheet.
-  assets: 'booha-assets-2026-600',
+  // Round token art for the nine new tokens and the arcade boss thumbnail.
+  assets: 'booha-assets-2026-601',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

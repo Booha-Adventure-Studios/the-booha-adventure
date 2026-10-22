@@ -139,8 +139,42 @@ assert(/BoohaTrophies/.test(pg) && !/const MEDALS = \[/.test(pg), 'the profile d
 assert(/loading="lazy"/.test(pg.slice(pg.indexOf('function renderTrophies'))), 'trophy art loads lazily');
 assert(/WEEKLY MEDALS · THIS WEEK/.test(pg), 'weekly medals are labelled as this week only');
 const core = read('js/core/adventure-core.js');
-assert(/worldsVisited/.test(core) && /\(muenba\|grimmerglen\|utsuroba\|karasuki\)\\\.html\$/.test(core),
-  'adventure-core records the first visit to each world page');
+assert(/BoohaTrophies\.recordWorldVisit\(m\[1\]\)/.test(core) && !/worldsVisited/.test(core),
+  'adventure-core names the world; trophy-case.js recordWorldVisit() is the only writer of worldsVisited');
+['muenba', 'grimmerglen', 'utsuroba', 'karasuki'].forEach(w => {
+  const html = read(`${w}.html`);
+  assert(html.includes('js/core/trophy-case.js'), `${w}.html must load trophy-case.js so its first visit is recorded`);
+});
+const writers = ['js', 'games'].flatMap(function walk(dir) {
+  return fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true }).flatMap(e =>
+    e.isDirectory() ? walk(`${dir}/${e.name}`) : /\.js$/.test(e.name) ? [`${dir}/${e.name}`] : []);
+}).filter(f => /patchDeep\(\s*'meta',\s*'worldsVisited'/.test(read(f)));
+assert.deepStrictEqual(writers, ['js/core/trophy-case.js'], 'exactly one file writes worldsVisited');
+
+/* ── every token is the same round medal shape (square 256 canvas) ── */
+{
+  const { execFileSync } = require('child_process');
+  const { T } = run();
+  const files = new Set(['medal-pb-champion.webp', 'medal-br-champion.webp', 'medal-bc-champion.webp']);
+  T.DEFS.forEach(d => { if (typeof d.img === 'string') files.add(d.img); });
+  files.forEach(f => {
+    const dims = execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height',
+      '-of', 'csv=p=0:s=x', path.join(ROOT, 'assets/img/profile', f)], { encoding: 'utf8' }).trim();
+    assert.strictEqual(dims, '256x256', `${f} must be a round 256×256 token like the rest (got ${dims})`);
+  });
+}
+
+/* ── Extra Arcade: launch panel, apart from the nine ── */
+assert(profile.indexOf('id="pg-trail"') < profile.indexOf('id="pg-extras"') &&
+  profile.indexOf('id="pg-extras"') < profile.indexOf('id="pg-stars"'), 'the Extra Arcade sits right after the nine-game trail');
+const arc = pg.slice(pg.indexOf('function renderArcade'), pg.indexOf('// Adventure Tokens'));
+assert(/getExtraForCurriculum\(s\.curr\)/.test(arc), 'arcade cards come from the registry extras');
+assert(/played >= 9/.test(arc) && /weeklyPlayedFor\(s\.curr\)/.test(arc), 'Week Boss opens only after all nine are played this week');
+assert(/these games do not change the 9-game unlock/.test(arc), 'the panel says the extras do not change the 9-game unlock');
+assert(!/27/.test(arc), 'arcade stars never join the ★ / 27 tally');
+assert(/game\.html\?week=/.test(arc), 'open cards launch the game');
+assert(/\[renderArcade, 'pg-extras'/.test(pg), 'renderArcade is part of the profile render');
+assert(fs.statSync(path.join(ROOT, 'assets/img/profile/arcade-week-boss.webp')).size <= 24 * 1024, 'the boss card art is a small thumbnail');
 assert(!/\(\?<[=!]/.test(SRC) && !/\(\?<[=!]/.test(pg), 'no regex lookbehind (older iPads)');
 
-console.log('Trophy Case audit passed: groups, tiers, secrets, lanes, worlds, juku, art and wiring.');
+console.log('Adventure Tokens + Extra Arcade audit passed: groups, tiers, secrets, round tokens, one world-visit writer, arcade panel.');

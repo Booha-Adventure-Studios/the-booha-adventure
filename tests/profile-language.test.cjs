@@ -25,7 +25,7 @@ assert.match(profile, /id="alog-past" role="region" aria-label="Past weeks" aria
 assert.match(profile, /\.dc-today-action:focus-visible/, 'daily check actions should have a visible focus state');
 assert.match(profile, /@media \(max-width:430px\)/, 'the profile should include a compact mobile layout');
 assert.match(profile, /js\/karasuki-wanderer-data\.js/, 'the canonical profile should load wanderer collection data');
-assert.match(profile, /id="pg-trophies" aria-label="Trophy case"/, 'permanent achievements should live in the labeled trophy case');
+assert.match(profile, /id="pg-trophies" aria-label="Adventure tokens"/, 'permanent achievements should live in the labeled trophy case');
 assert.doesNotMatch(profile, /BONUS GAMES/, 'the canonical profile should not duplicate the Bonus Games shelf');
 assert.ok(profile.indexOf('id="alog-week"') < profile.indexOf('id="alog-calendar"'), 'the calendar should follow the current week section');
 assert.ok(profile.indexOf('id="alog-calendar"') < profile.indexOf('id="curr-cards"'), 'curriculum details should follow the calendar');

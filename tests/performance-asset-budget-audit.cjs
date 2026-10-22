@@ -168,21 +168,10 @@ records.forEach(record => {
 });
 
 // Trophy Case pass (2026-10-22): count every raster under assets/img, not
-// only WebP. Source PNG originals that have a WebP twin are allowed to stay in
-// the repo only while nothing in the app references them (so no device ever
-// downloads them); any other PNG/JPG/GIF counts toward the budget like a WebP.
-const sourceOriginals = new Set([
-  'muenba/ghost-orb-background-v1.png',
-  'muenba/ghost-orb-jar-v1.png',
-  'family-room/flashlight.png',
-  'tree-arch.png',
-  'hw-background-1.png',
-  'uhibon/uhi-w.png',
-  'uhibon/uhi-t1.png',
-  'uhibon/uhi-t2.png',
-  'uhibon/uhi-st.png',
-  'uhibon/chat-uhi.png',
-]);
+// only WebP. The PNG source originals were deleted (their WebP twins ship),
+// so the only non-WebP raster left is the small referenced Juku logo. Any new
+// PNG/JPG/GIF must be converted or allowlisted here with its own ceiling.
+const sourceOriginals = new Set();
 const countedRasters = new Map([['juku-logo.png', 100 * 1024]]);
 function rasters(dir) {
   const result = [];
@@ -233,7 +222,7 @@ records
 
 // Smoothness comes from the per-file, per-directory and decode ceilings above
 // plus lazy loading; the global total only bounds what a full visit of every
-// world eventually downloads. 52 MiB keeps ~1.8 MiB of headroom over today.
+// world eventually downloads. 52 MiB keeps ~1.7 MiB of headroom over today.
 const totalBytes = records.reduce((sum, record) => sum + record.bytes, 0) + rasterBytes;
 assert(totalBytes <= 52 * 1024 * 1024, `deployed image payload exceeds the 52 MiB performance budget (got ${totalBytes})`);
 
