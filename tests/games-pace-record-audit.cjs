@@ -206,6 +206,10 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   assert.strictEqual(stored.scores['br:spell_word'].rainbows, 1, 'lifetime rainbow count');
   assert(stored.scores['br:spell_word'].firstRainbowAt > 0, 'first rainbow time is kept');
   assert.strictEqual(S.weeklyStarsFor('br'), 3, 'rainbow adds no stars to the weekly total');
+  // Ready Pass 1: the permanent week log keeps which games were rainbow.
+  const wk = stored.meta.weekLog['2026-10-25|october-w4'];
+  assert(wk && wk.ready && wk.ready['br:spell_word'] === 1, 'weekLog.ready records a rainbow game (survives the Sunday reset)');
+  assert(!wk.ready['br:vocab_tap'], 'weekLog.ready needs at least one star, like the score system');
 }
 /* ══ Pass B: shown everywhere it was promised ══ */
 {
@@ -230,6 +234,17 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   assert(/function readyMarker/.test(pg) && /READY GAMES THIS WEEK/.test(pg) && /if \(!n\) return '';/.test(pg),
     'the trail shows "N / 9 ready games this week", hidden until the first one');
   assert(!/🌈/.test(sc) && !/🌈/.test(pg), 'no rainbow emoji; the rainbow is shown by colour');
+  // Ready Pass 1
+  assert(/READY_LINES/.test(sc) && /You came ready!/.test(sc) && /Your ready pace is glowing!/.test(sc) && /The whole trail is rainbow!/.test(sc),
+    'Booha reacts on the score card at the first rainbow and at 3 / 9 ready games');
+  assert(/after >= 9 && before < 9/.test(sc) && /after >= 3 && before < 3/.test(sc), 'the 3 and 9 reactions fire only when the weekly count crosses them');
+  assert(/extras never move the 9/.test(sc), 'extra games do not count toward the 9');
+  assert(/READY_LANES/.test(pg) && /pg-ready-lanes/.test(pg) && /'WORDS'/.test(pg) && /'SENTENCES'/.test(pg) && /'LISTEN'/.test(pg),
+    'the ready marker breaks down by lane');
+  assert(/markSeen\('readySeen'/.test(pg) && /markSeen\('sealedSeen'/.test(pg), 'profile reactions and Week Sealed remember "seen" in the student save');
+  assert(!/localStorage\.setItem\('booha_week_sealed_seen'/.test(pg), 'Week Sealed no longer writes a one-slot device flag');
+  assert(/li class="ready"/.test(pg), 'Week Sealed shows READY PACE n / 9');
+  assert(/readyShownKey/.test(pg), 'a Booha ready line stays up through re-renders on the page where it first shows');
 }
 
 console.log('Pace + rainbow audit passed: first responses vs par, replay pause, ready-pace rule, weekly/lifetime rainbow, score card / menu / profile, calibration report.');

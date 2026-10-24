@@ -15,7 +15,10 @@
  *       blitz: { "vocab": { ms: 41200, tier: "clean", mistakes: 1 }, ... }
  *                                                // best weekly clear result
  *       duel:  { "liar": { w: 2, p: 3 } }    // wins / plays
+ *       ready: { "br:spell_word": 1, ... }  // ready-pace (rainbow) runs
  *   }
+ *   weekLog.ready survives the Sunday reset, so "best ready week" and
+ *   "rainbow weeks" can be read later. Logged from 2026-10-24 on.
  *
  * Rules:
  *  - Date/week keys come from CALENDAR (Tokyo time) — NEVER the browser clock.
@@ -125,6 +128,12 @@ const BoohaDayRecord = (() => {
       if (typeof score === 'number') {
         const best = wk.adv[saveId];
         if (best == null || score > best) wk.adv[saveId] = score;
+      }
+      // Rainbow (ready pace): same rule as the score system, at least 1 star.
+      if (detail.rainbow === true && typeof score === 'number') {
+        const R = window.BoohaGameRegistry;
+        const stars = R && R.starsForScore ? R.starsForScore(saveId, score) : 0;
+        if (stars >= 1) wk.ready = Object.assign({}, wk.ready, { [saveId]: 1 });
       }
     }
 

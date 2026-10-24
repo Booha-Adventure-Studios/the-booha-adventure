@@ -101,7 +101,9 @@ const CURRENT_CACHES = {
   // vertical +1★ chips sit between the label and the next disc.
   // Ready marker pass: profile shows "N / 9 ready games this week" (from the
   // first rainbow); rainbow emoji removed from the score card and profile.
-  pages:  'booha-pages-2026-494',
+  // Ready Pass 1 (2026-10-24): lane breakdown, Booha ready reactions, Week
+  // Sealed ready line, weekLog.ready history, per-student seen flags.
+  pages:  'booha-pages-2026-495',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -278,7 +280,8 @@ const CURRENT_CACHES = {
   // Trophy Case pass: nine new medal WebPs and the new trophy stylesheet.
   // Round token art for the nine new tokens and the arcade boss thumbnail.
   // Rainbow Pass B: theme/game.css + theme/menu.css rainbow star styles.
-  assets: 'booha-assets-2026-602',
+  // Ready Pass 1: score-card Booha line style (theme/game.css).
+  assets: 'booha-assets-2026-603',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
