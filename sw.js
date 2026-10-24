@@ -283,7 +283,9 @@ const CURRENT_CACHES = {
   // Round token art for the nine new tokens and the arcade boss thumbnail.
   // Rainbow Pass B: theme/game.css + theme/menu.css rainbow star styles.
   // Ready Pass 1: score-card Booha line style (theme/game.css).
-  assets: 'booha-assets-2026-604',
+  // Trophy token refresh: replace the older character/duplicate trophy centers
+  // with the shared photorealistic round-token set.
+  assets: 'booha-assets-2026-606',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
