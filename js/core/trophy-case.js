@@ -73,6 +73,9 @@ window.BoohaTrophies = (function () {
     var best = function (field) {
       return Object.keys(scores).reduce(function (m, id) { return Math.max(m, Number((scores[id] || {})[field]) || 0); }, 0);
     };
+    var readyGames = Object.keys(scores).filter(function (id) {
+      return /^(pb|br|bc)(-extra)?:/.test(id) && scores[id] && Number(scores[id].rainbows) > 0;
+    }).length;
     return {
       curr: CURRS.indexOf(curr) >= 0 ? curr : 'br',
       isUnlocked: isUnlocked,
@@ -80,6 +83,7 @@ window.BoohaTrophies = (function () {
       crowns: sum(function (id) { return !/-extra:week_boss$/.test(id); }, 'crowns'),
       bossWins: sum(function (id) { return /-extra:week_boss$/.test(id); }, 'crowns'),
       bestCombo: best('bestCombo'),
+      readyGames: readyGames,
       wanderersMet: Object.keys(wanderers).length,
       roster: roster,
       worldsVisited: WORLDS.filter(function (w) { return !!(meta.worldsVisited && meta.worldsVisited[w]); }),
@@ -110,6 +114,9 @@ window.BoohaTrophies = (function () {
     { id: 'combo_spark', group: 'journey', img: 'medal-combo-spark.webp', en: 'Combo Spark', jp: 'コンボ スパーク',
       how: 'Reach a ×3 combo (10 in a row)', howJp: '10れんぞく せいかいで ×3 コンボ',
       rule: function (ctx) { return { on: ctx.bestCombo >= 10, n: Math.min(ctx.bestCombo, 10), of: 10 }; } },
+    { id: 'rainbow_master', group: 'journey', img: 'token-rainbow-master.webp', en: 'Rainbow Master', jp: 'にじいろ マスター',
+      how: 'Earn Rainbow stars on 1 / 3 / 6 / 9 unique games', howJp: '1・3・6・9つの ゲームで にじいろスター',
+      rule: function (ctx) { return ladder(ctx.readyGames, [1, 3, 6, 9]); } },
     { id: 'crown_collector', group: 'journey', img: 'medal-crown-collector.webp', en: 'Crown Collector', jp: 'クラウン コレクター',
       how: 'Win crowns: 15 / 15 with no mistakes', howJp: 'ノーミス 15/15 で クラウン',
       rule: function (ctx) { return ladder(ctx.crowns, [1, 10, 25, 50]); } },
