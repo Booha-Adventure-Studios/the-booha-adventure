@@ -44,7 +44,7 @@ const item = (res, id) => res.items.find(t => t.id === id);
     'a new student sees Journey, Curriculum, Muenba and Grimmerglen; Secret stays hidden');
   assert.strictEqual(res.earned, 0, 'nothing is grandfathered; a new save starts at zero');
   assert(!item(res, 'juku_scholar'), 'Juku Scholar is shown only to Juku students');
-  assert(res.shown >= 15 && res.shown <= 17, `a curated case of about 16 trophies (got ${res.shown})`);
+  assert(res.shown >= 16 && res.shown <= 18, `a curated case of about 17 trophies (got ${res.shown})`);
   const champ = item(res, 'champion');
   assert.strictEqual(champ.img, 'medal-br-champion.webp', 'Champion follows the student curriculum');
   assert.strictEqual(champ.dots.length, 9, 'Champion carries a 9-dot game row');
@@ -75,6 +75,18 @@ const item = (res, id) => res.items.find(t => t.id === id);
   const boss = item(res, 'week_boss_slayer');
   assert.strictEqual(boss.tier, 2, '6 boss wins reaches tier 2 (5)');
   assert.strictEqual(item(res, 'combo_spark').on, true, 'a 10+ best combo earns Combo Spark');
+}
+{
+  const scores = {
+    'br:vocab_tap': { rainbows: 1 },
+    'br:spell_word': { rainbows: 1 },
+    'br-extra:booha_bites': { rainbows: 1 },
+  };
+  const { res } = run({ scores });
+  const rainbow = item(res, 'rainbow_master');
+  assert.strictEqual(rainbow.tier, 2, 'three unique rainbow games reaches tier 2');
+  assert.strictEqual(rainbow.tierName, 'silver');
+  assert.deepStrictEqual([rainbow.n, rainbow.of], [3, 6], 'Rainbow Master points at the next tier');
 }
 {
   const { res } = run({ scores: { 'br-extra:week_boss': { crowns: 12 } } });
@@ -127,6 +139,7 @@ const item = (res, id) => res.items.find(t => t.id === id);
   T.DEFS.forEach(d => { if (typeof d.img === 'string') imgs.add(d.img); });
   imgs.forEach(f => assert(fs.existsSync(path.join(ROOT, 'assets/img/profile', f)), `trophy art missing: ${f}`));
   assert(!fs.existsSync(path.join(ROOT, 'assets/img/profile/medal-word-keeper.png')), 'PNG sources are not shipped');
+  assert(fs.existsSync(path.join(ROOT, 'assets/source/profile/token-rainbow-master.png')), 'Rainbow Master PNG source is present');
 }
 
 /* ── wiring ── */
