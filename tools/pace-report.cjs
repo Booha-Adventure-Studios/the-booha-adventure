@@ -5,7 +5,8 @@
  * Reads student saves and summarises the pace records the game engines
  * store (score entry → recentRuns[].pace, last 8 runs per game). Rainbow
  * stars are live with first-guess zones (PACE_ZONES in js/game-utils.js);
- * run this on real classroom data to tune those zones, then edit the table.
+ * run this once on the first real classroom data to set those zones, then
+ * keep them fixed (re-tune only if a game is clearly broken).
  *
  *   node tools/pace-report.cjs saves/*.json
  *   node tools/pace-report.cjs export.json --json > pace.json
@@ -129,5 +130,7 @@ if (asJson) {
     console.log(`  rainbow share if zone ≤  ${ZONES.map(X => `${X}: ${Math.round((g.rainbowShareAt[X] || 0) * 100)}%`).join('  ')}`);
     console.log('');
   });
-  console.log('Pick, per game, the zone where roughly the top third of runs qualify.');
+  console.log('One-time calibration: set each game\'s zone once from the first classroom data (about the');
+  console.log('top third of runs qualifying), then keep it fixed so students learn what earns rainbow.');
+  console.log('Re-tune only if a game is clearly broken, not week to week.');
 }

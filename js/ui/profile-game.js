@@ -292,6 +292,14 @@ const BoohaProfileGame = (() => {
     return `<span class="${cls}" style="left:calc(${x1}% - 4px);top:${Math.min(y1, y2)}px;width:8px;height:${Math.abs(y2 - y1)}px"></span>`;
   }
 
+  // Ready games this week: how many of the nine have rainbow (ready-pace)
+  // stars. Hidden until the first one, so it reads as earned, not a quota.
+  function readyMarker(s) {
+    const n = s.games.filter(g => s.rainbow[g.saveId]).length;
+    if (!n) return '';
+    return `<p class="pg-ready" aria-label="${n} of ${s.games.length} ready games this week"><span>じゅんび OK · READY GAMES THIS WEEK</span><b>${n} / ${s.games.length}</b></p>`;
+  }
+
   function renderTrail(s) {
     const host = document.getElementById('pg-trail');
     if (!host) return;
@@ -379,7 +387,7 @@ const BoohaProfileGame = (() => {
         <div class="pg-stat teal"><span>アーケードまで ★★×${s.games.length}</span><b>${w.twoStarCount} / ${s.games.length}</b></div>
         <div class="pg-stat gold"><span>つながりボーナス</span><b>+${w.linkStars}★ <small>(${w.linkCount}/${s.games.length - 1})</small></b></div>
       </div>
-      ${s.games.some((g, i) => w.stars[i] != null && s.rainbow[g.saveId]) ? '<p class="pg-rainbow-key"><b>🌈 ★★★</b> Rainbow stars = ready pace · じゅんび OK</p>' : ''}
+      ${readyMarker(s)}
       <div class="pg-trail-board" role="list" aria-label="This week's games">${parts.join('')}</div>`;
   }
 

@@ -460,9 +460,11 @@ const UTILS = {
      few long pauses never cost the rainbow. Pace is time ÷ the item's par
      (par already scales with word / sentence length).
 
-     These zones are first defaults. Tune them from real class data with
+     These zones are first defaults. Calibrate them ONCE from the first
+     real class data with
        node tools/pace-report.cjs <Wix saves export>
-     (pick the zone where about the top third of runs qualify).
+     (about the top third of runs qualifying), then keep them fixed so
+     students learn what earns rainbow. Re-tune only if a game is broken.
      null = pace not judged (speed games already set the pace).
      ══════════════════════════════ */
   PACE_RULE: { firstTry: 0.75, maxFrantic: 2, minTimed: 5, preBooSlack: 1.3 },

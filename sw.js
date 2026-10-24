@@ -99,7 +99,9 @@ const CURRENT_CACHES = {
   // synced save, not a device flag); shorter READY PACE chip.
   // Trail fix: nameplates keep labels readable where vertical links pass;
   // vertical +1★ chips sit between the label and the next disc.
-  pages:  'booha-pages-2026-493',
+  // Ready marker pass: profile shows "N / 9 ready games this week" (from the
+  // first rainbow); rainbow emoji removed from the score card and profile.
+  pages:  'booha-pages-2026-494',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
