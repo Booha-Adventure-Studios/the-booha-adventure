@@ -197,7 +197,7 @@
     if (rainbow) {
       var firstRainbow = firstRainbowEver();
       var rb = el('div', 'bsc-rainbow-chip' + (firstRainbow ? ' first' : ''));
-      rb.appendChild(el('b', null, '🌈 READY PACE · じゅんび OK'));
+      rb.appendChild(el('b', null, 'READY PACE · じゅんび OK'));
       if (firstRainbow) {
         rb.appendChild(el('span', null, kana
           ? 'じゅんびして きたね！ さいしょで せいかい、いい ペース。'

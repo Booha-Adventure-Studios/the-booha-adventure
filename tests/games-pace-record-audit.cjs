@@ -227,7 +227,9 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   const pg = read('js/ui/profile-game.js');
   assert(/pg-node \$\{state\}\$\{rainbow \? ' rainbow' : ''\}/.test(pg), 'profile trail node keeps the rainbow');
   assert(/pg-x-stars\$\{rainbow \? ' rainbow' : ''\}/.test(pg), 'bonus game cards show rainbow stars');
-  assert(/pg-rainbow-key/.test(pg), 'the trail explains rainbow when one shows');
+  assert(/function readyMarker/.test(pg) && /READY GAMES THIS WEEK/.test(pg) && /if \(!n\) return '';/.test(pg),
+    'the trail shows "N / 9 ready games this week", hidden until the first one');
+  assert(!/🌈/.test(sc) && !/🌈/.test(pg), 'no rainbow emoji; the rainbow is shown by colour');
 }
 
 console.log('Pace + rainbow audit passed: first responses vs par, replay pause, ready-pace rule, weekly/lifetime rainbow, score card / menu / profile, calibration report.');
