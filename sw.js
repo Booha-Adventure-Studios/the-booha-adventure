@@ -285,7 +285,7 @@ const CURRENT_CACHES = {
   // Ready Pass 1: score-card Booha line style (theme/game.css).
   // Trophy token refresh: replace the older character/duplicate trophy centers
   // with the shared photorealistic round-token set.
-  assets: 'booha-assets-2026-606',
+  assets: 'booha-assets-2026-607',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
