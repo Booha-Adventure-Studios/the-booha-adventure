@@ -202,6 +202,7 @@ const BoohaProfileGame = (() => {
       level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - levelWeekTotal - medalStarsWeek),
       lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed, rainbow, readyEver,
       readySeen: typeof meta.readySeen === 'string' ? meta.readySeen : '',
+      readyRecord: readyRecordFor(weekLog, curr, ids),
       sealedSeen: typeof meta.sealedSeen === 'string' ? meta.sealedSeen : '',
       name: firstName(), sprite: heroSprite(),
     };
@@ -315,8 +316,8 @@ const BoohaProfileGame = (() => {
     return { x: COLS[col], y: ROW_Y[row] };
   }
 
-  function seg(x1, y1, x2, y2, lit) {
-    const cls = `pg-seg${lit ? ' lit' : ''}`;
+  function seg(x1, y1, x2, y2, lit, rainbow) {
+    const cls = `pg-seg${lit ? ' lit' : ''}${rainbow ? ' rainbow' : ''}${y1 === y2 ? '' : ' v'}`;
     if (y1 === y2) {
       return `<span class="${cls}" style="left:${Math.min(x1, x2)}%;top:${y1 - 4}px;width:${Math.abs(x2 - x1)}%;height:8px"></span>`;
     }
@@ -325,6 +326,22 @@ const BoohaProfileGame = (() => {
 
   // Ready games this week: how many of the nine have rainbow (ready-pace)
   // stars. Hidden until the first one, so it reads as earned, not a quota.
+  // Personal ready record from the permanent week log (logged from
+  // 2026-10-24): best week (most of the nine at ready pace) and rainbow
+  // weeks (6 or more of the nine). Stars, unlocks and grading never change.
+  const RAINBOW_WEEK_MIN = 6;
+  function readyRecordFor(weekLog, curr, ids) {
+    let best = 0, weeks = 0;
+    Object.keys(weekLog || {}).forEach(k => {
+      const r = weekLog[k] && weekLog[k].ready;
+      if (!r || typeof r !== 'object') return;
+      const n = ids.filter(id => r[`${curr}:${id}`]).length;
+      if (n > best) best = n;
+      if (n >= RAINBOW_WEEK_MIN) weeks++;
+    });
+    return { best, weeks };
+  }
+
   const READY_LANES = [
     { id: 'words', en: 'WORDS', ids: ['vocab_tap', 'spell_word', 'vocab_speed'] },
     { id: 'sentences', en: 'SENTENCES', ids: ['sentence_tap', 'sentence_order', 'sentence_speed'] },
@@ -333,7 +350,9 @@ const BoohaProfileGame = (() => {
   function readyCount(s) { return s.games.filter(g => s.rainbow[g.saveId]).length; }
   function readyMarker(s) {
     const n = s.games.filter(g => s.rainbow[g.saveId]).length;
-    if (!n) return '';
+    const rec = s.readyRecord;
+    const recLine = rec.best ? `<p class="pg-ready-record"><span>ベスト BEST READY WEEK <b>${rec.best} / ${s.games.length}</b></span><span>にじいろ RAINBOW WEEKS <b>${rec.weeks}</b></span></p>` : '';
+    if (!n) return recLine ? `<div class="pg-ready">${recLine}</div>` : '';
     // Lane breakdown: an immediate "what can I try next?" target.
     const lanes = READY_LANES.map(l => {
       const k = l.ids.filter(id => s.rainbow[`${s.curr}:${id}`]).length;
@@ -342,6 +361,7 @@ const BoohaProfileGame = (() => {
     return `<div class="pg-ready" aria-label="${n} of ${s.games.length} ready games this week">
         <p class="pg-ready-total"><span>じゅんび OK · READY GAMES THIS WEEK</span><b>${n} / ${s.games.length}</b></p>
         <p class="pg-ready-lanes">${lanes}</p>
+        ${recLine}
       </div>`;
   }
 
@@ -354,7 +374,10 @@ const BoohaProfileGame = (() => {
     for (let i = 0; i < s.games.length - 1; i++) {
       const a = nodePos(i);
       const b = nodePos(i + 1);
-      parts.push(seg(a.x, a.y, b.x, b.y, w.links[i]));
+      // Prism Trail: a lit link between two rainbow (ready-pace) games turns
+      // rainbow too, mirroring the +1★ link rule students already know.
+      const rl = !!(w.links[i] && s.rainbow[s.games[i].saveId] && s.rainbow[s.games[i + 1].saveId]);
+      parts.push(seg(a.x, a.y, b.x, b.y, w.links[i], rl));
       if (w.links[i]) {
         const mx = (a.x + b.x) / 2;
         const my = (a.y + b.y) / 2;
@@ -367,8 +390,9 @@ const BoohaProfileGame = (() => {
       }
     }
     const last = nodePos(s.games.length - 1);
-    parts.push(seg(last.x, last.y, last.x, GATE_Y, s.arcadeOpen));
-    parts.push(seg(COLS[1], GATE_Y, last.x, GATE_Y, s.arcadeOpen));
+    const prism = readyCount(s) === s.games.length;   // 9 / 9: the whole trail is rainbow
+    parts.push(seg(last.x, last.y, last.x, GATE_Y, s.arcadeOpen, prism));
+    parts.push(seg(COLS[1], GATE_Y, last.x, GATE_Y, s.arcadeOpen, prism));
     // Blitz row and the skin at the end.
     const bd = ['vocab', 'sentence', 'question'].map(t => w.blitzDone[t]);
     parts.push(seg(COLS[0], BLITZ_Y, COLS[1], BLITZ_Y, bd[0] && bd[1]));
@@ -399,10 +423,11 @@ const BoohaProfileGame = (() => {
       parts.push(`<img class="pg-token" src="${esc(s.sprite.src)}" alt="" aria-hidden="true" style="left:calc(${p.x}% + 20px);top:${p.y - 50}px" width="42" height="42">`);
     }
     parts.push(`
-      <div class="pg-gate${s.arcadeOpen ? ' open' : ''}" style="top:${GATE_Y - 50}px">
+      <div class="pg-gate${s.arcadeOpen ? ' open' : ''}${prism ? ' prism' : ''}" style="top:${GATE_Y - 50}px">
         <img src="${IMG}treasure-chest-${s.arcadeOpen ? 'open' : 'closed'}.webp" alt="Arcade chest${s.arcadeOpen ? ' (open)' : ' (locked)'}" width="120" height="80">
         <span class="pg-gate-title">${s.arcadeOpen ? 'アーケード オープン！' : 'アーケード たからばこ'}</span>
-        <span class="pg-gate-sub">${s.arcadeOpen ? 'ARCADE GAMES UNLOCKED' : 'ぜんぶ ★★ で ひらく'}</span>
+        ${prism ? '<span class="pg-gate-prism">にじの みち · PRISM TRAIL</span>'
+                : `<span class="pg-gate-sub">${s.arcadeOpen ? 'ARCADE GAMES UNLOCKED' : 'ぜんぶ ★★ で ひらく'}</span>`}
       </div>
       <div class="pg-divider" style="top:${GATE_Y + 72}px" aria-hidden="true"><span>BLITZ · SKIN</span></div>`);
     ['vocab', 'sentence', 'question'].forEach((t, i) => {

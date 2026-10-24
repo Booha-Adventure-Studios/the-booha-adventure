@@ -87,6 +87,14 @@ const item = (res, id) => res.items.find(t => t.id === id);
   assert.strictEqual(rainbow.tier, 2, 'three unique rainbow games reaches tier 2');
   assert.strictEqual(rainbow.tierName, 'silver');
   assert.deepStrictEqual([rainbow.n, rainbow.of], [3, 6], 'Rainbow Master points at the next tier');
+  assert.strictEqual(rainbow.en, 'Steady Starter', 'the Rainbow token is named for its tier');
+}
+{
+  const { res } = run();
+  assert.strictEqual(item(res, 'rainbow_master').en, 'Ready Explorer', 'a locked Rainbow token shows its first name');
+  const all = Object.fromEntries(['vocab_tap','spell_word','vocab_speed','sentence_tap','sentence_order','sentence_speed','say_word','say_sentence','ask_question'].map(g => [`br:${g}`, { rainbows: 2 }]));
+  const top = item(run({ scores: all }).res, 'rainbow_master');
+  assert.strictEqual(top.en, 'Rainbow Master'); assert.strictEqual(top.maxed, true, 'nine unique rainbow games is the top tier');
 }
 {
   const { res } = run({ scores: { 'br-extra:week_boss': { crowns: 12 } } });
