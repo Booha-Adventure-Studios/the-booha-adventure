@@ -1099,6 +1099,8 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 .bsc-rainbow-chip b { display: block; font-size: 13px; font-weight: 900; }
 .bsc-rainbow-chip span { display: block; font-size: 12px; line-height: 1.35; font-weight: 700; }
 .bsc-rainbow-chip.first { padding: 8px 14px; }
+.bsc-booha-says { margin: 4px 0 0; font-size: 13px; font-weight: 900; line-height: 1.35; }
+.bsc-rainbow-chip .bsc-booha-says b { display: inline; font-weight: 900; }
 @media (prefers-reduced-motion: reduce) { .bsc-rainbow::after { animation: none; display: none; } }
 @keyframes bscPop { from { opacity: 0; transform: scale(.2) rotate(-20deg); } to { opacity: 1; transform: none; } }
 

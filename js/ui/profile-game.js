@@ -160,6 +160,8 @@ const BoohaProfileGame = (() => {
     const scores = isObject(data.scores) ? data.scores : {};
     // Rainbow Pass B: ready-pace runs this week (weekly bucket, live week).
     const rainbow = isObject(data.weekly) && isObject(data.weekly.gameRainbow) ? data.weekly.gameRainbow : {};
+    // Lifetime: how many games have ever had a rainbow run (first-rainbow moment).
+    const readyEver = Object.keys(scores).filter(id => /^(pb|br|bc)(-extra)?:/.test(id) && isObject(scores[id]) && Number(scores[id].rainbows) > 0).length;
     let lastIndex = -1;
     let lastAt = 0;
     games.forEach((g, i) => {
@@ -198,14 +200,43 @@ const BoohaProfileGame = (() => {
     return {
       data, meta, keys, curr, games, week, life, weekTotal: weekTotalWithMedals, dailyThisWeek, medalStarsWeek,
       level: L.levelFor(life.total), levelBefore: L.levelFor(life.total - levelWeekTotal - medalStarsWeek),
-      lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed, rainbow,
+      lastIndex, arcadeOpen, weekPct, weeklySkin, daysPlayed, rainbow, readyEver,
+      readySeen: typeof meta.readySeen === 'string' ? meta.readySeen : '',
+      sealedSeen: typeof meta.sealedSeen === 'string' ? meta.sealedSeen : '',
       name: firstName(), sprite: heroSprite(),
     };
   }
 
   /* ── hero ───────────────────────────────────────────────────── */
 
+  // Booha's ready-pace reactions on the profile: shown once per student per
+  // milestone per week (seen state lives in that student's synced save).
+  const READY_SAY = {
+    1: 'じゅんび できてたね！ You came ready!',
+    3: 'じゅんび ペースが かがやいてる！ Your ready pace is glowing!',
+    9: 'みちが ぜんぶ にじいろ！ The whole trail is rainbow!',
+  };
+  function readySpeech(s) {
+    const n = readyCount(s);
+    const level = n >= 9 ? 9 : n >= 3 ? 3 : (n >= 1 && s.readyEver <= 1) ? 1 : 0;
+    if (!level) return null;
+    const key = `${s.keys.week}|${level}`;
+    // Seen in an earlier visit: stay quiet. Shown on this page: keep it up
+    // through re-renders until the student leaves.
+    if (s.readySeen === key && readyShownKey !== key) return null;
+    return { key, text: READY_SAY[level] };
+  }
+  let readyShownKey = '';
+  function markSeen(field, value) {
+    try { BoohaAdventure.save.patch('meta', { [field]: value }); } catch (_) {}
+  }
+
   function speech(s) {
+    const ready = readySpeech(s);
+    if (ready) {
+      if (readyShownKey !== ready.key) { readyShownKey = ready.key; markSeen('readySeen', ready.key); }
+      return ready.text;
+    }
     const left = s.games.length - s.week.twoStarCount;
     if (!s.week.played) return 'きょうも いっしょに ぼうけん しよう！';
     if (!s.arcadeOpen) return `あと ${left}つ ★★ で アーケード だよ！`;
@@ -294,10 +325,24 @@ const BoohaProfileGame = (() => {
 
   // Ready games this week: how many of the nine have rainbow (ready-pace)
   // stars. Hidden until the first one, so it reads as earned, not a quota.
+  const READY_LANES = [
+    { id: 'words', en: 'WORDS', ids: ['vocab_tap', 'spell_word', 'vocab_speed'] },
+    { id: 'sentences', en: 'SENTENCES', ids: ['sentence_tap', 'sentence_order', 'sentence_speed'] },
+    { id: 'listen', en: 'LISTEN', ids: ['say_word', 'say_sentence', 'ask_question'] },
+  ];
+  function readyCount(s) { return s.games.filter(g => s.rainbow[g.saveId]).length; }
   function readyMarker(s) {
     const n = s.games.filter(g => s.rainbow[g.saveId]).length;
     if (!n) return '';
-    return `<p class="pg-ready" aria-label="${n} of ${s.games.length} ready games this week"><span>じゅんび OK · READY GAMES THIS WEEK</span><b>${n} / ${s.games.length}</b></p>`;
+    // Lane breakdown: an immediate "what can I try next?" target.
+    const lanes = READY_LANES.map(l => {
+      const k = l.ids.filter(id => s.rainbow[`${s.curr}:${id}`]).length;
+      return `<span class="pg-ready-lane ${l.id}${k === l.ids.length ? ' full' : ''}">${l.en} <b>${k}/${l.ids.length}</b></span>`;
+    }).join('<i aria-hidden="true">·</i>');
+    return `<div class="pg-ready" aria-label="${n} of ${s.games.length} ready games this week">
+        <p class="pg-ready-total"><span>じゅんび OK · READY GAMES THIS WEEK</span><b>${n} / ${s.games.length}</b></p>
+        <p class="pg-ready-lanes">${lanes}</p>
+      </div>`;
   }
 
   function renderTrail(s) {
@@ -704,9 +749,12 @@ const BoohaProfileGame = (() => {
     if (!host) return;
     const complete = s.week.twoStarCount === s.games.length && s.week.blitzCount === 3;
     if (!complete) return;
-    let seen = '';
-    try { seen = localStorage.getItem('booha_week_sealed_seen') || ''; } catch (_) {}
-    if (seen === sealedKey(s)) return;
+    // Seen state lives in this student's save, so two students sealing the
+    // same week on one iPad each see their own celebration exactly once.
+    if (s.sealedSeen === s.keys.week) return;
+    let legacy = '';
+    try { legacy = localStorage.getItem('booha_week_sealed_seen') || ''; } catch (_) {}
+    if (legacy === sealedKey(s)) { markSeen('sealedSeen', s.keys.week); return; }
     const pct = s.weekPct == null ? '—' : `${s.weekPct}%`;
     const tier = s.weekPct == null ? 'SEAL' : s.weekPct >= 90 ? 'GOLD SEAL' : s.weekPct >= 75 ? 'SILVER SEAL' : 'BRONZE SEAL';
     const rewards = [
@@ -714,6 +762,10 @@ const BoohaProfileGame = (() => {
     ];
     if (s.level.level > s.levelBefore.level) {
       rewards.push(`<li class="coin"><img src="${IMG}rank-coin-${s.level.level}.webp" alt="" width="34" height="34"><span>レベルアップ！ Lv ${s.levelBefore.level} → ${s.level.level}</span><b>NEW COIN</b></li>`);
+    }
+    const readyN = readyCount(s);
+    if (readyN) {
+      rewards.push(`<li class="ready"><span>じゅんび OK · READY PACE</span><b>${readyN} / ${s.games.length} games</b></li>`);
     }
     if (s.weeklySkin && s.weeklySkin.unlocked) {
       rewards.push(`<li class="skin"><img src="${esc(s.weeklySkin.src)}" alt="" width="34" height="34"><span>${esc(s.weeklySkin.name)} ゲット！</span><b>BLITZ 3/3</b></li>`);
@@ -735,7 +787,7 @@ const BoohaProfileGame = (() => {
     const close = () => {
       host.hidden = true;
       host.innerHTML = '';
-      try { localStorage.setItem('booha_week_sealed_seen', sealedKey(s)); } catch (_) {}
+      markSeen('sealedSeen', s.keys.week);
       document.removeEventListener('keydown', onKey);
     };
     const onKey = e => { if (e.key === 'Escape') close(); };

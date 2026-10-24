@@ -311,11 +311,17 @@
     .pg-node.rainbow .pg-stars, .pg-x-stars.rainbow { background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9);
       -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:none; }
     .pg-x-stars.off { color:#6b5560; margin-left:-4px; }
-    .pg-ready { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 8px; padding:6px 12px;
-      border-radius:12px; background:rgba(255,255,255,.05); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
-    .pg-ready span { font-size:11px; font-weight:800; color:#e9d9ff; letter-spacing:.02em; }
-    .pg-ready b { font-family:'Cinzel Decorative',serif; font-size:16px; font-variant-numeric:tabular-nums;
+    .pg-ready { margin:0 0 8px; padding:6px 12px 7px; border-radius:12px; background:rgba(255,255,255,.05); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08); }
+    .pg-ready-total { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0; }
+    .pg-ready-total span { font-size:11px; font-weight:800; color:#e9d9ff; letter-spacing:.02em; }
+    .pg-ready-total b { font-family:'Cinzel Decorative',serif; font-size:16px; font-variant-numeric:tabular-nums;
       background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .pg-ready-lanes { display:flex; flex-wrap:wrap; align-items:center; gap:2px 6px; margin:3px 0 0; font-size:11px; font-weight:800; letter-spacing:.03em; }
+    .pg-ready-lanes i { font-style:normal; color:#6f6585; }
+    .pg-ready-lane.words { color:#ffd77a; } .pg-ready-lane.sentences { color:#5cb2ff; } .pg-ready-lane.listen { color:#a98bff; }
+    .pg-ready-lane b { font-variant-numeric:tabular-nums; }
+    .pg-ready-lane.full b { color:#fff; text-shadow:0 0 6px currentColor; }
+    .pg-sealed-rewards li.ready b { background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); -webkit-background-clip:text; background-clip:text; color:transparent; }
     .pg-node.blitz .pg-name { color:#c9b9e8; }
     .pg-token { position:absolute; width:42px; height:42px; object-fit:contain; z-index:3; filter:drop-shadow(0 0 8px rgba(168,230,61,.9)); animation:pgBob 3s ease-in-out infinite; }
     .pg-gate { position:absolute; left:50%; transform:translateX(-50%); width:180px; display:flex; flex-direction:column; align-items:center; gap:2px; z-index:1; }
