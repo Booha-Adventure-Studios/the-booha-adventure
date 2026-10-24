@@ -103,7 +103,7 @@ const CURRENT_CACHES = {
   // first rainbow); rainbow emoji removed from the score card and profile.
   // Ready Pass 1 (2026-10-24): lane breakdown, Booha ready reactions, Week
   // Sealed ready line, weekLog.ready history, per-student seen flags.
-  pages:  'booha-pages-2026-495',
+  pages:  'booha-pages-2026-496',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -281,7 +281,7 @@ const CURRENT_CACHES = {
   // Round token art for the nine new tokens and the arcade boss thumbnail.
   // Rainbow Pass B: theme/game.css + theme/menu.css rainbow star styles.
   // Ready Pass 1: score-card Booha line style (theme/game.css).
-  assets: 'booha-assets-2026-603',
+  assets: 'booha-assets-2026-604',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
