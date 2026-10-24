@@ -321,6 +321,10 @@
     .pg-ready-lane.words { color:#ffd77a; } .pg-ready-lane.sentences { color:#5cb2ff; } .pg-ready-lane.listen { color:#a98bff; }
     .pg-ready-lane b { font-variant-numeric:tabular-nums; }
     .pg-ready-lane.full b { color:#fff; text-shadow:0 0 6px currentColor; }
+    .pg-ready-record { display:flex; flex-wrap:wrap; justify-content:space-between; gap:2px 10px; margin:4px 0 0; font-size:10.5px; font-weight:800; color:#c9b9e8; letter-spacing:.02em; }
+    .pg-ready-record span { white-space:nowrap; }
+    .pg-ready-record b { color:#fff; font-variant-numeric:tabular-nums; }
+    .pg-ready > .pg-ready-record:first-child { margin-top:0; }
     .pg-sealed-rewards li.ready b { background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); -webkit-background-clip:text; background-clip:text; color:transparent; }
     .pg-node.blitz .pg-name { color:#c9b9e8; }
     .pg-token { position:absolute; width:42px; height:42px; object-fit:contain; z-index:3; filter:drop-shadow(0 0 8px rgba(168,230,61,.9)); animation:pgBob 3s ease-in-out infinite; }
@@ -330,6 +334,12 @@
     .pg-gate-title { font-size:12px; color:#5cffd0; text-shadow:0 1px 3px #000; }
     .pg-gate.open .pg-gate-title { color:#ffd77a; }
     .pg-gate-sub { font-size:10px; color:#cfe9e2; text-shadow:0 1px 3px #000; }
+    /* Prism Trail: rainbow links between ready games, prism gate at 9 / 9 (static). */
+    .pg-seg.lit.rainbow { background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); box-shadow:0 0 10px rgba(255,120,220,.55), 0 0 16px rgba(92,200,255,.35); }
+    .pg-seg.lit.rainbow.v { background:linear-gradient(180deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); }
+    .pg-gate.prism img { filter:drop-shadow(0 0 10px rgba(255,95,109,.7)) drop-shadow(0 0 16px rgba(92,200,255,.6)) drop-shadow(0 0 24px rgba(167,123,255,.55)); }
+    .pg-gate-prism { margin-top:2px; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:900; color:#2a1030;
+      background:linear-gradient(90deg,#ff5f6d,#ffb347,#fff36b,#5cffb0,#5cc8ff,#a77bff,#ff7ad9); box-shadow:0 0 12px rgba(255,120,220,.5); }
     .pg-divider { position:absolute; left:12px; right:12px; display:flex; align-items:center; gap:8px; }
     .pg-divider::before, .pg-divider::after { content:''; flex:1; height:1px; background:rgba(201,185,232,.4); }
     .pg-divider span { font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; color:#c9b9e8; }

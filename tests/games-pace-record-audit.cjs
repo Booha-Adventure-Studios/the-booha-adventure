@@ -231,8 +231,8 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   const pg = read('js/ui/profile-game.js');
   assert(/pg-node \$\{state\}\$\{rainbow \? ' rainbow' : ''\}/.test(pg), 'profile trail node keeps the rainbow');
   assert(/pg-x-stars\$\{rainbow \? ' rainbow' : ''\}/.test(pg), 'bonus game cards show rainbow stars');
-  assert(/function readyMarker/.test(pg) && /READY GAMES THIS WEEK/.test(pg) && /if \(!n\) return '';/.test(pg),
-    'the trail shows "N / 9 ready games this week", hidden until the first one');
+  assert(/function readyMarker/.test(pg) && /READY GAMES THIS WEEK/.test(pg) && /if \(!n\) return recLine \?/.test(pg),
+    'the trail shows "N / 9 ready games this week" from the first one (before that, only the personal record if any)');
   assert(!/🌈/.test(sc) && !/🌈/.test(pg), 'no rainbow emoji; the rainbow is shown by colour');
   // Ready Pass 1
   assert(/READY_LINES/.test(sc) && /You came ready!/.test(sc) && /Your ready pace is glowing!/.test(sc) && /The whole trail is rainbow!/.test(sc),
@@ -245,6 +245,20 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   assert(!/localStorage\.setItem\('booha_week_sealed_seen'/.test(pg), 'Week Sealed no longer writes a one-slot device flag');
   assert(/li class="ready"/.test(pg), 'Week Sealed shows READY PACE n / 9');
   assert(/readyShownKey/.test(pg), 'a Booha ready line stays up through re-renders on the page where it first shows');
+  // Ready Pass 2
+  assert(/w\.links\[i\] && s\.rainbow\[s\.games\[i\]\.saveId\] && s\.rainbow\[s\.games\[i \+ 1\]\.saveId\]/.test(pg),
+    'a lit link turns rainbow only between two rainbow games');
+  assert(/pg-gate-prism/.test(pg) && /readyCount\(s\) === s\.games\.length/.test(pg), 'the arcade gate becomes a prism at 9 / 9');
+  assert(/RAINBOW_WEEK_MIN = 6/.test(pg) && /BEST READY WEEK/.test(pg) && /RAINBOW WEEKS/.test(pg), 'best ready week and rainbow weeks come from the week log');
+  {
+    const ctx = { window: {} }; vm.createContext(ctx);
+    const src = pg.slice(pg.indexOf('const RAINBOW_WEEK_MIN'), pg.indexOf('const READY_LANES'));
+    vm.runInContext(src + '; this.f = readyRecordFor;', ctx);
+    const ids = ['vocab_tap', 'spell_word', 'vocab_speed', 'sentence_tap', 'sentence_order', 'sentence_speed', 'say_word', 'say_sentence', 'ask_question'];
+    const mk = n => ({ ready: Object.fromEntries(ids.slice(0, n).map(g => [`br:${g}`, 1])) });
+    const rec = ctx.f({ a: mk(7), b: mk(3), c: mk(6), d: { adv: {} }, e: { ready: { 'pb:vocab_tap': 1 } } }, 'br', ids);
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(rec)), { best: 7, weeks: 2 }, 'best = most ready games in a week; rainbow week = 6+ of own nine');
+  }
 }
 
 console.log('Pace + rainbow audit passed: first responses vs par, replay pause, ready-pace rule, weekly/lifetime rainbow, score card / menu / profile, calibration report.');

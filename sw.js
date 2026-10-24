@@ -103,7 +103,9 @@ const CURRENT_CACHES = {
   // first rainbow); rainbow emoji removed from the score card and profile.
   // Ready Pass 1 (2026-10-24): lane breakdown, Booha ready reactions, Week
   // Sealed ready line, weekLog.ready history, per-student seen flags.
-  pages:  'booha-pages-2026-496',
+  // Ready Pass 2 (2026-10-24): Rainbow token tier names, Prism Trail (rainbow
+  // links, prism gate at 9/9), best ready week + rainbow weeks.
+  pages:  'booha-pages-2026-497',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

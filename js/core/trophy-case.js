@@ -114,7 +114,10 @@ window.BoohaTrophies = (function () {
     { id: 'combo_spark', group: 'journey', img: 'medal-combo-spark.webp', en: 'Combo Spark', jp: 'コンボ スパーク',
       how: 'Reach a ×3 combo (10 in a row)', howJp: '10れんぞく せいかいで ×3 コンボ',
       rule: function (ctx) { return { on: ctx.bestCombo >= 10, n: Math.min(ctx.bestCombo, 10), of: 10 }; } },
+    // tierNames: the token's name grows with the tier (locked shows tier 1).
     { id: 'rainbow_master', group: 'journey', img: 'token-rainbow-master.webp', en: 'Rainbow Master', jp: 'にじいろ マスター',
+      tierNames: [['Ready Explorer', 'じゅんび たんけんか'], ['Steady Starter', 'コツコツ スターター'],
+                  ['Prepared Adventurer', 'じゅんび ばっちり ぼうけんしゃ'], ['Rainbow Master', 'にじいろ マスター']],
       how: 'Earn Rainbow stars on 1 / 3 / 6 / 9 unique games', howJp: '1・3・6・9つの ゲームで にじいろスター',
       rule: function (ctx) { return ladder(ctx.readyGames, [1, 3, 6, 9]); } },
     { id: 'crown_collector', group: 'journey', img: 'medal-crown-collector.webp', en: 'Crown Collector', jp: 'クラウン コレクター',
@@ -195,9 +198,10 @@ window.BoohaTrophies = (function () {
       var r = d.rule(ctx) || {};
       if (d.secret && !r.on) return;
       var tier = r.tier || 0;
+      var tn = Array.isArray(d.tierNames) ? d.tierNames[Math.max(1, Math.min(tier, d.tierNames.length)) - 1] : null;
       items.push({
         id: d.id, group: d.group, secret: !!d.secret, on: !!r.on,
-        img: val(d.img, ctx), en: val(d.en, ctx), jp: val(d.jp, ctx), how: d.how, howJp: d.howJp,
+        img: val(d.img, ctx), en: tn ? tn[0] : val(d.en, ctx), jp: tn ? tn[1] : val(d.jp, ctx), how: d.how, howJp: d.howJp,
         n: r.n, of: r.of, dots: r.dots || null,
         tier: tier, tiers: r.tiers || 0, tierName: tier ? TIER_NAMES[Math.min(tier, TIER_NAMES.length) - 1] : '', steps: r.steps || null,
         maxed: !!(r.tiers && tier >= r.tiers),
