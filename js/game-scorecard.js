@@ -52,6 +52,29 @@
     document.body.appendChild(s);
   }
 
+  // Booha reacts at meaningful moments. Each fires once by nature: the first
+  // rainbow ever (lifetime), and crossing 3 and 9 ready games this week
+  // (the weekly count only grows). Only the nine core games count to 9.
+  var READY_LINES = {
+    1: { en: 'You came ready!', jp: 'じゅんび できてたね！' },
+    3: { en: 'Your ready pace is glowing!', jp: 'じゅんび ペースが かがやいてる！' },
+    9: { en: 'The whole trail is rainbow!', jp: 'みちが ぜんぶ にじいろ！' }
+  };
+  function readyMoment(gameId, firstEver) {
+    if (firstEver) return 1;
+    try {
+      var curr = String(gameId || '').split(':')[0];
+      if (!/^(pb|br|bc)$/.test(curr)) return 0;   // extras never move the 9
+      var R = window.BoohaGameRegistry, S = window.BoohaAdventure && window.BoohaAdventure.scores;
+      var ids = R.getForCurriculum(curr).map(function (g) { return g.saveId; });
+      var before = ids.filter(function (id) { return S.weeklyRainbowForGame(id); }).length;
+      var after = before + (S.weeklyRainbowForGame(gameId) ? 0 : 1);
+      if (after >= 9 && before < 9) return 9;
+      if (after >= 3 && before < 3) return 3;
+    } catch (_) {}
+    return 0;
+  }
+
   var overlay = null;
   var tierAudio = null;
   var timers = [];
@@ -196,8 +219,15 @@
     card.appendChild(starRow);
     if (rainbow) {
       var firstRainbow = firstRainbowEver();
+      var moment = readyMoment(opts.gameId, firstRainbow);
       var rb = el('div', 'bsc-rainbow-chip' + (firstRainbow ? ' first' : ''));
       rb.appendChild(el('b', null, 'READY PACE · じゅんび OK'));
+      if (moment) {
+        var says = el('p', 'bsc-booha-says');
+        says.appendChild(el('b', null, 'Booha: '));
+        says.appendChild(document.createTextNode(READY_LINES[moment].jp + ' ' + READY_LINES[moment].en));
+        rb.appendChild(says);
+      }
       if (firstRainbow) {
         rb.appendChild(el('span', null, kana
           ? 'じゅんびして きたね！ さいしょで せいかい、いい ペース。'
