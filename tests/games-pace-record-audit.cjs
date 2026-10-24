@@ -206,6 +206,13 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   assert.strictEqual(stored.scores['br:spell_word'].rainbows, 1, 'lifetime rainbow count');
   assert(stored.scores['br:spell_word'].firstRainbowAt > 0, 'first rainbow time is kept');
   assert.strictEqual(S.weeklyStarsFor('br'), 3, 'rainbow adds no stars to the weekly total');
+  // Pass 3 (Sunday rollover): this week's rainbow clears with the week; the
+  // permanent weekLog.ready history and the lifetime rainbow counts survive.
+  BA.save.resetWeekly('2026-11-01|november-w1');
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(stored.weekly.gameRainbow)), {}, 'weekly rainbow resets on Sunday');
+  assert.strictEqual(S.weeklyRainbowForGame('br:spell_word'), false, 'no rainbow carries into the new week');
+  assert.strictEqual(stored.meta.weekLog['2026-10-25|october-w4'].ready['br:spell_word'], 1, 'last week\'s ready log survives the reset');
+  assert.strictEqual(stored.scores['br:spell_word'].rainbows, 1, 'lifetime rainbow count survives the reset');
   // Ready Pass 1: the permanent week log keeps which games were rainbow.
   const wk = stored.meta.weekLog['2026-10-25|october-w4'];
   assert(wk && wk.ready && wk.ready['br:spell_word'] === 1, 'weekLog.ready records a rainbow game (survives the Sunday reset)');
