@@ -47,9 +47,38 @@ assert.match(b, /min-height:44px/, 'filter chips are ≥44px');
 assert.match(b, /min-width:48px;min-height:48px/, 'zoom buttons are ≥44px');
 const css = b.slice(b.indexOf('style.textContent = `'), b.indexOf('`;', b.indexOf('style.textContent = `')));
 for (const m of css.matchAll(/transition:([^;}]+)/g)) {
-  m[1].split(',').forEach(part => assert.ok(/^(opacity|transform) /.test(part.trim()), `transition must be opacity/transform: ${part}`));
+  m[1].split(/,(?![^(]*\))/).forEach(part => assert.ok(/^(opacity|transform) /.test(part.trim()), `transition must be opacity/transform: ${part}`));
 }
 assert.ok(!/\(\?<[=!]/.test(b), 'no regex lookbehind');
 assert.match(html, /@media \(prefers-reduced-motion: reduce\)/, 'page-wide reduced-motion rule covers the binder');
+
+/* Pass 4b: flip the enlarged card to the shared back */
+const fn = name => {
+  const start = b.indexOf(`function ${name}(`);
+  const open = b.indexOf('{', start);
+  let depth = 0;
+  for (let i = open; i < b.length; i++) {
+    if (b[i] === '{') depth++;
+    else if (b[i] === '}' && --depth === 0) return b.slice(start, i + 1);
+  }
+  return '';
+};
+const show = fn('show');
+assert.match(show, /zoom\.back = false;/, 'every card opens face up (arrows land on faces)');
+assert.match(show, /<button type="button" class="kb-flip-btn" aria-pressed="false">Flip<small lang="ja">うらがえす<\/small><\/button>/, 'a real Flip button');
+assert.match(show, /window\.KarasukiCardFace\.back\(\{ width \}\)/, 'the back is the shared card back');
+assert.match(show, /\.kb-flip-btn'\)\.addEventListener\('click', flip\)/);
+assert.match(show, /\.kb-zoom-card'\)\.addEventListener\('click', flip\)/, 'tapping the card flips it');
+const flip = fn('flip');
+assert.match(flip, /setAttribute\('aria-pressed', String\(zoom\.back\)\)/);
+assert.match(flip, /\.kb-front'\)\.setAttribute\('aria-hidden', String\(zoom\.back\)\)/, 'screen readers hear only the visible side');
+assert.match(flip, /UtsuSfx\.cardFlip\(\)/, 'flip sound');
+assert.match(fn('onKey'), /e\.key === 'f' \|\| e\.key === 'F'/);
+assert.match(b, /#kb-zoom \.kb-side\{position:absolute;left:0;top:0;backface-visibility:hidden;-webkit-backface-visibility:hidden\}/);
+assert.match(b, /#kb-zoom \.kb-side\.kb-front\{transform:rotateY\(0deg\)\}/, 'explicit 3D planes on both sides');
+const shelf = b.slice(b.indexOf('function render()'), b.indexOf('/* ── zoom'));
+assert.ok(!/KarasukiCardFace\.back|kb-flip/.test(shelf), 'the shelf always shows faces');
+assert.ok(scripts.indexOf('js/utsu-sfx.js') >= 0 && scripts.indexOf('js/utsu-sfx.js') < scripts.indexOf('js/ui/karasuki-binder.js'), 'sounds load before the binder');
+assert.match(read('js/utsu-sfx.js'), /cardFlip: function/);
 
 console.log('Karasuki binder audit passed.');

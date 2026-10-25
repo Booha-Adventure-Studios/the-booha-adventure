@@ -115,7 +115,9 @@ const CURRENT_CACHES = {
   // (js/ui/karasuki-binder.js); leaving between rounds no longer costs a restart.
   // Profile art pass: medal/trophy/coin URLs carry js/core/profile-art.js's
   // ART_REV; profile pages load js/core/sw-register.js.
-  pages:  'booha-pages-2026-502',
+  // Karasuki Cards 4a/4b: cinematic reveal sounds (js/utsu-sfx.js) and the
+  // binder flip; adventure-profile.html now loads js/utsu-sfx.js.
+  pages:  'booha-pages-2026-503',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

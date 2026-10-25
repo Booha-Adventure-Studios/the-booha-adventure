@@ -528,6 +528,11 @@
         tone(f, { type: 'sine', gain: 0.03, dur: 0.6, delay: 0.1 + i * 0.09 });
       });
     },
+    /* Binder: turning a card over by hand — a soft paper whoosh and a tap. */
+    cardFlip: function () {
+      noiseSweep({ type: 'bandpass', from: 700, to: 2600, q: 0.9, gain: 0.05, dur: 0.26, attack: 0.12 });
+      tone(1320, { type: 'sine', gain: 0.022, dur: 0.05, delay: 0.2 });
+    },
     /* One tick per point as "Words recalled" counts up. */
     cardTick: function (step) {
       tone(900 + (step || 0) * 60, { type: 'sine', gain: 0.018, dur: 0.035 });
