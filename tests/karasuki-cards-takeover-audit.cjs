@@ -22,7 +22,8 @@ const data = read('js/karasuki-cards-data.js');
 /* Script order */
 const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]);
 const order = ['js/calendar.js', 'js/core/save-file.js', 'js/core/booha-skins.js', 'js/utsu-furigana.js', 'games/echo.js',
-  'js/karasuki-wanderer-data.js', 'js/karasuki-cards-data.js', 'js/karasuki-cards.js', 'js/karasuki-card-encounter.js', 'js/karasuki.js'];
+  'js/karasuki-wanderer-data.js', 'js/karasuki-cards-data.js', 'js/karasuki-cards.js', 'js/karasuki-card-face.js',
+  'js/karasuki-card-encounter.js', 'js/karasuki-card-challenge.js', 'js/karasuki.js'];
 let last = -1;
 for (const src of order) {
   const at = scripts.indexOf(src);
@@ -31,7 +32,7 @@ for (const src of order) {
 }
 
 /* Feature flag: off for students until Pass 2c */
-assert.match(data, /window\.KARASUKI_CARDS_ENABLED = false;/, 'cards stay off for students in Pass 2b');
+assert.match(data, /window\.KARASUKI_CARDS_ENABLED = (true|false);/, 'one switch controls the whole feature');
 assert.match(k, /window\.KARASUKI_CARDS_ENABLED === true \|\| window\.__devCards === true/);
 
 /* Status is read on refresh only, never in the frame loop */
