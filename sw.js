@@ -113,7 +113,9 @@ const CURRENT_CACHES = {
   // (js/karasuki-card-challenge.js); cards switched on for students.
   // Karasuki Cards Pass 3: binder shelf on adventure-profile.html
   // (js/ui/karasuki-binder.js); leaving between rounds no longer costs a restart.
-  pages:  'booha-pages-2026-501',
+  // Profile art pass: medal/trophy/coin URLs carry js/core/profile-art.js's
+  // ART_REV; profile pages load js/core/sw-register.js.
+  pages:  'booha-pages-2026-502',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -293,7 +295,9 @@ const CURRENT_CACHES = {
   // Ready Pass 1: score-card Booha line style (theme/game.css).
   // Trophy token refresh: replace the older character/duplicate trophy centers
   // with the shared photorealistic round-token set.
-  assets: 'booha-assets-2026-608',
+  // Profile art pass: purge in-place-replaced medal art; image misses now
+  // fetch with no-store.
+  assets: 'booha-assets-2026-609',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
@@ -558,13 +562,20 @@ async function staleWhileRevalidate(request, cacheName) {
   return cached || await fetchPromise || offlineFallback(request);
 }
 
+// Static images are sometimes replaced in place under the same filename.
+// On a cache miss (e.g. after an assets-cache bump) fetch them with
+// no-store, so the browser's HTTP cache can never hand back the old file.
+// Scoped to images only; other cache-first assets keep normal HTTP caching.
+const STATIC_IMAGE = /\.(webp|png|jpe?g|gif|svg|avif)$/i;
+
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   if (cached) return cached;
 
   try {
-    const response = await fetch(request);
+    const isImage = STATIC_IMAGE.test(new URL(request.url).pathname);
+    const response = isImage ? await fetch(request, { cache: 'no-store' }) : await fetch(request);
     if (response.ok) cache.put(request, response.clone());
     return response;
   } catch {
