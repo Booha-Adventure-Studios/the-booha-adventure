@@ -148,6 +148,7 @@ const directoryBudgets = new Map([
   ['profile', 1.6 * 1024 * 1024],
   ['blitz', 1.4 * 1024 * 1024],
   ['menu', 0.5 * 1024 * 1024],
+  ['cards', 1 * 1024 * 1024],
 ]);
 for (const [directory, budget] of directoryBudgets) {
   const bytes = records

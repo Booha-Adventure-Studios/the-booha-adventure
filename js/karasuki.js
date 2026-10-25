@@ -3054,9 +3054,10 @@ const HAPPY_HOUSE_PORTAL = {
     w.cardHost = cardHost;
     w.cardMode = cardHost.status.map;
     w.cardKind = (comment && comment.kind) || 'friendly';
-    // The card art loads only while a card is actually on the map.
-    if (w.cardMode === 'card' && cardHost.card && cardHost.card.art) {
-      w.cardImage = wandererImageCache.get(`card:${cardHost.card.id}`, { src: cardHost.card.art, required: true });
+    // Face down until won: the map shows the shared card back. The won
+    // card's own art is only requested by the reveal and the binder.
+    if (w.cardMode === 'card' && window.KARASUKI_CARD_BACK) {
+      w.cardImage = wandererImageCache.get('card:back', { src: window.KARASUKI_CARD_BACK, required: true });
     }
   }
 
@@ -3102,14 +3103,14 @@ const HAPPY_HOUSE_PORTAL = {
     ctx.rotate(tilt);
     ctx.globalAlpha = 1;
     if (shadowsEnabled) { ctx.shadowBlur = 18; ctx.shadowColor = 'rgba(0,0,0,.55)'; }
-    cardRoundRect(-cw / 2, -ch / 2, cw, ch, 10);
+    cardRoundRect(-cw / 2, -ch / 2, cw, ch, 9);
     ctx.fillStyle = accent; ctx.fill();
     ctx.shadowBlur = 0;
     ctx.save();
-    cardRoundRect(-cw / 2 + 5, -ch / 2 + 5, cw - 10, ch - 10, 6);
+    cardRoundRect(-cw / 2 + 3, -ch / 2 + 3, cw - 6, ch - 6, 7);
     ctx.clip();
-    if (img) ctx.drawImage(img, -cw / 2 + 5, -ch / 2 + 5, cw - 10, ch - 10);
-    else { ctx.fillStyle = '#14111E'; ctx.fill(); }
+    if (img) ctx.drawImage(img, -cw / 2 + 3, -ch / 2 + 3, cw - 6, ch - 6);
+    else { ctx.fillStyle = '#1A0F24'; ctx.fill(); }
     ctx.restore();
     // Badge: "!" = a new challenge, "…" = an unfinished one.
     const inProgress = w.cardHost && w.cardHost.status.phase === 'inProgress';
@@ -4788,6 +4789,7 @@ const HAPPY_HOUSE_PORTAL = {
       <select id="dev-card-phase" aria-label="Card host state" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;">
         <option value="auto">card: real save</option><option value="surprise">card: surprise (new)</option><option value="ready">card: ready (seen)</option><option value="inProgress">card: in progress</option><option value="teaserLocked">teaser: Blitz not done</option><option value="tomorrow">teaser: come back tomorrow</option><option value="outOfAttempts">teaser: out of tries</option><option value="won">won this week (plain)</option><option value="hidden">hidden (never seen)</option>
       </select>
+      <button id="dev-card-preview" type="button" style="margin-bottom:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Preview card faces</button>
       <select id="dev-card-host" aria-label="Card host" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;"></select>
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
       <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
@@ -4813,6 +4815,7 @@ const HAPPY_HOUSE_PORTAL = {
     document.getElementById('dev-cards').addEventListener('change', function() { window.__devCards = this.checked; refreshWanderersForRoom(); });
     document.getElementById('dev-card-phase').addEventListener('change', function() { window.__devCardPhase = this.value; refreshWanderersForRoom(); });
     devHostSelect.addEventListener('change', function() { window.__devCardHost = this.value; refreshWanderersForRoom(); });
+    document.getElementById('dev-card-preview').addEventListener('click', () => { if (window.KarasukiCardFace) KarasukiCardFace.preview(); });
     document.getElementById('dev-clear-quest').addEventListener('click', () => {
 
       try {

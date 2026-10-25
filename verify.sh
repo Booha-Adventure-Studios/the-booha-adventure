@@ -1937,6 +1937,13 @@ else
   bad "Karasuki Cards takeover audit failed"
 fi
 
+echo "[karasuki] Karasuki Cards Pass 2b.1 card face audit"
+if node tests/karasuki-card-face-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki card face/back renderer, face-down map and intro, cards budget pass"
+else
+  bad "Karasuki card face audit failed"
+fi
+
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then

@@ -44,7 +44,18 @@ for (const card of cards) {
   }
 }
 for (const file of fs.readdirSync(path.join(ROOT, 'assets/img/cards'))) {
-  assert.ok(cards.some(c => c.art === `assets/img/cards/${file}`), `${file} should be registered`);
+  assert.ok(cards.some(c => c.art === `assets/img/cards/${file}`) || ctx.KARASUKI_CARD_BACK === `assets/img/cards/${file}`,
+    `${file} should be registered`);
+}
+assert.ok(fs.existsSync(path.join(ROOT, ctx.KARASUKI_CARD_BACK)), 'card back exists');
+const karasukiSrc = read('js/karasuki.js');
+for (const card of cards) {
+  const m = karasukiSrc.match(new RegExp(`name:'${card.name}',\\s*nameJP:'([^']+)'`));
+  assert.ok(m, `${card.name} should be in Karasuki's Wanderer list`);
+  assert.strictEqual(card.nameJP, m[1], `${card.name} Japanese name should match Karasuki`);
+  if (/[\u4e00-\u9fff]/.test(card.nameJP)) {
+    assert.ok(card.nameFurigana && Object.keys(card.nameFurigana).every(k => card.nameJP.includes(k)), `${card.name} kanji name needs furigana`);
+  }
 }
 assert.ok(!/\/\s*\d+\s*['"`]/.test(read('js/karasuki-cards-data.js').replace(/\/\*[\s\S]*?\*\//g, '')),
   'card numbers must not be capped with a total');
