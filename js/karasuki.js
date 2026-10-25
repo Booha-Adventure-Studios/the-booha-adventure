@@ -2973,12 +2973,221 @@ const HAPPY_HOUSE_PORTAL = {
   }
   const roomDefs = WANDERER_DEFS_WEBP
     .filter(def => def.roomId === state.roomId && unlockedIndices.includes(def.index));
+  // Karasuki Cards: the host appears at its usual slot even when this
+  // week's roster would not include it. Status is read here only, never in
+  // the animation loop.
+  readCardHost();
+  const hostDef = cardHost
+    ? WANDERER_DEFS_WEBP.find(def => def.roomId === state.roomId && wandererSaveId(def) === cardHost.status.wandererId)
+    : null;
+  if (hostDef && !roomDefs.includes(hostDef)) roomDefs.push(hostDef);
   // Several portraits are intentionally large. Loading only the unlocked
   // wanderers in this room keeps Karasuki responsive on classroom devices.
   preloadWandererImages(roomDefs);
   activeWanderers = roomDefs
     .map(def => ({ ...def, rx: def.x, ry: def.y, wobblePhase: Math.random() * Math.PI * 2, hauntAngle: Math.random() * Math.PI * 2, pose: 0, frozen: false, glitter: [], glitterNextAt: 0, images: (def.frames || []).map(getWandererImage).filter(Boolean) }));
+  if (hostDef) markCardHost(activeWanderers.find(w => w.index === hostDef.index));
 }
+
+  /* ── Karasuki Cards host takeover (Pass 2b) ──────────────────────────
+     Rules: js/karasuki-cards.js. Intro overlay: js/karasuki-card-encounter.js.
+     The card is drawn on the canvas at the host's own slot, with a fixed
+     size and a larger hit area than any sprite: on a landscape phone the
+     stage scale is ≈0.55, so 136×190 world px stays above a 44pt target. */
+  const CARD_DRAW_W = 100;
+  const CARD_DRAW_H = 150;
+  const CARD_HIT_W  = 136;
+  const CARD_HIT_H  = 190;
+  const CARD_TEASER_TINT = '#c9b8ff';
+  let cardHost = null;   // { status, card, kind, dev }
+
+  function cardsEnabled() {
+    return window.KARASUKI_CARDS_ENABLED === true || window.__devCards === true;
+  }
+
+  function cardCurriculum() {
+    try {
+      const curr = BoohaAdventure.save.load().meta.curriculum;
+      return ['pb', 'br', 'bc'].includes(curr) ? curr : 'pb';
+    } catch (_) { return 'pb'; }
+  }
+
+  // Teacher dev switch: force any presentation without touching the save.
+  function devCardStatus(phase) {
+    const K = window.KarasukiCards;
+    const picked = window.__devCardHost && K.getCard(window.__devCardHost);
+    const fallback = K.registry().find(K.isShipped);
+    const id = (picked && K.isShipped(picked) ? picked : fallback || {}).id || null;
+    const base = { phase: 'ready', hostId: id, wandererId: id, map: 'card', featureSeen: true, surprise: false,
+      hostActive: false, attemptsLeft: 2, nextTry: 1, round: 0, score: 0 };
+    const table = {
+      surprise:      { phase: 'ready', map: 'card', surprise: true, featureSeen: false, hostActive: true },
+      ready:         { phase: 'ready', map: 'card', hostActive: true, nextTry: 2, attemptsLeft: 1 },
+      inProgress:    { phase: 'inProgress', map: 'card', hostActive: true, round: 4, score: 3 },
+      teaserLocked:  { phase: 'locked', map: 'teaser' },
+      tomorrow:      { phase: 'tomorrow', map: 'teaser', attemptsLeft: 1, nextTry: 2 },
+      outOfAttempts: { phase: 'outOfAttempts', map: 'teaser', attemptsLeft: 0, nextTry: 3 },
+      won:           { phase: 'wonThisWeek', map: 'plain' },
+      hidden:        { phase: 'locked', map: 'hidden', featureSeen: false },
+    };
+    return Object.assign(base, table[phase] || { map: 'none' });
+  }
+
+  function readCardHost() {
+    cardHost = null;
+    if (!cardsEnabled() || !window.KarasukiCards) return;
+    const forced = window.__devCardPhase && window.__devCardPhase !== 'auto';
+    let st = null;
+    try {
+      st = forced ? devCardStatus(window.__devCardPhase) : window.KarasukiCards.current();
+    } catch (e) {
+      console.error('[Karasuki] Card status failed:', e);
+      return;
+    }
+    if (!st || !st.wandererId || !['card', 'teaser', 'plain'].includes(st.map)) return;
+    cardHost = { status: st, card: window.KarasukiCards.getCard(st.wandererId), dev: !!forced };
+  }
+
+  function markCardHost(w) {
+    if (!w || !cardHost) return;
+    const comment = wandererComment(w);
+    w.cardHost = cardHost;
+    w.cardMode = cardHost.status.map;
+    w.cardKind = (comment && comment.kind) || 'friendly';
+    // The card art loads only while a card is actually on the map.
+    if (w.cardMode === 'card' && cardHost.card && cardHost.card.art) {
+      w.cardImage = wandererImageCache.get(`card:${cardHost.card.id}`, { src: cardHost.card.art, required: true });
+    }
+  }
+
+  function cardMotionReduced() {
+    const root = document.documentElement;
+    return LOW_POWER_HINT || perfTier === 'low'
+      || root.getAttribute('data-motion') === 'reduced'
+      || (!!root.getAttribute('data-power') && root.getAttribute('data-power') !== 'full');
+  }
+
+  // Manual rounded rectangle: CanvasRenderingContext2D.roundRect is missing
+  // on the older iPads this world targets.
+  function cardRoundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawCardHosts(now) {
+    for (const w of activeWanderers) if (w.cardMode === 'card') drawCardHost(w, now);
+  }
+
+  function drawCardHost(w, now) {
+    const sec = now / 1000;
+    const still = cardMotionReduced();
+    const accent = (window.KarasukiCardEncounter && KarasukiCardEncounter.KIND[w.cardKind] || {}).accent || '#F2C14E';
+    const img = w.cardImage && w.cardImage.complete && w.cardImage.naturalWidth > 0 ? w.cardImage : null;
+    const cw = CARD_DRAW_W, ch = CARD_DRAW_H;
+    const bob = still ? 0 : Math.sin(sec * 2.1 + w.wobblePhase) * 5;
+    const tilt = still ? 0 : Math.sin(sec * 1.3 + w.wobblePhase) * 0.035;
+    const pulse = still ? 0.5 : 0.5 + 0.5 * Math.sin(sec * 2.4 + w.wobblePhase);
+    ctx.save();
+    ctx.translate(w.rx, w.ry + bob);
+    const haloR = ch * 0.95;
+    const halo = ctx.createRadialGradient(0, 0, 0, 0, 0, haloR);
+    halo.addColorStop(0, accent + '66'); halo.addColorStop(1, 'transparent');
+    ctx.globalAlpha = 0.45 + pulse * 0.3; ctx.fillStyle = halo;
+    ctx.beginPath(); ctx.arc(0, 0, haloR, 0, Math.PI * 2); ctx.fill();
+    ctx.rotate(tilt);
+    ctx.globalAlpha = 1;
+    if (shadowsEnabled) { ctx.shadowBlur = 18; ctx.shadowColor = 'rgba(0,0,0,.55)'; }
+    cardRoundRect(-cw / 2, -ch / 2, cw, ch, 10);
+    ctx.fillStyle = accent; ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.save();
+    cardRoundRect(-cw / 2 + 5, -ch / 2 + 5, cw - 10, ch - 10, 6);
+    ctx.clip();
+    if (img) ctx.drawImage(img, -cw / 2 + 5, -ch / 2 + 5, cw - 10, ch - 10);
+    else { ctx.fillStyle = '#14111E'; ctx.fill(); }
+    ctx.restore();
+    // Badge: "!" = a new challenge, "…" = an unfinished one.
+    const inProgress = w.cardHost && w.cardHost.status.phase === 'inProgress';
+    ctx.fillStyle = accent; ctx.strokeStyle = '#14111E'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cw / 2 - 4, -ch / 2 + 4, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#14111E'; ctx.font = '900 20px system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(inProgress ? '…' : '!', cw / 2 - 4, -ch / 2 + 5);
+    if (w.cardHost && w.cardHost.status.surprise) {
+      cardRoundRect(-26, ch / 2 - 13, 52, 24, 12);
+      ctx.fillStyle = '#14111E'; ctx.fill();
+      ctx.strokeStyle = accent; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = accent; ctx.font = '900 13px system-ui, sans-serif';
+      ctx.fillText('NEW', 0, ch / 2 - 1);
+    }
+    ctx.restore();
+  }
+
+  // Teaser: the ordinary sprite with one faint, unusual shimmer — never a
+  // card shape, so the collection stays hidden.
+  function drawCardTeaser(w, now) {
+    const sz = w.size || WANDERER_SIZE;
+    const sec = now / 1000;
+    const still = cardMotionReduced();
+    const r = sz * 1.25;
+    ctx.save();
+    ctx.globalAlpha = still ? 0.35 : 0.22 + 0.18 * Math.sin(sec * 0.9 + w.wobblePhase);
+    ctx.strokeStyle = CARD_TEASER_TINT; ctx.lineWidth = 2; ctx.setLineDash([3, 7]);
+    ctx.beginPath(); ctx.arc(w.rx, w.ry, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+    if (!still) {
+      const a = sec * 0.8 + w.wobblePhase;
+      ctx.globalAlpha = 0.85; ctx.fillStyle = '#efe9ff';
+      ctx.beginPath(); ctx.arc(w.rx + Math.cos(a) * r, w.ry + Math.sin(a) * r * 0.6, 2.6, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function cardHostHit(worldX, worldY) {
+    for (const w of activeWanderers) {
+      if (w.cardMode !== 'card') continue;
+      // Never smaller than the host's own sprite hit box (Mister Happy is 110).
+      const spriteHalf = (w.size || WANDERER_SIZE) * 0.85;
+      const halfW = Math.max(CARD_HIT_W / 2, spriteHalf);
+      const halfH = Math.max(CARD_HIT_H / 2, spriteHalf);
+      if (Math.abs(worldX - w.rx) <= halfW && Math.abs(worldY - w.ry) <= halfH) return w;
+    }
+    return null;
+  }
+
+  function isCardEncounterOpen() {
+    return !!(window.KarasukiCardEncounter && KarasukiCardEncounter.isOpen());
+  }
+
+  function openCardEncounter(w) {
+    const host = w.cardHost;
+    if (!host || !window.KarasukiCardEncounter) { openWandererPop(w); return; }
+    // featureSeen means the student genuinely opened an introduction.
+    if (!host.dev && window.KarasukiCards) {
+      try { KarasukiCards.seen(); } catch (e) { console.error('[Karasuki] Card seen write failed:', e); }
+    }
+    const comment = wandererComment(w);
+    state.clickTarget = null;
+    KarasukiCardEncounter.open({
+      name: w.name,
+      nameJP: w.nameJP,
+      furigana: { ...(WANDERER_FURIGANA[w.name] || {}), ...((comment && comment.furigana) || {}) },
+      kind: w.cardKind,
+      card: host.card,
+      comment,
+      status: host.status,
+      curriculum: cardCurriculum(),
+      onClose: () => {
+        wandererPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+        refreshWanderersForRoom();
+      },
+    });
+  }
 
   function initWanderers() { refreshWanderersForRoom(); }
   
@@ -3016,6 +3225,7 @@ const HAPPY_HOUSE_PORTAL = {
           <div id="wanderer-pop-portrait-fade" style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(to bottom,transparent,#080810);pointer-events:none;"></div>
         </div>
         <div style="padding:0 28px;">
+          <div id="wanderer-pop-card-banner" class="kc-teaser" role="note" style="display:none;"></div>
           <h2 id="wanderer-pop-name" style="font-size:clamp(1.2rem,4vw,1.5rem);margin:0 0 4px;letter-spacing:.06em;"></h2>
           <p id="wanderer-pop-jp" style="font-size:clamp(.82rem,2.6vw,.96rem);margin:0 0 20px;line-height:2;opacity:.85;letter-spacing:.08em;font-family:'Georgia',serif;color:#ffffff;"></p>
 
@@ -3064,6 +3274,11 @@ const HAPPY_HOUSE_PORTAL = {
     descEl.textContent   = w.desc || '';
     if (w.descJP) { descJpEl.innerHTML = UtsuFurigana.sentence(w.descJP, furiMap); descJpEl.style.display = 'block'; }
     else          { descJpEl.style.display = 'none'; }
+    const cardBanner = document.getElementById('wanderer-pop-card-banner');
+    const teaserHTML = w.cardMode === 'teaser' && w.cardHost && window.KarasukiCardEncounter
+      ? KarasukiCardEncounter.teaserHTML(w.cardHost.status.phase, cardCurriculum()) : '';
+    cardBanner.innerHTML = teaserHTML;
+    cardBanner.style.display = teaserHTML ? 'block' : 'none';
     wandererPopOverlay.style.display    = 'flex';
     wandererPopOverlay.style.background = 'rgba(0,0,0,0.82)';
     state.clickTarget = null;
@@ -3090,6 +3305,8 @@ const HAPPY_HOUSE_PORTAL = {
 
   function clickCheckWanderers(worldX, worldY) {
     if (performance.now() < wandererPopCooldownUntil) return false;
+    const cardTarget = cardHostHit(worldX, worldY);
+    if (cardTarget) { openCardEncounter(cardTarget); return true; }
     for (const w of activeWanderers) {
       if (!w.name || !w.frames) continue;
       const sz = w.size || WANDERER_SIZE;
@@ -3102,6 +3319,7 @@ const HAPPY_HOUSE_PORTAL = {
     if (!activeWanderers.length) return;
     const sec = now / 1000;
     activeWanderers.forEach(w => {
+      if (w.cardMode === 'card') return;   // drawn above everything by drawCardHosts()
       const sz     = w.size || WANDERER_SIZE;
       const imgIdx = w.pose === 1 ? 1 : 0;
       const rawImg = w.images && w.images.length > imgIdx ? w.images[imgIdx] : (w.images && w.images[0]);
@@ -3126,6 +3344,7 @@ const HAPPY_HOUSE_PORTAL = {
         ctx.fillStyle = ig; ctx.beginPath(); ctx.arc(w.rx, w.ry, sz, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
       }
       ctx.restore();
+      if (w.cardMode === 'teaser') drawCardTeaser(w, now);
       drawGlitter(w, now);
     });
   }
@@ -4565,6 +4784,11 @@ const HAPPY_HOUSE_PORTAL = {
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-grimmerglen"> Grimmerglen unlocked</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-all-orbs"> Show all memory boxes</label>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-coords-toggle"> Coord mode</label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-cards"> Karasuki Cards on</label>
+      <select id="dev-card-phase" aria-label="Card host state" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;">
+        <option value="auto">card: real save</option><option value="surprise">card: surprise (new)</option><option value="ready">card: ready (seen)</option><option value="inProgress">card: in progress</option><option value="teaserLocked">teaser: Blitz not done</option><option value="tomorrow">teaser: come back tomorrow</option><option value="outOfAttempts">teaser: out of tries</option><option value="won">won this week (plain)</option><option value="hidden">hidden (never seen)</option>
+      </select>
+      <select id="dev-card-host" aria-label="Card host" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;"></select>
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
       <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
     document.body.appendChild(panel);
@@ -4580,6 +4804,15 @@ const HAPPY_HOUSE_PORTAL = {
     document.getElementById('dev-grimmerglen').addEventListener('change',   function() { window.__devGrimmerglen = this.checked; });
     document.getElementById('dev-all-orbs').addEventListener('change',      function() { window.__devAllOrbs = this.checked; });
     document.getElementById('dev-coords-toggle').addEventListener('change', function() { if (this.checked !== state.coordMode) toggleCoordMode(); });
+    window.__devCards = false; window.__devCardPhase = 'auto'; window.__devCardHost = '';
+    const devHostSelect = document.getElementById('dev-card-host');
+    if (window.KarasukiCards) {
+      devHostSelect.innerHTML = '<option value="">host: first unwon</option>' + KarasukiCards.registry().filter(KarasukiCards.isShipped)
+        .map(c => `<option value="${c.id}">host: No.${String(c.no).padStart(2, '0')} ${c.name}</option>`).join('');
+    }
+    document.getElementById('dev-cards').addEventListener('change', function() { window.__devCards = this.checked; refreshWanderersForRoom(); });
+    document.getElementById('dev-card-phase').addEventListener('change', function() { window.__devCardPhase = this.value; refreshWanderersForRoom(); });
+    devHostSelect.addEventListener('change', function() { window.__devCardHost = this.value; refreshWanderersForRoom(); });
     document.getElementById('dev-clear-quest').addEventListener('click', () => {
 
       try {
@@ -5143,7 +5376,7 @@ const HAPPY_HOUSE_PORTAL = {
     }
     trail=trail.filter(p=>p.life>0);
     drawPortalOrb(now); drawMuenbaOrb(now); drawGrimmerglenPortal(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
-    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawBarba(now); drawNuppi(now);
+    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawBarba(now); drawNuppi(now); drawCardHosts(now);
     
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
     const bob=Math.sin(bobPhase)*HOVER_AMP; const wobble=Math.sin(bobPhase*2)*2.2;
@@ -5198,7 +5431,8 @@ const HAPPY_HOUSE_PORTAL = {
       isNuppiPopOpen()           ||
       isOrbPanelOpen()           ||
       isHappyHousePopOpen()      ||
-      isGrimmerglenPopupOpen()
+      isGrimmerglenPopupOpen()   ||
+      isCardEncounterOpen()
     );
   }
 
@@ -5212,7 +5446,7 @@ const HAPPY_HOUSE_PORTAL = {
       || isBonusPopOpen() || isWandererPopOpen() || isUtsuobaPopOpen()
       || isMuenbaPopupOpen() || isObserverPopOpen() || isBarbaPopOpen() || isNuppiPopOpen()
       || isOrbPanelOpen() || isHappyHousePopOpen() || isGrimmerglenPopupOpen()
-      || state.grimmerglenExiting;
+      || isCardEncounterOpen() || state.grimmerglenExiting;
   }
 
   function scheduleKarasukiFrame() {
@@ -6294,6 +6528,7 @@ function drawObserver(now) {
       shouldRender: now => worldPerf.shouldRender(now),
     });
     document.addEventListener('booha:weeklyReset', () => {
+      refreshWanderersForRoom();
       refreshNuppiChargeState();
       lastLitEchoIds = null;
       renderEchoesTracker();

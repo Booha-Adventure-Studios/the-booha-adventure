@@ -1930,6 +1930,13 @@ else
   bad "Karasuki Cards logic test failed"
 fi
 
+echo "[karasuki] Karasuki Cards Pass 2b host takeover audit"
+if node tests/karasuki-cards-takeover-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki Cards takeover: script order, flag, refresh-only status, hit test, teaser copy pass"
+else
+  bad "Karasuki Cards takeover audit failed"
+fi
+
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then

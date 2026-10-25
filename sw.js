@@ -105,7 +105,9 @@ const CURRENT_CACHES = {
   // Sealed ready line, weekLog.ready history, per-student seen flags.
   // Ready Pass 2 (2026-10-24): Rainbow token tier names, Prism Trail (rainbow
   // links, prism gate at 9/9), best ready week + rainbow weeks.
-  pages:  'booha-pages-2026-497',
+  // Karasuki Cards Pass 2b: karasuki.html loads games/echo.js and the card
+  // registry/logic/encounter scripts (feature flag off until Pass 2c).
+  pages:  'booha-pages-2026-498',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
