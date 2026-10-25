@@ -98,7 +98,11 @@ function play(state, correct, now = 1) {
   const win = play(s, 8, 5);
   assert.ok(win.outcome.passed, '8/10 passes');
   assert.deepStrictEqual(JSON.parse(JSON.stringify(s.won['mister-happy'])),
-    { cardId: 'mister-happy', lv: 1, wonAt: 5, try: 2, score: 8, week: 'W1' }, 'win recorded as 2nd try');
+    { cardId: 'mister-happy', lv: 1, wonAt: 5, try: 2, score: 8, week: 'W1', viewedAt: 0 }, 'win recorded as 2nd try, NEW in the binder');
+  assert.ok(K.markViewed(s, 'mister-happy', 9), 'opening it in the binder clears NEW');
+  assert.ok(!K.markViewed(s, 'mister-happy', 10), 'once');
+  assert.ok(!K.markViewed(s, 'uhibon', 10), 'cards not won cannot be viewed');
+  assert.strictEqual(K.normalizeState(JSON.parse(JSON.stringify(s))).won['mister-happy'].viewedAt, 9, 'viewed survives a reload');
   assert.strictEqual(K.status(s, ctxFor(1, 3)).phase, 'wonThisWeek', 'one card per week');
   assert.ok(!K.status(s, ctxFor(1, 3)).hostActive, 'sprite returns after the win');
 
@@ -141,6 +145,30 @@ function play(state, correct, now = 1) {
   const seen = [];
   while (s.attempt) { seen.push(K.currentWord(s).en); K.submitAnswer(s, 'x', 1, E); }
   assert.strictEqual(new Set(seen).size, seen.length, 'no word repeats within an attempt');
+}
+
+/* ── Resume: mid-round costs a restart, between rounds is free ──────── */
+{
+  const s = K.defaultState();
+  K.startAttempt(s, ctxFor(1, 1), words(14), 1);
+  assert.strictEqual(K.resumeAttempt(s, 1).kind, 'resume', 'nothing shown yet: free');
+  K.beginRound(s);
+  assert.ok(s.attempt.roundLive);
+  const mid = K.resumeAttempt(s, 1);
+  assert.strictEqual(mid.kind, 'restart', 'left mid-round: counts as an interruption');
+  assert.strictEqual(s.attempt.interruptions, 1);
+  assert.ok(!s.attempt.roundLive, 'a restart ends the live round');
+  K.beginRound(s);
+  K.submitAnswer(s, K.currentWord(s).en, 1, E);
+  assert.ok(!s.attempt.roundLive, 'an answer ends the live round');
+  const between = K.resumeAttempt(s, 1);
+  assert.strictEqual(between.kind, 'resume', 'left during feedback: free');
+  assert.strictEqual(s.attempt.interruptions, 1, 'no restart used');
+  assert.strictEqual(s.attempt.results.length, 1, 'no miss recorded');
+  assert.strictEqual(K.normalizeState(JSON.parse(JSON.stringify(s))).attempt.roundLive, false);
+  K.beginRound(s);
+  assert.strictEqual(K.normalizeState(JSON.parse(JSON.stringify(s))).attempt.roundLive, true, 'roundLive survives a reload');
+  assert.strictEqual(K.resumeAttempt(K.defaultState(), 1).error, 'noAttempt');
 }
 
 /* ── Sunday rollover closes an open attempt ────────────────────────── */

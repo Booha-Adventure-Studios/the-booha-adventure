@@ -13,7 +13,8 @@
  * Interruptions: leaving the page for up to GRACE_MS pauses the round and
  * resumes it. Longer, the round is interrupted (KarasukiCards.interrupt):
  * a fresh word within the cap, a miss beyond it. Leaving with the Leave
- * button, or coming back with Continue after a reload, counts the same way.
+ * button, or coming back with Continue after a reload, counts the same way
+ * only if a round was live; leaving between rounds costs nothing.
  */
 (function () {
   'use strict';
@@ -206,8 +207,9 @@
   }
 
   function nextRound() {
-    const got = K().word();
-    if (!got || !got.ok || !got.word) return ended();
+    // Marks the round live in the save: leaving from here costs a restart.
+    const got = K().begin();
+    if (!got || !got.ok || !got.word) return got && got.error === 'noAttempt' ? ended(got.expired) : ended();
     run.word = got.word.en;
     dots();
     const input = $('.kcc-input');
@@ -398,7 +400,11 @@
     $('.kcc-label').textContent = 'GETTING WORDS READY · じゅんびちゅう';
     $('.kcc-input').disabled = false;
 
-    if (opts.mode === 'continue') return interrupted(K().interrupt());
+    if (opts.mode === 'continue') {
+      const r = K().resume();
+      if (r && r.ok && r.kind === 'resume') return nextRound();   // left between rounds: free
+      return interrupted(r);
+    }
 
     let words = [];
     try { words = await K().loadSnapshotWords(opts.curriculum); } catch (_) { words = []; }

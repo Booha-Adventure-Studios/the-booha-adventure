@@ -53,7 +53,8 @@ assert.match(vis, /else interrupted\(K\(\)\.interrupt\(\)\);/);
 assert.match(fn(c, 'open'), /document\.addEventListener\('visibilitychange', onVisibility\)/);
 assert.match(fn(c, 'close'), /document\.removeEventListener\('visibilitychange', onVisibility\)/);
 assert.match(fn(c, 'leave'), /run\.phase === 'show' \|\| run\.phase === 'fade' \|\| run\.phase === 'type'/, 'Leave only interrupts a live round');
-assert.match(fn(c, 'open'), /if \(opts\.mode === 'continue'\) return interrupted\(K\(\)\.interrupt\(\)\);/, 'Continue after a reload counts as an interruption');
+assert.match(fn(c, 'open'), /const r = K\(\)\.resume\(\);/, 'Continue uses resume (mid-round: interruption; between rounds: free)');
+assert.match(fn(c, 'nextRound'), /K\(\)\.begin\(\)/, 'each round is marked live before the word shows');
 
 /* iPad keyboard: focus inside the tap, before any await */
 const openSrc = fn(c, 'open');
