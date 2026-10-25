@@ -29,6 +29,7 @@ assert.ok(scripts.includes('js/core/booha-skins.js'), 'booha-skins (Blitz helper
 
 /* No totals, no hints */
 assert.ok(!/registry\(\)\.length|KARASUKI_CARDS\.length|\/ \$\{/.test(b), 'never shows how many cards exist');
+assert.ok(!/cards\.length\}|count\(key\)\}|adv-head-num|· \$\{/.test(b), 'no owned-card counts in the header or the filters');
 assert.match(b, /\.filter\(c => s\.won\[c\.id\]\)/, 'only owned cards are listed');
 assert.match(b, /key === 'all' \|\| count\(key\) > 0/, 'kind chips appear only for kinds the student owns');
 assert.ok(!/unknown|\?\?\?|kb-slot/.test(b), 'no empty slots');

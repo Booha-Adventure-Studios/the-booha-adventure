@@ -3,8 +3,8 @@
  * The Booha Adventure — Karasuki Cards binder (Pass 3), adventure-profile.html.
  *
  * Mounts #karasuki-cards. The section stays hidden until the student has won
- * a card, and it only ever talks about cards they own: no totals, no empty
- * slots, no hints about what is still out there.
+ * a card, and it only ever talks about cards they own: no counts or totals,
+ * no empty slots, no hints about what is still out there.
  *
  *   shelf     won cards in card-number order, swipeable, filter by kind
  *   NEW       until the card is first opened here (karasukiCards.won[id].viewedAt,
@@ -97,12 +97,11 @@ const BoohaKarasukiBinder = (() => {
     const width = shelfWidth();
     const chips = FILTERS
       .filter(([key]) => key === 'all' || count(key) > 0)
-      .map(([key, jp, en]) => `<button type="button" class="kb-filter ${key}" data-kb-filter="${key}" aria-pressed="${filter === key}">${jp} ${en} · ${key === 'all' ? cards.length : count(key)}</button>`)
+      .map(([key, jp, en]) => `<button type="button" class="kb-filter ${key}" data-kb-filter="${key}" aria-pressed="${filter === key}">${jp} ${en}</button>`)
       .join('');
     host.innerHTML = `
       <div class="adv-head">
         <div><h2 id="cards-title">カラスキーカード</h2><span class="adv-kicker pink">KARASUKI CARDS · Cards Won</span></div>
-        <b class="adv-head-num pink">${cards.length} ${cards.length === 1 ? 'card' : 'cards'}</b>
       </div>
       <p class="kb-intro">Win a Wanderer's card in Karasuki after this week's Blitz. Tap a card to see it big.<br>
         <span lang="ja">カードを タップすると、<ruby>大<rt>おお</rt></ruby>きく <ruby>見<rt>み</rt></ruby>られるよ。</span></p>
