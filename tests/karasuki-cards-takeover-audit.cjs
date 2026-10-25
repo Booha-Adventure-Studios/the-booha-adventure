@@ -121,6 +121,10 @@ assert.ok(!/\d+\s*\/\s*\d+\s*cards|of \d+ cards/i.test(enc), 'copy never reveals
 assert.ok(!/let me in, dear/.test(enc + k), 'card copy is read from karasuki-wanderer-data.js, not duplicated');
 assert.match(read('js/karasuki-wanderer-data.js'), /"Won't you let me in, dear\? Just for a little while\."/);
 
+/* Card hosts stay on their slot (haunting Wanderers stop orbiting) */
+assert.match(fn('markCardHost'), /if \(w\.cardMode === 'card'\) \{ w\.frozen = true; w\.rx = w\.x; w\.ry = w\.y; \}/);
+assert.match(fn('updateWanderers'), /if \(w\.type === 'haunt' && !w\.frozen\)/, 'haunt movement respects frozen');
+
 /* Teacher reset: dev panel only, two taps, touches karasukiCards only */
 const reset = fn('devResetCards');
 assert.match(reset, /data\.karasukiCards = KarasukiCards\.defaultState\(\);/);
