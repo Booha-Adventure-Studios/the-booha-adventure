@@ -15,10 +15,14 @@
  *   wonWeek           occurrence key of the last win (one card per week)
  *   attempt           the attempt in progress, or null:
  *                       { hostId, week, day, try, startedAt, words, cursor,
- *                         round, results, interruptions }
+ *                         round, results, interruptions, roundLive }
  *                     `interruptions` is kept apart from failure state.
+ *                     `roundLive` is true only while a word has been shown
+ *                     and not yet answered: leaving then costs a restart,
+ *                     leaving between rounds costs nothing.
  *   lastResult        { hostId, passed, score, try, at, week } or null
- *   won               { [cardId]: { cardId, lv, wonAt, try, score, week } }
+ *   won               { [cardId]: { cardId, lv, wonAt, try, score, week, viewedAt } }
+ *                     viewedAt: first opened in the binder (0 = still NEW)
  *   featureSeenAt     when the student first opened a card introduction
  *                     (0 = never). Rendering a host does not count.
  *
@@ -103,6 +107,7 @@
         ? a.results.filter(isObj).map(r => ({ w: str(r.w), ok: r.ok === true, why: str(r.why) }))
         : [],
       interruptions: count(a.interruptions),
+      roundLive: a.roundLive === true,
     };
   }
 
@@ -128,6 +133,7 @@
           try: Math.max(1, count(w.try)),
           score: count(w.score),
           week: str(w.week),
+          viewedAt: Number(w.viewedAt) > 0 ? Number(w.viewedAt) : 0,
         };
       });
     }
@@ -230,6 +236,7 @@
       round: 0,
       results: [],
       interruptions: 0,
+      roundLive: false,
     };
     return { ok: true, attempt: state.attempt };
   }
@@ -243,6 +250,7 @@
 
   function record(state, word, ok, why, now) {
     const a = state.attempt;
+    a.roundLive = false;
     a.results.push({ w: word.en, ok, why });
     a.cursor += 1;
     a.round += 1;
@@ -254,7 +262,7 @@
     const score = a.results.filter(r => r.ok).length;
     const passed = score >= RULES.passScore;
     if (passed) {
-      state.won[a.hostId] = { cardId: a.hostId, lv: 1, wonAt: now, try: a.try, score, week: a.week };
+      state.won[a.hostId] = { cardId: a.hostId, lv: 1, wonAt: now, try: a.try, score, week: a.week, viewedAt: 0 };
       state.wonWeek = a.week;
       state.hostId = null;
     } else {
@@ -284,11 +292,27 @@
     if (a.interruptions < RULES.interruptionCap) {
       a.interruptions += 1;
       a.cursor += 1;
+      a.roundLive = false;
       return { ok: true, kind: 'restart', interruptions: a.interruptions, word: currentWord(state) };
     }
     const word = currentWord(state);
     const outcome = record(state, word, false, 'left', now);
     return { ok: true, kind: 'miss', word, done: !!outcome, outcome };
+  }
+
+  /** The screen is about to show the current word. */
+  function beginRound(state) {
+    if (!state.attempt) return { ok: false, error: 'noAttempt' };
+    state.attempt.roundLive = true;
+    return { ok: true, word: currentWord(state) };
+  }
+
+  /** Coming back to an unfinished attempt (Continue, or after a reload).
+   *  Mid-round it counts as an interruption; between rounds it is free. */
+  function resumeAttempt(state, now) {
+    if (!state.attempt) return { ok: false, error: 'noAttempt' };
+    if (state.attempt.roundLive) return interruptRound(state, now);
+    return { ok: true, kind: 'resume', word: currentWord(state) };
   }
 
   /** An attempt left open across a Sunday rollover is closed: unanswered
@@ -301,6 +325,14 @@
       if (outcome) return outcome;
     }
     return state.attempt ? finish(state, now) : null;
+  }
+
+  /** The student opened a won card in the binder: it is no longer NEW. */
+  function markViewed(state, cardId, now) {
+    const card = state.won[cardId];
+    if (!card || card.viewedAt > 0) return false;
+    card.viewedAt = now;
+    return true;
   }
 
   /** The student opened a card introduction for the first time. */
@@ -508,6 +540,7 @@
     // pure
     defaultState, normalizeState, registry, getCard, isShipped, resolveHost,
     status, startAttempt, currentWord, submitAnswer, interruptRound, expireStale, markFeatureSeen,
+    beginRound, resumeAttempt, markViewed,
     checkAnswer, lookMs, typeMs, seededRng, pickWords, sliceForWeek,
     previousWeeks, loadSnapshotWords,
     // save-backed (current student)
@@ -515,8 +548,11 @@
     start(words) { return transact((s, ctx, now) => startAttempt(s, ctx, words, now)); },
     answer(typed) { return transact((s, ctx, now) => submitAnswer(s, typed, now)); },
     interrupt() { return transact((s, ctx, now) => interruptRound(s, now)); },
+    begin() { return transact(s => beginRound(s)); },
+    resume() { return transact((s, ctx, now) => resumeAttempt(s, now)); },
     word() { return transact(s => ({ ok: true, word: currentWord(s) })); },
     seen() { return transact((s, ctx, now) => ({ ok: true, changed: markFeatureSeen(s, now) })); },
+    viewed(cardId) { return transact((s, ctx, now) => ({ ok: true, changed: markViewed(s, cardId, now) })); },
     wonCards() {
       const api = saveApi();
       const state = normalizeState(api ? api.load().karasukiCards : null);

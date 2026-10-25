@@ -1951,6 +1951,13 @@ else
   bad "Karasuki card challenge audit failed"
 fi
 
+echo "[karasuki] Karasuki Cards Pass 3 binder audit"
+if node tests/karasuki-binder-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki Cards binder: hidden until first win, no totals, NEW per student, zoom pass"
+else
+  bad "Karasuki binder audit failed"
+fi
+
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then
