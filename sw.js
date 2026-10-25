@@ -111,7 +111,9 @@ const CURRENT_CACHES = {
   // map card and introduction now show the card back until the card is won.
   // Karasuki Cards Pass 2c: 10-round challenge + flip reveal
   // (js/karasuki-card-challenge.js); cards switched on for students.
-  pages:  'booha-pages-2026-500',
+  // Karasuki Cards Pass 3: binder shelf on adventure-profile.html
+  // (js/ui/karasuki-binder.js); leaving between rounds no longer costs a restart.
+  pages:  'booha-pages-2026-501',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

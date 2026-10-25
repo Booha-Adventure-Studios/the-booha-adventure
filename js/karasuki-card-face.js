@@ -53,6 +53,8 @@
 .kcf-fit{position:relative;flex:0 0 auto;display:inline-block;vertical-align:top}
 .kcf,.kcb{position:absolute;left:0;top:0;width:${W}px;height:${H}px;transform-origin:0 0;overflow:hidden;box-sizing:border-box;font-family:'Nunito',system-ui,-apple-system,sans-serif;text-align:left;-webkit-font-smoothing:antialiased}
 .kcf *,.kcb *{box-sizing:border-box}
+.kcf,.kcb{line-height:1.35;letter-spacing:normal;font-weight:600;text-shadow:none}
+.kcf p,.kcf span,.kcf b,.kcf small{margin:0;padding:0}
 .kcf .kcf-art{position:absolute;left:12px;top:12px;right:12px;bottom:12px;overflow:hidden}
 .kcf .kcf-art img{width:100%;height:100%;object-fit:cover;display:block}
 .kcf .kcf-shade{position:absolute;left:12px;top:12px;right:12px;height:96px}
@@ -68,7 +70,7 @@
 .kcf .kcf-name{margin:0;font-family:'Grenze',Georgia,serif;font-size:30px;font-weight:700;line-height:1}
 .kcf .kcf-name.is-long{font-size:26px}
 .kcf .kcf-namejp,.kcf .kcf-quotejp{margin:0;font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif;font-weight:500}
-.kcf .kcf-namejp{font-size:14px}
+.kcf .kcf-namejp{font-size:14px;line-height:1.4}
 .kcf .kcf-quote{margin:0;font-size:14px;font-style:italic;font-weight:600;line-height:1.35}
 .kcf .kcf-quotejp{font-size:13px;line-height:1.5}
 .kcf ruby rt{font-size:7px !important;opacity:.9}
@@ -77,7 +79,8 @@
 .kcf .kcf-rule{height:1px}
 .kcf .kcf-result{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:600}
 .kcf .kcf-result b{font-size:15px;font-weight:800}
-.kcf .kcf-try{padding:3px 9px;border:1.5px solid;font-weight:800}
+.kcf .kcf-result span{line-height:1.3}
+.kcf .kcf-result .kcf-try{display:inline-block;padding:3px 9px;border:1.5px solid;font-weight:800;line-height:1.2}
 
 .kcf--friendly{border-radius:20px;background:#D9A441;box-shadow:inset 0 0 0 2px #F6D27A,inset 0 0 0 9px #B9822A;color:#FFF8EC}
 .kcf--friendly .kcf-art{border-radius:12px;background:#2A1A0E}
