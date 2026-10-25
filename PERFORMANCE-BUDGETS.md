@@ -21,6 +21,7 @@ These are enforceable file/cache limits or runtime targets, not claims about eve
 | Muenba image-directory payload | 9.2 MiB |
 | Utsuroba image-directory payload | 5.75 MiB |
 | Wanderer image-directory payload | 11.5 MiB |
+| Karasuki Cards image-directory payload (300×450 WebP, ~50 KB each, lazy-loaded) | 1 MiB |
 | Canvas DPR | high: device-capped; low: 1 |
 | High-tier frame target | 60 FPS |
 | Low-tier frame target | deliberate 30 FPS |

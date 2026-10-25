@@ -107,7 +107,9 @@ const CURRENT_CACHES = {
   // links, prism gate at 9/9), best ready week + rainbow weeks.
   // Karasuki Cards Pass 2b: karasuki.html loads games/echo.js and the card
   // registry/logic/encounter scripts (feature flag off until Pass 2c).
-  pages:  'booha-pages-2026-498',
+  // Karasuki Cards Pass 2b.1: shared card face/back (js/karasuki-card-face.js);
+  // map card and introduction now show the card back until the card is won.
+  pages:  'booha-pages-2026-499',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
