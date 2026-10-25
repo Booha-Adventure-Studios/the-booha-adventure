@@ -75,7 +75,8 @@
 #kcc .kcc-word.is-gone{opacity:0}
 #kcc .kcc-word span{display:inline-block;opacity:0;transform:translateY(8px);animation:kcc-in .22s ease-out forwards}
 #kcc.kcc-still .kcc-word span{opacity:1;transform:none;animation:none}
-#kcc.kcc-still .kcc-word,#kcc.kcc-still .kcc-meter i,#kcc.kcc-still .kcc-flip,#kcc.kcc-still .kcc-reveal-card{transition:none !important}
+#kcc.kcc-still .kcc-word,#kcc.kcc-still .kcc-meter i,#kcc.kcc-still .kcc-flip{transition:none !important}
+#kcc.kcc-still .kcc-reveal-card{transition:opacity .5s ease !important}
 @keyframes kcc-in{to{opacity:1;transform:none}}
 #kcc .kcc-meter{width:min(520px,86vw);height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
 #kcc .kcc-meter i{display:block;height:100%;width:100%;transform-origin:0 50%;border-radius:99px}
@@ -96,13 +97,41 @@
 #kcc .kcc-btn small{display:block;font-size:12px}
 #kcc .kcc-btn.is-quiet{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35)}
 #kcc .kcc-reveal{flex:1 1 auto;display:flex;align-items:center;justify-content:center;gap:clamp(16px,4vw,40px);min-height:0;flex-wrap:wrap}
-#kcc .kcc-reveal-card{perspective:1200px;-webkit-perspective:1200px;transition:transform .6s ease-in,opacity .6s ease-in}
-#kcc .kcc-reveal-card.is-stowed{transform:translate(40vw,-45vh) scale(.15);opacity:0}
+#kcc .kcc-reveal{position:relative}
+#kcc .kcc-hush{position:absolute;left:-40px;top:-40px;right:-40px;bottom:-40px;background:radial-gradient(ellipse at 38% 50%,rgba(0,0,0,0) 0,rgba(0,0,0,.8) 70%);opacity:0;transition:opacity .4s ease;pointer-events:none}
+#kcc .kcc-reveal.is-hush .kcc-hush{opacity:1}
+#kcc .kcc-stage-card{position:relative;display:flex;align-items:center;justify-content:center}
+#kcc .kcc-reveal .kcc-panel{position:relative}
+#kcc .kcc-reveal-card{position:relative;z-index:1;transition:transform .6s ease-in,opacity .6s ease-in}
+#kcc .kcc-reveal-card.is-waiting{transform:translateY(24vh) scale(.55) rotate(-4deg);opacity:0}
+#kcc .kcc-reveal-card.is-up{transform:none;opacity:1;transition:transform 1s cubic-bezier(.2,.8,.2,1),opacity .5s ease}
+#kcc .kcc-reveal-card.is-up.is-stowed,#kcc .kcc-reveal-card.is-stowed{transform:translate(40vw,-45vh) scale(.15);opacity:0;transition:transform .6s ease-in,opacity .6s ease-in}
+#kcc.kcc-still .kcc-reveal-card.is-waiting,#kcc.kcc-still .kcc-reveal-card.is-stowed{transform:none}
+#kcc .kcc-shake{perspective:1200px;-webkit-perspective:1200px}
+#kcc .kcc-shake.is-shaking{animation:kcc-shake .25s ease-in-out 1}
+@keyframes kcc-shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-2.5deg)}75%{transform:rotate(2.5deg)}}
+#kcc .kcc-side.kcc-back{position:relative;transform:rotateY(0deg)}   /* explicit 3D plane: keeps the face hidden while the parent shakes */
+#kcc .kcc-shake{transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
+#kcc .kcc-sweep{position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;border-radius:18px;pointer-events:none}
+#kcc .kcc-sweep i{position:absolute;top:-20%;bottom:-20%;left:0;width:45%;background:linear-gradient(100deg,rgba(255,236,180,0),rgba(255,236,180,.55),rgba(255,236,180,0));transform:translateX(-140%) skewX(-12deg)}
+#kcc .kcc-sweep.is-sweeping i{transform:translateX(320%) skewX(-12deg);transition:transform 1s ease-in-out}
+#kcc .kcc-rays{position:absolute;left:50%;top:50%;opacity:0;transform:scale(.3);pointer-events:none}
+#kcc .kcc-rays span{position:absolute;left:50%;top:50%;width:8px;margin-left:-4px;transform-origin:50% 0;border-radius:4px}
+#kcc .kcc-rays.is-burst{opacity:.85;transform:scale(1.15) rotate(18deg);transition:transform 1.4s cubic-bezier(.1,.8,.2,1),opacity .25s ease}
+#kcc .kcc-rays.is-burst.is-fading{opacity:0;transition:transform 1.4s cubic-bezier(.1,.8,.2,1),opacity 1.1s ease}
+#kcc .kcc-sparks i{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;opacity:0;pointer-events:none}
+#kcc .kcc-title span{display:inline-block;opacity:0;transform:translateY(10px)}
+#kcc .kcc-title.is-shown span{opacity:1;transform:none;transition:opacity .3s ease,transform .3s ease}
+#kcc.kcc-still .kcc-title span{transform:none}
+#kcc .kcc-r{opacity:0;transition:opacity .4s ease}
+#kcc .kcc-r.is-shown{opacity:1}
+#kcc.kcc-fast *{transition-duration:.15s !important;animation-duration:.08s !important}
 #kcc .kcc-flip{position:relative;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
-#kcc .kcc-flip.is-flipped{transform:rotateY(180deg)}
+#kcc .kcc-flip.is-flipped{transform:rotateY(180deg) scale(1.08)}
+#kcc .kcc-flip.is-flipped.is-landed{transform:rotateY(180deg) scale(1);transition:transform .35s ease-out}
 #kcc .kcc-side{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 #kcc .kcc-side.kcc-front{position:absolute;left:0;top:0;transform:rotateY(180deg)}
-#kcc.kcc-still .kcc-flip.is-flipped{transform:none}
+#kcc.kcc-still .kcc-flip.is-flipped,#kcc.kcc-still .kcc-flip.is-flipped.is-landed{transform:none}
 #kcc.kcc-still .kcc-flip .kcc-side.kcc-back{opacity:1;transition:opacity .3s}
 #kcc.kcc-still .kcc-flip.is-flipped .kcc-side.kcc-back{opacity:0}
 #kcc.kcc-still .kcc-flip .kcc-side.kcc-front{transform:none;opacity:0;transition:opacity .3s}
@@ -349,38 +378,113 @@
       [{ label: 'OK', jp: 'わかった', go: close }]);
   }
 
+  /* ── The reveal (Pass 4a) ──────────────────────────────────────────
+     A fixed ~3.5 s sequence, unskippable by design: taps do nothing until
+     the binder button appears at the end. It is driven by timers, never by
+     animationend/transitionend (older iPads can drop those and would leave
+     a student on a frozen reveal). The win is saved before this starts, so
+     leaving mid-reveal never loses the card. Reduced motion keeps the same
+     timing and sounds with fades instead of movement. */
+  const REVEAL = Object.freeze({ hush: 0, rise: 400, shake: 1450, flip: 1700, land: 2050, title: 2350, line: 2550, count: 2650, button: 3500 });
+  let revealTimers = [];
+  function clearReveal() { revealTimers.forEach(clearTimeout); revealTimers = []; }
+
   function reveal(outcome) {
     const face = window.KarasukiCardFace;
+    const calm = still();
+    const speed = window.__devRevealFast ? 0.25 : 1;   // teacher dev toggle only
     // Fit the 2:3 card in the landscape height (phone ≈ 210px wide, iPad 260px).
     const cardW = Math.round(Math.max(140, Math.min(260, (window.innerHeight - 60) * 2 / 3)));
+    const cardH = Math.round(cardW * 1.5);
     const front = face ? face.fromRegistry(outcome.hostId, { width: cardW, result: { score: outcome.score, wonAt: outcome.at, try: outcome.try } }) : '';
     const back = face ? face.back({ width: cardW }) : '';
     const tryText = outcome.try > 1 ? ' (2nd try)' : '';
+    const color = accent();
+    const raySize = Math.round(cardH * 1.9);
+    const rays = Array.from({ length: 12 }, (_, i) =>
+      `<span style="height:${Math.round(raySize / 2)}px;transform:rotate(${i * 30}deg);background:linear-gradient(${color},rgba(0,0,0,0))"></span>`).join('');
+    const sparks = Array.from({ length: 14 }, () => `<i style="background:${color}"></i>`).join('');
+    const title = 'Card won!'.split('').map((ch, i) =>
+      `<span style="transition-delay:${i * 35}ms">${ch === ' ' ? '&nbsp;' : esc(ch)}</span>`).join('');
     root.innerHTML = `
       <div class="kcc-reveal">
-        <div class="kcc-reveal-card"><div class="kcc-flip" style="width:${cardW}px;height:${Math.round(cardW * 1.5)}px">
-          <div class="kcc-side kcc-back">${back}</div><div class="kcc-side kcc-front">${front}</div>
-        </div></div>
+        <div class="kcc-hush" aria-hidden="true"></div>
+        <div class="kcc-stage-card">
+          <div class="kcc-rays" aria-hidden="true" style="width:0;height:0">${rays}</div>
+          <div class="kcc-sparks" aria-hidden="true" style="position:absolute;left:50%;top:50%">${sparks}</div>
+          <div class="kcc-reveal-card is-waiting"><div class="kcc-shake"><div class="kcc-flip" style="width:${cardW}px;height:${cardH}px">
+            <div class="kcc-side kcc-back">${back}<div class="kcc-sweep" aria-hidden="true"><i></i></div></div>
+            <div class="kcc-side kcc-front">${front}</div>
+          </div></div></div>
+        </div>
         <div class="kcc-panel" style="align-items:flex-start;text-align:left">
-          <h2 style="color:${accent()}">Card won!</h2>
-          <p lang="ja" style="font-size:18px;font-weight:800">${jp('カード ゲット!', 'カードゲット!')}</p>
-          <p>${esc(opts.name)}'s card is yours. You remembered ${outcome.score} of 10${tryText}.</p>
-          <button type="button" class="kcc-btn" style="background:${accent()}">Put it in my binder<small lang="ja">${jp('バインダーに いれる', 'バインダーに入れる', { '入': 'い' })}</small></button>
+          <h2 class="kcc-title" style="color:${color}" aria-label="Card won!">${title}</h2>
+          <p class="kcc-r kcc-r-jp" lang="ja" style="font-size:18px;font-weight:800">${jp('カード ゲット!', 'カードゲット!')}</p>
+          <p class="kcc-r kcc-r-line">${esc(opts.name)}'s card is yours. You remembered <b class="kcc-count">0</b> of 10${tryText}.</p>
+          <button type="button" class="kcc-btn kcc-r" style="background:${color}" hidden>Put it in my binder<small lang="ja">${jp('バインダーに いれる', 'バインダーに入れる', { '入': 'い' })}</small></button>
           <p class="kcc-saved" role="status" aria-live="polite"></p>
         </div>
       </div>`;
-    root.className = 'is-open' + (still() ? ' kcc-still' : '');
-    sfx('wandererFound');
+    root.className = 'is-open' + (calm ? ' kcc-still' : '') + (speed < 1 ? ' kcc-fast' : '');
+    clearReveal();
+    const stage = $('.kcc-reveal');
+    // at(ms, fn): schedule fn ms after NOW (scaled for the dev 4× toggle).
+    const at = (ms, fn) => revealTimers.push(setTimeout(() => { if (root && root.contains(stage)) fn(); }, Math.round(ms * speed)));
+    const card = $('.kcc-reveal-card');
     const flip = $('.kcc-flip');
-    setTimeout(() => { if (flip) flip.classList.add('is-flipped'); }, still() ? 200 : 650);
-    const btn = $('.kcc-btn');
-    btn.focus({ preventScroll: true });
-    btn.addEventListener('click', () => {
-      btn.disabled = true;
-      $('.kcc-saved').innerHTML = `Saved to your Karasuki Cards. <span lang="ja">${jp('カラスキーカードに ほぞんしたよ!', 'カラスキーカードに保存したよ!', { '保存': 'ほぞん' })}</span>`;
-      $('.kcc-reveal-card').classList.add('is-stowed');
-      setTimeout(close, still() ? 700 : 1100);
+
+    at(REVEAL.hush, () => { stage.classList.add('is-hush'); sfx('cardHush'); });
+    at(REVEAL.rise, () => {
+      card.classList.remove('is-waiting');
+      card.classList.add('is-up');
+      if (!calm) $('.kcc-sweep').classList.add('is-sweeping');
+      sfx('cardCharge');
     });
+    at(REVEAL.shake, () => { if (!calm) $('.kcc-shake').classList.add('is-shaking'); });
+    at(REVEAL.flip, () => { flip.classList.add('is-flipped'); sfx('cardWhoosh'); });
+    at(REVEAL.land, () => {
+      flip.classList.add('is-landed');
+      try { if (window.UtsuSfx && typeof window.UtsuSfx.cardReveal === 'function') window.UtsuSfx.cardReveal(opts.kind); } catch (_) {}
+      if (calm) return;
+      const raysEl = $('.kcc-rays');
+      raysEl.classList.add('is-burst');
+      root.querySelectorAll('.kcc-sparks i').forEach((spark, i) => {
+        const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
+        const dist = cardH * (0.55 + Math.random() * 0.35);
+        spark.style.transition = 'none';
+        spark.style.opacity = '1';
+        spark.style.transform = 'translate(0,0) scale(1)';
+        void spark.offsetWidth;
+        spark.style.transition = 'transform .9s cubic-bezier(.1,.7,.2,1),opacity .9s ease-in';
+        spark.style.transform = `translate(${Math.round(Math.cos(angle) * dist)}px,${Math.round(Math.sin(angle) * dist)}px) scale(.3)`;
+        spark.style.opacity = '0';
+      });
+      at(700, () => raysEl.classList.add('is-fading'));   // relative to the landing
+    });
+    at(REVEAL.title, () => $('.kcc-title').classList.add('is-shown'));
+    at(REVEAL.line, () => { $('.kcc-r-jp').classList.add('is-shown'); $('.kcc-r-line').classList.add('is-shown'); });
+    const score = Math.max(0, Math.min(10, Number(outcome.score) || 0));
+    const step = Math.min(70, 600 / Math.max(1, score));
+    for (let i = 1; i <= score; i++) {
+      at(REVEAL.count + i * step, () => { $('.kcc-count').textContent = String(i); sfx2('cardTick', i); });
+    }
+    at(REVEAL.button, () => {
+      const btn = $('.kcc-btn');
+      btn.hidden = false;
+      void btn.offsetWidth;
+      btn.classList.add('is-shown');
+      $('.kcc-count').textContent = String(score);
+      try { btn.focus({ preventScroll: true }); } catch (_) { btn.focus(); }
+      btn.addEventListener('click', () => {
+        btn.disabled = true;
+        $('.kcc-saved').innerHTML = `Saved to your Karasuki Cards. <span lang="ja">${jp('カラスキーカードに ほぞんしたよ!', 'カラスキーカードに保存したよ!', { '保存': 'ほぞん' })}</span>`;
+        card.classList.add('is-stowed');
+        at(calm ? 700 : 1100, close);
+      });
+    });
+  }
+  function sfx2(name, arg) {
+    try { if (window.UtsuSfx && typeof window.UtsuSfx[name] === 'function') window.UtsuSfx[name](arg); } catch (_) {}
   }
 
   /* ── Open / close ──────────────────────────────────────────────────── */
@@ -427,6 +531,7 @@
   function isOpen() { return !!root && root.classList.contains('is-open'); }
 
   function close() {
+    clearReveal();
     if (run) clearTimeout(run.timer);
     run = null;
     document.removeEventListener('visibilitychange', onVisibility);

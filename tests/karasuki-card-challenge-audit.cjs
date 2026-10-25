@@ -66,7 +66,40 @@ assert.match(rev, /face\.fromRegistry\(outcome\.hostId/);
 assert.match(rev, /face\.back\(/);
 assert.match(rev, /classList\.add\('is-flipped'\)/);
 assert.match(c, /-webkit-backface-visibility:hidden/);
-assert.match(c, /#kcc\.kcc-still \.kcc-flip\.is-flipped\{transform:none\}/);
+assert.match(c, /#kcc\.kcc-still \.kcc-flip\.is-flipped,#kcc\.kcc-still \.kcc-flip\.is-flipped\.is-landed\{transform:none\}/, 'reduced motion: no 3D flip or pop');
+
+/* Pass 4a: cinematic reveal — unskippable, timer-driven, button at the end */
+const T = {};
+for (const m of c.match(/const REVEAL = Object\.freeze\(\{([^}]*)\}\)/)[1].matchAll(/(\w+): (\d+)/g)) T[m[1]] = Number(m[2]);
+assert.deepStrictEqual(Object.keys(T), ['hush', 'rise', 'shake', 'flip', 'land', 'title', 'line', 'count', 'button']);
+Object.values(T).reduce((prev, v) => { assert.ok(v >= prev, 'beats are in order'); return v; }, -1);
+assert.ok(T.button >= 3000 && T.button <= 4000, `reveal lasts 3–4 s (got ${T.button} ms)`);
+assert.ok(!/addEventListener\(['"](webkit)?(animationend|transitionend)|on(animationend|transitionend)\s*=/i.test(c), 'driven by timers only, never animation/transition events');
+assert.match(rev, /<button type="button" class="kcc-btn kcc-r"[^>]*hidden>/, 'binder button starts hidden');
+assert.match(rev, /at\(REVEAL\.button, \(\) => \{\s*const btn = \$\('\.kcc-btn'\);\s*btn\.hidden = false;/, 'button appears only at the end');
+assert.strictEqual((rev.match(/addEventListener\(/g) || []).length, 1, 'the only listener in the reveal is the binder button (taps cannot skip)');
+assert.match(rev, /btn\.addEventListener\('click'/);
+for (const cue of ["sfx('cardHush')", "sfx('cardCharge')", "sfx('cardWhoosh')", 'UtsuSfx.cardReveal(opts.kind)', "sfx2('cardTick', i)"]) {
+  assert.ok(rev.includes(cue), `reveal plays ${cue}`);
+}
+assert.match(rev, /if \(calm\) return;/, 'reduced motion skips rays and sparks');
+assert.match(c, /#kcc \.kcc-side\.kcc-back\{position:relative;transform:rotateY\(0deg\)\}/, 'back keeps its own 3D plane so the face stays hidden during the shake');
+assert.match(rev, /if \(!calm\) \$\('\.kcc-shake'\)\.classList\.add\('is-shaking'\)/, 'reduced motion skips the shake');
+assert.match(fn(c, 'close'), /clearReveal\(\);/, 'closing clears every reveal timer');
+assert.match(rev, /window\.__devRevealFast \? 0\.25 : 1/, 'dev 4× toggle');
+assert.match(k, /id="dev-reveal-fast"/, 'the 4× toggle lives in the dev panel');
+
+/* Reveal voices: shared context, capped gain, compressor bus, kind stings */
+const sfxSrc = read('js/utsu-sfx.js');
+for (const name of ['cardHush', 'cardCharge', 'cardWhoosh', 'cardReveal', 'cardTick']) {
+  assert.match(sfxSrc, new RegExp(`${name}: function`), `UtsuSfx.${name}`);
+}
+const revealSfx = sfxSrc.slice(sfxSrc.indexOf('cardReveal: function'), sfxSrc.indexOf('cardTick: function'));
+assert.match(revealSfx, /kind === 'dangerous'/);
+assert.match(revealSfx, /kind === 'mischievous'/);
+assert.match(sfxSrc, /function capped\(g\) \{ return Math\.min\(SFX_MAX_GAIN/, 'reveal voices use the shared gain cap');
+assert.match(sfxSrc, /gain\.connect\(cardBus\(c\)\)/, 'reveal voices go through the compressor bus');
+assert.ok(!/new (window\.)?(webkit)?AudioContext/.test(sfxSrc.replace(/if \(!ctx\) ctx = new AC\(\);/, '')), 'one shared AudioContext');
 
 /* Motion: transitions/animations touch opacity and transform only */
 const css = c.slice(c.indexOf('style.textContent = `'), c.indexOf('`;', c.indexOf('style.textContent = `')));
