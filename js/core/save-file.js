@@ -107,6 +107,25 @@ const BoohaSaveFile = (() => {
       collection: {
         wanderers: {},           // { [wandererId]: { visits, firstFoundAt, lastFoundAt } }
       },
+
+      // ── Karasuki Cards — permanent; js/karasuki-cards.js owns the shape.
+      // Its week counters reset lazily by occurrence key, so resetWeekly()
+      // leaves this section alone and a failed host survives the rollover.
+      karasukiCards: _defaultKarasukiCards(),
+    };
+  }
+
+  function _defaultKarasukiCards() {
+    return {
+      schema: 1,
+      hostId: null,
+      week: '',
+      attemptsThisWeek: 0,
+      lastAttemptDay: '',
+      wonWeek: '',
+      attempt: null,
+      lastResult: null,
+      won: {},               // { [cardId]: { cardId, lv, wonAt, try, score, week } }
     };
   }
 
@@ -385,6 +404,12 @@ const BoohaSaveFile = (() => {
       save.collection.wanderers = migrated;
     } else if (!save.collection.wanderers || typeof save.collection.wanderers !== 'object') {
       save.collection.wanderers = {};
+    }
+
+    if (!save.karasukiCards || typeof save.karasukiCards !== 'object' || Array.isArray(save.karasukiCards)) {
+      save.karasukiCards = _defaultKarasukiCards();
+    } else if (!save.karasukiCards.won || typeof save.karasukiCards.won !== 'object' || Array.isArray(save.karasukiCards.won)) {
+      save.karasukiCards.won = {};
     }
 
     if (save.version < 2) save.version = 2;
