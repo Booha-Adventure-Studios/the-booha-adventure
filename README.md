@@ -103,6 +103,11 @@ Before deployment, run:
 ./verify.sh
 ```
 
+Release checklist:
+
+- **Replaced any medal, trophy-token, rank-coin or chest art in `assets/img/profile/`?** Change `ART_REV` in `js/core/profile-art.js` (a date is fine), then run `node tests/profile-art-rev-guard.cjs --update`. Installed iPads only fetch replaced art under a new `ART_REV`; `verify.sh` fails until both steps are done.
+- Changed a precached page or asset? Bump the matching cache version in `sw.js` with a short comment line (`verify.sh` warns if you forget).
+
 The verification suite (about 300 checks) covers content data, navigation contracts, game behaviour, scoring and save rules, weekly rollover, service-worker paths, media assets, responsive behaviour, and performance budgets.
 
 Full verification requires Node.js, Python 3, and ffmpeg (ffprobe is included) for the media-inspection checks.

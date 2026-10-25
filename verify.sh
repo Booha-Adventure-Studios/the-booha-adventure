@@ -1965,6 +1965,13 @@ else
   bad "Profile art cache audit failed"
 fi
 
+echo "[cache] Profile art ART_REV guard"
+if node tests/profile-art-rev-guard.test.cjs >/dev/null 2>&1 && node tests/profile-art-rev-guard.cjs >/dev/null 2>&1; then
+  ok "Profile art unchanged since its ART_REV was recorded"
+else
+  bad "Profile art guard: $(node tests/profile-art-rev-guard.cjs 2>&1 | tail -1)"
+fi
+
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then
