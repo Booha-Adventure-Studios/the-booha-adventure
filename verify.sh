@@ -1923,6 +1923,13 @@ else
 fi
 
 # ── Test inventory and manifest-wired current tests ─────────
+echo "[karasuki] Karasuki Cards Pass 2a logic"
+if node tests/karasuki-cards.test.cjs >/dev/null 2>&1; then
+  ok "Karasuki Cards rules, attempts, interruptions, rollover, checker, and word snapshot pass"
+else
+  bad "Karasuki Cards logic test failed"
+fi
+
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then
