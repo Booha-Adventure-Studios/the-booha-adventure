@@ -9,7 +9,8 @@
  *   shelf     won cards in card-number order, swipeable, filter by kind
  *   NEW       until the card is first opened here (karasukiCards.won[id].viewedAt,
  *             in the student's own save — never device-wide)
- *   zoom      tap a card to see it large; arrows step through the shelf
+ *   zoom      tap a card to see it large; arrows step through the shelf;
+ *             Flip (or tapping the card, or F) turns it over to the shared back
  *
  * Faces come from js/karasuki-card-face.js, the same renderer as the reveal.
  */
@@ -48,8 +49,16 @@ const BoohaKarasukiBinder = (() => {
 .cards-section .kb-empty{margin:0;padding:24px 8px;font-size:13px;color:var(--muted,#c9b0d8)}
 #kb-zoom{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;gap:12px;padding:16px;background:rgba(8,4,16,.92);opacity:0;transition:opacity .2s ease}
 #kb-zoom.is-visible{opacity:1}
-#kb-zoom .kb-zoom-card{line-height:0;transform:scale(.96);transition:transform .2s ease}
+#kb-zoom .kb-zoom-col{display:flex;flex-direction:column;align-items:center;gap:12px}
+#kb-zoom .kb-zoom-card{line-height:0;transform:scale(.96);transition:transform .2s ease;perspective:1400px;-webkit-perspective:1400px;cursor:pointer}
 #kb-zoom.is-visible .kb-zoom-card{transform:none}
+#kb-zoom .kb-flip-inner{position:relative;display:block;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+#kb-zoom .kb-flip-inner.is-back{transform:rotateY(180deg)}
+#kb-zoom .kb-side{position:absolute;left:0;top:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+#kb-zoom .kb-side.kb-front{transform:rotateY(0deg)}
+#kb-zoom .kb-side.kb-back{transform:rotateY(180deg)}
+#kb-zoom .kb-flip-btn{font-size:15px;padding:0 18px;line-height:1.1}
+#kb-zoom .kb-flip-btn small{display:block;font-size:11px;opacity:.85}
 #kb-zoom button{flex:0 0 auto;min-width:48px;min-height:48px;border-radius:999px;border:1.5px solid rgba(255,255,255,.35);background:rgba(0,0,0,.4);color:#fff;font:800 20px/1 system-ui,sans-serif;cursor:pointer}
 #kb-zoom button:disabled{opacity:.25;cursor:default}
 #kb-zoom .kb-close{position:absolute;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));font-size:15px;padding:0 16px}
@@ -125,7 +134,8 @@ const BoohaKarasukiBinder = (() => {
   /* ── zoom ─────────────────────────────────────────────────────── */
 
   function zoomWidth() {
-    return Math.round(Math.max(160, Math.min(380, (window.innerHeight - 48) * 2 / 3, window.innerWidth - 150)));
+    // Leave room under the card for the Flip button (~60px).
+    return Math.round(Math.max(150, Math.min(380, (window.innerHeight - 110) * 2 / 3, window.innerWidth - 150)));
   }
 
   function open(cardId) {
@@ -150,20 +160,47 @@ const BoohaKarasukiBinder = (() => {
   function show() {
     const el = document.getElementById('kb-zoom');
     const card = zoom.list[zoom.index];
+    const width = zoomWidth();
     el.setAttribute('aria-label', `${card.name}'s card`);
+    // Every card opens face up; the arrows always land on the next face.
+    zoom.back = false;
     el.innerHTML = `
       <button type="button" class="kb-prev" aria-label="Previous card" ${zoom.index === 0 ? 'disabled' : ''}>‹</button>
-      <div class="kb-zoom-card">${faceFor(card, zoomWidth())}</div>
+      <div class="kb-zoom-col">
+        <div class="kb-zoom-card" title="Tap to flip">
+          <span class="kb-flip-inner" style="width:${width}px;height:${Math.round(width * 1.5)}px">
+            <span class="kb-side kb-front">${faceFor(card, width)}</span>
+            <span class="kb-side kb-back" aria-hidden="true">${window.KarasukiCardFace.back({ width })}</span>
+          </span>
+        </div>
+        <button type="button" class="kb-flip-btn" aria-pressed="false">Flip<small lang="ja">うらがえす</small></button>
+      </div>
       <button type="button" class="kb-next" aria-label="Next card" ${zoom.index === zoom.list.length - 1 ? 'disabled' : ''}>›</button>
       <button type="button" class="kb-close">Close<small lang="ja">とじる</small></button>`;
     el.querySelector('.kb-prev').addEventListener('click', () => step(-1));
     el.querySelector('.kb-next').addEventListener('click', () => step(1));
     el.querySelector('.kb-close').addEventListener('click', close);
+    // The Flip button is the accessible control; tapping the card itself is a shortcut.
+    el.querySelector('.kb-flip-btn').addEventListener('click', flip);
+    el.querySelector('.kb-zoom-card').addEventListener('click', flip);
     el.querySelector('.kb-close').focus({ preventScroll: true });
     // Opening a card is what clears its NEW tag (saved per student).
     if (!card.won.viewedAt && window.KarasukiCards) {
       try { KarasukiCards.viewed(card.id); card.won.viewedAt = Date.now(); } catch (e) { console.warn('[KarasukiBinder] viewed write failed:', e); }
     }
+  }
+
+  function flip() {
+    const el = document.getElementById('kb-zoom');
+    if (!zoom || !el) return;
+    zoom.back = !zoom.back;
+    el.querySelector('.kb-flip-inner').classList.toggle('is-back', zoom.back);
+    el.querySelector('.kb-front').setAttribute('aria-hidden', String(zoom.back));
+    el.querySelector('.kb-back').setAttribute('aria-hidden', String(!zoom.back));
+    const btn = el.querySelector('.kb-flip-btn');
+    btn.setAttribute('aria-pressed', String(zoom.back));
+    btn.setAttribute('aria-label', zoom.back ? 'Flip to the front' : 'Flip to the back');
+    try { if (window.UtsuSfx && typeof window.UtsuSfx.cardFlip === 'function') window.UtsuSfx.cardFlip(); } catch (_) {}
   }
 
   function step(delta) {
@@ -179,6 +216,7 @@ const BoohaKarasukiBinder = (() => {
     if (e.key === 'Escape') close();
     else if (e.key === 'ArrowLeft') step(-1);
     else if (e.key === 'ArrowRight') step(1);
+    else if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey && !e.altKey) flip();
   }
 
   function close() {
