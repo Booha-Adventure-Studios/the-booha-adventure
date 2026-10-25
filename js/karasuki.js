@@ -3183,11 +3183,29 @@ const HAPPY_HOUSE_PORTAL = {
       comment,
       status: host.status,
       curriculum: cardCurriculum(),
+      // Start / Continue is a tap, so the challenge can raise the iPad keyboard.
+      onStart: host.dev || !window.KarasukiCardChallenge ? undefined : () => {
+        const furigana = { ...(WANDERER_FURIGANA[w.name] || {}), ...((host.card && host.card.nameFurigana) || {}) };
+        const challenge = {
+          mode: host.status.phase === 'inProgress' ? 'continue' : 'start',
+          name: w.name, nameJP: w.nameJP, furigana, kind: w.cardKind, curriculum: cardCurriculum(),
+          onClose: () => {
+            wandererPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
+            refreshWanderersForRoom();
+          },
+        };
+        KarasukiCardEncounter.close();
+        KarasukiCardChallenge.open(challenge);
+      },
       onClose: () => {
         wandererPopCooldownUntil = performance.now() + POPUP_COOLDOWN_MS;
         refreshWanderersForRoom();
       },
     });
+  }
+
+  function isCardChallengeOpen() {
+    return !!(window.KarasukiCardChallenge && KarasukiCardChallenge.isOpen());
   }
 
   function initWanderers() { refreshWanderersForRoom(); }
@@ -5435,7 +5453,8 @@ const HAPPY_HOUSE_PORTAL = {
       isOrbPanelOpen()           ||
       isHappyHousePopOpen()      ||
       isGrimmerglenPopupOpen()   ||
-      isCardEncounterOpen()
+      isCardEncounterOpen()      ||
+      isCardChallengeOpen()
     );
   }
 
@@ -5449,7 +5468,7 @@ const HAPPY_HOUSE_PORTAL = {
       || isBonusPopOpen() || isWandererPopOpen() || isUtsuobaPopOpen()
       || isMuenbaPopupOpen() || isObserverPopOpen() || isBarbaPopOpen() || isNuppiPopOpen()
       || isOrbPanelOpen() || isHappyHousePopOpen() || isGrimmerglenPopupOpen()
-      || isCardEncounterOpen() || state.grimmerglenExiting;
+      || isCardEncounterOpen() || isCardChallengeOpen() || state.grimmerglenExiting;
   }
 
   function scheduleKarasukiFrame() {
