@@ -45,6 +45,14 @@
       || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
+  // The card stays face down until it is won (the reveal is Pass 2c).
+  function backWidth() {
+    const mq = q => typeof window.matchMedia === 'function' && window.matchMedia(q).matches;
+    if (mq('(max-height:520px)')) return Math.round(Math.min(150, window.innerWidth * 0.26));
+    if (mq('(max-width:560px) and (min-height:521px)')) return 130;
+    return Math.round(Math.min(200, window.innerWidth * 0.30));
+  }
+
   /** Banner for the normal story popup when the host is a teaser. */
   function teaserHTML(phase, curriculum) {
     const second = TEASER[phase];
@@ -69,8 +77,7 @@
 #kc-encounter .kc-box{position:relative;display:flex;gap:22px;align-items:center;max-width:min(760px,96vw);max-height:92vh;overflow-y:auto;box-sizing:border-box;padding:22px 24px;border-radius:12px;background:#080810;color:#fff;font-family:Georgia,serif;transform:translateY(10px) scale(.98);transition:transform .25s ease}
 #kc-encounter.is-visible .kc-box{transform:none}
 #kc-encounter.kc-still,#kc-encounter.kc-still .kc-box{transition:none}
-#kc-encounter .kc-art{flex:0 0 auto;width:min(200px,30vw);aspect-ratio:2/3;border-radius:10px;padding:5px;box-sizing:border-box}
-#kc-encounter .kc-art img{display:block;width:100%;height:100%;object-fit:cover;border-radius:6px}
+#kc-encounter .kc-art{flex:0 0 auto;align-self:center;border-radius:18px;line-height:0}
 #kc-encounter .kc-copy{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:10px;text-align:left}
 #kc-encounter .kc-eyebrow{margin:0;font:800 11px/1.3 system-ui,sans-serif;letter-spacing:.14em}
 #kc-encounter .kc-title{margin:0;font-size:clamp(1.15rem,3.2vw,1.6rem);line-height:1.2}
@@ -84,8 +91,8 @@
 #kc-encounter .kc-start{border:0}
 #kc-encounter .kc-later{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35)}
 #kc-encounter .kc-actions small{display:block;font-weight:700;font-size:12px;opacity:.85}
-@media (max-height:520px){#kc-encounter .kc-box{padding:14px 18px;gap:16px}#kc-encounter .kc-art{width:min(150px,26vw)}#kc-encounter .kc-quote{display:none}}
-@media (max-width:560px) and (min-height:521px){#kc-encounter .kc-box{flex-direction:column;align-items:stretch}#kc-encounter .kc-art{width:130px;align-self:center}}
+@media (max-height:520px){#kc-encounter .kc-box{padding:14px 18px;gap:16px}#kc-encounter .kc-quote{display:none}}
+@media (max-width:560px) and (min-height:521px){#kc-encounter .kc-box{flex-direction:column;align-items:stretch}}
 .kc-teaser{margin:0 0 16px;padding:10px 12px;border-radius:8px;background:rgba(201,184,255,.1);border:1px solid rgba(201,184,255,.35);text-align:left}
 .kc-teaser p{margin:0;color:#ece6ff;font-size:.9rem;line-height:1.6}
 .kc-teaser .kc-teaser-jp{margin-top:4px;line-height:1.9}`;
@@ -137,8 +144,8 @@
     const quote = comment.en
       ? `<p class="kc-quote" style="color:${kind.accent}">“${esc(comment.en)}”<span style="color:#fff" lang="ja">${furi(comment.jp || '', comment.furigana || {})}</span></p>`
       : '';
-    const art = o.card && o.card.art
-      ? `<div class="kc-art" style="background:${kind.accent}"><img src="${esc(o.card.art)}" alt="${name} Lv.1 card" decoding="async"></div>`
+    const art = window.KarasukiCardFace
+      ? `<div class="kc-art" style="box-shadow:0 0 0 3px ${kind.accent},0 0 30px ${kind.accent}66">${window.KarasukiCardFace.back({ width: backWidth() })}</div>`
       : '';
 
     build();
