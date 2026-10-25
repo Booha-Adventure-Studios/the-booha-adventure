@@ -1,0 +1,91 @@
+# The Booha Adventure
+
+> A framework-free, browser-based English-learning adventure (PWA) for Japanese learners. Weekly curriculum games, story worlds, and persistent per-student progress, built in HTML, CSS, and vanilla JavaScript with JSON content. Designed for short sessions on older iPads. Last updated 2026-10-25.
+
+This file is a factual map of the project for AI tools: what exists, where it lives, why it is designed that way, how to verify it, and what is not done yet. Paths are relative to the repository root. Everything listed under "Implemented" can be checked in the code and by running `./verify.sh`.
+
+## Overview
+
+- [README.md](README.md): project overview, structure, privacy, verification
+- [README.ja.md](README.ja.md): Japanese version of the README
+
+## Implemented: weekly curriculum
+
+- Three curricula share one game system: Pre-Boo (`pb`, hiragana support), Boo-riculum (`br`), Boo-Continuum (`bc`). Lesson decks live in `content/<curriculum>/<month>/` (e.g. `vocab`, `sentences`, `questions` JSON) and are selected by curriculum week.
+- Nine games per week in three lanes; engines in `games/`, hosted by `game.html` via `js/game-core.js`:
+  - Words: `vocab-tap.js`, `spell-word.js`, `vocab-speed.js`
+  - Sentences: `sentence-tap.js`, `sentence-order.js`, `sentence-speed.js`
+  - Listen: `say-word.js`, `say-sentence.js`, `ask-question.js`
+- Shared run tracker in `js/game-utils.js` (`createRun`): first-try scoring, combo multiplier, partial credit for corrected answers in games where guessing cannot pay.
+- Shared score card: `js/game-scorecard.js`. Stars come from accuracy thresholds in `js/core/game-registry.js`.
+- Weekly loop: stars per game, +1★ links between neighbouring games at ★★, the arcade chest at ★★ on all nine, three Blitz challenges for a weekly skin. Weekly data resets each Sunday (Tokyo time, `js/calendar.js`); see `js/core/save-file.js` (`resetWeekly`) and `js/core/adventure-core.js`.
+- Bonus Games (outside the nine; never change the nine-game unlock): `games/booha-bites.js`, `games/echo.js`, `games/week-boss.js` (opens after all nine are played that week).
+
+## Implemented: ready pace (rewarding preparation, not speed)
+
+- Each answer's first response time is recorded against that item's par time (par scales with word or sentence length) in `js/game-utils.js`.
+- A run earns rainbow ("ready pace") stars when at least 75% of answers are right on the first try, the median answer time is inside the game's ready zone, and there are no more than two frantic taps (wrong answers in under 0.4 s). Using the median means pauses to check a notebook do not cost the reward. Speed games judge accuracy only.
+- Rule and zones: `UTILS.readyPace` and `PACE_ZONES` in `js/game-utils.js`. Listen games pause the clock during clip replays.
+- Rainbow is a visual status only; it never adds stars or changes unlocks. Stored weekly (`weekly.gameRainbow`), per game for life (`rainbows`), and per week in a permanent log (`meta.weekLog[week].ready`, `js/core/day-record.js`).
+- Shown on the score card, menu tiles (`js/menu-core.js`), and profile trail with a lane breakdown and personal records (`js/ui/profile-game.js`).
+- Calibration tool: `tools/pace-report.cjs` (reads exported saves, JSON or CSV).
+
+## Implemented: story worlds
+
+- `karasuki.html` (`js/karasuki.js`): hub world; Wanderers (collectable characters with authored English/Japanese stories, `js/karasuki-wanderer-data.js`).
+- `grimmerglen.html` (`js/grimmerglen.js`, `js/grimmerglen-typing.js`): memory recovery through tiered typing (choices → clues → whole-memory recall) at Starter, Case, and Deep levels.
+- `utsuroba.html` (`js/utsuroba.js`, `js/utsuroba-reading.js`): reading episodes with sequence, detail, and inference tasks; drifter quests. `family-room.html` (Akiya) is a study space inside it.
+- `muenba.html` (`js/muenba.js`): ghost cemetery with briefings, hunts, hiding, and reading gates.
+- `happy_house.html`: Mister Happy's House; `liar_machine.html` (local two-player pass-and-play versus) and `mister_happys_snap_test.html`.
+- Arcade games unlocked by the weekly trail: `booha_invaders.html`, `booha_blocks.html`, `booha_destruction.html`, `feed_booha.html`.
+
+## Implemented: profile and progress
+
+- `profile.html` with `js/ui/profile-game.js`: level and rank coins, weekly trail, Bonus Games record cards, eight weekly medals (`js/core/weekly-medals.js`, reset weekly), Wanderer collection, adventure calendar.
+- Permanent Adventure Tokens, data-driven in `js/core/trophy-case.js` (groups, tiers, secret tokens hidden until earned).
+- English Juku classroom mode: `juku.html`, design rules in [JUKU-ASSESSMENT-DESIGN.md](JUKU-ASSESSMENT-DESIGN.md). Game activity is never used as learning evidence and never changes a Juku score.
+
+## Design rationale
+
+- Retrieval over recognition: learners type, order, and recall from memory (Grimmerglen, Echo, Week Boss), not only choose.
+- First-try scoring with recovery: mistakes give feedback and the activity continues.
+- Preparation over speed: ready pace uses median pace and excludes frantic tapping, so prepared students are rewarded and careful students are not punished.
+- Short weekly cycles with a fresh start each Sunday, plus permanent records that carry forward.
+- Bilingual instructions; Pre-Boo uses hiragana, older courses use kanji with furigana.
+- Low stakes: game results are practice, not assessment.
+
+## Privacy
+
+- Student data is first and last name only. The last name is never shown in the app and stays on the school's server (Wix).
+- Progress is saved per student (school server plus browser storage), so shared iPads keep students separate. "Seen" states for one-time messages are stored in each student's save, not on the device.
+- No teacher or parent dashboard by design. Progress is viewable only on the student's own device or with the student's PIN.
+- No advertising and no third-party analytics scripts.
+
+## Performance and devices
+
+- [PERFORMANCE-BUDGETS.md](PERFORMANCE-BUDGETS.md): per-file, per-directory, and total image budgets (enforced by `tests/performance-asset-budget-audit.cjs`).
+- Animations use transform and opacity only; reduced-motion and low-power modes scale effects down (`js/game-motion.js`). No regex lookbehind (older iPad Safari).
+- Service worker caching: `sw.js`.
+
+## Verification
+
+- `./verify.sh` runs about 300 automated checks (content data, navigation, game behaviour, scoring and save rules, weekly rollover, service-worker paths, media assets, responsive layout, performance budgets). Tests live in `tests/`.
+- Local preview: `node tests/serve-preview.cjs`, then open `http://localhost:8127/index.html`.
+
+## Known limitations
+
+- Ready-pace zones are first defaults; they will be calibrated once from the first classroom data, then kept fixed.
+- Ready-pace history (`weekLog.ready`) is recorded from 2026-10-24; World Traveler visits from 2026-10-22. Earlier play is not reconstructed.
+- Weekly games use the current week's content; there is no scheduled review of earlier weeks yet.
+- There is no remote progress view for teachers or parents. This is intentional for privacy, not an omission.
+- Requires authorized access; the app is not open to the public.
+
+## Planned
+
+- A Wanderer recall challenge in Karasuki: after the weekly Blitz challenges, a Wanderer shows a word, hides it, and the student writes it from memory, using words from earlier weeks (scheduled review). Winning awards a collectable card.
+- Cloze (gap-fill) recall for Grimmerglen Deep Memory.
+
+## Optional
+
+- [family-room-design-lock.md](family-room-design-lock.md): design constraints for the Family Room
+- `tests/verification-manifest.json`: which tests are current or superseded
