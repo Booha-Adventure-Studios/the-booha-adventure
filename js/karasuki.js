@@ -3204,6 +3204,24 @@ const HAPPY_HOUSE_PORTAL = {
     });
   }
 
+  // Teacher dev tool: clears ONLY data.karasukiCards for the signed-in
+  // student (host, tries, attempt, won cards, first-sighting flag). Blitz,
+  // Wanderers and every other part of the save are left untouched.
+  function devResetCards() {
+    if (!window.KarasukiCards || !window.BoohaAdventure || !BoohaAdventure.save) return;
+    try {
+      if (window.KarasukiCardChallenge && KarasukiCardChallenge.isOpen()) KarasukiCardChallenge.close();
+      if (window.KarasukiCardEncounter && KarasukiCardEncounter.isOpen()) KarasukiCardEncounter.close();
+      const data = BoohaAdventure.save.load();
+      data.karasukiCards = KarasukiCards.defaultState();
+      showToast(BoohaAdventure.save.save(data) ? 'Karasuki Cards reset for this student' : 'Reset failed: save blocked');
+    } catch (e) {
+      console.error('[Karasuki] Card reset failed:', e);
+      showToast('Reset failed');
+    }
+    refreshWanderersForRoom();
+  }
+
   function isCardChallengeOpen() {
     return !!(window.KarasukiCardChallenge && KarasukiCardChallenge.isOpen());
   }
@@ -4807,6 +4825,7 @@ const HAPPY_HOUSE_PORTAL = {
       <select id="dev-card-phase" aria-label="Card host state" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;">
         <option value="auto">card: real save</option><option value="surprise">card: surprise (new)</option><option value="ready">card: ready (seen)</option><option value="inProgress">card: in progress</option><option value="teaserLocked">teaser: Blitz not done</option><option value="tomorrow">teaser: come back tomorrow</option><option value="outOfAttempts">teaser: out of tries</option><option value="won">won this week (plain)</option><option value="hidden">hidden (never seen)</option>
       </select>
+      <button id="dev-card-reset" type="button" style="margin-bottom:4px;font:700 11px monospace;color:#ff9a9a;background:transparent;border:1px solid rgba(255,120,120,.5);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Reset my cards</button>
       <button id="dev-card-preview" type="button" style="margin-bottom:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Preview card faces</button>
       <select id="dev-card-host" aria-label="Card host" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;"></select>
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
@@ -4834,6 +4853,20 @@ const HAPPY_HOUSE_PORTAL = {
     document.getElementById('dev-card-phase').addEventListener('change', function() { window.__devCardPhase = this.value; refreshWanderersForRoom(); });
     devHostSelect.addEventListener('change', function() { window.__devCardHost = this.value; refreshWanderersForRoom(); });
     document.getElementById('dev-card-preview').addEventListener('click', () => { if (window.KarasukiCardFace) KarasukiCardFace.preview(); });
+    // Two taps (no browser dialog): the first arms it for 3 seconds.
+    const resetBtn = document.getElementById('dev-card-reset');
+    let resetArmed = 0;
+    resetBtn.addEventListener('click', () => {
+      if (Date.now() > resetArmed) {
+        resetArmed = Date.now() + 3000;
+        resetBtn.textContent = 'Tap again to reset';
+        setTimeout(() => { if (Date.now() > resetArmed) resetBtn.textContent = 'Reset my cards'; }, 3100);
+        return;
+      }
+      resetArmed = 0;
+      resetBtn.textContent = 'Reset my cards';
+      devResetCards();
+    });
     document.getElementById('dev-clear-quest').addEventListener('click', () => {
 
       try {

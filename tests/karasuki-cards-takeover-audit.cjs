@@ -121,4 +121,13 @@ assert.ok(!/\d+\s*\/\s*\d+\s*cards|of \d+ cards/i.test(enc), 'copy never reveals
 assert.ok(!/let me in, dear/.test(enc + k), 'card copy is read from karasuki-wanderer-data.js, not duplicated');
 assert.match(read('js/karasuki-wanderer-data.js'), /"Won't you let me in, dear\? Just for a little while\."/);
 
+/* Teacher reset: dev panel only, two taps, touches karasukiCards only */
+const reset = fn('devResetCards');
+assert.match(reset, /data\.karasukiCards = KarasukiCards\.defaultState\(\);/);
+const writes = reset.match(/data\.[a-zA-Z]+\s*=/g) || [];
+assert.deepStrictEqual(writes, ['data.karasukiCards ='], 'reset writes only the cards section');
+assert.ok(!/confirm\(|alert\(/.test(reset) && /Tap again to reset/.test(k), 'two-tap confirm, no browser dialog');
+assert.strictEqual((k.match(/devResetCards\(\);/g) || []).length, 1, 'only the dev panel button calls the reset');
+assert.ok(k.indexOf('id="dev-card-reset"') > k.indexOf('function injectDevPanel'), 'reset button lives in the dev panel');
+
 console.log('Karasuki Cards Pass 2b takeover audit passed.');
