@@ -81,6 +81,88 @@
     } catch (_) {}
   }
 
+  /* ── Karasuki Cards reveal voices (Pass 4a) ─────────────────────────
+     The reveal stacks several voices at once, so they share one gentle
+     compressor bus instead of going straight to the speakers. Every voice
+     still passes through the same capped gain as tone(). */
+  var cardBusNode = null;
+  function cardBus(c) {
+    if (cardBusNode && cardBusNode.context === c) return cardBusNode;
+    var comp = c.createDynamicsCompressor();
+    comp.threshold.setValueAtTime(-14, c.currentTime);
+    comp.knee.setValueAtTime(10, c.currentTime);
+    comp.ratio.setValueAtTime(5, c.currentTime);
+    comp.attack.setValueAtTime(0.004, c.currentTime);
+    comp.release.setValueAtTime(0.25, c.currentTime);
+    comp.connect(c.destination);
+    cardBusNode = comp;
+    return comp;
+  }
+  function capped(g) { return Math.min(SFX_MAX_GAIN, (g != null ? g : 0.05) * SFX_GAIN_BOOST); }
+
+  /* A note that fades IN then out (tone() only decays). opts: {type, gain,
+     dur, delay, attack, slideTo, lowpass, lowpassTo}. */
+  function swell(freq, opts) {
+    opts = opts || {};
+    try {
+      var c = ensureCtx();
+      if (!c) return;
+      var start = c.currentTime + (opts.delay || 0);
+      var dur = opts.dur != null ? opts.dur : 0.6;
+      var attack = Math.min(dur * 0.9, opts.attack != null ? opts.attack : dur * 0.4);
+      var osc = c.createOscillator();
+      var gain = c.createGain();
+      osc.type = opts.type || 'sine';
+      osc.frequency.setValueAtTime(freq, start);
+      if (opts.slideTo) osc.frequency.exponentialRampToValueAtTime(opts.slideTo, start + dur);
+      var node = osc;
+      if (opts.lowpass) {
+        var lp = c.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(opts.lowpass, start);
+        if (opts.lowpassTo) lp.frequency.exponentialRampToValueAtTime(opts.lowpassTo, start + dur);
+        osc.connect(lp); node = lp;
+      }
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(capped(opts.gain), start + attack);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      node.connect(gain); gain.connect(cardBus(c));
+      osc.start(start); osc.stop(start + dur + 0.03);
+    } catch (_) {}
+  }
+
+  var noiseBuffer = null;
+  /* Filtered white noise (rumbles, whooshes). opts: {gain, dur, delay,
+     attack, type ('bandpass'|'lowpass'), from, to, q}. */
+  function noiseSweep(opts) {
+    opts = opts || {};
+    try {
+      var c = ensureCtx();
+      if (!c) return;
+      if (!noiseBuffer || noiseBuffer.sampleRate !== c.sampleRate) {
+        noiseBuffer = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
+        var data = noiseBuffer.getChannelData(0);
+        for (var i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+      }
+      var start = c.currentTime + (opts.delay || 0);
+      var dur = opts.dur != null ? opts.dur : 0.4;
+      var attack = Math.min(dur * 0.9, opts.attack != null ? opts.attack : dur * 0.35);
+      var src = c.createBufferSource();
+      src.buffer = noiseBuffer;
+      var filter = c.createBiquadFilter();
+      filter.type = opts.type || 'bandpass';
+      filter.Q.setValueAtTime(opts.q != null ? opts.q : 1, start);
+      filter.frequency.setValueAtTime(opts.from || 400, start);
+      if (opts.to) filter.frequency.exponentialRampToValueAtTime(opts.to, start + dur);
+      var gain = c.createGain();
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(capped(opts.gain), start + attack);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      src.connect(filter); filter.connect(gain); gain.connect(cardBus(c));
+      src.start(start); src.stop(start + dur + 0.03);
+    } catch (_) {}
+  }
+
   // Pass 28A: authored scream samples share this same AudioContext. Keep
   // loading lazy so pages that never enter Muenba do not pay the download or
   // decode cost, then retain one decoded buffer per clip for cheap replay.
@@ -394,6 +476,61 @@
       tone(196.00, { type: 'sawtooth', gain: 0.045, dur: 0.32, slideTo: 130.81 });
       tone(207.65, { type: 'sawtooth', gain: 0.032, dur: 0.32, delay: 0.015, slideTo: 138.59 });
       tone(1500, { type: 'square', gain: 0.05, dur: 0.025, delay: 0.27 });
+    },
+
+    /* ── Karasuki Cards reveal (Pass 4a). Called in order by the reveal
+       timeline in js/karasuki-card-challenge.js; each cue lasts until the
+       next one begins. ─────────────────────────────────────────────── */
+    /* 0.0s — the world hushes: a low swell under a soft filtered rumble. */
+    cardHush: function () {
+      swell(55, { type: 'sine', gain: 0.07, dur: 1.7, attack: 0.6, slideTo: 82 });
+      noiseSweep({ type: 'lowpass', from: 260, to: 620, q: 0.7, gain: 0.035, dur: 1.5, attack: 0.5 });
+    },
+    /* 0.4s — the card rises: a filtered rising "charge" and sparkle ticks. */
+    cardCharge: function () {
+      swell(220, { type: 'sawtooth', gain: 0.03, dur: 1.35, attack: 1.0, slideTo: 466, lowpass: 380, lowpassTo: 2600 });
+      swell(330, { type: 'triangle', gain: 0.022, dur: 1.35, attack: 1.0, slideTo: 698 });
+      [0.15, 0.32, 0.5, 0.66, 0.8, 0.92, 1.02, 1.1].forEach(function (d, i) {
+        tone(1760 + i * 220, { type: 'sine', gain: 0.018, dur: 0.06, delay: d });
+      });
+    },
+    /* 1.7s — the turn: an airy whoosh across the flip. */
+    cardWhoosh: function () {
+      noiseSweep({ type: 'bandpass', from: 350, to: 4200, q: 1.1, gain: 0.09, dur: 0.5, attack: 0.28 });
+    },
+    /* 2.05s — the face lands: a sting in the card's kind. */
+    cardReveal: function (kind) {
+      if (kind === 'dangerous') {
+        swell(48, { type: 'sine', gain: 0.09, dur: 1.4, attack: 0.02, slideTo: 34 });
+        [110, 130.81, 155.56].forEach(function (f) {
+          swell(f, { type: 'sawtooth', gain: 0.03, dur: 1.6, attack: 0.03, lowpass: 900, lowpassTo: 300 });
+        });
+        tone(1244.5, { type: 'sine', gain: 0.03, dur: 1.9, delay: 0.12 });
+        tone(1661.2, { type: 'sine', gain: 0.022, dur: 1.7, delay: 0.16 });
+        return;
+      }
+      if (kind === 'mischievous') {
+        [587.33, 739.99, 880, 1174.66, 1479.98].forEach(function (f, i) {
+          tone(f * 1.004, { type: 'triangle', gain: 0.045, dur: 0.16, delay: i * 0.07 });
+        });
+        tone(300, { type: 'triangle', gain: 0.04, dur: 0.22, delay: 0.38, slideTo: 640 });
+        [587.33, 739.99, 880].forEach(function (f) {
+          swell(f, { type: 'triangle', gain: 0.022, dur: 1.1, attack: 0.03, delay: 0.42 });
+        });
+        return;
+      }
+      // friendly (and any future kind): a warm major chord with chimes.
+      swell(130.81, { type: 'sine', gain: 0.06, dur: 1.4, attack: 0.03 });
+      [523.25, 659.25, 783.99].forEach(function (f) {
+        swell(f, { type: 'triangle', gain: 0.03, dur: 1.4, attack: 0.03 });
+      });
+      [1046.5, 1318.5, 1568, 2093].forEach(function (f, i) {
+        tone(f, { type: 'sine', gain: 0.03, dur: 0.6, delay: 0.1 + i * 0.09 });
+      });
+    },
+    /* One tick per point as "Words recalled" counts up. */
+    cardTick: function (step) {
+      tone(900 + (step || 0) * 60, { type: 'sine', gain: 0.018, dur: 0.035 });
     },
   };
 

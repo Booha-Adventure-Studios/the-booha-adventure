@@ -4828,6 +4828,7 @@ const HAPPY_HOUSE_PORTAL = {
       <select id="dev-card-phase" aria-label="Card host state" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;">
         <option value="auto">card: real save</option><option value="surprise">card: surprise (new)</option><option value="ready">card: ready (seen)</option><option value="inProgress">card: in progress</option><option value="teaserLocked">teaser: Blitz not done</option><option value="tomorrow">teaser: come back tomorrow</option><option value="outOfAttempts">teaser: out of tries</option><option value="won">won this week (plain)</option><option value="hidden">hidden (never seen)</option>
       </select>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px;"><input type="checkbox" id="dev-reveal-fast"> Card reveal 4× (dev)</label>
       <button id="dev-card-reset" type="button" style="margin-bottom:4px;font:700 11px monospace;color:#ff9a9a;background:transparent;border:1px solid rgba(255,120,120,.5);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Reset my cards</button>
       <button id="dev-card-preview" type="button" style="margin-bottom:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Preview card faces</button>
       <select id="dev-card-host" aria-label="Card host" style="width:100%;margin-bottom:4px;font:700 11px monospace;background:#111;color:#ffd700;border:1px solid rgba(255,200,0,.4);border-radius:4px;"></select>
@@ -4855,6 +4856,8 @@ const HAPPY_HOUSE_PORTAL = {
     document.getElementById('dev-cards').addEventListener('change', function() { window.__devCards = this.checked; refreshWanderersForRoom(); });
     document.getElementById('dev-card-phase').addEventListener('change', function() { window.__devCardPhase = this.value; refreshWanderersForRoom(); });
     devHostSelect.addEventListener('change', function() { window.__devCardHost = this.value; refreshWanderersForRoom(); });
+    window.__devRevealFast = false;
+    document.getElementById('dev-reveal-fast').addEventListener('change', function() { window.__devRevealFast = this.checked; });
     document.getElementById('dev-card-preview').addEventListener('click', () => { if (window.KarasukiCardFace) KarasukiCardFace.preview(); });
     // Two taps (no browser dialog): the first arms it for 3 seconds.
     const resetBtn = document.getElementById('dev-card-reset');
