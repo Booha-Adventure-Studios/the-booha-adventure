@@ -1944,6 +1944,13 @@ else
   bad "Karasuki card face audit failed"
 fi
 
+echo "[karasuki] Karasuki Cards Pass 2c challenge audit"
+if node tests/karasuki-card-challenge-audit.cjs >/dev/null 2>&1; then
+  ok "Karasuki card challenge: input friction, timers, interruptions, reveal, motion, wiring pass"
+else
+  bad "Karasuki card challenge audit failed"
+fi
+
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then

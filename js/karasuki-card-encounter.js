@@ -173,7 +173,7 @@
     overlay.querySelector('.kc-start').addEventListener('click', () => {
       if (typeof o.onStart === 'function') { o.onStart(); return; }
       const note = overlay.querySelector('.kc-note');
-      note.textContent = 'The 10-round challenge arrives in Pass 2c.';
+      note.textContent = 'Dev preview state: choose “card: real save” in the dev panel to play.';
       note.hidden = false;
     });
     requestAnimationFrame(() => { if (overlay) overlay.classList.add('is-visible'); });

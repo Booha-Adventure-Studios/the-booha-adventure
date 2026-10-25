@@ -20,9 +20,9 @@
  *
  * Order after No. 04 is PROVISIONAL until Bryan confirms it.
  */
-// Students see nothing until Pass 2c ships the challenge screen. The
-// Karasuki dev panel ("Karasuki Cards on") turns it on for a session.
-window.KARASUKI_CARDS_ENABLED = false;
+// Live for students from Pass 2c. Set to false to hide the whole feature
+// (map host, teaser, challenge); the dev panel can still turn it on.
+window.KARASUKI_CARDS_ENABLED = true;
 
 // One shared back for every card: shown face down on the map and in the
 // introduction until the card is won.

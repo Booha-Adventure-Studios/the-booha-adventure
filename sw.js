@@ -109,7 +109,9 @@ const CURRENT_CACHES = {
   // registry/logic/encounter scripts (feature flag off until Pass 2c).
   // Karasuki Cards Pass 2b.1: shared card face/back (js/karasuki-card-face.js);
   // map card and introduction now show the card back until the card is won.
-  pages:  'booha-pages-2026-499',
+  // Karasuki Cards Pass 2c: 10-round challenge + flip reveal
+  // (js/karasuki-card-challenge.js); cards switched on for students.
+  pages:  'booha-pages-2026-500',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
