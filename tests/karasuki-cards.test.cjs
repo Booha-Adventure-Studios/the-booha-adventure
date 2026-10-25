@@ -155,6 +155,37 @@ function play(state, correct, now = 1) {
   assert.ok(!st.hostActive);
 }
 
+/* ── Map presentation (Pass 2b) ───────────────────────────────────── */
+{
+  const s = K.defaultState();
+  const m = c => { const st = K.status(s, c); return `${st.map}:${st.wandererId}`; };
+  assert.strictEqual(m(ctxFor(1, 1, false)), 'hidden:mister-happy', 'never seen + Blitz incomplete → hidden');
+  const surprise = K.status(s, ctxFor(1, 1));
+  assert.strictEqual(surprise.map, 'card');
+  assert.ok(surprise.surprise, 'first encounter is the surprise card');
+  assert.ok(K.markFeatureSeen(s, 50));
+  assert.ok(!K.markFeatureSeen(s, 60), 'first sighting is recorded once');
+  assert.strictEqual(s.featureSeenAt, 50);
+  assert.ok(!K.status(s, ctxFor(1, 1)).surprise);
+  assert.strictEqual(m(ctxFor(1, 1, false)), 'teaser:mister-happy', 'seen + Blitz incomplete → teaser');
+  K.startAttempt(s, ctxFor(1, 1), words(14), 1);
+  assert.strictEqual(m(ctxFor(1, 1)), 'card:mister-happy', 'in progress keeps the card');
+  play(s, 2);
+  assert.strictEqual(m(ctxFor(1, 1)), 'teaser:mister-happy', 'came back too soon → teaser');
+  K.startAttempt(s, ctxFor(1, 2), words(14), 2); play(s, 2);
+  assert.strictEqual(K.status(s, ctxFor(1, 3)).phase, 'outOfAttempts');
+  assert.strictEqual(m(ctxFor(1, 3)), 'teaser:mister-happy', 'out of tries → teaser, never invisible');
+  K.startAttempt(s, ctxFor(2, 8), words(14), 3); play(s, 10);
+  const quiet = K.status(s, ctxFor(2, 9));
+  assert.strictEqual(quiet.phase, 'wonThisWeek');
+  assert.strictEqual(`${quiet.map}:${quiet.wandererId}`, 'plain:mister-happy', 'won Wanderer stays as a plain sprite');
+  assert.notStrictEqual(quiet.wandererId, 'uhibon', 'next host is not revealed early');
+  assert.strictEqual(m(ctxFor(3, 15)), 'card:uhibon', 'next host appears after the rollover');
+  const allWon = K.defaultState();
+  cards.filter(K.isShipped).forEach(c => { allWon.won[c.id] = { cardId: c.id, lv: 1, wonAt: 1, try: 1, score: 10, week: 'W0' }; });
+  assert.strictEqual(K.status(allWon, ctxFor(9, 60)).map, 'none');
+}
+
 /* ── State normalisation ───────────────────────────────────────────── */
 {
   const n = K.normalizeState({ attemptsThisWeek: 99, won: { x: 'bad', y: { score: 9 } }, attempt: { hostId: 'a', words: [] } });

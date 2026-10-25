@@ -19,6 +19,17 @@
  *                     `interruptions` is kept apart from failure state.
  *   lastResult        { hostId, passed, score, try, at, week } or null
  *   won               { [cardId]: { cardId, lv, wonAt, try, score, week } }
+ *   featureSeenAt     when the student first opened a card introduction
+ *                     (0 = never). Rendering a host does not count.
+ *
+ * Map presentation (status().map), decided here so it can be tested:
+ *   'card'    floating card replaces the sprite (ready / in progress)
+ *   'teaser'  normal sprite with a faint unusual shimmer (locked after the
+ *             feature was seen, came back too soon, out of tries)
+ *   'plain'   normal sprite only (this week's won Wanderer stays quietly)
+ *   'hidden'  nothing extra (never seen and not yet eligible: keeps the
+ *             first discovery a surprise)
+ *   'none'    no host at all (every shipped card won)
  */
 (function (root) {
   'use strict';
@@ -69,6 +80,7 @@
       attempt: null,
       lastResult: null,
       won: {},
+      featureSeenAt: 0,
     };
   }
 
@@ -104,6 +116,7 @@
     s.wonWeek = str(raw.wonWeek);
     s.attempt = normalizeAttempt(raw.attempt);
     s.lastResult = isObj(raw.lastResult) ? { ...raw.lastResult } : null;
+    s.featureSeenAt = Number(raw.featureSeenAt) > 0 ? Number(raw.featureSeenAt) : 0;
     if (isObj(raw.won)) {
       Object.keys(raw.won).forEach(id => {
         const w = raw.won[id];
@@ -163,9 +176,27 @@
     else if (attemptsLeft <= 0) phase = PHASE.OUT_OF_ATTEMPTS;
     else if (ctx.todayKey && s.lastAttemptDay === ctx.todayKey) phase = PHASE.TOMORROW;
     else phase = PHASE.READY;
+    const featureSeen = s.featureSeenAt > 0;
+    let map = 'none';
+    let wandererId = hostId;
+    if (phase === PHASE.READY || phase === PHASE.IN_PROGRESS) map = 'card';
+    else if (phase === PHASE.LOCKED) map = featureSeen ? 'teaser' : 'hidden';
+    else if (phase === PHASE.TOMORROW || phase === PHASE.OUT_OF_ATTEMPTS) map = 'teaser';
+    else if (phase === PHASE.WON_THIS_WEEK) {
+      // The week goes quiet: never reveal the next host early. Only the
+      // Wanderer just won stays, as an ordinary sprite.
+      const last = s.lastResult;
+      wandererId = last && last.passed && last.week === ctx.weekKey ? last.hostId : null;
+      map = wandererId ? 'plain' : 'none';
+    }
+    if (map === 'hidden' || map === 'none') wandererId = map === 'hidden' ? hostId : null;
     return {
       phase,
       hostId,
+      map,
+      wandererId,
+      featureSeen,
+      surprise: map === 'card' && !featureSeen,
       hostActive: phase === PHASE.READY || phase === PHASE.IN_PROGRESS,
       attemptsLeft,
       nextTry: s.attemptsThisWeek + 1,
@@ -270,6 +301,13 @@
       if (outcome) return outcome;
     }
     return state.attempt ? finish(state, now) : null;
+  }
+
+  /** The student opened a card introduction for the first time. */
+  function markFeatureSeen(state, now) {
+    if (state.featureSeenAt > 0) return false;
+    state.featureSeenAt = now;
+    return true;
   }
 
   /* ── Answer check (reuses Echo's normalizer and edit distance) ─────── */
@@ -469,7 +507,7 @@
     RULES, TIMING, PHASE,
     // pure
     defaultState, normalizeState, registry, getCard, isShipped, resolveHost,
-    status, startAttempt, currentWord, submitAnswer, interruptRound, expireStale,
+    status, startAttempt, currentWord, submitAnswer, interruptRound, expireStale, markFeatureSeen,
     checkAnswer, lookMs, typeMs, seededRng, pickWords, sliceForWeek,
     previousWeeks, loadSnapshotWords,
     // save-backed (current student)
@@ -478,6 +516,7 @@
     answer(typed) { return transact((s, ctx, now) => submitAnswer(s, typed, now)); },
     interrupt() { return transact((s, ctx, now) => interruptRound(s, now)); },
     word() { return transact(s => ({ ok: true, word: currentWord(s) })); },
+    seen() { return transact((s, ctx, now) => ({ ok: true, changed: markFeatureSeen(s, now) })); },
     wonCards() {
       const api = saveApi();
       const state = normalizeState(api ? api.load().karasukiCards : null);
