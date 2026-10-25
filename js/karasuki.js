@@ -3054,6 +3054,9 @@ const HAPPY_HOUSE_PORTAL = {
     w.cardHost = cardHost;
     w.cardMode = cardHost.status.map;
     w.cardKind = (comment && comment.kind) || 'friendly';
+    // A floating card stays on its slot: haunting Wanderers (Sumiyo, Jubei)
+    // stop orbiting while they are a card, so the target never drifts away.
+    if (w.cardMode === 'card') { w.frozen = true; w.rx = w.x; w.ry = w.y; }
     // Face down until won: the map shows the shared card back. The won
     // card's own art is only requested by the reveal and the binder.
     if (w.cardMode === 'card' && window.KARASUKI_CARD_BACK) {

@@ -108,7 +108,8 @@ function play(state, correct, now = 1) {
 
   const next = K.status(s, ctxFor(2, 8));
   assert.strictEqual(next.phase, 'ready');
-  assert.strictEqual(next.hostId, 'uhibon', 'unshipped reserved numbers are skipped');
+  const firstUnwonAfterMH = K.registry().find(c => c.id !== 'mister-happy' && K.isShipped(c)).id;
+  assert.strictEqual(next.hostId, firstUnwonAfterMH, 'next host is the lowest-numbered shipped card not yet won');
 }
 
 /* ── Out of attempts; failed host carries into next week ───────────── */
@@ -218,8 +219,9 @@ function play(state, correct, now = 1) {
   const quiet = K.status(s, ctxFor(2, 9));
   assert.strictEqual(quiet.phase, 'wonThisWeek');
   assert.strictEqual(`${quiet.map}:${quiet.wandererId}`, 'plain:mister-happy', 'won Wanderer stays as a plain sprite');
-  assert.notStrictEqual(quiet.wandererId, 'uhibon', 'next host is not revealed early');
-  assert.strictEqual(m(ctxFor(3, 15)), 'card:uhibon', 'next host appears after the rollover');
+  const nextId = K.registry().find(c => c.id !== 'mister-happy' && K.isShipped(c)).id;
+  assert.notStrictEqual(quiet.wandererId, nextId, 'next host is not revealed early');
+  assert.strictEqual(m(ctxFor(3, 15)), `card:${nextId}`, 'next host appears after the rollover');
   const allWon = K.defaultState();
   cards.filter(K.isShipped).forEach(c => { allWon.won[c.id] = { cardId: c.id, lv: 1, wonAt: 1, try: 1, score: 10, week: 'W0' }; });
   assert.strictEqual(K.status(allWon, ctxFor(9, 60)).map, 'none');

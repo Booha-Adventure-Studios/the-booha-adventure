@@ -1958,6 +1958,13 @@ else
   bad "Karasuki binder audit failed"
 fi
 
+echo "[cache] Profile art revision + service-worker image refresh audit"
+if node tests/profile-art-cache-audit.cjs >/dev/null 2>&1; then
+  ok "Profile art URLs versioned, image misses no-store, profile pages register the service worker"
+else
+  bad "Profile art cache audit failed"
+fi
+
 echo "[inventory] Test manifest and current orphan tests"
 # MANIFEST_EXTRA_TESTS: status=verify entries are executed below.
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then

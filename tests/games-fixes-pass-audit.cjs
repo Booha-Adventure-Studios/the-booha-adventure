@@ -88,7 +88,7 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 {
   const html = read('profile.html');
   const pg = read('js/ui/profile-game.js');
-  assert.match(pg, /<span class="pg-coin-face"><img src="\$\{IMG\}rank-coin-/, 'the coin face wraps the image for the glint');
+  assert.match(pg, /<span class="pg-coin-face"><img src="\$\{profileArt\(`rank-coin-/, 'the coin face wraps the image for the glint (URL via BoohaProfileArt)');
   const kf = name => (html.match(new RegExp(`@keyframes ${name} \\{([\\s\\S]*?\\})\\s*\\}`)) || [])[1] || '';
   for (const name of ['pgCoinFlicker', 'pgCoinGlint']) {
     const body = kf(name);

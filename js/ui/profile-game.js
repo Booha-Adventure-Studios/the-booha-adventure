@@ -20,6 +20,8 @@ const BoohaProfileGame = (() => {
   'use strict';
 
   const IMG = 'assets/img/profile/';
+  // Profile art URLs carry the shared revision tag (js/core/profile-art.js).
+  const profileArt = file => (window.BoohaProfileArt ? window.BoohaProfileArt.url(file) : IMG + file);
   const LANTERN = 'assets/img/blitz/medal-spooky.webp';
   const BLITZ_ART = {
     vocab: 'assets/img/blitz/medal-circus.webp',
@@ -260,7 +262,7 @@ const BoohaProfileGame = (() => {
       : `Lv ${lv.level + 1} で あたらしい コイン`;
     host.innerHTML = `
       <div class="pg-hero-coin">
-        <span class="pg-coin-face"><img src="${IMG}rank-coin-${lv.level}.webp" alt="Rank coin, level ${lv.level}" width="72" height="72"></span>
+        <span class="pg-coin-face"><img src="${profileArt(`rank-coin-${lv.level}.webp`)}" alt="Rank coin, level ${lv.level}" width="72" height="72"></span>
         <span class="pg-hero-lv">LV ${lv.level}</span>
       </div>
       <p class="pg-hero-speech">${esc(greet)}<br><span>${esc(speech(s))}</span></p>
@@ -274,7 +276,7 @@ const BoohaProfileGame = (() => {
         <div class="pg-level">
           <div class="pg-level-row"><span>${lv.max ? 'ランク MAX' : `Lv ${lv.level + 1} まで`}</span><span class="pg-level-num">${lv.max ? `${s.life.total.toLocaleString()} ★` : `${s.life.total.toLocaleString()} / ${lv.next.toLocaleString()} ★`}</span></div>
           <div class="pg-level-track" role="progressbar" aria-label="Level progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><span style="width:${pct}%"></span></div>
-          <p class="pg-level-next">${esc(nextLine)}${lv.max ? '' : ` <img src="${IMG}rank-coin-${lv.level + 1}.webp" alt="" width="22" height="22">`}</p>
+          <p class="pg-level-next">${esc(nextLine)}${lv.max ? '' : ` <img src="${profileArt(`rank-coin-${lv.level + 1}.webp`)}" alt="" width="22" height="22">`}</p>
         </div>
       </div>`;
   }
@@ -424,7 +426,7 @@ const BoohaProfileGame = (() => {
     }
     parts.push(`
       <div class="pg-gate${s.arcadeOpen ? ' open' : ''}${prism ? ' prism' : ''}" style="top:${GATE_Y - 50}px">
-        <img src="${IMG}treasure-chest-${s.arcadeOpen ? 'open' : 'closed'}.webp" alt="Arcade chest${s.arcadeOpen ? ' (open)' : ' (locked)'}" width="120" height="80">
+        <img src="${profileArt(`treasure-chest-${s.arcadeOpen ? 'open' : 'closed'}.webp`)}" alt="Arcade chest${s.arcadeOpen ? ' (open)' : ' (locked)'}" width="120" height="80">
         <span class="pg-gate-title">${s.arcadeOpen ? 'アーケード オープン！' : 'アーケード たからばこ'}</span>
         ${prism ? '<span class="pg-gate-prism">にじの みち · PRISM TRAIL</span>'
                 : `<span class="pg-gate-sub">${s.arcadeOpen ? 'ARCADE GAMES UNLOCKED' : 'ぜんぶ ★★ で ひらく'}</span>`}
@@ -635,7 +637,7 @@ const BoohaProfileGame = (() => {
           ${rows.map(r => `
             <div class="pg-wm ${r.tier}${r.on ? ' on' : ''}">
               ${r.on ? '<span class="pg-wm-get">GET!</span>' : ''}
-              <img src="${IMG}${esc(r.img)}" alt="${esc(r.en)}${r.on ? ' (earned)' : ' (not yet)'}" width="96" height="96" loading="lazy" decoding="async">
+              <img src="${esc(profileArt(r.img))}" alt="${esc(r.en)}${r.on ? ' (earned)' : ' (not yet)'}" width="96" height="96" loading="lazy" decoding="async">
               <span class="pg-wm-name">${esc(r.jp)}</span>
               <span class="pg-wm-tier">${TIER[r.tier][1]} · +${W.bonusFor(r.id)}★</span>
               <span class="pg-wm-how">${esc(r.how)}</span>
@@ -689,7 +691,7 @@ const BoohaProfileGame = (() => {
         : g.boss ? '<span class="pg-x-tag open">OPEN! ひらいた！</span>'
         : '<span class="pg-x-tag skip">まだ · NOT YET</span>';
       const art = g.boss
-        ? `<img class="pg-x-boss" src="${IMG}arcade-week-boss.webp" alt="" width="72" height="80" loading="lazy" decoding="async">`
+        ? `<img class="pg-x-boss" src="${profileArt('arcade-week-boss.webp')}" alt="" width="72" height="80" loading="lazy" decoding="async">`
         : `<span class="pg-x-icon">${BONUS_ICON[g.gameKey] || ''}</span>`;
       const label = `${g.name}: ${stars} of 3 bonus stars this week${done ? ', done' : ''}; best ${best}; played ${times} times`;
       return `
@@ -750,7 +752,7 @@ const BoohaProfileGame = (() => {
           <div class="rb-trophies">
             ${g.items.map(t => `
               <div class="rb-trophy${t.on ? ' on' : ''}${t.tierName ? ' t-' + t.tierName : ''}${t.secret ? ' secret' : ''}" title="${esc(t.how)}">
-                <span class="rb-tframe"><img src="${esc(IMG + t.img)}" alt="${esc(t.en)}${t.on ? '' : ' (locked)'}" width="72" height="72" loading="lazy" decoding="async"></span>
+                <span class="rb-tframe"><img src="${esc(profileArt(t.img))}" alt="${esc(t.en)}${t.on ? '' : ' (locked)'}" width="72" height="72" loading="lazy" decoding="async"></span>
                 <b class="rb-tjp">${esc(t.jp)}</b>
                 <span class="rb-ten">${esc(t.en)}</span>
                 ${trophyProgress(t)}
@@ -786,7 +788,7 @@ const BoohaProfileGame = (() => {
       `<li class="gold"><span>こんしゅうのスター · WEEK TOTAL</span><b>${s.weekTotal}★</b></li>`,
     ];
     if (s.level.level > s.levelBefore.level) {
-      rewards.push(`<li class="coin"><img src="${IMG}rank-coin-${s.level.level}.webp" alt="" width="34" height="34"><span>レベルアップ！ Lv ${s.levelBefore.level} → ${s.level.level}</span><b>NEW COIN</b></li>`);
+      rewards.push(`<li class="coin"><img src="${profileArt(`rank-coin-${s.level.level}.webp`)}" alt="" width="34" height="34"><span>レベルアップ！ Lv ${s.levelBefore.level} → ${s.level.level}</span><b>NEW COIN</b></li>`);
     }
     const readyN = readyCount(s);
     if (readyN) {
@@ -801,7 +803,7 @@ const BoohaProfileGame = (() => {
         <span class="pg-kicker gold">WEEK SEALED</span>
         <h2 id="pg-sealed-title">${esc(s.name ? `${s.name}、` : '')}こんしゅう クリア！</h2>
         <div class="pg-sealed-stage">
-          <img class="pg-sealed-chest" src="${IMG}treasure-chest-open.webp" alt="Open treasure chest" width="280" height="187">
+          <img class="pg-sealed-chest" src="${profileArt('treasure-chest-open.webp')}" alt="Open treasure chest" width="280" height="187">
           <img class="pg-sealed-booha" src="${esc(s.sprite.src)}" alt="${esc(s.sprite.name)} cheering" width="150" height="150">
         </div>
         <div class="pg-sealed-score"><span class="pg-seal">${esc(pct)}</span><div><b>${tier}</b><span>12/12 クリア</span></div></div>

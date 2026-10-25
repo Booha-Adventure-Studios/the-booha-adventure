@@ -20,6 +20,8 @@
   var script = document.currentScript;
   var ROOT = script && script.src ? script.src.replace(/js\/ui\/medal-toast\.js(\?.*)?$/, '') : '';
   var IMG = ROOT + 'assets/img/profile/';
+  // Profile art URLs carry the shared revision tag (js/core/profile-art.js).
+  function profileArt(file) { return window.BoohaProfileArt ? window.BoohaProfileArt.url(file, ROOT) : IMG + file; }
   var DISPLAY_MS = 4200;
   var queue = [];
   // A check can fire while earlier medals are still waiting in the queue.
@@ -138,7 +140,7 @@
     var tierJp = { bronze: 'ブロンズ', silver: 'シルバー', gold: 'ゴールド' }[m.tier] || '';
     queue.push({
       tier: m.tier,
-      img: IMG + m.img,
+      img: profileArt(m.img),
       kicker: 'MEDAL GET! · メダル ゲット！',
       title: m.jp,
       sub: tierJp + ' · ' + m.how,
@@ -150,7 +152,7 @@
   function enqueueLevel(level) {
     queue.push({
       tier: 'gold',
-      img: IMG + 'rank-coin-' + Math.max(1, Math.min(9, level)) + '.webp',
+      img: profileArt('rank-coin-' + Math.max(1, Math.min(9, level)) + '.webp'),
       kicker: 'LEVEL UP! · レベルアップ！',
       title: 'Lv ' + level + ' に なった！',
       sub: 'あたらしい ランクコイン ゲット',
