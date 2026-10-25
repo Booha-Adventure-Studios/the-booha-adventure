@@ -57,9 +57,9 @@ window.KARASUKI_WANDERER_DATA = {
   },
   "Sumiyo Horaguchi": {
     id: "sumiyo-horaguchi",
-    en: "Won't you come inside for a little while, dear?",
-    jp: "少しだけ、中に入っていかない?",
-    furigana: { "少し": "すこし", "中": "なか", "入っていかない": "はいっていかない" }
+    en: "Won't you let me in, dear? Just for a little while.",
+    jp: "少しだけ、中に入れてくれない?",
+    furigana: { "少し": "すこし", "中": "なか", "入れてくれない": "いれてくれない" }
   },
 
   "Amekuro": {

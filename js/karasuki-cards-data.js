@@ -17,6 +17,10 @@
  *
  * Order after No. 04 is PROVISIONAL until Bryan confirms it.
  */
+// Students see nothing until Pass 2c ships the challenge screen. The
+// Karasuki dev panel ("Karasuki Cards on") turns it on for a session.
+window.KARASUKI_CARDS_ENABLED = false;
+
 window.KARASUKI_CARDS = Object.freeze([
   { no: 1,  id: 'mister-happy',     name: 'Mister Happy',     art: 'assets/img/cards/karasuki-card-mister-happy-lv1.webp' },
   { no: 2,  id: 'tom-katsu',        name: 'Tom Katsu',        art: null },

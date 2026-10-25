@@ -126,6 +126,7 @@ const BoohaSaveFile = (() => {
       attempt: null,
       lastResult: null,
       won: {},               // { [cardId]: { cardId, lv, wonAt, try, score, week } }
+      featureSeenAt: 0,      // first card introduction opened (0 = never)
     };
   }
 
