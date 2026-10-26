@@ -109,8 +109,10 @@ assert.match(utsurobaSource, /getSpawnPoint\(PAGE_ID\)/,
   'Utsuroba should resume its saved room for a profile entry');
 assert.match(utsurobaSource, /function worldGateOpen\(\)/,
   'Utsuroba must guard direct URL entry with the shared weekly gate');
-assert.match(utsurobaSource, /const DEV_MODE = params\.get\('dev'\) === '1';/,
-  'Utsuroba DEV mode must require the explicit dev=1 query flag');
+assert.match(utsurobaSource, /const DEV_MODE = params\.get\('dev'\) === '1' && devAccessAllowed\(\);/,
+  'Utsuroba DEV mode must require the explicit dev=1 query flag on a teacher browser');
+assert.match(utsurobaSource, /localStorage\.getItem\('booha_dev_worlds'\) === '1'\s*\|\| sessionStorage\.getItem\('booha_dev_session'\) === '1'/,
+  'Utsuroba must ignore dev=1 unless the teacher switch or a console dev session is on');
 assert.match(utsurobaSource, /if \(DEV_MODE\) window\.__devUtsuroba = true;/,
   'Utsuroba DEV mode must establish the test override');
 assert.match(utsurobaSource, /if \(DEV_MODE \|\| window\.__devUtsuroba\) return true;/,

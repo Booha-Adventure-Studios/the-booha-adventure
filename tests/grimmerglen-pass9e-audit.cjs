@@ -14,8 +14,11 @@ const profile = fs.readFileSync(path.join(root, 'grimmerglen-profile.html'), 'ut
 const verify = fs.readFileSync(path.join(root, 'verify.sh'), 'utf8');
 const profilePages = ['profile.html', 'adventure-profile.html', 'utsuroba-profile.html', 'muenba-profile.html'];
 
-assert(runtime.includes("const DEV_MODE = params.get('dev') === '1';"),
-  'playable-world DEV mode must require the explicit dev=1 query flag');
+assert(runtime.includes("const DEV_MODE = params.get('dev') === '1' && devAccessAllowed();"),
+  'playable-world DEV mode must require the explicit dev=1 query flag on a teacher browser');
+assert(runtime.includes("localStorage.getItem('booha_dev_worlds') === '1'")
+  && runtime.includes("sessionStorage.getItem('booha_dev_session') === '1'"),
+  'dev=1 must be ignored unless the teacher switch or a console dev session is on');
 assert(runtime.includes('if (DEV_MODE) window.__devGrimmerglen = true;'),
   'the explicit DEV flag must establish the Grimmerglen test override');
 
