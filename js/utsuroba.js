@@ -217,8 +217,16 @@
   /* ═══════════════════════════════════════════
      DEV MODE
   ═══════════════════════════════════════════ */
+  // ?dev=1 only opens worlds on a teacher browser: the persistent switch
+  // (localStorage booha_dev_worlds) or a console dev tool used in this tab.
+  function devAccessAllowed() {
+    try {
+      return localStorage.getItem('booha_dev_worlds') === '1'
+        || sessionStorage.getItem('booha_dev_session') === '1';
+    } catch (_) { return false; }
+  }
   const params = new URLSearchParams(window.location.search);
-  const DEV_MODE = params.get('dev') === '1';
+  const DEV_MODE = params.get('dev') === '1' && devAccessAllowed();
   if (DEV_MODE) window.__devUtsuroba = true;
 
   /* ═══════════════════════════════════════════
@@ -4134,6 +4142,7 @@
   Object.defineProperty(window, 'b_4911', {
     
     value: () => {
+      try { sessionStorage.setItem('booha_dev_session', '1'); } catch (_) {}
       if (typeof injectDevPanel === 'function') injectDevPanel();
     },
     writable: false,
