@@ -1264,17 +1264,17 @@ function renderRecords() {
     return;
   }
   box.innerHTML = rec.runs.map(r => {
-    const p1n = r.p1Name || 'P1';
+    const p1n = escapeHTML(r.p1Name || 'P1');
     const p2n = 'P2';
     const winner = r.winner === 'p1' ? `${p1n} WIN` : r.winner === 'p2' ? `${p2n} WIN` : 'DRAW';
     return `
       <div class="rec-row">
-        <div>${r.curr.toUpperCase()}<br>${r.mode.toUpperCase()}</div>
+        <div>${escapeHTML(String(r.curr || '').toUpperCase())}<br>${escapeHTML(String(r.mode || '').toUpperCase())}</div>
         <div>
           ${winner} · ${p1n} ${r.p1} — ${p2n} ${r.p2}<br>
-          <span class="jp">正解率 ${p1n} ${r.acc1 || '—'} / ${p2n} ${r.acc2 || '—'}</span>
+          <span class="jp">正解率 ${p1n} ${escapeHTML(r.acc1 || '—')} / ${p2n} ${escapeHTML(r.acc2 || '—')}</span>
         </div>
-        <div>${r.date}</div>
+        <div>${escapeHTML(r.date)}</div>
       </div>`;
   }).join('');
 }
