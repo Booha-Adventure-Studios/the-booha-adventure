@@ -744,6 +744,11 @@ const LIVE_MS   = 4000;   // how long the SNAP! window stays open before a dead 
 function answerMs() { return STATE.mode === 'vocab' ? 4500 : 6000; }  // read+answer window
 const ARM_MIN = 600, ARM_RANGE = 800;  // random anti-mash delay before SNAP!
 
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[ch]);
+}
 function getP1Name() {
   const raw = (localStorage.getItem('booha_first_name') || '').trim();
   if (!raw) return 'PLAYER 1';
@@ -1199,12 +1204,12 @@ function finishMatch() {
   // big head-to-head score
   document.getElementById('bigscore').innerHTML = `
     <div class="bs-side">
-      <div class="bs-name p1c">${STATE.p1Name}</div>
+      <div class="bs-name p1c">${escapeHTML(STATE.p1Name)}</div>
       <div class="bs-num p1c ${winner==='p1'?'win':winner==='p2'?'lose':''}">${STATE.p1}</div>
     </div>
     <div class="bs-dash">—</div>
     <div class="bs-side">
-      <div class="bs-name p2c">${STATE.p2Name}</div>
+      <div class="bs-name p2c">${escapeHTML(STATE.p2Name)}</div>
       <div class="bs-num p2c ${winner==='p2'?'win':winner==='p1'?'lose':''}">${STATE.p2}</div>
     </div>`;
 
