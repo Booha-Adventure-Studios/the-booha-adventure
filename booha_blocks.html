@@ -1459,6 +1459,11 @@ helpBtn?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation
 helpClose?.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();playUiClick();helpOverlay.style.display='none';isPaused=false;resumeLoop();},{passive:false});
 
 /* ── LEADERBOARD ── */
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[ch]);
+}
 const LB_KEY='booha_blocks_lb_v2',NAME_KEY='booha_blocks_name';
 function getBoard(){try{const b=JSON.parse(localStorage.getItem(LB_KEY)||'[]');return Array.isArray(b)?b:[];}catch(_){return[];}}
 function setBoard(a){try{localStorage.setItem(LB_KEY,JSON.stringify(a));}catch(_){}}
@@ -1482,7 +1487,7 @@ function renderBoard(){
     const rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
     const rl=i===0?'g':i===1?'p':i===2?'a':'';
     const d=new Date(e.at).toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo',month:'2-digit',day:'2-digit'});
-    return`<div class="lb-row ${rc}"><div class="lb-rank ${rl}">#${i+1}</div><div class="lb-info"><div class="lb-name">${e.name}</div><div class="lb-meta"><div class="lb-chip">Score <span>${e.score}</span><small>スコア</small></div><div class="lb-chip">Lv <span>${e.level}</span><small>レベル</small></div><div class="lb-chip">${fmtTime(e.time||0)}<small>時間</small></div><div class="lb-chip">${d}<small>日付</small></div></div></div><div class="lb-lines">${e.lines}<small>LINES<br>ライン</small></div></div>`;
+    return`<div class="lb-row ${rc}"><div class="lb-rank ${rl}">#${i+1}</div><div class="lb-info"><div class="lb-name">${escapeHTML(e.name)}</div><div class="lb-meta"><div class="lb-chip">Score <span>${e.score}</span><small>スコア</small></div><div class="lb-chip">Lv <span>${e.level}</span><small>レベル</small></div><div class="lb-chip">${fmtTime(e.time||0)}<small>時間</small></div><div class="lb-chip">${d}<small>日付</small></div></div></div><div class="lb-lines">${e.lines}<small>LINES<br>ライン</small></div></div>`;
   }).join('');
 }
 
