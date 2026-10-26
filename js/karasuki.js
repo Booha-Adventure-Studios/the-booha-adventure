@@ -6623,6 +6623,7 @@ function drawObserver(now) {
 
   Object.defineProperty(window, 'b_3910', {
     value: () => {
+      try { sessionStorage.setItem('booha_dev_session', '1'); } catch (_) {}
       if (typeof injectDevPanel === 'function') injectDevPanel();
     },
     writable: false,
