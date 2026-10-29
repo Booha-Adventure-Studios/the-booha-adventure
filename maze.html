@@ -2058,11 +2058,13 @@ function createSeasonalWanderer(index, delayMs, visitor, cycle) {
   return w;
 }
 function tickWanderers(nowMs){
-  const seasonalVisitorSeason = window.BoohaSkins?.seasonIdForDate?.();
-  const seasonalVisitorSeasonActive = seasonalVisitorSeason === 'halloween-2026';
+  // A seasonal visitor only stays while today's season still uses that same
+  // sprite, so Halloween bats vanish on Nov 1 and next year's seasons work
+  // without editing a hard-coded season id here.
+  const currentVisitorAsset = window.BoohaSkins?.seasonalVisitor?.()?.asset || null;
   for(let i=0;i<wanderers.length;i++){
     const w=wanderers[i];
-    if(w.kind==='seasonal' && !seasonalVisitorSeasonActive){w.done=true;w.opacity=0;continue;}
+    if(w.kind==='seasonal' && w.visitorSrc!==currentVisitorAsset){w.done=true;w.opacity=0;continue;}
     if(w.done)continue;
     if(w.startTime===null){if(nowMs<w.delayMs)continue;w.startTime=nowMs;}
     const elapsed=nowMs-w.startTime,t=Math.min(elapsed/w.dur,1),et=easeInOut(t);

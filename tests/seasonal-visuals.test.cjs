@@ -53,7 +53,15 @@ assert.deepStrictEqual([...christmas.characterIds], [
 ]);
 assert.strictEqual(skins.get('thumpkin').seasonId, 'christmas-2026');
 assert.ok(skins.isAvailable('thumpkin'), 'Thumpkin is the first complete Christmas unlockable');
-assert.ok(!skins.isAvailable('crumbly'), 'future Christmas art must stay unavailable until enabled with a complete set');
+christmas.characterIds.forEach(id => {
+  assert.ok(skins.isAvailable(id), `${id} has a complete Christmas pose set and must stay enabled`);
+});
+// Being enabled never releases a guide early: only the weekly schedule picks
+// who appears, so Crumbly cannot be the Nov 1 guide.
+assert.strictEqual(skins.rotationCharacterId('christmas-2026', '2026-11-01|november-w1'), 'thumpkin');
+assert.notStrictEqual(skins.rotationCharacterId('christmas-2026', '2026-11-01|november-w1'), 'crumbly');
+assert.deepStrictEqual([...christmas.checkpointSparkWeeks], [41, 42, 43, 44, 45, 46, 47, 48],
+  'Christmas sparks must cover every November and December maze week');
 assert.strictEqual(skins.seasonMascot('christmas-2026').id, 'grubb');
 assert.strictEqual(skins.mascotAsset('karasuki', 'christmas-2026'), grubb.assets.karasuki);
 assert.deepStrictEqual(Object.keys(christmas.palette).sort(), ['black', 'gold', 'green', 'lime', 'orange', 'purple', 'red', 'white']);
