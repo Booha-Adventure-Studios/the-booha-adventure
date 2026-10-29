@@ -1944,9 +1944,16 @@ else
   bad "Karasuki card face audit failed"
 fi
 
+echo "[keys] Shared on-screen keyboard audit (Grimmerglen Pass G1)"
+if node tests/booha-keys-audit.cjs >/dev/null 2>&1; then
+  ok "Shared keyboard: keys, physical-key mapping, iPad touch handling, 44 px keys, motion pass"
+else
+  bad "Shared keyboard audit failed"
+fi
+
 echo "[karasuki] Karasuki Cards Pass 2c challenge audit"
 if node tests/karasuki-card-challenge-audit.cjs >/dev/null 2>&1; then
-  ok "Karasuki card challenge: input friction, timers, interruptions, reveal, motion, wiring pass"
+  ok "Karasuki card challenge: on-screen keyboard, countdown, timers, interruptions, reveal, motion, wiring pass"
 else
   bad "Karasuki card challenge audit failed"
 fi

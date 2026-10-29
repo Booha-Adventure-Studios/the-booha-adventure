@@ -11,9 +11,10 @@
  * Keyboard (Pass 5): the challenge never uses the iPad system keyboard —
  * its QuickType suggestions and autofill would do the remembering, and a
  * Japanese keyboard adds IME composition. There is no text input at all:
- * a kind-tinted on-screen keyboard (a–z, apostrophe, hyphen, space,
- * backspace, OK) writes into a plain answer box, so paste is impossible.
- * A physical keyboard still works through keydown.
+ * the shared on-screen keyboard (js/booha-keys.js — a–z, apostrophe,
+ * hyphen, space, backspace, OK), tinted by host kind, writes into a plain
+ * answer box, so paste is impossible. A physical keyboard still works
+ * through keydown.
  *
  * Interruptions: leaving the page for up to GRACE_MS pauses the round and
  * resumes it. Longer, the round is interrupted (KarasukiCards.interrupt):
@@ -36,12 +37,12 @@
     mischievous: { kc: '#FF8AD0', kd: '#A64BD6', cap: '#2B1839', cap2: '#170C20' },
     dangerous: { kc: '#FF6B74', kd: '#C3303B', cap: '#26272E', cap2: '#111216' },
   };
-  const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
   const MAX_TYPED = 40;
 
   let root = null;
   let opts = null;
   let run = null;
+  let keys = null;      // the shared BoohaKeys keyboard for the current shell
 
   const K = () => window.KarasukiCards;
   function esc(v) {
@@ -118,30 +119,13 @@
 #kcc .kcc-stage.is-done .kcc-caret,#kcc.kcc-still .kcc-caret{animation:none}
 #kcc .kcc-stage.is-done .kcc-caret{opacity:0}
 @keyframes kcc-blink{50%{opacity:0}}
-#kcc .kcc-keys{--gap:6px;--kh:56px;display:flex;flex-direction:column;gap:var(--gap);width:min(800px,100%);margin-top:auto;padding:8px;border-radius:16px;background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}
-#kcc .kcc-row{display:flex;justify-content:center;gap:var(--gap)}
-#kcc .kcc-key{position:relative;flex:0 0 calc((100% - 9 * var(--gap)) / 10);min-width:0;height:var(--kh);padding:0;margin:0;border:0;border-radius:10px;background:linear-gradient(180deg,var(--cap),var(--cap2));color:#fff;font:800 24px/1 'Nunito',system-ui,sans-serif;box-shadow:inset 0 0 0 1.5px var(--kd),0 3px 0 rgba(0,0,0,.5);cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(0,0,0,0);transition:transform .12s ease-out}
-#kcc .kcc-key::after{content:'';position:absolute;left:-3px;top:-3px;right:-3px;bottom:-3px;border-radius:13px;box-shadow:0 0 16px 2px var(--kc),inset 0 0 0 2px var(--kc);opacity:0;transition:opacity .2s ease-out;pointer-events:none}
-#kcc .kcc-key.is-down{transform:translateY(2px) scale(.93);transition:transform .04s ease-out}
-#kcc .kcc-key.is-down::after{opacity:1;transition:opacity .04s ease-out}
-#kcc.kcc-still .kcc-key.is-down{transform:none}
-#kcc .kcc-key.is-mark{color:var(--kc);font-size:28px}
-#kcc .kcc-key.is-space{flex:1 1 auto;font-size:15px;letter-spacing:.12em;color:rgba(255,255,255,.75)}
-#kcc .kcc-key.is-back{flex-basis:calc((100% - 9 * var(--gap)) / 10 * 1.5);color:var(--kc)}
-#kcc .kcc-key.is-back svg{display:block;margin:0 auto}
-#kcc .kcc-key.is-ok{flex-basis:calc((100% - 9 * var(--gap)) / 10 * 2);background:linear-gradient(180deg,var(--kc),var(--kd));color:#14111E;font-size:20px;box-shadow:0 3px 0 rgba(0,0,0,.5)}
-#kcc .kcc-key.is-ok small{display:block;margin-top:2px;font-size:11px}
-#kcc .kcc-key:focus{outline:none}
-#kcc .kcc-key:focus-visible{outline:2px solid #fff;outline-offset:2px}
+#kcc .kcc-keys{width:min(800px,100%);margin-top:auto}   /* keycaps: js/booha-keys.js */
 @media (max-height:500px){
 #kcc .kcc-stage{gap:6px;padding-top:2px}
 #kcc .kcc-answer{height:44px;font-size:24px}
-#kcc .kcc-keys{--gap:5px;--kh:44px;padding:5px}
-#kcc .kcc-key{font-size:21px}
 #kcc .kcc-clock{width:70px;height:70px}
 #kcc .kcc-clock b{font-size:32px}
 }
-@media (max-height:340px){#kcc .kcc-keys{--kh:40px}}
 #kcc .kcc-feedback{min-height:22px;font:700 15px/1.5 system-ui,sans-serif;text-align:center}
 #kcc .kcc-feedback.is-ok{color:#5ee08a}
 #kcc .kcc-feedback.is-miss{color:#ff8a92}
@@ -225,81 +209,37 @@
         <div class="kcc-meter" aria-hidden="true"><i style="background:${accent()}"></i></div>
         <div class="kcc-answer" role="textbox" aria-readonly="true" aria-label="Your answer"><span class="kcc-typed"></span><i class="kcc-caret" aria-hidden="true"></i></div>
         <div class="kcc-feedback" role="status" aria-live="polite"></div>
-        <div class="kcc-keys" role="group" aria-label="Keyboard">${keysHTML()}</div>
       </div>`;
     $('.kcc-leave').addEventListener('click', leave);
-    wireKeys();
+    keys = window.BoohaKeys.create({
+      className: 'kcc-keys',
+      marks: ["'", '-'],
+      okHTML: 'OK<small lang="ja">けってい</small>',
+      onKey,
+    });
+    $('.kcc-stage').appendChild(keys.el);
   }
 
-  /* ── On-screen keyboard (Pass 5) ───────────────────────────────────── */
-  function keysHTML() {
-    const key = (k, label, cls, aria) =>
-      `<button type="button" class="kcc-key${cls ? ` ${cls}` : ''}" data-k="${esc(k)}"${aria ? ` aria-label="${aria}"` : ''}>${label}</button>`;
-    const rows = KEY_ROWS.map(row => `<div class="kcc-row">${row.split('').map(ch => key(ch, ch)).join('')}</div>`).join('');
-    const back = '<svg width="30" height="22" viewBox="0 0 30 22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M10 2h17a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H10L2 11z"/><path d="M14 7l8 8M22 7l-8 8"/></svg>';
-    return `${rows}<div class="kcc-row">${
-      key("'", '&#39;', 'is-mark', 'apostrophe')}${
-      key('-', '-', 'is-mark', 'hyphen')}${
-      key(' ', 'space', 'is-space', 'space')}${
-      key('back', back, 'is-back', 'backspace')}${
-      key('ok', 'OK<small lang="ja">けってい</small>', 'is-ok', 'OK')}</div>`;
-  }
-
-  // Taps act on pointerdown (fast, no 300 ms wait, no focus, no zoom or text
-  // selection). iPads without Pointer Events (iOS 12) use touchstart; its
-  // preventDefault also stops the emulated mouse and click. A focused key
-  // activated from a keyboard or switch control arrives as a click with
-  // detail 0.
-  function wireKeys() {
-    const keys = $('.kcc-keys');
-    const press = e => {
-      const btn = e.target && e.target.closest ? e.target.closest('.kcc-key') : null;
-      if (!btn) return;
-      if (e.cancelable) e.preventDefault();
-      tapKey(btn.getAttribute('data-k'), btn);
-    };
-    if (window.PointerEvent) keys.addEventListener('pointerdown', press);
-    else {
-      keys.addEventListener('touchstart', press, { passive: false });
-      keys.addEventListener('mousedown', press);
-    }
-    keys.addEventListener('click', e => { if (e.detail === 0) press(e); });
-  }
-
-  function keyButton(k) {
-    return Array.prototype.find.call(root.querySelectorAll('.kcc-key'), b => b.getAttribute('data-k') === k) || null;
-  }
-
-  function tapKey(k, btn) {
-    if (!run || run.phase !== 'type') return;
-    if (btn) {
-      btn.classList.add('is-down');
-      clearTimeout(btn.upTimer);
-      btn.upTimer = setTimeout(() => btn.classList.remove('is-down'), 110);
-    }
-    if (k === 'ok') return submit();
+  /* ── On-screen keyboard (shared: js/booha-keys.js) ────────────────── */
+  // Keys only type during TYPE; anything else is ignored (no press, no click).
+  function onKey(k) {
+    if (!run || run.phase !== 'type') return false;
+    if (k === 'ok') { submit(); return true; }
     if (k === 'back') run.typed = run.typed.slice(0, -1);
     else if (run.typed.length < MAX_TYPED) run.typed += k;
-    sfx2('keyTap', k === 'back' ? 'back' : '');
     showTyped();
+    return true;
   }
 
   // A physical keyboard (teacher Mac, iPad keyboard case) types the same keys.
   function onKeydown(e) {
-    if (!run || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!run || !keys) return;
     const live = run.phase === 'show' || run.phase === 'fade' || run.phase === 'type';
     if (!live) return;
-    const key = e.key;
-    let k = null;
-    if (key === 'Enter') k = 'ok';
-    else if (key === 'Backspace') k = 'back';
-    else if (key === ' ' || key === 'Spacebar') k = ' ';
-    else if (key === '-' || key === "'") k = key;
-    else if (key === '’') k = "'";
-    else if (key && key.length === 1 && /[a-z]/i.test(key)) k = key.toLowerCase();
+    const k = keys.keyFromEvent(e);
     if (k === null) return;
     e.preventDefault();                       // never scroll, never press a focused button
-    if (run.phase === 'type') tapKey(k, keyButton(k));
+    if (run.phase === 'type') keys.tap(k);
   }
 
   function showTyped() {
@@ -717,6 +657,7 @@
     clearReveal();
     if (run) { clearTimeout(run.timer); stopClock(); }
     run = null;
+    keys = null;
     document.removeEventListener('visibilitychange', onVisibility);
     document.removeEventListener('keydown', onKeydown);
     if (root) { root.className = ''; root.innerHTML = ''; }
