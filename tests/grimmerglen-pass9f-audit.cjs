@@ -50,10 +50,12 @@ assert(data.includes('answerEn: item.target') && data.includes('answerJp: item.j
   'memory exercises must expose the full answer for replay');
 assert(data.includes("options: tier === 'start' ? item.full : tier === 'case' ? item.partial : null") && data.includes('helpText: tier === \'deep\' ? item.jp : null'),
   'each tier must retain its authored helper choices and the Deep optional furigana help');
-assert(typing.includes("input.addEventListener('copy'"),
-  'typing input must block copying');
-assert(typing.includes("input.addEventListener('cut'"),
-  'typing input must block cutting');
+// Pass G2: there is no text input any more; the answer box blocks copy/cut
+// and selection, and paste has nowhere to go.
+assert(typing.includes("['copy', 'cut'].forEach(type => refs.answerEl.addEventListener(type, event => event.preventDefault()))"),
+  'typing answer box must block copying and cutting');
+assert(/\.mgty-answer\{[^}]*user-select:none/.test(typing),
+  'typing answer box must not be selectable');
 assert(runtime.includes("['copy', 'cut', 'paste'].forEach"),
   'Marietta memory cards must block clipboard actions');
 assert(runtime.includes('mg-memory-replay{position:relative;user-select:none'),

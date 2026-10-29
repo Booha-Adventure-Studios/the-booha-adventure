@@ -40,16 +40,19 @@ function load({ pointer = true, motion = null } = {}) {
     createElement: () => el(),
     head: { appendChild: n => styles.push(n) },
   };
+  const winListeners = {};
   const window = {
     document,
+    addEventListener(type, fn) { (winListeners[type] = winListeners[type] || []).push(fn); },
+    removeEventListener(type, fn) { winListeners[type] = (winListeners[type] || []).filter(f => f !== fn); },
     matchMedia: () => ({ matches: false }),
     UtsuSfx: { keyTap: k => sounds.push(k) },
   };
   if (pointer) window.PointerEvent = function () {};
-  const ctx = { window, document, setTimeout, clearTimeout, console };
+  const ctx = { window, document, setTimeout, clearTimeout, setInterval, clearInterval, console };
   vm.createContext(ctx);
   vm.runInContext(src, ctx);
-  return { K: window.BoohaKeys, styles, made, sounds };
+  return { K: window.BoohaKeys, styles, made, sounds, winListeners };
 }
 
 /* Keys: QWERTY a–z, the caller's marks, space, backspace, OK — real buttons */
@@ -89,6 +92,32 @@ kb.el.listeners.click[0].fn({ detail: 1, target: { closest: () => btn }, cancela
 assert.strictEqual(typed.length, before, 'the click after a tap does not type twice');
 kb.el.listeners.click[0].fn({ detail: 0, target: { closest: () => btn }, cancelable: true, preventDefault() {} });
 assert.strictEqual(typed.length, before + 1, 'a focused key still works from a keyboard or switch control');
+
+/* Hold backspace to keep deleting (opt-in: Grimmerglen sentences) */
+(async () => {
+  const r = load();
+  let deletes = 0;
+  const hold = r.K.create({ repeatBack: true, onKey: k => { if (k === 'back') deletes++; return true; } });
+  assert.ok(r.winListeners.pointerup && r.winListeners.touchend, 'lifting a finger anywhere stops the repeat');
+  const back = { getAttribute: () => 'back', classList: { add() {}, remove() {} } };
+  hold.el.listeners.pointerdown[0].fn({ type: 'pointerdown', target: { closest: () => back }, cancelable: true, preventDefault() {} });
+  await new Promise(res => setTimeout(res, 700));
+  r.winListeners.pointerup.forEach(fn => fn());
+  const held = deletes;
+  await new Promise(res => setTimeout(res, 250));
+  assert.ok(held >= 3, `holding deletes repeatedly (got ${held})`);
+  assert.strictEqual(deletes, held, 'lifting stops the repeat');
+  hold.destroy();
+  assert.strictEqual((r.winListeners.pointerup || []).length, 0, 'destroy removes the window listeners');
+  const once = load();
+  let n = 0;
+  const plain = once.K.create({ onKey: () => { n++; return true; } });
+  assert.ok(!once.winListeners.pointerup, 'no repeat unless asked (Karasuki)');
+  plain.el.listeners.pointerdown[0].fn({ type: 'pointerdown', target: { closest: () => back }, cancelable: true, preventDefault() {} });
+  await new Promise(res => setTimeout(res, 600));
+  assert.strictEqual(n, 1);
+  console.log('Booha shared keyboard audit passed.');
+})().catch(e => { console.error(e); process.exit(1); });
 
 /* iOS 12 (no Pointer Events): touchstart with passive:false, plus mouse */
 const old = load({ pointer: false }).K.create({});
@@ -131,4 +160,3 @@ for (const m of css.matchAll(/transition:([^;}]+)/g)) {
 assert.ok(!/@keyframes/.test(css), 'no keyframe animation in the keys');
 assert.ok(!/\(\?<[=!]/.test(src), 'no regex lookbehind');
 
-console.log('Booha shared keyboard audit passed.');

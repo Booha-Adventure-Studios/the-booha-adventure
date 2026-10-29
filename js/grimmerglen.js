@@ -2136,6 +2136,7 @@
     mariettaPanelCooldown = performance.now() + POPUP_COOLDOWN_MS;
     mariettaPanelOpen = false;
     handoffObject = null;
+    window.GrimmerglenTyping?.hideKeyboard?.();   // Pass G2: the on-screen keys leave with the panel
     mariettaPanel.classList.remove('open');
     scheduleGrimmerglenFrame();
   }
@@ -2664,7 +2665,7 @@
         </div></div>`;
       document.body.appendChild(typingTestPanel);
       typingTestPanel.querySelector('#grimmerglen-typing-test-close')
-        .addEventListener('click', () => typingTestPanel.classList.remove('open'));
+        .addEventListener('click', () => { window.GrimmerglenTyping?.hideKeyboard?.(); typingTestPanel.classList.remove('open'); });
     }
     const mount = typingTestPanel.querySelector('#grimmerglen-typing-test-mount');
     window.GrimmerglenTyping.renderExercise(mount, {
@@ -2870,9 +2871,11 @@
         // A height change can alter the vertical crop on landscape phones;
         // keep the authored object layout inside the newly visible bounds.
         if (worldInitialized) constrainObjectLayoutToViewport();
-        const focusedInput = document.querySelector('#grimmerglen-marietta-panel .mgty-input:focus');
-        if (focusedInput) {
-          try { focusedInput.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (_) {}
+        // Pass G2: keep the answer box above the on-screen keys after a resize.
+        const answerBox = document.getElementById('mgty-keys-dock')?.classList.contains('is-open')
+          ? document.querySelector('#grimmerglen-marietta-panel .mgty-answer') : null;
+        if (answerBox) {
+          try { answerBox.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (_) {}
         }
       });
     };
@@ -2975,7 +2978,8 @@
       #grimmerglen-return-yes { background:linear-gradient(135deg,#ff8fc0,#ffd166); border:1px solid rgba(224,85,158,.7); color:#5a1638; }
       #grimmerglen-return-no { background:transparent; border:1px solid rgba(224,85,158,.4); color:#a9548a; }
       .utsu-card#grimmerglen-marietta-panel .dp-btn.no { color:#a9548a; border-color:rgba(224,85,158,.4); }
-      #grimmerglen-marietta-panel { bottom:max(8px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px))); max-height:min(620px,calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 16px)); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; scrollbar-gutter:stable; -webkit-overflow-scrolling:touch; padding-bottom:max(12px,env(safe-area-inset-bottom,0px)); }
+      /* Pass G2: --grimmerglen-keys-inset is the on-screen keyboard dock (js/grimmerglen-typing.js); the panel sits above it. */
+      #grimmerglen-marietta-panel { box-sizing:border-box; bottom:max(8px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px) + var(--grimmerglen-keys-inset,0px))); max-height:min(620px,calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - var(--grimmerglen-keys-inset,0px) - 16px)); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; scrollbar-gutter:stable; -webkit-overflow-scrolling:touch; padding-bottom:max(12px,env(safe-area-inset-bottom,0px)); }
       #grimmerglen-marietta-panel .dp-btn { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-height:44px; text-align:center; touch-action:manipulation; }
       #grimmerglen-marietta-panel .dp-btn:focus-visible { outline:3px solid rgba(216,93,154,.62); outline-offset:3px; }
       #grimmerglen-marietta-panel .mg-btn-en { display:block; }
@@ -3037,7 +3041,7 @@
       .mg-object-art{display:block;width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(120,58,105,.2));}
       #grimmerglen-marietta-panel .mg-memory-inner,#grimmerglen-marietta-panel .mg-handoff-inner{align-items:center;}
       #grimmerglen-marietta-panel .mg-memory-inner .dp-body,#grimmerglen-marietta-panel .mg-handoff-inner .dp-body{min-width:0;}
-      @media(max-width:700px){#grimmerglen-marietta-panel .mg-object-art-wrap{flex-basis:64px;width:64px;height:64px;}#grimmerglen-marietta-panel .mgty-input-row{flex-wrap:wrap;}#grimmerglen-marietta-panel .mgty-submit{min-height:44px;flex:0 0 100%;padding:10px 16px;}}
+      @media(max-width:700px){#grimmerglen-marietta-panel .mg-object-art-wrap{flex-basis:64px;width:64px;height:64px;}#grimmerglen-marietta-panel .mgty-input-row{flex-wrap:wrap;}}
       /* Pass 3: short landscape phones need a contained reading surface, not
          a panel that pushes controls below the browser's visible edge. */
       @media (orientation:landscape) and (max-height:480px) {
@@ -3053,7 +3057,7 @@
         .grimmerglen-return-box .jp{margin-bottom:8px;}
         .grimmerglen-return-box p{margin-bottom:10px;line-height:1.45;}
         .grimmerglen-return-box p.jp-line{margin-top:-6px;}
-        #grimmerglen-marietta-panel{max-height:calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 8px);bottom:max(8px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px)));}
+        #grimmerglen-marietta-panel{max-height:calc(var(--grimmerglen-viewport-height,100dvh) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - var(--grimmerglen-keys-inset,0px) - 8px);bottom:max(8px,calc(env(safe-area-inset-bottom,0px) + var(--grimmerglen-keyboard-inset,0px) + var(--grimmerglen-keys-inset,0px)));}
         #grimmerglen-marietta-panel .dp-inner{gap:10px;padding:8px 12px 10px;}
         #grimmerglen-marietta-panel .dp-portrait{width:48px;height:48px;}
         #grimmerglen-marietta-panel .dp-btns{gap:6px;margin-top:6px;}
