@@ -56,6 +56,19 @@ const BoohaSkins = (() => {
     '#dfe5ee',
   ]);
   const CHRISTMAS_SNOWFLAKE_COLOR = '#bfe6ff';
+  const CHRISTMAS_SNOWFLAKE_VISITOR = Object.freeze({
+    kind: 'snowflake',
+    asset: 'assets/img/seasonal-snowflake.webp',
+    color: CHRISTMAS_SNOWFLAKE_COLOR,
+    requires: 'blitz-triple',
+  });
+  // December's "Lights On" phase: glowing ornaments join the snowflakes.
+  const CHRISTMAS_ORNAMENT_VISITOR = Object.freeze({
+    kind: 'ornament',
+    asset: 'assets/img/seasonal-ornament.webp',
+    color: CHRISTMAS_GLOW.gold,
+    requires: 'blitz-triple',
+  });
   const HALLOWEEN_KARASUKI = Object.freeze({
     kind: 'barba',
     name: 'Barba',
@@ -449,15 +462,13 @@ const BoohaSkins = (() => {
           end: '2027-01-02',
           mazeSnow: true,
           checkpointSparkColors: CHRISTMAS_CHECKPOINT_SPARK_COLORS,
+          // The player's Maze trail picks up gold sparks in Christmas weeks.
+          trailAccent: CHRISTMAS_GLOW.gold,
+          seasonalVisitors: Object.freeze([CHRISTMAS_SNOWFLAKE_VISITOR, CHRISTMAS_ORNAMENT_VISITOR]),
           greeting: Object.freeze({ en: 'Merry Christmas!', jp: 'メリークリスマス！' }),
         }),
       ]),
-      seasonalVisitor: Object.freeze({
-        kind: 'snowflake',
-        asset: 'assets/img/seasonal-snowflake.webp',
-        color: CHRISTMAS_SNOWFLAKE_COLOR,
-        requires: 'blitz-triple',
-      }),
+      seasonalVisitor: CHRISTMAS_SNOWFLAKE_VISITOR,
       seasonalKarasuki: CHRISTMAS_KARASUKI,
     }),
   };
@@ -582,6 +593,15 @@ const BoohaSkins = (() => {
 
   function seasonalVisitor(seasonId = seasonIdForDate()) {
     return getSeason(seasonId)?.seasonalVisitor || null;
+  }
+
+  // The full visitor flock for today: a phase may add visitors (December
+  // ornaments join the snowflakes); otherwise it is the season's one visitor.
+  function seasonalVisitors(seasonId = seasonIdForDate(), dateKey = currentDateKey()) {
+    const phaseVisitors = seasonPhase(seasonId, dateKey)?.seasonalVisitors;
+    if (Array.isArray(phaseVisitors) && phaseVisitors.length) return phaseVisitors;
+    const visitor = seasonalVisitor(seasonId);
+    return visitor ? [visitor] : [];
   }
 
   function seasonalKarasuki(seasonId = seasonIdForDate()) {
@@ -831,6 +851,7 @@ const BoohaSkins = (() => {
     monthColorsForWeek,
     seasonPhase,
     seasonalVisitor,
+    seasonalVisitors,
     seasonalKarasuki,
     seasonMascot,
     mascotAsset,

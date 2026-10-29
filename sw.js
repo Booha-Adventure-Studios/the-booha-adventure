@@ -119,7 +119,9 @@ const CURRENT_CACHES = {
   // binder flip; adventure-profile.html now loads js/utsu-sfx.js.
   // Christmas Pass 1 "First Snow": Grubb greeting + frost on index.html,
   // snowflake visitors and light snowfall in maze.html.
-  pages:  'booha-pages-2026-504',
+  // Christmas Pass 2 "Lights On": December string lights on index.html,
+  // ornament visitors and gold trail sparks in maze.html.
+  pages:  'booha-pages-2026-505',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

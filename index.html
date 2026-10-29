@@ -472,6 +472,57 @@
       from { background-position: 0 -210px, 40px -290px, 90px -330px, 120px -250px, 0 0, 0 0; }
       to { background-position: 56px 100vh, -28px 100vh, 34px 100vh, -46px 100vh, 0 0, 0 0; }
     }
+    /* December "Lights On": warm string lights. Built by buildStringLights()
+       only in that phase, so other months carry no extra DOM. */
+    .stringLights { display: none; }
+    html[data-season="christmas"][data-season-phase="lights-on"] .stringLights {
+      display: block;
+      position: absolute;
+      pointer-events: none;
+    }
+    #startScene > .stringLights {
+      top: var(--safe-top); left: 0; right: 0;
+      height: clamp(48px, 10vmin, 84px);
+      z-index: 2;
+    }
+    .hubTitle > .stringLights {
+      position: relative !important;
+      width: min(100%, 560px);
+      height: clamp(18px, 3vw, 28px);
+      margin: -2px auto 2px;
+    }
+    .stringLights svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .stringLights path { fill: none; stroke: rgba(30,52,38,.95); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+    .stringLights .bulb {
+      position: absolute;
+      width: var(--bulb, 9px);
+      height: calc(var(--bulb, 9px) * 1.35);
+      margin-left: calc(var(--bulb, 9px) / -2);
+      border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+      background: radial-gradient(circle at 38% 34%, rgba(255,255,255,.9) 0 14%, var(--c) 46%, var(--c2) 100%);
+      box-shadow: 0 0 6px 1px var(--c), 0 0 16px 4px var(--glow);
+      animation: bulbTwinkle var(--t, 2.6s) ease-in-out var(--d, 0s) infinite alternate;
+    }
+    .stringLights .bulb::before {
+      content: '';
+      position: absolute;
+      left: 22%; right: 22%; top: -24%;
+      height: 30%;
+      border-radius: 2px 2px 1px 1px;
+      background: #2c3a2f;
+    }
+    #startScene > .stringLights .bulb { --bulb: clamp(8px, 1.5vmin, 12px); }
+    .hubTitle > .stringLights .bulb { --bulb: clamp(6px, 1vw, 9px); }
+    .stringLights .bulb.red   { --c: #ff5a69; --c2: #b3192e; --glow: rgba(255,80,96,.45); }
+    .stringLights .bulb.gold  { --c: #ffd978; --c2: #c98d1c; --glow: rgba(255,210,110,.5); }
+    .stringLights .bulb.green { --c: #5fe08f; --c2: #17723f; --glow: rgba(85,212,134,.42); }
+    .stringLights .bulb.white { --c: #fffaf0; --c2: #d8cdb4; --glow: rgba(255,246,220,.45); }
+    @keyframes bulbTwinkle {
+      from { opacity: .58; }
+      to { opacity: 1; }
+    }
+    html.hub-reduced-motion .stringLights .bulb,
+    html.hub-low-power .stringLights .bulb { animation: none; opacity: .92; }
     /* Grubb greets students on the first screen. The line comes from the
        Christmas season phase (November: first snow, December: lights on). */
     .seasonGreeting { display: none; }
@@ -560,6 +611,7 @@
       html[data-season="halloween"] .hubHeading { animation: none; background-position: 0 50%; }
       html[data-season="christmas"] #startScene::before { animation: none; }
       html[data-season="christmas"] .seasonGreeting.show { animation: none; }
+      .stringLights .bulb { animation: none; opacity: .92; }
       html[data-season="christmas"] .hubHeading { animation: none; background-position: 0 50%; }
     }
 
@@ -2277,6 +2329,7 @@
       </div>
       <div id="seasonGreeting" class="seasonGreeting"><span class="sgEn"></span><span class="sgJp" lang="ja"></span></div>
     </div>
+    <div class="stringLights" data-swags="3" data-per-swag="8" aria-hidden="true"></div>
     
    <div id="dcStamp" class="dcStamp" aria-hidden="true"></div>
     <div class="startBtns">
@@ -2319,6 +2372,7 @@
           </div>
           <div class="hubTitle">
             <div class="sparkleField" aria-hidden="true"></div>
+            <div class="stringLights" data-swags="2" data-per-swag="7" aria-hidden="true"></div>
             <div class="hubHeading">BOOHA ADVENTURE</div>
             <div class="hubHeadingJp">ブーハー・アドベンチャー</div>
             <div id="playerGreeting" class="playerGreeting">
@@ -2560,6 +2614,42 @@ function applySeasonalLandingSkin() {
   if (image.getAttribute('src') !== source) image.src = source;
   image.alt = skin?.name || 'Booha';
   applySeasonGreeting(skin);
+  buildStringLights();
+}
+
+// Builds the December string lights: a wire of shallow swags with bulbs
+// hanging along each curve. Only runs in the "lights-on" phase.
+function buildStringLights() {
+  const lit = window.BoohaSkins?.seasonPhase?.()?.id === 'lights-on';
+  document.querySelectorAll('.stringLights').forEach(el => {
+    if (!lit) { el.textContent = ''; return; }
+    if (el.childElementCount) return;
+    const swags = Math.max(1, Number(el.dataset.swags) || 3);
+    const perSwag = Math.max(3, Number(el.dataset.perSwag) || 7);
+    const top = 6, sag = 54;
+    let d = '';
+    for (let i = 0; i < swags; i++) {
+      const x0 = (i / swags) * 1000, x1 = ((i + 1) / swags) * 1000;
+      d += `${i ? '' : `M${x0} ${top}`} Q${(x0 + x1) / 2} ${top + sag * 2} ${x1} ${top}`;
+    }
+    el.innerHTML = `<svg viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="${d}"/></svg>`;
+    const colors = ['red', 'gold', 'green', 'white'];
+    let n = 0;
+    for (let i = 0; i < swags; i++) {
+      for (let j = 1; j <= perSwag; j++) {
+        const t = j / (perSwag + 1);
+        const bulb = document.createElement('span');
+        bulb.className = `bulb ${colors[n % colors.length]}`;
+        bulb.style.left = `${((i + t) / swags) * 100}%`;
+        // Same curve as the SVG: y = top + 4·sag·t(1−t) along each swag.
+        bulb.style.top = `${top + sag * 4 * t * (1 - t)}%`;
+        bulb.style.setProperty('--d', `${-((n * 0.37) % 2.6).toFixed(2)}s`);
+        bulb.style.setProperty('--t', `${(2.1 + (n % 5) * 0.28).toFixed(2)}s`);
+        el.appendChild(bulb);
+        n++;
+      }
+    }
+  });
 }
 
 function applySeasonGreeting(skin) {
