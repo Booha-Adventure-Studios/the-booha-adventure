@@ -121,7 +121,9 @@ const CURRENT_CACHES = {
   // snowflake visitors and light snowfall in maze.html.
   // Christmas Pass 2 "Lights On": December string lights on index.html,
   // ornament visitors and gold trail sparks in maze.html.
-  pages:  'booha-pages-2026-505',
+  // Christmas Pass 3: Grubb countdown, Dec 26 / Jan 1 phases with gold
+  // winter lights on index.html, and the maze frost border.
+  pages:  'booha-pages-2026-506',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

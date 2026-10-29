@@ -30,7 +30,9 @@ const christmas = skins.getSeason('christmas-2026');
 const kinds = date => Array.from(skins.seasonalVisitors('christmas-2026', date), v => v.kind);
 assert.deepStrictEqual(kinds('2026-11-20'), ['snowflake'], 'November is snowflakes only');
 assert.deepStrictEqual(kinds('2026-12-01'), ['snowflake', 'ornament'], 'ornaments join on Dec 1');
-assert.deepStrictEqual(kinds('2027-01-02'), ['snowflake', 'ornament']);
+assert.deepStrictEqual(kinds('2026-12-25'), ['snowflake', 'ornament']);
+assert.deepStrictEqual(kinds('2026-12-26'), ['snowflake'], 'ornaments come down after Christmas');
+assert.deepStrictEqual(kinds('2027-01-02'), ['snowflake']);
 assert.deepStrictEqual(Array.from(skins.seasonalVisitors('halloween-2026', '2026-10-20'), v => v.kind), ['bat'],
   'Halloween keeps its single bat visitor');
 assert.deepStrictEqual(Array.from(loadSkins('2026-10-20').seasonalVisitors(), v => v.kind), ['bat'],
@@ -66,9 +68,9 @@ assert.ok(maze.includes('function christmasTrailAccent()') && maze.includes('con
 const index = read('index.html');
 assert.strictEqual((index.match(/class="stringLights"/g) || []).length, 2,
   'string lights on the first screen and above the hub title');
-assert.ok(index.includes('html[data-season="christmas"][data-season-phase="lights-on"] .stringLights'),
-  'string lights only show in the December phase');
-assert.ok(index.includes("seasonPhase?.()?.id === 'lights-on'"), 'lights are only built in December');
+assert.ok(index.includes('html[data-season="christmas"][data-season-lights] .stringLights'),
+  'string lights only show in phases that have lights');
+assert.ok(index.includes('seasonPhase?.()?.lights'), 'lights are only built in phases that have lights');
 assert.ok(/html\.hub-reduced-motion \.stringLights \.bulb,\s*html\.hub-low-power \.stringLights \.bulb \{ animation: none;/.test(index),
   'bulbs stop twinkling on reduced motion and low power');
 assert.ok(/prefers-reduced-motion[\s\S]*\.stringLights \.bulb \{ animation: none;/.test(index));

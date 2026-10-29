@@ -472,10 +472,11 @@
       from { background-position: 0 -210px, 40px -290px, 90px -330px, 120px -250px, 0 0, 0 0; }
       to { background-position: 56px 100vh, -28px 100vh, 34px 100vh, -46px 100vh, 0 0, 0 0; }
     }
-    /* December "Lights On": warm string lights. Built by buildStringLights()
-       only in that phase, so other months carry no extra DOM. */
+    /* December string lights. The two containers stay empty and hidden until
+       a phase has lights; buildStringLights() then adds the wire and bulbs.
+       Dec 1–25 uses Christmas colors, Dec 26–Jan 2 quieter gold and white. */
     .stringLights { display: none; }
-    html[data-season="christmas"][data-season-phase="lights-on"] .stringLights {
+    html[data-season="christmas"][data-season-lights] .stringLights {
       display: block;
       position: absolute;
       pointer-events: none;
@@ -2620,10 +2621,11 @@ function applySeasonalLandingSkin() {
 // Builds the December string lights: a wire of shallow swags with bulbs
 // hanging along each curve. Only runs in the "lights-on" phase.
 function buildStringLights() {
-  const lit = window.BoohaSkins?.seasonPhase?.()?.id === 'lights-on';
+  const lights = window.BoohaSkins?.seasonPhase?.()?.lights || null;
   document.querySelectorAll('.stringLights').forEach(el => {
-    if (!lit) { el.textContent = ''; return; }
-    if (el.childElementCount) return;
+    if (!lights) { el.textContent = ''; delete el.dataset.built; return; }
+    if (el.dataset.built === lights) return;
+    el.dataset.built = lights;
     const swags = Math.max(1, Number(el.dataset.swags) || 3);
     const perSwag = Math.max(3, Number(el.dataset.perSwag) || 7);
     const top = 6, sag = 54;
@@ -2633,7 +2635,7 @@ function buildStringLights() {
       d += `${i ? '' : `M${x0} ${top}`} Q${(x0 + x1) / 2} ${top + sag * 2} ${x1} ${top}`;
     }
     el.innerHTML = `<svg viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="${d}"/></svg>`;
-    const colors = ['red', 'gold', 'green', 'white'];
+    const colors = lights === 'gold' ? ['gold', 'white'] : ['red', 'gold', 'green', 'white'];
     let n = 0;
     for (let i = 0; i < swags; i++) {
       for (let j = 1; j <= perSwag; j++) {
@@ -2655,8 +2657,7 @@ function buildStringLights() {
 function applySeasonGreeting(skin) {
   const bubble = document.getElementById('seasonGreeting');
   if (!bubble) return;
-  const phase = window.BoohaSkins?.seasonPhase?.();
-  const line = skin?.kind === 'mascot' ? phase?.greeting : null;
+  const line = skin?.kind === 'mascot' ? window.BoohaSkins?.seasonGreeting?.() : null;
   if (!line) { bubble.classList.remove('show'); return; }
   bubble.querySelector('.sgEn').textContent = line.en;
   bubble.querySelector('.sgJp').textContent = line.jp;
