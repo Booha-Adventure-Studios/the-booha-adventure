@@ -1930,12 +1930,21 @@ function seededRandom(seed) {
 }
 
 function activeSeasonalVisitor() {
+  return activeSeasonalVisitors()[0] || null;
+}
+
+// Today's earned flock. December adds ornaments to the snowflakes, so the
+// flock can mix kinds; each slot keeps one kind by its index.
+function activeSeasonalVisitors() {
   const seasonId = window.BoohaSkins?.seasonIdForDate?.();
-  const visitor = seasonId ? window.BoohaSkins?.seasonalVisitor?.(seasonId) : null;
-  return SEASONAL_VISUALS.activeSeasonalVisitor(
-    visitor,
-    readBlitzCompletionState().completedCurriculum,
-  );
+  const visitors = seasonId ? (window.BoohaSkins?.seasonalVisitors?.(seasonId) || []) : [];
+  const completed = readBlitzCompletionState().completedCurriculum;
+  return visitors.filter(visitor => SEASONAL_VISUALS.activeSeasonalVisitor(visitor, completed));
+}
+function visitorForSlot(visitors, index) {
+  // Slots alternate direction by index, so pair them (0-1, 2-3, ...) when
+  // choosing a kind; otherwise every snowflake would fly the same way.
+  return visitors.length ? visitors[Math.floor(index / 2) % visitors.length] : null;
 }
 
 function shuffledExtraIndices() {
@@ -1963,8 +1972,8 @@ function buildWanderers() {
     wanderers.push(w);
   }
 
-  const seasonalVisitor = activeSeasonalVisitor();
-  if (seasonalVisitor) {
+  const seasonalFlock = activeSeasonalVisitors();
+  if (seasonalFlock.length) {
     // A completed Blitz trio replaces the ordinary extra Booha visitors.
     // The reward starts with four copies of one seasonal sprite. Regular
     // weekly Maze games then grow that flock using the old extra-visitor
@@ -1981,7 +1990,7 @@ function buildWanderers() {
       forceAll: true,
     });
     for (let i = 0; i < count; i++) {
-      const w = createSeasonalWanderer(i, i * 850, seasonalVisitor, 0);
+      const w = createSeasonalWanderer(i, i * 850, visitorForSlot(seasonalFlock, i), 0);
       wanderers.push(w);
     }
     return;
@@ -2062,10 +2071,10 @@ function tickWanderers(nowMs){
   // A seasonal visitor only stays while today's season still uses that same
   // sprite, so Halloween bats vanish on Nov 1 and next year's seasons work
   // without editing a hard-coded season id here.
-  const currentVisitorAsset = window.BoohaSkins?.seasonalVisitor?.()?.asset || null;
+  const currentVisitorAssets = (window.BoohaSkins?.seasonalVisitors?.() || []).map(v => v.asset);
   for(let i=0;i<wanderers.length;i++){
     const w=wanderers[i];
-    if(w.kind==='seasonal' && w.visitorSrc!==currentVisitorAsset){w.done=true;w.opacity=0;continue;}
+    if(w.kind==='seasonal' && !currentVisitorAssets.includes(w.visitorSrc)){w.done=true;w.opacity=0;continue;}
     if(w.done)continue;
     if(w.startTime===null){if(nowMs<w.delayMs)continue;w.startTime=nowMs;}
     const elapsed=nowMs-w.startTime,t=Math.min(elapsed/w.dur,1),et=easeInOut(t);
@@ -2097,7 +2106,7 @@ function tickWanderers(nowMs){
 
     let nw;
     if (old.kind === 'seasonal') {
-      const visitor = activeSeasonalVisitor();
+      const visitor = visitorForSlot(activeSeasonalVisitors(), old.visitorIndex || 0);
       nw = visitor
         ? createSeasonalWanderer(old.visitorIndex, delay, visitor, (old.visitorCycle || 0) + 1)
         : createWanderer(old.ghostIdx, delay);
@@ -2185,6 +2194,10 @@ const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
         const spin = (sec * .35 + w.wobblePhase) * (w.visitorIndex % 2 ? -1 : 1);
         ctx.rotate(spin);
         ctx.scale(.78, .78);
+      } else if (w.visitorKind === 'ornament') {
+        // Ornaments swing gently like they hang from an invisible branch.
+        ctx.rotate(Math.sin(sec * 1.7 + w.wobblePhase) * .2);
+        ctx.scale(.74, .74);
       } else {
         const flap = Math.sin(sec * 6.2 + w.wobblePhase) * .055;
         ctx.scale(1 + flap * .35, 1 - flap);
@@ -2218,7 +2231,8 @@ function easeInOutCubic(t){return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 
 function addTrail(ix,iy){
   if(mazePerfTier==='low'&&Math.random()>.5)return;
-  const c=Math.random()>.55?monthSecondary(activeWeek):monthPrimary(activeWeek);
+  const accent=christmasTrailAccent();
+  const c=accent&&Math.random()<.34?accent:(Math.random()>.55?monthSecondary(activeWeek):monthPrimary(activeWeek));
   trail.push({ix,iy,life:1,size:1.8+Math.random()*4.5,color:c,dx:(Math.random()-.5)*.28,dy:-Math.random()*.36});
   if(trail.length>100)trail.shift();
 }
@@ -2484,6 +2498,14 @@ function currentSeasonPhase(now){
     _seasonPhaseCache=window.BoohaSkins?.seasonPhase?.()||null;
   }
   return _seasonPhaseCache;
+}
+
+// December: the player's trail picks up gold sparks in Christmas weeks.
+function christmasTrailAccent(){
+  const phase=currentSeasonPhase(performance.now());
+  if(!phase?.trailAccent)return null;
+  const season=window.BoohaSkins?.getSeason?.(window.BoohaSkins?.seasonIdForDate?.());
+  return season?.checkpointSparkWeeks?.includes(activeWeek)?phase.trailAccent:null;
 }
 
 // Light maze snowfall: slower, smaller, and sparser than the first screen.
