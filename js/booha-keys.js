@@ -92,7 +92,7 @@
 .bk-keys{--gap:5px;--kh:44px;padding:5px}
 .bk-key{font-size:21px}
 }
-@media (max-height:340px){.bk-keys{--kh:40px}}`;
+@media (max-height:340px){.bk-keys{--gap:4px;padding:4px}}`;
     document.head.appendChild(style);
   }
 
