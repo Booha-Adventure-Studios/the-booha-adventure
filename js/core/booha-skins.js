@@ -55,6 +55,13 @@ const BoohaSkins = (() => {
     '#cfeaff',
     '#dfe5ee',
   ]);
+  // After Christmas (Dec 26 on) Japan turns to New Year, so the red/green
+  // fades to quieter gold-and-white winter lights.
+  const WINTER_GOLD_SPARK_COLORS = Object.freeze([
+    '#ffe9a3',
+    '#ffffff',
+    '#cfeaff',
+  ]);
   const CHRISTMAS_SNOWFLAKE_COLOR = '#bfe6ff';
   const CHRISTMAS_SNOWFLAKE_VISITOR = Object.freeze({
     kind: 'snowflake',
@@ -459,13 +466,45 @@ const BoohaSkins = (() => {
         Object.freeze({
           id: 'lights-on',
           start: '2026-12-01',
-          end: '2027-01-02',
+          end: '2026-12-25',
           mazeSnow: true,
+          mazeFrost: true,
+          lights: 'christmas',
           checkpointSparkColors: CHRISTMAS_CHECKPOINT_SPARK_COLORS,
           // The player's Maze trail picks up gold sparks in Christmas weeks.
           trailAccent: CHRISTMAS_GLOW.gold,
           seasonalVisitors: Object.freeze([CHRISTMAS_SNOWFLAKE_VISITOR, CHRISTMAS_ORNAMENT_VISITOR]),
-          greeting: Object.freeze({ en: 'Merry Christmas!', jp: 'メリークリスマス！' }),
+          greeting: Object.freeze({ en: 'Christmas is coming!', jp: 'もうすぐ クリスマス！' }),
+          // Grubb counts down the last week, then greets on the day itself.
+          countdown: Object.freeze({
+            to: '2026-12-25',
+            fromDays: 7,
+            many: Object.freeze({ en: '{n} more days to Christmas!', jp: 'クリスマスまで あと{n}日！' }),
+            tomorrow: Object.freeze({ en: 'Tomorrow is Christmas!', jp: 'あしたは クリスマス！' }),
+            today: Object.freeze({ en: 'Merry Christmas!', jp: 'メリークリスマス！' }),
+          }),
+        }),
+        Object.freeze({
+          id: 'year-end',
+          start: '2026-12-26',
+          end: '2026-12-31',
+          mazeSnow: true,
+          mazeFrost: true,
+          lights: 'gold',
+          checkpointSparkColors: WINTER_GOLD_SPARK_COLORS,
+          trailAccent: CHRISTMAS_GLOW.gold,
+          greeting: Object.freeze({ en: 'See you next year!', jp: 'よいお年を！' }),
+        }),
+        Object.freeze({
+          id: 'new-year',
+          start: '2027-01-01',
+          end: '2027-01-02',
+          mazeSnow: true,
+          mazeFrost: true,
+          lights: 'gold',
+          checkpointSparkColors: WINTER_GOLD_SPARK_COLORS,
+          trailAccent: CHRISTMAS_GLOW.gold,
+          greeting: Object.freeze({ en: 'Happy New Year!', jp: 'あけまして おめでとう！' }),
         }),
       ]),
       seasonalVisitor: CHRISTMAS_SNOWFLAKE_VISITOR,
@@ -591,6 +630,32 @@ const BoohaSkins = (() => {
     return season.phases.find(phase => date >= phase.start && date <= phase.end) || null;
   }
 
+  function daysUntil(fromDate, toDate) {
+    const a = Date.parse(`${String(fromDate).slice(0, 10)}T00:00:00Z`);
+    const b = Date.parse(`${String(toDate).slice(0, 10)}T00:00:00Z`);
+    return Number.isFinite(a) && Number.isFinite(b) ? Math.round((b - a) / 86400000) : NaN;
+  }
+
+  // Today's line for the seasonal mascot: a countdown near the big day,
+  // otherwise the phase's own greeting.
+  function seasonGreeting(seasonId = seasonIdForDate(), dateKey = currentDateKey()) {
+    const phase = seasonPhase(seasonId, dateKey);
+    if (!phase) return null;
+    const countdown = phase.countdown;
+    if (countdown) {
+      const days = daysUntil(dateKey, countdown.to);
+      if (days === 0 && countdown.today) return countdown.today;
+      if (days === 1 && countdown.tomorrow) return countdown.tomorrow;
+      if (days > 1 && days <= countdown.fromDays && countdown.many) {
+        return Object.freeze({
+          en: countdown.many.en.replace('{n}', String(days)),
+          jp: countdown.many.jp.replace('{n}', String(days)),
+        });
+      }
+    }
+    return phase.greeting || null;
+  }
+
   function seasonalVisitor(seasonId = seasonIdForDate()) {
     return getSeason(seasonId)?.seasonalVisitor || null;
   }
@@ -643,6 +708,10 @@ const BoohaSkins = (() => {
     const phase = seasonPhase(season.id);
     if (phase) root.dataset.seasonPhase = phase.id;
     else delete root.dataset.seasonPhase;
+    if (phase?.lights) root.dataset.seasonLights = phase.lights;
+    else delete root.dataset.seasonLights;
+    if (phase?.mazeFrost) root.dataset.seasonFrost = 'on';
+    else delete root.dataset.seasonFrost;
     return season.id;
   }
 
@@ -850,6 +919,7 @@ const BoohaSkins = (() => {
     menuCharacterId,
     monthColorsForWeek,
     seasonPhase,
+    seasonGreeting,
     seasonalVisitor,
     seasonalVisitors,
     seasonalKarasuki,
