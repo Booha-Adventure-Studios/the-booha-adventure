@@ -10,7 +10,13 @@ const vm = require('vm');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
-const visuals = require(path.join(root, 'js/core/seasonal-visuals.js'));
+// Load the helper in a VM context, like seasonal-visuals.test.cjs, so the
+// result does not depend on any parent package.json "type" setting.
+const visualsContext = {};
+vm.createContext(visualsContext);
+vm.runInContext(read('js/core/seasonal-visuals.js'), visualsContext, { filename: 'js/core/seasonal-visuals.js' });
+const visuals = visualsContext.BoohaSeasonalVisuals;
+assert.ok(visuals && typeof visuals.checkpointSparkColors === 'function', 'seasonal visuals helper must load');
 
 function loadSkins(today) {
   const context = {

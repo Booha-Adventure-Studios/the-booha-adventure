@@ -191,6 +191,11 @@
       "reason": "Christmas Pass 1: date-based phases, snowflake visitors, light maze snowfall, and Grubb greeting."
     },
     {
+      "path": "tests/christmas-lights-on.test.cjs",
+      "status": "verify",
+      "reason": "Christmas Pass 2: December ornament visitors, gold trail accent, and string lights."
+    },
+    {
       "path": "tests/seasonal-art-deadline.test.cjs",
       "status": "verify",
       "reason": "Scheduled seasonal characters must have complete art before entering the next 14 Tokyo calendar days."
