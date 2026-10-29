@@ -123,7 +123,9 @@ const CURRENT_CACHES = {
   // ornament visitors and gold trail sparks in maze.html.
   // Christmas Pass 3: Grubb countdown, Dec 26 / Jan 1 phases with gold
   // winter lights on index.html, and the maze frost border.
-  pages:  'booha-pages-2026-506',
+  // Grimmerglen Pass G1: shared on-screen keyboard js/booha-keys.js;
+  // karasuki.html loads it before the card challenge.
+  pages:  'booha-pages-2026-507',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
