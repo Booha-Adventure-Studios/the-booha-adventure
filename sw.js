@@ -299,7 +299,7 @@ const CURRENT_CACHES = {
   // with the shared photorealistic round-token set.
   // Profile art pass: purge in-place-replaced medal art; image misses now
   // fetch with no-store.
-  assets: 'booha-assets-2026-609',
+  assets: 'booha-assets-2026-610',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
