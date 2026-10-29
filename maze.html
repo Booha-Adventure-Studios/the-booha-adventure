@@ -2052,6 +2052,7 @@ function createSeasonalWanderer(index, delayMs, visitor, cycle) {
   const w = createWanderer(0, delayMs, rand, route);
   w.kind = 'seasonal';
   w.visitorSrc = visitor.asset;
+  w.visitorKind = visitor.kind || 'bat';
   w.visitorIndex = index;
   w.visitorCycle = cycle;
   w.visitorColor = visitor.color || HALLOWEEN_GLOW.lime;
@@ -2173,14 +2174,21 @@ const pulseG = .5 + .5 * Math.sin(sec * 2.1 + colorKey * .8);
 }
 
     if (w.kind === 'seasonal') {
-      // One bat sprite, multiplied into a small flock. The glow is cached by
-      // source, size, color, and DPR; only opacity changes each frame.
-      const flap = Math.sin(sec * 6.2 + w.wobblePhase) * .055;
+      // One visitor sprite, multiplied into a small flock. The glow is cached
+      // by source, size, color, and DPR; only opacity changes each frame.
       const batSprite = getGlowingBat(img, drawR * 2, w.visitorColor || HALLOWEEN_GLOW.lime);
       const batSize = batSprite?._boohaLogicalSize || drawR * 2;
       ctx.globalAlpha = w.opacity * (.90 + pulseG * .10);
       ctx.translate(gx, gy);
-      ctx.scale(1 + flap * .35, 1 - flap);
+      if (w.visitorKind === 'snowflake') {
+        // Snowflakes turn slowly and drift a little smaller than bats.
+        const spin = (sec * .35 + w.wobblePhase) * (w.visitorIndex % 2 ? -1 : 1);
+        ctx.rotate(spin);
+        ctx.scale(.78, .78);
+      } else {
+        const flap = Math.sin(sec * 6.2 + w.wobblePhase) * .055;
+        ctx.scale(1 + flap * .35, 1 - flap);
+      }
       ctx.drawImage(batSprite || img, -batSize / 2, -batSize / 2, batSize, batSize);
       ctx.restore();
       continue;
@@ -2393,6 +2401,7 @@ function drawFrame(now){
   const baseGhostR   = GHOST_SIZE / 2;
   const activeGhostR = baseGhostR * _ghostScale;
   const activeSeason = window.BoohaSkins.getSeason(window.BoohaSkins.seasonIdForDate?.()) || ACTIVE_SEASON;
+  const activeSeasonPhase = currentSeasonPhase(now);
 
   CHECKPOINTS.forEach((cp,cpIdx)=>{
     const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
@@ -2406,7 +2415,7 @@ function drawFrame(now){
     const christmasCP = christmas && activeSeason?.checkpointSparkWeeks?.includes(cp.w);
     const seasonalSparkCP = hallowCP || christmasCP;
     const hk = hallowCP ? .55 : 1;
-    const sparkColors = SEASONAL_VISUALS.checkpointSparkColors(activeSeason, cp.w, [col1, col2]);
+    const sparkColors = SEASONAL_VISUALS.checkpointSparkColors(activeSeason, cp.w, [col1, col2], activeSeasonPhase);
     if(hallowCP){
       ctx.globalCompositeOperation = 'lighter';
       drawGlow(x,y,glowR*4.9,HALLOWEEN_GLOW.lime,alpha*(.06+pulse*.04));
@@ -2437,6 +2446,9 @@ function drawFrame(now){
   tickWanderers(now);
   drawWanderers(now);
 
+  // ── Layer 4b: seasonal snowfall (under the player's Booha) ──────────────
+  drawMazeSnow(now, activeSeasonPhase);
+
   // ── Layer 5: active ghost (always topmost) ───────────────────────────────
   if(ghostVisible){
     const bob=Math.sin(sec*1.85)*3.5;const{x:gx,y:gy}=imgToCSS(ghostIX,ghostIY);
@@ -2461,6 +2473,37 @@ function drawFrame(now){
     ctx.save();ctx.strokeStyle='rgba(255,255,255,.50)';ctx.lineWidth=1;ctx.shadowBlur=8;ctx.shadowColor='rgba(255,255,255,.25)';ctx.setLineDash([5,5]);
     ctx.beginPath();ctx.moveTo(0,bMouseY);ctx.lineTo(cssW,bMouseY);ctx.stroke();ctx.beginPath();ctx.moveTo(bMouseX,0);ctx.lineTo(bMouseX,cssH);ctx.stroke();ctx.restore();
   }
+}
+
+// Season phase ("first-snow", "lights-on") is date-based. Re-check it a few
+// times a minute rather than every frame.
+let _seasonPhaseCache=null,_seasonPhaseCheckedAt=-Infinity;
+function currentSeasonPhase(now){
+  if(now-_seasonPhaseCheckedAt>15000){
+    _seasonPhaseCheckedAt=now;
+    _seasonPhaseCache=window.BoohaSkins?.seasonPhase?.()||null;
+  }
+  return _seasonPhaseCache;
+}
+
+// Light maze snowfall: slower, smaller, and sparser than the first screen.
+// Off on the low performance tier and with reduced motion.
+let mazeSnow=[],mazeSnowLast=0;
+function drawMazeSnow(now,phase){
+  const want=SEASONAL_VISUALS.mazeSnowCount({
+    width:cssW,height:cssH,performanceTier:mazePerfTier,
+    reducedMotion:MAZE_REDUCED_MOTION,enabled:!!phase?.mazeSnow,
+  });
+  if(!want){mazeSnow.length=0;mazeSnowLast=now;return;}
+  while(mazeSnow.length<want)mazeSnow.push(SEASONAL_VISUALS.makeSnowflake(cssW,cssH));
+  if(mazeSnow.length>want)mazeSnow.length=want;
+  const dt=mazeSnowLast?(now-mazeSnowLast)/1000:0;mazeSnowLast=now;
+  SEASONAL_VISUALS.stepSnowfall(mazeSnow,dt,cssW,cssH);
+  ctx.save();ctx.fillStyle='#ffffff';
+  for(const f of mazeSnow){
+    ctx.globalAlpha=f.alpha;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();
+  }
+  ctx.restore();
 }
 
 function updateMazePerfTier(now){

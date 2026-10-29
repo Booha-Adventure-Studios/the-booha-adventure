@@ -47,6 +47,15 @@ const BoohaSkins = (() => {
     CHRISTMAS_GLOW.gold,
     CHRISTMAS_GLOW.white,
   ]);
+  // November is the quiet "First Snow" phase: frosty white, ice, and silver
+  // sparkles around the red/green checkpoint core. December's "Lights On"
+  // phase brings the gold back (see the Christmas season phases below).
+  const CHRISTMAS_FIRST_SNOW_SPARK_COLORS = Object.freeze([
+    '#ffffff',
+    '#cfeaff',
+    '#dfe5ee',
+  ]);
+  const CHRISTMAS_SNOWFLAKE_COLOR = '#bfe6ff';
   const HALLOWEEN_KARASUKI = Object.freeze({
     kind: 'barba',
     name: 'Barba',
@@ -423,6 +432,32 @@ const BoohaSkins = (() => {
       // Maze weeks 41-44 are November and 45-48 are December.
       checkpointSparkWeeks: Object.freeze([41, 42, 43, 44, 45, 46, 47, 48]),
       checkpointSparkColors: CHRISTMAS_CHECKPOINT_SPARK_COLORS,
+      // Christmas builds up instead of arriving all at once. Each phase is
+      // picked by date, so December switches on without a deploy.
+      phases: Object.freeze([
+        Object.freeze({
+          id: 'first-snow',
+          start: '2026-11-01',
+          end: '2026-11-30',
+          mazeSnow: true,
+          checkpointSparkColors: CHRISTMAS_FIRST_SNOW_SPARK_COLORS,
+          greeting: Object.freeze({ en: "Hi! It's snowing!", jp: 'ゆきが ふってきたね！' }),
+        }),
+        Object.freeze({
+          id: 'lights-on',
+          start: '2026-12-01',
+          end: '2027-01-02',
+          mazeSnow: true,
+          checkpointSparkColors: CHRISTMAS_CHECKPOINT_SPARK_COLORS,
+          greeting: Object.freeze({ en: 'Merry Christmas!', jp: 'メリークリスマス！' }),
+        }),
+      ]),
+      seasonalVisitor: Object.freeze({
+        kind: 'snowflake',
+        asset: 'assets/img/seasonal-snowflake.webp',
+        color: CHRISTMAS_SNOWFLAKE_COLOR,
+        requires: 'blitz-triple',
+      }),
       seasonalKarasuki: CHRISTMAS_KARASUKI,
     }),
   };
@@ -538,6 +573,13 @@ const BoohaSkins = (() => {
     return MONTH_COLORS[monthIndex];
   }
 
+  function seasonPhase(seasonId = seasonIdForDate(), dateKey = currentDateKey()) {
+    const season = getSeason(seasonId);
+    const date = String(dateKey || '').slice(0, 10);
+    if (!season || !Array.isArray(season.phases) || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+    return season.phases.find(phase => date >= phase.start && date <= phase.end) || null;
+  }
+
   function seasonalVisitor(seasonId = seasonIdForDate()) {
     return getSeason(seasonId)?.seasonalVisitor || null;
   }
@@ -578,6 +620,9 @@ const BoohaSkins = (() => {
     Object.keys(vars).forEach(key => {
       if (season.palette[key]) root.style.setProperty(vars[key], season.palette[key]);
     });
+    const phase = seasonPhase(season.id);
+    if (phase) root.dataset.seasonPhase = phase.id;
+    else delete root.dataset.seasonPhase;
     return season.id;
   }
 
@@ -784,6 +829,7 @@ const BoohaSkins = (() => {
     rotationCharacterId,
     menuCharacterId,
     monthColorsForWeek,
+    seasonPhase,
     seasonalVisitor,
     seasonalKarasuki,
     seasonMascot,

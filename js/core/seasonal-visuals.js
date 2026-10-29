@@ -33,14 +33,52 @@
     return visitor;
   }
 
-  function checkpointSparkColors(season, week, baseColors) {
+  function checkpointSparkColors(season, week, baseColors, phase = null) {
     const fallback = Array.isArray(baseColors) ? baseColors : [];
     const sparkWeeks = season?.checkpointSparkWeeks || [];
     const glow = season?.glow;
     if (!glow || !sparkWeeks.includes(Number(week))) return fallback;
+    if (Array.isArray(phase?.checkpointSparkColors) && phase.checkpointSparkColors.length) {
+      return phase.checkpointSparkColors;
+    }
     return Array.isArray(season?.checkpointSparkColors) && season.checkpointSparkColors.length
       ? season.checkpointSparkColors
       : [glow.orange, glow.purple, glow.lime];
+  }
+
+  // Maze snowfall is deliberately lighter than the first screen: a few slow
+  // dots, none at all on the low tier or with reduced motion.
+  const MAZE_SNOW_MIN = 16;
+  const MAZE_SNOW_MAX = 42;
+  function mazeSnowCount({ width = 0, height = 0, performanceTier = 'high', reducedMotion = false, enabled = false } = {}) {
+    if (!enabled || reducedMotion || performanceTier === 'low') return 0;
+    const area = Math.max(0, Number(width) || 0) * Math.max(0, Number(height) || 0);
+    if (!area) return 0;
+    return Math.max(MAZE_SNOW_MIN, Math.min(MAZE_SNOW_MAX, Math.round(area / 30000)));
+  }
+
+  function makeSnowflake(width, height, random = Math.random, fromTop = false) {
+    return {
+      x: random() * width,
+      y: fromTop ? -6 - random() * 40 : random() * height,
+      r: .8 + random() * 1.6,
+      speed: 9 + random() * 14,
+      drift: 6 + random() * 10,
+      phase: random() * Math.PI * 2,
+      alpha: .28 + random() * .4,
+    };
+  }
+
+  function stepSnowfall(flakes, dtSeconds, width, height, random = Math.random) {
+    const dt = Math.min(.1, Math.max(0, Number(dtSeconds) || 0));
+    for (let i = 0; i < flakes.length; i++) {
+      const f = flakes[i];
+      f.phase += dt * .9;
+      f.y += f.speed * dt;
+      f.x += Math.sin(f.phase) * f.drift * dt;
+      if (f.y > height + 6 || f.x < -12 || f.x > width + 12) flakes[i] = makeSnowflake(width, height, random, true);
+    }
+    return flakes;
   }
 
   function createBatGlowCache({ createCanvas, getDevicePixelRatio } = {}) {
@@ -89,6 +127,11 @@
     seasonalVisitorCount,
     activeSeasonalVisitor,
     checkpointSparkColors,
+    MAZE_SNOW_MIN,
+    MAZE_SNOW_MAX,
+    mazeSnowCount,
+    makeSnowflake,
+    stepSnowfall,
     createBatGlowCache,
   };
 });
