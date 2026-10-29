@@ -151,6 +151,8 @@ const css = styles[0].textContent;
 const keysRule = css.match(/\.bk-keys\{([^}]*)\}/)[1];
 for (const prop of ['touch-action:manipulation', 'user-select:none', '-webkit-touch-callout:none', '--kh:56px']) assert.ok(keysRule.includes(prop), `keyboard has ${prop}`);
 assert.match(css.match(/@media \(max-height:500px\)\{([\s\S]*?)\n\}/)[1], /--kh:44px/, 'phone landscape keys stay 44 px');
+// No breakpoint may shrink keys below 44 px (very short landscape saves space with gaps instead).
+for (const m of css.matchAll(/--kh:(\d+)px/g)) assert.ok(Number(m[1]) >= 44, `key height ${m[1]}px is below 44 px`);
 assert.match(css, /\.bk-key\{[^}]*height:var\(--kh\)/);
 for (const v of ['--kc', '--kd', '--cap', '--cap2', '--kt,', '--kok,', '--kbg,', '--kshadow,']) assert.ok(css.includes(`var(${v}`), `colour comes from ${v}`);
 assert.match(css, /\.bk-still \.bk-key\.is-down\{transform:none\}/);

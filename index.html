@@ -2667,6 +2667,31 @@ function applySeasonGreeting(skin) {
 applySeasonalLandingSkin();
 document.addEventListener('booha:weeklyReset', applySeasonalLandingSkin);
 
+// The greeting countdown, string lights and season theme are all worked out
+// from today's date, so refresh them if the date changes while the page is
+// open (tab left open past midnight, or the page restored from the
+// back/forward cache on a later day).
+// Same day boundary the season code uses (CALENDAR's today key, Tokyo time).
+function seasonTodayKey() {
+  try {
+    if (typeof window.CALENDAR?.getTodayKey === 'function') return String(window.CALENDAR.getTodayKey());
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date());
+  } catch (e) { return new Date().toDateString(); }
+}
+let seasonDateKey = seasonTodayKey();
+function refreshSeasonIfDateChanged() {
+  const key = seasonTodayKey();
+  if (key === seasonDateKey) return;
+  seasonDateKey = key;
+  try { window.BoohaSkins?.applySeasonTheme?.(); } catch (e) {}
+  applySeasonalLandingSkin();
+}
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshSeasonIfDateChanged();
+});
+window.addEventListener('pageshow', refreshSeasonIfDateChanged);
+setInterval(refreshSeasonIfDateChanged, 60 * 1000);
+
 function getBoohaFirstName() {
   const raw = (localStorage.getItem('booha_first_name') || '').trim();
   if (!raw) return 'PLAYER';
