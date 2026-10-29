@@ -3041,6 +3041,26 @@
       .mg-object-art{display:block;width:92%;height:92%;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(120,58,105,.2));}
       #grimmerglen-marietta-panel .mg-memory-inner,#grimmerglen-marietta-panel .mg-handoff-inner{align-items:center;}
       #grimmerglen-marietta-panel .mg-memory-inner .dp-body,#grimmerglen-marietta-panel .mg-handoff-inner .dp-body{min-width:0;}
+      /* Pass G3: while the on-screen keys are up on a short landscape screen,
+         Marietta's panel keeps only what the student needs to type: the
+         tier/step line, the clues, the hint and the answer. The portrait,
+         titles and long instructions return when the keys go away (and
+         stay on iPad). "Check again" opens the same replay as the hint
+         button, so only the hint stays. */
+      @media (orientation:landscape) and (max-height:500px){
+        html.mgty-keys-up #grimmerglen-marietta-panel .dp-portrait-wrap,
+        html.mgty-keys-up #grimmerglen-marietta-panel .dp-name-kanji,
+        html.mgty-keys-up #grimmerglen-marietta-panel .dp-divider,
+        html.mgty-keys-up #grimmerglen-marietta-panel .dp-line-en,
+        html.mgty-keys-up #grimmerglen-marietta-panel .dp-line-jp,
+        html.mgty-keys-up #grimmerglen-marietta-panel .mg-memory-tier-guide,
+        html.mgty-keys-up #grimmerglen-marietta-panel .mg-memory-tier-guide-jp,
+        html.mgty-keys-up #grimmerglen-marietta-panel .mg-memory-inner .dp-name-en,
+        html.mgty-keys-up #grimmerglen-marietta-panel .mg-memory-recheck-wrap{display:none;}
+        html.mgty-keys-up #grimmerglen-marietta-panel .dp-inner{padding-top:6px;}
+        html.mgty-keys-up #grimmerglen-marietta-panel .dp-name-en{margin-bottom:0;}
+        html.mgty-keys-up #grimmerglen-marietta-panel .mg-memory-tier-progress{margin:2px 0 4px;}
+      }
       @media(max-width:700px){#grimmerglen-marietta-panel .mg-object-art-wrap{flex-basis:64px;width:64px;height:64px;}#grimmerglen-marietta-panel .mgty-input-row{flex-wrap:wrap;}}
       /* Pass 3: short landscape phones need a contained reading surface, not
          a panel that pushes controls below the browser's visible edge. */

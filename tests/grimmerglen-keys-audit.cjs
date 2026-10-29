@@ -92,6 +92,25 @@ assert.match(runtime, /#grimmerglen-marietta-panel \{ box-sizing:border-box; bot
 assert.match(widget, /if \(refs\.feedbackEl\.classList\.contains\('is-wrong'\)\) \{ refs\.feedbackEl\.textContent = '';/, 'typing again clears "Not quite"');
 assert.ok(html.indexOf('js/booha-keys.js') > 0 && html.indexOf('js/booha-keys.js') < html.indexOf('js/grimmerglen-typing.js'), 'grimmerglen.html loads the shared keyboard first');
 assert.ok(html.indexOf('js/utsu-sfx.js') > 0, 'key clicks come from UtsuSfx.keyTap');
+/* Pass G3: short landscape screens while the keys are up */
+assert.match(typing.slice(typing.indexOf('function showKeys('), typing.indexOf('function hideKeys(')), /document\.documentElement\.classList\.add\('mgty-keys-up'\)/);
+assert.match(typing.slice(typing.indexOf('function hideKeys('), typing.indexOf('function exerciseLive(')), /document\.documentElement\.classList\.remove\('mgty-keys-up'\)/);
+const shortTyping = typing.slice(typing.indexOf('/* Pass G3:'), typing.indexOf('html[data-motion="reduced"] .mgty-caret'));
+assert.match(shortTyping, /@media \(orientation:landscape\) and \(max-height:500px\)\{/, 'only short landscape screens (not iPad)');
+assert.match(shortTyping, /html\.mgty-keys-up \.mgty-exercise\{display:grid;grid-template-columns:minmax\(0,1fr\) minmax\(0,1fr\)/, 'two columns while typing');
+assert.match(shortTyping, /\.mgty-exercise>\.mgty-input-row\{grid-column:2;grid-row:1 \/ span 2;/, 'answer box top right, always in view');
+assert.match(shortTyping, /\.mgty-exercise>\.mgty-hint-btn\{grid-column:2;/, 'hint sits under the answer');
+assert.match(widget, /refs\.answerEl\.scrollTop = refs\.answerEl\.scrollHeight;/, 'a long answer keeps its newest line and the caret in view');
+assert.match(widget, /<p class="mgty-feedback" aria-live="polite"><\/p>\s*<\/div>/, 'feedback lives with the answer box');
+const shortPanel = runtime.slice(runtime.indexOf('/* Pass G3:'), runtime.indexOf('@media(max-width:700px){#grimmerglen-marietta-panel .mg-object-art-wrap'));
+assert.match(shortPanel, /@media \(orientation:landscape\) and \(max-height:500px\)\{/);
+for (const sel of ['.dp-portrait-wrap', '.dp-name-kanji', '.mg-memory-tier-guide', '.mg-memory-tier-guide-jp', '.mg-memory-recheck-wrap']) {
+  assert.ok(shortPanel.includes(`html.mgty-keys-up #grimmerglen-marietta-panel ${sel}`), `${sel} steps aside while typing on a short screen`);
+}
+assert.ok(!/mgty-prompt|mgty-chips|mgty-hint-btn|mgty-answer/.test(shortPanel.replace(/\/\*[\s\S]*?\*\//g, '')), 'the prompt, clues, hint and answer are never hidden');
+const recheck = runtime.match(/mg-memory-recheck'\) \|\| null|getElementById\('mg-memory-see-again'\)|querySelector\('#mg-memory-see-again'\)\?\.addEventListener\('click', \(\) => \{\s*(renderMariettaMemoryReplay\([^;]*\));/);
+const hint = runtime.match(/onHint: \(\) => (renderMariettaMemoryReplay\([^\n]*\)),/);
+assert.ok(recheck && hint && recheck[1] === hint[1], '"Check again" and the hint open the same replay, so hiding one loses nothing');
 assert.ok(!/\(\?<[=!]/.test(typing), 'no regex lookbehind');
 
 console.log('Grimmerglen on-screen keyboard audit passed.');
