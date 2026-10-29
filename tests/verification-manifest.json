@@ -196,6 +196,11 @@
       "reason": "Christmas Pass 2: December ornament visitors, gold trail accent, and string lights."
     },
     {
+      "path": "tests/christmas-countdown.test.cjs",
+      "status": "verify",
+      "reason": "Christmas Pass 3: Grubb countdown, Dec 26 / Jan 1 phases, gold winter lights, and maze frost."
+    },
+    {
       "path": "tests/seasonal-art-deadline.test.cjs",
       "status": "verify",
       "reason": "Scheduled seasonal characters must have complete art before entering the next 14 Tokyo calendar days."

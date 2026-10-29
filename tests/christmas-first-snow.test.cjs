@@ -40,7 +40,8 @@ assert.strictEqual(skins.seasonPhase('christmas-2026', '2026-10-31'), null, 'no 
 assert.strictEqual(skins.seasonPhase('christmas-2026', '2026-11-01').id, 'first-snow');
 assert.strictEqual(skins.seasonPhase('christmas-2026', '2026-11-30').id, 'first-snow');
 assert.strictEqual(skins.seasonPhase('christmas-2026', '2026-12-01').id, 'lights-on');
-assert.strictEqual(skins.seasonPhase('christmas-2026', '2027-01-02').id, 'lights-on');
+assert.strictEqual(skins.seasonPhase('christmas-2026', '2026-12-25').id, 'lights-on');
+assert.strictEqual(skins.seasonPhase('christmas-2026', '2027-01-02').id, 'new-year');
 assert.strictEqual(skins.seasonPhase('christmas-2026', '2027-01-03'), null);
 assert.strictEqual(skins.seasonPhase('halloween-2026', '2026-10-15'), null, 'Halloween has no phases');
 christmas.phases.forEach(phase => {
