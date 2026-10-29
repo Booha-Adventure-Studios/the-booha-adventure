@@ -263,6 +263,7 @@
     dock.classList.toggle('is-still', reducedMotion());
     void dock.offsetWidth;
     dock.classList.add('is-open');
+    document.documentElement.classList.add('mgty-keys-up');
     measureKeys();
     clearInterval(watchTimer);
     watchTimer = setInterval(watchActive, 400);
@@ -273,6 +274,7 @@
     watchTimer = 0;
     if (!dock || !dock.classList.contains('is-open')) return;
     dock.classList.remove('is-open');
+    document.documentElement.classList.remove('mgty-keys-up');
     setKeysInset(0);
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => { if (dock && !dock.classList.contains('is-open')) dock.hidden = true; }, KEYS_SHOW_MS);
@@ -348,8 +350,8 @@
         <div class="mgty-input-row">
           <div class="mgty-input-label"><span>Type here / ${furiJP('答えをタイプしてね', { '答え': 'こたえ' })}</span>
             <div class="mgty-answer" role="textbox" aria-readonly="true" aria-label="Type your answer"><span class="mgty-typed"></span><i class="mgty-caret" aria-hidden="true"></i></div></div>
+          <p class="mgty-feedback" aria-live="polite"></p>
         </div>
-        <p class="mgty-feedback" aria-live="polite"></p>
       </div>`;
 
     const refs = {
@@ -393,6 +395,7 @@
       text: () => displayAnswer(entry.typed, names),
       show() {
         refs.typedEl.textContent = entry.text();
+        refs.answerEl.scrollTop = refs.answerEl.scrollHeight;   // long answers: keep the newest line and caret in view
         const n = entry.typed.length;
         refs.answerEl.classList.toggle('is-long', n > 60);
         refs.answerEl.classList.remove('is-wrong');
@@ -449,7 +452,7 @@
         border:1px dashed rgba(126,99,196,.55);color:#6851a6;}
       .mgty-help-btn:hover{background:rgba(184,164,255,.22);}
       .mgty-help{margin:0 0 10px;padding:8px 11px;border-left:3px solid #b8a4ff;border-radius:0 8px 8px 0;background:rgba(184,164,255,.12);color:#5e4b88;font-size:.86rem;line-height:1.55;}
-      .mgty-input-row{position:relative;display:flex;gap:8px;margin:0 0 6px;}
+      .mgty-input-row{position:relative;display:flex;flex-direction:column;gap:2px;margin:0 0 6px;}
       .mgty-input-label{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px;color:#6a5030;font-size:.72rem;font-weight:700;line-height:1.35;}
       .mgty-input-label ruby{ruby-position:over;} .mgty-input-label rt{font-size:.78em;color:#8a6a42;}
       .mgty-answer{position:relative;display:block;width:100%;min-width:0;min-height:44px;max-height:calc(3 * 1.35em + 20px);overflow-y:auto;box-sizing:border-box;padding:9px 14px;border-radius:12px;
@@ -488,6 +491,27 @@
       @keyframes mgtyHintGlow{0%,100%{box-shadow:0 0 8px rgba(255,159,194,.42),0 0 15px rgba(255,209,102,.16);}50%{box-shadow:0 0 13px rgba(255,159,194,.68),0 0 23px rgba(255,209,102,.28);}}
       @media (orientation:landscape) and (max-height:480px){.mgty-input-row{flex-wrap:wrap;}.mgty-input-label{flex:0 0 100%;}.mgty-answer{scroll-margin-block:8px;max-height:calc(2 * 1.35em + 20px);}}
       @media (prefers-reduced-motion: reduce){.mgty-spark{animation:none;display:none;}.mgty-answer.is-wrong{animation:none;}.mgty-hint-btn{animation:none;}.mgty-caret{animation:none;}}
+      /* Pass G3: on short landscape screens the keys take ~210px, so while
+         they are up the exercise splits in two: the prompt and clues on the
+         left, the answer box with the hint/help buttons on the right. */
+      @media (orientation:landscape) and (max-height:500px){
+        html.mgty-keys-up .mgty-exercise{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:14px;align-items:start;}
+        html.mgty-keys-up .mgty-exercise>*{grid-column:1;}
+        html.mgty-keys-up .mgty-exercise>.mgty-prompt-en{grid-row:1;}
+        html.mgty-keys-up .mgty-exercise>.mgty-prompt-jp{grid-row:2;}
+        html.mgty-keys-up .mgty-exercise>.mgty-chips{grid-row:3 / span 3;}
+        html.mgty-keys-up .mgty-exercise>.mgty-input-row{grid-column:2;grid-row:1 / span 2;margin:0 0 4px;}
+        html.mgty-keys-up .mgty-exercise>.mgty-hint-btn{grid-column:2;grid-row:3;justify-self:start;}
+        html.mgty-keys-up .mgty-exercise>.mgty-help-btn{grid-column:2;grid-row:4;justify-self:start;}
+        html.mgty-keys-up .mgty-exercise>.mgty-help{grid-column:2;grid-row:5;}
+        html.mgty-keys-up .mgty-input-label>span{display:none;}
+        html.mgty-keys-up .mgty-answer{max-height:calc(3 * 1.35em + 20px);}
+        html.mgty-keys-up .mgty-prompt-jp{margin-bottom:6px;}
+        html.mgty-keys-up .mgty-chips{gap:5px;margin-bottom:6px;}
+        html.mgty-keys-up .mgty-chip{padding:5px 10px;line-height:1.25;white-space:normal;}
+        html.mgty-keys-up .mgty-hint-btn,html.mgty-keys-up .mgty-help-btn{margin-bottom:4px;}
+        html.mgty-keys-up .mgty-feedback{font-size:.76rem;line-height:1.3;}
+      }
       html[data-motion="reduced"] .mgty-caret,html[data-motion="reduced"] .mgty-answer.is-wrong{animation:none;}
     `;
     document.head.appendChild(style);
