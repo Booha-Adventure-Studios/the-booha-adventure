@@ -1,14 +1,19 @@
 /*
  * Karasuki Cards — Pass 2c: the 10-round recall challenge and the reveal.
  *
- * Each round: SHOW (the word is written letter by letter, a meter shows the
- * remaining look time, then it fades) → TYPE (its own timer meter; when it
- * runs out, whatever is typed is submitted) → short feedback. Rules, saving
- * and checking live in js/karasuki-cards.js; this file is the screen.
+ * Each round: READ (Pass 5: "Read and remember!", the word written large and
+ * a 3·2·1 countdown in a shrinking ring; nothing to type yet) → TYPE ("Now
+ * type it!", the answer box and an on-screen keyboard slide up, a bar meter
+ * runs; when it runs out, whatever is typed is submitted) → short feedback.
+ * Rules, saving and checking live in js/karasuki-cards.js; this file is the
+ * screen.
  *
- * iPad keyboard: iOS only raises the keyboard from a user tap, so the input
- * is focused on the Start/Continue tap and stays focused for the whole
- * attempt. Anything typed while the word is still visible is discarded.
+ * Keyboard (Pass 5): the challenge never uses the iPad system keyboard —
+ * its QuickType suggestions and autofill would do the remembering, and a
+ * Japanese keyboard adds IME composition. There is no text input at all:
+ * a kind-tinted on-screen keyboard (a–z, apostrophe, hyphen, space,
+ * backspace, OK) writes into a plain answer box, so paste is impossible.
+ * A physical keyboard still works through keydown.
  *
  * Interruptions: leaving the page for up to GRACE_MS pauses the round and
  * resumes it. Longer, the round is interrupted (KarasukiCards.interrupt):
@@ -25,6 +30,14 @@
   const KIND = {
     friendly: '#F2C14E', mischievous: '#FF8AD0', dangerous: '#FF6B74',
   };
+  // On-screen keyboard tint per host kind: glow, deep rim, keycap top/bottom.
+  const KEYS_TINT = {
+    friendly: { kc: '#F2C14E', kd: '#B9822A', cap: '#2B2316', cap2: '#16110B' },
+    mischievous: { kc: '#FF8AD0', kd: '#A64BD6', cap: '#2B1839', cap2: '#170C20' },
+    dangerous: { kc: '#FF6B74', kd: '#C3303B', cap: '#26272E', cap2: '#111216' },
+  };
+  const KEY_ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  const MAX_TYPED = 40;
 
   let root = null;
   let opts = null;
@@ -57,7 +70,7 @@
     const style = document.createElement('style');
     style.id = 'kcc-style';
     style.textContent = `
-#kcc{position:fixed;inset:0;z-index:9250;display:none;flex-direction:column;background:#07060c;color:#fff;font-family:'Nunito',system-ui,-apple-system,sans-serif;padding:max(10px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) 10px max(14px,env(safe-area-inset-left));box-sizing:border-box;overflow:hidden}
+#kcc{position:fixed;inset:0;z-index:9250;display:none;flex-direction:column;background:#07060c;color:#fff;font-family:'Nunito',system-ui,-apple-system,sans-serif;padding:max(10px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));box-sizing:border-box;overflow:hidden;touch-action:manipulation}
 #kcc.is-open{display:flex}
 #kcc *{box-sizing:border-box}
 #kcc .kcc-top{display:flex;align-items:center;gap:12px;min-height:44px}
@@ -80,12 +93,55 @@
 @keyframes kcc-in{to{opacity:1;transform:none}}
 #kcc .kcc-meter{width:min(520px,86vw);height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
 #kcc .kcc-meter i{display:block;height:100%;width:100%;transform-origin:0 50%;border-radius:99px}
-#kcc .kcc-form{display:flex;gap:10px;width:min(520px,86vw)}
-#kcc .kcc-input{flex:1 1 auto;min-width:0;height:52px;padding:0 14px;border-radius:12px;border:2px solid rgba(255,255,255,.3);background:#120f1c;color:#fff;font:700 24px/1 'Nunito',system-ui,sans-serif;outline:none}
-#kcc .kcc-input:focus{border-color:#fff}
-#kcc .kcc-input:disabled{opacity:.45}
-#kcc .kcc-ok{flex:0 0 auto;min-width:72px;height:52px;border-radius:12px;border:0;font:800 16px/1.1 system-ui,sans-serif;color:#14111E;cursor:pointer}
-#kcc .kcc-ok small{display:block;font-size:11px}
+#kcc .kcc-stage.is-wait>:not(.kcc-label){display:none}
+#kcc .kcc-stage.is-read{justify-content:center;gap:clamp(10px,3vh,22px);padding-top:0}
+#kcc .kcc-stage.is-read .kcc-label{font:800 clamp(17px,3.2vh,22px)/1.3 'Nunito',system-ui,sans-serif;letter-spacing:.02em;color:#fff}
+#kcc .kcc-stage.is-read .kcc-meter,#kcc .kcc-stage.is-read .kcc-answer,#kcc .kcc-stage.is-read .kcc-keys,#kcc .kcc-stage.is-read .kcc-feedback{display:none}
+#kcc .kcc-stage.is-type .kcc-word,#kcc .kcc-stage.is-type .kcc-clock,#kcc .kcc-stage.is-type .kcc-feedback{display:none}
+#kcc .kcc-stage.is-type .kcc-label{font:800 clamp(15px,2.8vh,19px)/1.3 'Nunito',system-ui,sans-serif;letter-spacing:.02em;color:var(--kc)}
+#kcc .kcc-stage.is-done .kcc-clock,#kcc .kcc-stage.is-done .kcc-meter,#kcc .kcc-stage.is-done .kcc-keys{display:none}
+#kcc .kcc-stage.is-type .kcc-answer,#kcc .kcc-stage.is-type .kcc-keys{animation:kcc-up .3s ease-out both}
+#kcc.kcc-still .kcc-stage.is-type .kcc-answer,#kcc.kcc-still .kcc-stage.is-type .kcc-keys{animation:kcc-show .2s ease-out both}
+@keyframes kcc-up{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+@keyframes kcc-show{from{opacity:0}to{opacity:1}}
+#kcc .kcc-clock{position:relative;width:84px;height:84px;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+#kcc .kcc-ring{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:50%;border:5px solid var(--kc);box-sizing:border-box;transform-origin:50% 50%}
+#kcc .kcc-clock b{position:relative;font:800 38px/1 'Nunito',system-ui,sans-serif;color:#fff}
+#kcc .kcc-clock b.is-pop{animation:kcc-pop .32s ease-out both}
+#kcc.kcc-still .kcc-clock b.is-pop{animation:none}
+#kcc.kcc-still .kcc-ring{transition:none !important}
+@keyframes kcc-pop{from{opacity:.3;transform:scale(1.4)}to{opacity:1;transform:none}}
+#kcc .kcc-answer{position:relative;display:flex;align-items:center;justify-content:center;width:min(560px,100%);height:56px;padding:0 16px;border-radius:12px;border:2px solid var(--kd);background:#120f1c;color:#fff;font:800 28px/1 'Nunito',system-ui,sans-serif;white-space:pre;overflow:hidden}
+#kcc .kcc-answer.is-ok{border-color:#5ee08a}
+#kcc .kcc-answer.is-miss{border-color:#ff6b74}
+#kcc .kcc-caret{display:inline-block;width:3px;height:1.05em;margin-left:2px;border-radius:2px;background:var(--kc);animation:kcc-blink 1s steps(1) infinite}
+#kcc .kcc-stage.is-done .kcc-caret,#kcc.kcc-still .kcc-caret{animation:none}
+#kcc .kcc-stage.is-done .kcc-caret{opacity:0}
+@keyframes kcc-blink{50%{opacity:0}}
+#kcc .kcc-keys{--gap:6px;--kh:56px;display:flex;flex-direction:column;gap:var(--gap);width:min(800px,100%);margin-top:auto;padding:8px;border-radius:16px;background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+#kcc .kcc-row{display:flex;justify-content:center;gap:var(--gap)}
+#kcc .kcc-key{position:relative;flex:0 0 calc((100% - 9 * var(--gap)) / 10);min-width:0;height:var(--kh);padding:0;margin:0;border:0;border-radius:10px;background:linear-gradient(180deg,var(--cap),var(--cap2));color:#fff;font:800 24px/1 'Nunito',system-ui,sans-serif;box-shadow:inset 0 0 0 1.5px var(--kd),0 3px 0 rgba(0,0,0,.5);cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:rgba(0,0,0,0);transition:transform .12s ease-out}
+#kcc .kcc-key::after{content:'';position:absolute;left:-3px;top:-3px;right:-3px;bottom:-3px;border-radius:13px;box-shadow:0 0 16px 2px var(--kc),inset 0 0 0 2px var(--kc);opacity:0;transition:opacity .2s ease-out;pointer-events:none}
+#kcc .kcc-key.is-down{transform:translateY(2px) scale(.93);transition:transform .04s ease-out}
+#kcc .kcc-key.is-down::after{opacity:1;transition:opacity .04s ease-out}
+#kcc.kcc-still .kcc-key.is-down{transform:none}
+#kcc .kcc-key.is-mark{color:var(--kc);font-size:28px}
+#kcc .kcc-key.is-space{flex:1 1 auto;font-size:15px;letter-spacing:.12em;color:rgba(255,255,255,.75)}
+#kcc .kcc-key.is-back{flex-basis:calc((100% - 9 * var(--gap)) / 10 * 1.5);color:var(--kc)}
+#kcc .kcc-key.is-back svg{display:block;margin:0 auto}
+#kcc .kcc-key.is-ok{flex-basis:calc((100% - 9 * var(--gap)) / 10 * 2);background:linear-gradient(180deg,var(--kc),var(--kd));color:#14111E;font-size:20px;box-shadow:0 3px 0 rgba(0,0,0,.5)}
+#kcc .kcc-key.is-ok small{display:block;margin-top:2px;font-size:11px}
+#kcc .kcc-key:focus{outline:none}
+#kcc .kcc-key:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (max-height:500px){
+#kcc .kcc-stage{gap:6px;padding-top:2px}
+#kcc .kcc-answer{height:44px;font-size:24px}
+#kcc .kcc-keys{--gap:5px;--kh:44px;padding:5px}
+#kcc .kcc-key{font-size:21px}
+#kcc .kcc-clock{width:70px;height:70px}
+#kcc .kcc-clock b{font-size:32px}
+}
+@media (max-height:340px){#kcc .kcc-keys{--kh:40px}}
 #kcc .kcc-feedback{min-height:22px;font:700 15px/1.5 system-ui,sans-serif;text-align:center}
 #kcc .kcc-feedback.is-ok{color:#5ee08a}
 #kcc .kcc-feedback.is-miss{color:#ff8a92}
@@ -155,34 +211,110 @@
   function accent() { return KIND[opts.kind] || KIND.friendly; }
 
   function shell() {
+    const tint = KEYS_TINT[opts.kind] || KEYS_TINT.friendly;
     root.innerHTML = `
       <div class="kcc-top">
         <div class="kcc-host" style="color:${accent()}">${esc(opts.name)} <span lang="ja" style="opacity:.8">${furi(opts.nameJP || '', opts.furigana)}</span></div>
         <div class="kcc-dots" aria-hidden="true">${'<i></i>'.repeat(10)}</div>
         <button type="button" class="kcc-leave">Leave<small lang="ja">やめる</small></button>
       </div>
-      <div class="kcc-stage">
+      <div class="kcc-stage is-wait" style="--kc:${tint.kc};--kd:${tint.kd};--cap:${tint.cap};--cap2:${tint.cap2}">
         <div class="kcc-label" aria-hidden="true"></div>
         <div class="kcc-word" aria-hidden="true"></div>
+        <div class="kcc-clock" aria-hidden="true"><i class="kcc-ring"></i><b></b></div>
         <div class="kcc-meter" aria-hidden="true"><i style="background:${accent()}"></i></div>
-        <form class="kcc-form" autocomplete="off">
-          <input class="kcc-input" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off"
-            spellcheck="false" enterkeyhint="done" maxlength="40" aria-label="Type the word you saw">
-          <button class="kcc-ok" type="submit" style="background:${accent()}">OK<small lang="ja">けってい</small></button>
-        </form>
+        <div class="kcc-answer" role="textbox" aria-readonly="true" aria-label="Your answer"><span class="kcc-typed"></span><i class="kcc-caret" aria-hidden="true"></i></div>
         <div class="kcc-feedback" role="status" aria-live="polite"></div>
+        <div class="kcc-keys" role="group" aria-label="Keyboard">${keysHTML()}</div>
       </div>`;
     $('.kcc-leave').addEventListener('click', leave);
-    const input = $('.kcc-input');
-    const reject = e => { e.preventDefault(); flash(jpPaste()); };
-    input.addEventListener('paste', reject);
-    input.addEventListener('drop', reject);
-    input.addEventListener('beforeinput', e => { if (/^insertFromPaste|^insertFromDrop/.test(e.inputType || '')) reject(e); });
-    input.addEventListener('input', () => { if (run && run.phase !== 'type') input.value = ''; });
-    $('.kcc-form').addEventListener('submit', e => { e.preventDefault(); if (run && run.phase === 'type') submit(); });
+    wireKeys();
   }
-  function jpPaste() { return `Type it yourself — no pasting. ${opts.curriculum === 'pb' ? 'じぶんで タイプしてね。' : '自分でタイプしてね。'}`; }
-  function flash(text) { const fb = $('.kcc-feedback'); if (fb) { fb.className = 'kcc-feedback'; fb.textContent = text; } }
+
+  /* ── On-screen keyboard (Pass 5) ───────────────────────────────────── */
+  function keysHTML() {
+    const key = (k, label, cls, aria) =>
+      `<button type="button" class="kcc-key${cls ? ` ${cls}` : ''}" data-k="${esc(k)}"${aria ? ` aria-label="${aria}"` : ''}>${label}</button>`;
+    const rows = KEY_ROWS.map(row => `<div class="kcc-row">${row.split('').map(ch => key(ch, ch)).join('')}</div>`).join('');
+    const back = '<svg width="30" height="22" viewBox="0 0 30 22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M10 2h17a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H10L2 11z"/><path d="M14 7l8 8M22 7l-8 8"/></svg>';
+    return `${rows}<div class="kcc-row">${
+      key("'", '&#39;', 'is-mark', 'apostrophe')}${
+      key('-', '-', 'is-mark', 'hyphen')}${
+      key(' ', 'space', 'is-space', 'space')}${
+      key('back', back, 'is-back', 'backspace')}${
+      key('ok', 'OK<small lang="ja">けってい</small>', 'is-ok', 'OK')}</div>`;
+  }
+
+  // Taps act on pointerdown (fast, no 300 ms wait, no focus, no zoom or text
+  // selection). iPads without Pointer Events (iOS 12) use touchstart; its
+  // preventDefault also stops the emulated mouse and click. A focused key
+  // activated from a keyboard or switch control arrives as a click with
+  // detail 0.
+  function wireKeys() {
+    const keys = $('.kcc-keys');
+    const press = e => {
+      const btn = e.target && e.target.closest ? e.target.closest('.kcc-key') : null;
+      if (!btn) return;
+      if (e.cancelable) e.preventDefault();
+      tapKey(btn.getAttribute('data-k'), btn);
+    };
+    if (window.PointerEvent) keys.addEventListener('pointerdown', press);
+    else {
+      keys.addEventListener('touchstart', press, { passive: false });
+      keys.addEventListener('mousedown', press);
+    }
+    keys.addEventListener('click', e => { if (e.detail === 0) press(e); });
+  }
+
+  function keyButton(k) {
+    return Array.prototype.find.call(root.querySelectorAll('.kcc-key'), b => b.getAttribute('data-k') === k) || null;
+  }
+
+  function tapKey(k, btn) {
+    if (!run || run.phase !== 'type') return;
+    if (btn) {
+      btn.classList.add('is-down');
+      clearTimeout(btn.upTimer);
+      btn.upTimer = setTimeout(() => btn.classList.remove('is-down'), 110);
+    }
+    if (k === 'ok') return submit();
+    if (k === 'back') run.typed = run.typed.slice(0, -1);
+    else if (run.typed.length < MAX_TYPED) run.typed += k;
+    sfx2('keyTap', k === 'back' ? 'back' : '');
+    showTyped();
+  }
+
+  // A physical keyboard (teacher Mac, iPad keyboard case) types the same keys.
+  function onKeydown(e) {
+    if (!run || e.metaKey || e.ctrlKey || e.altKey) return;
+    const live = run.phase === 'show' || run.phase === 'fade' || run.phase === 'type';
+    if (!live) return;
+    const key = e.key;
+    let k = null;
+    if (key === 'Enter') k = 'ok';
+    else if (key === 'Backspace') k = 'back';
+    else if (key === ' ' || key === 'Spacebar') k = ' ';
+    else if (key === '-' || key === "'") k = key;
+    else if (key === '’') k = "'";
+    else if (key && key.length === 1 && /[a-z]/i.test(key)) k = key.toLowerCase();
+    if (k === null) return;
+    e.preventDefault();                       // never scroll, never press a focused button
+    if (run.phase === 'type') tapKey(k, keyButton(k));
+  }
+
+  function showTyped() {
+    const box = $('.kcc-typed');
+    if (!box) return;
+    const typed = (run && run.typed) || '';
+    box.textContent = typed;
+    const n = typed.length;
+    box.style.fontSize = n > 26 ? '17px' : n > 16 ? '22px' : '';
+  }
+
+  function mode(name) {
+    const stage = $('.kcc-stage');
+    if (stage) stage.className = `kcc-stage is-${name}`;
+  }
 
   // Results are kept on screen: the save clears the attempt the moment the
   // tenth answer lands, but the dots should still show the whole run.
@@ -198,7 +330,7 @@
     });
   }
 
-  /* ── Phase timer with pause (meter animates transform only) ────────── */
+  /* ── Phase timer with pause (meter and ring animate transform only) ── */
   function startPhase(name, ms, onEnd) {
     run.phase = name;
     run.phaseMs = ms;
@@ -217,22 +349,66 @@
       bar.style.transform = 'scaleX(0)';
     }
   }
+  // The reading countdown: the ring closes in on the number (scale 1 → 0.55).
+  const RING_MIN = 0.55;
+  function ringTo(fraction, ms) {
+    const ring = $('.kcc-ring');
+    if (!ring) return;
+    const scale = f => (RING_MIN + (1 - RING_MIN) * Math.max(0, Math.min(1, f))).toFixed(3);
+    ring.style.transition = 'none';
+    ring.style.transform = `scale(${scale(fraction)})`;
+    if (ms > 0) {
+      void ring.offsetWidth;
+      ring.style.transition = `transform ${Math.round(ms)}ms linear`;
+      ring.style.transform = `scale(${scale(0)})`;
+    }
+  }
+  /** Look time still to go (the fade is the last part of it). */
+  function lookLeft() {
+    if (!run || (run.phase !== 'show' && run.phase !== 'fade')) return 0;
+    const ran = run.phaseStartedAt ? performance.now() - run.phaseStartedAt : 0;
+    const left = Math.max(0, run.phaseLeft - ran);
+    return run.phase === 'show' ? left + run.fade : left;
+  }
+  function clockTick() {
+    const n = Math.max(1, Math.ceil(lookLeft() / 1000));
+    if (n === run.clockN) return;
+    run.clockN = n;
+    const num = $('.kcc-clock b');
+    if (!num) return;
+    num.textContent = String(n);
+    num.classList.remove('is-pop');
+    void num.offsetWidth;
+    num.classList.add('is-pop');
+    sfx2('cardTick', n);
+  }
+  function stopClock() { clearInterval(run.clockTimer); run.clockTimer = 0; }
   function resumePhase() {
     clearTimeout(run.timer);
     run.phaseStartedAt = performance.now();
-    if (run.phase !== 'fade') meterTo(run.phaseLeft / run.phaseMs, run.phaseLeft);
+    if (run.phase === 'type') meterTo(run.phaseLeft / run.phaseMs, run.phaseLeft);
+    if (run.phase === 'show') ringTo((run.phaseLeft + run.fade) / run.lookMs, run.phaseLeft + run.fade);
+    if (run.phase === 'show' || run.phase === 'fade') {
+      stopClock();
+      clockTick();
+      run.clockTimer = setInterval(clockTick, 100);
+    }
     run.timer = setTimeout(() => { const end = run.onEnd; run.onEnd = null; if (end) end(); }, run.phaseLeft);
   }
   function pausePhase() {
     clearTimeout(run.timer);
+    stopClock();
     run.phaseLeft = Math.max(0, run.phaseLeft - (performance.now() - run.phaseStartedAt));
-    if (run.phase !== 'fade') meterTo(run.phaseLeft / run.phaseMs, 0);
+    run.phaseStartedAt = 0;
+    if (run.phase === 'type') meterTo(run.phaseLeft / run.phaseMs, 0);
+    if (run.phase === 'show') ringTo((run.phaseLeft + run.fade) / run.lookMs, 0);
   }
 
   /* ── Rounds ────────────────────────────────────────────────────────── */
   function wordSize(word) {
     const len = Math.max(3, String(word).length);
-    return Math.max(26, Math.min(64, Math.floor((Math.min(window.innerWidth, 900) * 0.86) / (len * 0.62))));
+    const fit = Math.floor((Math.min(window.innerWidth, 1000) * 0.86) / (len * 0.62));
+    return Math.max(26, Math.min(84, Math.floor(window.innerHeight * 0.2), fit));
   }
 
   function nextRound() {
@@ -240,12 +416,16 @@
     const got = K().begin();
     if (!got || !got.ok || !got.word) return got && got.error === 'noAttempt' ? ended(got.expired) : ended();
     run.word = got.word.en;
+    run.typed = '';
+    run.clockN = 0;
     dots();
-    const input = $('.kcc-input');
-    input.value = '';
-    input.disabled = false;
-    flash('');
-    $('.kcc-label').textContent = 'LOOK · みて';
+    showTyped();
+    $('.kcc-answer').className = 'kcc-answer';
+    const fb = $('.kcc-feedback');
+    fb.className = 'kcc-feedback';
+    fb.textContent = '';
+    mode('read');
+    $('.kcc-label').innerHTML = `Read and remember! · <span lang="ja">${jp('よんで おぼえよう!', '読んで覚えよう!', { '読': 'よ', '覚': 'おぼ' })}</span>`;
     const wordEl = $('.kcc-word');
     wordEl.classList.remove('is-gone');
     wordEl.style.fontSize = `${wordSize(run.word)}px`;
@@ -253,9 +433,11 @@
     const step = Math.min(120, (look * 0.35) / Math.max(1, run.word.length));
     wordEl.innerHTML = run.word.split('').map((ch, i) =>
       `<span style="animation-delay:${Math.round(i * step)}ms">${ch === ' ' ? '&nbsp;' : esc(ch)}</span>`).join('');
-    // The look meter spans the whole look time; the word's fade is its last
+    // The countdown spans the whole look time; the word's fade is its last
     // FADE_MS, so nothing is visible once typing starts.
     const fade = still() ? 0 : FADE_MS;
+    run.lookMs = look;
+    run.fade = fade;
     run.phase = 'show';
     run.phaseMs = look;
     run.phaseLeft = look - fade;
@@ -265,16 +447,15 @@
       startPhase('fade', fade, typePhase);
     };
     resumePhase();
-    meterTo(1, look);
   }
 
   function typePhase() {
-    const wordEl = $('.kcc-word');
-    wordEl.classList.add('is-gone');
-    $('.kcc-label').textContent = 'TYPE IT · かいて';
-    const input = $('.kcc-input');
-    input.value = '';
-    try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); }
+    stopClock();
+    $('.kcc-word').classList.add('is-gone');
+    run.typed = '';
+    showTyped();
+    mode('type');
+    $('.kcc-label').innerHTML = `Now type it! · <span lang="ja">タイプしよう!</span>`;
     startPhase('type', K().typeMs(run.word, opts.curriculum), submit);
   }
 
@@ -283,13 +464,14 @@
     clearTimeout(run.timer);
     run.phase = 'feedback';
     meterTo(0, 0);
-    const input = $('.kcc-input');
-    const r = K().answer(input.value);
+    const r = K().answer(run.typed);
     if (!r || !r.ok) return r && r.error === 'noAttempt' ? ended(r.expired) : saveProblem();
     run.results.push(!!r.correct);
+    mode('done');
     const wordEl = $('.kcc-word');
     wordEl.classList.remove('is-gone');
     wordEl.textContent = r.word.en;
+    $('.kcc-answer').className = `kcc-answer ${r.correct ? 'is-ok' : 'is-miss'}`;
     const fb = $('.kcc-feedback');
     if (r.verdict === 'exact') { fb.className = 'kcc-feedback is-ok'; fb.textContent = 'Right! · せいかい!'; sfx('correct'); }
     else if (r.verdict === 'near') { fb.className = 'kcc-feedback is-ok'; fb.textContent = 'Almost — one letter off, it counts! · おしい! OK!'; sfx('correct'); }
@@ -315,6 +497,7 @@
 
   function interrupted(r) {
     clearTimeout(run.timer);
+    stopClock();
     run.phase = 'paused';
     meterTo(0, 0);
     if (!r || !r.ok) return r && r.error === 'noAttempt' ? ended(r.expired) : saveProblem();
@@ -327,12 +510,13 @@
       miss
         ? `You left during a round again, so it counts as a miss.<br><span class="kcc-jp" lang="ja">${jp('また とちゅうで ぬけたので、この もんだいは ×に なるよ。', 'また途中でぬけたので、この問題は×になるよ。', { '途中': 'とちゅう', '問題': 'もんだい' })}</span>`
         : `No problem — it doesn't count. Here is a fresh word.<br><span class="kcc-jp" lang="ja">${jp('だいじょうぶ、×には ならないよ。あたらしい ことばで もういちど!', '大丈夫、×にはならないよ。新しいことばでもう一度!', { '大丈夫': 'だいじょうぶ', '新': 'あたら', '一度': 'いちど' })}</span>`,
-      [{ label: 'Continue', jp: 'つづける', go: () => { shell(); dots(); nextRound(); focusInput(); } }]);
+      [{ label: 'Continue', jp: 'つづける', go: () => { shell(); dots(); nextRound(); } }]);
   }
 
   function leave() {
     if (run && (run.phase === 'show' || run.phase === 'fade' || run.phase === 'type')) {
       clearTimeout(run.timer);
+      stopClock();
       try { K().interrupt(); } catch (_) {}
     }
     close();
@@ -341,6 +525,7 @@
   /* ── Panels and endings ────────────────────────────────────────────── */
   function showPanel(title, html, buttons) {
     const stage = $('.kcc-stage') || root;
+    if (stage !== root) stage.className = 'kcc-stage';   // panels show in every round state
     stage.innerHTML = `<div class="kcc-panel"><h2 style="color:${accent()}">${esc(title)}</h2><p>${html}</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">${buttons.map((b, i) =>
         `<button type="button" class="kcc-btn${b.quiet ? ' is-quiet' : ''}" data-i="${i}" ${b.quiet ? '' : `style="background:${accent()}"`}>${esc(b.label)}<small lang="ja">${esc(b.jp)}</small></button>`).join('')}</div></div>`;
@@ -348,7 +533,6 @@
     const first = stage.querySelector('.kcc-btn');
     if (first) first.focus({ preventScroll: true });
   }
-  function focusInput() { const input = $('.kcc-input'); if (input) { try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); } } }
 
   function saveProblem() {
     run.phase = 'done';
@@ -490,19 +674,18 @@
   /* ── Open / close ──────────────────────────────────────────────────── */
   /**
    * o: { mode: 'start' | 'continue', name, nameJP, furigana, kind, curriculum, onClose }
-   * Must be called from a tap so iOS raises the keyboard.
+   * Uses its own on-screen keyboard, so no system keyboard is ever raised.
    */
   async function open(o) {
     if (!K()) return;
     build();
     opts = o || {};
-    run = { phase: 'loading', timer: 0, hiddenAt: 0, results: savedResults() };
+    run = { phase: 'loading', timer: 0, clockTimer: 0, hiddenAt: 0, typed: '', results: savedResults() };
     root.className = 'is-open' + (still() ? ' kcc-still' : '');
     shell();
-    focusInput();                      // inside the tap: keyboard comes up now
     document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('keydown', onKeydown);
     $('.kcc-label').textContent = 'GETTING WORDS READY · じゅんびちゅう';
-    $('.kcc-input').disabled = false;
 
     if (opts.mode === 'continue') {
       const r = K().resume();
@@ -532,9 +715,10 @@
 
   function close() {
     clearReveal();
-    if (run) clearTimeout(run.timer);
+    if (run) { clearTimeout(run.timer); stopClock(); }
     run = null;
     document.removeEventListener('visibilitychange', onVisibility);
+    document.removeEventListener('keydown', onKeydown);
     if (root) { root.className = ''; root.innerHTML = ''; }
     const done = opts && opts.onClose;
     opts = null;

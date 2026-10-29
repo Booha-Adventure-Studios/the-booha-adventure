@@ -533,6 +533,12 @@
       noiseSweep({ type: 'bandpass', from: 700, to: 2600, q: 0.9, gain: 0.05, dur: 0.26, attack: 0.12 });
       tone(1320, { type: 'sine', gain: 0.022, dur: 0.05, delay: 0.2 });
     },
+    /* Karasuki Cards on-screen keyboard (Pass 5): a tiny, light click per
+       key; backspace answers a little lower. Quieter than buttonPress on
+       purpose because it fires with every letter. */
+    keyTap: function (kind) {
+      tone(kind === 'back' ? 760 : 1250, { type: 'triangle', gain: 0.02, dur: 0.028 });
+    },
     /* One tick per point as "Words recalled" counts up. */
     cardTick: function (step) {
       tone(900 + (step || 0) * 60, { type: 'sine', gain: 0.018, dur: 0.035 });
