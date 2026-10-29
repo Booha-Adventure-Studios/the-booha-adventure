@@ -28,48 +28,34 @@ const fn = (src, name) => {
   throw new Error(`unterminated ${name}`);
 };
 
-/* Pass 5: no system keyboard — a custom on-screen keyboard, no text input */
+/* Pass 5: no system keyboard — the shared on-screen keyboard, no text input */
 assert.ok(!/<input\b|<textarea\b|contenteditable/i.test(c), 'no text input anywhere: the iPad keyboard, QuickType and autofill never appear');
-assert.ok(!/\.focus\(\{ preventScroll: true \}\);[^\n]*kcc-input|focusInput/.test(c), 'the old keyboard-focus workaround is gone');
-const rows = c.match(/const KEY_ROWS = \[([^\]]*)\]/)[1].match(/'([a-z]+)'/g).map(r => r.slice(1, -1));
-assert.deepStrictEqual(rows.join('').split('').sort().join(''), 'abcdefghijklmnopqrstuvwxyz', 'all 26 letters, once each');
-assert.strictEqual(rows[0], 'qwertyuiop', 'QWERTY order');
-const keys = fn(c, 'keysHTML');
-for (const [k, aria] of [["\"'\"", 'apostrophe'], ["'-'", 'hyphen'], ["' '", 'space'], ["'back'", 'backspace'], ["'ok'", 'OK']]) {
-  assert.ok(keys.includes(`key(${k},`) && keys.includes(`'${aria}')`), `bottom row has ${aria} with an aria-label`);
-}
-assert.match(keys, /<button type="button" class="kcc-key/, 'keys are real buttons');
+assert.ok(!/focusInput|kcc-input/.test(c), 'the old keyboard-focus workaround is gone');
+const html = read('karasuki.html');
+assert.ok(html.indexOf('js/booha-keys.js') > 0 && html.indexOf('js/booha-keys.js') < html.indexOf('js/karasuki-card-challenge.js'), 'karasuki.html loads the shared keyboard before the challenge');
+const sh = fn(c, 'shell');
+assert.match(sh, /keys = window\.BoohaKeys\.create\(\{\s*className: 'kcc-keys',\s*marks: \["'", '-'\],\s*okHTML: 'OK<small lang="ja">けってい<\/small>',\s*onKey,\s*\}\);/, 'Karasuki keyboard: apostrophe, hyphen, OK けってい');
+assert.match(sh, /\$\('\.kcc-stage'\)\.appendChild\(keys\.el\)/);
 const tint = c.match(/const KEYS_TINT = \{([\s\S]*?)\n  \};/)[1];
 for (const kind of ['friendly', 'mischievous', 'dangerous']) assert.match(tint, new RegExp(`${kind}: \\{ kc: '#[0-9A-F]{6}', kd: '#[0-9A-F]{6}', cap: '#[0-9A-F]{6}', cap2: '#[0-9A-F]{6}' \\}`), `${kind} keyboard tint`);
 assert.match(tint, /friendly: \{ kc: '#F2C14E'/);
 assert.match(tint, /mischievous: \{ kc: '#FF8AD0', kd: '#A64BD6'/);
 assert.match(tint, /dangerous: \{ kc: '#FF6B74', kd: '#C3303B'/);
-const wire = fn(c, 'wireKeys');
-assert.match(wire, /if \(window\.PointerEvent\) keys\.addEventListener\('pointerdown', press\);/, 'taps act on pointerdown');
-assert.match(wire, /addEventListener\('touchstart', press, \{ passive: false \}\)/, 'iOS 12 fallback: touchstart');
-assert.match(wire, /if \(e\.cancelable\) e\.preventDefault\(\);/, 'no focus, zoom or selection from a tap');
-assert.match(wire, /e\.detail === 0/, 'a focused key still works from a keyboard or switch control');
-const tap = fn(c, 'tapKey');
-assert.match(tap, /if \(!run \|\| run\.phase !== 'type'\) return;/, 'keys only type during TYPE');
-assert.match(tap, /if \(k === 'ok'\) return submit\(\);/);
-assert.match(tap, /run\.typed\.length < MAX_TYPED/);
-assert.match(tap, /sfx2\('keyTap'/, 'each key clicks');
+assert.match(sh, /--kc:\$\{tint\.kc\};--kd:\$\{tint\.kd\};--cap:\$\{tint\.cap\};--cap2:\$\{tint\.cap2\}/, 'the kind tint reaches the keyboard through CSS variables');
+const ok = fn(c, 'onKey');
+assert.match(ok, /if \(!run \|\| run\.phase !== 'type'\) return false;/, 'keys only type during TYPE');
+assert.match(ok, /if \(k === 'ok'\) \{ submit\(\); return true; \}/);
+assert.match(ok, /run\.typed\.length < MAX_TYPED/);
 const kd = fn(c, 'onKeydown');
-assert.match(kd, /e\.metaKey \|\| e\.ctrlKey \|\| e\.altKey\) return;/, 'shortcuts (Cmd+V paste) are ignored');
-for (const k of ["key === 'Enter'", "key === 'Backspace'", "key === ' '", "key === '-' || key === \"'\""]) assert.ok(kd.includes(k), `physical keyboard: ${k}`);
+assert.match(kd, /const k = keys\.keyFromEvent\(e\);/, 'physical keys map through the shared keyboard (shortcuts like Cmd+V are never keys)');
 assert.match(kd, /e\.preventDefault\(\);/);
-assert.match(kd, /if \(run\.phase === 'type'\) tapKey\(k, keyButton\(k\)\);/, 'physical keys only type during TYPE');
+assert.match(kd, /if \(run\.phase === 'type'\) keys\.tap\(k\);/, 'physical keys only type during TYPE');
 assert.match(fn(c, 'open'), /document\.addEventListener\('keydown', onKeydown\)/);
 assert.match(fn(c, 'close'), /document\.removeEventListener\('keydown', onKeydown\)/);
 assert.match(fn(c, 'submit'), /K\(\)\.answer\(run\.typed\)/, 'the typed keys are what gets checked');
-/* Touch-friendly keys: ≥44 px tall everywhere a student plays, no zoom, no selection or callout */
 const cssAll = c.slice(c.indexOf('style.textContent = `'), c.indexOf('`;', c.indexOf('style.textContent = `')));
-const keysRule = cssAll.match(/#kcc \.kcc-keys\{([^}]*)\}/)[1];
-for (const prop of ['touch-action:manipulation', 'user-select:none', '-webkit-touch-callout:none']) assert.ok(keysRule.includes(prop), `keyboard has ${prop}`);
-assert.match(keysRule, /--kh:56px/);
-const shortScreen = cssAll.match(/@media \(max-height:500px\)\{([\s\S]*?)\n\}/)[1];
-assert.match(shortScreen, /--kh:44px/, 'phone landscape keys stay 44 px');
-assert.match(cssAll, /#kcc \.kcc-key\{[^}]*height:var\(--kh\)/);
+assert.match(cssAll, /#kcc \.kcc-keys\{width:min\(800px,100%\);margin-top:auto\}/, 'layout only: keycaps live in js/booha-keys.js');
+assert.ok(!/\.kcc-key\b|\.bk-key/.test(cssAll), 'no keycap styles duplicated here');
 /* Reading screen vs typing screen */
 assert.match(cssAll, /#kcc \.kcc-stage\.is-read \.kcc-meter,#kcc \.kcc-stage\.is-read \.kcc-answer,#kcc \.kcc-stage\.is-read \.kcc-keys/, 'the reading screen never shows the keyboard, answer box or bar');
 assert.match(cssAll, /#kcc \.kcc-stage\.is-type \.kcc-word,#kcc \.kcc-stage\.is-type \.kcc-clock/, 'the typing screen hides the word and the countdown');
