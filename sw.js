@@ -125,7 +125,9 @@ const CURRENT_CACHES = {
   // winter lights on index.html, and the maze frost border.
   // Grimmerglen Pass G1: shared on-screen keyboard js/booha-keys.js;
   // karasuki.html loads it before the card challenge.
-  pages:  'booha-pages-2026-507',
+  // Grimmerglen Pass G2: grimmerglen.html loads js/booha-keys.js; Marietta's
+  // typing uses the on-screen keyboard instead of the iPad keyboard.
+  pages:  'booha-pages-2026-508',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

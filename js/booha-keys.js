@@ -13,7 +13,9 @@
  *     marks: ["'", '-'],                // punctuation keys before space
  *     okHTML: 'OK<small lang="ja">けってい</small>',
  *     onKey: k => true,                 // a letter, a mark, ' ', 'back' or 'ok';
- *   });                                 // return false to ignore the key
+ *                                       // return false to ignore the key
+ *     repeatBack: false,                // hold backspace to keep deleting
+ *   });
  *   host.appendChild(keys.el);
  *   keys.tap(k);                        // press a key from code (physical keys)
  *   keys.keyFromEvent(keydownEvent);    // → a key on this keyboard, or null
@@ -32,6 +34,8 @@
   'use strict';
 
   const ROWS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+  const REPEAT_WAIT = 450;     // ms before a held backspace starts repeating
+  const REPEAT_EVERY = 75;     // ms between repeats
   const MARK_LABELS = { "'": 'apostrophe', '-': 'hyphen', ',': 'comma', '.': 'period', '?': 'question mark', '!': 'exclamation mark' };
   const BACK_SVG = '<svg width="30" height="22" viewBox="0 0 30 22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M10 2h17a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H10L2 11z"/><path d="M14 7l8 8M22 7l-8 8"/></svg>';
 
@@ -93,7 +97,7 @@
   }
 
   function create(o) {
-    const opts = Object.assign({ className: '', marks: ["'", '-'], okHTML: 'OK', label: 'Keyboard', onKey: null, sound: true }, o || {});
+    const opts = Object.assign({ className: '', marks: ["'", '-'], okHTML: 'OK', label: 'Keyboard', onKey: null, sound: true, repeatBack: false }, o || {});
     injectStyles();
     const el = document.createElement('div');
     el.className = `bk-keys${opts.className ? ` ${opts.className}` : ''}${still() ? ' bk-still' : ''}`;
@@ -128,11 +132,25 @@
     // its preventDefault also stops the emulated mouse and click. A focused
     // key activated from a keyboard or switch control arrives as a click
     // with detail 0.
+    // Holding backspace (repeatBack) deletes once, waits REPEAT_WAIT, then
+    // keeps deleting every REPEAT_EVERY until the finger lifts.
+    let repeatWait = 0, repeatEvery = 0;
+    const stopRepeat = () => { clearTimeout(repeatWait); clearInterval(repeatEvery); repeatWait = 0; repeatEvery = 0; };
+    const UP_EVENTS = ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseup', 'blur'];
+    if (opts.repeatBack) UP_EVENTS.forEach(t => window.addEventListener(t, stopRepeat));
+
     const press = e => {
       const btn = e.target && e.target.closest ? e.target.closest('.bk-key') : null;
       if (!btn || !el.contains(btn)) return;
       if (e.cancelable) e.preventDefault();
-      tap(btn.getAttribute('data-k'), btn);
+      const k = btn.getAttribute('data-k');
+      stopRepeat();
+      const typed = tap(k, btn);
+      if (typed && opts.repeatBack && k === 'back' && e.type !== 'click') {
+        repeatWait = setTimeout(() => {
+          repeatEvery = setInterval(() => { if (!tap('back', btn)) stopRepeat(); }, REPEAT_EVERY);
+        }, REPEAT_WAIT);
+      }
     };
     if (window.PointerEvent) el.addEventListener('pointerdown', press);
     else {
@@ -145,7 +163,11 @@
       el,
       tap: k => tap(k),
       keyFromEvent: e => keyFor(e, opts.marks),
-      destroy() { if (el.parentNode) el.parentNode.removeChild(el); },
+      destroy() {
+        stopRepeat();
+        if (opts.repeatBack) UP_EVENTS.forEach(t => window.removeEventListener(t, stopRepeat));
+        if (el.parentNode) el.parentNode.removeChild(el);
+      },
     };
   }
 

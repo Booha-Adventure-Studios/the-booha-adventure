@@ -1951,6 +1951,13 @@ else
   bad "Shared keyboard audit failed"
 fi
 
+echo "[grimmerglen] On-screen keyboard audit (Pass G2)"
+if node tests/grimmerglen-keys-audit.cjs >/dev/null 2>&1; then
+  ok "Grimmerglen typing: on-screen keys, comma-safe grading, display capitals, dock + panel inset pass"
+else
+  bad "Grimmerglen on-screen keyboard audit failed"
+fi
+
 echo "[karasuki] Karasuki Cards Pass 2c challenge audit"
 if node tests/karasuki-card-challenge-audit.cjs >/dev/null 2>&1; then
   ok "Karasuki card challenge: on-screen keyboard, countdown, timers, interruptions, reveal, motion, wiring pass"
