@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 /*
- * Karasuki Cards Pass 2c — challenge screen contracts: input friction, both
+ * Karasuki Cards Pass 2c/5 — challenge screen contracts: the on-screen
+ * keyboard (Pass 5), the reading countdown, both
  * timers, timeout submits, interruption grace + policy, Leave, iPad keyboard
  * focus, reveal with the shared face, motion rules, and Karasuki wiring.
  * (Full play-throughs are checked in the browser; see the pass notes.)
@@ -27,22 +28,72 @@ const fn = (src, name) => {
   throw new Error(`unterminated ${name}`);
 };
 
-/* Input friction */
-for (const attr of ['autocomplete="off"', 'autocorrect="off"', 'autocapitalize="off"', 'spellcheck="false"', 'enterkeyhint="done"']) {
-  assert.ok(c.includes(attr), `input has ${attr}`);
+/* Pass 5: no system keyboard — a custom on-screen keyboard, no text input */
+assert.ok(!/<input\b|<textarea\b|contenteditable/i.test(c), 'no text input anywhere: the iPad keyboard, QuickType and autofill never appear');
+assert.ok(!/\.focus\(\{ preventScroll: true \}\);[^\n]*kcc-input|focusInput/.test(c), 'the old keyboard-focus workaround is gone');
+const rows = c.match(/const KEY_ROWS = \[([^\]]*)\]/)[1].match(/'([a-z]+)'/g).map(r => r.slice(1, -1));
+assert.deepStrictEqual(rows.join('').split('').sort().join(''), 'abcdefghijklmnopqrstuvwxyz', 'all 26 letters, once each');
+assert.strictEqual(rows[0], 'qwertyuiop', 'QWERTY order');
+const keys = fn(c, 'keysHTML');
+for (const [k, aria] of [["\"'\"", 'apostrophe'], ["'-'", 'hyphen'], ["' '", 'space'], ["'back'", 'backspace'], ["'ok'", 'OK']]) {
+  assert.ok(keys.includes(`key(${k},`) && keys.includes(`'${aria}')`), `bottom row has ${aria} with an aria-label`);
 }
-assert.match(c, /addEventListener\('paste', reject\)/);
-assert.match(c, /addEventListener\('drop', reject\)/);
-assert.match(c, /insertFromPaste/);
-assert.match(c, /if \(run && run\.phase !== 'type'\) input\.value = '';/, 'typing during SHOW is discarded');
-assert.match(c, /font:700 24px/, 'input text ≥16px so iOS does not zoom');
+assert.match(keys, /<button type="button" class="kcc-key/, 'keys are real buttons');
+const tint = c.match(/const KEYS_TINT = \{([\s\S]*?)\n  \};/)[1];
+for (const kind of ['friendly', 'mischievous', 'dangerous']) assert.match(tint, new RegExp(`${kind}: \\{ kc: '#[0-9A-F]{6}', kd: '#[0-9A-F]{6}', cap: '#[0-9A-F]{6}', cap2: '#[0-9A-F]{6}' \\}`), `${kind} keyboard tint`);
+assert.match(tint, /friendly: \{ kc: '#F2C14E'/);
+assert.match(tint, /mischievous: \{ kc: '#FF8AD0', kd: '#A64BD6'/);
+assert.match(tint, /dangerous: \{ kc: '#FF6B74', kd: '#C3303B'/);
+const wire = fn(c, 'wireKeys');
+assert.match(wire, /if \(window\.PointerEvent\) keys\.addEventListener\('pointerdown', press\);/, 'taps act on pointerdown');
+assert.match(wire, /addEventListener\('touchstart', press, \{ passive: false \}\)/, 'iOS 12 fallback: touchstart');
+assert.match(wire, /if \(e\.cancelable\) e\.preventDefault\(\);/, 'no focus, zoom or selection from a tap');
+assert.match(wire, /e\.detail === 0/, 'a focused key still works from a keyboard or switch control');
+const tap = fn(c, 'tapKey');
+assert.match(tap, /if \(!run \|\| run\.phase !== 'type'\) return;/, 'keys only type during TYPE');
+assert.match(tap, /if \(k === 'ok'\) return submit\(\);/);
+assert.match(tap, /run\.typed\.length < MAX_TYPED/);
+assert.match(tap, /sfx2\('keyTap'/, 'each key clicks');
+const kd = fn(c, 'onKeydown');
+assert.match(kd, /e\.metaKey \|\| e\.ctrlKey \|\| e\.altKey\) return;/, 'shortcuts (Cmd+V paste) are ignored');
+for (const k of ["key === 'Enter'", "key === 'Backspace'", "key === ' '", "key === '-' || key === \"'\""]) assert.ok(kd.includes(k), `physical keyboard: ${k}`);
+assert.match(kd, /e\.preventDefault\(\);/);
+assert.match(kd, /if \(run\.phase === 'type'\) tapKey\(k, keyButton\(k\)\);/, 'physical keys only type during TYPE');
+assert.match(fn(c, 'open'), /document\.addEventListener\('keydown', onKeydown\)/);
+assert.match(fn(c, 'close'), /document\.removeEventListener\('keydown', onKeydown\)/);
+assert.match(fn(c, 'submit'), /K\(\)\.answer\(run\.typed\)/, 'the typed keys are what gets checked');
+/* Touch-friendly keys: ≥44 px tall everywhere a student plays, no zoom, no selection or callout */
+const cssAll = c.slice(c.indexOf('style.textContent = `'), c.indexOf('`;', c.indexOf('style.textContent = `')));
+const keysRule = cssAll.match(/#kcc \.kcc-keys\{([^}]*)\}/)[1];
+for (const prop of ['touch-action:manipulation', 'user-select:none', '-webkit-touch-callout:none']) assert.ok(keysRule.includes(prop), `keyboard has ${prop}`);
+assert.match(keysRule, /--kh:56px/);
+const shortScreen = cssAll.match(/@media \(max-height:500px\)\{([\s\S]*?)\n\}/)[1];
+assert.match(shortScreen, /--kh:44px/, 'phone landscape keys stay 44 px');
+assert.match(cssAll, /#kcc \.kcc-key\{[^}]*height:var\(--kh\)/);
+/* Reading screen vs typing screen */
+assert.match(cssAll, /#kcc \.kcc-stage\.is-read \.kcc-meter,#kcc \.kcc-stage\.is-read \.kcc-answer,#kcc \.kcc-stage\.is-read \.kcc-keys/, 'the reading screen never shows the keyboard, answer box or bar');
+assert.match(cssAll, /#kcc \.kcc-stage\.is-type \.kcc-word,#kcc \.kcc-stage\.is-type \.kcc-clock/, 'the typing screen hides the word and the countdown');
+const nr = fn(c, 'nextRound');
+assert.match(nr, /mode\('read'\);/);
+assert.match(nr, /Read and remember! · /);
+assert.ok(!/meterTo\(/.test(nr), 'reading uses the countdown ring, not the bar');
+const tp = fn(c, 'typePhase');
+assert.match(tp, /stopClock\(\);/);
+assert.match(tp, /mode\('type'\);/);
+assert.match(tp, /Now type it! · /);
+const rp = fn(c, 'resumePhase');
+assert.match(rp, /if \(run\.phase === 'type'\) meterTo\(/, 'the bar belongs to typing');
+assert.match(rp, /if \(run\.phase === 'show'\) ringTo\(/, 'the ring belongs to reading');
+assert.match(fn(c, 'pausePhase'), /stopClock\(\);/, 'the countdown pauses with the round');
+assert.match(fn(c, 'ringTo'), /transform/);
+assert.match(fn(c, 'clockTick'), /Math\.ceil\(lookLeft\(\) \/ 1000\)/, '3·2·1 counts whole seconds of look time');
+assert.match(read('js/utsu-sfx.js'), /keyTap: function/);
 
 /* Both timers come from the rules; the type timer submits what was typed */
 assert.match(fn(c, 'nextRound'), /K\(\)\.lookMs\(run\.word, opts\.curriculum\)/);
 assert.match(fn(c, 'nextRound'), /run\.phaseLeft = look - fade;/, 'the fade happens inside the look time');
 assert.match(fn(c, 'nextRound'), /startPhase\('fade', fade, typePhase\)/);
 assert.match(fn(c, 'typePhase'), /startPhase\('type', K\(\)\.typeMs\(run\.word, opts\.curriculum\), submit\)/);
-assert.match(fn(c, 'submit'), /K\(\)\.answer\(input\.value\)/);
 
 /* Interruptions: grace, pause/resume, policy from the rules module */
 assert.match(c, /const GRACE_MS = 2000;/);
@@ -55,10 +106,6 @@ assert.match(fn(c, 'close'), /document\.removeEventListener\('visibilitychange',
 assert.match(fn(c, 'leave'), /run\.phase === 'show' \|\| run\.phase === 'fade' \|\| run\.phase === 'type'/, 'Leave only interrupts a live round');
 assert.match(fn(c, 'open'), /const r = K\(\)\.resume\(\);/, 'Continue uses resume (mid-round: interruption; between rounds: free)');
 assert.match(fn(c, 'nextRound'), /K\(\)\.begin\(\)/, 'each round is marked live before the word shows');
-
-/* iPad keyboard: focus inside the tap, before any await */
-const openSrc = fn(c, 'open');
-assert.ok(openSrc.indexOf('focusInput();') > 0 && openSrc.indexOf('focusInput();') < openSrc.indexOf('await '), 'input focused before the first await');
 
 /* Reveal: shared face, face down first, flip, reduced-motion crossfade */
 const rev = fn(c, 'reveal');
@@ -110,6 +157,11 @@ for (const m of css.matchAll(/transition:([^;}]+)/g)) {
 }
 const kf = css.match(/@keyframes kcc-in\{([^}]*\})\}/);
 assert.ok(kf && /^to\{opacity:1;transform:none\}$/.test(kf[1]), 'letter animation is opacity/transform');
+for (const m of css.matchAll(/@keyframes ([\w-]+)\{((?:[^{}]*\{[^}]*\})*)\}/g)) {
+  for (const decl of m[2].matchAll(/\{([^}]*)\}/g)) {
+    decl[1].split(';').filter(Boolean).forEach(d => assert.ok(/^(opacity|transform):/.test(d.trim()), `@keyframes ${m[1]} animates ${d}`));
+  }
+}
 assert.match(fn(c, 'meterTo'), /transform/);
 assert.ok(!/\(\?<[=!]/.test(c), 'no regex lookbehind');
 assert.match(fn(c, 'still'), /data-motion/);
