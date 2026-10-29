@@ -1420,6 +1420,7 @@ const JUKU_TREE_IW = 78;
 const MONTH_COLORS = window.BoohaSkins.MONTH_COLORS;
 const HALLOWEEN_SEASON = window.BoohaSkins.getSeason('halloween');
 const HALLOWEEN_GLOW = window.BoohaSkins.getSeason('halloween').glow;
+const ACTIVE_SEASON = window.BoohaSkins.getSeason();
 const SEASONAL_VISUALS = window.BoohaSeasonalVisuals;
 
 const CHECKPOINTS = [
@@ -2057,8 +2058,12 @@ function createSeasonalWanderer(index, delayMs, visitor, cycle) {
   return w;
 }
 function tickWanderers(nowMs){
+  const seasonalVisitorSeason = window.BoohaSkins?.seasonIdForDate?.();
+  const seasonalVisitorSeasonActive = seasonalVisitorSeason === 'halloween-2026';
   for(let i=0;i<wanderers.length;i++){
-    const w=wanderers[i];if(w.done)continue;
+    const w=wanderers[i];
+    if(w.kind==='seasonal' && !seasonalVisitorSeasonActive){w.done=true;w.opacity=0;continue;}
+    if(w.done)continue;
     if(w.startTime===null){if(nowMs<w.delayMs)continue;w.startTime=nowMs;}
     const elapsed=nowMs-w.startTime,t=Math.min(elapsed/w.dur,1),et=easeInOut(t);
     const dx=w.tx-w.sx,dy=w.ty-w.sy,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len;
@@ -2385,6 +2390,7 @@ function drawFrame(now){
   const _ghostScale  = Math.min(1, Math.max(0.30, cssW / IMG_W));
   const baseGhostR   = GHOST_SIZE / 2;
   const activeGhostR = baseGhostR * _ghostScale;
+  const activeSeason = window.BoohaSkins.getSeason(window.BoohaSkins.seasonIdForDate?.()) || ACTIVE_SEASON;
 
   CHECKPOINTS.forEach((cp,cpIdx)=>{
     const state=cpState[cp.w];if(!state||state.alpha<=.01)return;
@@ -2393,9 +2399,12 @@ function drawFrame(now){
     const baseR=7,glowR=baseR+pulse*3.5*(1+state.extra*.6),alpha=state.alpha;
     ctx.save();
     const halloween = document.documentElement.dataset.season === 'halloween';
+    const christmas = document.documentElement.dataset.season === 'christmas';
     const hallowCP = halloween && getMonthIndexFromWeekNumber(cp.w) === 9;
+    const christmasCP = christmas && activeSeason?.checkpointSparkWeeks?.includes(cp.w);
+    const seasonalSparkCP = hallowCP || christmasCP;
     const hk = hallowCP ? .55 : 1;
-    const sparkColors = SEASONAL_VISUALS.checkpointSparkColors(HALLOWEEN_SEASON, cp.w, [col1, col2]);
+    const sparkColors = SEASONAL_VISUALS.checkpointSparkColors(activeSeason, cp.w, [col1, col2]);
     if(hallowCP){
       ctx.globalCompositeOperation = 'lighter';
       drawGlow(x,y,glowR*4.9,HALLOWEEN_GLOW.lime,alpha*(.06+pulse*.04));
@@ -2414,7 +2423,7 @@ function drawFrame(now){
       const angle=f.angle+sec*f.speed,twinkle=.35+.65*Math.abs(Math.sin(sec*f.twinkleSpeed+f.twinklePhase));
       const r=f.orbit*coverScale*(.82+state.extra*.08)*(.92+.08*Math.sin(sec*1.1+f.phase));
       const fx=x+Math.cos(angle)*r,fy=y+Math.sin(angle)*r*.84;
-      const fColor=hallowCP && sparkColors.length === 3 ? sparkColors[fi%3] : (f.useSecondary?col2:col1),fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
+      const fColor=seasonalSparkCP && sparkColors.length ? sparkColors[fi%sparkColors.length] : (f.useSecondary?col2:col1),fAlpha=twinkle*alpha*(.70+state.extra*.15),fSize=f.size*coverScale*(.65+twinkle*.45);
       drawGlow(fx,fy,fSize*3.2,fColor,fAlpha*.42);
       ctx.globalAlpha=fAlpha;ctx.strokeStyle='#fff';ctx.lineWidth=fSize*.55;ctx.shadowBlur=6;ctx.shadowColor=fColor;const sl=fSize*1.9;ctx.beginPath();ctx.moveTo(fx,fy-sl);ctx.lineTo(fx,fy+sl);ctx.moveTo(fx-sl,fy);ctx.lineTo(fx+sl,fy);ctx.stroke();
       ctx.globalAlpha=fAlpha;ctx.fillStyle='#fff';ctx.shadowBlur=5;ctx.shadowColor=fColor;ctx.beginPath();ctx.arc(fx,fy,fSize*.48,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;

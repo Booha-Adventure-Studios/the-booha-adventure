@@ -41,6 +41,12 @@ const BoohaSkins = (() => {
     purple: '#55d486',
     lime: '#ffe9a3',
   });
+  const CHRISTMAS_CHECKPOINT_SPARK_COLORS = Object.freeze([
+    CHRISTMAS_GLOW.red,
+    CHRISTMAS_GLOW.green,
+    CHRISTMAS_GLOW.gold,
+    CHRISTMAS_GLOW.white,
+  ]);
   const HALLOWEEN_KARASUKI = Object.freeze({
     kind: 'barba',
     name: 'Barba',
@@ -152,7 +158,7 @@ const BoohaSkins = (() => {
     Object.freeze(['#ff9f3b', '#ffd08a']),
     Object.freeze(['#3bffee', '#a8fff8']),
     Object.freeze([HALLOWEEN_GLOW.orange, HALLOWEEN_GLOW.purple]),
-    Object.freeze(['#ff3b6f', '#ff85a1']),
+    Object.freeze(['#e53935', '#43d17b']),
     Object.freeze(['#e53935', '#43d17b']),
   ]);
   const POSE_KEYS = Object.freeze([
@@ -414,6 +420,8 @@ const BoohaSkins = (() => {
       ]),
       palette: CHRISTMAS_PALETTE,
       glow: CHRISTMAS_GLOW,
+      checkpointSparkWeeks: Object.freeze([44, 45, 46, 47, 48]),
+      checkpointSparkColors: CHRISTMAS_CHECKPOINT_SPARK_COLORS,
       seasonalKarasuki: CHRISTMAS_KARASUKI,
     }),
   };
