@@ -455,8 +455,9 @@
         radial-gradient(circle at 86px 104px, rgba(255,250,240,.68) 0 2px, transparent 3.5px),
         radial-gradient(circle at 152px 56px, rgba(242,201,92,.64) 0 1.5px, transparent 3px),
         radial-gradient(circle at 210px 170px, rgba(255,250,240,.72) 0 1px, transparent 2.5px),
+        radial-gradient(140% 20% at 50% 103%, rgba(236,246,255,.46) 0%, rgba(205,230,255,.18) 46%, transparent 72%),
         linear-gradient(180deg, transparent 58%, rgba(7,19,15,.18) 100%);
-      background-size: 240px 210px, 320px 290px, 410px 330px, 280px 250px, 100% 100%;
+      background-size: 240px 210px, 320px 290px, 410px 330px, 280px 250px, 100% 100%, 100% 100%;
       animation: christmasSnow 16s linear infinite;
     }
     html[data-season="christmas"] #startScene::after {
@@ -468,8 +469,52 @@
       background: radial-gradient(ellipse at center, transparent 34%, rgba(7,19,15,.26) 72%, rgba(5,8,8,.58) 100%);
     }
     @keyframes christmasSnow {
-      from { background-position: 0 -210px, 40px -290px, 90px -330px, 120px -250px, 0 0; }
-      to { background-position: 56px 100vh, -28px 100vh, 34px 100vh, -46px 100vh, 0 0; }
+      from { background-position: 0 -210px, 40px -290px, 90px -330px, 120px -250px, 0 0, 0 0; }
+      to { background-position: 56px 100vh, -28px 100vh, 34px 100vh, -46px 100vh, 0 0, 0 0; }
+    }
+    /* Grubb greets students on the first screen. The line comes from the
+       Christmas season phase (November: first snow, December: lights on). */
+    .seasonGreeting { display: none; }
+    html[data-season="christmas"] .seasonGreeting.show {
+      display: block;
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 12px);
+      z-index: 2;
+      white-space: nowrap;
+      padding: 8px 15px 7px;
+      border-radius: 16px;
+      background: rgba(255,250,240,.95);
+      color: #17402b;
+      font-weight: 800;
+      font-size: clamp(14px, 2.6vmin, 19px);
+      line-height: 1.2;
+      box-shadow: 0 0 0 2px rgba(199,53,75,.6), 0 8px 20px rgba(0,0,0,.38), 0 0 22px rgba(207,234,255,.28);
+      pointer-events: none;
+      transform: translateX(-50%);
+      animation: seasonGreetingPop 560ms cubic-bezier(.2,1.45,.4,1) 650ms both;
+    }
+    html[data-season="christmas"] .seasonGreeting.show::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      margin-left: -8px;
+      border: 8px solid transparent;
+      border-top-color: rgba(255,250,240,.95);
+      border-bottom: 0;
+    }
+    .seasonGreeting .sgJp {
+      display: block;
+      margin-top: 2px;
+      font-size: .72em;
+      font-weight: 700;
+      color: #2c5d43;
+    }
+    .ghostWrap.flyAway ~ .seasonGreeting.show { animation: none; opacity: 0; transition: opacity 220ms ease; }
+    @keyframes seasonGreetingPop {
+      from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(.72); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
     }
     html[data-season="christmas"] .sp {
       background: var(--season-white, #fffaf0);
@@ -514,6 +559,7 @@
       html[data-season="halloween"] #halloweenOpening { display: none; }
       html[data-season="halloween"] .hubHeading { animation: none; background-position: 0 50%; }
       html[data-season="christmas"] #startScene::before { animation: none; }
+      html[data-season="christmas"] .seasonGreeting.show { animation: none; }
       html[data-season="christmas"] .hubHeading { animation: none; background-position: 0 50%; }
     }
 
@@ -2229,6 +2275,7 @@
       <div class="ghostWrap" aria-hidden="true">
         <img id="boohaGhost" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" data-default-src="assets/img/booha_ghost.webp" alt="Booha" decoding="async" />
       </div>
+      <div id="seasonGreeting" class="seasonGreeting"><span class="sgEn"></span><span class="sgJp" lang="ja"></span></div>
     </div>
     
    <div id="dcStamp" class="dcStamp" aria-hidden="true"></div>
@@ -2512,6 +2559,18 @@ function applySeasonalLandingSkin() {
   if (!source) return;
   if (image.getAttribute('src') !== source) image.src = source;
   image.alt = skin?.name || 'Booha';
+  applySeasonGreeting(skin);
+}
+
+function applySeasonGreeting(skin) {
+  const bubble = document.getElementById('seasonGreeting');
+  if (!bubble) return;
+  const phase = window.BoohaSkins?.seasonPhase?.();
+  const line = skin?.kind === 'mascot' ? phase?.greeting : null;
+  if (!line) { bubble.classList.remove('show'); return; }
+  bubble.querySelector('.sgEn').textContent = line.en;
+  bubble.querySelector('.sgJp').textContent = line.jp;
+  bubble.classList.add('show');
 }
 
 applySeasonalLandingSkin();
@@ -3809,9 +3868,12 @@ function renderDailyCheckStamp() {
       const stamp = document.getElementById('dcStamp');
       if (stamp) {
         const count = BoohaDailyCheck.streak();
-        stamp.textContent = document.documentElement.dataset.season === 'halloween'
+        const stampSeason = document.documentElement.dataset.season;
+        stamp.textContent = stampSeason === 'halloween'
           ? 'キャンディ ' + count + '個'
-          : '✓ ' + count + '日';
+          : stampSeason === 'christmas'
+            ? '❄ ' + count + '日'
+            : '✓ ' + count + '日';
         stamp.classList.add('show');
       }
     }
