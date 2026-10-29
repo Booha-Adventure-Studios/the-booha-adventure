@@ -332,13 +332,13 @@ const BoohaSkins = (() => {
     // sets land. The schedule is defined up front, but missing art can never
     // become a playable selection by accident.
     thumpkin: makeSeasonalUnlockable('thumpkin', 'Thumpkin', 'ソンプキン', true),
-    crumbly: makeSeasonalUnlockable('crumbly', 'Crumbly', 'クランブリー'),
-    gnasher: makeSeasonalUnlockable('gnasher', 'Gnasher', 'ナーシャー'),
-    waddlesworth: makeSeasonalUnlockable('waddlesworth', 'Waddlesworth', 'ワードルスワース'),
-    snaggle: makeSeasonalUnlockable('snaggle', 'Snaggle', 'スナグル'),
-    tinkerplunk: makeSeasonalUnlockable('tinkerplunk', 'Tinkerplunk', 'ティンカープランク'),
-    oats: makeSeasonalUnlockable('oats', 'Oats', 'オーツ'),
-    quillock: makeSeasonalUnlockable('quillock', 'Quillock', 'クウィラック'),
+    crumbly: makeSeasonalUnlockable('crumbly', 'Crumbly', 'クランブリー', true),
+    gnasher: makeSeasonalUnlockable('gnasher', 'Gnasher', 'ナーシャー', true),
+    waddlesworth: makeSeasonalUnlockable('waddlesworth', 'Waddlesworth', 'ワードルスワース', true),
+    snaggle: makeSeasonalUnlockable('snaggle', 'Snaggle', 'スナグル', true),
+    tinkerplunk: makeSeasonalUnlockable('tinkerplunk', 'Tinkerplunk', 'ティンカープランク', true),
+    oats: makeSeasonalUnlockable('oats', 'Oats', 'オーツ', true),
+    quillock: makeSeasonalUnlockable('quillock', 'Quillock', 'クウィラック', true),
   });
 
   const seasonDefinitions = {
