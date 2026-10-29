@@ -38,7 +38,9 @@
     const sparkWeeks = season?.checkpointSparkWeeks || [];
     const glow = season?.glow;
     if (!glow || !sparkWeeks.includes(Number(week))) return fallback;
-    return [glow.orange, glow.purple, glow.lime];
+    return Array.isArray(season?.checkpointSparkColors) && season.checkpointSparkColors.length
+      ? season.checkpointSparkColors
+      : [glow.orange, glow.purple, glow.lime];
   }
 
   function createBatGlowCache({ createCanvas, getDevicePixelRatio } = {}) {
