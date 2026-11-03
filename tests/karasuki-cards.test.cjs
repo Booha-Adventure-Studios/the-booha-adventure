@@ -236,28 +236,52 @@ function play(state, correct, now = 1) {
   assert.deepStrictEqual(Object.keys(K.normalizeState(null)), Object.keys(K.defaultState()));
 }
 
-/* ── Answer check ──────────────────────────────────────────────────── */
+/* ── Answer check: perfect spelling (Pass W1) ─────────────────────── */
 {
   const c = (t, typed) => K.checkAnswer(t, typed, E);
   assert.strictEqual(c('Bicycle', 'BICYCLE'), 'exact', 'case-insensitive');
-  assert.strictEqual(c('bicycle', ' bicycle. '), 'exact', 'spacing and punctuation ignored');
-  assert.strictEqual(c('bicycle', 'bicycel'), 'near', 'one swap allowed at 7 letters');
-  assert.strictEqual(c('bicycle', 'bycicel'), 'wrong', 'two slips are wrong');
-  assert.strictEqual(c('subway', 'subwy'), 'wrong', 'under 7 letters must be exact (Echo would allow this)');
+  assert.strictEqual(c('bicycle', ' bicycle. '), 'exact', 'spacing and end punctuation ignored');
+  assert.strictEqual(c('plan／think', 'think'), 'exact', 'either alternative is right');
+  // Hyphens and apostrophes never matter
+  for (const typed of ['t-shirt', 't shirt', 'tshirt', 'T-Shirt']) assert.strictEqual(c('T-shirt', typed), 'exact', `T-shirt ← ${typed}`);
+  for (const typed of ["new year's eve", 'new years eve', 'New Year’s Eve']) assert.strictEqual(c('New Year’s Eve', typed), 'exact', `New Year's Eve ← ${typed}`);
+  assert.strictEqual(c("don't", 'dont'), 'exact');
+  assert.strictEqual(c('one-way', 'one way'), 'exact');
+  assert.strictEqual(c('police car', 'policecar'), 'close', 'a missing space is still a spelling slip');
+  // Any slip is a miss now — graded only for the feedback
+  assert.strictEqual(c('bicycle', 'bicycel'), 'close', 'one swap is close, but not right');
+  assert.strictEqual(c('elephant', 'elefant'), 'close', 'two slips in a long word: close');
+  assert.strictEqual(c('subway', 'subwy'), 'close');
+  assert.strictEqual(c('bus', 'bis'), 'close');
+  assert.strictEqual(c('crosswalk', 'krosswok'), 'off');
+  assert.strictEqual(c('train', 'trwxq'), 'wayOff');
+  assert.strictEqual(c('cat', 'dog'), 'wayOff', 'a different word is way off');
+  assert.strictEqual(c('motorcycle', 'banana'), 'wayOff');
+  assert.strictEqual(c('cat', ''), 'empty', 'nothing typed (the timer ran out)');
+  assert.strictEqual(c('cat', '  '), 'empty');
   assert.strictEqual(E.check('subway', 'subwy'), 'near', 'Echo itself stays unchanged');
-  assert.strictEqual(c('cat', ''), 'wrong');
-  assert.strictEqual(c('plan／think', 'think'), 'exact');
+  assert.ok(!('typoMinLetters' in R), 'no slip allowance any more');
   const s = K.defaultState();
-  K.startAttempt(s, ctxFor(1, 1), [{ en: 'elephant' }].concat(words(13)), 1);
-  const near = K.submitAnswer(s, 'elephent', 1, E);
-  assert.ok(near.correct && near.verdict === 'near', 'a near answer counts toward the pass');
+  K.startAttempt(s, ctxFor(1, 1), [{ en: 'elephant' }, { en: 'T-shirt' }].concat(words(12)), 1);
+  const miss = K.submitAnswer(s, 'elephent', 1, E);
+  assert.ok(!miss.correct && miss.verdict === 'close', 'a near answer is a miss');
+  assert.strictEqual(s.attempt.results[0].ok, false);
+  const hit = K.submitAnswer(s, 'tshirt', 1, E);
+  assert.ok(hit.correct && hit.verdict === 'exact');
 }
 
 /* ── Timers ────────────────────────────────────────────────────────── */
 assert.ok(K.lookMs('elephant', 'br') > K.lookMs('cat', 'br'), 'look time scales with length');
 assert.ok(K.lookMs('cat', 'pb') > K.lookMs('cat', 'br'), 'Pre-Boo looks longer');
-assert.ok(K.typeMs('cat', 'pb') > K.typeMs('cat', 'bc'));
 assert.ok(K.lookMs('a'.repeat(40), 'br') <= K.TIMING.lookMax);
+// Pre-Boo has its own typing clock (Pass W1): 6 s + 1.2 s a letter, 10–28 s
+assert.strictEqual(K.typeMs('bus', 'pb'), 10000);
+assert.strictEqual(K.typeMs('train', 'pb'), 12000);
+assert.strictEqual(K.typeMs('crosswalk', 'pb'), 16800);
+assert.strictEqual(K.typeMs('police car', 'pb'), 16800, 'letters only: the space is free');
+assert.strictEqual(K.typeMs('a'.repeat(40), 'pb'), 28000);
+for (const w of ['bus', 'train', 'crosswalk', 'motorcycle']) assert.ok(K.typeMs(w, 'pb') > K.typeMs(w, 'bc') * 1.25, `Pre-Boo types longer than before for ${w}`);
+assert.strictEqual(K.typeMs('bus', 'bc'), 7100, 'other tracks unchanged');
 
 /* ── Word snapshot ─────────────────────────────────────────────────── */
 {

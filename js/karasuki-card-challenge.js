@@ -27,7 +27,9 @@
 
   const GRACE_MS = 2000;
   const FADE_MS = 250;     // the fade happens inside the look time, so the word is gone when typing starts
-  const FEEDBACK_MS = { exact: 1100, near: 1700, wrong: 2100 };
+  // A miss stays up longer: the right word, the student's letters and a
+  // two-language line to read (Pass W1).
+  const FEEDBACK_MS = { exact: 1100, close: 2400, off: 2400, wayOff: 2400, empty: 2400 };
   const KIND = {
     friendly: '#F2C14E', mischievous: '#FF8AD0', dangerous: '#FF6B74',
   };
@@ -115,6 +117,8 @@
 #kcc .kcc-answer{position:relative;display:flex;align-items:center;justify-content:center;width:min(560px,100%);height:56px;padding:0 16px;border-radius:12px;border:2px solid var(--kd);background:#120f1c;color:#fff;font:800 28px/1 'Nunito',system-ui,sans-serif;white-space:pre;overflow:hidden}
 #kcc .kcc-answer.is-ok{border-color:#5ee08a}
 #kcc .kcc-answer.is-miss{border-color:#ff6b74}
+#kcc .kcc-answer.is-wobble{animation:kcc-wobble .5s ease-in-out 1}
+@keyframes kcc-wobble{0%,100%{transform:none}20%{transform:rotate(-3deg) scale(1.03)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(1deg)}}
 #kcc .kcc-caret{display:inline-block;width:3px;height:1.05em;margin-left:2px;border-radius:2px;background:var(--kc);animation:kcc-blink 1s steps(1) infinite}
 #kcc .kcc-stage.is-done .kcc-caret,#kcc.kcc-still .kcc-caret{animation:none}
 #kcc .kcc-stage.is-done .kcc-caret{opacity:0}
@@ -399,6 +403,20 @@
     startPhase('type', K().typeMs(run.word, opts.curriculum), submit);
   }
 
+  // Misses are graded for the feedback only: none of them counts.
+  const MISS_LINES = {
+    close: { en: w => `So close! It's “${w}”.`, pb: 'おしい! あと すこし!', jp: '惜しい！あと少し！', map: { '惜': 'お', '少': 'すこ' } },
+    off: { en: w => `Not quite — it's “${w}”.`, pb: 'ちょっと ちがうよ。', jp: 'ちょっと違うよ。', map: { '違': 'ちが' } },
+    wayOff: { en: w => `Whoa, way off! It's “${w}”.`, pb: 'ぜんぜん ちがう〜!', jp: '全然ちがう〜！', map: { '全然': 'ぜんぜん' } },
+    empty: { en: w => `Time's up! It was “${w}”.`, pb: 'じかん ぎれ!', jp: '時間切れ！', map: { '時間': 'じかん', '切': 'ぎ' } },
+  };
+  function wobble(el) {
+    if (!el) return;
+    el.classList.remove('is-wobble');
+    void el.offsetWidth;
+    el.classList.add('is-wobble');
+  }
+
   function submit() {
     if (!run || run.phase !== 'type') return;
     clearTimeout(run.timer);
@@ -413,9 +431,14 @@
     wordEl.textContent = r.word.en;
     $('.kcc-answer').className = `kcc-answer ${r.correct ? 'is-ok' : 'is-miss'}`;
     const fb = $('.kcc-feedback');
+    const said = MISS_LINES[r.verdict];
     if (r.verdict === 'exact') { fb.className = 'kcc-feedback is-ok'; fb.textContent = 'Right! · せいかい!'; sfx('correct'); }
-    else if (r.verdict === 'near') { fb.className = 'kcc-feedback is-ok'; fb.textContent = 'Almost — one letter off, it counts! · おしい! OK!'; sfx('correct'); }
-    else { fb.className = 'kcc-feedback is-miss'; fb.textContent = `It was “${r.word.en}”. · こたえ`; sfx('wrong'); }
+    else {
+      fb.className = `kcc-feedback is-miss is-${r.verdict}`;
+      fb.innerHTML = said ? `${esc(said.en(r.word.en))} · <span lang="ja">${jp(said.pb, said.jp, said.map)}</span>` : esc(`It was “${r.word.en}”.`);
+      if (r.verdict === 'wayOff') { sfx('cardWayOff'); if (!still()) wobble($('.kcc-answer')); }
+      else sfx('wrong');
+    }
     $('.kcc-label').textContent = '';
     dots();
     run.timer = setTimeout(() => (r.done ? finish(r.outcome) : nextRound()), FEEDBACK_MS[r.verdict] || 1500);

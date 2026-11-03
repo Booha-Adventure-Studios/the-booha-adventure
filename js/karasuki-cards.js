@@ -44,7 +44,10 @@
     attemptsPerWeek: 2,
     interruptionCap: 2,     // restarts allowed per attempt; the next one is a miss
     snapshotSize: 14,       // 10 rounds + 2 restarts + spares
-    typoMinLetters: 7,      // one slip allowed only from 7 letters
+    // Spelling must be exact (Pass W1). A miss is still graded for the
+    // feedback: "so close" within closeSlips (closeSlipsLong from longFrom
+    // letters), "way off" from wayOffShare of the word's letters (min 3).
+    closeSlips: 1, closeSlipsLong: 2, longFrom: 7, wayOffShare: 0.6,
     reviewWeeksMin: 1,
     reviewWeeksMax: 6,
     wordsPerWeek: 15,
@@ -54,7 +57,10 @@
   const TIMING = Object.freeze({
     lookBase: 1200, lookPerLetter: 220, lookMin: 1800, lookMax: 5000,
     typeBase: 5000, typePerLetter: 700, typeMin: 7000, typeMax: 20000,
-    preBooLook: 1.5, preBooType: 1.25,
+    preBooLook: 1.5,
+    // Pre-Boo types on the on-screen keys while still finding letters:
+    // its own, longer typing clock (10 s for "bus", 15.6 s for "crosswalk").
+    preBooTypeBase: 6000, preBooTypePerLetter: 1200, preBooTypeMin: 10000, preBooTypeMax: 28000,
   });
 
   const PHASE = Object.freeze({
@@ -278,8 +284,8 @@
     if (!state.attempt) return { ok: false, error: 'noAttempt' };
     const word = currentWord(state);
     const verdict = checkAnswer(word.en, typed, echo);
-    const correct = verdict !== 'wrong';
-    const outcome = record(state, word, correct, correct ? verdict : 'wrong', now);
+    const correct = verdict === 'exact';
+    const outcome = record(state, word, correct, correct ? 'exact' : 'wrong', now);
     return { ok: true, word, verdict, correct, done: !!outcome, outcome };
   }
 
@@ -346,19 +352,34 @@
 
   function letters(s) { return String(s || '').replace(/[^a-z]/g, '').length; }
 
-  /** 'exact' | 'near' | 'wrong'. Case-insensitive; exact for short words;
-   *  one slip (a swapped pair counts as one) only for 7+ letters. */
+  /** Perfect spelling only (Pass W1). Returns 'exact' (right) or how far
+   *  off a miss was: 'close' | 'off' | 'wayOff' | 'empty'. Capitals,
+   *  hyphens and apostrophes never matter ("T-shirt" = "t shirt" =
+   *  "tshirt", "New Year's Eve" = "new years eve"); for "plan／think"
+   *  either word is right. A swapped pair of letters counts as one slip. */
+  function spellings(text, E) {
+    const base = E.normalize(String(text || '').replace(/['’‘`´]/g, ''));
+    const joined = E.normalize(String(text || '').replace(/['’‘`´]/g, '').replace(/[‐‑‒–—-]/g, ''));
+    return base === joined ? [base] : [base, joined];
+  }
   function checkAnswer(target, typed, echo) {
     const E = echo || root.EchoLogic;
     if (!E || typeof E.normalize !== 'function') throw new Error('[KarasukiCards] EchoLogic is not loaded');
-    const got = E.normalize(typed);
-    if (!got) return 'wrong';
-    let near = false;
-    for (const t of E.targetsOf(target)) {
-      if (got === t) return 'exact';
-      if (letters(t) >= RULES.typoMinLetters && E.distance(got, t) <= 1) near = true;
+    const got = E.normalize(String(typed || '').replace(/['’‘`´]/g, ''));
+    if (!got) return 'empty';
+    let best = Infinity, size = 0;
+    for (const alt of String(target || '').split(/[／/]/)) {
+      for (const t of spellings(alt, E)) {
+        if (!t) continue;
+        if (got === t) return 'exact';
+        const d = E.distance(got, t);
+        if (d < best) { best = d; size = letters(t); }
+      }
     }
-    return near ? 'near' : 'wrong';
+    const slips = size >= RULES.longFrom ? RULES.closeSlipsLong : RULES.closeSlips;
+    if (best <= slips) return 'close';
+    if (best >= Math.max(3, Math.ceil(size * RULES.wayOffShare))) return 'wayOff';
+    return 'off';
   }
 
   /* ── Timers ────────────────────────────────────────────────────────── */
@@ -371,8 +392,10 @@
   }
   function typeMs(word, curriculum) {
     const n = letters(String(word).toLowerCase());
-    const ms = clamp(TIMING.typeBase + TIMING.typePerLetter * n, TIMING.typeMin, TIMING.typeMax);
-    return Math.round(curriculum === 'pb' ? ms * TIMING.preBooType : ms);
+    if (curriculum === 'pb') {
+      return clamp(TIMING.preBooTypeBase + TIMING.preBooTypePerLetter * n, TIMING.preBooTypeMin, TIMING.preBooTypeMax);
+    }
+    return clamp(TIMING.typeBase + TIMING.typePerLetter * n, TIMING.typeMin, TIMING.typeMax);
   }
 
   /* ── Word snapshot ─────────────────────────────────────────────────── */
