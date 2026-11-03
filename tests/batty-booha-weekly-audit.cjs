@@ -35,6 +35,9 @@ const context = {
   window: {
     BoohaAdventure,
     CALENDAR: {
+      // Pin "today" inside the Halloween 2026 season so this audit does
+      // not start failing once the real calendar moves past Oct 31.
+      getTodayKey() { return '2026-10-20'; },
       getCurrentCurriculumWeek() { return currentWeek; },
       getCurriculumWeekOccurrenceKey(week) { return week.occurrenceKey; },
     },

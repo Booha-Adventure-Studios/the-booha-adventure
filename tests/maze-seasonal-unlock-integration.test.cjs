@@ -53,6 +53,9 @@ function makeHarness(stored) {
     window: {
       BoohaAdventure: adventure,
       CALENDAR: {
+        // Pin "today" inside the Halloween 2026 season (see the batty audit):
+        // the scheduled-character checks below are about Halloween weeks.
+        getTodayKey() { return '2026-10-20'; },
         getCurrentCurriculumWeek() {
           return { occurrenceKey: '2026-09-27|september-w4' };
         },
