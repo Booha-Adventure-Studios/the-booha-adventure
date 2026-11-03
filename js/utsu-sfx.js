@@ -539,6 +539,12 @@
     keyTap: function (kind) {
       tone(kind === 'back' ? 760 : 1250, { type: 'triangle', gain: 0.02, dur: 0.028 });
     },
+    /* Karasuki Cards: a "way off" miss (Pass W1) — a silly downward boing
+       and a bounce back, so a big miss feels playful rather than harsh. */
+    cardWayOff: function () {
+      tone(520, { type: 'triangle', gain: 0.05, dur: 0.18, slideTo: 170 });
+      tone(240, { type: 'triangle', gain: 0.045, dur: 0.16, delay: 0.17, slideTo: 420 });
+    },
     /* One tick per point as "Words recalled" counts up. */
     cardTick: function (step) {
       tone(900 + (step || 0) * 60, { type: 'sine', gain: 0.018, dur: 0.035 });
