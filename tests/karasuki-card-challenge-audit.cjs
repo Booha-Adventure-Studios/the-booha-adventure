@@ -81,6 +81,21 @@ assert.match(fn(c, 'nextRound'), /run\.phaseLeft = look - fade;/, 'the fade happ
 assert.match(fn(c, 'nextRound'), /startPhase\('fade', fade, typePhase\)/);
 assert.match(fn(c, 'typePhase'), /startPhase\('type', K\(\)\.typeMs\(run\.word, opts\.curriculum\), submit\)/);
 
+/* Pass W1: every miss explains itself, in English and Japanese */
+assert.match(c, /const FEEDBACK_MS = \{ exact: 1100, close: 2400, off: 2400, wayOff: 2400, empty: 2400 \};/);
+assert.ok(!/'near'|Almost — one letter off, it counts/.test(c), 'a slip never counts any more');
+const misses = c.slice(c.indexOf('const MISS_LINES = {'), c.indexOf('function wobble('));
+for (const [kind, en, pb] of [['close', 'So close!', 'おしい! あと すこし!'], ['off', 'Not quite', 'ちょっと ちがうよ。'], ['wayOff', 'Whoa, way off!', 'ぜんぜん ちがう〜!'], ['empty', "Time's up!", 'じかん ぎれ!']]) {
+  assert.ok(new RegExp(`${kind}: \\{ en: w => \`${en.replace(/[!?.]/g, '\\$&')}`).test(misses), `${kind}: English line`);
+  assert.ok(misses.includes(`pb: '${pb}'`), `${kind}: Pre-Boo hiragana line`);
+}
+assert.match(misses, /jp: '惜しい！あと少し！', map: \{ '惜': 'お', '少': 'すこ' \}/, 'kanji tracks get furigana');
+const sub = fn(c, 'submit');
+assert.match(sub, /\$\{jp\(said\.pb, said\.jp, said\.map\)\}/, 'Pre-Boo reads hiragana, other tracks kanji with furigana');
+assert.match(sub, /\$\{esc\(said\.en\(r\.word\.en\)\)\}/, 'the right word is escaped');
+assert.match(sub, /if \(r\.verdict === 'wayOff'\) \{ sfx\('cardWayOff'\); if \(!still\(\)\) wobble\(\$\('\.kcc-answer'\)\); \}/, 'way off: playful boing and wobble (no wobble with reduced motion)');
+assert.match(read('js/utsu-sfx.js'), /cardWayOff: function/);
+
 /* Interruptions: grace, pause/resume, policy from the rules module */
 assert.match(c, /const GRACE_MS = 2000;/);
 const vis = fn(c, 'onVisibility');
