@@ -15,6 +15,8 @@
  *     onKey: k => true,                 // a letter, a mark, ' ', 'back' or 'ok';
  *                                       // return false to ignore the key
  *     repeatBack: false,                // hold backspace to keep deleting
+ *     bubble: false,                    // pop the letter up above the key (Echo, Pass E2)
+ *     sound: true,                      // UtsuSfx.keyTap; or a function(k) of your own
  *   });
  *   host.appendChild(keys.el);
  *   keys.tap(k);                        // press a key from code (physical keys)
@@ -88,6 +90,8 @@
 .bk-key.is-ok small{display:block;margin-top:2px;font-size:11px}
 .bk-key:focus{outline:none}
 .bk-key:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.bk-pop{position:absolute;left:50%;bottom:100%;z-index:3;min-width:1.5em;padding:.12em .3em .18em;border-radius:12px;background:var(--kc);color:var(--kok,#14111E);font:900 30px/1.1 inherit;text-align:center;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.3);opacity:0;animation:bk-pop .42s ease-out 1 both}
+@keyframes bk-pop{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}30%{opacity:1;transform:translate(-50%,-8px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-24px) scale(1)}}
 @media (max-height:500px){
 .bk-keys{--gap:5px;--kh:44px;padding:5px}
 .bk-key{font-size:21px}
@@ -97,10 +101,11 @@
   }
 
   function create(o) {
-    const opts = Object.assign({ className: '', marks: ["'", '-'], okHTML: 'OK', label: 'Keyboard', onKey: null, sound: true, repeatBack: false }, o || {});
+    const opts = Object.assign({ className: '', marks: ["'", '-'], okHTML: 'OK', label: 'Keyboard', onKey: null, sound: true, repeatBack: false, bubble: false }, o || {});
     injectStyles();
     const el = document.createElement('div');
-    el.className = `bk-keys${opts.className ? ` ${opts.className}` : ''}${still() ? ' bk-still' : ''}`;
+    const calm = still();
+    el.className = `bk-keys${opts.className ? ` ${opts.className}` : ''}${calm ? ' bk-still' : ''}`;
     el.setAttribute('role', 'group');
     el.setAttribute('aria-label', opts.label);
     const key = (k, label, cls, aria) =>
@@ -123,7 +128,19 @@
         clearTimeout(b.upTimer);
         b.upTimer = setTimeout(() => b.classList.remove('is-down'), 110);
       }
-      if (opts.sound && k !== 'ok') keyTapSound(k);
+      if (opts.sound && k !== 'ok') {
+        if (typeof opts.sound === 'function') { try { opts.sound(k); } catch (_) {} }
+        else keyTapSound(k);
+      }
+      // The letter pops up above the key (opt-in; not with reduced motion).
+      if (opts.bubble && b && k.length === 1 && k !== ' ' && !calm) {
+        const pop = document.createElement('span');
+        pop.className = 'bk-pop';
+        pop.setAttribute('aria-hidden', 'true');
+        pop.textContent = k;
+        b.appendChild(pop);
+        setTimeout(() => { if (pop.parentNode) pop.parentNode.removeChild(pop); }, 450);
+      }
       return true;
     }
 

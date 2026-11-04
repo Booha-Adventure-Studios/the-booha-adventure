@@ -38,7 +38,7 @@ assert.match(echo, /\.ec-input\{[^}]*-webkit-user-select:none;user-select:none;-
 
 /* The keyboard */
 const sk = fn('showKeys');
-assert.match(sk, /window\.BoohaKeys\.create\(\{\s*className: 'ec-keys', marks: \["'", '-'\], okHTML: 'Check<small lang="ja">けってい<\/small>',\s*label: 'Keyboard', repeatBack: true, onKey,\s*\}\)/);
+assert.match(sk, /window\.BoohaKeys\.create\(\{\s*className: 'ec-keys', marks: \["'", '-'\], okHTML: 'Check<small lang="ja">けってい<\/small>',\s*label: 'Keyboard', repeatBack: true, bubble: true, sound: keyClick, onKey,\s*\}\)/);
 assert.match(sk, /document\.body\.appendChild\(dock\)/);
 for (const v of ['--kc:var(--game-primary)', '--cap:var(--game-surface)', '--kt:var(--game-ink)', '--kbg:var(--game-bg,#fff)']) assert.ok(echo.includes(v), `keys take the game colours (${v})`);
 assert.match(echo, /#ec-keys-dock \.bk-key\.is-ok\{background:linear-gradient\(135deg,var\(--game-primary\),var\(--game-secondary\)\)\}/, 'Check matches the old Check button');
@@ -67,6 +67,33 @@ assert.match(fn('showCard'), /showKeys\(\);/, 'each card brings the keys up');
 assert.match(fn('finishItem'), /if \(result === 'miss'\) \{\s*hideKeys\(\);/, 'a missed card puts them away so the answer and Next show');
 assert.match(fn('showResults'), /hideKeys\(\);/, 'no keys on the results screen');
 assert.ok(!/input\.focus/.test(fn('play')), 'the clip ending no longer jumps to a text box');
+
+/* Pass E2: pop design */
+assert.match(sk, /label: 'Keyboard', repeatBack: true, bubble: true, sound: keyClick, onKey,/, 'keys pop their letter and click');
+assert.match(fn('keyClick'), /window\.BoohaSFX\.context\(\)/, 'the click uses the game\'s own audio context');
+assert.match(fn('keyClick'), /if \(!c \|\| c\.state !== 'running'\) return;/, 'never starts audio on its own');
+const st = fn('showTyped');
+assert.match(st, /`<span class="ec-tile\$\{popLast && i === typed\.length - 1 \? ' is-new' : ''\}"><b>\$\{esc\(ch\)\}<\/b><\/span>`/, 'each letter is a tile; the newest pops in');
+assert.match(st, /'<span class="ec-gap"><\/span>'/, 'spaces are gaps');
+assert.match(ok, /showTyped\(added && !stillMotion\(\)\);/, 'no pop with reduced motion');
+const mt = fn('markTiles');
+assert.match(mt, /t\.style\.animationDelay = `\$\{i \* 55\}ms`/, 'right: a green wave, one tile after another');
+assert.match(mt, /t\.classList\.add\(c - lead < goodCount \? 'is-good' : 'is-bad'\)/, 'a miss keeps the right start green, the rest red');
+assert.match(mt, /if \(typed\[c\] === ' '\) continue;/, 'spaces are gaps, not tiles, so the colours stay lined up');
+assert.match(mt, /input\.classList\.add\('is-drop'\)/);
+assert.match(sub, /markTiles\('right'\);/);
+assert.match(sub, /if \(tries >= 2\) \{ markTiles\('drop'\); finishItem\('miss'\); return; \}/, 'a missed card\'s tiles tumble away');
+assert.match(sub, /markTiles\('miss', rightPrefix\(card\.en, typed\)\);/);
+assert.match(sub, /run\.hit\(\); score \+= 1;\s*U\.confetti\(input, 18\);/, 'a first-try answer sparkles (U.confetti respects motion settings)');
+assert.match(fn('showCard'), /playBtn\.classList\.add\('is-waiting'\);/, '▶ pulses until heard');
+assert.match(fn('play'), /playBtn\.classList\.remove\('playing', 'is-waiting'\);/);
+const hs = fn('hintSlots');
+assert.match(hs, /i === 0 \? `<span class="ec-slot is-first"/, 'the hint shows the first letter in a tile…');
+assert.match(hs, /`<span class="ec-slot" \$\{delay\}><\/span>`/, '…and empty slots for the rest');
+assert.match(echo, /hintEl\.setAttribute\('aria-label', hintFor\(order\[idx\]\.en\)\);/, 'screen readers still hear the hint');
+for (const sel of ['.ec-tile', '.ec-tile::before', '.ec-slot', '.ec-play .ec-pulse']) assert.ok(echo.includes(`html[data-motion="reduced"] ${sel}`), `reduced motion stops ${sel}`);
+assert.match(echo, /@media \(prefers-reduced-motion:reduce\)\{\.ec-tile,\.ec-tile::before,\.ec-slot,\.ec-play \.ec-pulse,\.ec-input\.is-drop \.ec-tile\{animation:none !important\}/);
+assert.ok(!/animation-delay:calc/.test(echo), 'per-tile delays are inline (no calc() times for older iPads)');
 
 /* Motion: the dock slides with transform/opacity; reduced motion fades */
 assert.match(echo, /#ec-keys-dock\{[^}]*transition:transform \.28s ease-out,opacity \.2s ease-out\}/);

@@ -21,6 +21,15 @@
    types. After a wrong try the next letter starts the word again (like the
    old select-all), backspace edits it instead.
 
+   Pop (Pass E2): typed letters pop into the answer box as chunky tiles and
+   each key pops its letter up above the finger with a click. ▶ pulses until
+   the clip has been heard. A hint shows tile slots with the first letter.
+   Right: the tiles flip green one after another and sparkle. So close / not
+   quite: the right start stays green, the rest wobbles red. A missed card's
+   tiles tumble away before the answer shows. The run's own combo banner and
+   meter (game-utils createRun) celebrate streaks. Transform/opacity only;
+   reduced motion keeps the colours and drops the movement.
+
    Extra game: saves as "{curriculum}-extra:echo" (outside the nine).
    ══════════════════════════════════════════════════════════════ */
 (async function () {
@@ -153,7 +162,40 @@ const STYLE = `
   --kc:var(--game-primary);--kd:var(--game-border);--cap:var(--game-surface);--cap2:var(--game-surface-2,var(--game-surface));
   --kt:var(--game-ink);--kt2:var(--game-muted);--kok:#0b0614;--kbg:var(--game-bg,#fff);--kring:var(--game-border);--kshadow:rgba(0,0,0,.28);
   box-shadow:inset 0 0 0 1.5px var(--kring),0 -6px 22px rgba(0,0,0,.22)}
-#ec-keys-dock .bk-key{font-family:var(--game-font-body)}
+#ec-keys-dock .bk-key{font-family:var(--game-font-body);border-radius:14px;box-shadow:inset 0 0 0 2px var(--kd),0 5px 0 var(--kshadow);transition:transform .2s cubic-bezier(.3,1.7,.5,1)}
+#ec-keys-dock .bk-key.is-down{transform:translateY(4px) scale(.92);transition:transform .05s ease-out}
+#ec-keys-dock .bk-pop{font-family:var(--game-font-title,var(--game-font-body))}
+.ec-typed-now{display:inline-flex;flex-wrap:wrap;gap:5px;align-items:center}
+.ec-tile{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:1.5em;height:1.8em;padding:0 .15em;border-radius:10px;
+  background:var(--game-surface-2,#fff);box-shadow:inset 0 0 0 2px var(--game-primary),0 3px 0 rgba(0,0,0,.18);font:900 22px/1 var(--game-font-body);color:var(--game-ink);box-sizing:border-box}
+.ec-tile b{position:relative;z-index:1;font:inherit}
+.ec-tile::before{content:'';position:absolute;left:0;top:0;right:0;bottom:0;border-radius:inherit;background:#22c55e;opacity:0}
+.ec-gap{display:inline-block;width:.55em}
+.ec-tile.is-new{animation:ecTileIn .28s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes ecTileIn{from{opacity:0;transform:scale(.3) translateY(10px)}to{opacity:1;transform:none}}
+.ec-input.is-right .ec-tile{animation:ecFlip .5s ease both}
+.ec-input.is-right .ec-tile::before{animation:ecGreen .5s ease both}
+@keyframes ecFlip{0%{transform:none}50%{transform:rotateX(90deg) scale(1.08)}100%{transform:none}}
+@keyframes ecGreen{0%,49%{opacity:0}50%,100%{opacity:1}}
+.ec-tile.is-good::before{background:#22c55e;opacity:1}
+.ec-tile.is-bad::before{background:#ef4444;opacity:.9}
+.ec-tile.is-bad{animation:ecWobble .45s ease both}
+.ec-tile.is-bad b{color:#fff}
+@keyframes ecWobble{20%{transform:rotate(-9deg)}45%{transform:rotate(8deg) translateY(-3px)}70%{transform:rotate(-4deg)}100%{transform:none}}
+.ec-input.is-drop .ec-tile{animation:ecDrop .6s ease-in both}
+@keyframes ecDrop{to{opacity:0;transform:translateY(42px) rotate(20deg)}}
+.ec-hint{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;font-family:var(--game-font-body)}
+.ec-slot{display:inline-flex;align-items:center;justify-content:center;width:1.35em;height:1.65em;border-radius:8px;border:2px dashed var(--game-amber);color:var(--game-amber);font:900 18px/1 var(--game-font-body);box-sizing:border-box;animation:ecTileIn .3s cubic-bezier(.3,1.6,.5,1) both}
+.ec-slot.is-first{border-style:solid;background:var(--game-amber);color:#fff}
+.ec-slot-gap{display:inline-block;width:.6em}
+.ec-play{position:relative}
+.ec-pulse{position:absolute;left:-7px;top:-7px;right:-7px;bottom:-7px;border-radius:50%;border:3px solid var(--game-primary);pointer-events:none;opacity:0}
+.ec-play.is-waiting .ec-pulse{animation:ecPulse 1.4s ease-out infinite}
+@keyframes ecPulse{from{opacity:.9;transform:scale(.92)}to{opacity:0;transform:scale(1.35)}}
+@media (prefers-reduced-motion:reduce){.ec-tile,.ec-tile::before,.ec-slot,.ec-play .ec-pulse,.ec-input.is-drop .ec-tile{animation:none !important}.ec-input.is-right .ec-tile::before{opacity:1}.ec-input.is-drop .ec-tile{opacity:.35}}
+html[data-motion="reduced"] .ec-tile,html[data-motion="reduced"] .ec-tile::before,html[data-motion="reduced"] .ec-slot,html[data-motion="reduced"] .ec-play .ec-pulse{animation:none !important}
+html[data-motion="reduced"] .ec-input.is-right .ec-tile::before{opacity:1}
+html[data-motion="reduced"] .ec-input.is-drop .ec-tile{opacity:.35}
 #ec-keys-dock .bk-key.is-ok{background:linear-gradient(135deg,var(--game-primary),var(--game-secondary))}
 @media (prefers-reduced-motion:reduce){#ec-keys-dock{transform:none}.ec-caret{animation:none}}
 html[data-motion="reduced"] #ec-keys-dock,html[data-power]:not([data-power="full"]) #ec-keys-dock{transform:none}
@@ -177,7 +219,7 @@ U.mount(`
   <div class="ec-dots" id="ec-dots"></div>
   <div class="ec-card" id="ec-card">
     <div class="ec-audio">
-      <button type="button" class="ec-play" id="ec-play" aria-label="Play / きく">▶</button>
+      <button type="button" class="ec-play" id="ec-play" aria-label="Play / きく">▶<span class="ec-pulse" aria-hidden="true"></span></button>
       <button type="button" class="ec-slow" id="ec-slow">Slow / ゆっくり</button>
     </div>
     <p class="ec-jp" id="ec-jp"></p>
@@ -209,20 +251,69 @@ const dotState = [];
 /* ── On-screen keys (Pass E1) ──────────────────────────────────────────── */
 const MAX_TYPED = 60;
 let dock = null, keys = null;
-function showTyped() {
-  typedEl.textContent = typed;
+function stillMotion() {
+  const m = window.BoohaMotion;
+  try { if (m && m.reduced && m.reduced()) return true; } catch (_) {}
+  return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+// Each letter is a tile; the newest one pops in. Spaces are gaps.
+function showTyped(popLast) {
+  const esc = c => c.replace(/[&<>"]/g, x => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[x]));
+  typedEl.innerHTML = typed.split('').map((ch, i) => ch === ' '
+    ? '<span class="ec-gap"></span>'
+    : `<span class="ec-tile${popLast && i === typed.length - 1 ? ' is-new' : ''}"><b>${esc(ch)}</b></span>`).join('');
+  typedEl.setAttribute('aria-label', typed);
   phEl.hidden = typed.length > 0;
-  input.classList.remove('bad');
+  input.classList.remove('bad', 'is-near');
+}
+// Mark the tiles after a check: 'right' flips them all green in a wave;
+// a miss keeps the right start green and wobbles the rest red; 'drop'
+// tumbles them away. Delays are set per tile (older iPads lack calc() times).
+function markTiles(kind, goodCount) {
+  const tiles = Array.prototype.slice.call(typedEl.querySelectorAll('.ec-tile'));
+  if (kind === 'right') {
+    tiles.forEach((t, i) => { t.style.animationDelay = `${i * 55}ms`; t.classList.remove('is-new'); });
+    input.classList.add('is-right');
+  } else if (kind === 'drop') {
+    tiles.forEach((t, i) => { t.style.animationDelay = `${i * 40}ms`; t.classList.remove('is-new', 'is-bad'); });
+    input.classList.add('is-drop');
+  } else {
+    // goodCount counts characters of the checked text (spaces too, leading
+    // spaces trimmed); tiles skip spaces, so walk the typed text alongside.
+    const lead = typed.length - typed.replace(/^\s+/, '').length;
+    let tile = 0;
+    for (let c = 0; c < typed.length && tile < tiles.length; c++) {
+      if (typed[c] === ' ') continue;
+      const t = tiles[tile++];
+      t.classList.remove('is-new');
+      t.classList.add(c - lead < goodCount ? 'is-good' : 'is-bad');
+    }
+  }
+}
+// A short, bright click per key (Web Audio from BoohaSFX, same context as the game's sounds).
+function keyClick(k) {
+  try {
+    const c = window.BoohaSFX && window.BoohaSFX.context && window.BoohaSFX.context();
+    if (!c || c.state !== 'running') return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(k === 'back' ? 520 : 900 + Math.random() * 220, t);
+    g.gain.setValueAtTime(0.05, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + 0.06);
+  } catch (_) {}
 }
 function onKey(k) {
   if (done) return false;
   if (k === 'ok') { submit(); return true; }
+  let added = false;
   if (k === 'back') { restartWord = false; typed = typed.slice(0, -1); }
   else {
     if (restartWord) { typed = ''; restartWord = false; }
-    if (typed.length < MAX_TYPED) typed += k;
+    if (typed.length < MAX_TYPED) { typed += k; added = k !== ' '; }
   }
-  showTyped();
+  showTyped(added && !stillMotion());
   return true;
 }
 function measureKeys() {
@@ -250,7 +341,7 @@ function showKeys() {
     dock.hidden = true;
     keys = window.BoohaKeys.create({
       className: 'ec-keys', marks: ["'", '-'], okHTML: 'Check<small lang="ja">けってい</small>',
-      label: 'Keyboard', repeatBack: true, onKey,
+      label: 'Keyboard', repeatBack: true, bubble: true, sound: keyClick, onKey,
     });
     dock.appendChild(keys.el);
     document.body.appendChild(dock);
@@ -304,7 +395,7 @@ function play(rate) {
   playBtn.classList.add('playing');
   const end = () => {
     if (myIdx !== idx) return;            // a clip from an earlier card: ignore
-    playBtn.classList.remove('playing');
+    playBtn.classList.remove('playing', 'is-waiting');
     heard = true; run.audioDone();   // also resumes the clock after a replay
   };
   if (!voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end })) end();
@@ -320,8 +411,10 @@ function showCard() {
   jpEl.textContent = (CFG.curriculum === 'pb' ? (card.hira || card.jp) : card.jp) || '';
   hintEl.textContent = '';
   typed = ''; restartWord = false;
-  showTyped();
   input.className = 'ec-input';
+  showTyped();
+  playBtn.classList.add('is-waiting');   // ▶ pulses until the clip has been heard
+  hintEl.removeAttribute('aria-label');
   hintBtn.disabled = false;
   showKeys();
   nextBtn.hidden = true;
@@ -374,9 +467,11 @@ function submit() {
   tries++;
   if (verdict === 'exact') {
     input.className = 'ec-input ok';
+    markTiles('right');
     U.playSFX('ding');
     if (tries === 1 && !hinted) {
       run.hit(); score += 1;
+      U.confetti(input, 18);
       fb.className = 'ec-feedback ok'; fb.textContent = 'Perfect! · せいかい！';
       finishItem('ok');
     } else {
@@ -393,7 +488,8 @@ function submit() {
   U.playSFX('fart');
   cardEl.classList.remove('shake'); void cardEl.offsetWidth; cardEl.classList.add('shake');
   input.className = 'ec-input bad';
-  if (tries >= 2) { finishItem('miss'); return; }
+  if (tries >= 2) { markTiles('drop'); finishItem('miss'); return; }
+  markTiles('miss', rightPrefix(card.en, typed));
   fb.className = 'ec-feedback ' + (verdict === 'near' ? 'near' : 'bad');
   fb.innerHTML = (verdict === 'near' ? 'So close! Check the spelling: ' : 'Not quite. Listen again: ') + typedHTML(card.en, typed);
   keepCardVisible();
@@ -408,8 +504,21 @@ hintBtn.addEventListener('click', () => {
   hintBtn.disabled = true;
   run.miss();   // a hint ends the combo: the item can still earn +0.5, never a first try
   if (!missedItems.includes(order[idx])) missedItems.push(order[idx]);
-  hintEl.textContent = hintFor(order[idx].en);
+  hintEl.setAttribute('aria-label', hintFor(order[idx].en));
+  hintEl.innerHTML = hintSlots(order[idx].en);
 });
+
+// The hint as tile slots: the first letter filled, the rest empty boxes.
+function hintSlots(target) {
+  const first = (targetsOf(target)[0] || '').replace(/'/g, '');
+  const esc = c => c.replace(/[&<>"]/g, x => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[x]));
+  let n = 0;
+  return first.split('').map((ch, i) => {
+    if (ch === ' ') return '<span class="ec-slot-gap"></span>';
+    const delay = `style="animation-delay:${(n++) * 45}ms"`;
+    return i === 0 ? `<span class="ec-slot is-first" ${delay}>${esc(ch)}</span>` : `<span class="ec-slot" ${delay}></span>`;
+  }).join('');
+}
 nextBtn.addEventListener('click', advance);
 
 function showResults() {
