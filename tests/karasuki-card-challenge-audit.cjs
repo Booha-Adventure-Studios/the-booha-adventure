@@ -122,6 +122,7 @@ for (const m of c.match(/const REVEAL = Object\.freeze\(\{([^}]*)\}\)/)[1].match
 assert.deepStrictEqual(Object.keys(T), ['hush', 'rise', 'shake', 'flip', 'land', 'title', 'line', 'info', 'count', 'button']);
 assert.match(rev, /at\(REVEAL\.info, \(\) => \{ if \(face\) face\.setInfo\(\$\('\.kcc-front'\), true\); \}\);/, 'Pass C1: the card lands full-art, then its info slides up');
 assert.ok(T.info > T.land + 400, 'the art has a moment on its own first');
+assert.match(rev, /if \(face\) face\.shine\(\$\('\.kcc-front'\)\);/, 'Pass C2: the kind foil plays as the card lands');
 Object.values(T).reduce((prev, v) => { assert.ok(v >= prev, 'beats are in order'); return v; }, -1);
 assert.ok(T.button >= 3000 && T.button <= 4000, `reveal lasts 3–4 s (got ${T.button} ms)`);
 assert.ok(!/addEventListener\(['"](webkit)?(animationend|transitionend)|on(animationend|transitionend)\s*=/i.test(c), 'driven by timers only, never animation/transition events');

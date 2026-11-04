@@ -29,7 +29,7 @@ window.KARASUKI_WANDERER_DATA = {
     id: "uhibon",
     en: "Uh-hi-hi... do I know you from somewhere?",
     jp: "ウヒヒヒ…どこかで会ったことある?",
-    furigana: { "どこかで会ったことある": "どこかであったことある" }
+    furigana: { "会": "あ" }
   },
   "Jacki": {
     id: "jacki",

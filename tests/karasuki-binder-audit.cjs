@@ -47,6 +47,7 @@ assert.match(b, /min-height:44px/, 'filter chips are ≥44px');
 assert.match(b, /min-width:48px;min-height:48px/, 'zoom buttons are ≥44px');
 const css = b.slice(b.indexOf('style.textContent = `'), b.indexOf('`;', b.indexOf('style.textContent = `')));
 for (const m of css.matchAll(/transition:([^;}]+)/g)) {
+  if (m[1].trim() === 'none') continue;
   m[1].split(/,(?![^(]*\))/).forEach(part => assert.ok(/^(opacity|transform) /.test(part.trim()), `transition must be opacity/transform: ${part}`));
 }
 assert.ok(!/\(\?<[=!]/.test(b), 'no regex lookbehind');
@@ -68,7 +69,21 @@ assert.match(show, /zoom\.back = false;/, 'every card opens face up (arrows land
 assert.match(show, /<button type="button" class="kb-flip-btn" aria-pressed="false">Flip<small lang="ja">うらがえす<\/small><\/button>/, 'a real Flip button');
 assert.match(show, /window\.KarasukiCardFace\.back\(\{ width \}\)/, 'the back is the shared card back');
 assert.match(show, /\.kb-flip-btn'\)\.addEventListener\('click', flip\)/);
-assert.match(show, /\.kb-zoom-card'\)\.addEventListener\('click', toggleInfo\)/, 'Pass C1: tapping the card shows/hides its info');
+assert.match(show, /\.kb-zoom-card'\)\.addEventListener\('click', \(\) => \{\s*if \(zoom && zoom\.dragged\) \{ zoom\.dragged = false; return; \}[^\n]*\n\s*toggleInfo\(\);/, 'Pass C1: tapping the card shows/hides its info (a drag is not a tap)');
+/* Pass C2: foil shine on open, drag to tilt and move the foil */
+assert.match(show, /wireFoil\(el\.querySelector\('\.kb-zoom-card'\)\);/);
+assert.match(show, /window\.KarasukiCardFace\.shine\(front\)/, 'the foil shines once as a card opens');
+const wf = fn('wireFoil');
+assert.match(wf, /if \(!window\.PointerEvent \|\| !cardEl\) return;/);
+assert.match(wf, /if \(!zoom \|\| zoom\.back \|\| still\(\)\) return;/, 'no drag effects on the back or with reduced motion');
+assert.match(wf, /Math\.hypot\(e\.clientX - down\.x, e\.clientY - down\.y\) < DRAG_PX/, 'a small wobble is still a tap');
+assert.match(wf, /perspective\(900px\) rotateY\(/, 'tilt is a transform');
+assert.match(wf, /KarasukiCardFace\.foil\(cardEl\.querySelector\('\.kb-front'\), x\)/);
+assert.match(wf, /\['pointerup', 'pointercancel', 'pointerleave'\]\.forEach/);
+assert.match(wf, /addEventListener\('dragstart', e => e\.preventDefault\(\)\)/, 'the art cannot be dragged away (that would cancel the drag)');
+assert.match(wf, /cardEl\.setPointerCapture\(e\.pointerId\)/);
+assert.match(fn('still'), /data-motion[\s\S]*data-power[\s\S]*prefers-reduced-motion/);
+assert.match(b, /#kb-zoom \.kb-zoom-card\{touch-action:none;/, 'dragging the card never scrolls or zooms the page');
 assert.match(show, /\.kb-info-btn'\)\.addEventListener\('click', toggleInfo\)/);
 assert.match(show, /<button type="button" class="kb-info-btn" aria-pressed="false">Details<small lang="ja">くわしく<\/small><\/button>/, 'a real Details button');
 assert.ok(!/\.kb-zoom-card'\)\.addEventListener\('click', flip\)/.test(show), 'tapping the card no longer flips it');

@@ -12,7 +12,9 @@
  *   zoom      tap a card to see it large; arrows step through the shelf.
  *             Pass C1: cards show full art; tapping the card (or Details, or I)
  *             slides its info panel up and down; Flip (button or F) turns it
- *             over to the shared back
+ *             over to the shared back. Pass C2: the kind foil shines once as a
+ *             card opens and follows a finger dragged across the big card (with
+ *             a small tilt); a drag never counts as a tap
  *
  * Faces come from js/karasuki-card-face.js, the same renderer as the reveal.
  */
@@ -59,6 +61,9 @@ const BoohaKarasukiBinder = (() => {
 #kb-zoom .kb-side{position:absolute;left:0;top:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 #kb-zoom .kb-side.kb-front{transform:rotateY(0deg)}
 #kb-zoom .kb-side.kb-back{transform:rotateY(180deg)}
+#kb-zoom .kb-zoom-card{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#kb-zoom .kb-zoom-card img{-webkit-user-drag:none}
+#kb-zoom .kb-zoom-card.is-tilting{transition:none}
 #kb-zoom .kb-zoom-btns{display:flex;gap:10px}
 #kb-zoom .kb-flip-btn,#kb-zoom .kb-info-btn{font-size:15px;padding:0 18px;line-height:1.1}
 #kb-zoom .kb-flip-btn small,#kb-zoom .kb-info-btn small{display:block;font-size:11px;opacity:.85}
@@ -191,7 +196,13 @@ const BoohaKarasukiBinder = (() => {
     // button); turning the card over is the Flip button's job.
     el.querySelector('.kb-flip-btn').addEventListener('click', flip);
     el.querySelector('.kb-info-btn').addEventListener('click', toggleInfo);
-    el.querySelector('.kb-zoom-card').addEventListener('click', toggleInfo);
+    el.querySelector('.kb-zoom-card').addEventListener('click', () => {
+      if (zoom && zoom.dragged) { zoom.dragged = false; return; }   // that was a drag, not a tap
+      toggleInfo();
+    });
+    wireFoil(el.querySelector('.kb-zoom-card'));
+    const front = el.querySelector('.kb-front');
+    setTimeout(() => { if (zoom && !zoom.back && window.KarasukiCardFace) window.KarasukiCardFace.shine(front); }, 250);
     el.querySelector('.kb-close').focus({ preventScroll: true });
     // Opening a card is what clears its NEW tag (saved per student).
     if (!card.won.viewedAt && window.KarasukiCards) {
@@ -210,6 +221,51 @@ const BoohaKarasukiBinder = (() => {
     btn.setAttribute('aria-pressed', String(zoom.back));
     btn.setAttribute('aria-label', zoom.back ? 'Flip to the front' : 'Flip to the back');
     try { if (window.UtsuSfx && typeof window.UtsuSfx.cardFlip === 'function') window.UtsuSfx.cardFlip(); } catch (_) {}
+  }
+
+  function still() {
+    const r = document.documentElement;
+    return r.getAttribute('data-motion') === 'reduced'
+      || (!!r.getAttribute('data-power') && r.getAttribute('data-power') !== 'full')
+      || (typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  // Drag across the big card: the foil follows the finger and the card
+  // tilts a little (transform only). Reduced motion: no drag effects.
+  const TILT = 7;          // degrees at the card's edge
+  const DRAG_PX = 8;       // movement before a press counts as a drag
+  function wireFoil(cardEl) {
+    if (!window.PointerEvent || !cardEl) return;
+    let down = null;
+    const end = () => {
+      if (!down) return;
+      down = null;
+      cardEl.classList.remove('is-tilting');
+      cardEl.style.transform = '';
+      if (window.KarasukiCardFace) window.KarasukiCardFace.foil(cardEl.querySelector('.kb-front'), null);
+    };
+    // The art is an <img>: stop the browser dragging it away (that cancels
+    // the pointer), and keep the pointer on the card until it lifts.
+    cardEl.addEventListener('dragstart', e => e.preventDefault());
+    cardEl.addEventListener('pointerdown', e => {
+      if (!zoom || zoom.back || still()) return;
+      down = { x: e.clientX, y: e.clientY, moved: false };
+      zoom.dragged = false;
+      try { cardEl.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    cardEl.addEventListener('pointermove', e => {
+      if (!down || !zoom || zoom.back) return;
+      if (!down.moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) < DRAG_PX) return;
+      down.moved = true;
+      zoom.dragged = true;
+      const r = cardEl.getBoundingClientRect();
+      const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+      const y = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height));
+      cardEl.classList.add('is-tilting');
+      cardEl.style.transform = `perspective(900px) rotateY(${((x - 0.5) * 2 * TILT).toFixed(2)}deg) rotateX(${((0.5 - y) * 2 * TILT).toFixed(2)}deg)`;
+      if (window.KarasukiCardFace) window.KarasukiCardFace.foil(cardEl.querySelector('.kb-front'), x);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => cardEl.addEventListener(t, end));
   }
 
   function toggleInfo() {
