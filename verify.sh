@@ -1095,6 +1095,13 @@ else
   bad "Weekly rollover audit failed"
 fi
 
+echo "[seasonal] Grubb Karasuki art guard"
+if node tests/grubb-karasuki-art-guard.cjs >/dev/null 2>&1; then
+  ok "Karasuki's floating Grubb matches the start-screen Grubb"
+else
+  bad "Grubb Karasuki art guard failed (re-export the Karasuki copy from static.webp)"
+fi
+
 echo "[weekly] Batty Booha weekly unlock audit"
 if node tests/batty-booha-weekly-audit.cjs >/dev/null 2>&1; then
   ok "Batty Booha unlocks, relocks, and can be earned again each week"
