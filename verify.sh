@@ -1965,6 +1965,13 @@ else
   bad "Grimmerglen on-screen keyboard audit failed"
 fi
 
+echo "[games] Echo on-screen keyboard audit (Pass E1)"
+if node tests/echo-keys-audit.cjs >/dev/null 2>&1; then
+  ok "Echo types on the shared on-screen keyboard (no iPad keyboard, suggestions or paste)"
+else
+  bad "Echo on-screen keyboard audit failed"
+fi
+
 echo "[karasuki] Karasuki Cards Pass 2c challenge audit"
 if node tests/karasuki-card-challenge-audit.cjs >/dev/null 2>&1; then
   ok "Karasuki card challenge: on-screen keyboard, countdown, timers, interruptions, reveal, motion, wiring pass"
