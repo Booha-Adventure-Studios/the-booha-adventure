@@ -159,6 +159,29 @@ assert.match(css, /\.bk-still \.bk-key\.is-down\{transform:none\}/);
 for (const m of css.matchAll(/transition:([^;}]+)/g)) {
   m[1].split(/,(?![^(]*\))/).forEach(part => assert.ok(/^(opacity|transform) /.test(part.trim()), `transition must be opacity/transform: ${part}`));
 }
-assert.ok(!/@keyframes/.test(css), 'no keyframe animation in the keys');
+// Pass E2: the only keyframes are the opt-in letter pop, transform/opacity only
+const kfs = [...css.matchAll(/@keyframes ([\w-]+)\{((?:[^{}]*\{[^}]*\})*)\}/g)];
+assert.deepStrictEqual(kfs.map(m => m[1]), ['bk-pop']);
+for (const d of kfs[0][2].matchAll(/\{([^}]*)\}/g)) d[1].split(';').filter(Boolean).forEach(p => assert.ok(/^(opacity|transform):/.test(p.trim()), `bk-pop: ${p}`));
+assert.match(css, /\.bk-pop\{[^}]*pointer-events:none/, 'the pop never blocks the next tap');
+{
+  const r = load();
+  const heard = [];
+  const kb2 = r.K.create({ bubble: true, sound: k => heard.push(k), onKey: () => true });
+  const kids = [];
+  const key = k => ({ getAttribute: () => k, classList: { add() {}, remove() {} }, appendChild: c => kids.push(c) });
+  kb2.el.listeners.pointerdown[0].fn({ type: 'pointerdown', target: { closest: () => key('g') }, cancelable: true, preventDefault() {} });
+  kb2.el.listeners.pointerdown[0].fn({ type: 'pointerdown', target: { closest: () => key(' ') }, cancelable: true, preventDefault() {} });
+  kb2.el.listeners.pointerdown[0].fn({ type: 'pointerdown', target: { closest: () => key('back') }, cancelable: true, preventDefault() {} });
+  assert.strictEqual(kids.length, 1, 'only letters and marks pop up (not space or backspace)');
+  assert.strictEqual(kids[0].className, 'bk-pop');
+  assert.strictEqual(kids[0].textContent, 'g');
+  assert.deepStrictEqual(heard, ['g', ' ', 'back'], 'a game can bring its own click');
+  const calm = load({ motion: 'reduced' });
+  const kids2 = [];
+  const kb3 = calm.K.create({ bubble: true, onKey: () => true });
+  kb3.el.listeners.pointerdown[0].fn({ type: 'pointerdown', target: { closest: () => ({ getAttribute: () => 'a', classList: { add() {}, remove() {} }, appendChild: c => kids2.push(c) }) }, cancelable: true, preventDefault() {} });
+  assert.strictEqual(kids2.length, 0, 'no pop with reduced motion');
+}
 assert.ok(!/\(\?<[=!]/.test(src), 'no regex lookbehind');
 
