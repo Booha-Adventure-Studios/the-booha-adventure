@@ -10,9 +10,15 @@
  * width with one transform, so every card is pixel-identical at any size.
  * Copy comes from js/karasuki-wanderer-data.js (single source of truth).
  *
- *   KarasukiCardFace.face({ card, name, nameJP, furigana, kind, comment, result, width })
+ *   KarasukiCardFace.face({ card, name, nameJP, furigana, kind, comment, result, width, info })
  *   KarasukiCardFace.back({ width })
- *   KarasukiCardFace.fromRegistry(cardId, { result, width })   // looks up the copy
+ *   KarasukiCardFace.fromRegistry(cardId, { result, width, info })   // looks up the copy
+ *   KarasukiCardFace.setInfo(element, on)     // slide the info panel up/down
+ *
+ * Pass C1 — full-art face: the art fills the card; the Lv. / kind / No.
+ * badges and a slim name ribbon always show. The quote, Japanese line and
+ * stats live in an info panel that slides up over the art (info: true, or
+ * setInfo) and away again, so the character is never hidden for long.
  */
 (function () {
   'use strict';
@@ -64,21 +70,29 @@
 .kcf .kcf-kind{position:absolute;left:82px;top:33px;display:flex;align-items:center;gap:6px;padding:5px 11px 5px 8px;font-size:11px;font-weight:800;letter-spacing:.1em;line-height:1.2}
 .kcf .kcf-kind span:last-child{font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif;letter-spacing:0}
 .kcf .kcf-no{position:absolute;right:24px;top:28px;font-family:'Grenze',Georgia,serif;font-size:22px;font-weight:700;line-height:1}
-.kcf .kcf-plate{position:absolute;left:12px;right:12px;bottom:12px;padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.kcf .kcf-fade{position:absolute;left:12px;right:12px;bottom:12px;height:150px;pointer-events:none}
+.kcf .kcf-plate{position:absolute;z-index:1;left:12px;right:12px;bottom:12px;padding:12px 18px 14px;display:flex;flex-direction:column;gap:8px;transform:translateY(calc(100% - 78px));transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+.kcf .kcf-plate::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;z-index:-1;opacity:0;transition:opacity .35s ease}
+.kcf .kcf-detail{display:flex;flex-direction:column;gap:8px;opacity:0;transition:opacity .3s ease}
+.kcf.is-info .kcf-plate{transform:none}
+.kcf.is-info .kcf-plate::before,.kcf.is-info .kcf-detail{opacity:1}
+.kcf .kcf-name,.kcf .kcf-namejp{text-shadow:0 2px 6px rgba(0,0,0,.75)}
+@media (prefers-reduced-motion:reduce){.kcf .kcf-plate{transition:none}}
+html[data-motion="reduced"] .kcf .kcf-plate,html[data-power]:not([data-power="full"]) .kcf .kcf-plate{transition:none}
 .kcf .kcf-head{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
 .kcf .kcf-names{display:flex;flex-direction:column;gap:2px;min-width:0}
 .kcf .kcf-name{margin:0;font-family:'Grenze',Georgia,serif;font-size:30px;font-weight:700;line-height:1}
 .kcf .kcf-name.is-long{font-size:26px}
 .kcf .kcf-namejp,.kcf .kcf-quotejp{margin:0;font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN',sans-serif;font-weight:500}
 .kcf .kcf-namejp{font-size:14px;line-height:1.4}
-.kcf .kcf-quote{margin:0;font-size:14px;font-style:italic;font-weight:600;line-height:1.35}
-.kcf .kcf-quotejp{font-size:13px;line-height:1.5}
-.kcf ruby rt{font-size:7px !important;opacity:.9}
+.kcf .kcf-quote{margin:0;font-size:15px;font-style:italic;font-weight:600;line-height:1.35}
+.kcf .kcf-quotejp{font-size:14px;line-height:1.55}
+.kcf ruby rt{font-size:8px !important;opacity:.9}
 .kcf .kcf-rarity{display:flex;gap:4px;padding-bottom:7px;flex:0 0 auto}
 .kcf .kcf-rarity i{display:block;width:9px;height:9px;transform:rotate(45deg);border:1.5px solid}
 .kcf .kcf-rule{height:1px}
-.kcf .kcf-result{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:600}
-.kcf .kcf-result b{font-size:15px;font-weight:800}
+.kcf .kcf-result{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;font-weight:600}
+.kcf .kcf-result b{font-size:16px;font-weight:800}
 .kcf .kcf-result span{line-height:1.3}
 .kcf .kcf-result .kcf-try{display:inline-block;padding:3px 9px;border:1.5px solid;font-weight:800;line-height:1.2}
 
@@ -88,7 +102,9 @@
 .kcf--friendly .kcf-lv{border-radius:50%;background:#2A1A0E;border-color:#F2C14E}
 .kcf--friendly .kcf-lv small{color:#F2C14E}
 .kcf--friendly .kcf-kind{border-radius:999px;background:#F2C14E;color:#2A1A0E}
-.kcf--friendly .kcf-plate{border-radius:0 0 12px 12px;background:rgba(42,26,14,.95);border-top:2px solid #F2C14E}
+.kcf--friendly .kcf-fade{border-radius:0 0 12px 12px;background:linear-gradient(rgba(20,12,4,0),rgba(20,12,4,.88))}
+.kcf--friendly .kcf-plate,.kcf--friendly .kcf-plate::before{border-radius:0 0 12px 12px}
+.kcf--friendly .kcf-plate::before{background:rgba(42,26,14,.95);border-top:2px solid #F2C14E}
 .kcf--friendly .kcf-name{color:#FFE6A8}
 .kcf--friendly .kcf-namejp,.kcf--friendly .kcf-quotejp,.kcf--friendly .kcf-result{color:#F6E3BC}
 .kcf--friendly .kcf-rule{background:rgba(242,193,78,.4)}
@@ -101,7 +117,9 @@
 .kcf--mischievous .kcf-lv{border-radius:14px;transform:rotate(-9deg);background:#24102E;border-color:#FF8AD0}
 .kcf--mischievous .kcf-lv small{color:#FF8AD0}
 .kcf--mischievous .kcf-kind{border-radius:6px;transform:rotate(-2deg);background:#FF8AD0;color:#24102E}
-.kcf--mischievous .kcf-plate{background:rgba(36,16,46,.95);border-top:2px dashed #FF8AD0;-webkit-clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px));clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px));padding-bottom:16px}
+.kcf--mischievous .kcf-fade{background:linear-gradient(rgba(36,16,46,0),rgba(36,16,46,.88))}
+.kcf--mischievous .kcf-plate::before{background:rgba(36,16,46,.95);border-top:2px dashed #FF8AD0}
+.kcf--mischievous .kcf-plate{-webkit-clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px));clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px));padding-bottom:16px}
 .kcf--mischievous .kcf-name{color:#FFB8E3}
 .kcf--mischievous .kcf-namejp,.kcf--mischievous .kcf-quotejp,.kcf--mischievous .kcf-result{color:#FFD1EC}
 .kcf--mischievous .kcf-rule{background:rgba(255,138,208,.4)}
@@ -120,7 +138,9 @@
 .kcf--dangerous .kcf-lv b{font-size:20px}
 .kcf--dangerous .kcf-kind{left:84px;background:#C3303B;color:#fff}
 .kcf--dangerous .kcf-no{right:26px}
-.kcf--dangerous .kcf-plate{left:14px;right:14px;bottom:14px;background:rgba(12,11,16,.96);border-top:2px solid #C3303B}
+.kcf--dangerous .kcf-fade{left:14px;right:14px;bottom:14px;background:linear-gradient(rgba(8,7,10,0),rgba(8,7,10,.9))}
+.kcf--dangerous .kcf-plate{left:14px;right:14px;bottom:14px}
+.kcf--dangerous .kcf-plate::before{background:rgba(12,11,16,.96);border-top:2px solid #C3303B}
 .kcf--dangerous .kcf-name{color:#F3D6D8;font-size:28px}
 .kcf--dangerous .kcf-name.is-long{font-size:26px}
 .kcf--dangerous .kcf-namejp,.kcf--dangerous .kcf-quotejp,.kcf--dangerous .kcf-result{color:#C9B8BA}
@@ -171,9 +191,10 @@
           <span>${esc(tokyoDate(r.wonAt))}</span>
           <span class="kcf-try">${esc(ordinal(Number(r.try) || 1))} try</span>
         </div>` : '';
-    const inner = `<div class="kcf kcf--${kind}">
+    const inner = `<div class="kcf kcf--${kind}${o.info ? ' is-info' : ''}">
       ${kind === 'dangerous' ? '<div class="kcf-line"></div>' : ''}
       <div class="kcf-art">${card.art ? `<img src="${esc(card.art)}" alt="" decoding="async" loading="lazy">` : ''}</div>
+      <div class="kcf-fade"></div>
       <div class="kcf-shade"></div>
       <div class="kcf-lv"><small>Lv.</small><b>1</b></div>
       <div class="kcf-kind">${ICON[kind]}<span>${KIND_LABEL[kind][0]}</span><span lang="ja">${KIND_LABEL[kind][1]}</span></div>
@@ -186,9 +207,11 @@
           </div>
           <div class="kcf-rarity" aria-hidden="true">${pips}</div>
         </div>
-        ${comment.en ? `<p class="kcf-quote">“${esc(comment.en)}”</p>` : ''}
-        ${comment.jp ? `<p class="kcf-quotejp" lang="ja">${furi(comment.jp, comment.furigana)}</p>` : ''}
-        ${result}
+        <div class="kcf-detail">
+          ${comment.en ? `<p class="kcf-quote">“${esc(comment.en)}”</p>` : ''}
+          ${comment.jp ? `<p class="kcf-quotejp" lang="ja">${furi(comment.jp, comment.furigana)}</p>` : ''}
+          ${result}
+        </div>
       </div>
     </div>`;
     const label = `${o.name} — ${no(card.no)}, Lv.1, ${KIND_LABEL[kind][0].toLowerCase()} card` + (r ? `, ${r.score} of 10 words` : '');
@@ -209,12 +232,22 @@
     const comment = (window.KARASUKI_WANDERER_DATA || {})[card.name] || {};
     return {
       card, name: card.name, nameJP: card.nameJP || '', furigana: Object.assign({}, card.nameFurigana),
-      kind: comment.kind, comment, result: o.result, width: o.width,
+      kind: comment.kind, comment, result: o.result, width: o.width, info: !!o.info,
     };
   }
   function fromRegistry(cardId, opts) {
     const o = optionsFor(cardId, opts);
     return o ? face(o) : '';
+  }
+
+  /** Show (on: true) or hide the info panel of the face inside element.
+   *  Returns the new state; on omitted toggles. */
+  function setInfo(element, on) {
+    const f = element && (element.classList && element.classList.contains('kcf') ? element : element.querySelector && element.querySelector('.kcf'));
+    if (!f) return false;
+    const next = on === undefined ? !f.classList.contains('is-info') : !!on;
+    f.classList.toggle('is-info', next);
+    return next;
   }
 
   /** Teacher preview: every shipped face (sample results) plus the back. */
@@ -224,6 +257,8 @@
       const K = window.KarasukiCards;
       entries = K.registry().filter(K.isShipped).map((c, i) =>
         optionsFor(c.id, { result: { score: 8 + (i % 3), wonAt: Date.now(), try: 1 + (i % 2) } }));
+      // Every face twice: full art, then with its info panel up.
+      entries = entries.reduce((all, e) => all.concat([e, Object.assign({}, e, { info: true })]), []);
     }
     const old = document.getElementById('kcf-preview');
     if (old) old.remove();
@@ -237,5 +272,5 @@
     return box;
   }
 
-  window.KarasukiCardFace = Object.freeze({ W, H, face, back, fromRegistry, preview, tokyoDate });
+  window.KarasukiCardFace = Object.freeze({ W, H, face, back, fromRegistry, setInfo, preview, tokyoDate });
 })();
