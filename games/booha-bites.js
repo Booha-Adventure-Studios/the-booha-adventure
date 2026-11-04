@@ -8,6 +8,15 @@
    (own card first, then any vocab of the week), otherwise the sentence's
    strongest content word. Decoys come from the same week.
 
+   Booha comes alive (Pass B1): each card, Booha swoops across the
+   sentence, crunches the word away (crumbs fly, the gap pops in — the
+   word itself is never shown) and floats back to bob above the card. A
+   right answer is burped back: the word flies from Booha into the gap and
+   Booha throws his arms up. A wrong choice gets gobbled: the button flies
+   into Booha's mouth and he goes "bleh!". The speed window starts once the
+   crunch is over. Transform/opacity only; reduced motion or low power
+   keeps the poses, sounds and colours and skips the flying.
+
    Extra game: saves as "{curriculum}-extra:booha_bites", so it never
    counts toward the nine-game unlock (see game-registry EXTRA_GAMES).
    Shared systems: GAME_UTILS SFX / createRun / showScorecard.
@@ -153,9 +162,29 @@ const STYLE = `
   background:var(--game-surface);border:2px solid var(--game-border);box-shadow:0 6px 26px rgba(0,0,0,.22);display:flex;flex-direction:column;gap:.8rem;align-items:center}
 .bb-card.shake{animation:bbShake .38s ease}
 @keyframes bbShake{20%{transform:translateX(-7px)}45%{transform:translateX(6px)}70%{transform:translateX(-3px)}}
-.bb-booha{width:74px;height:74px;object-fit:contain}
+.bb-bwrap{position:relative;z-index:3;width:74px;height:74px;transition:transform .42s cubic-bezier(.45,0,.3,1),opacity .25s ease}
+.bb-bwrap.is-away{opacity:0}
+.bb-bwrap.is-fast{transition:none}
+.bb-booha{display:block;width:74px;height:74px;object-fit:contain}
+.bb-booha.is-idle{animation:bbBob 2.4s ease-in-out infinite}
+@keyframes bbBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .bb-booha.chomp{animation:bbChomp .5s cubic-bezier(.3,1.6,.5,1)}
 @keyframes bbChomp{30%{transform:scale(1.18) rotate(-6deg)}60%{transform:scale(.94) rotate(4deg)}}
+.bb-booha.cheer{animation:bbCheer .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bbCheer{0%{transform:none}35%{transform:translateY(-14px) scale(1.12)}70%{transform:translateY(2px) scale(.96)}100%{transform:none}}
+.bb-booha.bleh{animation:bbBleh .6s ease}
+@keyframes bbBleh{15%{transform:scale(1.15,.88)}35%{transform:rotate(-10deg) scale(.95)}55%{transform:rotate(9deg)}75%{transform:rotate(-5deg)}100%{transform:none}}
+.bb-gap.is-hidden{opacity:0}
+.bb-gap.pop{animation:bbGapPop .35s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes bbGapPop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+.bb-crumb{position:absolute;z-index:2;width:9px;height:9px;margin:-4px 0 0 -4px;border-radius:3px;background:var(--game-amber);pointer-events:none;transition:transform .55s cubic-bezier(.2,.7,.3,1),opacity .55s ease-in}
+.bb-flyword{position:absolute;z-index:4;margin:0;font-family:var(--game-font-title);font-size:clamp(22px,4.6vw,34px);line-height:1;color:var(--game-primary);white-space:nowrap;pointer-events:none;
+  transition:transform .38s cubic-bezier(.3,1.2,.5,1),opacity .2s ease}
+[data-curriculum="pb"] .bb-flyword{color:#e0439a}
+.bb-choice.eaten{transition:transform .42s cubic-bezier(.5,0,.8,.4),opacity .42s ease-in;opacity:0;pointer-events:none}
+.bb-choice.gone{visibility:hidden}
+@media (prefers-reduced-motion:reduce){.bb-booha.is-idle,.bb-booha.chomp,.bb-booha.cheer,.bb-booha.bleh,.bb-gap.pop{animation:none}.bb-bwrap{transition:opacity .25s ease}}
+html[data-motion="reduced"] .bb-booha,html[data-power]:not([data-power="full"]) .bb-booha.is-idle,html[data-motion="reduced"] .bb-gap.pop{animation:none}
 .bb-sentence{font-family:var(--game-font-title);font-size:clamp(22px,4.6vw,34px);line-height:1.35;color:var(--game-ink);margin:0;text-wrap:balance}
 [data-curriculum="bc"] .bb-sentence,[data-curriculum="br"] .bb-sentence{font-size:clamp(18px,3.6vw,27px)}
 .bb-gap{display:inline-block;min-width:4.2em;border-bottom:4px dashed var(--game-amber);line-height:1.1}
@@ -186,7 +215,7 @@ U.mount(`
   </div>
   <div class="bb-dots" id="bb-dots"></div>
   <div class="bb-card" id="bb-card">
-    <img class="bb-booha" id="bb-booha" src="/the-booha-adventure/assets/img/booha_ghost.webp" alt="" decoding="async">
+    <div class="bb-bwrap" id="bb-bwrap"><img class="bb-booha is-idle" id="bb-booha" src="/the-booha-adventure/assets/img/booha_ghost.webp" alt="" decoding="async"></div>
     <p class="bb-sentence" id="bb-sentence"></p>
     <p class="bb-jp" id="bb-jp"></p>
     <p class="bb-hira" id="bb-hira"></p>
@@ -199,6 +228,148 @@ U.mount(`
 const $ = id => document.getElementById(id);
 const sentenceEl = $('bb-sentence'), jpEl = $('bb-jp'), hiraEl = $('bb-hira'), choicesEl = $('bb-choices');
 const cardEl = $('bb-card'), boohaEl = $('bb-booha'), numEl = $('bb-num'), scoreEl = $('bb-score'), dotsEl = $('bb-dots');
+const bwrapEl = $('bb-bwrap');
+
+/* ── Booha comes alive (Pass B1) ───────────────────────────────────────── */
+const IMG = '/the-booha-adventure/assets/img/';
+const POSE = { idle: IMG + 'booha_ghost.webp', cheer: IMG + 'booha_ghost_dance_arms_up.webp' };
+const INTRO_MS = 900;                   // swoop in, crunch, float back
+const FLY_MS = 380;                     // a burped-back word reaching the gap
+[POSE.cheer].forEach(src => { const im = new Image(); im.src = src; });   // no flash on the first cheer
+let cardToken = 0;                      // timers from an older card do nothing
+function calm() {
+  const m = window.BoohaMotion;
+  try { if (m && ((m.reduced && m.reduced()) || (m.lowPower && m.lowPower()))) return true; } catch (_) {}
+  return typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function later(token, ms, fn) { setTimeout(() => { if (token === cardToken) fn(); }, ms); }
+function replayClass(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+function centerIn(el) {
+  const c = cardEl.getBoundingClientRect(), r = el.getBoundingClientRect();
+  return { x: r.left - c.left + r.width / 2, y: r.top - c.top + r.height / 2 };
+}
+function pose(name) { const src = POSE[name] || POSE.idle; if (boohaEl.getAttribute('src') !== src) boohaEl.setAttribute('src', src); }
+function moveBooha(x, y, instant) {
+  bwrapEl.classList.toggle('is-fast', !!instant);
+  bwrapEl.style.transform = x || y ? `translate(${Math.round(x)}px,${Math.round(y)}px)` : '';
+  if (instant) { void bwrapEl.offsetWidth; bwrapEl.classList.remove('is-fast'); }
+}
+
+// Little sounds from the game's own Web Audio context (no new files).
+function sfx(kind) {
+  try {
+    const c = window.BoohaSFX && window.BoohaSFX.context && window.BoohaSFX.context();
+    if (!c || c.state !== 'running') return;
+    const t = c.currentTime;
+    const out = c.createGain();
+    out.connect(c.destination);
+    if (kind === 'crunch') {
+      // three quick noise bites
+      const len = Math.floor(c.sampleRate * 0.05);
+      const buf = c.createBuffer(1, len, c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      [0, 0.07, 0.15].forEach((at, i) => {
+        const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+        src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 1400 - i * 250; f.Q.value = 1.2;
+        g.gain.setValueAtTime(0.16, t + at); g.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.05);
+        src.connect(f); f.connect(g); g.connect(out); src.start(t + at);
+      });
+      return;
+    }
+    const o = c.createOscillator();
+    o.connect(out);
+    if (kind === 'gulp') {
+      o.type = 'sine'; o.frequency.setValueAtTime(320, t); o.frequency.exponentialRampToValueAtTime(110, t + 0.18);
+      out.gain.setValueAtTime(0.12, t); out.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
+      o.start(t); o.stop(t + 0.21);
+    } else {   // pop: the word comes back
+      o.type = 'triangle'; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(1250, t + 0.08);
+      out.gain.setValueAtTime(0.09, t); out.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+      o.start(t); o.stop(t + 0.13);
+    }
+  } catch (_) {}
+}
+
+function crumbs(at) {
+  for (let i = 0; i < 7; i++) {
+    const b = document.createElement('span');
+    b.className = 'bb-crumb';
+    b.style.left = `${at.x}px`; b.style.top = `${at.y}px`;
+    cardEl.appendChild(b);
+    const a = (i / 7) * Math.PI * 2 + Math.random() * 0.6, d = 26 + Math.random() * 34;
+    void b.offsetWidth;
+    b.style.transform = `translate(${Math.round(Math.cos(a) * d)}px,${Math.round(Math.sin(a) * d + 18)}px) rotate(${Math.round(Math.random() * 180)}deg)`;
+    b.style.opacity = '0';
+    setTimeout(() => b.remove(), 650);
+  }
+}
+
+// Each card: Booha swoops over the gap, crunches the word away, floats back.
+function introBite(token, gap, done) {
+  pose('idle');
+  if (calm()) {
+    gap.classList.remove('is-hidden');
+    replayClass(boohaEl, 'chomp');
+    sfx('crunch');
+    done();
+    return;
+  }
+  const home = centerIn(bwrapEl), g = centerIn(gap);
+  boohaEl.classList.remove('is-idle');
+  moveBooha(30 - home.x, g.y - home.y, true);           // start at the card's left edge (fades in; never widens the page)
+  bwrapEl.classList.add('is-away');
+  void bwrapEl.offsetWidth;
+  bwrapEl.classList.remove('is-away');
+  moveBooha(g.x - home.x, g.y - home.y - 10);
+  later(token, 400, () => {
+    replayClass(boohaEl, 'chomp');
+    sfx('crunch');
+    crumbs(g);
+    gap.classList.remove('is-hidden');
+    replayClass(gap, 'pop');
+  });
+  later(token, 620, () => moveBooha(0, 0));
+  later(token, INTRO_MS, () => { boohaEl.classList.add('is-idle'); done(); });
+}
+
+// Right answer: the word flies from Booha into the gap, then Booha cheers.
+function burpBack(token, word, gap, land) {
+  pose('cheer');
+  replayClass(boohaEl, 'cheer');
+  later(token, 900, () => pose('idle'));
+  if (calm()) { land(); sfx('pop'); return; }
+  const from = centerIn(bwrapEl), to = centerIn(gap);
+  const w = document.createElement('span');
+  w.className = 'bb-flyword';
+  w.textContent = word;
+  cardEl.appendChild(w);
+  const half = { x: w.offsetWidth / 2, y: w.offsetHeight / 2 };
+  w.style.left = `${from.x - half.x}px`; w.style.top = `${from.y - half.y}px`;
+  w.style.transform = 'scale(.3)';
+  void w.offsetWidth;
+  w.style.transform = `translate(${Math.round(to.x - from.x)}px,${Math.round(to.y - from.y)}px) scale(1)`;
+  setTimeout(() => {
+    w.remove();
+    if (token !== cardToken) return;
+    land();
+    replayClass(gap, 'pop');
+    sfx('pop');
+    if (window.GAME_UTILS && U.confetti) U.confetti(gap, 14);
+  }, FLY_MS);
+}
+
+// Wrong choice: Booha gobbles the button and goes "bleh!".
+function gobble(btn) {
+  const from = centerIn(btn), mouth = centerIn(bwrapEl);
+  btn.classList.add('eaten');
+  if (!calm()) btn.style.transform = `translate(${Math.round(mouth.x - from.x)}px,${Math.round(mouth.y - from.y)}px) scale(.12) rotate(-14deg)`;
+  setTimeout(() => {
+    btn.classList.add('gone');
+    replayClass(boohaEl, 'bleh');
+    sfx('gulp');
+  }, calm() ? 0 : 400);
+}
 
 let rounds = buildRounds();
 let idx = 0, score = 0, firstTry = true, busy = false, pickCooldown = false;
@@ -226,12 +397,14 @@ function showCard() {
   gap.className = 'bb-gap';
   gap.id = 'bb-gap';
   gap.textContent = '\u00a0';                     // empty until answered: no hint in the text
+  gap.classList.add('is-hidden');                // appears where Booha bites
   gap.setAttribute('aria-label', 'missing word / ぬけた ことば');
   sentenceEl.appendChild(gap);
   sentenceEl.appendChild(document.createTextNode(s.slice(b.end)));
   jpEl.textContent = r.card.jp || '';
   hiraEl.textContent = PB && r.card.hira ? r.card.hira : '';
-  boohaEl.classList.remove('chomp'); void boohaEl.offsetWidth; boohaEl.classList.add('chomp');
+  const token = ++cardToken;
+  busy = true;                                   // no picks while Booha is biting
 
   choicesEl.innerHTML = '';
   r.options.forEach((opt, i) => {
@@ -243,8 +416,12 @@ function showCard() {
     choicesEl.appendChild(btn);
     setTimeout(() => btn.classList.remove('enter'), 60 + i * 55);
   });
-  // Sharp window grows with sentence length (reading time).
-  run.ready(2000 + 160 * s.split(/\s+/).length);
+  // Sharp window grows with sentence length (reading time); it starts
+  // once Booha has finished his bite.
+  introBite(token, gap, () => {
+    busy = false;
+    run.ready(2000 + 160 * s.split(/\s+/).length);
+  });
 }
 
 function pick(btn, opt) {
@@ -259,14 +436,20 @@ function pick(btn, opt) {
     btn.classList.add('correct');
     Array.from(choicesEl.children).forEach(b => b.classList.add('locked'));
     const gapEl = $('bb-gap');
-    gapEl.textContent = r.bite.word;
-    gapEl.removeAttribute('aria-label');
-    gapEl.classList.add('filled');
+    burpBack(cardToken, r.bite.word, gapEl, () => {
+      gapEl.textContent = r.bite.word;
+      gapEl.removeAttribute('aria-label');
+      gapEl.classList.add('filled');
+    });
     renderDots();
     let moved = false;
+    const answeredAt = Date.now();
     const next = () => {
       if (moved) return; moved = true;
-      setTimeout(() => { idx++; if (idx >= rounds.length) showResults(); else showCard(); }, 260);
+      // Give the burped-back word time to land and be seen, even when the
+      // ding or the voice clip is missing.
+      const wait = Math.max(260, FLY_MS + 450 - (Date.now() - answeredAt));
+      setTimeout(() => { idx++; if (idx >= rounds.length) showResults(); else showCard(); }, wait);
     };
     let dingDone = false;
     const afterDing = () => {
@@ -283,6 +466,7 @@ function pick(btn, opt) {
     run.miss();
     if (!missedItems.some(m => m.jp === r.card.jp)) missedItems.push(r.card);
     btn.classList.add('wrong');
+    gobble(btn);
     U.playSFX('fart');
     cardEl.classList.remove('shake'); void cardEl.offsetWidth; cardEl.classList.add('shake');
   }
@@ -316,6 +500,7 @@ function showResults() {
 }
 
 $('bb-replay').addEventListener('click', () => {
+  cardToken++;
   rounds = buildRounds();
   idx = 0; score = 0; missedItems = []; dotState.length = 0;
   scoreEl.textContent = '0';
