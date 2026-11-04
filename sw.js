@@ -127,7 +127,9 @@ const CURRENT_CACHES = {
   // karasuki.html loads it before the card challenge.
   // Grimmerglen Pass G2: grimmerglen.html loads js/booha-keys.js; Marietta's
   // typing uses the on-screen keyboard instead of the iPad keyboard.
-  pages:  'booha-pages-2026-508',
+  // Echo Pass E1: game.html loads js/booha-keys.js; Echo types on the
+  // on-screen keyboard instead of the iPad keyboard.
+  pages:  'booha-pages-2026-509',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
