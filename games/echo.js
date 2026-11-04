@@ -14,6 +14,13 @@
    A hint (first letter + length) is allowed, but a hinted item can no
    longer be a first-try answer.
 
+   Keys (Pass E1): no text box, so the iPad keyboard, its suggestions and
+   autofill never appear and nothing can be pasted. The shared on-screen
+   keyboard (js/booha-keys.js), in the curriculum's game colours, is docked
+   at the bottom while a card is being answered; a physical keyboard still
+   types. After a wrong try the next letter starts the word again (like the
+   old select-all), backspace edits it instead.
+
    Extra game: saves as "{curriculum}-extra:echo" (outside the nine).
    ══════════════════════════════════════════════════════════════ */
 (async function () {
@@ -128,13 +135,28 @@ const STYLE = `
 .ec-jp{font-family:var(--game-font-jp);font-weight:800;font-size:clamp(15px,2.8vw,19px);color:var(--game-ink);margin:0}
 .ec-hint{font-family:ui-monospace,Menlo,monospace;font-size:clamp(16px,3vw,20px);letter-spacing:.08em;color:var(--game-amber);min-height:1.4em;margin:0}
 .ec-row{width:100%;display:flex;gap:10px}
-.ec-input{flex:1;min-width:0;font:800 18px var(--game-font-body);padding:14px 16px;border-radius:16px;border:2px solid var(--game-border);
-  background:var(--game-answer-bg);color:var(--game-answer-text);outline:none}
-.ec-input:focus{border-color:var(--game-primary)}
+.ec-input{flex:1;min-width:0;min-height:54px;display:flex;align-items:center;flex-wrap:wrap;font:800 18px var(--game-font-body);padding:12px 16px;border-radius:16px;border:2px solid var(--game-primary);
+  background:var(--game-answer-bg);color:var(--game-answer-text);white-space:pre-wrap;overflow-wrap:anywhere;text-align:left;box-sizing:border-box;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ec-ph{margin-left:4px;color:var(--game-muted);font-weight:700}
+.ec-ph[hidden]{display:none}
+.ec-caret{display:inline-block;width:2px;height:1.15em;margin-left:1px;border-radius:1px;background:var(--game-primary);animation:ecCaret 1s steps(1) infinite}
+@keyframes ecCaret{50%{opacity:0}}
 .ec-input.ok{border-color:#22c55e}.ec-input.bad{border-color:#ef4444}
-.ec-check{min-width:96px;min-height:54px;border:none;border-radius:16px;cursor:pointer;font:900 17px var(--game-font-body);color:#0b0614;
-  background:linear-gradient(135deg,var(--game-primary),var(--game-secondary));box-shadow:0 4px 0 rgba(0,0,0,.25)}
-.ec-check:disabled{opacity:.45;cursor:default}
+.ec-input.is-done .ec-caret{opacity:0;animation:none}
+#ec-keys-dock{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;justify-content:center;box-sizing:border-box;
+  padding:0 max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));
+  pointer-events:none;opacity:0;transform:translateY(110%);transition:transform .28s ease-out,opacity .2s ease-out}
+#ec-keys-dock.is-open{opacity:1;transform:none}
+#ec-keys-dock[hidden]{display:none}
+#ec-keys-dock .ec-keys{width:min(800px,100%);pointer-events:auto;
+  --kc:var(--game-primary);--kd:var(--game-border);--cap:var(--game-surface);--cap2:var(--game-surface-2,var(--game-surface));
+  --kt:var(--game-ink);--kt2:var(--game-muted);--kok:#0b0614;--kbg:var(--game-bg,#fff);--kring:var(--game-border);--kshadow:rgba(0,0,0,.28);
+  box-shadow:inset 0 0 0 1.5px var(--kring),0 -6px 22px rgba(0,0,0,.22)}
+#ec-keys-dock .bk-key{font-family:var(--game-font-body)}
+#ec-keys-dock .bk-key.is-ok{background:linear-gradient(135deg,var(--game-primary),var(--game-secondary))}
+@media (prefers-reduced-motion:reduce){#ec-keys-dock{transform:none}.ec-caret{animation:none}}
+html[data-motion="reduced"] #ec-keys-dock,html[data-power]:not([data-power="full"]) #ec-keys-dock{transform:none}
 .ec-tools{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .ec-tool{min-height:44px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--game-border);background:transparent;color:var(--game-muted);font-weight:900;cursor:pointer}
 .ec-tool:disabled{opacity:.4;cursor:default}
@@ -160,12 +182,9 @@ U.mount(`
     </div>
     <p class="ec-jp" id="ec-jp"></p>
     <p class="ec-hint" id="ec-hint" aria-live="polite"></p>
-    <form class="ec-row" id="ec-form" autocomplete="off">
-      <label for="ec-input" class="ec-visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Type what you hear</label>
-      <input class="ec-input" id="ec-input" type="text" inputmode="text" autocapitalize="off" autocorrect="off" spellcheck="false"
-        enterkeyhint="done" placeholder="type here · かこう">
-      <button type="submit" class="ec-check" id="ec-check">Check</button>
-    </form>
+    <div class="ec-row">
+      <div class="ec-input" id="ec-input" role="textbox" aria-readonly="true" aria-label="Type what you hear"><span class="ec-typed-now" id="ec-typed"></span><i class="ec-caret" aria-hidden="true"></i><span class="ec-ph" id="ec-ph">type here · かこう</span></div>
+    </div>
     <p class="ec-feedback" id="ec-feedback" aria-live="polite"></p>
     <div class="ec-tools">
       <button type="button" class="ec-tool" id="ec-hintbtn">Hint · ヒント</button>
@@ -177,14 +196,86 @@ U.mount(`
 </div>`);
 
 const $ = id => document.getElementById(id);
-const playBtn = $('ec-play'), slowBtn = $('ec-slow'), jpEl = $('ec-jp'), hintEl = $('ec-hint'), form = $('ec-form');
-const input = $('ec-input'), checkBtn = $('ec-check'), fb = $('ec-feedback'), hintBtn = $('ec-hintbtn'), nextBtn = $('ec-next');
+const playBtn = $('ec-play'), slowBtn = $('ec-slow'), jpEl = $('ec-jp'), hintEl = $('ec-hint');
+const input = $('ec-input'), typedEl = $('ec-typed'), phEl = $('ec-ph'), fb = $('ec-feedback'), hintBtn = $('ec-hintbtn'), nextBtn = $('ec-next');
 const cardEl = $('ec-card'), numEl = $('ec-num'), scoreEl = $('ec-score'), dotsEl = $('ec-dots');
 
 let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, tries = 0, hinted = false, heard = false, done = false;
+let typed = '', restartWord = false;   // restartWord: the next letter replaces a wrong try
 let missedItems = [];
 const dotState = [];
+
+/* ── On-screen keys (Pass E1) ──────────────────────────────────────────── */
+const MAX_TYPED = 60;
+let dock = null, keys = null;
+function showTyped() {
+  typedEl.textContent = typed;
+  phEl.hidden = typed.length > 0;
+  input.classList.remove('bad');
+}
+function onKey(k) {
+  if (done) return false;
+  if (k === 'ok') { submit(); return true; }
+  if (k === 'back') { restartWord = false; typed = typed.slice(0, -1); }
+  else {
+    if (restartWord) { typed = ''; restartWord = false; }
+    if (typed.length < MAX_TYPED) typed += k;
+  }
+  showTyped();
+  return true;
+}
+function measureKeys() {
+  const wrap = $('ec-main');
+  if (!dock || !wrap) return;
+  wrap.style.paddingBottom = dock.classList.contains('is-open') ? `${dock.offsetHeight + 16}px` : '';
+}
+// Keep the card's answer, feedback and Hint above the docked keys (iPad
+// landscape has room for the card, not for the title above it too).
+function keepCardVisible() {
+  if (!dock || !dock.classList.contains('is-open')) return;
+  requestAnimationFrame(() => {
+    const tools = cardEl.querySelector('.ec-tools');
+    const room = window.innerHeight - dock.offsetHeight - 12;
+    const over = tools.getBoundingClientRect().bottom - room;
+    const top = cardEl.getBoundingClientRect().top;
+    if (over > 0) window.scrollBy(0, Math.min(over, Math.max(0, top - 8)));
+  });
+}
+function showKeys() {
+  if (!window.BoohaKeys) return;
+  if (!dock) {
+    dock = document.createElement('div');
+    dock.id = 'ec-keys-dock';
+    dock.hidden = true;
+    keys = window.BoohaKeys.create({
+      className: 'ec-keys', marks: ["'", '-'], okHTML: 'Check<small lang="ja">けってい</small>',
+      label: 'Keyboard', repeatBack: true, onKey,
+    });
+    dock.appendChild(keys.el);
+    document.body.appendChild(dock);
+    window.addEventListener('resize', measureKeys, { passive: true });
+  }
+  dock.hidden = false;
+  void dock.offsetWidth;
+  dock.classList.add('is-open');
+  measureKeys();
+  setTimeout(keepCardVisible, 320);
+}
+function hideKeys() {
+  if (!dock) return;
+  dock.classList.remove('is-open');
+  measureKeys();
+  setTimeout(() => { if (dock && !dock.classList.contains('is-open')) dock.hidden = true; }, 300);
+}
+// A physical keyboard (teacher Mac, iPad keyboard case) types the same keys.
+document.addEventListener('keydown', e => {
+  if (!keys || !dock || !dock.classList.contains('is-open') || done) return;
+  const k = keys.keyFromEvent(e);
+  if (k === null) return;
+  e.preventDefault();                 // never scroll or press a focused button
+  keys.tap(k);
+});
 
 function renderDots() {
   dotsEl.innerHTML = '';
@@ -215,7 +306,6 @@ function play(rate) {
     if (myIdx !== idx) return;            // a clip from an earlier card: ignore
     playBtn.classList.remove('playing');
     heard = true; run.audioDone();   // also resumes the clock after a replay
-    if (!done) { try { input.focus({ preventScroll: true }); } catch (_) { input.focus(); } }
   };
   if (!voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end })) end();
 }
@@ -229,11 +319,11 @@ function showCard() {
   // Pre-Boo shows hiragana: small children should not need to read kanji.
   jpEl.textContent = (CFG.curriculum === 'pb' ? (card.hira || card.jp) : card.jp) || '';
   hintEl.textContent = '';
-  input.value = '';
+  typed = ''; restartWord = false;
+  showTyped();
   input.className = 'ec-input';
-  input.disabled = false;
-  checkBtn.disabled = false;
   hintBtn.disabled = false;
+  showKeys();
   nextBtn.hidden = true;
   fb.className = 'ec-feedback';
   fb.textContent = 'Tap ▶ to listen · ▶ を おして きこう';
@@ -251,7 +341,8 @@ function typedHTML(target, typed) {
 
 function finishItem(result) {
   done = true;
-  input.disabled = true; checkBtn.disabled = true; hintBtn.disabled = true;
+  hintBtn.disabled = true;
+  input.classList.add('is-done');
   const card = order[idx];
   if (result === 'ok') { dotState[idx] = 'ok'; }
   else if (result === 'half') { dotState[idx] = 'half'; }
@@ -262,7 +353,10 @@ function finishItem(result) {
     fb.querySelector('.ec-answer').textContent = card.en;
   }
   renderDots();
-  if (result === 'miss') { nextBtn.hidden = false; try { nextBtn.focus({ preventScroll: true }); } catch (_) {} }
+  if (result === 'miss') {
+    hideKeys();                         // the answer and Next stay in view
+    nextBtn.hidden = false; try { nextBtn.focus({ preventScroll: true }); } catch (_) {}
+  }
   else setTimeout(advance, 900);
 }
 
@@ -272,12 +366,10 @@ function advance() {
   else showCard();
 }
 
-form.addEventListener('submit', e => {
-  e.preventDefault();
+function submit() {
   if (done) return;
   const card = order[idx];
-  const typed = input.value;
-  if (!normalize(typed)) { input.focus(); return; }
+  if (!normalize(typed)) return;
   const verdict = check(card.en, typed);
   tries++;
   if (verdict === 'exact') {
@@ -304,8 +396,9 @@ form.addEventListener('submit', e => {
   if (tries >= 2) { finishItem('miss'); return; }
   fb.className = 'ec-feedback ' + (verdict === 'near' ? 'near' : 'bad');
   fb.innerHTML = (verdict === 'near' ? 'So close! Check the spelling: ' : 'Not quite. Listen again: ') + typedHTML(card.en, typed);
-  try { input.select(); } catch (_) {}
-});
+  keepCardVisible();
+  restartWord = true;                   // like the old select-all: the next letter starts again
+}
 
 playBtn.addEventListener('click', () => play(1));
 slowBtn.addEventListener('click', () => play(0.72));
@@ -316,7 +409,6 @@ hintBtn.addEventListener('click', () => {
   run.miss();   // a hint ends the combo: the item can still earn +0.5, never a first try
   if (!missedItems.includes(order[idx])) missedItems.push(order[idx]);
   hintEl.textContent = hintFor(order[idx].en);
-  try { input.focus({ preventScroll: true }); } catch (_) {}
 });
 nextBtn.addEventListener('click', advance);
 
@@ -324,6 +416,7 @@ function showResults() {
   const runSum = run.summary();
   const pct = Math.round((score / 15) * 100);
   voiceGate.stop();
+  hideKeys();
   U.emitGameEnd({
     points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
     saveId: SAVE_ID, score: pct, completed: pct >= 40,
@@ -357,6 +450,7 @@ $('ec-replay').addEventListener('click', () => {
 });
 $('ec-back').addEventListener('click', () => {
   voiceGate.stop();
+  hideKeys();
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
 

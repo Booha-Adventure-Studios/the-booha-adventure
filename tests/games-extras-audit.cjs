@@ -189,12 +189,14 @@ assert.match(menu, /setAttribute\('data-extra'/, 'extra tiles must not use data-
   assert.match(echo, /const SAVE_ID = `\$\{CFG\.curriculum\}-extra:echo`;/, 'Echo must save under the extra id');
   assert.match(echo, /U\.createRun\(\{ total: 15, recoverPoints: 50 \}\)/, 'Echo second tries earn +50 (typing cannot be guessed)');
   assert.match(echo, /run\.ready\(2500 \+ 900 \* words, \{ waitAudio: true \}\)/, 'the sharp window starts after the clip');
-  for (const call of ['run.hit()', 'run.miss()', 'run.recover()', 'run.reset()', 'run.audioDone()', 'U.showScorecard(', 'U.emitGameEnd(', "U.loadSFX('fart'", 'autocorrect="off"', 'spellcheck="false"', 'autocapitalize="off"']) {
+  for (const call of ['run.hit()', 'run.miss()', 'run.recover()', 'run.reset()', 'run.audioDone()', 'U.showScorecard(', 'U.emitGameEnd(', "U.loadSFX('fart'"]) {
     assert(echo.includes(call), `Echo must use ${call}`);
   }
   assert.match(echo, /hinted = true;[\s\S]{0,80}run\.miss\(\)/, 'a hint must end the combo (never a first-try answer)');
   assert(!/@keyframes[^{]*\{[^}]*(box-shadow|filter)\s*:/.test(echo), 'Echo animations must stay transform/opacity');
-  assert(/font:800 18px/.test(echo), 'the Echo input must be ≥16px so iOS does not zoom');
+  assert(/font:800 18px/.test(echo), 'the Echo answer box text stays ≥16px');
+  // Pass E1: no text box — the shared on-screen keyboard (tests/echo-keys-audit.cjs)
+  assert(!/<input\b|<textarea\b|contenteditable/i.test(echo), 'Echo never raises the iPad keyboard');
   assert.match(menu, /if \(g\.hira\) a\.setAttribute\('data-hira', g\.hira\)/, 'extra tiles take their Japanese line from the registry');
 
   const ctx = { window: {}, console };
