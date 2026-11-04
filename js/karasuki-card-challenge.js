@@ -532,7 +532,7 @@
      a student on a frozen reveal). The win is saved before this starts, so
      leaving mid-reveal never loses the card. Reduced motion keeps the same
      timing and sounds with fades instead of movement. */
-  const REVEAL = Object.freeze({ hush: 0, rise: 400, shake: 1450, flip: 1700, land: 2050, title: 2350, line: 2550, count: 2650, button: 3500 });
+  const REVEAL = Object.freeze({ hush: 0, rise: 400, shake: 1450, flip: 1700, land: 2050, title: 2350, line: 2550, info: 2600, count: 2650, button: 3500 });
   let revealTimers = [];
   function clearReveal() { revealTimers.forEach(clearTimeout); revealTimers = []; }
 
@@ -610,6 +610,9 @@
     });
     at(REVEAL.title, () => $('.kcc-title').classList.add('is-shown'));
     at(REVEAL.line, () => { $('.kcc-r-jp').classList.add('is-shown'); $('.kcc-r-line').classList.add('is-shown'); });
+    // Pass C1: the card lands full-art; half a second later its info panel
+    // slides up over the art (quote, Japanese line, words recalled).
+    at(REVEAL.info, () => { if (face) face.setInfo($('.kcc-front'), true); });
     const score = Math.max(0, Math.min(10, Number(outcome.score) || 0));
     const step = Math.min(70, 600 / Math.max(1, score));
     for (let i = 1; i <= score; i++) {
