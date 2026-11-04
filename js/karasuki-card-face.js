@@ -14,17 +14,26 @@
  *   KarasukiCardFace.back({ width })
  *   KarasukiCardFace.fromRegistry(cardId, { result, width, info })   // looks up the copy
  *   KarasukiCardFace.setInfo(element, on)     // slide the info panel up/down
+ *   KarasukiCardFace.shine(element)           // play the kind foil once (Pass C2)
+ *   KarasukiCardFace.foil(element, x)         // hold the foil at x (0–1); null ends
  *
  * Pass C1 — full-art face: the art fills the card; the Lv. / kind / No.
  * badges and a slim name ribbon always show. The quote, Japanese line and
  * stats live in an info panel that slides up over the art (info: true, or
  * setInfo) and away again, so the character is never hidden for long.
+ *
+ * Pass C2 — kind foil: friendly cards catch a soft gold glint, mischievous
+ * cards a candy rainbow shimmer, dangerous cards a dim red flicker at the
+ * edges. It plays once (shine) when a card lands or opens, and follows the
+ * finger (foil) when a big card is dragged. Transform/opacity only; with
+ * reduced motion the shine is a still glint that fades.
  */
 (function () {
   'use strict';
 
   const W = 380;
   const H = 570;
+  const SHINE_MS = 1300;
   const BACK = () => window.KARASUKI_CARD_BACK || 'assets/img/cards/karasuki-card-back.webp';
 
   const KIND_LABEL = {
@@ -148,6 +157,20 @@ html[data-motion="reduced"] .kcf .kcf-plate,html[data-power]:not([data-power="fu
 .kcf--dangerous .kcf-try{border-color:#C3303B;color:#F3D6D8}
 .kcf--dangerous .kcf-rarity i{border-color:#6B4A4E}.kcf--dangerous .kcf-rarity i.on{background:#FF6B74;border-color:#FF6B74}
 
+.kcf .kcf-foil{position:absolute;left:0;top:0;right:0;bottom:0;z-index:2;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .35s ease}
+.kcf .kcf-foil i{position:absolute;top:-20%;bottom:-20%;left:0;width:45%;transform:translateX(-130%) skewX(-18deg)}
+.kcf.is-shine .kcf-foil,.kcf.is-foil .kcf-foil{opacity:1;transition:opacity .15s ease}
+.kcf.is-shine .kcf-foil i{animation:kcf-sweep 1.1s ease-in-out 1 both}
+@keyframes kcf-sweep{from{transform:translateX(-130%) skewX(-18deg)}to{transform:translateX(260%) skewX(-18deg)}}
+.kcf--friendly .kcf-foil i{background:linear-gradient(90deg,rgba(255,226,150,0),rgba(255,226,150,.45) 35%,rgba(255,252,235,.7) 50%,rgba(255,226,150,.45) 65%,rgba(255,226,150,0))}
+.kcf--mischievous .kcf-foil i{width:70%;background:linear-gradient(90deg,rgba(255,138,208,0),rgba(255,138,208,.38) 20%,rgba(255,232,120,.38) 40%,rgba(130,236,255,.38) 60%,rgba(190,130,255,.38) 80%,rgba(190,130,255,0))}
+.kcf--dangerous .kcf-foil i{top:0;bottom:0;left:0;right:0;width:auto;transform:none;box-shadow:inset 0 0 44px 10px rgba(255,40,60,.6),inset 0 0 0 2px rgba(255,90,100,.5);opacity:0}
+.kcf--dangerous.is-shine .kcf-foil i{animation:kcf-flicker 1.2s linear 1 both}
+@keyframes kcf-flicker{0%{opacity:0}12%{opacity:.85}22%{opacity:.25}34%{opacity:.9}48%{opacity:.4}62%{opacity:.75}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.kcf.is-shine .kcf-foil i{animation:none;transform:translateX(80%) skewX(-18deg)}.kcf--dangerous.is-shine .kcf-foil i{animation:none;transform:none;opacity:.6}}
+html[data-motion="reduced"] .kcf.is-shine .kcf-foil i,html[data-power]:not([data-power="full"]) .kcf.is-shine .kcf-foil i{animation:none;transform:translateX(80%) skewX(-18deg)}
+html[data-motion="reduced"] .kcf--dangerous.is-shine .kcf-foil i,html[data-power]:not([data-power="full"]) .kcf--dangerous.is-shine .kcf-foil i{animation:none;transform:none;opacity:.6}
+
 .kcb{border-radius:18px;background:#1A0F24;box-shadow:inset 0 0 0 2px rgba(242,193,78,.55)}
 .kcb img{display:block;width:100%;height:100%;object-fit:cover}
 
@@ -213,6 +236,7 @@ html[data-motion="reduced"] .kcf .kcf-plate,html[data-power]:not([data-power="fu
           ${result}
         </div>
       </div>
+      <div class="kcf-foil" aria-hidden="true"><i></i></div>
     </div>`;
     const label = `${o.name} — ${no(card.no)}, Lv.1, ${KIND_LABEL[kind][0].toLowerCase()} card` + (r ? `, ${r.score} of 10 words` : '');
     return fit(o.width, inner, label);
@@ -250,6 +274,41 @@ html[data-motion="reduced"] .kcf .kcf-plate,html[data-power]:not([data-power="fu
     return next;
   }
 
+  function faceIn(element) {
+    return element && (element.classList && element.classList.contains('kcf') ? element : element.querySelector && element.querySelector('.kcf'));
+  }
+
+  /** Play the kind foil across the face inside element, once. */
+  function shine(element) {
+    const f = faceIn(element);
+    if (!f) return false;
+    f.classList.remove('is-shine');
+    void f.offsetWidth;                      // restart the sweep
+    f.classList.add('is-shine');
+    clearTimeout(f.shineTimer);
+    f.shineTimer = setTimeout(() => f.classList.remove('is-shine'), SHINE_MS);
+    return true;
+  }
+
+  /** Hold the foil at x (0 = left edge, 1 = right) while a card is dragged;
+   *  null lets it fade away. Dangerous cards glow stronger toward the edges. */
+  function foil(element, x) {
+    const f = faceIn(element);
+    const band = f && f.querySelector('.kcf-foil i');
+    if (!band) return false;
+    if (x == null) {
+      f.classList.remove('is-foil');
+      band.style.transform = '';
+      band.style.opacity = '';
+      return true;
+    }
+    const t = Math.max(0, Math.min(1, Number(x) || 0));
+    f.classList.add('is-foil');
+    if (f.classList.contains('kcf--dangerous')) band.style.opacity = (0.2 + 0.7 * Math.abs(t - 0.5) * 2).toFixed(2);
+    else band.style.transform = `translateX(${(-130 + 390 * t).toFixed(1)}%) skewX(-18deg)`;
+    return true;
+  }
+
   /** Teacher preview: every shipped face (sample results) plus the back. */
   function preview(entries) {
     ensureStyles();
@@ -272,5 +331,5 @@ html[data-motion="reduced"] .kcf .kcf-plate,html[data-power]:not([data-power="fu
     return box;
   }
 
-  window.KarasukiCardFace = Object.freeze({ W, H, face, back, fromRegistry, setInfo, preview, tokyoDate });
+  window.KarasukiCardFace = Object.freeze({ W, H, SHINE_MS, face, back, fromRegistry, setInfo, shine, foil, preview, tokyoDate });
 })();

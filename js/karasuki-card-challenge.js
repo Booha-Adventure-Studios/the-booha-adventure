@@ -592,6 +592,7 @@
     at(REVEAL.land, () => {
       flip.classList.add('is-landed');
       try { if (window.UtsuSfx && typeof window.UtsuSfx.cardReveal === 'function') window.UtsuSfx.cardReveal(opts.kind); } catch (_) {}
+      if (face) face.shine($('.kcc-front'));   // Pass C2: the kind foil catches the light as it lands
       if (calm) return;
       const raysEl = $('.kcc-rays');
       raysEl.classList.add('is-burst');

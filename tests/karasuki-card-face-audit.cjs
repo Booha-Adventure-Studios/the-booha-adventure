@@ -12,7 +12,7 @@ const vm = require('vm');
 const ROOT = path.resolve(__dirname, '..');
 const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
-const ctx = { console, Intl, Date, Math, JSON };
+const ctx = { console, Intl, Date, Math, JSON, setTimeout, clearTimeout };
 ctx.window = ctx;
 ctx.document = {
   readyState: 'complete', addEventListener() {}, getElementById: () => null,
@@ -67,7 +67,32 @@ assert.ok(!/kcf-name|No\. /.test(back), 'the back reveals nothing');
 const src = read('js/karasuki-card-face.js');
 assert.ok(!/\(\?<[=!]/.test(src), 'no regex lookbehind');
 // Pass C1: the info panel slides (transform) and fades (opacity) — nothing else moves
-assert.ok(!/animation|@keyframes/.test(src), 'no animations on the face');
+// Pass C2: the foil is the only animation, and it moves by transform/opacity
+const kfs = [...src.matchAll(/@keyframes ([\w-]+)\{((?:[^{}]*\{[^}]*\})*)\}/g)];
+assert.deepStrictEqual(kfs.map(m => m[1]), ['kcf-sweep', 'kcf-flicker']);
+for (const m of kfs) for (const d of m[2].matchAll(/\{([^}]*)\}/g)) d[1].split(';').filter(Boolean).forEach(p => assert.ok(/^(opacity|transform):/.test(p.trim()), `@keyframes ${m[1]}: ${p}`));
+for (const m of src.matchAll(/animation:([^;}]+)/g)) assert.ok(/^(none|kcf-sweep |kcf-flicker )/.test(m[1].trim()), `only the foil animates: ${m[1]}`);
+assert.ok(src.includes('@media (prefers-reduced-motion:reduce){.kcf.is-shine .kcf-foil i{animation:none;transform:translateX(80%) skewX(-18deg)}'), 'reduced motion: a still glint');
+assert.ok(src.includes('html[data-motion="reduced"] .kcf.is-shine .kcf-foil i,html[data-power]:not([data-power="full"]) .kcf.is-shine .kcf-foil i{animation:none;'));
+for (const kind of ['friendly', 'mischievous', 'dangerous']) assert.ok(src.includes(`.kcf--${kind} .kcf-foil i{`), `${kind} has its own foil`);
+assert.ok(src.includes('.kcf--dangerous.is-shine .kcf-foil i{animation:kcf-flicker'), 'dangerous: a red flicker at the edges');
+assert.ok(mh.includes('<div class="kcf-foil" aria-hidden="true"><i></i></div>'));
+assert.ok(src.includes('.kcf .kcf-foil{position:absolute;left:0;top:0;right:0;bottom:0;z-index:2;overflow:hidden;pointer-events:none;opacity:0;'), 'the foil never blocks a tap');
+{
+  const classes = new Set(['kcf', 'kcf--friendly']);
+  const band = { style: {} };
+  const kcfEl = { classList: { contains: c => classes.has(c), add: c => classes.add(c), remove: c => classes.delete(c), toggle: (c, on) => (on ? classes.add(c) : classes.delete(c)) }, querySelector: () => band, offsetWidth: 1 };
+  const wrap = { querySelector: () => kcfEl };
+  assert.ok(F.shine(wrap) && classes.has('is-shine'), 'shine plays');
+  assert.ok(F.foil(wrap, 0.5) && classes.has('is-foil'));
+  assert.strictEqual(band.style.transform, 'translateX(65.0%) skewX(-18deg)', 'the band follows the finger');
+  F.foil(wrap, null);
+  assert.ok(!classes.has('is-foil') && band.style.transform === '');
+  classes.add('kcf--dangerous'); classes.delete('kcf--friendly');
+  F.foil(wrap, 0);
+  assert.strictEqual(band.style.opacity, '0.90', 'dangerous glows at the edges');
+  assert.strictEqual(F.shine(null), false);
+}
 for (const m of src.matchAll(/transition:([^;}]+)/g)) {
   if (m[1].trim() === 'none') continue;
   m[1].split(/,(?![^(]*\))/).forEach(part => assert.ok(/^(opacity|transform) /.test(part.trim()), `face transition must be opacity/transform: ${part}`));
