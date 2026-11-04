@@ -141,7 +141,9 @@ const BoohaSkins = (() => {
     kind: 'grubb',
     name: 'Grubb',
     nameJp: 'グラブ',
-    asset: 'assets/skins/grubb_booha/karasuki.webp',
+    // Same knitted Grubb as the start screen (static.webp), exported smaller
+    // for Karasuki under a new name so iPads drop the old cached sprite.
+    asset: 'assets/skins/grubb_booha/karasuki-knit.webp',
     color: CHRISTMAS_GLOW.gold,
     popupLabel: 'GRUBB SAYS',
     popupLabelJp: 'グラブからのひとこと',
@@ -360,7 +362,7 @@ const BoohaSkins = (() => {
       nameJp: 'グラブ',
       assets: Object.freeze({
         static: 'assets/skins/grubb_booha/static.webp',
-        karasuki: 'assets/skins/grubb_booha/karasuki.webp',
+        karasuki: 'assets/skins/grubb_booha/karasuki-knit.webp',
       }),
     }),
     // Art-complete unlockables are enabled one at a time as their full pose
