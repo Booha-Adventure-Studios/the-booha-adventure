@@ -68,7 +68,15 @@ assert.match(show, /zoom\.back = false;/, 'every card opens face up (arrows land
 assert.match(show, /<button type="button" class="kb-flip-btn" aria-pressed="false">Flip<small lang="ja">うらがえす<\/small><\/button>/, 'a real Flip button');
 assert.match(show, /window\.KarasukiCardFace\.back\(\{ width \}\)/, 'the back is the shared card back');
 assert.match(show, /\.kb-flip-btn'\)\.addEventListener\('click', flip\)/);
-assert.match(show, /\.kb-zoom-card'\)\.addEventListener\('click', flip\)/, 'tapping the card flips it');
+assert.match(show, /\.kb-zoom-card'\)\.addEventListener\('click', toggleInfo\)/, 'Pass C1: tapping the card shows/hides its info');
+assert.match(show, /\.kb-info-btn'\)\.addEventListener\('click', toggleInfo\)/);
+assert.match(show, /<button type="button" class="kb-info-btn" aria-pressed="false">Details<small lang="ja">くわしく<\/small><\/button>/, 'a real Details button');
+assert.ok(!/\.kb-zoom-card'\)\.addEventListener\('click', flip\)/.test(show), 'tapping the card no longer flips it');
+const info = fn('toggleInfo');
+assert.match(info, /window\.KarasukiCardFace\.setInfo\(el\.querySelector\('\.kb-front'\)\)/);
+assert.match(info, /setAttribute\('aria-pressed', String\(on\)\)/);
+assert.match(info, /if \(zoom\.back\) \{ flip\(\); return; \}/, 'a tap on the back turns it face up');
+assert.match(fn('onKey'), /e\.key === 'i' \|\| e\.key === 'I'/);
 const flip = fn('flip');
 assert.match(flip, /setAttribute\('aria-pressed', String\(zoom\.back\)\)/);
 assert.match(flip, /\.kb-front'\)\.setAttribute\('aria-hidden', String\(zoom\.back\)\)/, 'screen readers hear only the visible side');

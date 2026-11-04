@@ -55,7 +55,8 @@ ctx.document.body.appendChild = el => { previewEl = el; };
 F.preview();
 assert.ok(previewEl && /<div class="kcf-fit"[^>]*width:220px/.test(previewEl.innerHTML), 'preview cards are 220px wide');
 assert.ok(!/width:380px;height:570px/.test(previewEl.innerHTML), 'no preview card falls back to full size');
-assert.strictEqual((previewEl.innerHTML.match(/class="kcf kcf--/g) || []).length, ctx.KarasukiCards.registry().filter(ctx.KarasukiCards.isShipped).length);
+assert.strictEqual((previewEl.innerHTML.match(/class="kcf kcf--/g) || []).length, 2 * ctx.KarasukiCards.registry().filter(ctx.KarasukiCards.isShipped).length, 'every face twice: full art, then info up');
+assert.strictEqual((previewEl.innerHTML.match(/class="kcf kcf--\w+ is-info"/g) || []).length, ctx.KarasukiCards.registry().filter(ctx.KarasukiCards.isShipped).length);
 
 /* Back */
 const back = F.back({ width: 150 });
@@ -65,7 +66,33 @@ assert.ok(!/kcf-name|No\. /.test(back), 'the back reveals nothing');
 /* Older-iPad + motion safety in the face CSS */
 const src = read('js/karasuki-card-face.js');
 assert.ok(!/\(\?<[=!]/.test(src), 'no regex lookbehind');
-assert.ok(!/animation|transition|@keyframes/.test(src), 'the face itself is static (effects come later via opacity/transform)');
+// Pass C1: the info panel slides (transform) and fades (opacity) — nothing else moves
+assert.ok(!/animation|@keyframes/.test(src), 'no animations on the face');
+for (const m of src.matchAll(/transition:([^;}]+)/g)) {
+  if (m[1].trim() === 'none') continue;
+  m[1].split(/,(?![^(]*\))/).forEach(part => assert.ok(/^(opacity|transform) /.test(part.trim()), `face transition must be opacity/transform: ${part}`));
+}
+assert.ok(src.includes('@media (prefers-reduced-motion:reduce){.kcf .kcf-plate{transition:none}}'), 'reduced motion: the panel does not slide');
+assert.ok(src.includes('html[data-motion="reduced"] .kcf .kcf-plate,html[data-power]:not([data-power="full"]) .kcf .kcf-plate{transition:none}'), 'html[data-motion]/[data-power] respected');
+
+/* Pass C1: full-art face — badges and the name ribbon always, details on demand */
+assert.ok(src.includes('.kcf .kcf-plate{position:absolute;z-index:1;') && src.includes('transform:translateY(calc(100% - 78px))'), 'only the name ribbon shows until the info is up');
+assert.ok(src.includes('.kcf.is-info .kcf-plate{transform:none}') && src.includes('.kcf.is-info .kcf-plate::before,.kcf.is-info .kcf-detail{opacity:1}'));
+assert.ok(/<div class="kcf-detail">[\s\S]*kcf-quote[\s\S]*kcf-quotejp[\s\S]*kcf-result/.test(mh), 'quote, Japanese line and stats are the details');
+assert.ok(/kcf-lv[\s\S]*kcf-kind[\s\S]*kcf-no[\s\S]*kcf-plate/.test(mh), 'Lv., kind and No. badges stay on the art');
+assert.ok(mh.includes('<div class="kcf-fade"></div>'), 'a soft fade keeps the name readable on any art');
+assert.ok(!mh.includes('is-info'), 'faces start full-art');
+assert.ok(F.fromRegistry('mister-happy', { info: true, width: 100 }).includes('class="kcf kcf--friendly is-info"'));
+{
+  const classes = new Set(['kcf']);
+  const kcfEl = { classList: { contains: c => classes.has(c), toggle: (c, on) => (on ? classes.add(c) : classes.delete(c)) } };
+  const wrap = { querySelector: () => kcfEl };
+  assert.strictEqual(F.setInfo(wrap, true), true);
+  assert.ok(classes.has('is-info'));
+  assert.strictEqual(F.setInfo(wrap), false, 'no argument toggles');
+  assert.ok(!classes.has('is-info'));
+  assert.strictEqual(F.setInfo(null, true), false);
+}
 assert.ok(/-webkit-clip-path/.test(src), 'clip-path has the -webkit- prefix for older Safari');
 
 /* Face down until won: map + introduction never request the card's own art */

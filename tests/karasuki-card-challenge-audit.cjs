@@ -119,7 +119,9 @@ assert.match(c, /#kcc\.kcc-still \.kcc-flip\.is-flipped,#kcc\.kcc-still \.kcc-fl
 /* Pass 4a: cinematic reveal — unskippable, timer-driven, button at the end */
 const T = {};
 for (const m of c.match(/const REVEAL = Object\.freeze\(\{([^}]*)\}\)/)[1].matchAll(/(\w+): (\d+)/g)) T[m[1]] = Number(m[2]);
-assert.deepStrictEqual(Object.keys(T), ['hush', 'rise', 'shake', 'flip', 'land', 'title', 'line', 'count', 'button']);
+assert.deepStrictEqual(Object.keys(T), ['hush', 'rise', 'shake', 'flip', 'land', 'title', 'line', 'info', 'count', 'button']);
+assert.match(rev, /at\(REVEAL\.info, \(\) => \{ if \(face\) face\.setInfo\(\$\('\.kcc-front'\), true\); \}\);/, 'Pass C1: the card lands full-art, then its info slides up');
+assert.ok(T.info > T.land + 400, 'the art has a moment on its own first');
 Object.values(T).reduce((prev, v) => { assert.ok(v >= prev, 'beats are in order'); return v; }, -1);
 assert.ok(T.button >= 3000 && T.button <= 4000, `reveal lasts 3–4 s (got ${T.button} ms)`);
 assert.ok(!/addEventListener\(['"](webkit)?(animationend|transitionend)|on(animationend|transitionend)\s*=/i.test(c), 'driven by timers only, never animation/transition events');
