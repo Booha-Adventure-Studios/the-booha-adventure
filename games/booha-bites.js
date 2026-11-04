@@ -17,6 +17,13 @@
    crunch is over. Transform/opacity only; reduced motion or low power
    keeps the poses, sounds and colours and skips the flying.
 
+   The game layer (Pass B2): a hunger ring around Booha shrinks through
+   the speed-bonus window, so students can see they are racing him. Booha
+   gets rounder with every first-try answer in a row (back to normal on a
+   miss) and dances at the combo milestones: sway at 3, wave at 6, arms up
+   with a spin at 10. Choices are chunky snacks with a springy press. After
+   the last card, Booha does a full-belly BURP! before the results.
+
    Extra game: saves as "{curriculum}-extra:booha_bites", so it never
    counts toward the nine-game unlock (see game-registry EXTRA_GAMES).
    Shared systems: GAME_UTILS SFX / createRun / showScorecard.
@@ -174,6 +181,17 @@ const STYLE = `
 @keyframes bbCheer{0%{transform:none}35%{transform:translateY(-14px) scale(1.12)}70%{transform:translateY(2px) scale(.96)}100%{transform:none}}
 .bb-booha.bleh{animation:bbBleh .6s ease}
 @keyframes bbBleh{15%{transform:scale(1.15,.88)}35%{transform:rotate(-10deg) scale(.95)}55%{transform:rotate(9deg)}75%{transform:rotate(-5deg)}100%{transform:none}}
+.bb-belly{transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.bb-ring{position:absolute;left:-12px;top:-12px;right:-12px;bottom:-12px;border-radius:50%;border:4px solid var(--game-amber);pointer-events:none;opacity:0;transform-origin:50% 50%}
+.bb-ring.is-on{opacity:.85}
+.bb-ring.is-out{opacity:0;transition:opacity .3s ease !important}
+.bb-booha.dance{animation:bbDance 1.2s ease-in-out}
+@keyframes bbDance{0%,100%{transform:none}20%{transform:rotate(-12deg) translateY(-6px)}40%{transform:rotate(10deg)}60%{transform:rotate(-8deg) translateY(-4px)}80%{transform:rotate(6deg)}}
+.bb-booha.spin{animation:bbSpin 1.2s cubic-bezier(.3,1.3,.5,1)}
+@keyframes bbSpin{0%{transform:none}50%{transform:rotate(360deg) scale(1.2)}100%{transform:rotate(360deg)}}
+.bb-burp{position:absolute;z-index:5;left:50%;top:-6px;margin:0;padding:.2em .55em;border-radius:14px;background:var(--game-amber);color:#2b1a05;font-family:var(--game-font-title);font-size:clamp(20px,4vw,28px);line-height:1.1;white-space:nowrap;pointer-events:none;
+  transform:translate(-50%,0) scale(.3);opacity:0;transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .2s ease}
+.bb-burp.is-on{transform:translate(-50%,-70%) scale(1);opacity:1}
 .bb-gap.is-hidden{opacity:0}
 .bb-gap.pop{animation:bbGapPop .35s cubic-bezier(.3,1.6,.5,1) both}
 @keyframes bbGapPop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
@@ -183,8 +201,10 @@ const STYLE = `
 [data-curriculum="pb"] .bb-flyword{color:#e0439a}
 .bb-choice.eaten{transition:transform .42s cubic-bezier(.5,0,.8,.4),opacity .42s ease-in;opacity:0;pointer-events:none}
 .bb-choice.gone{visibility:hidden}
-@media (prefers-reduced-motion:reduce){.bb-booha.is-idle,.bb-booha.chomp,.bb-booha.cheer,.bb-booha.bleh,.bb-gap.pop{animation:none}.bb-bwrap{transition:opacity .25s ease}}
+@media (prefers-reduced-motion:reduce){.bb-booha.is-idle,.bb-booha.chomp,.bb-booha.cheer,.bb-booha.bleh,.bb-booha.dance,.bb-booha.spin,.bb-gap.pop{animation:none}.bb-bwrap,.bb-belly,.bb-choice{transition:opacity .25s ease}.bb-ring{display:none}}
 html[data-motion="reduced"] .bb-booha,html[data-power]:not([data-power="full"]) .bb-booha.is-idle,html[data-motion="reduced"] .bb-gap.pop{animation:none}
+html[data-motion="reduced"] .bb-ring{display:none}
+html[data-motion="reduced"] .bb-belly{transition:none}
 .bb-sentence{font-family:var(--game-font-title);font-size:clamp(22px,4.6vw,34px);line-height:1.35;color:var(--game-ink);margin:0;text-wrap:balance}
 [data-curriculum="bc"] .bb-sentence,[data-curriculum="br"] .bb-sentence{font-size:clamp(18px,3.6vw,27px)}
 .bb-gap{display:inline-block;min-width:4.2em;border-bottom:4px dashed var(--game-amber);line-height:1.1}
@@ -196,7 +216,8 @@ html[data-motion="reduced"] .bb-booha,html[data-power]:not([data-power="full"]) 
 .bb-choice{min-height:60px;padding:.7rem .8rem;border-radius:18px;cursor:pointer;font-family:var(--game-font-title);font-size:clamp(17px,3.2vw,22px);
   color:var(--game-tile-text);background:var(--game-tile-bg);border:2px solid var(--game-tile-border);box-shadow:0 4px 0 rgba(0,0,0,.25);
   transition:transform .14s cubic-bezier(.34,1.56,.64,1),opacity .2s;-webkit-tap-highlight-color:transparent}
-.bb-choice:active{transform:scale(.96)}
+.bb-choice{box-shadow:0 6px 0 rgba(0,0,0,.22),inset 0 0 0 3px rgba(255,255,255,.35);border-radius:22px;transition:transform .22s cubic-bezier(.3,1.7,.5,1),opacity .2s}
+.bb-choice:active{transform:translateY(4px) scale(.95);transition:transform .05s ease-out}
 .bb-choice:focus-visible{outline:3px solid var(--game-amber);outline-offset:3px}
 .bb-choice.correct{background:#22c55e;border-color:#16a34a;color:#fff}
 .bb-choice.wrong{opacity:.38;pointer-events:none}
@@ -215,7 +236,7 @@ U.mount(`
   </div>
   <div class="bb-dots" id="bb-dots"></div>
   <div class="bb-card" id="bb-card">
-    <div class="bb-bwrap" id="bb-bwrap"><img class="bb-booha is-idle" id="bb-booha" src="/the-booha-adventure/assets/img/booha_ghost.webp" alt="" decoding="async"></div>
+    <div class="bb-bwrap" id="bb-bwrap"><span class="bb-ring" id="bb-ring" aria-hidden="true"></span><div class="bb-belly" id="bb-belly"><img class="bb-booha is-idle" id="bb-booha" src="/the-booha-adventure/assets/img/booha_ghost.webp" alt="" decoding="async"></div></div>
     <p class="bb-sentence" id="bb-sentence"></p>
     <p class="bb-jp" id="bb-jp"></p>
     <p class="bb-hira" id="bb-hira"></p>
@@ -232,10 +253,13 @@ const bwrapEl = $('bb-bwrap');
 
 /* ── Booha comes alive (Pass B1) ───────────────────────────────────────── */
 const IMG = '/the-booha-adventure/assets/img/';
-const POSE = { idle: IMG + 'booha_ghost.webp', cheer: IMG + 'booha_ghost_dance_arms_up.webp' };
+const POSE = {
+  idle: IMG + 'booha_ghost.webp', cheer: IMG + 'booha_ghost_dance_arms_up.webp',
+  sway: IMG + 'booha_ghost_dance_sway.webp', wave: IMG + 'booha_ghost_dance_wave.webp',
+};
 const INTRO_MS = 900;                   // swoop in, crunch, float back
 const FLY_MS = 380;                     // a burped-back word reaching the gap
-[POSE.cheer].forEach(src => { const im = new Image(); im.src = src; });   // no flash on the first cheer
+[POSE.cheer, POSE.sway, POSE.wave].forEach(src => { const im = new Image(); im.src = src; });   // no flash on the first pose
 let cardToken = 0;                      // timers from an older card do nothing
 function calm() {
   const m = window.BoohaMotion;
@@ -279,7 +303,13 @@ function sfx(kind) {
     }
     const o = c.createOscillator();
     o.connect(out);
-    if (kind === 'gulp') {
+    if (kind === 'burp') {
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(140, t); o.frequency.linearRampToValueAtTime(95, t + 0.32);
+      const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 600;
+      o.disconnect(); o.connect(f); f.connect(out);
+      out.gain.setValueAtTime(0.0001, t); out.gain.exponentialRampToValueAtTime(0.16, t + 0.04); out.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+      o.start(t); o.stop(t + 0.36);
+    } else if (kind === 'gulp') {
       o.type = 'sine'; o.frequency.setValueAtTime(320, t); o.frequency.exponentialRampToValueAtTime(110, t + 0.18);
       out.gain.setValueAtTime(0.12, t); out.gain.exponentialRampToValueAtTime(0.0001, t + 0.2);
       o.start(t); o.stop(t + 0.21);
@@ -337,7 +367,7 @@ function introBite(token, gap, done) {
 function burpBack(token, word, gap, land) {
   pose('cheer');
   replayClass(boohaEl, 'cheer');
-  later(token, 900, () => pose('idle'));
+  later(token, 900, () => { if (!boohaEl.classList.contains('dance') && !boohaEl.classList.contains('spin')) pose('idle'); });
   if (calm()) { land(); sfx('pop'); return; }
   const from = centerIn(bwrapEl), to = centerIn(gap);
   const w = document.createElement('span');
@@ -357,6 +387,61 @@ function burpBack(token, word, gap, land) {
     sfx('pop');
     if (window.GAME_UTILS && U.confetti) U.confetti(gap, 14);
   }, FLY_MS);
+}
+
+/* ── The game layer (Pass B2) ──────────────────────────────────────────── */
+const ringEl = $('bb-ring'), bellyEl = $('bb-belly');
+const BELLY_STEP = 0.05, BELLY_MAX = 6;     // up to 1.3× after six in a row
+const MILESTONES = { 3: 'sway', 6: 'wave', 10: 'cheer' };
+let streak = 0;
+
+// The hunger ring shrinks through the speed-bonus window (run.ready ms).
+function startRing(ms) {
+  if (calm()) return;
+  ringEl.classList.remove('is-out');
+  ringEl.style.transition = 'none';
+  ringEl.style.transform = 'scale(1)';
+  ringEl.classList.add('is-on');
+  void ringEl.offsetWidth;
+  ringEl.style.transition = `transform ${Math.round(ms)}ms linear`;
+  ringEl.style.transform = 'scale(.55)';
+  ringEl.timer = setTimeout(stopRing, ms);
+}
+function stopRing() {
+  clearTimeout(ringEl.timer);
+  const now = getComputedStyle(ringEl).transform;
+  ringEl.style.transition = 'none';
+  if (now && now !== 'none') ringEl.style.transform = now;   // freeze where it was
+  ringEl.classList.add('is-out');
+  ringEl.classList.remove('is-on');
+}
+
+// Rounder with each first-try answer in a row; back to normal on a miss.
+function setBelly(n) {
+  bellyEl.style.transform = n > 0 ? `scale(${(1 + BELLY_STEP * Math.min(n, BELLY_MAX)).toFixed(2)})` : '';
+}
+// At 3 / 6 / 10 in a row Booha dances (the run's combo banner shows too).
+function milestone(n) {
+  const p = MILESTONES[n];
+  if (!p) return false;
+  pose(p);
+  replayClass(boohaEl, n >= 10 ? 'spin' : 'dance');
+  sfx('pop');
+  const token = cardToken;
+  setTimeout(() => { boohaEl.classList.remove('dance', 'spin'); if (token === cardToken) pose('idle'); }, 1250);
+  return true;
+}
+
+// After the last card: a full-belly BURP! before the results.
+function finalBurp(done) {
+  const bubble = document.createElement('p');
+  bubble.className = 'bb-burp';
+  bubble.textContent = 'BURP! · げっぷ！';
+  bwrapEl.appendChild(bubble);
+  bellyEl.style.transform = calm() ? '' : 'scale(1.45)';
+  sfx('gulp');
+  setTimeout(() => { bubble.classList.add('is-on'); sfx('burp'); }, calm() ? 0 : 280);
+  setTimeout(() => { setBelly(0); bubble.remove(); done(); }, 1300);
 }
 
 // Wrong choice: Booha gobbles the button and goes "bleh!".
@@ -420,7 +505,9 @@ function showCard() {
   // once Booha has finished his bite.
   introBite(token, gap, () => {
     busy = false;
-    run.ready(2000 + 160 * s.split(/\s+/).length);
+    const sharp = 2000 + 160 * s.split(/\s+/).length;
+    run.ready(sharp);
+    startRing(sharp);
   });
 }
 
@@ -431,15 +518,19 @@ function pick(btn, opt) {
   const r = rounds[idx];
   if (opt === r.answer) {
     busy = true;
-    if (firstTry) { run.hit(); score++; scoreEl.textContent = score; dotState[idx] = 'ok'; }
-    else { run.recover(); dotState[idx] = 'miss'; }
+    stopRing();
+    if (firstTry) { run.hit(); score++; scoreEl.textContent = score; dotState[idx] = 'ok'; streak++; }
+    else { run.recover(); dotState[idx] = 'miss'; streak = 0; }
+    setBelly(streak);
     btn.classList.add('correct');
     Array.from(choicesEl.children).forEach(b => b.classList.add('locked'));
     const gapEl = $('bb-gap');
+    const reached = streak;
     burpBack(cardToken, r.bite.word, gapEl, () => {
       gapEl.textContent = r.bite.word;
       gapEl.removeAttribute('aria-label');
       gapEl.classList.add('filled');
+      milestone(reached);
     });
     renderDots();
     let moved = false;
@@ -449,7 +540,11 @@ function pick(btn, opt) {
       // Give the burped-back word time to land and be seen, even when the
       // ding or the voice clip is missing.
       const wait = Math.max(260, FLY_MS + 450 - (Date.now() - answeredAt));
-      setTimeout(() => { idx++; if (idx >= rounds.length) showResults(); else showCard(); }, wait);
+      setTimeout(() => {
+        idx++;
+        if (idx >= rounds.length) finalBurp(showResults);
+        else showCard();
+      }, wait);
     };
     let dingDone = false;
     const afterDing = () => {
@@ -466,6 +561,7 @@ function pick(btn, opt) {
     run.miss();
     if (!missedItems.some(m => m.jp === r.card.jp)) missedItems.push(r.card);
     btn.classList.add('wrong');
+    streak = 0; setBelly(0); stopRing();   // the speed bonus is gone after a wrong pick
     gobble(btn);
     U.playSFX('fart');
     cardEl.classList.remove('shake'); void cardEl.offsetWidth; cardEl.classList.add('shake');
@@ -501,6 +597,7 @@ function showResults() {
 
 $('bb-replay').addEventListener('click', () => {
   cardToken++;
+  streak = 0; setBelly(0); stopRing();
   rounds = buildRounds();
   idx = 0; score = 0; missedItems = []; dotState.length = 0;
   scoreEl.textContent = '0';
