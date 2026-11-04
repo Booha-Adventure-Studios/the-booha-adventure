@@ -58,7 +58,7 @@ assert.match(pk, /btn\.classList\.add\('wrong'\);[^\n]*\n[^\n]*\n\s*gobble\(btn\
 const gb = fn('gobble');
 assert.match(gb, /btn\.classList\.add\('eaten'\);/);
 assert.match(gb, /if \(!calm\(\)\) btn\.style\.transform = `translate\(/, 'the button flies into Booha (not with reduced motion)');
-assert.match(gb, /btn\.classList\.add\('gone'\);\s*replayClass\(boohaEl, 'bleh'\);\s*sfx\('gulp'\);/);
+assert.match(gb, /btn\.classList\.add\('gone'\);\s*bounce\('bleh'\);\s*sfx\('gulp'\);/);
 assert.match(b, /\.bb-choice\.eaten\{[^}]*pointer-events:none\}/, 'an eaten choice can never be picked');
 assert.match(b, /\.bb-choice\.gone\{visibility:hidden\}/, 'its slot stays, so the other choices never jump');
 
@@ -72,7 +72,13 @@ assert.match(pk, /streak = 0; setBelly\(0\); stopRing\(\);/, 'a wrong pick shrin
 assert.match(fn('setBelly'), /scale\(\$\{\(1 \+ BELLY_STEP \* Math\.min\(n, BELLY_MAX\)\)\.toFixed\(2\)\}\)/);
 assert.match(b, /const BELLY_STEP = 0\.05, BELLY_MAX = 6;/, 'at most 1.3× bigger');
 assert.match(b, /const MILESTONES = \{ 3: 'sway', 6: 'wave', 10: 'cheer' \};/, 'dances at the run\'s combo milestones');
-assert.match(fn('milestone'), /replayClass\(boohaEl, n >= 10 \? 'spin' : 'dance'\);/);
+assert.match(fn('milestone'), /bounce\(n >= 10 \? 'spin' : 'dance'\);/, 'dances only when motion is welcome (the pose still changes)');
+assert.match(fn('bounce'), /if \(!calm\(\)\) replayClass\(boohaEl, cls\);/, 'every Booha move respects reduced motion and low power');
+assert.ok(!/replayClass\(boohaEl,/.test(b.replace(fn('bounce'), '')), 'no Booha move bypasses bounce()');
+assert.match(fn('setBelly'), /if \(calm\(\)\) \{ bellyEl\.style\.transform = ''; return; \}/, 'no growing on reduced motion / low power');
+for (const rule of ['html[data-power]:not([data-power="full"]) .bb-booha,', 'html[data-power]:not([data-power="full"]) .bb-gap.pop{animation:none}', 'html[data-power]:not([data-power="full"]) .bb-ring{display:none}', 'html[data-power]:not([data-power="full"]) .bb-belly{transition:none}']) {
+  assert.ok(b.includes(rule), `low/minimal power CSS: ${rule}`);
+}
 assert.match(pk, /milestone\(reached\);/);
 const fb = fn('finalBurp');
 assert.match(fb, /bubble\.textContent = 'BURP! · げっぷ！';/);
@@ -101,7 +107,7 @@ for (const m of css.matchAll(/transition:([^;}]+)/g)) {
 }
 assert.match(fn('calm'), /m\.reduced && m\.reduced\(\)\) \|\| \(m\.lowPower && m\.lowPower\(\)\)/, 'BoohaMotion reduced or low power → no flying');
 assert.match(fn('calm'), /prefers-reduced-motion: reduce/);
-assert.match(css, /html\[data-power\]:not\(\[data-power="full"\]\) \.bb-booha\.is-idle/, 'the idle bob stops on low power');
+assert.match(css, /html\[data-power\]:not\(\[data-power="full"\]\) \.bb-booha,/, 'every Booha animation (bob included) stops on low power');
 assert.ok(!/\(\?<[=!]/.test(b), 'no regex lookbehind');
 
 console.log('Booha Bites fun audit passed.');
