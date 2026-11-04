@@ -26,16 +26,16 @@ const fn = name => {
 };
 
 /* Poses come from the existing Booha ghost art */
-for (const f of ['booha_ghost.webp', 'booha_ghost_dance_arms_up.webp']) {
+for (const f of ['booha_ghost.webp', 'booha_ghost_dance_arms_up.webp', 'booha_ghost_dance_sway.webp', 'booha_ghost_dance_wave.webp']) {
   assert.ok(fs.existsSync(path.join(ROOT, 'assets/img', f)), `${f} exists`);
 }
-assert.match(b, /const POSE = \{ idle: IMG \+ 'booha_ghost\.webp', cheer: IMG \+ 'booha_ghost_dance_arms_up\.webp' \};/);
+assert.match(b, /idle: IMG \+ 'booha_ghost\.webp', cheer: IMG \+ 'booha_ghost_dance_arms_up\.webp',\s*sway: IMG \+ 'booha_ghost_dance_sway\.webp', wave: IMG \+ 'booha_ghost_dance_wave\.webp',/);
 
 /* Each card: the bite, never the word */
 const sc = fn('showCard');
 assert.match(sc, /gap\.classList\.add\('is-hidden'\);/, 'the gap appears where Booha bites');
 assert.match(sc, /busy = true;/, 'no picks while Booha is biting');
-assert.match(sc, /introBite\(token, gap, \(\) => \{\s*busy = false;\s*run\.ready\(2000 \+ 160 \* s\.split\(\/\\s\+\/\)\.length\);/, 'the speed window starts after the bite');
+assert.match(sc, /introBite\(token, gap, \(\) => \{\s*busy = false;\s*const sharp = 2000 \+ 160 \* s\.split\(\/\\s\+\/\)\.length;\s*run\.ready\(sharp\);\s*startRing\(sharp\);/, 'the speed window (and its ring) starts after the bite');
 const ib = fn('introBite');
 assert.match(ib, /if \(calm\(\)\) \{\s*gap\.classList\.remove\('is-hidden'\);/, 'reduced motion: the gap just appears');
 assert.match(ib, /sfx\('crunch'\);\s*crumbs\(g\);/, 'crunch and crumbs at the gap');
@@ -54,7 +54,7 @@ assert.match(bb, /U\.confetti\(gap, 14\)/, 'a sparkle where the word lands (U.co
 assert.match(pk, /const wait = Math\.max\(260, FLY_MS \+ 450 - \(Date\.now\(\) - answeredAt\)\);/, 'the word always lands and shows before the next card');
 
 /* Wrong: gobbled */
-assert.match(pk, /btn\.classList\.add\('wrong'\);\s*gobble\(btn\);/, 'Booha eats wrong choices');
+assert.match(pk, /btn\.classList\.add\('wrong'\);[^\n]*\n[^\n]*\n\s*gobble\(btn\);/, 'Booha eats wrong choices');
 const gb = fn('gobble');
 assert.match(gb, /btn\.classList\.add\('eaten'\);/);
 assert.match(gb, /if \(!calm\(\)\) btn\.style\.transform = `translate\(/, 'the button flies into Booha (not with reduced motion)');
@@ -62,9 +62,29 @@ assert.match(gb, /btn\.classList\.add\('gone'\);\s*replayClass\(boohaEl, 'bleh'\
 assert.match(b, /\.bb-choice\.eaten\{[^}]*pointer-events:none\}/, 'an eaten choice can never be picked');
 assert.match(b, /\.bb-choice\.gone\{visibility:hidden\}/, 'its slot stays, so the other choices never jump');
 
+/* Pass B2: the game layer */
+const sr = fn('startRing');
+assert.match(sr, /if \(calm\(\)\) return;/, 'no ring with reduced motion / low power');
+assert.match(sr, /ringEl\.style\.transition = `transform \$\{Math\.round\(ms\)\}ms linear`;/, 'the ring shrinks over the same window as the speed bonus');
+assert.match(fn('stopRing'), /ringEl\.style\.transform = now;/, 'an answer freezes the ring where it was');
+assert.match(pk, /stopRing\(\);\s*if \(firstTry\) \{ run\.hit\(\); score\+\+; scoreEl\.textContent = score; dotState\[idx\] = 'ok'; streak\+\+; \}\s*else \{ run\.recover\(\); dotState\[idx\] = 'miss'; streak = 0; \}\s*setBelly\(streak\);/, 'right first time grows the streak; a fix resets it');
+assert.match(pk, /streak = 0; setBelly\(0\); stopRing\(\);/, 'a wrong pick shrinks Booha back and ends the ring');
+assert.match(fn('setBelly'), /scale\(\$\{\(1 \+ BELLY_STEP \* Math\.min\(n, BELLY_MAX\)\)\.toFixed\(2\)\}\)/);
+assert.match(b, /const BELLY_STEP = 0\.05, BELLY_MAX = 6;/, 'at most 1.3× bigger');
+assert.match(b, /const MILESTONES = \{ 3: 'sway', 6: 'wave', 10: 'cheer' \};/, 'dances at the run\'s combo milestones');
+assert.match(fn('milestone'), /replayClass\(boohaEl, n >= 10 \? 'spin' : 'dance'\);/);
+assert.match(pk, /milestone\(reached\);/);
+const fb = fn('finalBurp');
+assert.match(fb, /bubble\.textContent = 'BURP! · げっぷ！';/);
+assert.match(fb, /sfx\('burp'\)/);
+assert.match(pk, /if \(idx >= rounds\.length\) finalBurp\(showResults\);/, 'the last card ends with a burp, then the results');
+assert.match(b, /\.bb-choice:active\{transform:translateY\(4px\) scale\(\.95\);/, 'snack buttons press with a spring');
+assert.match(b, /@media \(prefers-reduced-motion:reduce\)\{[^\n]*\.bb-booha\.dance,\.bb-booha\.spin[^\n]*\.bb-ring\{display:none\}\}/);
+assert.match(b, /\$\('bb-replay'\)\.addEventListener\('click', \(\) => \{\s*cardToken\+\+;\s*streak = 0; setBelly\(0\); stopRing\(\);/);
+
 /* Timers belong to their card */
 assert.match(fn('later'), /if \(token === cardToken\) fn\(\);/);
-assert.match(b, /\$\('bb-replay'\)\.addEventListener\('click', \(\) => \{\s*cardToken\+\+;/);
+
 
 /* Sounds: the game's own Web Audio context, never started by us */
 assert.match(fn('sfx'), /window\.BoohaSFX\.context\(\)/);
