@@ -1965,6 +1965,13 @@ else
   bad "Grimmerglen on-screen keyboard audit failed"
 fi
 
+echo "[games] Booha Bites fun audit (Pass B1)"
+if node tests/booha-bites-fun-audit.cjs >/dev/null 2>&1; then
+  ok "Booha Bites: Booha bites, burps back, gobbles wrong choices (transform/opacity, calm modes)"
+else
+  bad "Booha Bites fun audit failed"
+fi
+
 echo "[games] Echo on-screen keyboard audit (Pass E1)"
 if node tests/echo-keys-audit.cjs >/dev/null 2>&1; then
   ok "Echo types on the shared on-screen keyboard (no iPad keyboard, suggestions or paste)"
