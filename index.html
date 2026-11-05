@@ -612,6 +612,44 @@
       .ornamentBanner .obOrn,
       .ornamentBanner .obOrn::before { animation: none; }
     }
+    /* Blitz centerpiece (Pass 13): all three Blitz games done this week →
+       one bigger month ornament in the middle, the bow's knot on the wire,
+       soft gold rays behind. Sized to clear the title. The rays turn
+       slowly (transform only) and stand still for reduced motion / any
+       reduced power. */
+    .ornamentBanner .obOrn.obCenter { --ob-art: 1.32; z-index: 2; }
+    .ornamentBanner .obOrn.obCenter::before { display: none; }
+    .ornamentBanner .obRays {
+      position: absolute;
+      left: 50%; top: var(--ob-glow-y);
+      width: calc(var(--ob-oh) * 1.27); height: calc(var(--ob-oh) * 1.27);
+      margin: calc(var(--ob-oh) * -.635) 0 0 calc(var(--ob-oh) * -.635);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,214,110,.8) 0%, rgba(255,196,64,.32) 32%, rgba(0,0,0,0) 64%);
+      background:
+        radial-gradient(circle, rgba(255,214,110,.8) 0%, rgba(255,196,64,.32) 32%, rgba(0,0,0,0) 64%),
+        repeating-conic-gradient(rgba(255,226,150,.34) 0deg 7deg, rgba(0,0,0,0) 7deg 22.5deg);
+      -webkit-mask-image: radial-gradient(circle, #000 34%, rgba(0,0,0,0) 70%);
+      mask-image: radial-gradient(circle, #000 34%, rgba(0,0,0,0) 70%);
+      animation: obRaysTurn 30s linear infinite;
+    }
+    .ornamentBanner .obBow {
+      position: absolute; z-index: 1;
+      left: 50%;
+      width: calc(var(--ob-oh) * .4); height: calc(var(--ob-oh) * .6);
+      margin-left: calc(var(--ob-oh) * -.2);
+      /* knot centre on the wire: the wire sits at the art's loop height */
+      top: calc(var(--ob-oh) * var(--ob-loop) - var(--ob-oh) * .6 * var(--ob-bow-knot, .467));
+    }
+    @keyframes obRaysTurn { to { transform: rotate(360deg); } }
+    html.hub-reduced-motion .ornamentBanner .obRays,
+    html.hub-low-power .ornamentBanner .obRays,
+    html[data-motion="reduced"] .ornamentBanner .obRays,
+    html[data-power="reduced"] .ornamentBanner .obRays,
+    html[data-power="minimal"] .ornamentBanner .obRays { animation: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .ornamentBanner .obRays { animation: none; }
+    }
 
     /* Grubb greets students on the first screen. The line comes from the
        Christmas season phase (November: first snow, December: lights on). */
@@ -3517,7 +3555,7 @@ const PILLS = [
   function initPillsWhenEnginesReady() {
     renderPills();
     const wireRelight = () => {
-      const relight = () => { renderPills(); updateMazeFriendCue(); };
+      const relight = () => { renderPills(); updateMazeFriendCue(); renderOrnamentBanner(); };
       if (window.VocabBlitz)    VocabBlitz._onClose    = relight;
       if (window.SentenceBlitz) SentenceBlitz._onClose = relight;
       if (window.QuestionBlitz) QuestionBlitz._onClose = relight;
@@ -4482,6 +4520,19 @@ function recordHubVisit() {
    ornament (today's visit, or a Daily Check turning it gold) hangs itself
    with a small animation the next time the hub is actually on screen. */
 let ornamentPopDays = new Set();
+// Blitz centerpiece (Pass 13): shown while all three Blitz games are done
+// this week (the same rule that unlocks the week's Booha skin). It hangs
+// itself only when earned while this page is open, once the hub is on
+// screen and no Blitz game is covering it; a hub opened after it was
+// earned shows it quietly.
+let centerpieceShown = null;       // null until the first render with identity ready
+let centerpiecePending = false;
+function hubHasBlitzCenterpiece() {
+  if (!window.BOOHA_READY) return false;
+  try {
+    return !!window.BoohaSkins?.hasCurrentBlitzTriple?.(window.BoohaAdventure?.save?.load?.());
+  } catch (e) { return false; }
+}
 function renderOrnamentBanner() {
   const el = document.getElementById('hubOrnamentBanner');
   if (!el || !window.BoohaOrnamentBanner) return;
@@ -4490,8 +4541,17 @@ function renderOrnamentBanner() {
     const summary = window.BOOHA_READY && window.BoohaVisitDays ? BoohaVisitDays.current() : null;
     const hub = document.getElementById('hubScene');
     const onScreen = !!(hub && hub.classList.contains('active')) && !document.hidden;
-    BoohaOrnamentBanner.render(el, art, summary, { pop: onScreen ? ornamentPopDays : null });
+    const centerpiece = hubHasBlitzCenterpiece();
+    if (window.BOOHA_READY) {
+      if (centerpiece && centerpieceShown === false) centerpiecePending = true;
+      if (!centerpiece) centerpiecePending = false;
+      centerpieceShown = centerpiece;
+    }
+    const blitzOpen = typeof document.querySelector === 'function' && !!document.querySelector('#vb-overlay, #sb-overlay, #qb-overlay');
+    const popCenter = onScreen && !blitzOpen && centerpiecePending;
+    BoohaOrnamentBanner.render(el, art, summary, { pop: onScreen ? ornamentPopDays : null, centerpiece, popCenter });
     if (onScreen) ornamentPopDays = new Set();
+    if (popCenter) centerpiecePending = false;
   } catch (e) { console.error('[OrnamentBanner]', e); }
 }
 document.addEventListener('booha:visitRecorded', e => {
@@ -4503,6 +4563,11 @@ document.addEventListener('booha:checkIn', e => {
   renderOrnamentBanner();
 });
 document.addEventListener('booha:weeklyReset', renderOrnamentBanner);
+// A finished Blitz may complete the week's three: note it now (no animation
+// while the game covers the hub); the Blitz close hook re-renders to hang it.
+document.addEventListener('booha:gameEnd', e => {
+  if (String(e.detail?.saveId || '').startsWith('blitz:')) setTimeout(renderOrnamentBanner, 0);
+});
 document.addEventListener('DOMContentLoaded', renderOrnamentBanner);
 // Declared above so the banner state exists before the first visit renders.
 if (window.BOOHA_READY) recordHubVisit();
