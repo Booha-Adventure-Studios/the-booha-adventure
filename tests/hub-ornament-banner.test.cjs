@@ -32,16 +32,22 @@ const Banner = loadBrowserScript('js/ui/hub-ornament-banner.js', 'BoohaOrnamentB
 
 // ── Art by month ─────────────────────────────────────────────────────────
 const expectArt = [
-  ['2026-10-31', null],
-  ['2026-11-01', 'november-round'],
-  ['2026-11-30', 'november-round'],
-  ['2026-12-01', 'december-bulb'],
-  ['2026-12-31', 'december-bulb'],
+  ['2026-10-31', 'october-pumpkin'],
+  ['2026-11-01', 'november-tree'],
+  ['2026-11-30', 'november-tree'],
+  ['2026-12-01', 'december-stocking'],
+  ['2026-12-31', 'december-stocking'],
   ['2027-01-01', 'january-shimenawa'],   // New Year art even inside the Christmas season
   ['2027-02-28', 'february-oni'],
-  ['2027-03-01', null],
+  ['2027-03-01', 'march-hinamatsuri'],
+  ['2027-04-15', 'april-sakura'],
+  ['2027-07-07', 'july-tanabata'],
   ['garbage', null],
 ];
+for (let m = 1; m <= 12; m++) {
+  const mm = String(m).padStart(2, '0');
+  assert.ok(Banner.artForDay(`2027-${mm}-15`), `month ${mm} has ornament art`);
+}
 expectArt.forEach(([day, id]) => {
   const art = Banner.artForDay(day);
   assert.strictEqual(art ? art.id : null, id, `${day} art`);
@@ -53,16 +59,19 @@ Object.values(Banner.ART_BY_MONTH).forEach(art => {
   const buf = fs.readFileSync(file);
   assert.strictEqual(buf.toString('ascii', 0, 4), 'RIFF');
   assert.strictEqual(buf.toString('ascii', 8, 12), 'WEBP');
-  assert.ok(buf.length < 40 * 1024, `${art.src} stays small`);
-  // VP8X header carries the canvas size: every ornament shares 256×384.
+  assert.ok(buf.length < 25 * 1024, `${art.src} stays small (optimised)`);
+  assert.ok(/-r\d+\.webp$/.test(art.src), `${art.src} carries a revision so replaced art busts the iPad cache`);
+  assert.ok(art.loop >= 0 && art.loop <= 0.2, `${art.id} loop height is measured`);
+  assert.ok(art.glowY >= 0.3 && art.glowY <= 0.8, `${art.id} glow centre is measured`);
+  // VP8X header carries the canvas size: every ornament shares 192×288.
   if (buf.toString('ascii', 12, 16) === 'VP8X') {
     const w = 1 + buf.readUIntLE(24, 3);
     const h = 1 + buf.readUIntLE(27, 3);
-    assert.deepStrictEqual([w, h], [256, 384], `${art.src} uses the shared 256×384 canvas`);
+    assert.deepStrictEqual([w, h], [192, 288], `${art.src} uses the shared 192×288 canvas`);
   }
 });
-assert.deepStrictEqual(Array.from(Banner.artForDay('2026-12-05').tints), ['red', 'green', 'warm'],
-  'December bulbs light in Christmas colours');
+assert.ok(Object.values(Banner.ART_BY_MONTH).every(a => !a.tints && !a.glass),
+  'no glass-bulb tints remain (December is a stocking now)');
 
 // ── Geometry ─────────────────────────────────────────────────────────────
 assert.deepStrictEqual(plain(Banner.positions(0)), []);
@@ -86,7 +95,7 @@ assert.deepStrictEqual(['2026-11-01', '2026-11-03', '2026-11-07', 'bad'].map(Ban
 class FakeNode {
   constructor(doc, tag) {
     this.ownerDocument = doc; this.tagName = tag; this.children = []; this.parent = null;
-    this.style = {}; this.dataset = {}; this.attrs = {}; this.hidden = false; this.className = '';
+    this.style = { setProperty(k, v) { this[k] = v; } }; this.dataset = {}; this.attrs = {}; this.hidden = false; this.className = '';
     const self = this;
     this.classList = {
       _s: new Set(),
@@ -117,7 +126,9 @@ const nov = Banner.artForDay('2026-11-05');
 // Before identity: base strand only.
 Banner.render(el, nov, null, {});
 assert.strictEqual(el.hidden, false);
-assert.strictEqual(el.dataset.art, 'november-round');
+assert.strictEqual(el.dataset.art, 'november-tree');
+assert.strictEqual(el.style['--ob-loop'], '0.118', 'the strand knows where November\'s loop is');
+assert.strictEqual(el.style['--ob-glow-y'], '64%');
 const wire = el.children[0];
 assert.strictEqual(wire.attrs.class, 'obWire');
 assert.strictEqual(el.children.filter(c => c.className === 'obBead').length, 11, 'beads show from the start');
@@ -135,7 +146,7 @@ assert.strictEqual(ornaments().length, 1);
 const tue = ornaments()[0];
 assert.strictEqual(tue.dataset.day, '2026-11-03');
 assert.strictEqual(tue.children[0].className, 'obArt', 'art sits in a tilt/tint wrapper');
-assert.strictEqual(tue.children[0].children[0].src, 'assets/img/hub/ornaments/ornament-november-round.webp');
+assert.strictEqual(tue.children[0].children[0].src, 'assets/img/hub/ornaments/ornament-november-tree-r2.webp');
 assert.strictEqual(tue.children[0].children[0].alt, '');
 assert.strictEqual(tue.dataset.wd, '2', 'Tuesday hangs with Tuesday\'s tilt');
 assert.strictEqual(tue.style.left, '50%');
@@ -171,9 +182,10 @@ assert.strictEqual(el.children[0], wire);
 const dec = Banner.artForDay('2026-12-02');
 Banner.render(el, dec, sum(['2026-11-29'], ['2026-11-30'], ['2026-12-01', true], ['2026-12-02']), {});
 assert.notStrictEqual(el.children[0], wire, 'new month art rebuilds the strand');
-assert.strictEqual(el.dataset.art, 'december-bulb');
-assert.deepStrictEqual(Array.from(ornaments(), o => o.dataset.tint), ['red', 'green', 'warm', 'red']);
-assert.ok(ornaments().every(o => o.children[0].children[0].src.endsWith('ornament-december-bulb.webp')),
+assert.strictEqual(el.dataset.art, 'december-stocking');
+assert.strictEqual(el.style['--ob-loop'], '0.028', 'per-art loop updates with the month');
+assert.ok(ornaments().every(o => o.dataset.tint === undefined), 'no colour tints');
+assert.ok(ornaments().every(o => o.children[0].children[0].src.endsWith('ornament-december-stocking-r2.webp')),
   'the whole week shows this month\'s art');
 
 // No art (e.g. March): hidden and empty.
@@ -224,20 +236,13 @@ keyframes.forEach(k => {
 assert.ok(/@media \(prefers-reduced-motion: reduce\) \{\s*\.ornamentBanner \.obOrn,\s*\.ornamentBanner \.obOrn::before \{ animation: none; \}/.test(css),
   'prefers-reduced-motion stops banner motion');
 assert.ok(!/\.hubTitle > \.stringLights/.test(index), 'the old hub strand rules are gone');
-Object.values(Banner.ART_BY_MONTH).forEach(art => {
-  assert.ok(new RegExp(`\\.ornamentBanner\\[data-art="${art.id}"\\]\\s*\\{[^}]*--ob-glow-y: \\d+%;`).test(css),
-    `${art.id} has a glow centre so the light sits on the ornament body`);
-});
-
 // Pass 3b: quiet strand, smaller December bulbs, masked tint, no filters.
 assert.ok(!/(^|[\s;{])filter\s*:/.test(css), 'no CSS filters in the banner (cheap on older iPads)');
-assert.ok(/\.ornamentBanner\[data-art="december-bulb"\]\s*\{[^}]*--ob-art: \.72;/.test(css),
-  'December bulbs are drawn smaller than the other ornaments');
 assert.ok(/--ob-oh: calc\(var\(--ob-h\) \* var\(--ob-art\)\)/.test(css),
   'the whole ornament box (glow and loop included) follows the size factor');
-assert.ok(/-webkit-mask-image: linear-gradient\([^;]*url\('assets\/img\/hub\/ornaments\/ornament-december-bulb\.webp'\)/.test(css)
-  && /-webkit-mask-composite: source-in;/.test(css) && /mask-composite: intersect;/.test(css),
-  'the December tint is masked to the glass and kept off the cap');
+assert.ok(/margin: calc\(var\(--ob-oh\) \* var\(--ob-loop\) \* -1\)/.test(css),
+  'each ornament is lifted by its own loop height so the loop meets the wire');
+assert.ok(!/mask-image|data-tint|data-art="/.test(css), 'no per-art CSS rules or glass tints left (art data lives in the module)');
 for (let wd = 0; wd < 7; wd++) {
   assert.ok(new RegExp(`\\.obOrn\\[data-wd="${wd}"\\] \\{ --ob-tilt: -?\\.?\\d`).test(css), `weekday ${wd} has a fixed tilt`);
 }

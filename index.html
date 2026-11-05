@@ -528,8 +528,9 @@
        animate, and no filters (cheap on older iPads). */
     .ornamentBanner {
       --ob-h: clamp(38px, 5.2vw, 60px);
-      --ob-art: 1;          /* per-art size factor */
-      --ob-glow-y: 50%;     /* per-art body centre on the 256×384 canvas */
+      --ob-art: 1;          /* size factor (all current art is 1) */
+      --ob-loop: .075;      /* set per art by the module: loop height on the canvas */
+      --ob-glow-y: 50%;     /* set per art by the module: body centre on the canvas */
       position: relative;
       width: min(100%, 560px);
       height: calc(var(--ob-h) * 1.15);
@@ -537,10 +538,6 @@
       pointer-events: none;
     }
     .ornamentBanner[hidden] { display: none; }
-    .ornamentBanner[data-art="november-round"]    { --ob-glow-y: 41%; }
-    .ornamentBanner[data-art="december-bulb"]     { --ob-glow-y: 64%; --ob-art: .72; }
-    .ornamentBanner[data-art="january-shimenawa"] { --ob-glow-y: 40%; }
-    .ornamentBanner[data-art="february-oni"]      { --ob-glow-y: 42%; }
     .ornamentBanner .obWire { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
     .ornamentBanner .obWire path { fill: none; stroke: rgba(25,34,27,.68); stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
     .ornamentBanner .obBead {
@@ -558,14 +555,14 @@
       position: absolute;
       width: calc(var(--ob-oh) * .6667);
       height: var(--ob-oh);
-      /* every ornament canvas puts its loop ~7.5% down, centred */
-      margin: calc(var(--ob-oh) * -.075) 0 0 calc(var(--ob-oh) * -.3333);
-      transform-origin: 50% 7%;
+      /* lift each ornament by its own loop height so the loop meets the wire */
+      margin: calc(var(--ob-oh) * var(--ob-loop) * -1) 0 0 calc(var(--ob-oh) * -.3333);
+      transform-origin: 50% calc(var(--ob-loop) * 100%);
     }
     .ornamentBanner .obArt {
       position: absolute; inset: 0;
       transform: translateY(var(--ob-y, 0px)) rotate(var(--ob-tilt, 0deg));
-      transform-origin: 50% 7%;   /* tilts pivot on the loop, like a real hang */
+      transform-origin: 50% calc(var(--ob-loop) * 100%);   /* tilts pivot on the loop, like a real hang */
     }
     .ornamentBanner .obArt img { display: block; width: 100%; height: 100%; }
     /* Tiny fixed variation per weekday so a full week never looks stamped. */
@@ -587,8 +584,6 @@
       opacity: .45;
       animation: obGlow 3.4s ease-in-out infinite alternate;
     }
-    .ornamentBanner .obOrn[data-tint="red"]   { --glow: rgba(255,84,100,.8); }
-    .ornamentBanner .obOrn[data-tint="green"] { --glow: rgba(80,225,135,.75); }
     .ornamentBanner .obOrn.gold { --glow: rgba(255,196,64,.95); }
     .ornamentBanner .obOrn.gold::before {
       left: -42%; right: -42%;
@@ -596,25 +591,6 @@
       opacity: .72;
       animation-name: obGlowGold;
     }
-    /* December: colour the glass, not the cap or the forest. The bulb's own
-       alpha limits the tint to the glass; the gradient keeps it off the cap. */
-    .ornamentBanner[data-art="december-bulb"] .obArt::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: var(--bulb-tint, transparent);
-      mix-blend-mode: color;
-      opacity: .3;
-      -webkit-mask-image: linear-gradient(rgba(0,0,0,0) 31%, #000 34%), url('assets/img/hub/ornaments/ornament-december-bulb.webp');
-      -webkit-mask-size: 100% 100%;
-      -webkit-mask-composite: source-in;
-      mask-image: linear-gradient(rgba(0,0,0,0) 31%, #000 34%), url('assets/img/hub/ornaments/ornament-december-bulb.webp');
-      mask-size: 100% 100%;
-      mask-composite: intersect;
-    }
-    .ornamentBanner[data-art="december-bulb"] .obOrn[data-tint="red"]   { --bulb-tint: #c7354b; }
-    .ornamentBanner[data-art="december-bulb"] .obOrn[data-tint="green"] { --bulb-tint: #267448; }
-    .ornamentBanner[data-art="december-bulb"] .obOrn[data-tint="warm"]  { --bulb-tint: #f2c95c; }
-    .ornamentBanner[data-art="december-bulb"] .obOrn.gold               { --bulb-tint: #f2c95c; }
     .ornamentBanner .obOrn.is-new { animation: obHang 900ms cubic-bezier(.2,1.4,.4,1) both; }
     @keyframes obGlow { from { opacity: .3; } to { opacity: .5; } }
     @keyframes obGlowGold { from { opacity: .62; } to { opacity: .82; } }

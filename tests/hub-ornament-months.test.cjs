@@ -7,8 +7,8 @@
 // save and a calendar the test moves forward, across every boundary:
 //   Nov 30 → Dec 1 (mid-week art change; December lights take over)
 //   Sat → Sun (weekly reset: fresh strand)
-//   Dec 31 → Jan 1, Jan 31 → Feb 1, Feb 28 → Mar 1 (banner hides),
-//   and a leap day.
+//   Dec 31 → Jan 1, Jan 31 → Feb 1, Feb 28 → Mar 1, Oct 31 → Nov 1,
+//   and a leap day. (All twelve months have art since the r2 set.)
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -31,7 +31,7 @@ const visitSrc = slice('/* Weekly visit record for the hub ornament banner', '\n
 class FakeNode {
   constructor(doc, tag) {
     this.ownerDocument = doc; this.tagName = tag; this.children = []; this.parent = null;
-    this.style = {}; this.dataset = {}; this.attrs = {}; this.hidden = false; this.className = '';
+    this.style = { setProperty(k, v) { this[k] = v; } }; this.dataset = {}; this.attrs = {}; this.hidden = false; this.className = '';
     this.offsetWidth = 10;
     const set = new Set();
     this.classList = {
@@ -120,7 +120,7 @@ function nextDay() {
 // Page opened on Sunday Nov 29 (identity already ready): today's visit hangs.
 assert.strictEqual(save.weekly.visitDays['2026-11-29'], 1, 'opening the page records today');
 assert.strictEqual(banner.hidden, false);
-assert.strictEqual(banner.dataset.art, 'november-round');
+assert.strictEqual(banner.dataset.art, 'november-tree');
 assert.deepStrictEqual(days(), ['2026-11-29']);
 
 // Monday Nov 30: page left open past midnight → a visit; then a Daily Check.
@@ -133,15 +133,15 @@ assert.ok(orn()[1].classList.contains('is-new'), 'the gold upgrade hangs itself 
 assert.strictEqual(banner.children[0], novWire, 'no rebuild for a check-in');
 
 // Tuesday Dec 1: mid-week month change. The whole week becomes December
-// lights (one art per month), the gold day stays gold, colours cycle.
+// stockings (one art per month) and the gold day stays gold.
 nextDay();
-assert.strictEqual(banner.dataset.art, 'december-bulb', 'December lights take over on Dec 1');
+assert.strictEqual(banner.dataset.art, 'december-stocking', 'December art takes over on Dec 1');
+assert.strictEqual(banner.style['--ob-loop'], '0.028', 'the loop offset follows the new art');
 assert.notStrictEqual(banner.children[0], novWire, 'new art rebuilds the strand');
 assert.deepStrictEqual(days(), ['2026-11-29', '2026-11-30', '2026-12-01']);
-assert.ok(srcs().every(s => s === 'december-bulb.webp'), 'earlier days this week re-hang as bulbs');
+assert.ok(srcs().every(s => s === 'december-stocking-r2.webp'), 'earlier days this week re-hang as stockings');
 assert.deepStrictEqual(orn().map(o => o.classList.contains('gold')), [false, true, false], 'gold survives the art change');
-assert.deepStrictEqual(orn().map(o => o.dataset.tint), ['red', 'green', 'warm']);
-assert.ok(orn()[2].classList.contains('is-new'), 'today\'s new bulb hangs itself');
+assert.ok(orn()[2].classList.contains('is-new'), 'today\'s new stocking hangs itself');
 assert.ok(!orn()[0].classList.contains('is-new'), 're-hung earlier days do not animate');
 assert.strictEqual(banner.dataset.visits, '3');
 
@@ -160,19 +160,18 @@ assert.strictEqual(orn().length, 7, 'a full week is seven ornaments');
 nextDay();
 assert.strictEqual(today, '2026-12-06');
 assert.deepStrictEqual(days(), ['2026-12-06'], 'the new week starts with one ornament (today)');
-assert.strictEqual(banner.dataset.art, 'december-bulb');
+assert.strictEqual(banner.dataset.art, 'december-stocking');
 
 // Jump ahead: Wed Dec 30 → Fri Jan 1 (New Year art inside the Christmas season).
 today = '2026-12-29'; sundayReset(); save.weekly.visitDays = { '2026-12-27': 1 };
 nextDay();                                   // Wed Dec 30
-assert.strictEqual(banner.dataset.art, 'december-bulb');
+assert.strictEqual(banner.dataset.art, 'december-stocking');
 nextDay();                                   // Thu Dec 31
 nextDay();                                   // Fri Jan 1
 assert.strictEqual(today, '2027-01-01');
 assert.strictEqual(banner.dataset.art, 'january-shimenawa', 'shimenawa on New Year\'s Day');
 assert.deepStrictEqual(days(), ['2026-12-27', '2026-12-30', '2026-12-31', '2027-01-01']);
-assert.ok(srcs().every(s => s === 'january-shimenawa.webp'));
-assert.ok(orn().every(o => o.dataset.tint === 'warm'), 'only December uses coloured tints');
+assert.ok(srcs().every(s => s === 'january-shimenawa-r2.webp'));
 
 // Sun Jan 31 → Mon Feb 1.
 today = '2027-01-30'; save.weekly.visitDays = {};
@@ -182,23 +181,30 @@ nextDay();                                   // Mon Feb 1
 assert.strictEqual(banner.dataset.art, 'february-oni');
 assert.deepStrictEqual(days(), ['2027-01-31', '2027-02-01']);
 
-// Sun Feb 28 → Mon Mar 1: no March art → the banner hides cleanly.
+// Sun Feb 28 → Mon Mar 1: hinamatsuri lanterns.
 today = '2027-02-27'; save.weekly.visitDays = {};
 nextDay();                                   // Sun Feb 28
-assert.strictEqual(banner.hidden, false);
+assert.strictEqual(banner.dataset.art, 'february-oni');
 nextDay();                                   // Mon Mar 1
-assert.strictEqual(banner.hidden, true, 'months without art hide the banner');
-assert.strictEqual(banner.children.length, 0);
-assert.strictEqual(save.weekly.visitDays['2027-03-01'], 1, 'visits are still recorded while the banner is hidden');
+assert.strictEqual(banner.hidden, false);
+assert.strictEqual(banner.dataset.art, 'march-hinamatsuri');
+assert.deepStrictEqual(days(), ['2027-02-28', '2027-03-01']);
 
-// Leap year: Feb 29 is February; Mar 1 hides.
+// Sat Oct 31 → Sun Nov 1: pumpkins → trees, and the week resets.
+today = '2027-10-30'; save.weekly.visitDays = {};
+nextDay();                                   // Sun Oct 31 2027
+assert.strictEqual(banner.dataset.art, 'october-pumpkin');
+nextDay();                                   // Mon Nov 1 2027
+assert.strictEqual(banner.dataset.art, 'november-tree');
+
+// Leap year: Feb 29 is February; Mar 1 is March.
 today = '2028-02-28'; save.weekly.visitDays = {};
 nextDay();                                   // Tue Feb 29 2028
 assert.strictEqual(today, '2028-02-29');
 assert.strictEqual(banner.hidden, false);
 assert.strictEqual(banner.dataset.art, 'february-oni');
 nextDay();
-assert.strictEqual(banner.hidden, true);
+assert.strictEqual(banner.dataset.art, 'march-hinamatsuri');
 
 // A hidden tab crossing midnight records nothing and hangs nothing new.
 today = '2026-11-10'; save.weekly.visitDays = {};
