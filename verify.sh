@@ -1851,6 +1851,13 @@ else
   bad "Phone layout test failed"
 fi
 
+echo "[maze] Christmas unlock reveal"
+if node tests/maze-seasonal-unlock-christmas.test.cjs >/dev/null 2>&1; then
+  ok "Every seasonal Booha has reveal copy; Thumpkin reveal shows; marked seen only on equip"
+else
+  bad "Christmas unlock reveal test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
