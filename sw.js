@@ -141,7 +141,8 @@ const CURRENT_CACHES = {
   // Pass 10: quiet homework count badge replaces NEW on the notebook button.
   // Pass 11a: homework.html loads the save stack; shared js/core/homework-store.js (week-keyed known).
   // Pass 11: hub liveliness levels (glow, fireflies, seasonal drift).
-  pages:  'booha-pages-2026-521',
+  // Pass 12: weekly postcards (Trophy Case) — profile.html loads postcards + art helpers.
+  pages:  'booha-pages-2026-522',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

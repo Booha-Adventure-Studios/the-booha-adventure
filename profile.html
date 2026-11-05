@@ -737,6 +737,22 @@
     .rb-bar b { display:block; height:100%; background:#5cffd0; border-radius:3px; }
     .rb-count { font-size:9px; color:#a8916a; font-variant-numeric:tabular-nums; }
     .rb-trophy.on .rb-count { color:#ffd76a; }
+    /* Weekly postcards (js/core/postcards.js): one per week visited, gold
+       frame for a full week. Static styling only — no filters or motion. */
+    .rb-postcards { margin-top:18px; }
+    .rb-pc-head h4 { margin:0 0 2px; color:#f3e6c8; font-size:15px; }
+    .rb-pc-head h4 span { color:#cbb994; font-size:11px; letter-spacing:1px; }
+    .rb-pc-how, .rb-pc-empty { margin:0 0 10px; color:#cbb994; font-size:12px; line-height:1.5; }
+    .rb-pc-how span, .rb-pc-empty span { display:block; opacity:.8; font-size:11px; }
+    .rb-pc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:10px; }
+    .rb-postcard { position:relative; display:flex; align-items:center; gap:8px; margin:0; padding:8px 10px; border-radius:6px; background:#fbf6e8; color:#3a2a14; border:1px solid rgba(150,128,88,.55); box-shadow:0 4px 10px rgba(0,0,0,.35); }
+    .rb-postcard img { flex:0 0 auto; width:32px; height:48px; object-fit:contain; }
+    .rb-postcard figcaption { display:flex; flex-direction:column; min-width:0; line-height:1.25; }
+    .rb-postcard figcaption b { font-size:12px; white-space:nowrap; }
+    .rb-postcard figcaption span { font-size:10px; color:#6b5634; }
+    .rb-postcard figcaption em { font-style:normal; font-size:11px; font-weight:800; color:#2c4f86; margin-top:2px; }
+    .rb-postcard.deluxe { border:2px solid #e2b13c; box-shadow:0 0 0 2px rgba(255,214,110,.35), 0 4px 12px rgba(0,0,0,.4); background:linear-gradient(160deg,#fffaf0,#f7e7bd); }
+    .rb-pc-stamp { position:absolute; top:-8px; right:-6px; padding:2px 6px; border-radius:4px; background:#c7354b; color:#fffaf0; font-size:9px; font-style:normal; font-weight:900; letter-spacing:.8px; transform:rotate(6deg); box-shadow:0 2px 5px rgba(0,0,0,.35); }
     .rb-pips, .rb-dots { display:flex; gap:3px; justify-content:center; margin-top:2px; }
     .rb-pips i { width:7px; height:7px; border-radius:50%; background:#3a2c1a; }
     .rb-pips i.on { background:#ffcf3f; }
@@ -988,6 +1004,9 @@
 <script src="./js/core/profile-art.js"></script>
 <script src="./js/core/weekly-medals.js"></script>
 <script src="./js/core/trophy-case.js"></script>
+<script src="./js/core/visit-days.js"></script>
+<script src="./js/ui/hub-ornament-banner.js"></script>
+<script src="./js/core/postcards.js"></script>
 <script src="./js/ui/profile-icons.js"></script>
 <script src="./js/ui/bonus-games.js"></script>
 <script src="./js/ui/adventure-log.js"></script>

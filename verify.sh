@@ -1893,6 +1893,9 @@ else
   bad "Hub liveliness test failed"
 fi
 
+echo "[hub] Weekly postcards"
+node tests/postcards.test.cjs
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
