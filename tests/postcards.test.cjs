@@ -16,7 +16,7 @@ const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
 const plain = v => JSON.parse(JSON.stringify(v));
 const keyFor = id => `booha_save:v3:${id}`;
 
-function device() {
+function device({ deferPostcards = false } = {}) {
   const store = new Map();
   let userId = null;
   let today = '2026-11-03';
@@ -43,10 +43,11 @@ function device() {
     getCurriculumWeekOccurrenceKey: cw => cw.occurrenceKey,
   };
   vm.createContext(ctx);
-  ['js/core/adventure-core.js', 'js/core/save-file.js', 'js/core/visit-days.js', 'js/core/postcards.js']
-    .forEach(f => vm.runInContext(read(f), ctx, { filename: f }));
+  const files = ['js/core/adventure-core.js', 'js/core/save-file.js', 'js/core/visit-days.js', 'js/core/postcards.js'];
+  (deferPostcards ? files.slice(0, 3) : files).forEach(f => vm.runInContext(read(f), ctx, { filename: f }));
   return {
-    ctx, store, events, P: ctx.BoohaPostcards,
+    ctx, store, events, get P() { return ctx.BoohaPostcards; },
+    loadPostcards() { vm.runInContext(read('js/core/postcards.js'), ctx, { filename: 'js/core/postcards.js' }); },
     signIn(id) {
       userId = id;
       if (!store.has(keyFor(id))) store.set(keyFor(id), JSON.stringify({ version: 2, meta: { lastWeeklyKey: `${sundayOf(today)}|w` }, weekly: {} }));
@@ -115,6 +116,19 @@ d.visit('2026-12-02');
 assert.deepStrictEqual(d.pc('student-b'), { '2026-11-29': { m: '12', v: 1, g: 0 } });
 assert.strictEqual(Object.keys(d.pc('student-a')).length, 3, 'A is unchanged');
 
+// ── Loaded after the save is already ready (Adventure Log page) ───────────
+{
+  const late = device({ deferPostcards: true });
+  late.signIn('student-c');
+  late.visit('2026-11-03');                      // visit recorded before postcards.js exists
+  assert.strictEqual(late.ctx.BoohaPostcards, undefined);
+  late.loadPostcards();                          // booha:ready already fired
+  assert.deepStrictEqual(late.pc('student-c'), { '2026-11-01': { m: '11', v: 1, g: 0 } }, 'catches up at load: no waiting for another visit');
+  const late2 = device({ deferPostcards: true });
+  late2.loadPostcards();                         // not ready yet: nothing written
+  assert.strictEqual(late2.store.size, 0, 'no write before identity');
+}
+
 // ── Normalization ────────────────────────────────────────────────────────
 assert.strictEqual(d.P.normalizeCard({ m: '13', v: 2 }), null);
 assert.strictEqual(d.P.normalizeCard({ m: '11', v: 0 }), null, 'no visits, no card');
@@ -133,8 +147,8 @@ const html = P.renderHTML([
 ], { artFor: day => `art/${day.slice(5, 7)}.webp` });
 assert.match(html, /POSTCARDS · 2 · ★ 1/, 'count and deluxe count');
 assert.strictEqual((html.match(/class="rb-postcard[ "]/g) || []).length, 2);
-assert.match(html, /<figure class="rb-postcard deluxe" aria-label="Week of Nov 1: 5 visits, 1 Daily Check, full week">/);
-assert.match(html, /<i class="rb-pc-stamp">FULL WEEK<\/i>/);
+assert.match(html, /<figure class="rb-postcard deluxe" aria-label="Week of Nov 1: 5 visits, 1 Daily Check, 5-day week">/);
+assert.match(html, /<i class="rb-pc-stamp">5-DAY WEEK<\/i>/);
 assert.match(html, /<img src="art\/12\.webp"/, 'art comes from the month');
 assert.match(html, /11月29日の しゅう/);
 assert.ok(html.indexOf('Week of Nov 29') < html.indexOf('Week of Nov 1:'), 'newest first');

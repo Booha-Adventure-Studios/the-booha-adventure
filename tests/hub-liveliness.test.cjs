@@ -122,4 +122,28 @@ keyframes.forEach(k => {
 assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{ \.hlFly, \.hlDrift \{ display: none !important; \}/);
 assert.doesNotMatch(css, /filter\s*:|backdrop-filter/, 'no filters (cheap on older iPads)');
 
+// ── Pass 12b: a hub left open across a date change refreshes the season ─
+{
+  const refreshSrc = slice('let seasonDateKey = seasonTodayKey();', '\n}\n') + '\n}\n';
+  assert.match(refreshSrc, /if \(typeof updateHubLiveliness === 'function'\) updateHubLiveliness\(\);/, 'date refresh calls updateHubLiveliness');
+  let today = '2027-02-28';
+  const ds = {};
+  const ctx = {
+    console, document: { hidden: false, documentElement: { dataset: ds }, addEventListener() {} },
+    setTimeout: fn => fn(), applySeasonalLandingSkin() {}, renderDailyCheckStamp() {}, recordHubVisit() {}, renderOrnamentBanner() {},
+  };
+  ctx.window = ctx; ctx.BOOHA_READY = true;
+  ctx.BoohaCurriculum = { get: () => 'pb' };
+  ctx.BoohaSkins = { seasonPhase: () => null, applySeasonTheme() {} };
+  ctx.BoohaAdventure = { save: { load: () => ({ weekly: { completedGames: {} } }) } };
+  ctx.__today = () => today;
+  vm.createContext(ctx);
+  vm.runInContext('function seasonTodayKey() { return window.__today(); }\n' + refreshSrc + src, ctx, { filename: 'index-liveliness-refresh.js' });
+  ctx.updateHubLiveliness();
+  assert.strictEqual(ds.hubSeason, 'winter');
+  today = '2027-03-01';
+  ctx.refreshSeasonIfDateChanged();
+  assert.strictEqual(ds.hubSeason, 'spring', 'Feb 28 → Mar 1 switches the drift without a reload');
+}
+
 console.log('hub liveliness: ok');
