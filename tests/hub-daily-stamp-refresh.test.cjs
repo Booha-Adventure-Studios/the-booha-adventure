@@ -30,8 +30,10 @@ assert(index.indexOf('function renderDailyCheckStamp()') < scriptEnd,
 
 assert(/document\.addEventListener\('booha:checkIn',\s*renderDailyCheckStamp\)/.test(index),
   'a finished Daily Check must redraw the stamp');
+assert(/document\.addEventListener\('booha:ready',\s*recordHubVisit,\s*\{\s*once:\s*true\s*\}\)/.test(index),
+  'opening the hub records a visit once identity is ready');
 
-function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'christmas' }) {
+function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'christmas', hidden = false }) {
   const classes = new Set();
   const stamp = {
     textContent: '',
@@ -41,7 +43,7 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
       contains: c => classes.has(c),
     },
   };
-  const state = { today, skinRefreshes: 0 };
+  const state = { today, skinRefreshes: 0, visits: 0 };
   const context = {
     console, Intl, Date,
     window: {
@@ -50,10 +52,12 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
       BoohaSkins: { applySeasonTheme() {} },
     },
     document: {
+      hidden,
       documentElement: { dataset: { season } },
       getElementById: id => (id === 'dcStamp' ? stamp : null),
     },
     applySeasonalLandingSkin: () => { state.skinRefreshes++; },
+    recordHubVisit: () => { state.visits++; },
   };
   context.window.BoohaDailyCheck = {
     isDoneToday: () => !!done[state.today],
@@ -94,9 +98,20 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
   assert.ok(!h.shown(), 'yesterday\'s stamp is hidden after midnight');
   assert.strictEqual(h.stamp.textContent, '', 'stale stamp text is cleared');
 
+  assert.strictEqual(h.state.visits, 1, 'a visible page on a new day records a visit');
+
   // Same day again: no extra work.
   h.context.refreshSeasonIfDateChanged();
   assert.strictEqual(h.state.skinRefreshes, 1, 'no refresh while the date is unchanged');
+  assert.strictEqual(h.state.visits, 1, 'no second visit on the same day');
+}
+
+// ── A hidden tab crossing midnight is not a visit ────────────────────────
+{
+  const h = makeHarness({ today: '2026-11-05', hidden: true });
+  h.state.today = '2026-11-06';
+  h.context.refreshSeasonIfDateChanged();
+  assert.strictEqual(h.state.visits, 0, 'hidden pages do not record visits');
 }
 
 // ── New day where the check is already done (e.g. finished on another iPad) ─
@@ -116,6 +131,7 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
   h.state.today = '2026-11-06';
   h.context.refreshSeasonIfDateChanged();
   assert.ok(!h.shown(), 'no stamp from a save that is not identity-ready yet');
+  assert.strictEqual(h.state.visits, 0, 'no visit before identity is ready');
   assert.strictEqual(h.stamp.textContent, '');
 }
 
