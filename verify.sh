@@ -1809,6 +1809,13 @@ else
   bad "Daily Check stamp date refresh test failed"
 fi
 
+echo "[hub] Weekly visit record"
+if node tests/hub-visit-days.test.cjs >/dev/null 2>&1; then
+  ok "weekly.visitDays: once per day, per student, after identity, carried across the Sunday reset"
+else
+  bad "Weekly visit record test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"

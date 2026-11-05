@@ -100,6 +100,7 @@ const BoohaSaveFile = (() => {
         unlockedBonusGames:{},   // { booha_invaders: true, booha_blocks: true, ... }
         unlockedBoohaSkins:{},   // { batty: { unlockedAt } } — temporary cosmetic unlocks
         wanderers:         [],   // [ wandererId, ... ] unlocked this week (index = order)
+        visitDays:         {},   // { "2026-11-05": 1 } Tokyo days this student opened the hub this week
         worlds:            _defaultWeeklyWorlds(),
       },
 
@@ -369,13 +370,14 @@ const BoohaSaveFile = (() => {
         unlockedBonusGames: {},
         unlockedBoohaSkins: {},
         wanderers:          [],
+        visitDays:          {},
         worlds:             _defaultWeeklyWorlds(),
       };
     }
     if (!save.weekly.unlockedBoohaSkins || typeof save.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(save.weekly.unlockedBoohaSkins)) {
       save.weekly.unlockedBoohaSkins = {};
     }
-    for (const key of ['gamePoints', 'gameCrowns', 'gameRainbow']) {
+    for (const key of ['gamePoints', 'gameCrowns', 'gameRainbow', 'visitDays']) {
       if (!save.weekly[key] || typeof save.weekly[key] !== 'object' || Array.isArray(save.weekly[key])) save.weekly[key] = {};
     }
 
@@ -493,6 +495,18 @@ const BoohaSaveFile = (() => {
     return save(data);
   }
 
+  // Day keys (YYYY-MM-DD) on or after weekStart. With no valid weekStart,
+  // nothing carries over.
+  function _visitDaysFrom(visitDays, weekStart) {
+    const out = {};
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(weekStart)) return out;
+    if (!visitDays || typeof visitDays !== 'object' || Array.isArray(visitDays)) return out;
+    Object.keys(visitDays).forEach(day => {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= weekStart && visitDays[day]) out[day] = 1;
+    });
+    return out;
+  }
+
   // ── Weekly reset ──────────────────────────────────────────────────────────
   /**
    * Clears all weekly data. Called by adventure-core on occurrence change.
@@ -501,6 +515,13 @@ const BoohaSaveFile = (() => {
    */
   function resetWeekly(occurrenceKey) {
     const data = load();
+    // A visit can be recorded under the new Tokyo day just before the live
+    // page notices the rollover (same race the Blitz bucket handles below).
+    // Keep only day keys on or after the new occurrence's Sunday start.
+    const carriedVisitDays = _visitDaysFrom(
+      data.weekly && data.weekly.visitDays,
+      String(occurrenceKey || '').slice(0, 10)
+    );
     data.weekly = {
       completedGames:     {},
       gameScores:         {},
@@ -511,6 +532,7 @@ const BoohaSaveFile = (() => {
       unlockedBonusGames: {},
       unlockedBoohaSkins:{},
       wanderers:          [],
+      visitDays:          carriedVisitDays,
       worlds:             _defaultWeeklyWorlds(),
     };
     data.weekly.worlds.occurrenceKey = occurrenceKey || '';

@@ -2687,7 +2687,11 @@ function refreshSeasonIfDateChanged() {
   applySeasonalLandingSkin();
   // The Daily Check stamp is per-day too. Only redraw once identity is
   // ready; before that, the booha:ready listener draws it.
-  if (window.BOOHA_READY) renderDailyCheckStamp();
+  if (window.BOOHA_READY) {
+    renderDailyCheckStamp();
+    // A visible page that crosses midnight is a visit on the new day.
+    if (!document.hidden) recordHubVisit();
+  }
 }
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refreshSeasonIfDateChanged();
@@ -4008,6 +4012,15 @@ else document.addEventListener('booha:ready', renderDailyCheckStamp, { once: tru
 // A finished Daily Check updates the stamp without a reload.
 document.addEventListener('booha:checkIn', renderDailyCheckStamp);
 
+/* Weekly visit record for the hub ornament banner (weekly.visitDays).
+   Opening the app counts once identity is restored; the module writes at
+   most once per student per Tokyo day and never before BOOHA_READY. */
+function recordHubVisit() {
+  try { if (window.BoohaVisitDays) BoohaVisitDays.record(); } catch (e) {}
+}
+if (window.BOOHA_READY) recordHubVisit();
+else document.addEventListener('booha:ready', recordHubVisit, { once: true });
+
 
 let started = false, fadingOut = false;
 
@@ -4141,6 +4154,7 @@ window.addEventListener('pageshow', ev => {
 <script src="js/sync-client.js"></script>
 <script src="js/core/day-record.js"></script>
 <script src="js/daily-check.js"></script>
+<script src="js/core/visit-days.js"></script>
 <script src="js/core/level-stars.js"></script>
 <script src="js/core/profile-art.js"></script>
 <script src="js/core/weekly-medals.js"></script>
