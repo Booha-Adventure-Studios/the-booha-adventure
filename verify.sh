@@ -1886,6 +1886,13 @@ else
   bad "Homework known-store test failed"
 fi
 
+echo "[hub] Liveliness levels"
+if node tests/hub-liveliness.test.cjs >/dev/null 2>&1; then
+  ok "Hub liveliness: quiet/glowing/lively/festival from distinct Maze games; only adds; motion gated"
+else
+  bad "Hub liveliness test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"

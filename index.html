@@ -2465,6 +2465,64 @@ html.hub-low-power .mazeCtaFriend { animation: none; }
 }   
     
 
+/* ══ Hub Pass 11: liveliness ═════════════════════════════════════════════
+   The hub gains a little life as the student completes this week's Maze
+   games — distinct games, the same count as the "0 / 9" bar, so replays
+   never move it:  quiet 0–2 · glowing 3–5 · lively 6–8 · festival 9.
+   Quiet is the hub exactly as before; each level only adds:
+     glowing  — warm light pooling along the forest path (static)
+     lively   — + a few drifting fireflies
+     festival — + gentle seasonal drift (snow / petals / fireflies / leaves)
+   A fixed layer behind the hub content; transform/opacity only; the moving
+   layers are off for low power and reduced motion (the glow stays). */
+.hubLively { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.hubScroll { position: relative; z-index: 1; }
+/* Warm light where the forest is actually visible on the hub: behind the
+   title (top band) and along the path below the panels. */
+.hlGlow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 34% at 50% 14%, rgba(255,214,140,.5) 0%, rgba(255,190,110,.2) 45%, rgba(0,0,0,0) 72%),
+    radial-gradient(ellipse 70% 30% at 50% 100%, rgba(255,214,140,.34) 0%, rgba(255,186,104,.12) 45%, rgba(0,0,0,0) 72%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+html[data-hub-tier="glowing"]  .hlGlow { opacity: .7; }
+html[data-hub-tier="lively"]   .hlGlow { opacity: .85; }
+html[data-hub-tier="festival"] .hlGlow { opacity: 1; }
+.hlFly, .hlDrift { position: absolute; display: none; opacity: 0; }
+.hlFly {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: radial-gradient(circle, #fffbe0 0%, #ffd56e 38%, rgba(255,213,110,0) 72%);
+  animation-name: hlFlyA; animation-timing-function: ease-in-out; animation-iteration-count: infinite;
+}
+.hlFly:nth-child(3n)   { animation-name: hlFlyB; }
+.hlFly:nth-child(3n+1) { animation-name: hlFlyC; }
+html[data-hub-tier="lively"] .hlFly:nth-child(-n+9),
+html[data-hub-tier="festival"] .hlFly { display: block; }
+@keyframes hlFlyA { 0%,100% { opacity: 0; transform: translate(0,0); } 25% { opacity: .9; } 50% { opacity: .55; transform: translate(26px,-18px); } 75% { opacity: .95; } }
+@keyframes hlFlyB { 0%,100% { opacity: 0; transform: translate(0,0); } 25% { opacity: .85; } 50% { opacity: .5; transform: translate(-22px,-26px); } 75% { opacity: .9; } }
+@keyframes hlFlyC { 0%,100% { opacity: 0; transform: translate(0,0); } 30% { opacity: .9; } 55% { opacity: .6; transform: translate(14px,22px); } 80% { opacity: .8; } }
+.hlDrift {
+  top: -6vh; width: 7px; height: 7px; border-radius: 50%;
+  background: rgba(255,255,255,.85);
+  animation-name: hlFallA; animation-timing-function: linear; animation-iteration-count: infinite;
+}
+.hlDrift:nth-child(2n) { animation-name: hlFallB; }
+html[data-hub-tier="festival"] .hlDrift { display: block; }
+html[data-hub-season="winter"] .hlDrift { width: 8px; height: 8px; background: radial-gradient(circle, #fff 0%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 75%); }
+html[data-hub-season="spring"] .hlDrift { width: 9px; height: 6px; border-radius: 70% 0 70% 0; background: #ffc4dc; }
+html[data-hub-season="summer"] .hlDrift { width: 6px; height: 6px; background: radial-gradient(circle, #fffbe0 0%, #ffd56e 42%, rgba(255,213,110,0) 72%); }
+html[data-hub-season="autumn"] .hlDrift { width: 10px; height: 7px; border-radius: 0 75% 0 75%; background: #e8913a; }
+@keyframes hlFallA { 0% { opacity: 0; transform: translate(0,0) rotate(0deg); } 8% { opacity: .9; } 92% { opacity: .85; } 100% { opacity: 0; transform: translate(34px,112vh) rotate(240deg); } }
+@keyframes hlFallB { 0% { opacity: 0; transform: translate(0,0) rotate(0deg); } 8% { opacity: .85; } 92% { opacity: .8; } 100% { opacity: 0; transform: translate(-30px,112vh) rotate(-200deg); } }
+html.hub-reduced-motion .hlFly, html.hub-reduced-motion .hlDrift,
+html.hub-low-power .hlFly, html.hub-low-power .hlDrift,
+html[data-motion="reduced"] .hlFly, html[data-motion="reduced"] .hlDrift,
+html[data-power="reduced"] .hlDrift,
+html[data-power="minimal"] .hlFly, html[data-power="minimal"] .hlDrift { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .hlFly, .hlDrift { display: none !important; } .hlGlow { transition: none; } }
+
 /* ══ Hub Pass 6: phone layouts ═══════════════════════════════════════════
    Layout B — phones held upright: everything already fits, so only the week
    doors under the card get slimmer (one line, no dates).
@@ -2608,6 +2666,7 @@ html.hub-low-power .mazeCtaFriend { animation: none; }
 
   <!-- ── HUB ── -->
   <section id="hubScene" class="scene" aria-label="Week Hub">
+    <div id="hubLively" class="hubLively" aria-hidden="true"><span class="hlGlow"></span><span class="hlFly" style="left:73%;top:30%;animation-duration:9.0s;animation-delay:-6.2s"></span><span class="hlFly" style="left:67%;top:17%;animation-duration:9.0s;animation-delay:-1.5s"></span><span class="hlFly" style="left:83%;top:9%;animation-duration:8.2s;animation-delay:-6.3s"></span><span class="hlFly" style="left:73%;top:18%;animation-duration:7.1s;animation-delay:-0.7s"></span><span class="hlFly" style="left:31%;top:28%;animation-duration:6.1s;animation-delay:-7.9s"></span><span class="hlFly" style="left:88%;top:92%;animation-duration:8.6s;animation-delay:-5.2s"></span><span class="hlFly" style="left:6%;top:36%;animation-duration:8.9s;animation-delay:-0.5s"></span><span class="hlFly" style="left:60%;top:97%;animation-duration:9.1s;animation-delay:-4.8s"></span><span class="hlFly" style="left:79%;top:30%;animation-duration:7.5s;animation-delay:-6.7s"></span><span class="hlFly" style="left:4%;top:35%;animation-duration:8.2s;animation-delay:-4.0s"></span><span class="hlFly" style="left:65%;top:30%;animation-duration:7.6s;animation-delay:-2.2s"></span><span class="hlFly" style="left:5%;top:68%;animation-duration:6.3s;animation-delay:-2.0s"></span><span class="hlDrift" style="left:31%;animation-duration:19.6s;animation-delay:-0.7s"></span><span class="hlDrift" style="left:74%;animation-duration:21.9s;animation-delay:-8.8s"></span><span class="hlDrift" style="left:39%;animation-duration:18.5s;animation-delay:-21.1s"></span><span class="hlDrift" style="left:89%;animation-duration:15.0s;animation-delay:-4.6s"></span><span class="hlDrift" style="left:8%;animation-duration:19.2s;animation-delay:-21.6s"></span><span class="hlDrift" style="left:52%;animation-duration:18.8s;animation-delay:-12.5s"></span><span class="hlDrift" style="left:27%;animation-duration:22.0s;animation-delay:-5.9s"></span><span class="hlDrift" style="left:13%;animation-duration:17.8s;animation-delay:-0.3s"></span><span class="hlDrift" style="left:54%;animation-duration:21.8s;animation-delay:-2.6s"></span><span class="hlDrift" style="left:33%;animation-duration:21.4s;animation-delay:-0.2s"></span><span class="hlDrift" style="left:61%;animation-duration:22.2s;animation-delay:-3.9s"></span><span class="hlDrift" style="left:73%;animation-duration:16.7s;animation-delay:-11.2s"></span></div>
     <div class="hubScroll">
       <div class="hub">
         <header class="hubHeader">
@@ -3253,6 +3312,36 @@ function hubWeeklyCompletedFor(curriculum) {
   }
 }
 
+/* Hub Pass 11: liveliness level from this week's distinct Maze games
+   (same count as the 0/9 bar) and a season for the festival drift.
+   Before identity is ready the hub stays quiet. */
+function hubTierFor(count) {
+  const n = Number(count) || 0;
+  return n >= 9 ? 'festival' : n >= 6 ? 'lively' : n >= 3 ? 'glowing' : 'quiet';
+}
+function hubSeasonFor(dayKey, phase) {
+  // Follow the app's own season phases first (November "first snow" and the
+  // Christmas weeks snow), then fall back to the calendar month.
+  if (phase && phase.mazeSnow) return 'winter';
+  const m = Number(String(dayKey || '').slice(5, 7));
+  if (!m) return 'winter';
+  return (m === 12 || m <= 2) ? 'winter' : m <= 5 ? 'spring' : m <= 8 ? 'summer' : 'autumn';
+}
+function updateHubLiveliness() {
+  try {
+    const curr = window.BoohaCurriculum?.get?.() || 'pb';
+    const games = window.BOOHA_READY ? hubWeeklyCompletedFor(curr) : 0;
+    const root = document.documentElement;
+    root.dataset.hubTier = hubTierFor(games);
+    let phase = null;
+    try { phase = window.BoohaSkins?.seasonPhase?.() || null; } catch (e) { phase = null; }
+    root.dataset.hubSeason = hubSeasonFor(seasonTodayKey(), phase);
+  } catch (e) {}
+}
+document.addEventListener('booha:ready', updateHubLiveliness);
+document.addEventListener('booha:weeklyReset', updateHubLiveliness);
+document.addEventListener('booha:gameEnd', () => setTimeout(updateHubLiveliness, 0));
+
 function setHubWeekTab(buttonId, titleId, dateId, wk, direction) {
   const button = document.getElementById(buttonId);
   const title = document.getElementById(titleId);
@@ -3298,6 +3387,7 @@ function renderHub() {
   }
   updateMazeFriendCue();
   updateHomeworkCountBadge();
+  updateHubLiveliness();
 
 const MEDAL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 2.5L11 9M15.5 2.5L13 9"></path><circle cx="12" cy="15" r="6"></circle></svg>';
 const PILLS = [
