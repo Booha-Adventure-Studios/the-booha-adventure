@@ -205,6 +205,12 @@
   </div>
 
   <script src="/the-booha-adventure/js/calendar.js"></script>
+  <!-- Save/sync boot stack: the "hide items I know" state lives in the
+       student's own save (weekly.homework.known), shared with the hub. -->
+  <script src="./js/core/adventure-core.js"></script>
+  <script src="./js/core/save-file.js"></script>
+  <script src="./js/sync-client.js"></script>
+  <script src="./js/core/homework-store.js"></script>
   <script>
   document.getElementById('mazeBackBtn').addEventListener('click', () => {
     window.location.href = 'maze.html';
@@ -243,7 +249,7 @@
   function getRelativeWeek(offset) {
     const shifted = new Date(Date.now() + offset * 7 * 86400000);
     const cw = window.CALENDAR.getCurrentCurriculumWeek(shifted);
-    return { monthSlug: cw.monthSlug, monthLabel: cw.monthLabel, weekNumber: cw.weekNumber };
+    return { monthSlug: cw.monthSlug, monthLabel: cw.monthLabel, weekNumber: cw.weekNumber, weekStart: cw.weekStart };
   }
   function buildWeekCode(curr, monthSlug, week) { return `${curr}_${MONTH_SHORT[monthSlug]||monthSlug}_w${week}`; }
   function parseWeekCode(code) {
@@ -257,11 +263,21 @@
     return `${mo} Week ${p.week}`;
   }
 
-  function knownKey(week, curr, type) { return `booha_hw_known_${week}_${curr}_${type}`; }
-  function getKnown(week, curr, type) {
-    try { return new Set(JSON.parse(localStorage.getItem(knownKey(week,curr,type))||'[]')); } catch { return new Set(); }
+  /* "Hide items I know" lives in the student's own save
+     (weekly.homework.known, keyed by the week's Tokyo Sunday start), via
+     js/core/homework-store.js — never device-wide localStorage. The chosen
+     week's start travels as activeWeekStart (a repeated fifth week keeps
+     its own state). Old booha_hw_known_* keys are not migrated; they are
+     removed once identity is ready. */
+  let activeWeekStart = null;
+  function getKnown(weekCode, curr, type) {
+    try { return window.BoohaHomeworkStore ? window.BoohaHomeworkStore.getKnown(activeWeekStart, curr, type) : new Set(); }
+    catch (e) { return new Set(); }
   }
-  function saveKnown(week, curr, type, set) { localStorage.setItem(knownKey(week,curr,type), JSON.stringify([...set])); }
+  function saveKnown(weekCode, curr, type, set) {
+    try { return !!(window.BoohaHomeworkStore && window.BoohaHomeworkStore.setKnown(activeWeekStart, curr, type, set)); }
+    catch (e) { return false; }
+  }
 
   async function loadCards(curr, weekCode, type) {
     const p = parseWeekCode(weekCode); if (!p) return [];
@@ -288,15 +304,15 @@
         <p class="panel-sub">しゅうをえらぼう &nbsp;|&nbsp; 週を選ぼう</p>
       </div>
       <div class="week-row">
-        <button class="week-card last" data-month="${last.monthSlug}" data-week="${last.weekNumber}">
+        <button class="week-card last" data-month="${last.monthSlug}" data-week="${last.weekNumber}" data-week-start="${last.weekStart}">
           <div class="wc-label">LAST WEEK</div><div class="wc-jp">せんしゅう<br>先週</div>
           <div class="wc-week">${last.monthLabel} W${last.weekNumber}</div>
         </button>
-        <button class="week-card this" data-month="${thisW.monthSlug}" data-week="${thisW.weekNumber}">
+        <button class="week-card this" data-month="${thisW.monthSlug}" data-week="${thisW.weekNumber}" data-week-start="${thisW.weekStart}">
           <div class="wc-label">THIS WEEK</div><div class="wc-jp">こんしゅう<br>今週</div>
           <div class="wc-week">${thisW.monthLabel} W${thisW.weekNumber}</div>
         </button>
-        <button class="week-card next" data-month="${next.monthSlug}" data-week="${next.weekNumber}">
+        <button class="week-card next" data-month="${next.monthSlug}" data-week="${next.weekNumber}" data-week-start="${next.weekStart}">
           <div class="wc-label">NEXT WEEK</div><div class="wc-jp">らいしゅう<br>来週</div>
           <div class="wc-week">${next.monthLabel} W${next.weekNumber}</div>
         </button>
@@ -328,6 +344,7 @@
       root.querySelectorAll('.week-card').forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
       selectedMonth=btn.dataset.month; selectedWeek=Number(btn.dataset.week);
+      activeWeekStart=btn.dataset.weekStart||null;
     }
     const thisCard=root.querySelector('.week-card.this');
     if(thisCard) selectWeekCard(thisCard);
@@ -417,15 +434,24 @@
       item.querySelector('.hide-btn').addEventListener('click', ()=>{
         const set=getKnown(weekCode,curr,type);
         if(set.has(n)) set.delete(n); else set.add(n);
-        saveKnown(weekCode,curr,type,set);
+        if(!saveKnown(weekCode,curr,type,set)) return;   // only change what was saved
         renderSheet(weekCode,curr,type,hideKnown);
       });
       list.appendChild(item);
     });
   }
 
-  if(window.CALENDAR) renderWeekPicker();
-  else document.getElementById('root').innerHTML='<div class="loading-wrap">Loading calendar / よみこみちゅう…</div>';
+  // Wait for the student's save: the sheet shows that student's hidden items.
+  function startHomework() {
+    try { window.BoohaHomeworkStore && window.BoohaHomeworkStore.clearLegacy(); } catch (e) {}
+    if(window.CALENDAR) renderWeekPicker();
+    else document.getElementById('root').innerHTML='<div class="loading-wrap">Loading calendar / よみこみちゅう…</div>';
+  }
+  if (window.BOOHA_READY) startHomework();
+  else {
+    document.getElementById('root').innerHTML='<div class="loading-wrap">Loading / よみこみちゅう…</div>';
+    document.addEventListener('booha:ready', startHomework, { once: true });
+  }
   </script>
 </body>
 </html>
