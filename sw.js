@@ -135,7 +135,8 @@ const CURRENT_CACHES = {
   // Hub Pass 3b: quieter ornament banner (smaller art, softer glow, masked December tint).
   // Hub Pass 4: layout A (full-width week card, corner week doors) and the notebook Homework button.
   // Hub: twelve months of ornament art (r2, 192×288) with per-art loop/glow data; December glass tint removed.
-  pages:  'booha-pages-2026-515',
+  // Hub Pass 6: phone layouts (slim doors upright; two-column hub sideways).
+  pages:  'booha-pages-2026-516',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

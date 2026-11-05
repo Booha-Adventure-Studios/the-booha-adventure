@@ -1844,6 +1844,13 @@ else
   bad "token.js offline boot test failed"
 fi
 
+echo "[hub] Phone layouts B + C"
+if node tests/hub-phone-layouts.test.cjs >/dev/null 2>&1; then
+  ok "Phones: slim week doors upright; two-column hub sideways with Maze on the first screen"
+else
+  bad "Phone layout test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
