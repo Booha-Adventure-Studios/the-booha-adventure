@@ -1088,22 +1088,25 @@
       background: linear-gradient(225deg, rgba(0,0,0,0) 50%, #e3d6b4 50%);
       box-shadow: -1px 1px 2px rgba(0,0,0,.18);
     }
-    /* NEW: this student hasn't opened this week's homework yet. */
-    .hubHomeworkNew {
+    /* Items left to copy this week (see updateHomeworkCountBadge): a quiet
+       ink-blue tab on the paper, no animation. */
+    .hubHomeworkCount {
       position: absolute;
       top: -9px; left: -8px;
+      min-width: 22px;
       padding: 2px 6px 1px;
       border-radius: 999px;
-      background: #e24b4a;
-      color: #fff;
-      font-size: 9px;
+      background: #2c4f86;
+      color: #fffaf0;
+      font-size: 11px;
       font-weight: 900;
-      letter-spacing: .6px;
+      font-variant-numeric: tabular-nums;
       line-height: 1.3;
+      text-align: center;
       box-shadow: 0 2px 6px rgba(0,0,0,.35);
       pointer-events: none;
     }
-    .hubHomeworkNew[hidden] { display: none; }
+    .hubHomeworkCount[hidden] { display: none; }
     .hubHomeworkBtn:hover {
       background-color: #fffaf0;
       box-shadow:
@@ -2669,7 +2672,7 @@ html.hub-low-power .mazeCtaFriend { animation: none; }
             </span>
             <span class="mazeCtaArrow" aria-hidden="true">→</span>
           </button>
-          <button id="hubHomeworkBtn" class="hubHomeworkBtn" type="button"><span id="hubHomeworkNew" class="hubHomeworkNew" hidden>NEW</span><svg class="hubHomeworkPencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/><path d="M14 6l3 3"/></svg><span class="hubHomeworkText">HOMEWORK <span>しゅくだい</span></span></button>
+          <button id="hubHomeworkBtn" class="hubHomeworkBtn" type="button"><span id="hubHomeworkCount" class="hubHomeworkCount" hidden></span><svg class="hubHomeworkPencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/><path d="M14 6l3 3"/></svg><span class="hubHomeworkText">HOMEWORK <span>しゅくだい</span></span></button>
           <button id="pwa-install-btn" class="pwaIconBtn" type="button" onclick="boohaInstallPWA()" aria-label="Install app / インストール">📲</button>
           </div>
         </section>
@@ -3294,6 +3297,7 @@ function renderHub() {
     mazeButton.classList.toggle('is-complete', !mazeAvailable);
   }
   updateMazeFriendCue();
+  updateHomeworkCountBadge();
 
 const MEDAL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 2.5L11 9M15.5 2.5L13 9"></path><circle cx="12" cy="15" r="6"></circle></svg>';
 const PILLS = [
@@ -3897,6 +3901,8 @@ async function renderHomeworkTrack(curr) {
 
   try {
     const data = await loadHomeworkTrack(curr, week);
+    // Real totals are known now; the count may sharpen from the 15s default.
+    updateHomeworkCountBadge();
     if (token !== homeworkRenderToken) return;
     const blitz = homeworkBlitzScores(curr);
     renderHomeworkPayoff(curr, blitz);
@@ -4000,47 +4006,52 @@ function closeHomeworkList() {
 }
 
 homeworkListClose.addEventListener('click', closeHomeworkList);
-/* NEW badge on the Homework button: shown until this student opens this
-   week's homework list. Stored in the student's own save
-   (meta.homeworkSeenWeek = current occurrence key), so it returns each new
-   week, never leaks between students on a shared iPad, and is never read
-   before identity is ready. */
-function homeworkWeekKey() {
+/* Hub Pass 10: a quiet count on the notebook button — how many of this
+   week's homework items the student has not marked "copied" yet for their
+   current class (normally 15 words + 15 sentences + 15 questions = 45).
+   Same save source as the list's ticks (weekly.homework), so it never
+   leaks between students. Hidden at zero and before identity is ready.
+   No animation. Totals come from the week's content once the list has
+   loaded it, and from the weekly 15-per-section slice before that, so the
+   hub still makes no content requests on load. (Replaces the Pass 4 NEW
+   badge; meta.homeworkSeenWeek is no longer read.) */
+function homeworkTotals(curr, week) {
+  const data = homeworkCache.get(`${week.weekStart}:${curr}`);
+  const totals = {};
+  HOMEWORK_SECTIONS.forEach(section => {
+    totals[section.key] = data ? homeworkWeekCards(data[section.key], week).length : 15;
+  });
+  return totals;
+}
+function homeworkLeft(curr, week) {
+  const totals = homeworkTotals(curr, week);
+  let total = 0;
+  Object.keys(totals).forEach(key => { total += totals[key]; });
+  let done = 0;
+  getHomeworkCopied(curr, week).forEach(key => {
+    const m = /^([a-z]+):(\d+)$/.exec(key);
+    if (m && totals[m[1]] && Number(m[2]) >= 1 && Number(m[2]) <= totals[m[1]]) done++;
+  });
+  return Math.max(0, total - done);
+}
+function updateHomeworkCountBadge() {
   try {
-    const cw = window.CALENDAR?.getCurrentCurriculumWeek?.();
-    return (cw && (window.CALENDAR.getCurriculumWeekOccurrenceKey?.(cw) || cw.occurrenceKey)) || '';
-  } catch (e) { return ''; }
-}
-function homeworkSeenThisWeek() {
-  const key = homeworkWeekKey();
-  if (!key) return true;                       // no calendar: never nag
-  const save = window.BoohaSaveFile?.load?.();
-  return !!(save && save.meta && save.meta.homeworkSeenWeek === key);
-}
-function updateHomeworkNewBadge() {
-  const badge = document.getElementById('hubHomeworkNew');
-  if (!badge) return;
-  let show = false;
-  try { show = !!window.BOOHA_READY && !homeworkSeenThisWeek(); } catch (e) { show = false; }
-  badge.hidden = !show;
-  hubHomeworkBtn.setAttribute('aria-label', show
-    ? 'Homework (new this week) / しゅくだい（あたらしい）'
-    : 'Homework / しゅくだい');
-}
-function markHomeworkSeen() {
-  const key = homeworkWeekKey();
-  if (!key || !window.BOOHA_READY || !window.BoohaSaveFile) return;
-  try {
-    if (!homeworkSeenThisWeek()) window.BoohaSaveFile.patch('meta', { homeworkSeenWeek: key });
+    const badge = document.getElementById('hubHomeworkCount');
+    if (!badge) return;
+    let left = 0;
+    if (window.BOOHA_READY) left = homeworkLeft(window.BoohaCurriculum?.get?.() || 'pb', homeworkWeekRange());
+    badge.hidden = left <= 0;
+    badge.textContent = left > 0 ? String(left) : '';
+    hubHomeworkBtn.setAttribute('aria-label', left > 0
+      ? `Homework: ${left} left to copy / しゅくだい のこり ${left}`
+      : 'Homework / しゅくだい');
   } catch (e) {}
-  updateHomeworkNewBadge();
 }
-if (window.BOOHA_READY) updateHomeworkNewBadge();
-else document.addEventListener('booha:ready', updateHomeworkNewBadge, { once: true });
-document.addEventListener('booha:weeklyReset', updateHomeworkNewBadge);
+document.addEventListener('booha:ready', updateHomeworkCountBadge);
+document.addEventListener('booha:homeworkChanged', updateHomeworkCountBadge);
+document.addEventListener('booha:weeklyReset', updateHomeworkCountBadge);
 
 hubHomeworkBtn.addEventListener('click', () => {
-  markHomeworkSeen();
   openHomeworkList();
 });
 homeworkCopyBtn.addEventListener('click', () => {
