@@ -2828,6 +2828,26 @@ window.BoohaBlitzEngine = (() => {
       }
       .booha-blitz-week-pip.done { color: #082016; background: #7ff0b0; border-color: #7ff0b0; }
       .booha-blitz-week-msg { color: #eef1f6; font-size: 13px; line-height: 1.35; }
+      .booha-blitz-maze-cta {
+        grid-column: 1 / -1;
+        appearance: none;
+        min-height: 44px;
+        margin-top: 2px;
+        padding: 8px 16px;
+        border: 0;
+        border-radius: 999px;
+        color: #3b0f2b;
+        background: linear-gradient(180deg, #ffd1ec, #ff8fcf);
+        box-shadow: 0 6px 18px rgba(255, 120, 190, .35);
+        font-size: 14px;
+        font-weight: 900;
+        line-height: 1.2;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .booha-blitz-maze-cta .jp { display: block; margin-top: 2px; font-size: 11px; font-weight: 700; opacity: .8; }
+      .booha-blitz-maze-cta:active { transform: scale(.97); }
+      .booha-blitz-maze-cta:focus-visible { outline: 3px solid #fff3a8; outline-offset: 3px; }
       .booha-blitz-week-msg .jp { display: block; color: rgba(238, 241, 246, .62); font-size: 12px; }
       .scene-card .vb-win-buttons, .scene-card .sb-win-buttons, .scene-card .qb-win-buttons {
         width: 100%;
@@ -3974,6 +3994,23 @@ window.BoohaBlitzEngine = (() => {
       row.innerHTML = `${art ? `<img src="${escapeHtml(art)}" alt="" class="${left ? 'locked' : ''}">` : ''}`
         + `<div class="booha-blitz-week-text"><div class="booha-blitz-week-pips">${pips}</div>`
         + `<div class="booha-blitz-week-msg">${message}</div></div>`;
+
+      // Until the Maze reveal has been seen, the unlocking result card gets a
+      // real way there. The hub handles booha:openMaze with its own fade +
+      // navigation; if nothing handles it, go to the Maze directly.
+      if (!left && skin && !skins.isRevealSeen?.(skinId)) {
+        const go = document.createElement('button');
+        go.type = 'button';
+        go.className = 'booha-blitz-maze-cta';
+        go.innerHTML = `Meet ${name} in the Maze <span aria-hidden="true">→</span>`
+          + `<span class="jp">めいろ で ${nameJp} に あいに いこう！</span>`;
+        go.addEventListener('click', () => {
+          go.disabled = true;
+          const ev = new CustomEvent('booha:openMaze', { cancelable: true, detail: { skinId } });
+          if (document.dispatchEvent(ev)) window.location.href = 'maze.html';
+        });
+        row.appendChild(go);
+      }
     }
 
     function ensureFinalCard(winScreen, palette) {
