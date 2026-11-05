@@ -140,14 +140,19 @@ assert.strictEqual(reloaded.popup.classList.contains('show'), false,
   'a reload must not show the same weekly popup again');
 
 // Regression: Blitz may have already persisted the unlock before Maze opens.
-// The first Maze visit must still show the reveal, then mark it seen.
+// The first Maze visit must still show the reveal. Pass 7: it is marked seen
+// only when the student equips (was: as soon as it showed), so an
+// interrupted reveal comes back on the next visit.
 const unseen = makeHarness(baseSave(currentKey, completeBc));
 unseen.stored.weekly.unlockedBoohaSkins.mummington = { unlockedAt: Date.now() };
 unseen.controller.maybeShowSeasonalUnlockPopup();
 assert.strictEqual(unseen.popup.dataset.skinId, 'mummington',
   'an unlocked but unseen character must still get its Maze reveal');
+assert.ok(!unseen.stored.weekly.unlockedBoohaSkins.mummington.revealSeenAt,
+  'showing the Maze reveal must not mark it seen before the student acts');
+unseen.controller.equipSeasonalFromUnlockPopup();
 assert.ok(unseen.stored.weekly.unlockedBoohaSkins.mummington.revealSeenAt,
-  'showing the Maze reveal must persist revealSeenAt');
+  'equipping from the reveal must persist revealSeenAt');
 
 // Negative: a trio spread across curricula is not sufficient.
 const mixed = makeHarness(baseSave(currentKey, {
