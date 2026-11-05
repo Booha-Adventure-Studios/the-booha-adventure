@@ -472,8 +472,10 @@
       from { background-position: 0 -210px, 40px -290px, 90px -330px, 120px -250px, 0 0, 0 0; }
       to { background-position: 56px 100vh, -28px 100vh, 34px 100vh, -46px 100vh, 0 0, 0 0; }
     }
-    /* December string lights. The two containers stay empty and hidden until
-       a phase has lights; buildStringLights() then adds the wire and bulbs.
+    /* December string lights on the start screen (atmosphere only). The
+       container stays empty and hidden until a phase has lights;
+       buildStringLights() then adds the wire and bulbs. The hub title uses
+       the progress-aware ornament banner instead (see .ornamentBanner).
        Dec 1–25 uses Christmas colors, Dec 26–Jan 2 quieter gold and white. */
     .stringLights { display: none; }
     html[data-season="christmas"][data-season-lights] .stringLights {
@@ -485,12 +487,6 @@
       top: var(--safe-top); left: 0; right: 0;
       height: clamp(48px, 10vmin, 84px);
       z-index: 2;
-    }
-    .hubTitle > .stringLights {
-      position: relative !important;
-      width: min(100%, 560px);
-      height: clamp(18px, 3vw, 28px);
-      margin: -2px auto 2px;
     }
     .stringLights svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
     .stringLights path { fill: none; stroke: rgba(30,52,38,.95); stroke-width: 2px; vector-effect: non-scaling-stroke; }
@@ -513,7 +509,6 @@
       background: #2c3a2f;
     }
     #startScene > .stringLights .bulb { --bulb: clamp(8px, 1.5vmin, 12px); }
-    .hubTitle > .stringLights .bulb { --bulb: clamp(6px, 1vw, 9px); }
     .stringLights .bulb.red   { --c: #ff5a69; --c2: #b3192e; --glow: rgba(255,80,96,.45); }
     .stringLights .bulb.gold  { --c: #ffd978; --c2: #c98d1c; --glow: rgba(255,210,110,.5); }
     .stringLights .bulb.green { --c: #5fe08f; --c2: #17723f; --glow: rgba(85,212,134,.42); }
@@ -524,6 +519,89 @@
     }
     html.hub-reduced-motion .stringLights .bulb,
     html.hub-low-power .stringLights .bulb { animation: none; opacity: .92; }
+
+    /* Weekly ornament banner above the hub title (js/ui/hub-ornament-banner.js).
+       A wire with plain beads is always there; each visit day this week hangs
+       one ornament; a completed Daily Check turns it gold. The art carries no
+       glow — CSS lights it. Only transform/opacity animate. */
+    .ornamentBanner {
+      --ob-h: clamp(44px, 7vw, 80px);
+      --ob-glow-y: 50%;
+      position: relative;
+      width: min(100%, 620px);
+      height: calc(var(--ob-h) * 1.25);
+      margin: -4px auto -2px;
+      pointer-events: none;
+    }
+    .ornamentBanner[hidden] { display: none; }
+    /* Where each ornament's body sits on the shared 256×384 canvas, so the
+       light glows from the glass/face rather than the empty canvas below. */
+    .ornamentBanner[data-art="november-round"]    { --ob-glow-y: 41%; }
+    .ornamentBanner[data-art="december-bulb"]     { --ob-glow-y: 64%; }
+    .ornamentBanner[data-art="january-shimenawa"] { --ob-glow-y: 40%; }
+    .ornamentBanner[data-art="february-oni"]      { --ob-glow-y: 42%; }
+    .ornamentBanner .obWire { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .ornamentBanner .obWire path { fill: none; stroke: rgba(24,30,24,.92); stroke-width: 1.6px; vector-effect: non-scaling-stroke; }
+    .ornamentBanner .obBead {
+      position: absolute;
+      width: 5px; height: 5px;
+      margin: -1px 0 0 -2.5px;
+      border-radius: 50%;
+      background: rgba(214,222,200,.6);
+      box-shadow: inset 0 -1px 1px rgba(0,0,0,.35);
+    }
+    .ornamentBanner .obOrnaments { position: absolute; inset: 0; }
+    .ornamentBanner .obOrn {
+      --glow: rgba(255,214,140,.72);
+      position: absolute;
+      width: calc(var(--ob-h) * .6667);
+      height: var(--ob-h);
+      /* every ornament canvas puts its loop ~7.5% down, centred */
+      margin: calc(var(--ob-h) * -.075) 0 0 calc(var(--ob-h) * -.3333);
+      transform-origin: 50% 7%;
+    }
+    .ornamentBanner .obOrn img { position: relative; display: block; width: 100%; height: 100%; }
+    .ornamentBanner .obOrn::before {
+      content: '';
+      position: absolute;
+      /* a circle 1.9× the ornament's width, centred on its body */
+      left: -45%; right: -45%;
+      top: calc(var(--ob-glow-y) - 63%); height: 126%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, var(--glow) 0%, rgba(0,0,0,0) 62%);
+      opacity: .85;
+      animation: obGlow 3.4s ease-in-out infinite alternate;
+    }
+    .ornamentBanner .obOrn[data-tint="red"]   { --glow: rgba(255,84,100,.8); }
+    .ornamentBanner .obOrn[data-tint="green"] { --glow: rgba(80,225,135,.75); }
+    .ornamentBanner .obOrn.gold { --glow: rgba(255,196,64,.95); }
+    .ornamentBanner .obOrn.gold::before {
+      left: -62%; right: -62%;
+      top: calc(var(--ob-glow-y) - 75%); height: 150%;
+      opacity: 1;
+      animation-name: obGlowGold;
+    }
+    .ornamentBanner .obOrn.is-new { animation: obHang 900ms cubic-bezier(.2,1.4,.4,1) both; }
+    @keyframes obGlow { from { opacity: .65; } to { opacity: 1; } }
+    @keyframes obGlowGold { from { opacity: .8; } to { opacity: 1; } }
+    @keyframes obHang {
+      0%   { opacity: 0; transform: translateY(-40%) scale(.6) rotate(-8deg); }
+      60%  { opacity: 1; transform: translateY(4%) scale(1.04) rotate(4deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    html.hub-reduced-motion .ornamentBanner .obOrn,
+    html.hub-reduced-motion .ornamentBanner .obOrn::before,
+    html.hub-low-power .ornamentBanner .obOrn,
+    html.hub-low-power .ornamentBanner .obOrn::before,
+    html[data-motion="reduced"] .ornamentBanner .obOrn,
+    html[data-motion="reduced"] .ornamentBanner .obOrn::before,
+    html[data-power="reduced"] .ornamentBanner .obOrn::before,
+    html[data-power="minimal"] .ornamentBanner .obOrn,
+    html[data-power="minimal"] .ornamentBanner .obOrn::before { animation: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .ornamentBanner .obOrn,
+      .ornamentBanner .obOrn::before { animation: none; }
+    }
     /* Grubb greets students on the first screen. The line comes from the
        Christmas season phase (November: first snow, December: lights on). */
     .seasonGreeting { display: none; }
@@ -2373,7 +2451,7 @@
           </div>
           <div class="hubTitle">
             <div class="sparkleField" aria-hidden="true"></div>
-            <div class="stringLights" data-swags="2" data-per-swag="7" aria-hidden="true"></div>
+            <div id="hubOrnamentBanner" class="ornamentBanner" role="img" aria-label="This week" hidden></div>
             <div class="hubHeading">BOOHA ADVENTURE</div>
             <div class="hubHeadingJp">ブーハー・アドベンチャー</div>
             <div id="playerGreeting" class="playerGreeting">
@@ -2692,6 +2770,8 @@ function refreshSeasonIfDateChanged() {
     // A visible page that crosses midnight is a visit on the new day.
     if (!document.hidden) recordHubVisit();
   }
+  // New month → new ornament art; new week → fresh strand.
+  renderOrnamentBanner();
 }
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refreshSeasonIfDateChanged();
@@ -2894,7 +2974,10 @@ function showScene(el) {
   document.documentElement.classList.toggle('scene-start', el !== hubScene);
 
   
-  if (el === hubScene) hubScene.scrollTop = 0;
+  if (el === hubScene) {
+    hubScene.scrollTop = 0;
+    renderOrnamentBanner();
+  }
   checkOrientation();
 }
 
@@ -4017,7 +4100,38 @@ document.addEventListener('booha:checkIn', renderDailyCheckStamp);
    most once per student per Tokyo day and never before BOOHA_READY. */
 function recordHubVisit() {
   try { if (window.BoohaVisitDays) BoohaVisitDays.record(); } catch (e) {}
+  renderOrnamentBanner();
 }
+
+/* Weekly ornament banner above the hub title. The wire and beads draw as
+   soon as the page parses (no identity needed, so no layout shift later);
+   ornaments appear once the student's save is ready. A newly earned
+   ornament (today's visit, or a Daily Check turning it gold) hangs itself
+   with a small animation the next time the hub is actually on screen. */
+let ornamentPopDays = new Set();
+function renderOrnamentBanner() {
+  const el = document.getElementById('hubOrnamentBanner');
+  if (!el || !window.BoohaOrnamentBanner) return;
+  try {
+    const art = BoohaOrnamentBanner.artForDay(seasonTodayKey());
+    const summary = window.BOOHA_READY && window.BoohaVisitDays ? BoohaVisitDays.current() : null;
+    const hub = document.getElementById('hubScene');
+    const onScreen = !!(hub && hub.classList.contains('active')) && !document.hidden;
+    BoohaOrnamentBanner.render(el, art, summary, { pop: onScreen ? ornamentPopDays : null });
+    if (onScreen) ornamentPopDays = new Set();
+  } catch (e) { console.error('[OrnamentBanner]', e); }
+}
+document.addEventListener('booha:visitRecorded', e => {
+  if (e.detail && e.detail.day) ornamentPopDays.add(e.detail.day);
+  renderOrnamentBanner();
+});
+document.addEventListener('booha:checkIn', e => {
+  if (e.detail && e.detail.st === 'done' && e.detail.day) ornamentPopDays.add(e.detail.day);
+  renderOrnamentBanner();
+});
+document.addEventListener('booha:weeklyReset', renderOrnamentBanner);
+document.addEventListener('DOMContentLoaded', renderOrnamentBanner);
+// Declared above so the banner state exists before the first visit renders.
 if (window.BOOHA_READY) recordHubVisit();
 else document.addEventListener('booha:ready', recordHubVisit, { once: true });
 
@@ -4115,6 +4229,7 @@ function jumpToHub() {
   fadingOut = false;
   started   = false;
   try { renderHub(); hubRendered = true; } catch(e2) {}
+  renderOrnamentBanner();
   
   setTimeout(showGreeting, 250);
   sessionStorage.removeItem('booha_return_to_hub');
@@ -4155,6 +4270,7 @@ window.addEventListener('pageshow', ev => {
 <script src="js/core/day-record.js"></script>
 <script src="js/daily-check.js"></script>
 <script src="js/core/visit-days.js"></script>
+<script src="js/ui/hub-ornament-banner.js"></script>
 <script src="js/core/level-stars.js"></script>
 <script src="js/core/profile-art.js"></script>
 <script src="js/core/weekly-medals.js"></script>

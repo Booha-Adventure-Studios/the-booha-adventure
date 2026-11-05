@@ -66,8 +66,20 @@ assert.ok(maze.includes('function christmasTrailAccent()') && maze.includes('con
 
 // ── First screen + hub string lights ─────────────────────────────────────
 const index = read('index.html');
-assert.strictEqual((index.match(/class="stringLights"/g) || []).length, 2,
-  'string lights on the first screen and above the hub title');
+// Hub Pass 3: the hub title's lights became the progress-aware ornament
+// banner (December bulbs light up per visit). Only the first screen keeps
+// the atmospheric string lights.
+assert.strictEqual((index.match(/class="stringLights"/g) || []).length, 1,
+  'atmospheric string lights stay on the first screen only');
+assert.ok(/<div class="hubTitle">[\s\S]*id="hubOrnamentBanner"[\s\S]*class="hubHeading"/.test(index),
+  'the hub title carries the ornament banner above the heading');
+const bannerSandbox = { console, Date, Math, JSON };
+bannerSandbox.window = bannerSandbox;
+vm.createContext(bannerSandbox);
+// VM, not require(): a parent "type": "module" package.json would turn js/*.js into ES modules.
+vm.runInContext(read('js/ui/hub-ornament-banner.js'), bannerSandbox, { filename: 'js/ui/hub-ornament-banner.js' });
+assert.strictEqual(bannerSandbox.BoohaOrnamentBanner.artForDay('2026-12-10').id,
+  'december-bulb', 'December\'s hub banner is the Christmas lights');
 assert.ok(index.includes('html[data-season="christmas"][data-season-lights] .stringLights'),
   'string lights only show in phases that have lights');
 assert.ok(index.includes('seasonPhase?.()?.lights'), 'lights are only built in phases that have lights');
