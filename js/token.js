@@ -44,6 +44,16 @@
 
   let _identitySignalled = false;
 
+  // token.js runs in <head>. On the synchronous offline path (and any early
+  // banner) document.body does not exist yet, and appending to it threw —
+  // the offline banner never showed, and an expired offline session got a
+  // blank page instead of the "connection needed" screen. Every banner and
+  // overlay waits for the body.
+  function whenBody(fn) {
+    if (document.body) { fn(); return; }
+    document.addEventListener('DOMContentLoaded', fn, { once: true });
+  }
+
   function signalIdentityReady() {
     if (_identitySignalled) return;
     _identitySignalled = true;
@@ -156,7 +166,7 @@
         'box-shadow:0 -4px 18px rgba(229,116,170,.2)',
         'font:600 14px/1.4 sans-serif', 'z-index:99999'
       ].join(';');
-      document.body.appendChild(el);
+      whenBody(() => document.body.appendChild(el));
     }
     const preparing = saveHealth.locked && !saveHealth.adventure && !saveHealth.juku;
     el.textContent = preparing
@@ -211,7 +221,7 @@
       'font:600 14px/1.4 sans-serif', 'z-index:99999'
     ].join(';');
     el.textContent = 'せつぞくちゅう… / Connecting — saves are paused.';
-    document.body.appendChild(el);
+    whenBody(() => document.body.appendChild(el));
   }
 
   function clearConnectingBanner() {
@@ -229,10 +239,11 @@
       'font:600 14px/1.4 sans-serif', 'z-index:99999'
     ].join(';');
     el.textContent = 'Save identity unavailable — tell your teacher.';
-    document.body.appendChild(el);
+    whenBody(() => document.body.appendChild(el));
   }
 
   function showOfflineBanner() {
+    if (document.getElementById('booha-offline-banner')) return;
     const el = document.createElement('div');
     el.id = 'booha-offline-banner';
     el.style.cssText = [
@@ -242,19 +253,21 @@
       'font:600 14px/1.4 sans-serif', 'z-index:99999'
     ].join(';');
     el.textContent = 'No connection — playing from last session.';
-    document.body.appendChild(el);
+    whenBody(() => document.body.appendChild(el));
   }
 
   function showOfflineBlock() {
     document.documentElement.style.background    = '#000';
     document.documentElement.style.visibility   = 'visible';
-    document.body.style.cssText = [
-      'background:#000', 'color:#fff', 'margin:0',
-      'display:flex', 'align-items:center', 'justify-content:center',
-      'height:100vh', 'font:400 18px/1.6 sans-serif', 'text-align:center'
-    ].join(';');
-    document.body.innerHTML =
-      '<div><p>接続が必要です</p><p>Connection needed to verify your session.</p></div>';
+    whenBody(() => {
+      document.body.style.cssText = [
+        'background:#000', 'color:#fff', 'margin:0',
+        'display:flex', 'align-items:center', 'justify-content:center',
+        'height:100vh', 'font:400 18px/1.6 sans-serif', 'text-align:center'
+      ].join(';');
+      document.body.innerHTML =
+        '<div><p>接続が必要です</p><p>Connection needed to verify your session.</p></div>';
+    });
   }
 
   function waitForConnection(cb) {
@@ -332,7 +345,7 @@
           ${deferBtn}`;
       }
 
-      document.body.appendChild(overlay);
+      whenBody(() => document.body.appendChild(overlay));
       unlock(); // show overlay, still blocks game content underneath
 
       // Android install prompt

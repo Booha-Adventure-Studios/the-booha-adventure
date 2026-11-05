@@ -1837,6 +1837,13 @@ else
   bad "Ornament banner month-boundary test failed"
 fi
 
+echo "[token] Offline boot before <body> exists"
+if node tests/token-offline-body.test.cjs >/dev/null 2>&1; then
+  ok "token.js offline: banner and block screen wait for <body>; identity still signalled"
+else
+  bad "token.js offline boot test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
