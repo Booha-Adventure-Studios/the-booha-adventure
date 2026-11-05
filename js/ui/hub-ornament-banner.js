@@ -41,7 +41,7 @@
   const WIRE_TOP = 6;
   const WIRE_SAG = 14;
   const BEADS = 11;
-  const STEP = 9;          // % of banner width between neighbouring ornaments
+  const STEP = 7.5;        // % of banner width between neighbouring ornaments
 
   function artForDay(dayKey) {
     const m = /^\d{4}-(\d{2})-\d{2}$/.exec(String(dayKey || ''));
@@ -74,6 +74,13 @@
   }
 
   function round(v) { return Math.round(v * 100) / 100; }
+
+  /* 0 (Sun) … 6 (Sat) for a YYYY-MM-DD key. Drives the tiny per-day tilt,
+     so a given day always hangs the same way whatever order nodes were added. */
+  function weekday(dayKey) {
+    const t = Date.parse(`${String(dayKey).slice(0, 10)}T00:00:00Z`);
+    return Number.isFinite(t) ? new Date(t).getUTCDay() : 0;
+  }
 
   function label(summary) {
     const v = summary ? summary.visits : 0;
@@ -114,15 +121,22 @@
   }
 
   function makeOrnament(doc, art, day) {
+    // span.obOrn   — position on the wire, glow (::before), hang animation
+    //   span.obArt — static per-day tilt + December glass tint (::after)
+    //     img
     const o = doc.createElement('span');
     o.className = 'obOrn';
     o.dataset.day = day;
+    o.dataset.wd = String(weekday(day));
+    const artBox = doc.createElement('span');
+    artBox.className = 'obArt';
     const img = doc.createElement('img');
     img.src = art.src;
     img.alt = '';
     img.decoding = 'async';
     img.draggable = false;
-    o.appendChild(img);
+    artBox.appendChild(img);
+    o.appendChild(artBox);
     return o;
   }
 
@@ -177,5 +191,5 @@
     el.setAttribute('aria-label', label(summary));
   }
 
-  return { ART_BY_MONTH, artForDay, wireY, positions, beadPositions, label, render };
+  return { ART_BY_MONTH, artForDay, wireY, positions, beadPositions, weekday, label, render };
 });
