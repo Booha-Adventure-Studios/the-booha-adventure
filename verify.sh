@@ -1872,6 +1872,13 @@ else
   bad "Homework ticks test failed"
 fi
 
+echo "[hub] Homework count badge"
+if node tests/homework-count-badge.test.cjs >/dev/null 2>&1; then
+  ok "Notebook badge: quiet count of items left to copy, per student, hidden at zero"
+else
+  bad "Homework count badge test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"

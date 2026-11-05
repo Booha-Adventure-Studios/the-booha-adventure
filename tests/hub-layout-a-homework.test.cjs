@@ -6,7 +6,8 @@
 //     doors in its top corners (one shared grid cell). 999px and below keeps
 //     the stacked doors under the card.
 //   · The Blitz strip matches the full-width card.
-//   · Homework is ruled notebook paper with a NEW badge that shows until
+//   · Homework is ruled notebook paper. (Its Pass 4 NEW badge was replaced
+//     in Pass 10 by a quiet count — see homework-count-badge.test.cjs.) Was: a NEW badge that showed until
 //     this student opens this week's homework (stored in their own save).
 const assert = require('assert');
 const fs = require('fs');
@@ -69,71 +70,11 @@ assert.match(hw, /min-height: 44px;/, 'touch-sized');
 assert.doesNotMatch(hw, /#fff2a0|#ffd45f|#f5ae24/, 'no longer the Blitz gold');
 assert.match(index, /\.hubHomeworkBtn::after \{[\s\S]*?linear-gradient\(225deg/, 'folded corner');
 const button = index.match(/<button id="hubHomeworkBtn"[\s\S]*?<\/button>/)[0];
-assert.match(button, /<span id="hubHomeworkNew" class="hubHomeworkNew" hidden>NEW<\/span>/, 'NEW starts hidden');
+assert.match(button, /<span id="hubHomeworkCount" class="hubHomeworkCount" hidden><\/span>/, 'the count badge starts hidden (Pass 10)');
 assert.match(button, /<svg class="hubHomeworkPencil"[^>]*aria-hidden="true"/, 'pencil icon is decorative');
 assert.match(button, /HOMEWORK <span>しゅくだい<\/span>/, 'bilingual label kept');
 
-// ── NEW badge runtime (two students, one iPad) ───────────────────────────
-const start = index.indexOf('/* NEW badge on the Homework button');
-const end = index.indexOf("hubHomeworkBtn.addEventListener('click'", start);
-assert.ok(start > 0 && end > start, 'badge logic is extractable');
-const badgeSrc = index.slice(start, end);
-assert.doesNotMatch(badgeSrc, /localStorage/, 'badge state never uses device-wide storage');
-
-const saves = { a: { meta: {} }, b: { meta: {} } };
-let student = 'a';
-let week = { occurrenceKey: '2026-11-01|november-w1' };
-const listeners = {};
-const badge = { hidden: true };
-const btn = { attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } };
-const ctx = {
-  console,
-  hubHomeworkBtn: btn,
-  document: {
-    getElementById: id => (id === 'hubHomeworkNew' ? badge : null),
-    addEventListener(type, fn) { (listeners[type] = listeners[type] || []).push(fn); },
-  },
-  window: {
-    BOOHA_READY: false,
-    CALENDAR: {
-      getCurrentCurriculumWeek: () => week,
-      getCurriculumWeekOccurrenceKey: cw => cw.occurrenceKey,
-    },
-    BoohaSaveFile: {
-      load: () => JSON.parse(JSON.stringify(saves[student])),
-      patch(section, obj) { Object.assign(saves[student][section], obj); return true; },
-    },
-  },
-};
-vm.createContext(ctx);
-vm.runInContext(badgeSrc, ctx, { filename: 'index-homework-badge.js' });
-
-assert.strictEqual(badge.hidden, true, 'hidden before identity is ready');
-ctx.window.BOOHA_READY = true;
-listeners['booha:ready'].forEach(fn => fn());
-assert.strictEqual(badge.hidden, false, 'NEW shows for a student who has not opened this week\'s homework');
-assert.match(btn.attrs['aria-label'], /new this week/);
-
-ctx.markHomeworkSeen();
-assert.strictEqual(saves.a.meta.homeworkSeenWeek, '2026-11-01|november-w1', 'opening records this week in A\'s save');
-assert.strictEqual(badge.hidden, true, 'NEW clears after opening');
-assert.strictEqual(btn.attrs['aria-label'], 'Homework / しゅくだい');
-
-student = 'b';
-ctx.updateHomeworkNewBadge();
-assert.strictEqual(badge.hidden, false, 'student B on the same iPad still sees NEW');
-assert.strictEqual(saves.b.meta.homeworkSeenWeek, undefined);
-
-student = 'a';
-week = { occurrenceKey: '2026-11-08|november-w2' };
-listeners['booha:weeklyReset'].forEach(fn => fn());
-assert.strictEqual(badge.hidden, false, 'NEW returns for the new week');
-
-ctx.window.CALENDAR = null;
-ctx.updateHomeworkNewBadge();
-assert.strictEqual(badge.hidden, true, 'without a calendar the badge never nags');
-
-// Clicking opens the list after marking it seen.
-assert.match(index, /hubHomeworkBtn\.addEventListener\('click', \(\) => \{\s*markHomeworkSeen\(\);\s*openHomeworkList\(\);/);
+// Clicking opens the list (the count badge has its own test).
+assert.match(index, /hubHomeworkBtn\.addEventListener\('click', \(\) => \{\s*openHomeworkList\(\);/);
 
 console.log('hub layout A + homework: ok');
