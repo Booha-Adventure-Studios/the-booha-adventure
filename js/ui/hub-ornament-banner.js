@@ -11,8 +11,8 @@
      · Data comes from BoohaVisitDays.current(); this module never writes.
 
    Art is picked by Tokyo month (not by BoohaSkins season), so Jan 1–2
-   already shows the New Year shimenawa. Months without art hide the
-   banner. December's bulbs are the hub's Christmas lights.
+   already shows the New Year shimenawa. All twelve months have art; a
+   month without an entry would hide the banner.
 
    Rendering: the wire and beads are built once per art id. Ornaments are
    reused by day and updated in place (gold class, position), so earning a
@@ -27,14 +27,28 @@
   'use strict';
 
   const DIR = 'assets/img/hub/ornaments/';
-  // All ornament art shares one 256×384 canvas with the hanging loop at the
-  // top centre, so one box size and one loop offset fit every month.
+  // One ornament per Tokyo month. Every file shares a 192×288 canvas; the
+  // artist's loop height and the body's centre differ per piece, so each
+  // entry carries them (fractions of the canvas height, measured from the
+  // files): loop → where the ornament meets the wire, glowY → where the
+  // light sits. Replaced art gets a new file name (-r3, …) so iPads don't
+  // keep a cached copy.
+  function art(id, loop, glowY) {
+    return Object.freeze({ id, src: DIR + 'ornament-' + id + '-r2.webp', loop, glowY });
+  }
   const ART_BY_MONTH = Object.freeze({
-    '11': Object.freeze({ id: 'november-round',    src: DIR + 'ornament-november-round.webp',    glass: true }),
-    '12': Object.freeze({ id: 'december-bulb',     src: DIR + 'ornament-december-bulb.webp',     glass: true,
-                          tints: Object.freeze(['red', 'green', 'warm']) }),
-    '01': Object.freeze({ id: 'january-shimenawa', src: DIR + 'ornament-january-shimenawa.webp', glass: false }),
-    '02': Object.freeze({ id: 'february-oni',      src: DIR + 'ornament-february-oni.webp',      glass: false }),
+    '01': art('january-shimenawa', 0.087, 0.54),
+    '02': art('february-oni', 0.014, 0.61),
+    '03': art('march-hinamatsuri', 0.010, 0.55),
+    '04': art('april-sakura', 0.080, 0.60),
+    '05': art('may-tulip', 0.083, 0.61),
+    '06': art('june-hydrangea', 0.062, 0.61),
+    '07': art('july-tanabata', 0.062, 0.55),
+    '08': art('august-watermelon', 0.097, 0.64),
+    '09': art('september-dragonfly', 0.115, 0.53),
+    '10': art('october-pumpkin', 0.104, 0.61),
+    '11': art('november-tree', 0.118, 0.64),
+    '12': art('december-stocking', 0.028, 0.58),
   });
 
   // Wire geometry in viewBox units (0 0 1000 100, stretched to the box).
@@ -116,7 +130,8 @@
     el.appendChild(wrap);
 
     el.dataset.art = art.id;
-    el.dataset.glass = art.glass ? 'true' : 'false';
+    el.style.setProperty('--ob-loop', String(art.loop));
+    el.style.setProperty('--ob-glow-y', Math.round(art.glowY * 100) + '%');
     el._ob = { wrap, byDay: new Map(), art };
   }
 
@@ -177,7 +192,6 @@
       }
       node.style.left = pos[i].x + '%';
       node.style.top = pos[i].y + '%';
-      node.dataset.tint = art.tints ? art.tints[i % art.tints.length] : 'warm';
       node.classList.toggle('gold', !!d.gold);
       if (pop && typeof pop.has === 'function' && pop.has(d.day)) {
         node.classList.remove('is-new');

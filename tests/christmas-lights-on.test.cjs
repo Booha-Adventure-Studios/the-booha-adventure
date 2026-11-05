@@ -79,7 +79,7 @@ vm.createContext(bannerSandbox);
 // VM, not require(): a parent "type": "module" package.json would turn js/*.js into ES modules.
 vm.runInContext(read('js/ui/hub-ornament-banner.js'), bannerSandbox, { filename: 'js/ui/hub-ornament-banner.js' });
 assert.strictEqual(bannerSandbox.BoohaOrnamentBanner.artForDay('2026-12-10').id,
-  'december-bulb', 'December\'s hub banner is the Christmas lights');
+  'december-stocking', 'December\'s hub banner shows the stocking ornaments');
 assert.ok(index.includes('html[data-season="christmas"][data-season-lights] .stringLights'),
   'string lights only show in phases that have lights');
 assert.ok(index.includes('seasonPhase?.()?.lights'), 'lights are only built in phases that have lights');
