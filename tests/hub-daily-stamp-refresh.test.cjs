@@ -58,6 +58,7 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
     },
     applySeasonalLandingSkin: () => { state.skinRefreshes++; },
     recordHubVisit: () => { state.visits++; },
+    renderOrnamentBanner: () => { state.banners = (state.banners || 0) + 1; },
   };
   context.window.BoohaDailyCheck = {
     isDoneToday: () => !!done[state.today],

@@ -495,14 +495,18 @@ const BoohaSaveFile = (() => {
     return save(data);
   }
 
-  // Day keys (YYYY-MM-DD) on or after weekStart. With no valid weekStart,
-  // nothing carries over.
+  // Day keys (YYYY-MM-DD) inside the new occurrence's seven days
+  // (weekStart … weekStart + 6). Anything earlier, later or malformed is
+  // dropped. With no valid weekStart, nothing carries over.
   function _visitDaysFrom(visitDays, weekStart) {
     const out = {};
     if (!/^\d{4}-\d{2}-\d{2}$/.test(weekStart)) return out;
     if (!visitDays || typeof visitDays !== 'object' || Array.isArray(visitDays)) return out;
+    const start = Date.parse(weekStart + 'T00:00:00Z');
+    if (!Number.isFinite(start)) return out;
+    const weekEnd = new Date(start + 6 * 86400000).toISOString().slice(0, 10);
     Object.keys(visitDays).forEach(day => {
-      if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= weekStart && visitDays[day]) out[day] = 1;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(day) && day >= weekStart && day <= weekEnd && visitDays[day]) out[day] = 1;
     });
     return out;
   }
