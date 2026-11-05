@@ -9,6 +9,10 @@
      · A completed Daily Check turns that day's ornament gold.
      · Only earned ornaments exist — no empty slots, no "missed" days.
      · Data comes from BoohaVisitDays.current(); this module never writes.
+     · Blitz centerpiece (Pass 13): when the hub says all three Blitz games
+       are done this week, one bigger ornament hangs in the middle with the
+       red bow on the wire, and the day ornaments move aside for it. It is
+       only ever added: no empty slot while Blitz is unfinished.
 
    Art is picked by Tokyo month (not by BoohaSkins season), so Jan 1–2
    already shows the New Year shimenawa. All twelve months have art; a
@@ -51,11 +55,19 @@
     '12': art('december-stocking', 0.028, 0.58),
   });
 
+  // The centerpiece's bow. Same 192×288 canvas as the month art; knotY is
+  // the gold knot's centre (fraction of the canvas height, measured from
+  // the file), which CSS sets on the wire.
+  const CENTERPIECE_BOW = Object.freeze({
+    id: 'centerpiece-bow', src: DIR + 'ornament-centerpiece-bow-r1.webp', knotY: 0.467,
+  });
+
   // Wire geometry in viewBox units (0 0 1000 100, stretched to the box).
   const WIRE_TOP = 6;
   const WIRE_SAG = 14;
   const BEADS = 11;
   const STEP = 7.5;        // % of banner width between neighbouring ornaments
+  const CENTER_GAP = 10.5; // % from the middle to the nearest day ornament when the centerpiece hangs
 
   function artForDay(dayKey) {
     const m = /^\d{4}-(\d{2})-\d{2}$/.exec(String(dayKey || ''));
@@ -67,15 +79,21 @@
     return WIRE_TOP + 4 * WIRE_SAG * t * (1 - t);
   }
 
-  /* n ornaments gathered around the centre, evenly spaced, no gaps. */
-  function positions(n) {
+  /* n ornaments gathered around the centre, evenly spaced, no gaps.
+     With the centerpiece, the days keep their order left to right and
+     split around it: the first half (rounded up) on the left. */
+  function positions(n, centerpiece) {
     const count = Math.max(0, Math.min(7, Math.floor(Number(n) || 0)));
-    const out = [];
-    for (let i = 0; i < count; i++) {
-      const x = 50 + (i - (count - 1) / 2) * STEP;
-      out.push({ x: round(x), y: round(wireY(x / 100)) });
+    const xs = [];
+    if (centerpiece) {
+      const left = Math.ceil(count / 2);
+      for (let i = 0; i < count; i++) {
+        xs.push(i < left ? 50 - CENTER_GAP - (left - 1 - i) * STEP : 50 + CENTER_GAP + (i - left) * STEP);
+      }
+    } else {
+      for (let i = 0; i < count; i++) xs.push(50 + (i - (count - 1) / 2) * STEP);
     }
-    return out;
+    return xs.map(x => ({ x: round(x), y: round(wireY(x / 100)) }));
   }
 
   function beadPositions() {
@@ -96,11 +114,12 @@
     return Number.isFinite(t) ? new Date(t).getUTCDay() : 0;
   }
 
-  function label(summary) {
+  function label(summary, centerpiece) {
     const v = summary ? summary.visits : 0;
     const c = summary ? summary.checks : 0;
-    return `This week: ${v} ${v === 1 ? 'visit' : 'visits'}, ${c} Daily ${c === 1 ? 'Check' : 'Checks'} · ` +
-      `今週 ${v}回 · デイリーチェック ${c}回`;
+    return `This week: ${v} ${v === 1 ? 'visit' : 'visits'}, ${c} Daily ${c === 1 ? 'Check' : 'Checks'}` +
+      (centerpiece ? ', Blitz 3/3' : '') + ' · ' +
+      `今週 ${v}回 · デイリーチェック ${c}回` + (centerpiece ? ' · ブリッツ 3/3' : '');
   }
 
   /* ── DOM ─────────────────────────────────────────────────────────────── */
@@ -132,7 +151,40 @@
     el.dataset.art = art.id;
     el.style.setProperty('--ob-loop', String(art.loop));
     el.style.setProperty('--ob-glow-y', Math.round(art.glowY * 100) + '%');
-    el._ob = { wrap, byDay: new Map(), art };
+    el.style.setProperty('--ob-bow-knot', String(CENTERPIECE_BOW.knotY));
+    el._ob = { wrap, byDay: new Map(), art, center: null };
+  }
+
+  function makeCenterpiece(doc, art) {
+    // span.obOrn.gold.obCenter — bigger month ornament in the middle
+    //   i.obRays               — soft gold light behind it (CSS)
+    //   span.obArt > img       — the month art
+    //   img.obBow              — the bow, knot on the wire (no tilt)
+    const o = doc.createElement('span');
+    o.className = 'obOrn gold obCenter';
+    o.dataset.center = '1';
+    const rays = doc.createElement('i');
+    rays.className = 'obRays';
+    o.appendChild(rays);
+    const artBox = doc.createElement('span');
+    artBox.className = 'obArt';
+    const img = doc.createElement('img');
+    img.src = art.src;
+    img.alt = '';
+    img.decoding = 'async';
+    img.draggable = false;
+    artBox.appendChild(img);
+    o.appendChild(artBox);
+    const bow = doc.createElement('img');
+    bow.className = 'obBow';
+    bow.src = CENTERPIECE_BOW.src;
+    bow.alt = '';
+    bow.decoding = 'async';
+    bow.draggable = false;
+    o.appendChild(bow);
+    o.style.left = '50%';
+    o.style.top = round(wireY(0.5)) + '%';
+    return o;
   }
 
   function makeOrnament(doc, art, day) {
@@ -156,10 +208,12 @@
   }
 
   /**
-   * render(el, art, summary, { pop })
-   *   art      artForDay(today) or null (null hides the banner)
-   *   summary  BoohaVisitDays summary, or null before identity is ready
-   *   pop      Set of day keys to animate in (new or just turned gold)
+   * render(el, art, summary, { pop, centerpiece, popCenter })
+   *   art          artForDay(today) or null (null hides the banner)
+   *   summary      BoohaVisitDays summary, or null before identity is ready
+   *   pop          Set of day keys to animate in (new or just turned gold)
+   *   centerpiece  true when all three Blitz games are done this week
+   *   popCenter    animate the centerpiece in (just earned, hub on screen)
    */
   function render(el, art, summary, opts) {
     if (!el) return;
@@ -175,8 +229,22 @@
 
     const state = el._ob;
     const days = summary && Array.isArray(summary.days) ? summary.days.slice(0, 7) : [];
-    const pos = positions(days.length);
+    const center = !!(opts && opts.centerpiece);
+    const pos = positions(days.length, center);
     const pop = opts && opts.pop;
+
+    if (center && !state.center) {
+      state.center = makeCenterpiece(el.ownerDocument, art);
+      state.wrap.appendChild(state.center);
+    } else if (!center && state.center) {
+      state.center.remove();
+      state.center = null;
+    }
+    if (state.center && opts && opts.popCenter) {
+      state.center.classList.remove('is-new');
+      void state.center.offsetWidth;
+      state.center.classList.add('is-new');
+    }
     const keep = new Set(days.map(d => d.day));
 
     state.byDay.forEach((node, day) => {
@@ -202,8 +270,9 @@
 
     el.dataset.visits = String(days.length);
     el.dataset.checks = String(days.filter(d => d.gold).length);
-    el.setAttribute('aria-label', label(summary));
+    el.dataset.centerpiece = center ? '1' : '0';
+    el.setAttribute('aria-label', label(summary, center));
   }
 
-  return { ART_BY_MONTH, artForDay, wireY, positions, beadPositions, weekday, label, render };
+  return { ART_BY_MONTH, CENTERPIECE_BOW, artForDay, wireY, positions, beadPositions, weekday, label, render };
 });

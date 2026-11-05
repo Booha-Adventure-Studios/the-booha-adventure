@@ -203,7 +203,8 @@ assert.ok(/id="hubOrnamentBanner" class="ornamentBanner" role="img"[^>]*hidden/.
 ['booha:visitRecorded', 'booha:checkIn', 'booha:weeklyReset', 'DOMContentLoaded'].forEach(ev => {
   assert.ok(new RegExp(`addEventListener\\('${ev}',[^\\n]*`).test(index), `banner listens for ${ev}`);
 });
-assert.ok(/BoohaOrnamentBanner\.render\(el, art, summary, \{ pop: onScreen \? ornamentPopDays : null \}\)/.test(index),
+// Pass 13 added the centerpiece options after pop.
+assert.ok(/BoohaOrnamentBanner\.render\(el, art, summary, \{ pop: onScreen \? ornamentPopDays : null, centerpiece, popCenter \}\)/.test(index),
   'pop animations only play while the hub is on screen');
 assert.ok(index.indexOf('let ornamentPopDays') < index.indexOf("if (window.BOOHA_READY) recordHubVisit();"),
   'banner state exists before the first visit can render');
@@ -222,7 +223,7 @@ function keyframeBlocks(src) {
   return out;
 }
 const keyframes = keyframeBlocks(css);
-assert.strictEqual(keyframes.length, 3, 'banner keyframes found');
+assert.strictEqual(keyframes.length, 4, 'banner keyframes found (glow, gold glow, hang, Pass 13 centerpiece rays)');
 keyframes.forEach(k => {
   const props = (k.match(/([a-z-]+)\s*:/g) || []).map(p => p.replace(/\s*:$/, ''));
   props.forEach(p => assert.ok(p === 'opacity' || p === 'transform', `banner animations only use transform/opacity (found ${p})`));
@@ -242,7 +243,9 @@ assert.ok(/--ob-oh: calc\(var\(--ob-h\) \* var\(--ob-art\)\)/.test(css),
   'the whole ornament box (glow and loop included) follows the size factor');
 assert.ok(/margin: calc\(var\(--ob-oh\) \* var\(--ob-loop\) \* -1\)/.test(css),
   'each ornament is lifted by its own loop height so the loop meets the wire');
-assert.ok(!/mask-image|data-tint|data-art="/.test(css), 'no per-art CSS rules or glass tints left (art data lives in the module)');
+// The Pass 13 centerpiece rays use a radial fade mask; that rule is not a per-art tint.
+const cssNoRays = css.replace(/\.ornamentBanner \.obRays \{[^}]*\}/, '');
+assert.ok(!/mask-image|data-tint|data-art="/.test(cssNoRays), 'no per-art CSS rules or glass tints left (art data lives in the module)');
 for (let wd = 0; wd < 7; wd++) {
   assert.ok(new RegExp(`\\.obOrn\\[data-wd="${wd}"\\] \\{ --ob-tilt: -?\\.?\\d`).test(css), `weekday ${wd} has a fixed tilt`);
 }

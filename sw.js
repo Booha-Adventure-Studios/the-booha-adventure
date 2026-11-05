@@ -143,7 +143,8 @@ const CURRENT_CACHES = {
   // Pass 11: hub liveliness levels (glow, fireflies, seasonal drift).
   // Pass 12: weekly postcards (Trophy Case) — profile.html loads postcards + art helpers.
   // Pass 12b: postcard catch-up at load, liveliness on date change, 5-DAY WEEK stamp.
-  pages:  'booha-pages-2026-523',
+  // Pass 13: Blitz centerpiece on the hub strand (bow art, rays).
+  pages:  'booha-pages-2026-524',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

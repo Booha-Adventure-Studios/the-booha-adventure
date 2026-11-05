@@ -1894,7 +1894,18 @@ else
 fi
 
 echo "[hub] Weekly postcards"
-node tests/postcards.test.cjs
+if node tests/postcards.test.cjs >/dev/null 2>&1; then
+  ok "Postcards: one per week visited, 5-DAY WEEK deluxe, per student, permanent, Trophy Case shelf"
+else
+  bad "Weekly postcards test failed"
+fi
+
+echo "[hub] Blitz centerpiece"
+if node tests/hub-blitz-centerpiece.test.cjs >/dev/null 2>&1; then
+  ok "Blitz 3/3 hangs the bow centerpiece; only adds; hangs itself once, never under a Blitz game"
+else
+  bad "Blitz centerpiece test failed"
+fi
 
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then

@@ -115,7 +115,8 @@ assert.strictEqual((() => { const h = harness({ ready: false }); h.ctx.updateMaz
 }
 ['booha:ready', 'booha:gameEnd', 'booha:weeklyReset'].forEach(ev =>
   assert.ok(new RegExp(`addEventListener\\('${ev}', (\\(\\) => setTimeout\\()?updateMazeFriendCue`).test(index), `cue refreshes on ${ev}`));
-assert.match(index, /const relight = \(\) => \{ renderPills\(\); updateMazeFriendCue\(\); \};/, 'cue refreshes when a Blitz closes');
+// Pass 13: the same close hook also re-renders the ornament banner (Blitz centerpiece).
+assert.match(index, /const relight = \(\) => \{ renderPills\(\); updateMazeFriendCue\(\); renderOrnamentBanner\(\); \};/, 'cue refreshes when a Blitz closes');
 assert.match(index, /mazeButton\.classList\.toggle\('is-complete', !mazeAvailable\);\s*\}\s*updateMazeFriendCue\(\);/, 'cue refreshes with the hub');
 assert.match(index, /<img id="mazeCtaFriend" class="mazeCtaFriend" alt="" decoding="async" hidden>/, 'face starts hidden');
 
