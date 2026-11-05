@@ -71,6 +71,7 @@ function hub() {
   vm.createContext(ctx);
   vm.runInContext(read('js/core/adventure-core.js'), ctx, { filename: 'js/core/adventure-core.js' });
   vm.runInContext(read('js/core/save-file.js'), ctx, { filename: 'js/core/save-file.js' });
+  vm.runInContext(read('js/core/homework-store.js'), ctx, { filename: 'js/core/homework-store.js' });
   vm.runInContext([sectionsSrc, weekCardsSrc, ticksSrc, badgeSrc].join('\n'), ctx, { filename: 'index-homework-count.js' });
   return {
     ctx, badge, btnAttrs, listeners, store,

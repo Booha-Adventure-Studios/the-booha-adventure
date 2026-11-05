@@ -3548,41 +3548,24 @@ function homeworkWeekCards(data, week) {
 /* Hub Pass 9: "copied into my notebook" ticks live in the student's own
    save (weekly.homework), so they sync between devices, reset on Sunday,
    and never show one student's ticks to the next on a shared iPad.
-   Nothing is read or written before identity is ready. The old
-   device-wide booha_hw_copied_* keys are not migrated (they cannot be
-   attributed to a student); they are removed once, below. */
+   js/core/homework-store.js is the single reader/writer, shared with
+   homework.html (which keeps its "hide items I know" state in the same
+   bucket). Nothing is read or written before identity is ready. Old
+   device-wide keys are not migrated; they are removed once identity is
+   ready. */
 function getHomeworkCopied(curr, week) {
-  try {
-    if (!window.BOOHA_READY || !window.BoohaSaveFile) return new Set();
-    const hw = window.BoohaSaveFile.load()?.weekly?.homework;
-    if (!hw || !week || hw.weekStart !== week.weekStart) return new Set();
-    const list = hw.copied?.[curr];
-    return new Set(Array.isArray(list) ? list.filter(key => typeof key === 'string') : []);
-  } catch (error) { return new Set(); }
+  try { return window.BoohaHomeworkStore ? window.BoohaHomeworkStore.getCopied(curr, week?.weekStart) : new Set(); }
+  catch (error) { return new Set(); }
 }
 function saveHomeworkCopied(curr, week, set) {
-  if (!window.BOOHA_READY || !window.BoohaSaveFile || !week?.weekStart) return false;
-  try {
-    const prev = window.BoohaSaveFile.load()?.weekly?.homework;
-    const copied = prev && prev.weekStart === week.weekStart && prev.copied && typeof prev.copied === 'object'
-      ? { ...prev.copied } : {};
-    copied[curr] = [...set].sort();
-    const ok = window.BoohaSaveFile.patch('weekly', { homework: { weekStart: week.weekStart, copied } });
-    if (ok) document.dispatchEvent(new CustomEvent('booha:homeworkChanged', { detail: { curr, copied: set.size } }));
-    return !!ok;
-  } catch (error) { return false; }
+  try { return !!(window.BoohaHomeworkStore && window.BoohaHomeworkStore.setCopied(curr, week?.weekStart, set)); }
+  catch (error) { return false; }
 }
 function clearLegacyHomeworkTicks() {
-  try {
-    const old = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.indexOf('booha_hw_copied_') === 0) old.push(key);
-    }
-    old.forEach(key => localStorage.removeItem(key));
-  } catch (error) {}
+  try { window.BoohaHomeworkStore?.clearLegacy?.(); } catch (error) {}
 }
-clearLegacyHomeworkTicks();
+if (window.BOOHA_READY) clearLegacyHomeworkTicks();
+else document.addEventListener('booha:ready', clearLegacyHomeworkTicks, { once: true });
 // A list opened before the student's save was ready (or left open across
 // the Sunday reset) repaints with the right ticks.
 function repaintOpenHomeworkList() {
@@ -4568,6 +4551,7 @@ window.addEventListener('pageshow', ev => {
 <script src="js/core/day-record.js"></script>
 <script src="js/daily-check.js"></script>
 <script src="js/core/visit-days.js"></script>
+<script src="js/core/homework-store.js"></script>
 <script src="js/ui/hub-ornament-banner.js"></script>
 <script src="js/core/level-stars.js"></script>
 <script src="js/core/profile-art.js"></script>

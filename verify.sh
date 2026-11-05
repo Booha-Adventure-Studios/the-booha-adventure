@@ -1879,6 +1879,13 @@ else
   bad "Homework count badge test failed"
 fi
 
+echo "[homework] Study sheet hides in the student save"
+if node tests/homework-known-store.test.cjs >/dev/null 2>&1; then
+  ok "homework.html hides: per student, week-keyed last/this/next, rolled on Sunday, shared store with the hub"
+else
+  bad "Homework known-store test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
