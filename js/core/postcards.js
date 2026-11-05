@@ -1,8 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════════════
    postcards.js  —  The Booha Adventure  ·  Weekly postcards (permanent)
    ─────────────────────────────────────────────────────────────────────
-   Any visit in a week earns that week's postcard; a full week (5+ visit
-   days, Sunday–Saturday) earns the deluxe frame. Postcards are permanent
+   Any visit in a week earns that week's postcard; a 5-day week (any 5+
+   visit days, Sunday–Saturday, weekends count) earns the deluxe frame
+   and the 5-DAY WEEK stamp. Postcards are permanent
    and live in the Trophy Case (Adventure Log).
 
    Stored in the student's own save (never device-wide):
@@ -112,10 +113,10 @@
     const items = shown.map(c => {
       const art = artFor(`${c.week.slice(0, 4)}-${c.m}-15`);
       const label = weekLabel(c.week);
-      return `<figure class="rb-postcard${c.deluxe ? ' deluxe' : ''}" aria-label="${esc(label.en)}: ${c.v} visit${c.v === 1 ? '' : 's'}, ${c.g} Daily Check${c.g === 1 ? '' : 's'}${c.deluxe ? ', full week' : ''}">`
+      return `<figure class="rb-postcard${c.deluxe ? ' deluxe' : ''}" aria-label="${esc(label.en)}: ${c.v} visit${c.v === 1 ? '' : 's'}, ${c.g} Daily Check${c.g === 1 ? '' : 's'}${c.deluxe ? ', 5-day week' : ''}">`
         + (art ? `<img src="${esc(art)}" alt="" width="48" height="72" loading="lazy" decoding="async">` : '')
         + `<figcaption><b>${esc(label.jp)}</b><span>${esc(label.en)}</span>`
-        + `<em>${c.v}日 · ✓${c.g}</em>${c.deluxe ? '<i class="rb-pc-stamp">FULL WEEK</i>' : ''}</figcaption></figure>`;
+        + `<em>${c.v}日 · ✓${c.g}</em>${c.deluxe ? '<i class="rb-pc-stamp">5-DAY WEEK</i>' : ''}</figcaption></figure>`;
     }).join('');
     return `<div class="rb-postcards">${head}<div class="rb-pc-grid">${items}</div></div>`;
   }
@@ -127,6 +128,9 @@
     root.document.addEventListener('booha:ready', update);
     root.document.addEventListener('booha:visitRecorded', update);
     root.document.addEventListener('booha:checkIn', update);
+    // Loaded after the save was already ready (e.g. the Adventure Log page):
+    // booha:ready has been and gone, so catch up now.
+    if (root.BOOHA_READY) update();
   }
 
   return { FULL_WEEK, record, list, isDeluxe, normalizeCard, weekLabel, renderHTML };

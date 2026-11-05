@@ -142,7 +142,8 @@ const CURRENT_CACHES = {
   // Pass 11a: homework.html loads the save stack; shared js/core/homework-store.js (week-keyed known).
   // Pass 11: hub liveliness levels (glow, fireflies, seasonal drift).
   // Pass 12: weekly postcards (Trophy Case) — profile.html loads postcards + art helpers.
-  pages:  'booha-pages-2026-522',
+  // Pass 12b: postcard catch-up at load, liveliness on date change, 5-DAY WEEK stamp.
+  pages:  'booha-pages-2026-523',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
