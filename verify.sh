@@ -1865,6 +1865,13 @@ else
   bad "Blitz → Maze path test failed"
 fi
 
+echo "[hub] Homework ticks in the student save"
+if node tests/homework-ticks-save.test.cjs >/dev/null 2>&1; then
+  ok "Homework ticks: per student, sync with the save, reset on Sunday, old device-wide ticks never reappear"
+else
+  bad "Homework ticks test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
