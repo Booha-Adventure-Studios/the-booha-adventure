@@ -17,17 +17,29 @@ const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
 const plain = value => JSON.parse(JSON.stringify(value));
 
-// ── Pure helpers (Node module path) ──────────────────────────────────────
-const VisitDays = require(path.join(ROOT, 'js/core/visit-days.js'));
+// Browser scripts are loaded the way the page loads them (a VM with a
+// window), never with require(): a parent package.json with
+// "type": "module" makes Node treat js/*.js as ES modules.
+function loadBrowserScript(file, globalName) {
+  const sandbox = { console, Date, Math, JSON };
+  sandbox.window = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(read(file), sandbox, { filename: file });
+  assert.ok(sandbox[globalName], `${file} must define window.${globalName}`);
+  return sandbox[globalName];
+}
 
-assert.deepStrictEqual(VisitDays.weekDays('2026-11-01'), [
+// ── Pure helpers ─────────────────────────────────────────────────────────
+const VisitDays = loadBrowserScript('js/core/visit-days.js', 'BoohaVisitDays');
+
+assert.deepStrictEqual(plain(VisitDays.weekDays('2026-11-01')), [
   '2026-11-01', '2026-11-02', '2026-11-03', '2026-11-04',
   '2026-11-05', '2026-11-06', '2026-11-07',
 ], 'a week is Sunday through Saturday');
-assert.deepStrictEqual(VisitDays.weekDays('2026-12-27').slice(-2), ['2027-01-01', '2027-01-02'],
+assert.deepStrictEqual(plain(VisitDays.weekDays('2026-12-27').slice(-2)), ['2027-01-01', '2027-01-02'],
   'weeks cross the year boundary');
-assert.deepStrictEqual(VisitDays.weekDays(null), []);
-assert.deepStrictEqual(VisitDays.weekDays('not-a-date'), []);
+assert.deepStrictEqual(plain(VisitDays.weekDays(null)), []);
+assert.deepStrictEqual(plain(VisitDays.weekDays('not-a-date')), []);
 
 {
   const s = plain(VisitDays.summarize(
@@ -167,13 +179,38 @@ userId = 'student-a';
 today = '2026-11-08';
 assert.strictEqual(win.BoohaVisitDays.record(), true);
 assert.deepStrictEqual(saveOf('student-a').weekly.visitDays, { '2026-11-05': 1, '2026-11-08': 1 });
+// Stray keys: one inside the new week (Saturday), one next week, one far
+// future, one malformed. Only the new week's seven days may carry over.
+{
+  const s = saveOf('student-a');
+  Object.assign(s.weekly.visitDays, { '2026-11-14': 1, '2026-11-15': 1, '2099-01-01': 1, '2026-13-40x': 1 });
+  store.set(keyFor('student-a'), JSON.stringify(s));
+}
 week = { weekStart: '2026-11-08', weekId: 'november-w2', occurrenceKey: '2026-11-08|november-w2' };
+assert.deepStrictEqual(plain(win.BoohaVisitDays.current()).visits, 2,
+  'reading already ignores keys outside this week');
+{
+  const s = saveOf('student-a');
+  delete s.weekly.visitDays['2026-11-14'];
+  store.set(keyFor('student-a'), JSON.stringify(s));
+}
 assert.deepStrictEqual(plain(win.BoohaVisitDays.current()), {
   weekStart: '2026-11-08', visits: 1, checks: 0, days: [{ day: '2026-11-08', gold: false }],
 }, 'before the reset runs, last week\'s keys are already ignored');
 assert.ok(win.BoohaSaveFile.resetWeekly('2026-11-08|november-w2'));
 assert.deepStrictEqual(saveOf('student-a').weekly.visitDays, { '2026-11-08': 1 },
-  'reset clears last week but keeps the new week\'s Sunday visit');
+  'reset keeps only the new week\'s days: last week, next week, far-future and malformed keys are dropped');
+
+// Saturday of the new week is still inside the window and carries over.
+{
+  const s = saveOf('student-a');
+  s.weekly.visitDays['2026-11-14'] = 1;
+  s.weekly.visitDays['2026-11-15'] = 1;
+  store.set(keyFor('student-a'), JSON.stringify(s));
+}
+assert.ok(win.BoohaSaveFile.resetWeekly('2026-11-08|november-w2'));
+assert.deepStrictEqual(saveOf('student-a').weekly.visitDays, { '2026-11-08': 1, '2026-11-14': 1 },
+  'the window is exactly Sunday through Saturday');
 assert.strictEqual(win.BoohaVisitDays.record(), false, 'Sunday is not written twice');
 
 // A plain reset with no new-week keys starts empty.

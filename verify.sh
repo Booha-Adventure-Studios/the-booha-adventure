@@ -1816,6 +1816,13 @@ else
   bad "Weekly visit record test failed"
 fi
 
+echo "[hub] Weekly ornament banner"
+if node tests/hub-ornament-banner.test.cjs >/dev/null 2>&1; then
+  ok "Ornament banner: month art, earned-only ornaments, gold check-ins, in-place updates, motion gates"
+else
+  bad "Weekly ornament banner test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"

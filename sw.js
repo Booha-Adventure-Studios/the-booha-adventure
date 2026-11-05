@@ -131,7 +131,8 @@ const CURRENT_CACHES = {
   // on-screen keyboard instead of the iPad keyboard.
   // Hub Pass 1: the Daily Check stamp refreshes when the Tokyo date changes.
   // Hub Pass 2: index.html loads js/core/visit-days.js and records weekly visits.
-  pages:  'booha-pages-2026-511',
+  // Hub Pass 3: the hub title's string lights become the weekly ornament banner.
+  pages:  'booha-pages-2026-512',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
