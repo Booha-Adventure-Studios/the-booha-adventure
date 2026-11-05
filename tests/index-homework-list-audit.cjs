@@ -13,7 +13,9 @@ assert.match(index, /id="hubHomeworkBtn" class="hubHomeworkBtn"/, 'the hub must 
 assert.match(index, /hubHomeworkBtn\.addEventListener\('click',[\s\S]*?openHomeworkList\(\)/, 'the hub homework action must open the homework list');
 assert.doesNotMatch(index, /class="weekHomeworkBtn"/, 'the homework action must not sit inside the current-week tile');
 assert.match(index, /\.hubGreetingRow[\s\S]*?grid-template-columns: minmax\(0,1fr\) auto minmax\(0,1fr\)/, 'the greeting row must keep the welcome line centered');
-assert.match(index, /\.hubHomeworkBtn[\s\S]*?color: #100b00[\s\S]*?linear-gradient\(180deg, #fff2a0/, 'the hub homework action must be a glowing gold button with dark text');
+// Hub Pass 4: Homework is notebook paper (cream, ruled lines, red margin),
+// a third category next to the pink Maze and gold Blitz. (Was: gold pill.)
+assert.match(index, /\.hubHomeworkBtn \{[\s\S]*?color: #1f3a6b;[\s\S]*?background-color: #fbf6e8;[\s\S]*?rgba\(214,84,84,\.85\)[\s\S]*?repeating-linear-gradient\(180deg/, 'the hub homework action must look like ruled notebook paper');
 assert.match(index, /id="homeworkList" class="homeworkList"/, 'the homework list modal must exist');
 assert.match(index, /role="dialog" aria-modal="true" aria-labelledby="homeworkListTitle" aria-describedby="homeworkListIntro"/, 'the homework list dialog must expose its title and instructions');
 assert.match(index, /id="homeworkListContent"/, 'the modal must have a content region');
