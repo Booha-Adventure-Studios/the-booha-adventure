@@ -1830,6 +1830,13 @@ else
   bad "Layout A / Homework test failed"
 fi
 
+echo "[hub] Ornament banner across months (live page)"
+if node tests/hub-ornament-months.test.cjs >/dev/null 2>&1; then
+  ok "Banner on an open page: Nov→Dec lights, Sunday reset, Dec→Jan, Jan→Feb, Feb→Mar hide, leap day"
+else
+  bad "Ornament banner month-boundary test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
