@@ -1802,6 +1802,13 @@ else
   bad "Hub render runtime test failed"
 fi
 
+echo "[hub] Daily Check stamp date refresh"
+if node tests/hub-daily-stamp-refresh.test.cjs >/dev/null 2>&1; then
+  ok "Daily Check stamp hides after midnight and redraws on date change and check-in"
+else
+  bad "Daily Check stamp date refresh test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"

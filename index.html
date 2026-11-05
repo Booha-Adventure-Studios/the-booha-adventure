@@ -2685,6 +2685,9 @@ function refreshSeasonIfDateChanged() {
   seasonDateKey = key;
   try { window.BoohaSkins?.applySeasonTheme?.(); } catch (e) {}
   applySeasonalLandingSkin();
+  // The Daily Check stamp is per-day too. Only redraw once identity is
+  // ready; before that, the booha:ready listener draws it.
+  if (window.BOOHA_READY) renderDailyCheckStamp();
 }
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refreshSeasonIfDateChanged();
@@ -3979,24 +3982,31 @@ if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
    the identity-scoped save there emitted a permanent false "Not saving"
    warning even though the student was identified a moment later. */
 function renderDailyCheckStamp() {
+  const stamp = document.getElementById('dcStamp');
+  if (!stamp) return;
+  let count = null;
   try {
-    if (window.BoohaDailyCheck && BoohaDailyCheck.isDoneToday()) {
-      const stamp = document.getElementById('dcStamp');
-      if (stamp) {
-        const count = BoohaDailyCheck.streak();
-        const stampSeason = document.documentElement.dataset.season;
-        stamp.textContent = stampSeason === 'halloween'
-          ? 'キャンディ ' + count + '個'
-          : stampSeason === 'christmas'
-            ? '❄ ' + count + '日'
-            : '✓ ' + count + '日';
-        stamp.classList.add('show');
-      }
-    }
+    if (window.BoohaDailyCheck && BoohaDailyCheck.isDoneToday()) count = BoohaDailyCheck.streak();
   } catch (e) {}
+  // Not done today (including a new day after midnight): hide yesterday's
+  // stamp instead of leaving it up until the next reload.
+  if (count === null) {
+    stamp.classList.remove('show');
+    stamp.textContent = '';
+    return;
+  }
+  const stampSeason = document.documentElement.dataset.season;
+  stamp.textContent = stampSeason === 'halloween'
+    ? 'キャンディ ' + count + '個'
+    : stampSeason === 'christmas'
+      ? '❄ ' + count + '日'
+      : '✓ ' + count + '日';
+  stamp.classList.add('show');
 }
 if (window.BOOHA_READY) renderDailyCheckStamp();
 else document.addEventListener('booha:ready', renderDailyCheckStamp, { once: true });
+// A finished Daily Check updates the stamp without a reload.
+document.addEventListener('booha:checkIn', renderDailyCheckStamp);
 
 
 let started = false, fadingOut = false;
