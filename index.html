@@ -3007,6 +3007,8 @@ function refreshSeasonIfDateChanged() {
   }
   // New month → new ornament art; new week → fresh strand.
   renderOrnamentBanner();
+  // Liveliness season follows the date too (e.g. Feb 28 → Mar 1 drift).
+  if (typeof updateHubLiveliness === 'function') updateHubLiveliness();
 }
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refreshSeasonIfDateChanged();
