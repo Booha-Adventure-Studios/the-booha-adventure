@@ -15,8 +15,13 @@ for (const name of ['hubGlowGold', 'hubGlowViolet', 'hubGlowTeal', 'hubGlowPink'
 assert.match(index, /class="hubCurriculumBtn hub-glow-gold"/, 'curriculum must use the gold glow role');
 assert.match(index, /class="hubWeekTab hub-glow-violet"/, 'last week must use the violet glow role');
 assert.match(index, /class="hubWeekTab hub-glow-teal"/, 'next week must use the teal glow role');
-assert.match(index, /\.hubWeekTab\s*\{[\s\S]*?max-height:\s*240px[\s\S]*?align-self:\s*center/, 'wide week tabs must read as centered side doors');
-assert.match(index, /\.hubBlitzMount\s*\{[\s\S]*?grid-template-columns:\s*minmax\(108px, \.42fr\) minmax\(0, 1\.8fr\) minmax\(108px, \.42fr\)/, 'Blitz mount must share the hero card grid');
+// Hub Pass 4 (layout A): on wide screens the week card is full width and
+// last/next week are compact doors in its top corners; the Blitz strip
+// matches the card's width. (Was: side doors in a three-column grid.)
+assert.match(index, /\.hubWeekTab\s*\{[\s\S]*?min-height:\s*44px[\s\S]*?align-self:\s*start[\s\S]*?border-radius:\s*999px/, 'wide week tabs must be touch-sized doors in the card corners');
+assert.match(index, /#hubPrevWeekBtn \{ grid-area: current; justify-self: start;/, 'last week sits in the card\'s top-left corner');
+assert.match(index, /#hubNextWeekBtn \{ grid-area: current; justify-self: end;/, 'next week sits in the card\'s top-right corner');
+assert.match(index, /\.hubBlitzMount\s*\{\s*display:\s*block;\s*width:\s*100%;/, 'Blitz mount must match the full-width hero card');
 assert.match(index, /\.blitzArcade\s*\{[\s\S]*?grid-column:\s*2[\s\S]*?width:\s*100%/, 'Blitz strip must occupy the same center column as the hero card');
 assert.match(index, /class="mazeCta"/, 'Maze must have a neutral base class before progress state is applied');
 assert.match(index, /mazeButton\.classList\.toggle\('hub-glow-pink', mazeAvailable\)/, 'Maze must glow while weekly games remain');
@@ -35,7 +40,7 @@ assert.match(index, /document\.documentElement\.classList\.add\('hub-low-power'\
 assert.match(index, /document\.documentElement\.classList\.add\('hub-reduced-motion'\)/, 'reduced-motion preference must be represented before paint');
 assert.match(index, /html\.hub-low-power[\s\S]*?animation: none !important/, 'low-power hub surfaces must stop animation');
 assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.hub-glow-pink,[\s\S]*?\.mazeCta\.is-complete \{ animation: none !important; \}/, 'reduced motion must stop every hub glow and completion animation');
-assert.match(index, /grid-template-areas: "previous current next"/, 'wide hubs must use side tabs around the current card');
+assert.match(index, /grid-template-areas: "current";/, 'wide hubs overlay the week doors on the full-width current card');
 assert.match(index, /grid-template-areas: "current current" "previous next"/, 'medium hubs must move tabs below the card');
 assert.match(index, /@media \(max-width: 600px\)[\s\S]*?\.blitzRecordsBtn[\s\S]*?min-height: 44px/, 'phone layout must retain a touch-sized Records action');
 assert.match(verify, /tests\/index-hub-polish-audit\.cjs/, 'verify.sh must run the Pass 19 polish audit');

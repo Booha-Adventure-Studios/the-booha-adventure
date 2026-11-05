@@ -1823,6 +1823,13 @@ else
   bad "Weekly ornament banner test failed"
 fi
 
+echo "[hub] Layout A + notebook Homework"
+if node tests/hub-layout-a-homework.test.cjs >/dev/null 2>&1; then
+  ok "Wide hub: full-width week card with corner doors; notebook Homework with per-student NEW badge"
+else
+  bad "Layout A / Homework test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"
