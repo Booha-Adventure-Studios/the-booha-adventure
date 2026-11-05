@@ -69,7 +69,112 @@
       buttonEn: 'EQUIP MISTER HAPPY BOOHA',
       buttonJp: 'ミスター・ハッピー・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
     }),
+    // ── Christmas 2026 (Nov 1 – Jan 2), one per weekly reward ──
+    thumpkin: Object.freeze({
+      kickerEn: 'A FLUFFY FRIEND HOPPED IN!',
+      kickerJp: 'ふわふわの <ruby>友<rt>とも</rt></ruby>だちが ぴょんと <ruby>来<rt>き</rt></ruby>たよ！',
+      titleEn: 'You Unlocked Thumpkin Booha!',
+      titleJp: 'ソンプキン・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Thumpkin put on a warm scarf just for the trip. Tap to hop along together!',
+      copyJp: 'ソンプキンは ぽかぽか マフラーで じゅんび ばっちり！ タップして いっしょに ぴょんぴょん いこう！',
+      buttonEn: 'EQUIP THUMPKIN BOOHA',
+      buttonJp: 'ソンプキン・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    crumbly: Object.freeze({
+      kickerEn: 'FRESH FROM THE OVEN!',
+      kickerJp: 'オーブンから やきたて！',
+      titleEn: 'You Unlocked Crumbly Booha!',
+      titleJp: 'クランブリー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Crumbly smells like cookies and smiles all day long. Tap to take Crumbly with you!',
+      copyJp: 'クランブリーは クッキーの あまい におい。いつも にこにこ！ タップして いっしょに いこう！',
+      buttonEn: 'EQUIP CRUMBLY BOOHA',
+      buttonJp: 'クランブリー・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    gnasher: Object.freeze({
+      kickerEn: 'A REINDEER FRIEND LANDED!',
+      kickerJp: 'トナカイの <ruby>友<rt>とも</rt></ruby>だちが おりてきたよ！',
+      titleEn: 'You Unlocked Gnasher Booha!',
+      titleJp: 'ナーシャー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Gnasher practiced flying all year. Tap to fly through the maze together!',
+      copyJp: 'ナーシャーは いちねんじゅう とぶ れんしゅうを したよ。タップして いっしょに めいろを とぼう！',
+      buttonEn: 'EQUIP GNASHER BOOHA',
+      buttonJp: 'ナーシャー・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    waddlesworth: Object.freeze({
+      kickerEn: 'A PENGUIN WADDLED IN!',
+      kickerJp: 'ペンギンが よちよち <ruby>来<rt>き</rt></ruby>たよ！',
+      titleEn: 'You Unlocked Waddlesworth Booha!',
+      titleJp: 'ワードルスワース・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Waddlesworth loves snow, hats, and you! Tap to waddle along together.',
+      copyJp: 'ワードルスワースは ゆきと ぼうしと きみが だいすき！ タップして いっしょに よちよち あるこう。',
+      buttonEn: 'EQUIP WADDLESWORTH BOOHA',
+      buttonJp: 'ワードルスワース・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    snaggle: Object.freeze({
+      kickerEn: 'JINGLE, JINGLE! A LITTLE HELPER IS HERE!',
+      kickerJp: 'ジングル ジングル！ ちいさな おてつだいさんが <ruby>来<rt>き</rt></ruby>たよ！',
+      titleEn: 'You Unlocked Snaggle Booha!',
+      titleJp: 'スナグル・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Snaggle\'s bell rings when a secret is close. Tap to go exploring together!',
+      copyJp: 'スナグルの すずは ひみつが ちかいと なるよ。タップして いっしょに たんけんしよう！',
+      buttonEn: 'EQUIP SNAGGLE BOOHA',
+      buttonJp: 'スナグル・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    tinkerplunk: Object.freeze({
+      kickerEn: 'HO HO HO! A VERY SPECIAL GUEST!',
+      kickerJp: 'ホー ホー ホー！ とくべつな おきゃくさまだよ！',
+      titleEn: 'You Unlocked Tinkerplunk Booha!',
+      titleJp: 'ティンカープランク・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Tinkerplunk checked the list twice, and you\'re on it! Tap to share smiles together.',
+      copyJp: 'ティンカープランクは リストを 2かい チェック。きみの なまえも あったよ！ タップして いっしょに えがおを とどけよう！',
+      buttonEn: 'EQUIP TINKERPLUNK BOOHA',
+      buttonJp: 'ティンカープランク・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    oats: Object.freeze({
+      kickerEn: 'A COZY FRIEND HAS ARRIVED!',
+      kickerJp: 'ぽかぽかの <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ！',
+      titleEn: 'You Unlocked Oats Booha!',
+      titleJp: 'オーツ・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Oats is prickly on the outside and snuggly on the inside. Tap to stay warm together!',
+      copyJp: 'オーツは そとは ちくちく、なかは ふわふわ。タップして いっしょに あったまろう！',
+      buttonEn: 'EQUIP OATS BOOHA',
+      buttonJp: 'オーツ・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    quillock: Object.freeze({
+      kickerEn: 'A SPARKLY FRIEND LIT UP!',
+      kickerJp: 'キラキラの <ruby>友<rt>とも</rt></ruby>だちが ひかったよ！',
+      titleEn: 'You Unlocked Quillock Booha!',
+      titleJp: 'クウィラック・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Quillock borrowed the lights from the tree. Tap to light up the maze together!',
+      copyJp: 'クウィラックは ツリーの ライトを かりてきたよ。タップして いっしょに めいろを てらそう！',
+      buttonEn: 'EQUIP QUILLOCK BOOHA',
+      buttonJp: 'クウィラック・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
   });
+
+  // Any character without hand-written copy still gets a reveal, built from
+  // its own names, so a new season can never silently skip the popup.
+  // English goes in via textContent; the Japanese name is escaped because
+  // the *Jp fields are written with innerHTML (they carry <ruby>).
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function copyFor(id, skin) {
+    if (COPY[id]) return COPY[id];
+    const name = String((skin && skin.name) || '').trim();
+    if (!name) return null;
+    const nameJp = escapeHtml(String((skin && skin.nameJp) || name).trim());
+    return Object.freeze({
+      kickerEn: 'A NEW FRIEND HAS ARRIVED',
+      kickerJp: '<ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ',
+      titleEn: `You Unlocked ${name}!`,
+      titleJp: `${nameJp}を <ruby>解放<rt>かいほう</rt></ruby>したよ！`,
+      copyEn: `Tap ${name} to equip your new traveling friend.`,
+      copyJp: `${nameJp}を タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。`,
+      buttonEn: `EQUIP ${name.toUpperCase()}`,
+      buttonJp: `${nameJp}を <ruby>装備<rt>そうび</rt></ruby>`,
+    });
+  }
 
   function create(options) {
     options = options || {};
@@ -124,8 +229,8 @@
     }
 
     function prepareSeasonalUnlockPopup(id) {
-      const copy = COPY[id];
       const skin = skins?.get(id);
+      const copy = copyFor(id, skin);
       if (!copy || !skin || !ui.popup) return false;
       const setLeadText = (selector, value) => {
         const el = ui.popup.querySelector(selector);
@@ -157,6 +262,9 @@
 
     function equipSeasonalFromUnlockPopup() {
       if (!unlockId || !skins?.unlockAndEquip?.(unlockId)) return;
+      // The reveal counts as seen only once the student acts on it. If they
+      // leave or reload before tapping, it shows again on the next visit.
+      skins.markRevealSeen?.(unlockId);
       options.applyEquippedMazeSkin?.();
       closeSeasonalUnlockPopup();
     }
@@ -169,7 +277,7 @@
       if (skins.isUnlocked?.(id) && skins.isRevealSeen?.(id)) return;
       if (!prepareSeasonalUnlockPopup(id)) return;
       if (!skins.isUnlocked?.(id) && (typeof skins.unlock !== 'function' || !skins.unlock(id))) return;
-      skins.markRevealSeen?.(id);
+      // Not marked seen here: see equipSeasonalFromUnlockPopup().
       unlockId = id;
       popupShown = true;
       ui.scrim?.classList.add('show');
@@ -195,5 +303,5 @@
     };
   }
 
-  global.MazeSeasonalUnlock = Object.freeze({ COPY, create });
+  global.MazeSeasonalUnlock = Object.freeze({ COPY, copyFor, create });
 })(window);
