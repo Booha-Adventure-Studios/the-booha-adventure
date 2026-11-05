@@ -498,22 +498,72 @@ const BoohaSaveFile = (() => {
     return save(data);
   }
 
-  // ── Homework ticks ─────────────────────────────────────────────────────
-  // weekly.homework = { weekStart: 'YYYY-MM-DD', copied: { pb: ['vocab:3', …], br, bc } }
-  // The weekStart stamp lets readers ignore a stale bucket and lets the
-  // Sunday reset keep ticks that already belong to the new week.
+  // ── Homework ───────────────────────────────────────────────────────────
+  // weekly.homework = {
+  //   weekStart: 'YYYY-MM-DD',                 // stamps `copied` (this week only)
+  //   copied: { pb: ['vocab:3', …], br, bc },  // hub list: copied into my notebook
+  //   known:  { 'YYYY-MM-DD': { pb: { vocab: [1, 2], sentences: [4] } } }
+  //           // homework.html: "hide items I know", keyed by week start;
+  //           // the Sunday reset keeps last / this / next week only.
+  // }
+  // Notebook progress (copied) and a display preference (known) are kept
+  // apart. js/core/homework-store.js is the only reader/writer.
+  const HOMEWORK_CURRICULA = ['pb', 'br', 'bc'];
+  const HOMEWORK_SECTIONS = ['vocab', 'sentences', 'questions'];
+  const DAY_KEY_RE = /^\d{4}-\d{2}-\d{2}$/;
   function _defaultHomework() {
-    return { weekStart: '', copied: {} };
+    return { weekStart: '', copied: {}, known: {} };
+  }
+  function _isObj(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
+  function _normalizeKnownWeek(week) {
+    const out = {};
+    if (!_isObj(week)) return out;
+    HOMEWORK_CURRICULA.forEach(curr => {
+      if (!_isObj(week[curr])) return;
+      const sections = {};
+      HOMEWORK_SECTIONS.forEach(section => {
+        const list = week[curr][section];
+        if (!Array.isArray(list)) return;
+        const nums = Array.from(new Set(list.map(Number)))
+          .filter(n => Number.isInteger(n) && n >= 1 && n <= 15)
+          .sort((a, b) => a - b);
+        if (nums.length) sections[section] = nums;
+      });
+      if (Object.keys(sections).length) out[curr] = sections;
+    });
+    return out;
   }
   function _normalizeHomework(value) {
     const out = _defaultHomework();
-    if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
-    if (typeof value.weekStart === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value.weekStart)) out.weekStart = value.weekStart;
-    const copied = value.copied && typeof value.copied === 'object' && !Array.isArray(value.copied) ? value.copied : {};
-    ['pb', 'br', 'bc'].forEach(curr => {
+    if (!_isObj(value)) return out;
+    if (typeof value.weekStart === 'string' && DAY_KEY_RE.test(value.weekStart)) out.weekStart = value.weekStart;
+    const copied = _isObj(value.copied) ? value.copied : {};
+    HOMEWORK_CURRICULA.forEach(curr => {
       if (Array.isArray(copied[curr])) {
-        out.copied[curr] = copied[curr].filter(k => typeof k === 'string' && /^[a-z]+:\d{1,2}$/.test(k));
+        out.copied[curr] = copied[curr].filter(k => typeof k === 'string' && /^(vocab|sentences|questions):([1-9]|1[0-5])$/.test(k));
       }
+    });
+    const known = _isObj(value.known) ? value.known : {};
+    Object.keys(known).forEach(week => {
+      if (!DAY_KEY_RE.test(week)) return;
+      const normalized = _normalizeKnownWeek(known[week]);
+      if (Object.keys(normalized).length) out.known[week] = normalized;
+    });
+    return out;
+  }
+  // Week starts within one week of `weekStart` (last / this / next).
+  function _homeworkWindow(weekStart) {
+    const t = Date.parse(weekStart + 'T00:00:00Z');
+    if (!Number.isFinite(t)) return null;
+    const day = ms => new Date(ms).toISOString().slice(0, 10);
+    return { from: day(t - 7 * 86400000), to: day(t + 7 * 86400000) };
+  }
+  function _pruneKnown(known, weekStart) {
+    const win = _homeworkWindow(weekStart);
+    const out = {};
+    if (!win) return out;
+    Object.keys(known || {}).forEach(week => {
+      if (week >= win.from && week <= win.to) out[week] = known[week];
     });
     return out;
   }
@@ -549,11 +599,16 @@ const BoohaSaveFile = (() => {
       data.weekly && data.weekly.visitDays,
       String(occurrenceKey || '').slice(0, 10)
     );
-    // Homework ticks: keep the bucket only if it is already the new week's.
+    // Homework: `copied` survives only if it is already the new week's;
+    // `known` keeps the rolling last / this / next window around the new week.
+    const newWeekStart = String(occurrenceKey || '').slice(0, 10);
     const previousHomework = _normalizeHomework(data.weekly && data.weekly.homework);
-    const carriedHomework = previousHomework.weekStart &&
-      previousHomework.weekStart === String(occurrenceKey || '').slice(0, 10)
-      ? previousHomework : _defaultHomework();
+    const carriedHomework = _defaultHomework();
+    if (previousHomework.weekStart && previousHomework.weekStart === newWeekStart) {
+      carriedHomework.weekStart = previousHomework.weekStart;
+      carriedHomework.copied = previousHomework.copied;
+    }
+    carriedHomework.known = _pruneKnown(previousHomework.known, newWeekStart);
     data.weekly = {
       completedGames:     {},
       gameScores:         {},
