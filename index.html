@@ -2432,6 +2432,91 @@
   transform: translateY(-2px) scale(1.03) translateZ(0);
 }   
     
+
+/* ══ Hub Pass 6: phone layouts ═══════════════════════════════════════════
+   Layout B — phones held upright: everything already fits, so only the week
+   doors under the card get slimmer (one line, no dates).
+   Layout C — phones held sideways (short screens): two columns. Title,
+   ornaments, links and class picker on the left; the week card (with the
+   layout-A corner doors), Maze, Homework and Blitz on the right, so the
+   Maze is on the first screen without scrolling. CSS only — no markup moves.
+   These rules sit last in the sheet so they win over the Blitz/Maze rules. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .hubWeekTab { min-height: 48px; padding: 6px 10px; }
+  .hubWeekTabDate { display: none; }
+  .hubWeekTabLabel { font-size: 8px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 999px) {
+  .hub {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+    grid-template-rows: auto auto;
+    grid-template-areas: "head hero" "head blitz";
+    column-gap: 14px;
+    row-gap: 8px;
+  }
+  .hubHeader {
+    grid-area: head;
+    align-self: start;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "title" "left" "curriculum";
+    row-gap: 8px;
+  }
+  .hubHero { grid-area: hero; }
+  .hubBlitzMount { grid-area: blitz; }
+
+  /* left column: compact title block */
+  .ornamentBanner { --ob-h: 32px; margin: 0 auto -4px; }
+  .hubTitle { padding: 0 4px; }
+  .hubHeading { font-size: clamp(20px, 3.3vw, 28px); letter-spacing: 1.5px; }
+  .hubHeadingJp { font-size: 9px; letter-spacing: 1.5px; }
+  .playerGreeting { margin-top: 4px; }
+  .greetingEn { font-size: 12px; letter-spacing: 2px; }
+  .greetingJp { font-size: 9px; }
+  .hubHeaderLeft { align-items: stretch; }
+  .hubUtilityNav { flex-wrap: nowrap; }
+  .hubUtilityNav .hubUtilityBtn { flex: 1 1 0; min-width: 0; }
+  .hubCurriculumBtn { justify-self: stretch; min-height: 44px; }
+
+  /* right column: layout-A card with the week doors in its corners */
+  .hubWeekLayout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "current";
+    align-items: start;
+  }
+  #hubPrevWeekBtn { grid-area: current; justify-self: start; }
+  #hubNextWeekBtn { grid-area: current; justify-self: end; padding: 4px 8px 4px 10px; }
+  .hubWeekTab {
+    min-height: 44px;
+    margin: 8px;
+    align-self: start;
+    padding: 4px 10px 4px 8px;
+    border-radius: 999px;
+    flex-direction: row;
+    gap: 6px;
+  }
+  .hubWeekTabLabel, .hubWeekTabDate { display: none; }
+  .hubWeekTabTitle { margin-top: 0; font-size: 11px; }
+  .hubWeekTabArrow { font-size: 18px; }
+  .hubCurrentWeekMount .weekCard { padding: 12px 14px 12px; }
+  .hubCurrentWeekMount .weekCard.currentWeek .weekTag { font-size: 9px; }
+  .hubCurrentWeekMount .weekCard.currentWeek .weekTitle { font-size: clamp(17px, 2.6vw, 22px); margin-top: 6px; }
+  .hubCurrentWeekMount .weekCard.currentWeek .weekDates { font-size: 10px; margin-top: 3px; }
+  .hubMazeLabel { margin-top: 8px; font-size: 10px; }
+  .hubProgress { margin-top: 5px; gap: 4px; }
+  .hubProgressHint { display: none; }
+  .hubCurrentWeekMount .hubHeroActions { margin-top: 10px; flex-wrap: nowrap; align-items: stretch; }
+  .hubHeroActions .mazeCta { flex: 1 1 auto; min-width: 0; min-height: 48px; }
+  .hubHeroActions .hubHomeworkBtn { flex: 0 0 auto; width: auto; }
+
+  /* Blitz: one compact row */
+  .blitzArcade { padding: 8px 10px; border-radius: 16px; }
+  .blitzMedals { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 6px; margin-top: 6px; }
+  .blitzMedal { min-height: 44px; padding: 4px 6px; flex-direction: row; gap: 5px; }
+  .blitzMedalCopy { align-items: flex-start; }
+  .blitzRecordsBtn { grid-column: auto; width: 52px; min-height: 44px; flex-direction: column; }
+}
   </style>
 </head>
 <body>
