@@ -759,7 +759,20 @@ const BoohaProfileGame = (() => {
               </div>`).join('')}
           </div>
         </div>`).join('')}
-      ${next ? `<p class="rb-next">つぎの トークン: <b>${esc(next.jp)}</b> — ${esc(next.howJp || '')} <span>${esc(next.en)} · ${esc(next.how)}</span></p>` : ''}`;
+      ${next ? `<p class="rb-next">つぎの トークン: <b>${esc(next.jp)}</b> — ${esc(next.howJp || '')} <span>${esc(next.en)} · ${esc(next.how)}</span></p>` : ''}
+      ${renderPostcards()}`;
+  }
+
+  // Weekly postcards shelf (data + markup in js/core/postcards.js; art from
+  // the ornament month table so renamed art never breaks an old card).
+  function renderPostcards() {
+    const P = window.BoohaPostcards;
+    if (!P || !P.renderHTML) return '';
+    const B = window.BoohaOrnamentBanner;
+    return P.renderHTML(P.list(), {
+      esc,
+      artFor: day => { try { return B ? (B.artForDay(day) || {}).src || null : null; } catch (_) { return null; } },
+    });
   }
 
 
@@ -858,6 +871,7 @@ const BoohaProfileGame = (() => {
   document.addEventListener('booha:checkIn', render);
   document.addEventListener('booha:profileCurr', render);
   document.addEventListener('booha:medalEarned', render);
+  document.addEventListener('booha:postcardUpdated', render);
 
   return { render, _test: { kindFor, nodePos, speech, sealedKey } };
 })();
