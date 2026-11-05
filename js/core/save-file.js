@@ -101,6 +101,7 @@ const BoohaSaveFile = (() => {
         unlockedBoohaSkins:{},   // { batty: { unlockedAt } } — temporary cosmetic unlocks
         wanderers:         [],   // [ wandererId, ... ] unlocked this week (index = order)
         visitDays:         {},   // { "2026-11-05": 1 } Tokyo days this student opened the hub this week
+        homework:          _defaultHomework(), // hub list "copied into my notebook" ticks (this week)
         worlds:            _defaultWeeklyWorlds(),
       },
 
@@ -371,9 +372,11 @@ const BoohaSaveFile = (() => {
         unlockedBoohaSkins: {},
         wanderers:          [],
         visitDays:          {},
+        homework:           _defaultHomework(),
         worlds:             _defaultWeeklyWorlds(),
       };
     }
+    save.weekly.homework = _normalizeHomework(save.weekly.homework);
     if (!save.weekly.unlockedBoohaSkins || typeof save.weekly.unlockedBoohaSkins !== 'object' || Array.isArray(save.weekly.unlockedBoohaSkins)) {
       save.weekly.unlockedBoohaSkins = {};
     }
@@ -495,6 +498,26 @@ const BoohaSaveFile = (() => {
     return save(data);
   }
 
+  // ── Homework ticks ─────────────────────────────────────────────────────
+  // weekly.homework = { weekStart: 'YYYY-MM-DD', copied: { pb: ['vocab:3', …], br, bc } }
+  // The weekStart stamp lets readers ignore a stale bucket and lets the
+  // Sunday reset keep ticks that already belong to the new week.
+  function _defaultHomework() {
+    return { weekStart: '', copied: {} };
+  }
+  function _normalizeHomework(value) {
+    const out = _defaultHomework();
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+    if (typeof value.weekStart === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value.weekStart)) out.weekStart = value.weekStart;
+    const copied = value.copied && typeof value.copied === 'object' && !Array.isArray(value.copied) ? value.copied : {};
+    ['pb', 'br', 'bc'].forEach(curr => {
+      if (Array.isArray(copied[curr])) {
+        out.copied[curr] = copied[curr].filter(k => typeof k === 'string' && /^[a-z]+:\d{1,2}$/.test(k));
+      }
+    });
+    return out;
+  }
+
   // Day keys (YYYY-MM-DD) inside the new occurrence's seven days
   // (weekStart … weekStart + 6). Anything earlier, later or malformed is
   // dropped. With no valid weekStart, nothing carries over.
@@ -526,6 +549,11 @@ const BoohaSaveFile = (() => {
       data.weekly && data.weekly.visitDays,
       String(occurrenceKey || '').slice(0, 10)
     );
+    // Homework ticks: keep the bucket only if it is already the new week's.
+    const previousHomework = _normalizeHomework(data.weekly && data.weekly.homework);
+    const carriedHomework = previousHomework.weekStart &&
+      previousHomework.weekStart === String(occurrenceKey || '').slice(0, 10)
+      ? previousHomework : _defaultHomework();
     data.weekly = {
       completedGames:     {},
       gameScores:         {},
@@ -537,6 +565,7 @@ const BoohaSaveFile = (() => {
       unlockedBoohaSkins:{},
       wanderers:          [],
       visitDays:          carriedVisitDays,
+      homework:           carriedHomework,
       worlds:             _defaultWeeklyWorlds(),
     };
     data.weekly.worlds.occurrenceKey = occurrenceKey || '';
