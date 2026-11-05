@@ -1858,6 +1858,13 @@ else
   bad "Christmas unlock reveal test failed"
 fi
 
+echo "[maze] Blitz → Maze path + Christmas reveal"
+if node tests/blitz-maze-path.test.cjs >/dev/null 2>&1; then
+  ok "Unlocking Blitz links to the Maze; hub Maze button shows the new friend until the reveal is seen; Christmas reveal colours"
+else
+  bad "Blitz → Maze path test failed"
+fi
+
 echo "[hub] Weekly homework list audit"
 if node tests/index-homework-list-audit.cjs >/dev/null 2>&1; then
   ok "Current-week homework action and readable list contracts pass"

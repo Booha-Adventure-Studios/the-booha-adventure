@@ -2297,6 +2297,35 @@
     0 0 38px rgba(76,236,145,.5);
 }
 .mazeCta.is-complete .mazeCtaJp { color: rgba(8,38,25,.72); }
+/* Pass 8: new-friend cue (see updateMazeFriendCue). Transform/opacity only. */
+.mazeCtaFriend {
+  flex: 0 0 auto;
+  width: 46px; height: 46px;
+  margin: -6px 2px -6px -6px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,240,190,.95) 0%, rgba(255,214,110,.55) 55%, rgba(255,214,110,0) 72%);
+  animation: mazeFriendBob 2.4s ease-in-out infinite;
+}
+.mazeCtaFriend[hidden] { display: none; }
+/* Gold ring on a pseudo-element: the Maze glow animates box-shadow, which
+   would hide a ring drawn with box-shadow here. */
+.mazeCta.has-new-friend { position: relative; }
+.mazeCta.has-new-friend::after {
+  content: '';
+  position: absolute; inset: -5px;
+  border-radius: inherit;
+  border: 3px solid rgba(255,214,110,.9);
+  box-shadow: 0 0 22px rgba(255,214,110,.55);
+  pointer-events: none;
+}
+@keyframes mazeFriendBob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-3px) rotate(3deg); }
+}
+html.hub-reduced-motion .mazeCtaFriend,
+html.hub-low-power .mazeCtaFriend { animation: none; }
+@media (prefers-reduced-motion: reduce) { .mazeCtaFriend { animation: none; } }
 
 .mazeCtaMain { display: flex; flex-direction: column; align-items: center; line-height: 1.25; }
 .mazeCtaEn {
@@ -2633,6 +2662,7 @@
           </div>
           <div class="hubHeroActions">
           <button id="mazeBtn" class="mazeCta" type="button">
+            <img id="mazeCtaFriend" class="mazeCtaFriend" alt="" decoding="async" hidden>
             <span class="mazeCtaMain">
               <span class="mazeCtaEn">Enter the Maze</span>
               <span class="mazeCtaJp">今日のゲームはここから</span>
@@ -3263,6 +3293,7 @@ function renderHub() {
     mazeButton.classList.toggle('hub-glow-pink', mazeAvailable);
     mazeButton.classList.toggle('is-complete', !mazeAvailable);
   }
+  updateMazeFriendCue();
 
 const MEDAL_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 2.5L11 9M15.5 2.5L13 9"></path><circle cx="12" cy="15" r="6"></circle></svg>';
 const PILLS = [
@@ -3390,7 +3421,7 @@ const PILLS = [
   function initPillsWhenEnginesReady() {
     renderPills();
     const wireRelight = () => {
-      const relight = () => renderPills();
+      const relight = () => { renderPills(); updateMazeFriendCue(); };
       if (window.VocabBlitz)    VocabBlitz._onClose    = relight;
       if (window.SentenceBlitz) SentenceBlitz._onClose = relight;
       if (window.QuestionBlitz) QuestionBlitz._onClose = relight;
@@ -4109,13 +4140,47 @@ document.getElementById('hubCurriculumBtn')?.addEventListener('click', () => {
 ════════════════════════════════════════════════════════════ */
 const mazeBtn = document.getElementById('mazeBtn');
 let hubMazeNavigationStarted = false;
-mazeBtn.addEventListener('click', () => {
+function goToMaze() {
   if (hubMazeNavigationStarted) return;
   hubMazeNavigationStarted = true;
   playIndexSfx('hubPrimary');
   sessionStorage.setItem('booha_return_to_hub', '1');
   fadeToBlack(true);
   setTimeout(() => { window.location.href = 'maze.html'; }, 520);
+}
+mazeBtn.addEventListener('click', goToMaze);
+/* One-time "new friend" cue: after this week's Booha is unlocked (by
+   clearing all three Blitz) and until its Maze reveal has been seen, the
+   Maze button carries the Booha's face and a soft gold ring. Reads only
+   this student's save, never before identity is ready. */
+function updateMazeFriendCue() {
+  const btn = document.getElementById('mazeBtn');
+  const face = document.getElementById('mazeCtaFriend');
+  if (!btn || !face) return;
+  let skin = null;
+  try {
+    const skins = window.BoohaSkins;
+    const id = window.BOOHA_READY ? skins?.rotationCharacterId?.() : null;
+    if (id && skins.isUnlocked?.(id) && !skins.isRevealSeen?.(id)) skin = skins.get(id);
+  } catch (e) { skin = null; }
+  const art = skin?.assets?.maze || '';
+  btn.classList.toggle('has-new-friend', !!art);
+  face.hidden = !art;
+  if (art) {
+    if (face.getAttribute('src') !== art) face.src = art;
+    btn.setAttribute('aria-label', `Enter the Maze — meet ${skin.name} / めいろへ — ${skin.nameJp} に あいに いこう`);
+  } else {
+    btn.removeAttribute('aria-label');
+  }
+}
+document.addEventListener('booha:ready', updateMazeFriendCue);
+document.addEventListener('booha:gameEnd', () => setTimeout(updateMazeFriendCue, 0));
+document.addEventListener('booha:weeklyReset', updateMazeFriendCue);
+
+// The unlocking Blitz result card's "Meet … in the Maze" button.
+document.addEventListener('booha:openMaze', e => {
+  e.preventDefault();
+  goToMaze();
 });
 
 

@@ -17,9 +17,12 @@ assert.match(
 );
 
 assert.match(index, /let hubMazeNavigationStarted = false;/, 'Maze navigation needs a one-shot guard');
+// Pass 8: the guarded navigation moved into goToMaze() so the unlocking
+// Blitz card (booha:openMaze) and the Maze button share the same one-shot path.
+assert.match(index, /mazeBtn\.addEventListener\('click', goToMaze\);/, 'the Maze button uses the shared navigation');
 assert.match(
   index,
-  /mazeBtn\.addEventListener\('click', \(\) => \{\s*if \(hubMazeNavigationStarted\) return;\s*hubMazeNavigationStarted = true;[\s\S]*?setTimeout\(\(\) => \{ window\.location\.href = 'maze\.html';/,
+  /function goToMaze\(\) \{\s*if \(hubMazeNavigationStarted\) return;\s*hubMazeNavigationStarted = true;[\s\S]*?setTimeout\(\(\) => \{ window\.location\.href = 'maze\.html';/,
   'Maze navigation must guard before scheduling the redirect'
 );
 
