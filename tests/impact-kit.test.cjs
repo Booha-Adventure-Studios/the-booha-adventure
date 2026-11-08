@@ -155,9 +155,10 @@ const plain = o => JSON.parse(JSON.stringify(o));
 // ── 5. Pass 2: small contact for every game on the tracker ──
 {
   const kinds = () => nodes.filter(n => /\bbimp\b/.test(n.className)).map(n => n.className.replace('bimp ', '').split(' ')[0]);
+  // Opt-in since Pass 6 (autoContact: true); these cases exercise it directly.
   const fresh = (opts, motion) => {
     const U = makeCtx(motion);
-    return { U, run: U.createRun(Object.assign({ total: 15 }, opts)), tap: el => { LAST.__brunTap = { el, t: NOW }; } };
+    return { U, run: U.createRun(Object.assign({ total: 15, autoContact: true }, opts)), tap: el => { LAST.__brunTap = { el, t: NOW }; } };
   };
 
   // First-try hit: contact at the tapped answer (flash, ring, fragments), no bolt.
@@ -207,7 +208,24 @@ const plain = o => JSON.parse(JSON.stringify(o));
   for (let i = 0; i < 10; i++) { nodes.length = 0; t.run.ready(5000); t.tap(btn); t.run.hit(); }
   assert(nodes.some(n => /bimp-ring t4/.test(n.className)), '10 in a row: the largest ring');
 
+  // Off by default: a run without autoContact draws nothing on hit, miss or recover.
+  const off = makeCtx();
+  const offRun = off.createRun({ total: 15, recoverPoints: 50 });
+  offRun.ready(5000); LAST.__brunTap = { el: btn, t: NOW }; offRun.miss();
+  LAST.__brunTap = { el: btn, t: NOW }; offRun.recover();
+  offRun.ready(5000); LAST.__brunTap = { el: btn, t: NOW }; offRun.hit();
+  assert.strictEqual(nodes.filter(n => /\bbimp\b/.test(n.className)).length, 0, 'no automatic effect unless a game opts in');
+  // The extras keep their own reactions (e.g. Echo's Hint calls run.miss()).
+  for (const f of ['booha-bites', 'echo', 'week-boss']) {
+    assert(!/autoContact: true/.test(read(`games/${f}.js`)), `${f}: no automatic tracker effect`);
+  }
+  // All nine curriculum games draw their own (richer) impacts.
+  for (const f of ['vocab-tap', 'spell-word', 'vocab-speed', 'sentence-tap', 'sentence-order', 'sentence-speed', 'say-word', 'say-sentence', 'ask-question']) {
+    assert.match(read(`games/${f}.js`), /impactKit: true \}\);/, `${f}: on the full kit`);
+  }
+
   // Wiring.
+  assert.match(utilsSrc, /if \(!autoContact \|\| impactKit \|\| !hud/, 'automatic effect is opt-in');
   assert.match(utilsSrc, /autoImpact\('hit', \{ combo: st\.combo, sharp \}\);/);
   assert.match(utilsSrc, /if \(recoverPoints > 0\) autoImpact\('recover', \{ combo: 1 \}\);/);
   assert.match(utilsSrc, /paint\(\{ broke: hadCombo \}\);\s*autoImpact\('miss'\);/);
