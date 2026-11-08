@@ -5,7 +5,8 @@
  * Mounts (profile.html):
  *   #pg-hero        companion card: seasonal/selected Booha, name, rank coin, level bar
  *   #pg-skin        this week's Blitz skin
- *   #pg-trail       this week's trail: 9 maze games → arcade chest → 3 Blitz → skin
+ *   #pg-trail       this week's trail: two parallel tracks, side by side —
+ *                   9 maze games → arcade chest, and 3 Blitz → skin
  *   #pg-stars       this week's star breakdown
  *   #pg-collection  wanderer collection (friendly / mischievous / dangerous)
  *   #pg-travelers   travelers the player has tapped (Nuppi, seasonal travelers)
@@ -242,7 +243,13 @@ const BoohaProfileGame = (() => {
     }
     const left = s.games.length - s.week.twoStarCount;
     if (!s.week.played) return 'きょうも いっしょに ぼうけん しよう！';
-    if (!s.arcadeOpen) return `あと ${left}つ ★★ で アーケード だよ！`;
+    // Two independent tracks: Blitz is never presented as "after the maze".
+    const blitzLeft = 3 - s.week.blitzCount;
+    if (!s.arcadeOpen) {
+      return s.weeklySkin && !s.weeklySkin.unlocked && blitzLeft > 0
+        ? `あと ${left}つ ★★ で アーケード！ Blitz あと ${blitzLeft}つ で スキン！`
+        : `あと ${left}つ ★★ で アーケード だよ！`;
+    }
     if (s.week.blitzCount < 3) {
       return s.weeklySkin
         ? `アーケード オープン！ Blitz あと ${3 - s.week.blitzCount}つ で スキン！`
@@ -306,10 +313,18 @@ const BoohaProfileGame = (() => {
 
   const COLS = [16.5, 50, 83.5];
   const ROW_Y = [60, 180, 300];
-  const GATE_Y = 425;
-  const BLITZ_Y = 575;
-  const SKIN_Y = 720;
-  const SKIN_ELBOW_Y = BLITZ_Y + 86;   // below every Blitz label
+  // Below the maze: two parallel lanes whose goals sit side by side.
+  // Maze lane (right): the path leaves the last game and runs down to the
+  // arcade chest. Blitz lane (left): three Blitz discs stacked on one line
+  // with their labels beside them, running down to the weekly skin.
+  // The lanes never join, so neither reads as a step before the other.
+  const LANES_Y = 392;                  // "two goals · any order" caption
+  const MAZE_JOG_Y = 446;               // maze path turns into its lane here
+  const MAZE_LANE_X = 72;
+  const BLITZ_LANE_X = 18;
+  const BLITZ_YS = [480, 570, 660];     // Blitz disc centres
+  const BLITZ_DISC_R = 35;
+  const GOAL_Y = 758;                   // chest and skin share this centre line
 
   function nodePos(i) {
     const row = Math.floor(i / 3);
@@ -393,19 +408,17 @@ const BoohaProfileGame = (() => {
     }
     const last = nodePos(s.games.length - 1);
     const prism = readyCount(s) === s.games.length;   // 9 / 9: the whole trail is rainbow
-    parts.push(seg(last.x, last.y, last.x, GATE_Y, s.arcadeOpen, prism));
-    parts.push(seg(COLS[1], GATE_Y, last.x, GATE_Y, s.arcadeOpen, prism));
-    // Blitz row and the skin at the end.
+    // Maze lane: last game → down → into the lane → arcade chest.
+    parts.push(seg(last.x, last.y, last.x, MAZE_JOG_Y, s.arcadeOpen, prism));
+    parts.push(seg(MAZE_LANE_X, MAZE_JOG_Y, last.x, MAZE_JOG_Y, s.arcadeOpen, prism));
+    parts.push(seg(MAZE_LANE_X, MAZE_JOG_Y, MAZE_LANE_X, GOAL_Y - 40, s.arcadeOpen, prism));
+    // Blitz lane: one vertical line through the discs (labels sit beside
+    // them, never on the line), then down to the skin.
     const bd = ['vocab', 'sentence', 'question'].map(t => w.blitzDone[t]);
-    parts.push(seg(COLS[0], BLITZ_Y, COLS[1], BLITZ_Y, bd[0] && bd[1]));
-    parts.push(seg(COLS[1], BLITZ_Y, COLS[2], BLITZ_Y, bd[1] && bd[2]));
-    // The skin path drops from the gaps between the Blitz nodes, never
-    // through a node's labels, and joins below them (a funnel).
     const allBlitz = w.blitzCount === 3;
-    const GAPS = [(COLS[0] + COLS[1]) / 2, (COLS[1] + COLS[2]) / 2];
-    GAPS.forEach(x => parts.push(seg(x, BLITZ_Y, x, SKIN_ELBOW_Y + 4, allBlitz)));
-    parts.push(seg(GAPS[0], SKIN_ELBOW_Y, GAPS[1], SKIN_ELBOW_Y, allBlitz));
-    parts.push(seg(COLS[1], SKIN_ELBOW_Y, COLS[1], SKIN_Y - 40, allBlitz));
+    parts.push(seg(BLITZ_LANE_X, BLITZ_YS[0], BLITZ_LANE_X, BLITZ_YS[1], bd[0] && bd[1]));
+    parts.push(seg(BLITZ_LANE_X, BLITZ_YS[1], BLITZ_LANE_X, BLITZ_YS[2], bd[1] && bd[2]));
+    parts.push(seg(BLITZ_LANE_X, BLITZ_YS[2], BLITZ_LANE_X, GOAL_Y - 38, allBlitz));
 
     s.games.forEach((g, i) => {
       const p = nodePos(i);
@@ -425,25 +438,24 @@ const BoohaProfileGame = (() => {
       parts.push(`<img class="pg-token" src="${esc(s.sprite.src)}" alt="" aria-hidden="true" style="left:calc(${p.x}% + 20px);top:${p.y - 50}px" width="42" height="42">`);
     }
     parts.push(`
-      <div class="pg-gate${s.arcadeOpen ? ' open' : ''}${prism ? ' prism' : ''}" style="top:${GATE_Y - 50}px">
+      <div class="pg-lanes-cap" style="top:${LANES_Y}px"><b>どちらからでも OK！</b><span>TWO GOALS · ANY ORDER</span></div>
+      <div class="pg-gate lane${s.arcadeOpen ? ' open' : ''}${prism ? ' prism' : ''}" style="left:${MAZE_LANE_X}%;top:${GOAL_Y - 40}px">
         <img src="${profileArt(`treasure-chest-${s.arcadeOpen ? 'open' : 'closed'}.webp`)}" alt="Arcade chest${s.arcadeOpen ? ' (open)' : ' (locked)'}" width="120" height="80">
         <span class="pg-gate-title">${s.arcadeOpen ? 'アーケード オープン！' : 'アーケード たからばこ'}</span>
         ${prism ? '<span class="pg-gate-prism">にじの みち · PRISM TRAIL</span>'
                 : `<span class="pg-gate-sub">${s.arcadeOpen ? 'ARCADE GAMES UNLOCKED' : 'ぜんぶ ★★ で ひらく'}</span>`}
-      </div>
-      <div class="pg-divider" style="top:${GATE_Y + 72}px" aria-hidden="true"><span>BLITZ · SKIN</span></div>`);
+      </div>`);
     ['vocab', 'sentence', 'question'].forEach((t, i) => {
       const done = w.blitzDone[t];
       parts.push(`
-        <div class="pg-node blitz${done ? ' done' : ''}" style="left:${COLS[i]}%;top:${BLITZ_Y - 35}px" role="listitem" aria-label="${BLITZ_LABEL[t]}: ${done ? 'cleared' : 'not cleared yet'}">
+        <div class="pg-node blitz side${done ? ' done' : ''}" style="left:${BLITZ_LANE_X}%;top:${BLITZ_YS[i] - BLITZ_DISC_R}px" role="listitem" aria-label="${BLITZ_LABEL[t]}: ${done ? 'cleared' : 'not cleared yet'}">
           <span class="pg-disc"><img src="${BLITZ_ART[t]}" alt="" width="52" height="52"></span>
-          <span class="pg-stars">${done ? 'CLEAR · +3★' : 'PLAY'}</span>
-          <span class="pg-name">${BLITZ_LABEL[t]}</span>
+          <span class="pg-side"><span class="pg-stars">${done ? 'CLEAR · +3★' : 'PLAY'}</span><span class="pg-name">${BLITZ_LABEL[t]}</span></span>
         </div>`);
     });
     if (s.weeklySkin) {
       parts.push(`
-        <div class="pg-trail-skin${s.weeklySkin.unlocked ? ' unlocked' : ''}" style="top:${SKIN_Y - 40}px">
+        <div class="pg-trail-skin lane${s.weeklySkin.unlocked ? ' unlocked' : ''}" style="left:${BLITZ_LANE_X}%;top:${GOAL_Y - 38}px">
           <img src="${esc(s.weeklySkin.src)}" alt="${esc(s.weeklySkin.name)}${s.weeklySkin.unlocked ? '' : ' (locked)'}" width="76" height="76">
           <span>${esc(s.weeklySkin.name)} · ${s.weeklySkin.unlocked ? 'ゲット！' : `${w.blitzCount}/3`}</span>
         </div>`);

@@ -144,7 +144,11 @@ const CURRENT_CACHES = {
   // Pass 12: weekly postcards (Trophy Case) — profile.html loads postcards + art helpers.
   // Pass 12b: postcard catch-up at load, liveliness on date change, 5-DAY WEEK stamp.
   // Pass 13: Blitz centerpiece on the hub strand (bow art, rays).
-  pages:  'booha-pages-2026-524',
+  // Two tracks: Maze and Blitz as parallel lanes (profile.html trail), Blitz
+  // as an optional warm-up at the Maze entrance (maze.html).
+  // Daily Check opening: pending / done / skipped / failed states, confirmed
+  // Skip today, hub reminder, Adventure Log event marks (index + profile).
+  pages:  'booha-pages-2026-526',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
