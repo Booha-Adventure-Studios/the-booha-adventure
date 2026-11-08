@@ -18,7 +18,11 @@ const nodes = [];
 const timers = [];
 function fakeEl(tag) {
   const n = {
-    tag, className: '', style: {}, attrs: {}, removed: false, anims: [],
+    tag, className: '', style: { setProperty() {} }, attrs: {}, removed: false, anims: [], dataset: {}, innerHTML: '', textContent: '',
+    isConnected: true, offsetWidth: 0,
+    classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
+    querySelector() { return fakeEl('span'); },
+    querySelectorAll() { return []; },
     setAttribute(k, v) { this.attrs[k] = v; },
     animate(frames, opts) { this.anims.push({ frames, opts }); return {}; },
     remove() { this.removed = true; },
@@ -26,10 +30,12 @@ function fakeEl(tag) {
   };
   return n;
 }
+let NOW = 0;
+let LAST = null;
 function makeCtx(motion = { reduced: false, power: 'full' }) {
-  nodes.length = 0; timers.length = 0;
+  nodes.length = 0; timers.length = 0; NOW = 0;
   const ctx = {
-    console, Math, performance: { now: () => 0 },
+    console, Math, performance: { now: () => NOW },
     setTimeout: (fn, ms) => { timers.push(ms); return 1; },
     document: {
       body: { appendChild: n => nodes.push(n) },
@@ -40,6 +46,7 @@ function makeCtx(motion = { reduced: false, power: 'full' }) {
   };
   ctx.window = ctx;
   vm.runInNewContext(utilsSrc, ctx);
+  LAST = ctx;
   return ctx.GAME_UTILS;
 }
 const box = (left, top, width, height) => { const e = fakeEl('button'); e.rect = { left, top, width, height }; return e; };
@@ -117,7 +124,7 @@ const plain = o => JSON.parse(JSON.stringify(o));
 
 // ── 4. Tracker and pilot wiring ──
 {
-  assert.match(utilsSrc, /\} else if \(fx\.gained && st\.combo >= 3 && !impactKit\) \{/, 'kit games skip the tracker\'s small per-hit sparks');
+  assert(!/fxParticles\(fxOrigin\(\), 5, 'brun-spark', 60\)/.test(utilsSrc), 'per-hit sparks are the impact kit\'s job now');
   assert.match(utilsSrc, /fxParticles\(fxOrigin\(\), fx\.milestone >= 3 \? 18 : 14/, 'milestones (banner, chime, sparks) unchanged');
   const vs = read('games/vocab-speed.js');
   assert.match(vs, /U\.createRun\(\{ total: 15, recoverPoints: 0, impactKit: true \}\)/);
@@ -135,4 +142,65 @@ const plain = o => JSON.parse(JSON.stringify(o));
   assert.match(css, /\.bimp \{ position: fixed; z-index: 68; pointer-events: none;/, 'effects never block taps');
 }
 
-console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring.');
+// ── 5. Pass 2: small contact for every game on the tracker ──
+{
+  const kinds = () => nodes.filter(n => /\bbimp\b/.test(n.className)).map(n => n.className.replace('bimp ', '').split(' ')[0]);
+  const fresh = (opts, motion) => {
+    const U = makeCtx(motion);
+    return { U, run: U.createRun(Object.assign({ total: 15 }, opts)), tap: el => { LAST.__brunTap = { el, t: NOW }; } };
+  };
+
+  // First-try hit: contact at the tapped answer (flash, ring, fragments), no bolt.
+  let t = fresh({ recoverPoints: 0 });
+  const btn = box(40, 600, 140, 60);
+  t.run.ready(5000); t.tap(btn); t.run.hit();
+  let k = kinds();
+  assert(k.includes('bimp-flash') && k.includes('bimp-ring') && k.includes('bimp-frag'), 'every hit makes contact');
+  assert(!k.includes('bimp-bolt'), 'no target known to the tracker: no bolt');
+  const frag = nodes.find(n => /bimp-frag/.test(n.className));
+  assert.deepStrictEqual([frag.style.left, frag.style.top], ['110px', '630px'], 'it lands on the button that was tapped');
+  assert(!nodes.some(n => /brun-spark/.test(n.className)), 'no doubled per-hit sparks');
+  assert.strictEqual(btn.anims.length, 0, 'the game keeps its own button animation (squash off)');
+
+  // Miss: a small grey puff only.
+  t = fresh({ recoverPoints: 0 });
+  t.run.ready(5000); t.tap(btn); t.run.miss();
+  k = kinds();
+  assert(k.length > 0 && k.every(c => c === 'bimp-flash' || c === 'bimp-frag'), 'a miss is a puff');
+  assert(nodes.filter(n => /bimp-frag/.test(n.className)).every(n => /dust/.test(n.className)), 'grey dust');
+
+  // Recovery: rewarded only where a second try scores.
+  t = fresh({ recoverPoints: 0 });
+  t.run.ready(5000); t.tap(btn); t.run.miss(); nodes.length = 0; t.tap(btn); t.run.recover();
+  assert.strictEqual(kinds().length, 0, 'multiple choice (recover = 0 points): no reward effect for tapping around');
+  t = fresh({ recoverPoints: 50 });
+  t.run.ready(5000); t.tap(btn); t.run.miss(); nodes.length = 0; t.tap(btn); t.run.recover();
+  assert(nodes.some(n => /bimp-ring rec/.test(n.className)), 'a scoring recovery gets the blue-gold rebuild');
+
+  // A stale tap (e.g. a timeout long after the last tap) draws nothing.
+  t = fresh({ recoverPoints: 0 });
+  t.run.ready(5000); t.tap(btn); NOW += 4000; t.run.miss();
+  assert.strictEqual(kinds().length, 0, 'never draws at a stale button');
+
+  // Games on the full kit are skipped (they call U.impact themselves).
+  t = fresh({ recoverPoints: 0, impactKit: true });
+  t.run.ready(5000); t.tap(btn); t.run.hit();
+  assert.strictEqual(kinds().length, 0, 'impactKit games are not drawn twice');
+
+  // Headless runs (hud:false, used by audits) draw nothing.
+  t = fresh({ recoverPoints: 0, hud: false });
+  t.run.ready(5000); t.tap(btn); t.run.hit();
+  assert.strictEqual(kinds().length, 0, 'hud:false stays silent');
+
+  // Streak escalation reaches the tracker path too.
+  t = fresh({ recoverPoints: 0 });
+  for (let i = 0; i < 10; i++) { nodes.length = 0; t.run.ready(5000); t.tap(btn); t.run.hit(); }
+  assert(nodes.some(n => /bimp-ring t4/.test(n.className)), '10 in a row: the largest ring');
+
+  // Wiring.
+  assert.match(utilsSrc, /autoImpact\('hit', \{ combo: st\.combo, sharp \}\);/);
+  assert.match(utilsSrc, /if \(recoverPoints > 0\) autoImpact\('recover', \{ combo: 1 \}\);/);
+  assert.match(utilsSrc, /paint\(\{ broke: hadCombo \}\);\s*autoImpact\('miss'\);/);
+}
+
+console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game.');

@@ -1045,6 +1045,23 @@ const UTILS = {
       const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
       return r && r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : { x: innerWidth / 2, y: innerHeight / 2 };
     };
+    /* Razzle-dazzle Pass 2: every game on the tracker gets small "contact"
+       at the answer the student just tapped (U.impact, no target, so no bolt:
+       flash, ring and a few fragments that grow with the streak, plus the
+       crack/thump layer). Games on the full kit (impactKit: true) draw their
+       own, richer impacts and are skipped here. Only a fresh tap counts as
+       the origin (a timeout or programmatic miss draws nothing stale). A
+       recovery shows its blue-gold effect only where a second try scores:
+       in multiple-choice games (recoverPoints 0) it would reward tapping
+       every option. */
+    const fxTapEl = () => {
+      const tap = (typeof window !== 'undefined' && window.__brunTap) || {};
+      return tap.el && tap.el.isConnected && performance.now() - tap.t < 1500 ? tap.el : null;
+    };
+    const autoImpact = (outcome, extra) => {
+      if (impactKit || !hud || typeof document === 'undefined' || typeof UTILS === 'undefined') return;
+      try { UTILS.impact(Object.assign({ source: fxTapEl(), outcome, squash: false }, extra || {})); } catch (_) {}
+    };
     const fxCtx = () => {
       const S = typeof window !== 'undefined' && window.BoohaSFX;
       try { const c = S && S.context && S.context(); return c && c.state === 'running' ? c : null; } catch (_) { return null; }
@@ -1149,10 +1166,9 @@ const UTILS = {
         fxBanner(fx.milestone);
         fxChime(fx.milestone);
         fxParticles(fxOrigin(), fx.milestone >= 3 ? 18 : 14, 'brun-spark', fx.milestone >= 3 ? 130 : 100);
-      } else if (fx.gained && st.combo >= 3 && !impactKit) {
-        // Games on the impact kit draw their own per-hit burst at the target.
-        fxParticles(fxOrigin(), 5, 'brun-spark', 60);
       }
+      // (Per-hit sparks are now the impact kit's job: autoImpact below, or
+      // the game's own U.impact when it runs on the full kit.)
       if (fx.broke) {
         if (typeof UTILS !== 'undefined') UTILS._synthReplace('fart');
         bump(hudEl, 'break', 500);
@@ -1217,6 +1233,7 @@ const UTILS = {
         st.points += pts;
         item.resolved = true;
         paint({ gained: pts, milestone: mult > before ? mult : 0 });
+        autoImpact('hit', { combo: st.combo, sharp });
         return { pts, combo: st.combo, mult, sharp };
       },
       miss() {
@@ -1228,6 +1245,7 @@ const UTILS = {
         const hadCombo = st.combo >= 3;
         st.combo = 0;
         paint({ broke: hadCombo });
+        autoImpact('miss');
       },
       recover() {
         if (!item || item.resolved) return null;
@@ -1236,6 +1254,7 @@ const UTILS = {
         st.recovered++;
         st.points += recoverPoints;
         paint({ gained: recoverPoints });
+        if (recoverPoints > 0) autoImpact('recover', { combo: 1 });
         return { pts: recoverPoints, combo: 0, mult: 1, sharp: false };
       },
       summary() {
