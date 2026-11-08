@@ -59,7 +59,20 @@
     return { en: m + ' Week ' + n, jp: (Object.keys(MONTHS).indexOf(p[1]) + 1) + '月 第' + n + '週' };
   }
 
-  window.BoohaMenu = { liveWeekSlug: liveWeekSlug, tileStars: tileStars, saveIdFor: saveIdFor, weekLabel: weekLabel, MENU_ART: MENU_ART };
+  /* Step 4 (2026-11-08): a brand-new week starts quiet. On the live week,
+     once the save is ready and nothing on this board has been played, the
+     "Try me!" tile is spotlit, the other eight soften slightly (still
+     tappable), the extra-games row folds behind one small button and the
+     arcade bar waits until the first game. Until the save is ready the row
+     stays folded, so it never flashes open and then closes. The student can
+     always open it; it opens by itself after the first play. */
+  function boardView(o) {
+    var live = !!o.live, ready = !!o.ready;
+    var fresh = live && ready && !o.anyPlayed;
+    return { fresh: fresh, foldExtras: live && !o.extrasOpened && (fresh || !ready) };
+  }
+
+  window.BoohaMenu = { liveWeekSlug: liveWeekSlug, tileStars: tileStars, saveIdFor: saveIdFor, weekLabel: weekLabel, boardView: boardView, MENU_ART: MENU_ART };
   if (typeof document === 'undefined' || !document.documentElement || !document.body) return;
 
   var root = document.documentElement;
@@ -167,9 +180,18 @@
   var R = window.BoohaGameRegistry;
   var extras = R && typeof R.getExtraForCurriculum === 'function' ? R.getExtraForCurriculum(CURR) : [];
   var extraTiles = [];
+  var extraLane = null, extraToggle = null, extrasOpened = false;
   if (extras.length) {
     var xl = el('section', 'bm-lane bm-lane-extra');
+    xl.id = 'bm-extra-lane';
     xl.setAttribute('aria-label', 'Extra games');
+    extraLane = xl;
+    extraToggle = el('button', 'bm-extra-toggle', '＋ おまけ ' + extras.length + 'つ · Extra games');
+    extraToggle.type = 'button';
+    extraToggle.setAttribute('aria-controls', 'bm-extra-lane');
+    extraToggle.setAttribute('aria-expanded', 'false');
+    extraToggle.hidden = true;
+    lanesEl.appendChild(extraToggle);
     var xlab = el('div', 'bm-lane-label');
     xlab.appendChild(el('b', null, 'EXTRA'));
     xlab.appendChild(el('span', null, 'おまけ'));
@@ -234,7 +256,7 @@
   /* ── Fill from the save (after booha:ready) ── */
   function paint() {
     var BA = window.BoohaAdventure, scores = BA && BA.scores, live = week === liveWeekSlug(CURR, window.CALENDAR);
-    var total = 0, atTwo = 0, crowns = 0, firstOpen = -1;
+    var total = 0, atTwo = 0, crowns = 0, firstOpen = -1, anyPlayed = false;
     var playedIds = {};   // any score this week, even 0 (the Week Boss counts these)
     if (live) { try { playedIds = (BA.save.load().weekly || {}).gameScores || {}; } catch (_) {} }
     tiles.forEach(function (t, i) {
@@ -259,6 +281,7 @@
       t._bm.best.textContent = !live ? '' : pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : (n || played ? '' : 'NOT PLAYED YET');
       var oldTag = t.querySelector('.bm-tag'); if (oldTag) oldTag.remove();
       if (live && n === 0 && !played && firstOpen < 0) firstOpen = i;
+      if (n > 0 || played) anyPlayed = true;
     });
     if (firstOpen >= 0) tiles[firstOpen].appendChild(el('span', 'bm-tag', 'Try me!'));
 
@@ -280,6 +303,7 @@
       var oc = t.querySelector('.bm-crown'); if (oc) oc.remove();
       if (crowned) { var cr = svg(CROWN, 'bm-crown', '0 0 26 20'); cr.setAttribute('role', 'img'); cr.setAttribute('aria-label', 'Crown'); t.insertBefore(cr, t.firstChild); }
       t._bm.best.textContent = live && pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : '';
+      if (n > 0 || pts > 0) anyPlayed = true;
       var ot = t.querySelector('.bm-tag'); if (ot) ot.remove();
       if (t._boss) {
         // Week Boss: opens once all nine are played this week, live week only.
@@ -302,6 +326,16 @@
       if (live && n === 0 && pts === 0) t.appendChild(el('span', 'bm-tag', 'NEW'));
     });
 
+    // Fresh-week quiet mode (boardView above).
+    var view = boardView({ live: live, ready: !!window.BOOHA_READY, anyPlayed: anyPlayed, extrasOpened: extrasOpened });
+    mainEl.classList.toggle('bm-fresh', view.fresh);
+    tiles.forEach(function (t, i) { t.classList.toggle('bm-spotlight', view.fresh && i === firstOpen); });
+    if (extraLane) {
+      extraLane.hidden = view.foldExtras;
+      extraToggle.hidden = !view.foldExtras;
+      extraToggle.setAttribute('aria-expanded', view.foldExtras ? 'false' : 'true');
+    }
+
     tally.textContent = '';
     if (!live) {
       tally.className = 'bm-practice';
@@ -314,6 +348,11 @@
     var big = el('div', 'bm-tally-big', '★ ' + total); big.appendChild(el('small', null, ' / 27'));
     st.appendChild(big); st.appendChild(el('div', 'bm-tally-lab', 'THIS WEEK · こんしゅう'));
     tally.appendChild(st);
+    if (view.fresh) {
+      // A brand-new week: one clear next step, no arcade arithmetic yet.
+      bubble.textContent = 'Start with the glowing game! / ひかってる ゲームから はじめよう！';
+      return;
+    }
     tally.appendChild(el('div', 'bm-tally-rule'));
     var bonus = el('div', 'bm-tally-bonus');
     var unlocked = false;
@@ -370,6 +409,12 @@
     sessionStorage.setItem('booha_return_week', week);
     if (swipe) swipe.classList.add('go');
     setTimeout(function () { window.location.href = BASE + '/maze.html?week=' + encodeURIComponent(week); }, reducedMotion ? 60 : 320);
+  });
+  if (extraToggle) extraToggle.addEventListener('click', function () {
+    extrasOpened = true;
+    cue('toggle');
+    paint();
+    if (extraTiles[0]) extraTiles[0].focus();
   });
   sound.addEventListener('click', function () {
     muted = !muted;

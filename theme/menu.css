@@ -189,3 +189,25 @@ html[data-power="reduced"] *, html[data-power="minimal"] * { animation-iteration
 .bmenu .tile.nope { animation: bmNope .36s ease; }
 @keyframes bmNope { 25% { transform: translateX(-6px); } 55% { transform: translateX(5px); } 80% { transform: translateX(-2px); } }
 @media (max-width: 640px) { .bm-tree-crown { top: -8px; width: 26px; height: 20px; margin-left: -13px; } }
+
+/* ── Step 4: a quiet brand-new week (js/menu-core.js boardView) ──
+   Spotlight the "Try me!" tile, soften the other eight (still tappable),
+   and fold the extra-games row behind one small button. Opacity-only
+   pulse on a pseudo-element; reduced motion keeps the ring, stops the pulse. */
+.bm-lane[hidden], .bm-extra-toggle[hidden] { display: none !important; }
+.bm-fresh .bm-lane:not(.bm-lane-extra) .tile:not(.bm-spotlight) { opacity: .62; filter: saturate(.7); transition: opacity .25s ease, filter .25s ease, transform .18s cubic-bezier(.34,1.56,.64,1); }
+.bm-fresh .bm-lane .tile:not(.bm-spotlight):hover,
+.bm-fresh .bm-lane .tile:not(.bm-spotlight):focus-visible { opacity: 1; filter: none; }
+.bmenu .tile.bm-spotlight { z-index: 1; box-shadow: inset 0 0 0 2px var(--bm-gold), 0 0 34px rgba(255,200,80,.42), 0 14px 30px rgba(0,0,0,.45); }
+.bmenu .tile.bm-spotlight::before { content: ''; position: absolute; inset: -7px; border-radius: 28px; pointer-events: none;
+  box-shadow: 0 0 0 3px rgba(255,214,102,.9), 0 0 28px rgba(255,200,80,.7); animation: bmSpot 2.4s ease-in-out infinite; }
+@keyframes bmSpot { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+.bm-extra-toggle { align-self: center; appearance: none; cursor: pointer; padding: 10px 20px; border-radius: 999px;
+  border: 1.5px dashed color-mix(in srgb, var(--bm-accent) 60%, transparent); background: rgba(0,0,0,.35);
+  color: var(--bm-ink); font: inherit; font-size: 14px; font-weight: 800; letter-spacing: .02em; }
+.bm-extra-toggle:hover { background: rgba(0,0,0,.5); }
+.bm-extra-toggle:focus-visible { outline: 3px solid var(--bm-gold); outline-offset: 3px; }
+@media (max-width: 720px) {
+  .bmenu .tile.bm-spotlight::before { inset: -5px; border-radius: 21px; }
+  .bm-extra-toggle { font-size: 12px; padding: 8px 16px; }
+}
