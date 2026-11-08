@@ -1248,3 +1248,13 @@ html.bsc-open .brun-hud, html.bsc-open .brun-banner, html.bsc-open .brun-edge { 
   background: conic-gradient(from 45deg, #fff 0 12.5%, transparent 0 25%, #fff 0 37.5%, transparent 0 50%, #fff 0 62.5%, transparent 0 75%, #fff 0 87.5%, transparent 0);
   clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
   filter: drop-shadow(0 0 6px #ffe27a); }
+
+/* ── Razzle-dazzle Pass 3: Sentence Speed wave (U.impact flavor 'wave') ── */
+.bimp-wave { overflow: hidden; border-radius: 18px; }
+.bimp-wave-band { position: absolute; top: -10%; bottom: -10%; left: 0; display: block; width: 30%;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75) 45%, rgba(255,226,122,.85) 55%, rgba(255,226,122,0));
+  filter: blur(1px); }
+.bimp-wave-band.t2 { width: 40%; }
+.bimp-wave-band.t3 { width: 55%; background: linear-gradient(90deg, rgba(255,255,255,0), #fff 45%, rgba(255,190,60,.9) 58%, rgba(255,160,40,0)); }
+.bimp-wave-band.t4 { width: 70%; background: linear-gradient(90deg, rgba(255,255,255,0), #fff 40%, #ffd34d 55%, rgba(255,120,40,.9) 70%, rgba(255,120,40,0)); }
+.bimp-wave-band.rec { background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75) 45%, rgba(140,210,255,.85) 55%, rgba(140,210,255,0)); }

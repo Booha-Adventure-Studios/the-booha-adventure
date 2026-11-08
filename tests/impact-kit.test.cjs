@@ -23,6 +23,7 @@ function fakeEl(tag) {
     classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
     querySelector() { return fakeEl('span'); },
     querySelectorAll() { return []; },
+    appendChild(c) { (this.children = this.children || []).push(c); nodes.push(c); return c; },
     setAttribute(k, v) { this.attrs[k] = v; },
     animate(frames, opts) { this.anims.push({ frames, opts }); return {}; },
     remove() { this.removed = true; },
@@ -203,4 +204,47 @@ const plain = o => JSON.parse(JSON.stringify(o));
   assert.match(utilsSrc, /paint\(\{ broke: hadCombo \}\);\s*autoImpact\('miss'\);/);
 }
 
-console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game.');
+// ── 6. Pass 3: Sentence Speed wave ──
+{
+  const U = makeCtx();
+  const prompt = box(20, 120, 360, 160);
+  const left = box(20, 600, 160, 60);
+  U.impact({ source: left, target: prompt, outcome: 'hit', combo: 1, flavor: 'wave', squash: false });
+  const clip = nodes.find(n => /bimp-wave\b/.test(n.className));
+  assert(clip, 'a wave hit draws a sweeping band');
+  assert.deepStrictEqual([clip.style.left, clip.style.top, clip.style.width, clip.style.height], ['20px', '120px', '360px', '160px'],
+    'the wave covers the whole sentence card');
+  const band = clip.children[0];
+  assert.match(band.className, /bimp-wave-band t1/);
+  assert(!nodes.some(n => /bimp-bolt/.test(n.className)), 'wave replaces the bolt');
+  assert.match(JSON.stringify(band.anims[0].frames[0]), /translateX\(-130%\)/, 'from the left when the answer is on the left');
+  const keys = new Set(); band.anims[0].frames.forEach(f => Object.keys(f).forEach(k => keys.add(k))); keys.delete('offset');
+  assert.deepStrictEqual([...keys].sort(), ['opacity', 'transform'], 'transform/opacity only');
+  assert(band.anims[0].opts.duration <= 320 && timers.includes(280), '≤ 320 ms, removed at 280 ms');
+  assert(nodes.some(n => /bimp-ring t1/.test(n.className)), 'still lands with a ring');
+}
+{
+  const U = makeCtx();
+  const prompt = box(20, 120, 360, 160), right = box(220, 600, 160, 60);
+  U.impact({ source: right, target: prompt, outcome: 'hit', combo: 10, flavor: 'wave', squash: false });
+  const band = nodes.find(n => /bimp-wave-band/.test(n.className));
+  assert.match(band.className, /t4/, 'broader, brighter band at 10 in a row');
+  assert.match(JSON.stringify(band.anims[0].frames[0]), /translateX\(230%\)/, 'from the right when the answer is on the right');
+  const css = read('theme/game.css');
+  const w = t => Number((css.match(new RegExp(`\\.bimp-wave-band\\.t${t} \\{ width: (\\d+)%`)) || [])[1]);
+  assert(w(2) > 30 && w(3) > w(2) && w(4) > w(3), 'band widths grow with the streak (30% → 40% → 55% → 70%)');
+  assert.match(css, /\.bimp-wave \{ overflow: hidden;/, 'the band is clipped to the card');
+
+  const R = makeCtx({ reduced: true, power: 'full' });
+  R.impact({ source: right, target: prompt, outcome: 'hit', combo: 10, flavor: 'wave' });
+  assert(!nodes.some(n => /bimp-wave/.test(n.className)), 'reduced motion: no sweep');
+
+  const ss = read('games/sentence-speed.js');
+  assert.match(ss, /U\.createRun\(\{ total: 15, recoverPoints: 0, impactKit: true \}\)/);
+  assert.match(ss, /const hit = run\.hit\(\) \|\| \{\};\s*U\.playSFX\('ding'\);[\s\S]{0,360}U\.impact\(\{ source: btn, target: promptBox, outcome: 'hit', combo: hit\.combo \|\| 1, sharp: !!hit\.sharp, flavor: 'wave', squash: false \}\);/);
+  assert.match(ss, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'wave', squash: false \}\)/);
+  assert.match(ss, /U\.impact\(\{ source: heatEl, outcome: 'timeout', flavor: 'wave' \}\)/);
+  assert.match(ss, /\? \(streak === 15 \? 620 : 560\)\s*: 340;/, 'next-question timing unchanged (340 ms)');
+}
+
+console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game, Sentence Speed wave.');

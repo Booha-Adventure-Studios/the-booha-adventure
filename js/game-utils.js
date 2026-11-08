@@ -872,7 +872,11 @@ const UTILS = {
          outcome  'hit' | 'recover' | 'miss' | 'timeout'
          combo    current streak (run.hit() returns it)
          sharp    fast first-try answer (run.hit() returns it)
-         flavor   'speed' (bolt) — later passes add 'listen' | 'build' | 'match'
+         flavor   'speed' (bolt from the answer into the target)
+                  'wave'  (Sentence Speed: a wide band sweeps across the
+                           target, from the answer's side; broader and
+                           brighter with the streak)
+                  later passes add 'listen' | 'build' | 'match'
          squash   false when the game already animates the answer button
 
      Escalation: combo 1–2 a tight hit (4 fragments); 3–5 a stronger ring;
@@ -918,8 +922,23 @@ const UTILS = {
         : [{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)', offset: .3 }, { transform: 'translateX(4px)', offset: .6 }, { transform: 'translateX(0)' }],
         { duration: 220, easing: 'ease-out' });
     }
-    // 2. Bolt from the answer into the target.
-    if (plan.bolt && from && to && (from.x !== to.x || from.y !== to.y)) {
+    // 2a. Wave: a wide band sweeps across the whole target, starting on the
+    //     side the answer came from. Its width grows with the streak (CSS t1–t4).
+    if (plan.bolt && flavor === 'wave' && to && to !== from) {
+      const r = to.r;
+      const clip = fx('bimp-wave', r.left, r.top);
+      clip.style.width = r.width + 'px'; clip.style.height = r.height + 'px';
+      const band = document.createElement('i');
+      band.className = 'bimp-wave-band t' + plan.tier + (outcome === 'recover' ? ' rec' : '');
+      clip.appendChild(band);
+      const ltr = !from || from.x <= to.x;
+      const a = ltr ? -130 : 230, z = ltr ? 230 : -130;   // % of the band's own width
+      if (band.animate) band.animate([{ transform: `translateX(${a}%) skewX(-18deg)`, opacity: 1 },
+        { transform: `translateX(${z}%) skewX(-18deg)`, opacity: .85 }], { duration: 240, easing: 'cubic-bezier(.3,.6,.3,1)', fill: 'forwards' });
+      setTimeout(() => clip.remove(), 280);
+    }
+    // 2b. Bolt from the answer into the target.
+    if (plan.bolt && flavor !== 'wave' && from && to && (from.x !== to.x || from.y !== to.y)) {
       const dx = to.x - from.x, dy = to.y - from.y, len = Math.hypot(dx, dy);
       const b = fx('bimp-bolt t' + tier + (outcome === 'recover' ? ' rec' : ''), from.x, from.y);
       b.style.width = len + 'px';
