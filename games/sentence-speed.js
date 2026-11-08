@@ -11,7 +11,8 @@ const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
 /* Games Pass 4: combo / sharp / points. Sharp = inside 60% of the current heat timer. */
-const run = U.createRun({ total: 15, recoverPoints: 0 });
+// Razzle-dazzle Pass 3: on the full impact kit (a sweeping wave per hit).
+const run = U.createRun({ total: 15, recoverPoints: 0, impactKit: true });
 
 U.setTitle('Sentence Speed');
 U.unlockAudio();
@@ -1196,8 +1197,12 @@ function handlePick(btn, en) {
 
   if (correct) {
     btn.classList.add('ssp-correct');
-    run.hit();
+    const hit = run.hit() || {};
     U.playSFX('ding');
+    // A wide wave sweeps across the sentence from the answer's side, then the
+    // flash, ring and fragments; broader and brighter with the streak.
+    // (squash:false — the button keeps its own sspCorrectPop.)
+    U.impact({ source: btn, target: promptBox, outcome: 'hit', combo: hit.combo || 1, sharp: !!hit.sharp, flavor: 'wave', squash: false });
 
     score++;
     streak++;
@@ -1216,6 +1221,7 @@ function handlePick(btn, en) {
   } else {
     btn.classList.add('ssp-wrong');
     run.miss();
+    U.impact({ source: btn, outcome: 'miss', flavor: 'wave', squash: false });   // keeps sspWrongShake
     if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     streak   = 0;
     updateStreakUI();
@@ -1234,6 +1240,8 @@ function onTimeout() {
   if (locked || feedbackState !== 'playing') return;
   stopHeat();
   run.miss();
+  // Time ran out: the heat bar jolts and flashes red.
+  U.impact({ source: heatEl, outcome: 'timeout', flavor: 'wave' });
   locked   = true;
   streak   = 0;
   updateStreakUI();
