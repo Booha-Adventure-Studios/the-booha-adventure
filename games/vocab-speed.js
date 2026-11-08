@@ -11,7 +11,8 @@ const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
 /* Games Pass 4: combo / sharp / points. Sharp = inside 60% of the current heat timer. */
-const run = U.createRun({ total: 15, recoverPoints: 0 });
+// Razzle-dazzle Pass 1 pilot: the impact kit draws each hit at the prompt.
+const run = U.createRun({ total: 15, recoverPoints: 0, impactKit: true });
 
 U.unlockAudio();
 
@@ -1341,8 +1342,12 @@ function handlePick(btn, en) {
 
   if (correct) {
     btn.classList.add('vs-correct');
-    run.hit();
+    const hit = run.hit() || {};
     U.playSFX('ding');
+    // The answer fires into the prompt: crack + thump, bolt, flash, ring and
+    // fragments that grow with the streak; a sharp answer adds a critical spark.
+    // (squash:false — the button keeps its own vsCorrectPop.)
+    U.impact({ source: btn, target: promptBox, outcome: 'hit', combo: hit.combo || 1, sharp: !!hit.sharp, flavor: 'speed', squash: false });
 
     score++;
     streak++;
@@ -1361,6 +1366,8 @@ function handlePick(btn, en) {
   } else {
     btn.classList.add('vs-wrong');
     run.miss();
+    // A short recoil and a dull grey puff — the miss is never the best show.
+    U.impact({ source: btn, outcome: 'miss', flavor: 'speed', squash: false });   // keeps vsWrongShake
     if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     streak   = 0;
     updateStreakUI();
@@ -1379,6 +1386,8 @@ function onTimeout() {
   if (locked || feedbackState !== 'playing') return;
   stopHeat();
   run.miss();
+  // Time ran out: the heat bar jolts and flashes red.
+  U.impact({ source: heatEl, outcome: 'timeout', flavor: 'speed' });
   locked   = true;
   streak   = 0;
   updateStreakUI();

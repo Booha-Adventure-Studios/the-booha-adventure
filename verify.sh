@@ -1704,6 +1704,13 @@ else
   bad "Fixes-pass audit failed"
 fi
 
+echo "[games] impact kit (razzle-dazzle pass 1)"
+if node tests/impact-kit.test.cjs >/dev/null 2>&1; then
+  ok "Impact kit test passed (escalation, smaller misses, tiers, ≤320 ms, Vocab Speed pilot)"
+else
+  bad "Impact kit test failed"
+fi
+
 echo "[profile] Adventure Log summary card"
 if node tests/profile-summary-card.test.cjs >/dev/null 2>&1; then
   ok "Profile summary card test passed (next action, progress, nearest unlock)"

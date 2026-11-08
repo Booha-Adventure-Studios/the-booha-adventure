@@ -1222,3 +1222,29 @@ html.bsc-open .brun-hud, html.bsc-open .brun-banner, html.bsc-open .brun-edge { 
   .bsc-details .game-result-details { margin: 2px auto 4px; }
 }
 .bsc-best.bsc-first { background: color-mix(in srgb, var(--game-primary) 20%, transparent); color: var(--game-ink); }
+
+/* ── Impact kit (Razzle-dazzle Pass 1, js/game-utils.js U.impact) ──
+   Fixed, pointer-events:none; animated with transform/opacity only (WAAPI). */
+.bimp { position: fixed; z-index: 68; pointer-events: none; display: block; }
+.bimp-bolt { height: 5px; margin-top: -2.5px; transform-origin: 0 50%; border-radius: 3px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), #fff 30%, #ffe27a); box-shadow: 0 0 10px rgba(255,214,90,.9); }
+.bimp-bolt.t2 { height: 6px; margin-top: -3px; }
+.bimp-bolt.t3 { height: 8px; margin-top: -4px; box-shadow: 0 0 16px rgba(255,190,60,.95); }
+.bimp-bolt.t4 { height: 10px; margin-top: -5px; background: linear-gradient(90deg, rgba(255,255,255,0), #fff 25%, #ffd34d 60%, #ff8a3d); box-shadow: 0 0 22px rgba(255,150,40,.95); }
+.bimp-bolt.rec { background: linear-gradient(90deg, rgba(255,255,255,0), #bfe8ff 30%, #ffe27a); box-shadow: 0 0 10px rgba(110,190,255,.8); }
+.bimp-flash { border-radius: 18px; opacity: 0; background: radial-gradient(ellipse at center, rgba(255,255,255,.95), rgba(255,226,122,.55) 55%, rgba(255,226,122,0) 80%); }
+.bimp-flash.t3, .bimp-flash.t4 { background: radial-gradient(ellipse at center, #fff, rgba(255,190,60,.7) 55%, rgba(255,160,40,0) 82%); }
+.bimp-flash.rec { background: radial-gradient(ellipse at center, rgba(255,255,255,.9), rgba(120,200,255,.55) 55%, rgba(120,200,255,0) 80%); }
+.bimp-flash.dull { background: radial-gradient(ellipse at center, rgba(160,150,170,.55), rgba(90,80,100,0) 75%); }
+.bimp-flash.bad { background: radial-gradient(ellipse at center, rgba(255,90,70,.55), rgba(255,60,40,0) 75%); }
+.bimp-ring { width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 3px solid #ffe27a; box-shadow: 0 0 12px rgba(255,214,90,.7); opacity: 0; }
+.bimp-ring.t3 { border-width: 4px; } .bimp-ring.t4 { border-width: 5px; border-color: #fff3c4; box-shadow: 0 0 20px rgba(255,170,50,.9); }
+.bimp-ring.rec { border-color: #9fd8ff; box-shadow: 0 0 12px rgba(110,190,255,.7); }
+.bimp-frag { width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 2px; background: #ffe27a; box-shadow: 0 0 6px rgba(255,214,90,.8); }
+.bimp-frag.t3, .bimp-frag.t4 { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: #fff3c4; }
+.bimp-frag.rec { background: #bfe8ff; box-shadow: 0 0 6px rgba(110,190,255,.8); }
+.bimp-frag.dust { width: 7px; height: 7px; border-radius: 50%; background: rgba(170,160,180,.8); box-shadow: none; }
+.bimp-crit { width: 26px; height: 26px; margin: -13px 0 0 -13px; opacity: 0;
+  background: conic-gradient(from 45deg, #fff 0 12.5%, transparent 0 25%, #fff 0 37.5%, transparent 0 50%, #fff 0 62.5%, transparent 0 75%, #fff 0 87.5%, transparent 0);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  filter: drop-shadow(0 0 6px #ffe27a); }

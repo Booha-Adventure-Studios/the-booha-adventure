@@ -861,7 +861,159 @@ const UTILS = {
        t = first-response time in tenths of a second (null: clip unfinished)
        p = par in tenths, f = first try right (1) / wrong (0), fr = frantic
      ══════════════════════════════ */
-  createRun({ total = 15, recoverPoints = 50, minMs = 400, hud = true, now = null } = {}) {
+  /* ══════════════════════════════
+     IMPACT KIT — "contact" for every answer (Razzle-dazzle Pass 1)
+     Simple answers, big-feeling hits (the Minecraft Dungeons idea): the
+     answer lands somewhere, with a layered sound, and grows with the streak.
+
+       U.impact({ source, target, outcome, combo, sharp, flavor })
+         source   element the student answered with (the "attacker")
+         target   element the answer lands on (the prompt), optional
+         outcome  'hit' | 'recover' | 'miss' | 'timeout'
+         combo    current streak (run.hit() returns it)
+         sharp    fast first-try answer (run.hit() returns it)
+         flavor   'speed' (bolt) — later passes add 'listen' | 'build' | 'match'
+         squash   false when the game already animates the answer button
+
+     Escalation: combo 1–2 a tight hit (4 fragments); 3–5 a stronger ring;
+     6–9 a charged, larger burst; 10+ the largest (the run tracker adds its
+     banner and gold edge). Sharp adds a white-gold critical spark and tink.
+     A miss is a short recoil and a dull grey puff — never the best show.
+     Rules: ~260 ms, transform/opacity only, fixed and pointer-events:none,
+     ≤ 6 fragments (half on reduced power, none on minimal), NEVER delays
+     input or the next question, sounds end within ~120 ms (before any
+     learning audio). Reduced motion: flash and sound only, nothing moves.
+     ══════════════════════════════ */
+  impact({ source = null, target = null, outcome = 'hit', combo = 1, sharp = false, flavor = 'speed', squash = true } = {}) {
+    if (typeof document === 'undefined' || !document.body) return null;
+    const M = window.BoohaMotion || null;
+    const reduced = !!(M && M.reduced && M.reduced());
+    const power = (M && M.power && M.power()) || 'full';
+    const tier = combo >= 10 ? 4 : combo >= 6 ? 3 : combo >= 3 ? 2 : 1;
+    const plan = UTILS._impactPlan({ outcome, tier, sharp, reduced, power });
+    const centre = el => {
+      const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+      return r && r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2, r } : null;
+    };
+    const from = centre(source), to = centre(target) || from;
+    const fx = (cls, x, y) => {
+      const n = document.createElement('i');
+      n.className = 'bimp ' + cls;
+      n.setAttribute('aria-hidden', 'true');
+      n.style.left = x + 'px'; n.style.top = y + 'px';
+      document.body.appendChild(n);
+      return n;
+    };
+    const play = (n, frames, ms, easing) => {
+      if (n.animate) n.animate(frames, { duration: ms, easing: easing || 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+      setTimeout(() => n.remove(), ms + 40);
+    };
+
+    UTILS._impactSound(plan.sound, tier, sharp);
+
+    // 1. The answer itself: a quick squash (hit) or recoil (miss).
+    if (source && source.animate && plan.squash && squash) {
+      source.animate(outcome === 'hit' || outcome === 'recover'
+        ? [{ transform: 'scale(1)' }, { transform: 'scale(.92)', offset: .25 }, { transform: 'scale(1.04)', offset: .6 }, { transform: 'scale(1)' }]
+        : [{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)', offset: .3 }, { transform: 'translateX(4px)', offset: .6 }, { transform: 'translateX(0)' }],
+        { duration: 220, easing: 'ease-out' });
+    }
+    // 2. Bolt from the answer into the target.
+    if (plan.bolt && from && to && (from.x !== to.x || from.y !== to.y)) {
+      const dx = to.x - from.x, dy = to.y - from.y, len = Math.hypot(dx, dy);
+      const b = fx('bimp-bolt t' + tier + (outcome === 'recover' ? ' rec' : ''), from.x, from.y);
+      b.style.width = len + 'px';
+      const rot = `rotate(${Math.atan2(dy, dx)}rad)`;
+      play(b, [{ transform: rot + ' scaleX(0)', opacity: 1 }, { transform: rot + ' scaleX(1)', opacity: 1, offset: .35 }, { transform: rot + ' scaleX(1)', opacity: 0 }], 220, 'ease-out');
+    }
+    const at = outcome === 'miss' ? from : to;
+    if (!at) return plan;
+    // 3. Flash on the target (also the whole show under reduced motion).
+    if (plan.flash) {
+      const box = (outcome === 'miss' ? from : to).r;
+      const f = fx('bimp-flash ' + plan.flash, box.left, box.top);
+      f.style.width = box.width + 'px'; f.style.height = box.height + 'px';
+      play(f, [{ opacity: 0 }, { opacity: plan.flashPeak, offset: .2 }, { opacity: 0 }], 240, 'ease-out');
+    }
+    // 4. Shock ring.
+    if (plan.ring) {
+      const ring = fx('bimp-ring ' + plan.ring, at.x, at.y);
+      play(ring, [{ transform: 'scale(.3)', opacity: .95 }, { transform: `scale(${plan.ringScale})`, opacity: 0 }], 280);
+    }
+    // 5. Fragments.
+    for (let i = 0; i < plan.fragments; i++) {
+      const a = (Math.PI * 2 * i) / plan.fragments + Math.random() * 0.6;
+      const d = plan.spread * (0.6 + Math.random() * 0.5);
+      const p = fx('bimp-frag ' + plan.fragClass, at.x, at.y);
+      play(p, [{ transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d + (plan.fragClass === 'dust' ? 14 : 0)}px) scale(.4)`, opacity: 0 }], 300);
+    }
+    // 6. Sharp: a critical-hit star.
+    if (plan.crit) {
+      const c = fx('bimp-crit', at.x, at.y - 6);
+      play(c, [{ transform: 'rotate(0) scale(0)', opacity: 1 }, { transform: 'rotate(45deg) scale(1.3)', opacity: 1, offset: .45 }, { transform: 'rotate(90deg) scale(.2)', opacity: 0 }], 260);
+    }
+    return plan;
+  },
+
+  /* Pure: what an impact shows for an outcome, streak tier, sharpness and the
+     device's motion/power tier. Tests read this directly. */
+  _impactPlan({ outcome = 'hit', tier = 1, sharp = false, reduced = false, power = 'full' } = {}) {
+    const good = outcome === 'hit' || outcome === 'recover';
+    const minimal = power === 'minimal';
+    const fragBase = good ? [0, 4, 5, 6, 6][tier] : 4;
+    let fragments = reduced || minimal ? 0 : power === 'reduced' ? Math.ceil(fragBase / 2) : fragBase;
+    return {
+      outcome, tier,
+      sound: outcome === 'hit' ? 'hit' : outcome === 'recover' ? 'recover' : 'none',   // misses keep their own sound
+      squash: !reduced,
+      bolt: good && !reduced && !minimal,
+      flash: good ? (outcome === 'recover' ? 'rec' : 't' + tier) : outcome === 'timeout' ? 'bad' : 'dull',
+      flashPeak: good ? [0, .35, .45, .55, .65][tier] : .3,
+      ring: reduced ? '' : good ? (outcome === 'recover' ? 'rec' : 't' + tier) : '',
+      ringScale: [0, 1.5, 1.8, 2.2, 2.6][good ? tier : 1],
+      fragments,
+      fragClass: good ? (outcome === 'recover' ? 'rec' : 't' + tier) : 'dust',
+      spread: good ? [0, 34, 44, 58, 72][tier] : 26,
+      crit: !!(sharp && outcome === 'hit' && !reduced),
+    };
+  },
+
+  /* Layered hit sound on the shared synth: an immediate crack and a low
+     thump (the game's own ding is the musical reward on top). Short: done
+     within ~120 ms, so it never runs under learning audio. */
+  _impactSound(kind, tier = 1, sharp = false) {
+    if (kind === 'none') return;
+    let c = null;
+    try { const S = window.BoohaSFX; c = S && S.context && S.context(); } catch (_) {}
+    if (!c || c.state !== 'running') return;
+    const t = c.currentTime + 0.005;
+    const n = Math.floor(c.sampleRate * 0.03);
+    const buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
+    const src = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = buf; hp.type = 'highpass'; hp.frequency.value = kind === 'recover' ? 1800 : 2600;
+    g.gain.value = 0.10 + tier * 0.02;
+    src.connect(hp); hp.connect(g); g.connect(c.destination); src.start(t);
+    const o = c.createOscillator(), og = c.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(kind === 'recover' ? 220 : 150 + tier * 10, t);
+    o.frequency.exponentialRampToValueAtTime(55, t + 0.09);
+    og.gain.setValueAtTime(0.0001, t);
+    og.gain.exponentialRampToValueAtTime(0.22 + tier * 0.04, t + 0.006);
+    og.gain.exponentialRampToValueAtTime(0.0001, t + 0.11);
+    o.connect(og); og.connect(c.destination); o.start(t); o.stop(t + 0.12);
+    if (sharp) {
+      const k = c.createOscillator(), kg = c.createGain();
+      k.type = 'sine'; k.frequency.setValueAtTime(2640, t + 0.02);
+      kg.gain.setValueAtTime(0.0001, t + 0.02);
+      kg.gain.exponentialRampToValueAtTime(0.08, t + 0.026);
+      kg.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+      k.connect(kg); kg.connect(c.destination); k.start(t + 0.02); k.stop(t + 0.1);
+    }
+  },
+
+  createRun({ total = 15, recoverPoints = 50, minMs = 400, hud = true, now = null, impactKit = false } = {}) {
     const clock = typeof now === 'function' ? now : () => performance.now();
     const MULT = c => (c >= 10 ? 3 : c >= 6 ? 2 : c >= 3 ? 1.5 : 1);
     let st = null;
@@ -997,7 +1149,8 @@ const UTILS = {
         fxBanner(fx.milestone);
         fxChime(fx.milestone);
         fxParticles(fxOrigin(), fx.milestone >= 3 ? 18 : 14, 'brun-spark', fx.milestone >= 3 ? 130 : 100);
-      } else if (fx.gained && st.combo >= 3) {
+      } else if (fx.gained && st.combo >= 3 && !impactKit) {
+        // Games on the impact kit draw their own per-hit burst at the target.
         fxParticles(fxOrigin(), 5, 'brun-spark', 60);
       }
       if (fx.broke) {
