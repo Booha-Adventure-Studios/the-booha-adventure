@@ -4615,12 +4615,9 @@ function renderDailyCheckStamp() {
     stamp.textContent = '';
     return;
   }
-  const stampSeason = document.documentElement.dataset.season;
-  stamp.textContent = stampSeason === 'halloween'
-    ? 'キャンディ ' + count + '個'
-    : stampSeason === 'christmas'
-      ? '❄ ' + count + '日'
-      : '✓ ' + count + '日';
+  // Same wording as the Daily Check result (BoohaDailyCheck.streakLabel):
+  // the seasonal candy/gift count always says it is the check-in streak.
+  stamp.textContent = BoohaDailyCheck.streakLabel(count);
   stamp.classList.add('show');
 }
 if (window.BOOHA_READY) renderDailyCheckStamp();

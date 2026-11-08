@@ -63,6 +63,8 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
   context.window.BoohaDailyCheck = {
     isDoneToday: () => !!done[state.today],
     streak: () => streak,
+    // The real shared label (js/daily-check.js), for this harness's season.
+    streakLabel: n => realStreakLabel(n, season || ''),
   };
   context.BoohaDailyCheck = context.window.BoohaDailyCheck;
   vm.createContext(context);
@@ -70,22 +72,34 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
   return { context, stamp, state, shown: () => classes.has('show') };
 }
 
+// Real BoohaDailyCheck.streakLabel, loaded from js/daily-check.js.
+const realStreakLabel = (() => {
+  const ctx = {
+    console, CustomEvent: function () {}, setTimeout: fn => fn(),
+    document: { addEventListener() {}, dispatchEvent() {}, documentElement: { dataset: {} } },
+  };
+  ctx.window = ctx;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'js', 'daily-check.js'), 'utf8'), ctx);
+  return ctx.BoohaDailyCheck.streakLabel;
+})();
+
 // ── Done today: stamp shows the streak in the season's wording ───────────
+// (Labels pass 2026-11-08: always says it is the check-in streak.)
 {
   const h = makeHarness({ today: '2026-11-05', done: { '2026-11-05': true } });
   h.context.renderDailyCheckStamp();
   assert.ok(h.shown(), 'stamp shows when today is done');
-  assert.strictEqual(h.stamp.textContent, '❄ 3日');
+  assert.strictEqual(h.stamp.textContent, 'チェックれんぞく · ギフト 3個');
 }
 {
   const h = makeHarness({ today: '2026-10-20', done: { '2026-10-20': true }, season: 'halloween', streak: 2 });
   h.context.renderDailyCheckStamp();
-  assert.strictEqual(h.stamp.textContent, 'キャンディ 2個');
+  assert.strictEqual(h.stamp.textContent, 'チェックれんぞく · キャンディ 2個');
 }
 {
   const h = makeHarness({ today: '2027-03-01', done: { '2027-03-01': true }, season: null, streak: 1 });
   h.context.renderDailyCheckStamp();
-  assert.strictEqual(h.stamp.textContent, '✓ 1日');
+  assert.strictEqual(h.stamp.textContent, 'チェックれんぞく ✓ 1日');
 }
 
 // ── Page left open past midnight: yesterday's stamp disappears ───────────
@@ -123,7 +137,7 @@ function makeHarness({ today, done = {}, streak = 3, ready = true, season = 'chr
   h.state.today = '2026-12-01';
   h.context.refreshSeasonIfDateChanged();
   assert.ok(h.shown(), 'done on Dec 1 shows after the date change');
-  assert.strictEqual(h.stamp.textContent, '❄ 4日');
+  assert.strictEqual(h.stamp.textContent, 'チェックれんぞく · ギフト 4個');
 }
 
 // ── Before identity is ready, the date refresh does not touch the stamp ──
