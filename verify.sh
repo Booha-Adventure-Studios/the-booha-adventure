@@ -1704,6 +1704,13 @@ else
   bad "Fixes-pass audit failed"
 fi
 
+echo "[board] quiet brand-new week"
+if node tests/board-fresh-week.test.cjs >/dev/null 2>&1; then
+  ok "Board fresh-week test passed (spotlight, folded extras, no arcade bar until the first play)"
+else
+  bad "Board fresh-week test failed"
+fi
+
 echo "[labels] Sharp chip and Daily Check streak label"
 if node tests/labels-pass-audit.cjs >/dev/null 2>&1; then
   ok "Labels pass audit passed (Sharp hidden at 0 and bilingual; one streak label)"
