@@ -1704,6 +1704,13 @@ else
   bad "Fixes-pass audit failed"
 fi
 
+echo "[profile] Adventure Log summary card"
+if node tests/profile-summary-card.test.cjs >/dev/null 2>&1; then
+  ok "Profile summary card test passed (next action, progress, nearest unlock)"
+else
+  bad "Profile summary card test failed"
+fi
+
 echo "[board] quiet brand-new week"
 if node tests/board-fresh-week.test.cjs >/dev/null 2>&1; then
   ok "Board fresh-week test passed (spotlight, folded extras, no arcade bar until the first play)"
