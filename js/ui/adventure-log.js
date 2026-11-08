@@ -300,9 +300,67 @@ const BoohaAdventureLog = (() => {
     return `${y}-${String(m).padStart(2, '0')}`;
   }
 
-  function renderCalendar(mount, dayLog, todayKey, checkIn) {
+  /* Daily Check events (meta.dailyCheckEvents, see daily-check.js): skips,
+     closes and technical failures. Completion stays the day's main state
+     (teal border); these add a small secondary mark, and tapping the day
+     shows each event's reason and time. Student skips and technical problems
+     are always counted separately — a loading failure is never a skip. */
+  const DC_KIND = { student_skip: 'skip', legacy_skip: 'skip', closed: 'closed', load_failure: 'tech', save_failure: 'tech' };
+  const DC_TEXT = {
+    student_skip: ['スキップ', 'Skipped today'],
+    legacy_skip: ['あとで', 'Later (older record)'],
+    closed: ['とちゅうで とじた', 'Closed before finishing'],
+    load_failure: ['よみこみ エラー', 'Couldn’t load (technical)'],
+    save_failure: ['ほぞん エラー', 'Couldn’t save (technical)'],
+  };
+  function tokyoTime(ts) {
+    const n = Number(ts);
+    if (!n) return '';
+    try { return new Date(n).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' }); }
+    catch (_) { return ''; }
+  }
+  function dcEventsByDay(dcEvents, checkIn) {
+    const byDay = {};
+    Object.keys(dcEvents || {}).forEach(id => {
+      const ev = dcEvents[id];
+      if (!ev || typeof ev !== 'object' || typeof ev.day !== 'string' || !DC_KIND[ev.type]) return;
+      (byDay[ev.day] = byDay[ev.day] || []).push(Object.assign({ id }, ev));
+    });
+    // Before 2026-11-08 "Enter anyway" (and ×) wrote checkIn[day].st = 'skip'.
+    Object.keys(checkIn || {}).forEach(day => {
+      const rec = checkIn[day];
+      if (rec && rec.st === 'skip') (byDay[day] = byDay[day] || []).push({ id: 'legacy', day, type: 'legacy_skip', ts: rec.ts });
+    });
+    Object.keys(byDay).forEach(day => byDay[day].sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0)));
+    return byDay;
+  }
+  function dcDetailLines(dayEvents, rec) {
+    const lines = (dayEvents || []).map(ev => {
+      const [jp, en] = DC_TEXT[ev.type];
+      const pct = ev.type === 'save_failure' && ev.detail && typeof ev.detail.pct === 'number' ? ` (${ev.detail.pct}%)` : '';
+      return { ts: Number(ev.ts) || 0, kind: DC_KIND[ev.type], text: `${tokyoTime(ev.ts) || '—'}  ${jp}${pct} · ${en}` };
+    });
+    if (rec && rec.st === 'done') {
+      const pct = typeof rec.pct === 'number' ? ` ${rec.pct}%` : '';
+      lines.push({ ts: Number(rec.ts) || 0, kind: 'done', text: `${tokyoTime(rec.ts) || '—'}  チェック クリア${pct} · Daily Check done` });
+    }
+    return lines.sort((a, b) => a.ts - b.ts);
+  }
+
+  /* Earliest day the calendar may page back to: any game day, completed or
+     legacy check, or Daily Check event (a month with only a skip or a
+     technical problem must still be reachable). */
+  function calendarEarliest(dayLog, checkIn, dcByDay, todayKey) {
+    return Object.keys(dayLog || {})
+      .concat(Object.keys(checkIn || {}), Object.keys(dcByDay || {}))
+      .filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k))
+      .sort()[0] || todayKey;
+  }
+
+  function renderCalendar(mount, dayLog, todayKey, checkIn, dcEvents) {
     mount.textContent = '';
     checkIn = checkIn && typeof checkIn === 'object' ? checkIn : {};
+    const dcByDay = dcEventsByDay(dcEvents, checkIn);
     const baseY = Number(todayKey.slice(0, 4));
     const baseM = Number(todayKey.slice(5, 7));
     const shifted = new Date(Date.UTC(baseY, baseM - 1 - calendarOffset, 1));
@@ -310,7 +368,7 @@ const BoohaAdventureLog = (() => {
     const M = shifted.getUTCMonth() + 1;
     const first = new Date(Date.UTC(Y, M - 1, 1));
     const days = new Date(Date.UTC(Y, M, 0)).getUTCDate();
-    const earliest = Object.keys(dayLog).concat(Object.keys(checkIn)).sort()[0] || todayKey;
+    const earliest = calendarEarliest(dayLog, checkIn, dcByDay, todayKey);
     const canBack = monthKey(Y, M) > earliest.slice(0, 7);
 
     const head = el('div', 'rb-cal-head');
@@ -318,12 +376,12 @@ const BoohaAdventureLog = (() => {
     prev.type = 'button';
     prev.setAttribute('aria-label', 'Previous month / まえの月');
     prev.disabled = !canBack;
-    prev.addEventListener('click', () => { calendarOffset++; renderCalendar(mount, dayLog, todayKey, checkIn); });
+    prev.addEventListener('click', () => { calendarOffset++; renderCalendar(mount, dayLog, todayKey, checkIn, dcEvents); });
     const next = el('button', 'rb-cal-nav', '›');
     next.type = 'button';
     next.setAttribute('aria-label', 'Next month / つぎの月');
     next.disabled = calendarOffset === 0;
-    next.addEventListener('click', () => { calendarOffset = Math.max(0, calendarOffset - 1); renderCalendar(mount, dayLog, todayKey, checkIn); });
+    next.addEventListener('click', () => { calendarOffset = Math.max(0, calendarOffset - 1); renderCalendar(mount, dayLog, todayKey, checkIn, dcEvents); });
     head.appendChild(prev);
     head.appendChild(el('span', 'rb-cal-month', `${Y}年${M}月`));
     head.appendChild(next);
@@ -336,6 +394,11 @@ const BoohaAdventureLog = (() => {
 
     let playedDays = 0;
     let checkedDays = 0;
+    const dcDays = { skip: 0, tech: 0, closed: 0 };
+    const detail = el('div', 'rb-cal-detail');
+    detail.setAttribute('aria-live', 'polite');
+    detail.hidden = true;
+    let selectedCell = null;
     for (let d = 1; d <= days; d++) {
       const key = `${monthKey(Y, M)}-${String(d).padStart(2, '0')}`;
       const rec = dayLog[key];
@@ -358,13 +421,46 @@ const BoohaAdventureLog = (() => {
       if (played) parts.push('ゲーム');
       else if (visited) parts.push('ひらいた');
       if (checked) parts.push('チェック');
+      // Secondary Daily Check marks: one per kind that happened that day.
+      const dayEvents = future ? [] : (dcByDay[key] || []);
+      const kinds = ['skip', 'tech', 'closed'].filter(k => dayEvents.some(ev => DC_KIND[ev.type] === k));
+      kinds.forEach(k => { dcDays[k]++; });
+      if (kinds.length) {
+        const flags = el('span', 'rb-cal-flags');
+        kinds.forEach(k => flags.appendChild(el('i', 'rb-cal-flag ' + k)));
+        cell.appendChild(flags);
+        parts.push(kinds.map(k => ({ skip: 'スキップ', tech: 'トラブル', closed: 'とじた' })[k]).join(' · '));
+      }
       cell.setAttribute('aria-label', parts.join(' · '));
+      const lines = future ? [] : dcDetailLines(dayEvents, checkIn[key]);
+      if (lines.length) {
+        cell.classList.add('tappable');
+        cell.setAttribute('role', 'button');
+        cell.tabIndex = 0;
+        const show = () => {
+          if (selectedCell) selectedCell.classList.remove('selected');
+          if (selectedCell === cell) { selectedCell = null; detail.hidden = true; return; }
+          selectedCell = cell;
+          cell.classList.add('selected');
+          detail.textContent = '';
+          detail.appendChild(el('b', null, `${M}月${d}日 · デイリーチェック`));
+          lines.forEach(line => detail.appendChild(el('span', 'rb-cal-detail-line ' + line.kind, line.text)));
+          detail.hidden = false;
+        };
+        cell.addEventListener('click', show);
+        cell.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(); } });
+      }
       grid.appendChild(cell);
     }
     board.appendChild(grid);
+    board.appendChild(detail);
 
     const legend = el('div', 'rb-cal-legend');
-    [['played', 'ゲームを あそんだ'], ['checked', 'チェック した'], ['today', 'きょう']].forEach(([cls, text]) => {
+    const legendItems = [['played', 'ゲームを あそんだ'], ['checked', 'チェック した'], ['today', 'きょう']];
+    if (dcDays.skip) legendItems.push(['flag skip', 'スキップ']);
+    if (dcDays.tech) legendItems.push(['flag tech', 'トラブル']);
+    if (dcDays.closed) legendItems.push(['flag closed', 'とちゅうで とじた']);
+    legendItems.forEach(([cls, text]) => {
       const item = el('span', 'rb-legend-item');
       item.appendChild(el('span', 'rb-legend-key ' + cls));
       item.appendChild(el('span', null, text));
@@ -382,6 +478,23 @@ const BoohaAdventureLog = (() => {
       totals.appendChild(box);
     });
     mount.appendChild(totals);
+
+    // Daily Check exceptions this month, never lumped together: a student's
+    // choice to skip vs a technical problem vs closing partway.
+    if (dcDays.skip || dcDays.tech || dcDays.closed) {
+      const sum = el('div', 'rb-cal-dcsum');
+      sum.appendChild(el('b', null, 'デイリーチェック · こんげつ'));
+      [['skip', dcDays.skip, 'スキップ', 'Skipped'], ['tech', dcDays.tech, 'トラブル', 'Technical problem'], ['closed', dcDays.closed, 'とちゅうで とじた', 'Closed early']]
+        .filter(([, n]) => n > 0)
+        .forEach(([k, n, jp, en]) => {
+          const item = el('span', 'rb-cal-dcsum-item ' + k);
+          item.appendChild(el('i', 'rb-cal-flag ' + k));
+          item.appendChild(el('span', null, `${jp} ${n}日 · ${en}`));
+          sum.appendChild(item);
+        });
+      sum.appendChild(el('small', null, 'ひにちを タップすると じかんと りゆうが みられます · Tap a day for times and reasons'));
+      mount.appendChild(sum);
+    }
   }
 
   function weekMedalCount(key) {
@@ -546,11 +659,13 @@ const BoohaAdventureLog = (() => {
       if (cMount) {
         try {
           let checkIn = {};
+          let dcEvents = {};
           try {
             const saved = BoohaAdventure.save.load();
             checkIn = saved && saved.meta && saved.meta.checkIn ? saved.meta.checkIn : {};
+            dcEvents = saved && saved.meta && saved.meta.dailyCheckEvents ? saved.meta.dailyCheckEvents : {};
           } catch (_) {}
-          renderCalendar(cMount, dayLog && typeof dayLog === 'object' ? dayLog : {}, keys.day, checkIn);
+          renderCalendar(cMount, dayLog && typeof dayLog === 'object' ? dayLog : {}, keys.day, checkIn, dcEvents);
           cMount.setAttribute('aria-busy', 'false');
         } catch (error) {
           showMountFallback(cMount, 'Adventure calendar', error);
@@ -572,7 +687,7 @@ const BoohaAdventureLog = (() => {
   }
   document.addEventListener('booha:dayRecorded', init);
 
-  return { init, _test: { inferCurriculum, weekStatus, streak, fmtMs, recentFullWeekAverage } };
+  return { init, _test: { inferCurriculum, weekStatus, streak, fmtMs, recentFullWeekAverage, dcEventsByDay, calendarEarliest } };
 })();
 
 window.BoohaAdventureLog = BoohaAdventureLog;

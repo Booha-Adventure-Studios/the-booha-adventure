@@ -2682,14 +2682,27 @@ html[data-power="minimal"] .hlFly, html[data-power="minimal"] .hlDrift { display
     <div class="stringLights" data-swags="3" data-per-swag="8" aria-hidden="true"></div>
     
    <div id="dcStamp" class="dcStamp" aria-hidden="true"></div>
-    <div class="startBtns">
-      <div class="btnGroup">
+    <!-- Daily Check opening (2026-11-08): pending → Daily Check + small
+         "Skip today"; done / skipped / failed → Continue (+ a quiet link to
+         take or retry the check). Rendered by renderDailyCheckOpening(). -->
+    <div class="startBtns" id="startBtns" data-dc-state="pending">
+      <div class="btnGroup" id="dcStartGroup">
         <div class="btnLabel"><span class="halloweenLabel">Trick or Treat?</span><span>デイリーチェック</span><span class="defaultLabel">Daily Check</span></div>
         <button id="dailyCheckBtn" class="btn btnGold" type="button">スタート</button>
       </div>
-      <div class="btnGroup">
-        <div class="btnLabel muted"><span class="halloweenLabel">ENTER ANYWAY</span><span>あとで</span><span class="defaultLabel">Enter anyway</span></div>
-        <button id="startBtn" class="btn btnGhost" type="button">つづける</button>
+      <div class="btnGroup" id="dcContinueGroup" hidden>
+        <div class="btnLabel"><span class="halloweenLabel" id="dcContinueHalloween">Continue</span><span id="dcContinueJp">ぼうけんへ</span><span class="defaultLabel" id="dcContinueEn">Continue</span></div>
+        <button id="startBtn" class="btn btnGold" type="button">つづける</button>
+      </div>
+      <button id="dcSideLink" class="dcSideLink" type="button" hidden></button>
+    </div>
+    <div id="dcSkipConfirm" class="dcConfirm" role="dialog" aria-modal="true" aria-labelledby="dcSkipConfirmTitle" hidden>
+      <div class="dcConfirmCard">
+        <p id="dcSkipConfirmTitle" class="dcConfirmTitle"><span class="nw">きょうは</span> <span class="nw">チェックを</span> <span class="nw">スキップする？</span></p>
+        <p class="dcConfirmJp"><span class="nw">スキップは</span> <span class="nw">ぼうけんログに</span> <span class="nw">のこり、</span><span class="nw"><ruby>先生<rt>せんせい</rt></ruby>も<ruby>見<rt>み</rt></ruby>られます。</span></p>
+        <p class="dcConfirmEn">Skip today’s check? The skip will remain in your Adventure Log and your teacher can see it.</p>
+        <button id="dcConfirmCheck" class="btn btnGold" type="button">チェックする<small>Do the check</small></button>
+        <button id="dcConfirmSkip" class="dcConfirmSkip" type="button">スキップして つづける · Skip and continue</button>
       </div>
     </div>
     
@@ -2730,6 +2743,7 @@ html[data-power="minimal"] .hlFly, html[data-power="minimal"] .hlDrift { display
               <div class="greetingEn">WELCOME BACK, <span class="greetName" id="greetNameSlot">PLAYER</span></div>
               <div class="greetingJp">おかえりなさい</div>
             </div>
+            <button id="hubDcReminder" class="hubDcReminder" type="button" hidden>デイリーチェック まだだよ · Daily Check →</button>
           </div>
           <button id="hubCurriculumBtn" class="hubCurriculumBtn hub-glow-gold" type="button" aria-label="Choose curriculum">
             <img id="hubCurriculumIcon" class="hubCurriculumIcon" src="assets/img/pre-boo.webp" alt="">
@@ -2872,6 +2886,19 @@ html[data-power="minimal"] .hlFly, html[data-power="minimal"] .hlDrift { display
 .btnLabel{font-weight:800;font-size:1.05rem;letter-spacing:.02em;line-height:1.25;text-align:center;color:var(--text);}
 .btnLabel span{display:block;font-size:.72rem;font-weight:600;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
 .btnLabel.muted{color:var(--muted);}
+.btnGroup[hidden],.dcSideLink[hidden],.dcConfirm[hidden],.hubDcReminder[hidden]{display:none !important;}
+.dcSideLink{appearance:none;background:none;border:0;margin-top:-14px;padding:8px 12px;color:var(--muted);font:inherit;font-size:.8rem;font-weight:700;line-height:1.35;text-decoration:underline;text-underline-offset:3px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.dcSideLink small{display:block;font-size:.68rem;font-weight:600;letter-spacing:.04em;text-decoration:none;opacity:.85;}
+.dcConfirm{position:fixed;inset:0;z-index:9000;display:grid;place-items:center;padding:20px;background:rgba(5,3,12,.74);}
+.dcConfirmCard{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 20px 16px;border-radius:20px;text-align:center;color:#fff;background:#1b1226;border:1px solid rgba(255,173,85,.35);box-shadow:0 20px 60px rgba(0,0,0,.6);}
+.dcConfirmTitle{margin:0;font-size:1.15rem;font-weight:900;line-height:1.4;}
+.dcConfirmJp{margin:0;font-size:.95rem;line-height:1.6;}
+.dcConfirm .nw{white-space:nowrap;}  /* Japanese phrases never split mid-word */
+.dcConfirmJp rt{font-size:.55em;}
+.dcConfirmEn{margin:0 0 6px;font-size:.8rem;line-height:1.45;color:var(--muted);}
+.dcConfirm .btn small{display:block;font-size:.7rem;font-weight:700;opacity:.8;}
+.dcConfirmSkip{appearance:none;background:none;border:0;padding:10px;color:var(--muted);font:inherit;font-size:.8rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+.hubDcReminder{appearance:none;display:block;margin:8px auto 0;padding:5px 14px;border-radius:999px;border:1px solid rgba(242,201,92,.5);background:rgba(242,201,92,.1);color:#f6d98a;font:inherit;font-size:.78rem;font-weight:800;letter-spacing:.02em;cursor:pointer;}
 .btnGold{background:linear-gradient(135deg,#f5c451,#e0a32e);color:#2a1c00;box-shadow:0 8px 24px rgba(224,163,46,.45);}
 .btnGhost{background:transparent;border:1.5px solid rgba(255,59,189,.55);box-shadow:none;color:var(--pink2);font-weight:700;}
 .dcStamp{min-height:1.4em;margin-bottom:10px;font-weight:800;color:var(--pink2);opacity:0;transition:opacity .3s;}
@@ -4456,24 +4483,119 @@ function reactHalloweenButton(button) {
   window.setTimeout(() => button.classList.remove('pressed'), 260);
 }
 
-/* Daily check-in (optional homework). The handler attaches now, but the module
-   and save layer finish loading later in the body — so we check at click time,
-   by which point they're ready. */
-if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
-  if (started) return;
-  reactHalloweenButton(dailyCheckBtn);
-  playIndexSfx('mischiefReward');
+/* Daily Check — the daily teaching routine, required before the first
+   adventure entry each day (2026-11-08 decision; it used to be optional,
+   with an equal-weight bypass button beside it). Four opening states, from
+   BoohaDailyCheck.todayState():
+     pending → Daily Check button + small "Skip today" (with confirmation)
+     done    → Continue
+     skipped → Continue + quiet "take it now"
+     failed  → Continue + "Try Daily Check again" (a technical problem is
+               never treated as a skip)
+   Closing the check with × returns here still pending. The module and save
+   layer finish loading later in the body, so state is read at render time;
+   until identity is ready the screen shows the pending layout. */
+const DC_LINK_FALLBACK_MS = 10000;   // never a lockout if identity is slow
+let dcSkipLinkReady = !!window.BOOHA_READY;
+function dailyCheckState() {
+  if (!window.BOOHA_READY || !window.BoohaDailyCheck) return 'pending';
+  try { return BoohaDailyCheck.todayState(); } catch (e) { return 'pending'; }
+}
+function launchDailyCheck(opts) {
   if (!window.BoohaDailyCheck) return;
   const today = BoohaDailyCheck.todaySummary();
-  BoohaDailyCheck.run({
+  BoohaDailyCheck.run(Object.assign({
     // Once today's first attempt exists, every later launch is a retake of
     // that same curriculum. A fresh day still gets the normal class picker.
     curr: today.done ? (today.curr || BoohaDailyCheck.knownCurr()) : null,
     mode: today.done ? 'retake' : 'check',
     onDone: () => { try { jumpToHub(); } catch (e) { showScene(hubScene); } },
-    onCancel: () => {}   // stay on the start scene; they can tap あとで
-  });
+    // × or a technical failure: back to the opening, which re-renders.
+    onCancel: renderDailyCheckOpening
+  }, opts || {}));
+}
+const DC_OPENING = {
+  done:    { jp: 'きょうの チェック クリア！', en: 'Daily Check done' },
+  skipped: { jp: 'ぼうけんへ', en: 'Continue',
+             link: 'チェックは スキップ中 — いま チェックする<small>Daily Check skipped — take it now</small>' },
+  failed:  { jp: 'ぼうけんへ', en: 'Continue',
+             link: 'もういちど チェックする<small>Try Daily Check again</small>' },
+  pending: { link: 'きょうは スキップ<small>Skip today</small>' }
+};
+function renderDailyCheckOpening() {
+  const box = document.getElementById('startBtns');
+  if (!box) return;
+  const state = dailyCheckState();
+  const copy = DC_OPENING[state] || DC_OPENING.pending;
+  box.dataset.dcState = state;
+  document.getElementById('dcStartGroup').hidden = state !== 'pending';
+  document.getElementById('dcContinueGroup').hidden = state === 'pending';
+  if (state !== 'pending') {
+    document.getElementById('dcContinueJp').textContent = copy.jp;
+    document.getElementById('dcContinueEn').textContent = copy.en;
+    document.getElementById('dcContinueHalloween').textContent = copy.en;
+  }
+  const link = document.getElementById('dcSideLink');
+  link.innerHTML = copy.link || '';
+  link.hidden = !copy.link || (state === 'pending' && !dcSkipLinkReady);
+  renderHubDcReminder();
+}
+// Quiet hub nudge, only while today is still pending (a student can reach
+// the hub without the opening: return-to-hub, #hub, back/forward cache).
+// A deliberate skip or a technical failure silences it for the day.
+function renderHubDcReminder() {
+  const btn = document.getElementById('hubDcReminder');
+  if (btn) btn.hidden = !window.BOOHA_READY || dailyCheckState() !== 'pending';
+}
+function openSkipConfirm() {
+  const dlg = document.getElementById('dcSkipConfirm');
+  dlg.hidden = false;
+  document.getElementById('dcConfirmCheck').focus();
+}
+function closeSkipConfirm() { document.getElementById('dcSkipConfirm').hidden = true; }
+
+if (dailyCheckBtn) dailyCheckBtn.addEventListener('click', () => {
+  if (started) return;
+  reactHalloweenButton(dailyCheckBtn);
+  playIndexSfx('mischiefReward');
+  launchDailyCheck();
 });
+document.getElementById('dcSideLink').addEventListener('click', () => {
+  if (started) return;
+  const state = dailyCheckState();
+  if (state === 'pending') openSkipConfirm();
+  else launchDailyCheck();
+});
+document.getElementById('dcConfirmCheck').addEventListener('click', () => {
+  closeSkipConfirm();
+  launchDailyCheck();
+});
+document.getElementById('dcConfirmSkip').addEventListener('click', () => {
+  closeSkipConfirm();
+  try { if (window.BoohaDailyCheck) BoohaDailyCheck.markSkip(BoohaDailyCheck.knownCurr()); } catch (e) {}
+  renderDailyCheckOpening();
+  playIndexSfx('hubPrimary');
+  startIntro();
+});
+document.getElementById('dcSkipConfirm').addEventListener('click', e => {
+  if (e.target.id === 'dcSkipConfirm') closeSkipConfirm();   // tap outside = never mind
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !document.getElementById('dcSkipConfirm').hidden) closeSkipConfirm();
+});
+document.getElementById('hubDcReminder').addEventListener('click', () => {
+  launchDailyCheck({ onDone: renderDailyCheckOpening, onCancel: renderDailyCheckOpening });
+});
+setTimeout(() => { dcSkipLinkReady = true; renderDailyCheckOpening(); }, DC_LINK_FALLBACK_MS);
+function onDailyCheckReady() { dcSkipLinkReady = true; renderDailyCheckOpening(); }
+if (window.BOOHA_READY) onDailyCheckReady();
+else document.addEventListener('booha:ready', onDailyCheckReady, { once: true });
+document.addEventListener('booha:checkIn', renderDailyCheckOpening);
+document.addEventListener('booha:dailyCheckEvent', renderDailyCheckOpening);
+// daily-check.js loads later in the body; re-read once everything is parsed.
+document.addEventListener('DOMContentLoaded', renderDailyCheckOpening);
+window.addEventListener('load', renderDailyCheckOpening);
+renderDailyCheckOpening();
 
 /* Done-state stamp — wait for identity + cloud restore, not window.load.
    On slower devices window.load can win the Wix verification race; reading
@@ -4604,10 +4726,12 @@ async function startIntro() {
   }
 }
 
+// Continue: only shown once today is done, skipped or failed. It records
+// nothing — skipping is the separate, confirmed "Skip today" action.
 startBtn.addEventListener('click', () => {
+  if (dailyCheckState() === 'pending') { renderDailyCheckOpening(); return; }
   reactHalloweenButton(startBtn);
   playIndexSfx('hubPrimary');
-  try { if (window.BoohaDailyCheck) BoohaDailyCheck.markSkip(BoohaDailyCheck.knownCurr()); } catch (e) {}
   startIntro();
 });
 
@@ -4668,6 +4792,7 @@ function jumpToHub() {
   started   = false;
   try { renderHub(); hubRendered = true; } catch(e2) {}
   renderOrnamentBanner();
+  renderHubDcReminder();
   
   setTimeout(showGreeting, 250);
   sessionStorage.removeItem('booha_return_to_hub');

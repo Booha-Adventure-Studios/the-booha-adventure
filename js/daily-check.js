@@ -2,7 +2,10 @@
 /* ═══════════════════════════════════════════════════════════════════════
    daily-check.js  —  The Booha Adventure  ·  Daily 5-Minute Check-in
    ─────────────────────────────────────────────────────────────────────
-   An OPTIONAL homework check launched from the start scene or adventure log.
+   The daily teaching routine. The opening screen asks for it before the
+   first adventure entry each day (2026-11-08 decision); a small, honest
+   "Skip today" escape exists, and every skip, close or technical failure is
+   kept as an event the Adventure Log shows.
 
    Flow (≈3–4 min, all tap, no typing):
      5 vocab (tap-through, audio) → 5 sentences → 5 questions → 5-item quiz
@@ -12,12 +15,28 @@
        { st:'done'|'skip', pct:<first 0-100|null>, curr, ts:<first ms>,
          retries:[{ pct, curr, ts }, ...] }
    Flat, dayKey-keyed — the exact shape a future Wix sync will lift as-is.
+   Only completions live here ('skip' records are legacy, read-only).
+
+   Everything that is NOT a completion goes to
+       booha_save.meta.dailyCheckEvents[<eventId>] =
+       { day, type, ts, curr, mode?, detail? }
+   type: 'student_skip' | 'closed' | 'load_failure' | 'save_failure'.
+   A map keyed by unique id (not an array) so syncs merge instead of
+   clobbering, and a later completion never erases the history.
+
+   Today's state for the opening screen (todayState):
+     'done'    — completed today
+     'skipped' — the student confirmed "Skip today" (latest bypass)
+     'failed'  — a load or save failure (latest bypass); never "disobedience"
+     'pending' — none of the above. Closing with × does NOT grant entry.
    Streak is COMPUTED at read time (see BoohaDailyCheck.streak); never stored.
 
    House rules honoured:
      · Day key from CALENDAR (Tokyo) ONLY — never the browser clock.
-     · Writes via load → mutate → save.patch('meta', …)  (patchDeep MERGES;
-       we never need to clear, so a flat per-day key is safe with patch).
+     · checkIn writes go load → mutate → save.patch('meta', fullMeta).
+       save.patch is a SHALLOW Object.assign on meta, so a partial object
+       would replace whole maps. Events therefore go through addEvents(),
+       which merges into meta.dailyCheckEvents via save.patchDeep.
      · Does NOT dispatch booha:gameEnd — day-record.js would miscount this
        as an adventure game and pollute weekly best-pct. Its own record.
      · textContent for every data string. No innerHTML with card data.
@@ -81,6 +100,115 @@ window.BoohaDailyCheck = (function () {
     meta.checkIn = meta.checkIn || {};
     return meta;
   }
+  /* ── Event log (skips, closes, technical failures) ────────────────────── */
+  const EVENT_TYPES = ['student_skip', 'closed', 'load_failure', 'save_failure'];
+  // Events that let the student through the opening for the rest of the day.
+  const BYPASS_STATE = { student_skip: 'skipped', load_failure: 'failed', save_failure: 'failed' };
+  const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+
+  // Tab-session mirror: the opening honours a bypass in this tab even when
+  // the save itself failed (that is exactly when save_failure is recorded).
+  function mirrorKey(day) {
+    let uid = '';
+    try { uid = localStorage.getItem('booha_userid') || ''; } catch (_) {}
+    return 'booha_dc_events:' + uid + ':' + day;
+  }
+  function mirrorRead(day) {
+    try {
+      const v = JSON.parse(sessionStorage.getItem(mirrorKey(day)) || '{}');
+      return isObj(v) ? v : {};
+    } catch (_) { return {}; }
+  }
+  function mirrorAdd(id, ev) {
+    try {
+      const m = mirrorRead(ev.day);
+      m[id] = ev;
+      sessionStorage.setItem(mirrorKey(ev.day), JSON.stringify(m));
+    } catch (_) {}
+  }
+  function savedEvents() {
+    try {
+      const meta = window.BoohaSaveFile.load().meta || {};
+      return isObj(meta.dailyCheckEvents) ? meta.dailyCheckEvents : {};
+    } catch (_) { return {}; }
+  }
+  /* Every event, optionally for one day, oldest first, each with its id. */
+  function events(dayKey) {
+    const all = Object.assign({}, savedEvents());
+    if (dayKey) Object.assign(all, mirrorRead(dayKey));
+    return Object.keys(all)
+      .map(id => Object.assign({ id }, all[id]))
+      .filter(ev => isObj(ev) && EVENT_TYPES.includes(ev.type) && typeof ev.day === 'string' &&
+        (!dayKey || ev.day === dayKey))
+      .sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0));
+  }
+  /* Merge events into meta.dailyCheckEvents without touching the rest.
+     BoohaSaveFile.patch() is shallow (Object.assign on meta): passing
+     { dailyCheckEvents: { id: ev } } would REPLACE the whole map and erase
+     every earlier event. patchDeep merges one level down; the fallback
+     merges by hand and writes the full meta back. */
+  function addEvents(map) {
+    const SF = window.BoohaSaveFile;
+    if (typeof SF.patchDeep === 'function') return !!SF.patchDeep('meta', 'dailyCheckEvents', map);
+    const meta = SF.load().meta || {};
+    meta.dailyCheckEvents = Object.assign({}, isObj(meta.dailyCheckEvents) ? meta.dailyCheckEvents : {}, map);
+    return !!SF.patch('meta', meta);
+  }
+
+  function recordEvent(type, curr, extra) {
+    if (!EVENT_TYPES.includes(type)) return null;
+    const day = todayKey();
+    if (!day) { console.error('[DailyCheck] CALENDAR missing — event not recorded.'); return null; }
+    const ts = Date.now();
+    const id = day + '_' + ts.toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    const ev = { day, type, ts, curr: curr || null };
+    if (extra && extra.mode) ev.mode = extra.mode;
+    if (extra && isObj(extra.detail)) ev.detail = extra.detail;
+    mirrorAdd(id, ev);
+    // Never write before identity + cloud restore: on a borrowed device that
+    // would land in the previous student's save. The mirror still covers it.
+    let saved = false;
+    if (window.BOOHA_READY) {
+      try { saved = addEvents({ [id]: ev }); } catch (_) {}
+      if (saved && window.BoohaSync) {
+        try { BoohaSync.checkpoint('adventure'); } catch (e) {}
+      }
+    }
+    document.dispatchEvent(new CustomEvent('booha:dailyCheckEvent', { detail: { id, day, type, saved } }));
+    return id;
+  }
+  // Events recorded before identity was ready live only in the tab mirror;
+  // copy today's into the save once it is safe, so the Adventure Log has them.
+  function flushMirror() {
+    const day = todayKey();
+    if (!day || !window.BOOHA_READY) return;
+    const saved = savedEvents();
+    const missing = {};
+    const mirror = mirrorRead(day);
+    Object.keys(mirror).forEach(id => { if (!saved[id] && isObj(mirror[id])) missing[id] = mirror[id]; });
+    if (!Object.keys(missing).length) return;
+    try {
+      if (addEvents(missing) && window.BoohaSync) {
+        try { BoohaSync.checkpoint('adventure'); } catch (e) {}
+      }
+    } catch (_) {}
+  }
+  if (window.BOOHA_READY) setTimeout(flushMirror, 0);
+  else if (typeof document.addEventListener === 'function') {
+    document.addEventListener('booha:ready', flushMirror, { once: true });
+  }
+
+  function todayState() {
+    const day = todayKey();
+    if (!day) return 'pending';
+    if (isDoneToday()) return 'done';
+    const bypass = events(day).filter(ev => BYPASS_STATE[ev.type]);
+    if (bypass.length) return BYPASS_STATE[bypass[bypass.length - 1].type];
+    // Legacy: before 2026-11-08 "Enter anyway" wrote checkIn[day].st = 'skip'.
+    const rec = recordFor(day);
+    return rec && rec.st === 'skip' ? 'skipped' : 'pending';
+  }
+
   function recordFor(dayKey) {
     return _meta().checkIn[dayKey] || null;
   }
@@ -109,7 +237,7 @@ window.BoohaDailyCheck = (function () {
   function todaySummary() {
     const key = todayKey();
     const rec = key ? recordFor(key) : null;
-    return Object.assign({ key, st: rec ? rec.st : null }, summarizeRecord(rec));
+    return Object.assign({ key, st: rec ? rec.st : null, state: todayState() }, summarizeRecord(rec));
   }
   function write(st, pct, curr) {
     const k = todayKey();
@@ -522,7 +650,10 @@ window.BoohaDailyCheck = (function () {
     const onCancel = typeof opts.onCancel === 'function' ? opts.onCancel : onSkip;
     const fixedCurr = ['pb', 'br', 'bc'].includes(opts.curr) ? opts.curr : null;
     const mode = opts.mode === 'retake' ? 'retake' : 'check';
-    const recordSkipOnCancel = opts.recordSkipOnCancel !== false && mode !== 'retake';
+    // Closing today's first check with × is recorded as 'closed' (it does not
+    // let the student through). Journal-launched checks and retakes pass
+    // recordSkipOnCancel:false and leave no record.
+    const recordCloseOnCancel = opts.recordSkipOnCancel !== false && mode !== 'retake';
     const doneLabel = opts.doneLabel ||
       (mode === 'retake' ? 'ログにもどる' : 'ぼうけんへ');
     injectStyles();
@@ -544,12 +675,9 @@ window.BoohaDailyCheck = (function () {
         { detail: { open: false } }));
     }
     function bailToCancel() {
-      // Leaving the first check from the start scene records "later." Leaving
-      // a journal-launched check or retake must not alter today's evidence.
-      if (recordSkipOnCancel) {
-        const curr = fixedCurr || knownCurr();
-        write('skip', null, curr || 'pb');
-      }
+      // Leaving today's first check records 'closed' (history only — it never
+      // grants entry). A journal-launched check or retake records nothing.
+      if (recordCloseOnCancel) recordEvent('closed', fixedCurr || knownCurr(), { mode });
       teardown(); onCancel();
     }
 
@@ -638,15 +766,20 @@ window.BoohaDailyCheck = (function () {
         runSections(content, day);
       }).catch(err => {
         console.error('[DailyCheck] load failed:', err);
+        // A technical problem, never a skip: the opening lets the student in
+        // ("Try Daily Check again" stays available) for the rest of the day.
+        recordEvent('load_failure', curr, {
+          mode, detail: { message: String((err && err.message) || err || '').slice(0, 120) }
+        });
         clear();
         root.appendChild(ghost());
         const m = document.createElement('div'); m.className = 'dc-title';
         m.textContent = 'まだ準備中'; root.appendChild(m);
         const s = document.createElement('div'); s.className = 'dc-sub';
-        s.textContent = 'コンテンツをよみこめませんでした。'; root.appendChild(s);
+        s.textContent = 'コンテンツをよみこめませんでした。 / Couldn’t load today’s check.'; root.appendChild(s);
         const b = document.createElement('button');
-        b.className = 'dc-btn ghost'; b.type = 'button'; b.textContent = 'とじる';
-        b.addEventListener('click', bailToCancel);
+        b.className = 'dc-btn ghost'; b.type = 'button'; b.textContent = 'とじる / CLOSE';
+        b.addEventListener('click', () => { teardown(); onCancel(); });
         root.appendChild(b);
       });
     }
@@ -773,7 +906,12 @@ window.BoohaDailyCheck = (function () {
         const pct = Math.round((correct / day.quiz.length) * 100);
         let saving = false;
 
+        let saveFailureLogged = false;
         function renderSaveFailure() {
+          if (!saveFailureLogged) {
+            saveFailureLogged = true;
+            recordEvent('save_failure', content.curr, { mode, detail: { pct } });
+          }
           clear();
           root.appendChild(ghost());
           const t = document.createElement('div'); t.className = 'dc-title';
@@ -786,6 +924,12 @@ window.BoohaDailyCheck = (function () {
           b.textContent = 'もういちど保存 / RETRY SAVE';
           b.addEventListener('click', persistResult);
           root.appendChild(b);
+          // Never a lockout: the student may continue; the failure is logged.
+          const later = document.createElement('button');
+          later.className = 'dc-btn ghost'; later.type = 'button';
+          later.textContent = 'あとで / CONTINUE FOR NOW';
+          later.addEventListener('click', () => { teardown(); onCancel(); });
+          root.appendChild(later);
         }
 
         function renderSuccess() {
@@ -864,8 +1008,11 @@ window.BoohaDailyCheck = (function () {
       const d = new Date(start); d.setUTCDate(d.getUTCDate() + i);
       const key = d.toISOString().slice(0, 10);
       const rec = log[key] || null;
-      const st = rec ? rec.st : null;
       const summary = summarizeRecord(rec);
+      const dayEvents = events(key);
+      const skipped = dayEvents.some(ev => ev.type === 'student_skip') || !!(rec && rec.st === 'skip');
+      const tech = dayEvents.some(ev => ev.type === 'load_failure' || ev.type === 'save_failure');
+      const st = rec && rec.st === 'done' ? 'done' : skipped ? 'skip' : tech ? 'tech' : null;
       if (st === 'done') {
         doneCount++;
         if (summary.first != null) {
@@ -877,7 +1024,7 @@ window.BoohaDailyCheck = (function () {
         if (summary.hasRetakes) hasRetakes = true;
       }
       days.push({
-        key, st,
+        key, st, skipped, tech,
         attempts: summary.attempts,
         isToday: key === today,
         isFuture: today ? key > today : false
@@ -898,10 +1045,12 @@ window.BoohaDailyCheck = (function () {
   /* ── Public surface ──────────────────────────────────────────────────── */
   return {
     // state
-    isDoneToday, recordFor, todaySummary, streak, knownCurr, todayKey,
+    isDoneToday, recordFor, todaySummary, todayState, streak, knownCurr, todayKey,
     // records
     markDone: (pct, curr) => write('done', pct, curr),
-    markSkip: (curr) => write('skip', null, curr),
+    // "Skip today", confirmed by the student. Never written into checkIn.
+    markSkip: (curr) => recordEvent('student_skip', curr),
+    recordEvent, events, EVENT_TYPES,
     // content
     loadContent, buildDay, weekInfo, audioUrl, weekSummary,
     // runner

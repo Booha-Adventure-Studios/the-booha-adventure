@@ -1704,6 +1704,20 @@ else
   bad "Fixes-pass audit failed"
 fi
 
+echo "[daily check] opening states and event log"
+if node tests/daily-check-states.test.cjs >/dev/null 2>&1; then
+  ok "Daily Check states passed (pending/done/skipped/failed; × never grants entry; events kept apart)"
+else
+  bad "Daily Check states test failed"
+fi
+
+echo "[games] maze entry: Blitz is an optional warm-up"
+if node tests/maze-entry-warmup-audit.cjs >/dev/null 2>&1; then
+  ok "Maze entry audit passed (Enter the Maze primary, no gate wording)"
+else
+  bad "Maze entry audit failed"
+fi
+
 echo "[games] engine markup audit"
 if node tests/games-markup-audit.cjs >/dev/null 2>&1; then
   ok "Engine markup audit passed"
