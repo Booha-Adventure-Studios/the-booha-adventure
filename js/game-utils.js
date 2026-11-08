@@ -1148,7 +1148,7 @@ const UTILS = {
     }
   },
 
-  createRun({ total = 15, recoverPoints = 50, minMs = 400, hud = true, now = null, impactKit = false } = {}) {
+  createRun({ total = 15, recoverPoints = 50, minMs = 400, hud = true, now = null, impactKit = false, autoContact = false } = {}) {
     const clock = typeof now === 'function' ? now : () => performance.now();
     const MULT = c => (c >= 10 ? 3 : c >= 6 ? 2 : c >= 3 ? 1.5 : 1);
     let st = null;
@@ -1180,11 +1180,14 @@ const UTILS = {
       const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
       return r && r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : { x: innerWidth / 2, y: innerHeight / 2 };
     };
-    /* Razzle-dazzle Pass 2: every game on the tracker gets small "contact"
-       at the answer the student just tapped (U.impact, no target, so no bolt:
-       flash, ring and a few fragments that grow with the streak, plus the
-       crack/thump layer). Games on the full kit (impactKit: true) draw their
-       own, richer impacts and are skipped here. Only a fresh tap counts as
+    /* Razzle-dazzle Pass 2 (opt-in since Pass 6): with autoContact: true the
+       tracker draws small "contact" at the answer the student just tapped
+       (U.impact, no target, so no bolt: flash, ring and a few fragments that
+       grow with the streak, plus the crack/thump layer). OFF by default: all
+       nine curriculum games now call the richer kit themselves
+       (impactKit: true), and Booha Bites, Echo and Week Boss keep their own
+       bespoke reactions — Echo's Hint, for one, calls run.miss() without a
+       wrong answer, so an automatic puff there would be misleading. Only a fresh tap counts as
        the origin (a timeout or programmatic miss draws nothing stale). A
        recovery shows its blue-gold effect only where a second try scores:
        in multiple-choice games (recoverPoints 0) it would reward tapping
@@ -1194,7 +1197,7 @@ const UTILS = {
       return tap.el && tap.el.isConnected && performance.now() - tap.t < 1500 ? tap.el : null;
     };
     const autoImpact = (outcome, extra) => {
-      if (impactKit || !hud || typeof document === 'undefined' || typeof UTILS === 'undefined') return;
+      if (!autoContact || impactKit || !hud || typeof document === 'undefined' || typeof UTILS === 'undefined') return;
       try { UTILS.impact(Object.assign({ source: fxTapEl(), outcome, squash: false }, extra || {})); } catch (_) {}
     };
     const fxCtx = () => {
