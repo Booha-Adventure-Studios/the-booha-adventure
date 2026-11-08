@@ -175,6 +175,10 @@ const context = {
   Date,
   document,
   localStorage: makeStorage(),
+  // Like the real page: identity ready, tab session storage available
+  // (Daily Check events use both; see tests/daily-check-states.test.cjs).
+  sessionStorage: makeStorage(),
+  BOOHA_READY: true,
   fetch(url) {
     const response = contentResponses.get(url);
     if (response) return Promise.resolve(response);
@@ -230,11 +234,13 @@ const daily = context.window.BoohaDailyCheck;
     'exactly one quiz item should come from spaced review');
   assert.ok(day.quiz.find(question => question.isSpacedReview).reviewWeeksAgo >= 3);
 
-  assert.strictEqual(daily.markSkip('pb'), true);
-  assert.strictEqual(daily.todaySummary().st, 'skip');
+  // 2026-11-08: a skip is a dailyCheckEvents entry, never a checkIn record.
+  assert.ok(daily.markSkip('pb'), 'markSkip returns the new event id');
+  assert.strictEqual(daily.todaySummary().st, null);
+  assert.strictEqual(daily.todaySummary().state, 'skipped');
   assert.strictEqual(daily.markDone(80, 'pb'), true);
   assert.deepStrictEqual({ ...daily.todaySummary() }, {
-    key: '2026-09-25', st: 'done', done: true, first: 80, best: 80,
+    key: '2026-09-25', st: 'done', state: 'done', done: true, first: 80, best: 80,
     attempts: 1, hasRetakes: false, curr: 'pb',
   });
   assert.strictEqual(daily.markDone(100, 'pb'), true);
