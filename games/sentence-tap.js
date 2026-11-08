@@ -15,7 +15,8 @@ const REVEAL_OK_MS = 220, REVEAL_MISS_MS = 300, REVEAL_END_MS = 350;
 
 /* Games Pass 4: combo / sharp / points. Each pair is one item; sharp = the
    whole round of 5 matched inside the par time (but not under 2 s). */
-const run = U.createRun({ total: 15, recoverPoints: 0 });
+// Razzle-dazzle Pass 6: on the full impact kit (rune per match + round finisher).
+const run = U.createRun({ total: 15, recoverPoints: 0, impactKit: true });
 const ROUND_PAR_MS = 30000;
 let roundStartedAt = 0;
 
@@ -873,7 +874,9 @@ async function gradeRound() {
       run.ready(ROUND_PAR_MS, { at: roundStartedAt, minMs: 2000 });
       // Combo sparks come from the slot being graded, not the Check button.
       window.__brunTap = { el, t: performance.now() };
-      run.hit(checkedAt);
+      const hit = run.hit(checkedAt) || {};
+      // The match lights like a connected rune; it climbs with the streak.
+      U.impact({ source: el, outcome: 'hit', combo: hit.combo || 1, sharp: !!hit.sharp, flavor: 'match', squash: false });
       /* Pass 2: quick cascade; each correct answer in a row dings a step higher */
       U.playSFX('ding', { rate: Math.min(1.5, 1 + dingStep * 0.06) });
       dingStep++;
@@ -884,6 +887,7 @@ async function gradeRound() {
       run.ready(ROUND_PAR_MS, { at: roundStartedAt, minMs: 2000 });
       window.__brunTap = { el, t: performance.now() };
       run.miss();
+      U.impact({ source: el, outcome: 'miss', flavor: 'match', squash: false });   // a dusty poof
       if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
       U.playSFX('fart');
       flashWrong();
@@ -892,6 +896,9 @@ async function gradeRound() {
     }
   }
 
+  // One finisher for the whole round, sized by how many were right (none
+  // for 0), inside the existing end-of-round pause.
+  U.impactRound(jpSlots, roundScore, slotEls.length);
   score += roundScore;
   scoreEl.textContent = String(score);
 
