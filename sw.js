@@ -338,7 +338,8 @@ const CURRENT_CACHES = {
   // Step 4 quiet board: theme/menu.css spotlight + folded extras row.
   // Razzle-dazzle Pass 1: impact kit styles (theme/game.css .bimp-*).
   // Razzle-dazzle Pass 3: Sentence Speed wave styles (theme/game.css .bimp-wave*).
-  assets: 'booha-assets-2026-614',
+  // Razzle-dazzle Pass 4: listening-game sound-wave arcs (theme/game.css .bimp-arc).
+  assets: 'booha-assets-2026-615',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

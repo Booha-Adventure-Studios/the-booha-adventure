@@ -15,7 +15,8 @@ const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
 /* Games Pass 4: combo / sharp / points. Multiple choice → a second try earns 0. */
-const run = U.createRun({ total: 15, recoverPoints: 0 });
+// Razzle-dazzle Pass 4: on the full impact kit (sound waves into the card).
+const run = U.createRun({ total: 15, recoverPoints: 0, impactKit: true });
 const LISTEN_PAR_MS = 3000;   // sharp window after the clip finishes
 
 U.setTitle('Say the Sentence');
@@ -380,7 +381,14 @@ function handleChoice(btn, card) {
   setTimeout(() => { pickCooldown = false; }, 600);
   const correct = card.jp === order[idx].jp;
   if (correct) {
-    if (firstTry) run.hit(); else run.recover();
+    if (firstTry) {
+      const hit = run.hit() || {};
+      // The answer sends a sound wave into the listening card. Short and
+      // silent of speech: the next clip only starts after the ding + 220 ms.
+      U.impact({ source: btn, target: sasCard, outcome: 'hit', combo: hit.combo || 1, sharp: !!hit.sharp, flavor: 'listen', squash: false });
+    } else {
+      run.recover();   // multiple choice: a later right answer earns no show
+    }
     isBusy = true; answered = true;
     voiceGate.stop();   // answered: the clip is done, move on cleanly
     btn.classList.add('correct');
@@ -392,6 +400,8 @@ function handleChoice(btn, card) {
   } else {
     firstTry = false;
     run.miss();
+    // A small grey puff on the button; the card keeps its own soft shake.
+    U.impact({ source: btn, outcome: 'miss', flavor: 'listen', squash: false });
     if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     updateStreak(0);
     btn.classList.add('wrong');

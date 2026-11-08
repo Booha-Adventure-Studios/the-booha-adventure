@@ -247,4 +247,40 @@ const plain = o => JSON.parse(JSON.stringify(o));
   assert.match(ss, /\? \(streak === 15 \? 620 : 560\)\s*: 340;/, 'next-question timing unchanged (340 ms)');
 }
 
-console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game, Sentence Speed wave.');
+// ── 7. Pass 4: listening games' sound waves ──
+{
+  const U = makeCtx();
+  const card = box(20, 100, 360, 200), btn = box(40, 620, 150, 70);
+  U.impact({ source: btn, target: card, outcome: 'hit', combo: 6, sharp: true, flavor: 'listen', squash: false });
+  const arcs = nodes.filter(n => /bimp-arc/.test(n.className));
+  assert.strictEqual(arcs.length, 3, 'three sound-wave arcs');
+  assert(arcs.every(a => /t3/.test(a.className)), 'arcs grow with the streak');
+  assert.deepStrictEqual(arcs.map(a => a.anims[0].opts.delay), [0, 45, 90], 'staggered like a sound wave');
+  assert(arcs.every(a => a.style.left === '115px' && a.style.top === '655px'), 'they leave from the answer');
+  assert.match(JSON.stringify(arcs[0].anims[0].frames[2]), /translate\(85px,-455px\)/, 'and arrive at the card');
+  assert.strictEqual(nodes.filter(n => /bimp-ring/.test(n.className)).length, 2, 'the card absorbs them in two concentric rings');
+  assert(!nodes.some(n => /bimp-bolt|bimp-wave/.test(n.className)), 'no bolt or wave in listening games');
+  assert(nodes.some(n => /bimp-crit/.test(n.className)), 'sharp still crits');
+  // Everything (delay + duration) ends within 320 ms, before any next clip.
+  const ends = nodes.flatMap(n => n.anims.map(a => (a.opts.delay || 0) + a.opts.duration));
+  assert(Math.max(...ends) <= 320, `every effect ends by 320 ms (latest ${Math.max(...ends)})`);
+  assert(timers.every(ms => ms <= 360), 'and is removed by 360 ms');
+  const keys = new Set(); nodes.forEach(n => n.anims.forEach(a => a.frames.forEach(f => Object.keys(f).forEach(k => keys.add(k))))); keys.delete('offset');
+  assert.deepStrictEqual([...keys].sort(), ['opacity', 'transform']);
+
+  const R = makeCtx({ reduced: true, power: 'full' });
+  R.impact({ source: btn, target: card, outcome: 'hit', combo: 6, flavor: 'listen' });
+  assert(!nodes.some(n => /bimp-arc|bimp-ring/.test(n.className)), 'reduced motion: no travelling waves');
+
+  for (const [f, cardVar] of [['say-word', 'stwCard'], ['say-sentence', 'sasCard'], ['ask-question', 'aqCard']]) {
+    const src = read(`games/${f}.js`);
+    assert.match(src, /U\.createRun\(\{ total: 15, recoverPoints: 0, impactKit: true \}\)/, `${f}: on the full kit`);
+    assert(new RegExp(`if \\(firstTry\\) \\{\\s*const hit = run\\.hit\\(\\) \\|\\| \\{\\};[\\s\\S]{0,240}U\\.impact\\(\\{ source: btn, target: ${cardVar}, outcome: 'hit', combo: hit\\.combo \\|\\| 1, sharp: !!hit\\.sharp, flavor: 'listen', squash: false \\}\\);\\s*\\} else \\{\\s*run\\.recover\\(\\);`).test(src),
+      `${f}: first-try hits send waves into the card; later right answers earn no show`);
+    assert.match(src, /run\.miss\(\);\s*\/\/[^\n]*\n\s*U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'listen', squash: false \}\);/, `${f}: misses puff`);
+    assert.match(src, /const goNext = \(\) => setTimeout\(advanceToNextCard, 220\);/, `${f}: next card timing unchanged`);
+    assert.match(src, /setTimeout\(afterDing, 450\);/, `${f}: the next clip still waits for the ding`);
+  }
+}
+
+console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game, Sentence Speed wave, listening-game sound waves.');
