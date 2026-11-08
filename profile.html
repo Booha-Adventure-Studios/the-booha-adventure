@@ -205,6 +205,12 @@
       font:inherit; font-size:15px; font-weight:900; color:#2a1c00; background:linear-gradient(135deg,#ffe08a,#f2b53a);
       box-shadow:0 6px 18px rgba(242,181,58,.35); }
     .pg-sum-go:focus-visible { outline:3px solid #fff6dc; outline-offset:3px; }
+    .pg-sum-choices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .pg-sum-choice { display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:10px; border-radius:14px; background:rgba(0,0,0,.28); border:1px solid rgba(255,215,122,.25); }
+    .pg-sum-choice.blitz { border-color:rgba(155,99,232,.45); }
+    .pg-sum-choice .pg-sum-copy b { font-size:14px; }
+    .pg-sum-choice .pg-sum-go { min-height:40px; font-size:14px; }
+    .pg-summary[hidden] { display:none; }
     .pg-sum-progress { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
     .pg-sum-pill { display:flex; flex-direction:column; align-items:center; gap:1px; padding:6px 4px; border-radius:12px; background:rgba(0,0,0,.28); }
     .pg-sum-pill small { font-size:10px; color:#b7a88a; }
@@ -1066,10 +1072,13 @@
 <script src="./js/ui/adventure-log.js"></script>
 <script src="./js/ui/profile-progress.js"></script>
 <script src="./js/ui/juku-report-log.js"></script>
+<!-- daily-check.js before profile-game.js: the summary card reads today's
+     Daily Check state on its first render (it may run immediately when the
+     save is already ready). -->
+<script src="./js/daily-check.js"></script>
 <script src="./js/ui/profile-game.js"></script>
 <script src="./js/ui/medal-toast.js"></script>
 <script src="./js/ui/world-portals.js"></script>
-<script src="./js/daily-check.js"></script>
 <script>
   (function () {
     var muenbaTab = document.getElementById('pnet-muenba');

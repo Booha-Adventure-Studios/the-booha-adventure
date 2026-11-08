@@ -39,16 +39,27 @@ function state({ stars = Array(9).fill(null), blitz = 0, skin = { name: 'Batty B
   for (const st of ['done', 'skipped', 'failed']) {
     assert.notStrictEqual(summaryFor(s, st).next.kind, 'daily', `${st}: the summary does not push the check again`);
   }
+  // Parallel tracks: while both have work, Maze and Blitz are offered side by
+  // side (never maze-first); a single track only when the other is done.
   const fresh = summaryFor(s, 'done').next;
-  assert.deepStrictEqual([fresh.kind, fresh.jp, fresh.sub], ['games', 'Vocabulary Tap を あそぼう', 'あと 9つ ★★ で アーケード'],
-    'fresh week: the first game in maze order');
-  const mid = summaryFor(state({ stars: [2, 3, null, 1, null, null, null, null, null] }), 'done').next;
-  assert.strictEqual(mid.jp, 'Vocab Speed を あそぼう', 'next unplayed game');
-  assert.strictEqual(mid.sub, 'あと 7つ ★★ で アーケード');
+  assert.strictEqual(fresh.kind, 'choice', 'fresh week: Maze or Blitz, any order');
+  assert.strictEqual(fresh.jp, 'どちらからでも OK！');
+  assert.deepStrictEqual(fresh.options.map(o => [o.kind, o.jp, o.sub]), [
+    ['games', 'Vocabulary Tap を あそぼう', 'あと 9つ ★★ で アーケード'],
+    ['blitz', 'Blitz を あそぼう', 'あと 3つ で Batty Booha'],
+  ]);
+  const mid = summaryFor(state({ stars: [2, 3, null, 1, null, null, null, null, null], blitz: 1 }), 'done').next;
+  assert.deepStrictEqual(mid.options.map(o => o.sub), ['あと 7つ ★★ で アーケード', 'あと 2つ で Batty Booha']);
+  assert.strictEqual(mid.options[0].jp, 'Vocab Speed を あそぼう', 'next unplayed game');
   const allPlayed = summaryFor(state({ stars: [2, 2, 2, 1, 2, 2, 2, 2, 2] }), 'done').next;
-  assert.strictEqual(allPlayed.jp, 'Sentence Tap を あそぼう', 'all played: the first one below ★★');
+  assert.strictEqual(allPlayed.options[0].jp, 'Sentence Tap を あそぼう', 'all played: the first one below ★★');
   const blitz = summaryFor(state({ stars: Array(9).fill(2), blitz: 1 }), 'done').next;
-  assert.deepStrictEqual([blitz.kind, blitz.sub], ['blitz', 'あと 2つ で Batty Booha'], 'arcade open → Blitz toward the skin');
+  assert.deepStrictEqual([blitz.kind, blitz.sub], ['blitz', 'あと 2つ で Batty Booha'], 'maze done → only Blitz');
+  const mazeOnly = summaryFor(state({ stars: [2, null, null, null, null, null, null, null, null], blitz: 3,
+    skin: { name: 'Batty Booha', src: 'b', unlocked: true } }), 'done').next;
+  assert.deepStrictEqual([mazeOnly.kind, mazeOnly.jp], ['games', 'Spell the Word を あそぼう'], 'Blitz done first → only the maze');
+  const noSkin = summaryFor(state({ stars: Array(9).fill(2), blitz: 1, skin: null }), 'done').next;
+  assert.deepStrictEqual([noSkin.kind, noSkin.sub], ['blitz', 'あと 2つ · +3★ each'], 'Blitz still offered without a weekly skin');
   const rainbow = summaryFor(state({ stars: Array(9).fill(3), blitz: 3, skin: { name: 'Batty Booha', src: 'b', unlocked: true }, rainbow: 4 }), 'done').next;
   assert.deepStrictEqual([rainbow.kind, rainbow.sub], ['games', 'じゅんび 4 / 9'], 'then rainbow stars');
   const all = summaryFor(state({ stars: Array(9).fill(3), blitz: 3, skin: { name: 'B', src: 'b', unlocked: true }, rainbow: 9 }), 'done').next;
@@ -88,6 +99,15 @@ function state({ stars = Array(9).fill(null), blitz = 0, skin = { name: 'Batty B
   assert.match(pg, /document\.addEventListener\('booha:dailyCheckEvent', render\);/, 'a skip updates the card');
   assert.match(pg, /games-index\.html\?week=\$\{encodeURIComponent\(slug\)\}/, 'the button goes to this week\'s board');
   assert.match(pg, /sessionStorage\.setItem\('booha_scroll_to_blitz', '1'\)/, 'Blitz goes to the hub arcade');
+  // The card must know today's Daily Check state on its first render.
+  const dcAt = html.indexOf('<script src="./js/daily-check.js"></script>');
+  const pgAt = html.indexOf('<script src="./js/ui/profile-game.js"></script>');
+  assert(dcAt > 0 && pgAt > dcAt, 'daily-check.js loads before profile-game.js');
+  assert(!/let dcState = 'done';/.test(pg), 'never assume the check is done');
+  assert.match(pg, /if \(!window\.BoohaDailyCheck \|\| typeof BoohaDailyCheck\.todayState !== 'function'\) \{\s*host\.hidden = true;/,
+    'without the module the card waits (hidden) instead of guessing');
+  assert.match(pg, /window\.addEventListener\('load', \(\) => \{ renderSummary\._waiting = false; render\(\); \}, \{ once: true \}\);/,
+    'and repaints once the page has loaded');
 }
 
 console.log('Profile summary card test passed: next action, progress, nearest unlock, placement.');

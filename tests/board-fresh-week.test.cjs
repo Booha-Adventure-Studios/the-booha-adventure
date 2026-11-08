@@ -37,7 +37,8 @@ assert.match(src, /var view = boardView\(\{ live: live, ready: !!window\.BOOHA_R
   'paint() decides from live week, save readiness, plays and the student\'s choice');
 assert.match(src, /t\.classList\.toggle\('bm-spotlight', view\.fresh && i === firstOpen\)/, 'only the "Try me!" tile is spotlit');
 assert.match(src, /if \(n > 0 \|\| played\) anyPlayed = true;/, 'any star or score on the nine ends quiet mode');
-assert.match(src, /if \(n > 0 \|\| pts > 0\) anyPlayed = true;/, 'so does any extra-game result');
+assert.match(src, /if \(n > 0 \|\| pts > 0 \|\| Object\.prototype\.hasOwnProperty\.call\(playedIds, id\)\) anyPlayed = true;/,
+  'so does any saved extra-game record, even a 0 score (same rule as the nine)');
 const freshBlock = src.slice(src.indexOf('if (view.fresh) {'), src.indexOf("tally.appendChild(el('div', 'bm-tally-rule'));"));
 assert(/return;/.test(freshBlock) && freshBlock.length < 400, 'a fresh week skips the arcade bar');
 assert.match(src, /extraToggle\.setAttribute\('aria-controls', 'bm-extra-lane'\)/, 'the fold button controls the row');
