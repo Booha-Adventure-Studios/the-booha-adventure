@@ -11,6 +11,7 @@ const ORIGINAL = process.env.JUKU_PREVIEW_FALLBACK
   ? path.resolve(process.env.JUKU_PREVIEW_FALLBACK)
   : WORK;
 const PORT = Number(process.env.JUKU_PREVIEW_PORT || 8127);
+const PROD_PREFIX = '/the-booha-adventure';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -197,7 +198,12 @@ const PROFILE_PREVIEW = `
 http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(url.pathname);
-  if (pathname === '/') pathname = '/juku.html';
+  // Production serves the app under /the-booha-adventure/ (GitHub Pages), and
+  // many pages load scripts by that absolute path. Strip it first, so prefixed
+  // requests reach the same files and the token/sync stand-ins below.
+  if (pathname === PROD_PREFIX) pathname = '/';
+  else if (pathname.startsWith(PROD_PREFIX + '/')) pathname = pathname.slice(PROD_PREFIX.length);
+  if (pathname === '/') pathname = '/index.html';
 
   if (pathname === '/js/token.js') {
     res.writeHead(200, { 'Content-Type': MIME['.js'] });
@@ -251,5 +257,7 @@ http.createServer((req, res) => {
   });
   fs.createReadStream(filename).pipe(res);
 }).listen(PORT, '127.0.0.1', () => {
-  console.log(`Juku preview: http://127.0.0.1:${PORT}/juku.html`);
+  console.log(`Booha preview: http://localhost:${PORT}/index.html`);
+  console.log(`Juku preview:  http://localhost:${PORT}/juku.html`);
+  console.log(`(Production paths under ${PROD_PREFIX}/ are served too.)`);
 });

@@ -95,6 +95,8 @@ Then open:
 http://localhost:8127/index.html
 ```
 
+The English Juku lesson mode is at `http://localhost:8127/juku.html`. Pages that load files by their production path (`/the-booha-adventure/...`, as on GitHub Pages) work in the preview too.
+
 ## Verification
 
 Before deployment, run:

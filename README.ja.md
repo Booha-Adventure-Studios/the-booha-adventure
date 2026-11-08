@@ -95,6 +95,8 @@ node tests/serve-preview.cjs
 http://localhost:8127/index.html
 ```
 
+English Juku(塾モード)は `http://localhost:8127/juku.html` で開けます。本番パス(`/the-booha-adventure/...`、GitHub Pages と同じ形)で読み込むページも、そのままプレビューで動きます。
+
 ## 検証(Verification)
 
 デプロイ前には、以下を実行してください。
