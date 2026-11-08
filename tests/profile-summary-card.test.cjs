@@ -68,6 +68,21 @@ function state({ stars = Array(9).fill(null), blitz = 0, skin = { name: 'Batty B
   assert.strictEqual(opened.kind, 'blitz', 'an arcade opened another way is not re-suggested');
 }
 
+// ── Accessible names: every button says where it goes ──
+{
+  const choice = summaryFor(state({ stars: [2, null, null, null, null, null, null, null, null] }), 'done').next;
+  assert.deepStrictEqual(choice.options.map(o => o.label), ['Spell the Wordへ · Go to Spell the Word', 'Blitzへ · Go to Blitz'],
+    'the two side-by-side buttons have different names');
+  assert.strictEqual(summaryFor(state(), 'pending').next.label, 'デイリーチェックへ · Go to the Daily Check');
+  const rb = summaryFor(state({ stars: Array(9).fill(3), blitz: 3, skin: { name: 'B', src: 'b', unlocked: true }, rainbow: 2 }), 'done').next;
+  assert.strictEqual(rb.label, 'ゲームへ · Go to this week’s games');
+  const pg = read('js/ui/profile-game.js');
+  assert.match(pg, /class="pg-sum-go" data-i="\$\{idx\}" aria-label="\$\{esc\(opt\.label\)\}"/, 'buttons carry the label');
+  const html = read('profile.html');
+  assert(!/\.pg-sum-choice \.pg-sum-go \{[^}]*min-height/.test(html), 'choice buttons keep the 44px minimum height');
+  assert.match(html, /\.pg-sum-go \{[^}]*min-height:44px/, '44px touch target');
+}
+
 // ── Progress pills ──
 {
   const p = summaryFor(state({ stars: [2, 3, 1, null, null, null, null, null, null], blitz: 2, daily: 4 }), 'done').progress;
