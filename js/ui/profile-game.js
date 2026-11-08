@@ -294,28 +294,40 @@ const BoohaProfileGame = (() => {
      A short first view under the companion card: what to do next (with a
      button that goes there), this week's progress, and the nearest unlock.
      Everything below stays as it was; this only answers "what now?".
-     Next-action order: today's Daily Check if it is still pending (a skip or
-     a technical problem is respected, not pushed), then the maze toward the
-     arcade, then Blitz toward the week's skin, then rainbow stars. The unlock
+     Next action: today's Daily Check first if it is still pending (a skip or
+     a technical problem is respected, not pushed). Then the two parallel
+     tracks — maze toward the arcade, Blitz toward the week's skin — offered
+     side by side ("どちらからでも OK"), never one before the other; when only
+     one track has work left, just that one. Then rainbow stars. The unlock
      shown is the closest one, by the fraction still left. */
   function summaryFor(s, dcState) {
     const w = s.week;
     const n = s.games.length;
     const arcadeLeft = s.arcadeOpen ? 0 : Math.max(0, n - w.twoStarCount);
     const skin = s.weeklySkin;
-    const blitzLeft = skin && !skin.unlocked ? Math.max(0, 3 - w.blitzCount) : 0;
+    const skinLeft = skin && !skin.unlocked ? Math.max(0, 3 - w.blitzCount) : 0;
+    const blitzLeft = Math.max(0, 3 - w.blitzCount);
     const ready = readyCount(s);
+
+    let mazeOpt = null;
+    if (arcadeLeft > 0) {
+      let i = w.stars.findIndex(v => v == null);
+      if (i < 0) i = w.stars.findIndex(v => v < 2);
+      const g = s.games[i] || s.games[0];
+      mazeOpt = { kind: 'games', jp: `${g.name} を あそぼう`, en: `Play ${g.name}`, sub: `あと ${arcadeLeft}つ ★★ で アーケード` };
+    }
+    const blitzOpt = blitzLeft > 0
+      ? { kind: 'blitz', jp: 'Blitz を あそぼう', en: 'Play a Blitz',
+          sub: skinLeft > 0 ? `あと ${skinLeft}つ で ${skin.name}` : `あと ${blitzLeft}つ · +3★ each` }
+      : null;
 
     let next;
     if (dcState === 'pending') {
       next = { kind: 'daily', jp: 'きょうの チェックを しよう', en: 'Do today’s Daily Check', sub: '5ふん · +2★' };
-    } else if (arcadeLeft > 0) {
-      let i = w.stars.findIndex(v => v == null);
-      if (i < 0) i = w.stars.findIndex(v => v < 2);
-      const g = s.games[i] || s.games[0];
-      next = { kind: 'games', jp: `${g.name} を あそぼう`, en: `Play ${g.name}`, sub: `あと ${arcadeLeft}つ ★★ で アーケード` };
-    } else if (blitzLeft > 0) {
-      next = { kind: 'blitz', jp: 'Blitz を あそぼう', en: 'Play a Blitz', sub: `あと ${blitzLeft}つ で ${skin.name}` };
+    } else if (mazeOpt && blitzOpt) {
+      next = { kind: 'choice', jp: 'どちらからでも OK！', en: 'Maze or Blitz — any order', sub: '', options: [mazeOpt, blitzOpt] };
+    } else if (mazeOpt || blitzOpt) {
+      next = mazeOpt || blitzOpt;
     } else if (ready < n) {
       next = { kind: 'games', jp: 'にじいろ★を ねらおう', en: 'Go for rainbow stars', sub: `じゅんび ${ready} / ${n}` };
     } else {
@@ -333,9 +345,9 @@ const BoohaProfileGame = (() => {
       candidates.push({ key: 'arcade', jp: 'アーケード', left: arcadeLeft, unit: 'つ ★★',
         frac: arcadeLeft / n, img: profileArt('treasure-chest-closed.webp') });
     }
-    if (blitzLeft > 0) {
-      candidates.push({ key: 'skin', jp: skin.name, left: blitzLeft, unit: 'つ Blitz',
-        frac: blitzLeft / 3, img: skin.src });
+    if (skinLeft > 0) {
+      candidates.push({ key: 'skin', jp: skin.name, left: skinLeft, unit: 'つ Blitz',
+        frac: skinLeft / 3, img: skin.src });
     }
     const lv = s.level;
     if (lv && !lv.max && lv.span > 0) {
@@ -377,12 +389,32 @@ const BoohaProfileGame = (() => {
   function renderSummary(s) {
     const host = document.getElementById('pg-summary');
     if (!host) return;
-    let dcState = 'done';
-    try { if (window.BoohaDailyCheck && BoohaDailyCheck.todayState) dcState = BoohaDailyCheck.todayState(); } catch (_) {}
+    // Never assume "done": without the Daily Check module the card would
+    // skip today's check. profile.html loads it first; if it is somehow
+    // missing, stay hidden and repaint once the page has fully loaded.
+    if (!window.BoohaDailyCheck || typeof BoohaDailyCheck.todayState !== 'function') {
+      host.hidden = true;
+      if (!renderSummary._waiting) {
+        renderSummary._waiting = true;
+        window.addEventListener('load', () => { renderSummary._waiting = false; render(); }, { once: true });
+      }
+      return;
+    }
+    host.hidden = false;
+    let dcState = 'pending';
+    try { dcState = BoohaDailyCheck.todayState(); } catch (_) {}
     const sum = summaryFor(s, dcState);
     const nx = sum.next;
-    const go = nx.kind === 'none' ? ''
-      : `<button type="button" class="pg-sum-go">${nx.kind === 'daily' ? 'チェック' : 'いく'} <span aria-hidden="true">→</span></button>`;
+    const goBtn = (kind, idx) =>
+      `<button type="button" class="pg-sum-go" data-i="${idx}">${kind === 'daily' ? 'チェック' : 'いく'} <span aria-hidden="true">→</span></button>`;
+    const go = nx.kind === 'none' || nx.kind === 'choice' ? '' : goBtn(nx.kind, -1);
+    const choices = nx.kind === 'choice'
+      ? `<div class="pg-sum-choices">${nx.options.map((o, i) => `
+          <div class="pg-sum-choice ${o.kind}">
+            <div class="pg-sum-copy"><b>${phrases(o.jp)}</b><span>${phrases(o.sub)}</span></div>
+            ${goBtn(o.kind, i)}
+          </div>`).join('')}</div>`
+      : '';
     const pills = sum.progress.map(p =>
       `<span class="pg-sum-pill ${p.key}${p.done ? ' done' : ''}"><small>${esc(p.jp)}</small><b>${esc(p.value)}</b></span>`).join('');
     const u = sum.unlock;
@@ -391,18 +423,22 @@ const BoohaProfileGame = (() => {
         <div class="pg-sum-copy">
           <span class="pg-kicker gold">NEXT · つぎは</span>
           <b>${phrases(nx.jp)}</b>
-          <span>${phrases(nx.en)} · ${phrases(nx.sub)}</span>
+          <span>${phrases(nx.en)}${nx.sub ? ` · ${phrases(nx.sub)}` : ''}</span>
         </div>
         ${go}
       </div>
+      ${choices}
       <div class="pg-sum-progress" aria-label="This week">${pills}</div>
       ${u ? `<div class="pg-sum-unlock ${u.key}">
         <img src="${esc(u.img)}" alt="" width="40" height="40">
         <div><span class="pg-kicker">もうすぐ · SOON</span><b>${esc(u.jp)}</b></div>
         <span class="pg-sum-left">あと ${u.left}${esc(u.unit)}</span>
       </div>` : ''}`;
-    const btn = host.querySelector('.pg-sum-go');
-    if (btn) btn.addEventListener('click', () => goNext(nx.kind, s));
+    host.querySelectorAll('.pg-sum-go').forEach(btn => {
+      const i = Number(btn.dataset.i);
+      const kind = i >= 0 && nx.options ? nx.options[i].kind : nx.kind;
+      btn.addEventListener('click', () => goNext(kind, s));
+    });
   }
 
   /* ── weekly Blitz skin ──────────────────────────────────────── */

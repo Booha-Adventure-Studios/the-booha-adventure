@@ -303,7 +303,8 @@
       var oc = t.querySelector('.bm-crown'); if (oc) oc.remove();
       if (crowned) { var cr = svg(CROWN, 'bm-crown', '0 0 26 20'); cr.setAttribute('role', 'img'); cr.setAttribute('aria-label', 'Crown'); t.insertBefore(cr, t.firstChild); }
       t._bm.best.textContent = live && pts > 0 ? 'BEST ' + pts.toLocaleString('en-US') : '';
-      if (n > 0 || pts > 0) anyPlayed = true;
+      // Same rule as the nine: any saved record this week (even a 0 score).
+      if (n > 0 || pts > 0 || Object.prototype.hasOwnProperty.call(playedIds, id)) anyPlayed = true;
       var ot = t.querySelector('.bm-tag'); if (ot) ot.remove();
       if (t._boss) {
         // Week Boss: opens once all nine are played this week, live week only.
