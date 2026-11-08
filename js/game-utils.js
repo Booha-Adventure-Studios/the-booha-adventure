@@ -876,7 +876,11 @@ const UTILS = {
                   'wave'  (Sentence Speed: a wide band sweeps across the
                            target, from the answer's side; broader and
                            brighter with the streak)
-                  later passes add 'listen' | 'build' | 'match'
+                  'listen' (Say Word / Say Sentence / Ask Question: three
+                           sound-wave arcs travel from the answer into the
+                           listening card, which absorbs them in two
+                           concentric rings)
+                  later passes add 'build' | 'match'
          squash   false when the game already animates the answer button
 
      Escalation: combo 1–2 a tight hit (4 fragments); 3–5 a stronger ring;
@@ -937,8 +941,29 @@ const UTILS = {
         { transform: `translateX(${z}%) skewX(-18deg)`, opacity: .85 }], { duration: 240, easing: 'cubic-bezier(.3,.6,.3,1)', fill: 'forwards' });
       setTimeout(() => clip.remove(), 280);
     }
-    // 2b. Bolt from the answer into the target.
-    if (plan.bolt && flavor !== 'wave' && from && to && (from.x !== to.x || from.y !== to.y)) {
+    // 2b. Listen: three sound-wave arcs, staggered, travel into the card.
+    if (plan.bolt && flavor === 'listen' && from && to && (from.x !== to.x || from.y !== to.y)) {
+      const dx = to.x - from.x, dy = to.y - from.y;
+      const rot = `rotate(${Math.atan2(dy, dx)}rad)`;
+      [0, 45, 90].forEach(delay => {
+        const arc = fx('bimp-arc t' + plan.tier + (outcome === 'recover' ? ' rec' : ''), from.x, from.y);
+        if (arc.animate) arc.animate([
+          { transform: `translate(0,0) ${rot} scale(.45)`, opacity: 0 },
+          { transform: `translate(${dx * .25}px,${dy * .25}px) ${rot} scale(.7)`, opacity: 1, offset: .2 },
+          { transform: `translate(${dx}px,${dy}px) ${rot} scale(1.25)`, opacity: 0 },
+        ], { duration: 190, delay, easing: 'cubic-bezier(.3,.5,.4,1)', fill: 'both' });
+        setTimeout(() => arc.remove(), delay + 230);
+      });
+      // The card absorbs it: a second, later concentric ring.
+      if (plan.ring) {
+        const r2 = fx('bimp-ring ' + plan.ring, to.x, to.y);
+        if (r2.animate) r2.animate([{ transform: 'scale(.2)', opacity: .9 }, { transform: `scale(${plan.ringScale * .7})`, opacity: 0 }],
+          { duration: 240, delay: 70, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both' });
+        setTimeout(() => r2.remove(), 350);
+      }
+    }
+    // 2c. Bolt from the answer into the target.
+    if (plan.bolt && flavor !== 'wave' && flavor !== 'listen' && from && to && (from.x !== to.x || from.y !== to.y)) {
       const dx = to.x - from.x, dy = to.y - from.y, len = Math.hypot(dx, dy);
       const b = fx('bimp-bolt t' + tier + (outcome === 'recover' ? ' rec' : ''), from.x, from.y);
       b.style.width = len + 'px';
