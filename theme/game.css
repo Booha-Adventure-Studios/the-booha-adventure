@@ -1266,3 +1266,8 @@ html.bsc-open .brun-hud, html.bsc-open .brun-banner, html.bsc-open .brun-edge { 
 .bimp-arc.t3 { width: 52px; height: 52px; margin: -26px 0 0 -26px; border-width: 4px; border-right-color: #fff3c4; }
 .bimp-arc.t4 { width: 64px; height: 64px; margin: -32px 0 0 -32px; border-width: 5px; border-right-color: #fff3c4; filter: drop-shadow(0 0 8px rgba(255,170,50,.9)); }
 .bimp-arc.rec { border-right-color: #9fd8ff; filter: drop-shadow(0 0 4px rgba(110,190,255,.8)); }
+
+/* ── Razzle-dazzle Pass 5: built answers lock in (U.impactChain) ── */
+.bimp-ring.mini { width: 36px; height: 36px; margin: -18px 0 0 -18px; border-width: 2px; }
+.bimp-flash.lock { border-radius: 12px; background: radial-gradient(ellipse at center, rgba(255,255,255,.9), rgba(255,226,122,.6) 60%, rgba(255,226,122,0) 85%); }
+.bimp-flash.anchor { border-radius: 12px; background: radial-gradient(ellipse at center, rgba(120,255,170,.7), rgba(120,255,170,0) 80%); }

@@ -339,7 +339,8 @@ const CURRENT_CACHES = {
   // Razzle-dazzle Pass 1: impact kit styles (theme/game.css .bimp-*).
   // Razzle-dazzle Pass 3: Sentence Speed wave styles (theme/game.css .bimp-wave*).
   // Razzle-dazzle Pass 4: listening-game sound-wave arcs (theme/game.css .bimp-arc).
-  assets: 'booha-assets-2026-615',
+  // Razzle-dazzle Pass 5: built-answer lock-in styles (theme/game.css .bimp-ring.mini, lock/anchor).
+  assets: 'booha-assets-2026-616',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

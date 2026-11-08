@@ -16,6 +16,15 @@ const utilsSrc = read('js/game-utils.js');
 // ── Load GAME_UTILS with a tiny fake DOM that records every effect node ──
 const nodes = [];
 const timers = [];
+const pending = [];
+// Run scheduled callbacks (in time order) — used by the chain tests.
+function flush() {
+  while (pending.length) {
+    pending.sort((a, b) => a.ms - b.ms);
+    const { fn } = pending.shift();
+    fn();
+  }
+}
 function fakeEl(tag) {
   const n = {
     tag, className: '', style: { setProperty() {} }, attrs: {}, removed: false, anims: [], dataset: {}, innerHTML: '', textContent: '',
@@ -34,10 +43,10 @@ function fakeEl(tag) {
 let NOW = 0;
 let LAST = null;
 function makeCtx(motion = { reduced: false, power: 'full' }) {
-  nodes.length = 0; timers.length = 0; NOW = 0;
+  nodes.length = 0; timers.length = 0; pending.length = 0; NOW = 0;
   const ctx = {
     console, Math, performance: { now: () => NOW },
-    setTimeout: (fn, ms) => { timers.push(ms); return 1; },
+    setTimeout: (fn, ms) => { timers.push(ms); pending.push({ fn, ms }); return 1; },
     document: {
       body: { appendChild: n => nodes.push(n) },
       createElement: fakeEl, addEventListener() {}, querySelectorAll: () => [],
@@ -283,4 +292,72 @@ const plain = o => JSON.parse(JSON.stringify(o));
   }
 }
 
-console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game, Sentence Speed wave, listening-game sound waves.');
+// ── 8. Pass 5: built answers (Spell the Word, Sentence Order) ──
+{
+  const U = makeCtx();
+  assert.deepStrictEqual(plain(U._chainPlan({ outcome: 'hit', rights: [true, true, true] })), ['lock', 'lock', 'lock']);
+  assert.deepStrictEqual(plain(U._chainPlan({ outcome: 'miss', rights: [true, false, true, false] })), ['anchor', 'crack', 'anchor', 'crack']);
+
+  // Correct: each piece locks in on the game's stagger, then the word releases.
+  const slots = [0, 1, 2, 3, 4].map(i => box(40 + i * 60, 300, 50, 60));
+  const row = box(30, 290, 320, 80);
+  const ret = U.impactChain(slots, { outcome: 'hit', stagger: 55, combo: 6, sharp: false, container: row });
+  assert.strictEqual(ret.releaseAt, 5 * 55 + 20, 'release lands right after the last letter (on the ding)');
+  assert.deepStrictEqual(timers.slice(0, 6), [0, 55, 110, 165, 220, 295], 'follows the game\'s own 55 ms stagger');
+  flush();
+  const minis = nodes.filter(n => /bimp-ring mini/.test(n.className));
+  assert.strictEqual(minis.length, 5, 'every letter locks in with a small ring');
+  assert.deepStrictEqual([minis[0].style.left, minis[4].style.left], ['65px', '305px'], 'left to right, on each letter');
+  const release = nodes.filter(n => /bimp-ring t3/.test(n.className));
+  assert.strictEqual(release.length, 1, 'then the whole word releases a ring that matches the streak');
+  assert.deepStrictEqual([release[0].style.left, release[0].style.top], ['190px', '330px'], 'centred on the whole answer');
+  assert(!nodes.some(n => /bimp-bolt|bimp-wave|bimp-arc/.test(n.className)), 'build: no bolt, wave or arcs');
+
+  // Recovery (these games score a second try): blue-gold.
+  const U2 = makeCtx();
+  U2.impactChain(slots, { outcome: 'recover', stagger: 55, container: row });
+  flush();
+  assert(nodes.some(n => /bimp-ring mini rec/.test(n.className)) && nodes.some(n => /bimp-ring rec/.test(n.className)), 'recovery locks in blue-gold');
+
+  // Wrong: wrong pieces crack with dust, right ones glow (anchored); no release, no reward.
+  const U3 = makeCtx();
+  const r3 = U3.impactChain(slots, { outcome: 'miss', stagger: 50, isRight: (el, i) => i !== 1 && i !== 3 });
+  assert.deepStrictEqual(plain(r3.kinds), ['anchor', 'crack', 'anchor', 'crack', 'anchor']);
+  flush();
+  assert.strictEqual(nodes.filter(n => /bimp-frag dust/.test(n.className)).length, 4, 'two dust bits per wrong piece');
+  assert.strictEqual(nodes.filter(n => /bimp-flash anchor/.test(n.className)).length, 3, 'right pieces glow');
+  assert(!nodes.some(n => /bimp-ring/.test(n.className)), 'a wrong answer never releases a ring');
+
+  // Reduced motion: flashes only.
+  const U4 = makeCtx({ reduced: true, power: 'full' });
+  U4.impactChain(slots, { outcome: 'hit', stagger: 55, combo: 10, container: row });
+  flush();
+  assert(nodes.length > 0 && nodes.every(n => /bimp-flash/.test(n.className)), 'reduced motion: only flashes');
+
+  // Every node animates transform/opacity only and is short.
+  const U5 = makeCtx();
+  U5.impactChain(slots, { outcome: 'hit', stagger: 55, combo: 10, sharp: true, container: row });
+  flush();
+  const keys = new Set(); nodes.forEach(n => n.anims.forEach(a => a.frames.forEach(f => Object.keys(f).forEach(k => keys.add(k))))); keys.delete('offset');
+  assert.deepStrictEqual([...keys].sort(), ['opacity', 'transform']);
+  assert(nodes.every(n => n.anims.every(a => (a.opts.delay || 0) + a.opts.duration <= 320)), 'each piece effect ≤ 320 ms');
+
+  // Wiring.
+  const sw = read('games/spell-word.js'), so = read('games/sentence-order.js');
+  assert.match(sw, /U\.createRun\(\{ total: 15, recoverPoints: 50, impactKit: true \}\)/);
+  assert.match(so, /U\.createRun\(\{ total: 15, recoverPoints: 50, impactKit: true \}\)/);
+  assert.match(sw, /const res = \(isRecovery \? run\.recover\(\) : run\.hit\(\)\) \|\| \{\};[\s\S]{0,200}U\.impactChain\(slotEls, \{ outcome: isRecovery \? 'recover' : 'hit', stagger: 55,\s*combo: res\.combo \|\| 1, sharp: !!res\.sharp, container: slotsEl \}\);/);
+  assert.match(so, /const res = \(isRecovery \? run\.recover\(\) : run\.hit\(\)\) \|\| \{\};[\s\S]{0,200}U\.impactChain\(chips, \{ outcome: isRecovery \? 'recover' : 'hit', stagger: 55,\s*combo: res\.combo \|\| 1, sharp: !!res\.sharp, container: answerEl \}\);/);
+  assert.match(sw, /U\.impactChain\(slotEls, \{ outcome: 'miss', stagger: 50,\s*isRight: \(el, i\) => !!\(placed\[i\] && placed\[i\]\.letter === target\[i\]\) \}\);/, 'Spell: same 50 ms stagger as its red/green marking');
+  assert.match(so, /U\.impactChain\(chips, \{ outcome: 'miss', stagger: 55,/);
+  assert(!/^\s*fireConfetti\(false\);/m.test(sw), 'Spell: per-word confetti replaced by the lock-in');
+  assert(!/fireSparkles\(answerEl, false\)/.test(so), 'Order: per-sentence sparkles replaced');
+  assert.match(sw, /setTimeout\(\(\) => fireConfetti\(true\),  900\);/, 'Spell: end-of-game confetti stays');
+  assert.match(so, /setTimeout\(\(\) => fireSparkles\(null, true\),  900\);/, 'Order: end-of-game sparkles stay');
+  for (const src of [sw, so]) {
+    assert.match(src, /\}, (slotEls|chips)\.length \* 55 \+ 20\);/, 'ding timing unchanged');
+    assert.match(src, /const danceMs = (slotEls|chips)\.length \* 50 \+ 280;/, 'dance + word-audio timing unchanged');
+  }
+}
+
+console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game, Sentence Speed wave, listening-game sound waves, built answers lock in.');

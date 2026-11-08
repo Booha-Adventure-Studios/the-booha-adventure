@@ -880,7 +880,10 @@ const UTILS = {
                            sound-wave arcs travel from the answer into the
                            listening card, which absorbs them in two
                            concentric rings)
-                  later passes add 'build' | 'match'
+                  'build'  (Spell the Word / Sentence Order release, via
+                           U.impactChain: no bolt, the ring lands on the
+                           whole answer)
+                  a later pass adds 'match'
          squash   false when the game already animates the answer button
 
      Escalation: combo 1–2 a tight hit (4 fragments); 3–5 a stronger ring;
@@ -998,6 +1001,70 @@ const UTILS = {
       play(c, [{ transform: 'rotate(0) scale(0)', opacity: 1 }, { transform: 'rotate(45deg) scale(1.3)', opacity: 1, offset: .45 }, { transform: 'rotate(90deg) scale(.2)', opacity: 0 }], 260);
     }
     return plan;
+  },
+
+  /* Razzle-dazzle Pass 5: answers that are BUILT (Spell the Word, Sentence
+     Order). The effect explains the answer: pieces lock in one by one, in
+     step with the game's own stagger, then the whole answer releases a
+     shock ring (U.impact flavor 'build', with the crack/thump on the ding).
+     On a wrong answer the wrong pieces crack with a little dust and the
+     right ones glow faintly: they stay anchored.
+
+       U.impactChain(pieces, { outcome, stagger, combo, sharp, container, isRight })
+         outcome   'hit' | 'recover' | 'miss'
+         stagger   ms between pieces — the game's own green/red stagger
+         container the whole answer (where the release lands)
+         isRight   (el, i) => bool, for 'miss': which pieces were right
+
+     Never adds delay: it only follows timings the game already has. */
+  impactChain(pieces, { outcome = 'hit', stagger = 55, combo = 1, sharp = false, container = null, isRight = null } = {}) {
+    if (typeof document === 'undefined' || !document.body) return null;
+    const list = Array.from(pieces || []);
+    const M = window.BoohaMotion || null;
+    const reduced = !!(M && M.reduced && M.reduced());
+    const power = (M && M.power && M.power()) || 'full';
+    const kinds = UTILS._chainPlan({ outcome, rights: list.map((el, i) => (outcome === 'miss' ? !!(isRight && isRight(el, i)) : true)) });
+    const node = (cls, x, y) => {
+      const n = document.createElement('i');
+      n.className = 'bimp ' + cls; n.setAttribute('aria-hidden', 'true');
+      n.style.left = x + 'px'; n.style.top = y + 'px';
+      document.body.appendChild(n);
+      return n;
+    };
+    const anim = (n, frames, ms) => {
+      if (n.animate) n.animate(frames, { duration: ms, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+      setTimeout(() => n.remove(), ms + 40);
+    };
+    const mini = (el, kind) => {
+      const r = el && el.isConnected !== false && el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+      if (!r || !r.width) return;
+      const f = node('bimp-flash ' + (kind === 'crack' ? 'dull' : kind === 'anchor' ? 'anchor' : (outcome === 'recover' ? 'rec' : 'lock')), r.left, r.top);
+      f.style.width = r.width + 'px'; f.style.height = r.height + 'px';
+      anim(f, [{ opacity: 0 }, { opacity: kind === 'anchor' ? .25 : .55, offset: .25 }, { opacity: 0 }], 200);
+      if (reduced) return;
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      if (kind === 'lock') {
+        const ring = node('bimp-ring mini' + (outcome === 'recover' ? ' rec' : ''), cx, cy);
+        anim(ring, [{ transform: 'scale(.3)', opacity: .9 }, { transform: 'scale(1.1)', opacity: 0 }], 200);
+      } else if (kind === 'crack' && power !== 'minimal') {
+        [-1, 1].forEach(side => {
+          const p = node('bimp-frag dust', cx, cy);
+          anim(p, [{ transform: 'translate(0,0) scale(1)', opacity: 1 },
+            { transform: `translate(${side * (10 + Math.random() * 8)}px, ${12 + Math.random() * 8}px) scale(.4)`, opacity: 0 }], 260);
+        });
+      }
+    };
+    list.forEach((el, i) => setTimeout(() => mini(el, kinds[i]), i * stagger));
+    const releaseAt = list.length * stagger + 20;
+    if (outcome !== 'miss') {
+      setTimeout(() => UTILS.impact({ source: container || list[list.length - 1], outcome, combo, sharp, flavor: 'build', squash: false }), releaseAt);
+    }
+    return { kinds, releaseAt };
+  },
+
+  /* Pure: per-piece effect for a built answer. */
+  _chainPlan({ outcome = 'hit', rights = [] } = {}) {
+    return rights.map(ok => (outcome === 'miss' ? (ok ? 'anchor' : 'crack') : 'lock'));
   },
 
   /* Pure: what an impact shows for an outcome, streak tier, sharpness and the
