@@ -24,7 +24,8 @@ const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
 /* Games Pass 4: combo / sharp / points. A fixed answer after a miss earns +50. */
-const run = U.createRun({ total: 15, recoverPoints: 50 });
+// Razzle-dazzle Pass 5: on the full impact kit (words lock in, sentence releases).
+const run = U.createRun({ total: 15, recoverPoints: 50, impactKit: true });
 
 U.unlockAudio();
 
@@ -1020,7 +1021,11 @@ function resolveCorrect(chips) {
   });
 
   const isRecovery = recoveryActive;
-  if (isRecovery) run.recover(); else run.hit();
+  const res = (isRecovery ? run.recover() : run.hit()) || {};
+  // Energy runs through the sentence: each word locks in as it turns green
+  // (same 55 ms stagger), then the whole sentence releases on the ding.
+  U.impactChain(chips, { outcome: isRecovery ? 'recover' : 'hit', stagger: 55,
+    combo: res.combo || 1, sharp: !!res.sharp, container: answerEl });
   const bankBefore = recoveryBank;
   if (isRecovery) {
     recoveredItems.add(idx);
@@ -1049,7 +1054,7 @@ function resolveCorrect(chips) {
 
   setTimeout(() => {
     U.playSFX('ding', () => {
-      if (!isRecovery) fireSparkles(answerEl, false);
+      // (Razzle-dazzle Pass 5: the lock-in + release replaced these sparkles.)
 
       Array.from(answerEl.querySelectorAll('.so-placed-chip')).forEach((chip, i) => {
         setTimeout(() => {
@@ -1101,6 +1106,9 @@ function resolveWrong() {
       chip.classList.add(placed[pi] === pi ? 'so-correct' : 'so-wrong');
     }, pi * 55);
   });
+  // Wrong words crack with a little dust; right ones glow: they stay anchored.
+  U.impactChain(chips, { outcome: 'miss', stagger: 55,
+    isRight: chip => placed[Number(chip.dataset.pi)] === Number(chip.dataset.pi) });
 
   feedbackEl.textContent = isFinalAttempt
     ? 'Tough one — the answer is shown, then we move on.'

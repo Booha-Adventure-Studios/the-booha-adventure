@@ -22,7 +22,8 @@ const U   = window.GAME_UTILS;
 if (!CFG || !U) return;
 
 /* Games Pass 4: combo / sharp / points. A fixed answer after a miss earns +50. */
-const run = U.createRun({ total: 15, recoverPoints: 50 });
+// Razzle-dazzle Pass 5: on the full impact kit (letters lock in, word releases).
+const run = U.createRun({ total: 15, recoverPoints: 50, impactKit: true });
 
 U.unlockAudio();
 
@@ -988,7 +989,12 @@ function resolveCorrect(card, slotEls) {
   });
 
   const isRecovery = recoveryActive;
-  if (isRecovery) run.recover(); else run.hit();
+  const res = (isRecovery ? run.recover() : run.hit()) || {};
+  // Each letter locks in as it turns green (same 55 ms stagger), then the
+  // whole word releases a shock ring on the ding. A scoring recovery gets
+  // the blue-gold version.
+  U.impactChain(slotEls, { outcome: isRecovery ? 'recover' : 'hit', stagger: 55,
+    combo: res.combo || 1, sharp: !!res.sharp, container: slotsEl });
   const bankBefore = recoveryBank;
   if (isRecovery) {
     recoveredItems.add(idx);
@@ -1017,8 +1023,8 @@ function resolveCorrect(card, slotEls) {
   /* 2. ding after slots finish */
   setTimeout(() => {
     U.playSFX('ding', () => {
-      /* 3. confetti */
-      fireConfetti(false);
+      /* 3. (Razzle-dazzle Pass 5: the lock-in + release replaced the
+            per-word confetti; the end-of-game confetti stays.) */
 
       /* 3. dance on slots */
       Array.from(slotsEl.querySelectorAll('.sw-slot')).forEach((sl, i) => {
@@ -1069,6 +1075,9 @@ function resolveWrong(card, slotEls) {
       sl.classList.add(placed[i] && placed[i].letter === target[i] ? 'sw-correct' : 'sw-wrong');
     }, i * 50);
   });
+  // Wrong letters crack with a little dust; right ones glow: they stay anchored.
+  U.impactChain(slotEls, { outcome: 'miss', stagger: 50,
+    isRight: (el, i) => !!(placed[i] && placed[i].letter === target[i]) });
 
   feedbackEl.textContent = isFinalAttempt
     ? 'Tough one — the answer is shown, then we move on.'
