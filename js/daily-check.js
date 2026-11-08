@@ -282,6 +282,19 @@ window.BoohaDailyCheck = (function () {
     return true;
   }
 
+  /* The streak, labelled the same way everywhere (Daily Check result and the
+     opening stamp). Seasons show it as candy or gifts, but always say it is
+     the check-in streak, so "ギフト 1個" never reads as an awarded item. */
+  function streakLabel(n, season) {
+    const count = Math.max(0, Number(n) || 0);
+    const s = season === undefined
+      ? (typeof document !== 'undefined' && document.documentElement ? document.documentElement.dataset.season : '')
+      : season;
+    if (s === 'halloween') return `チェックれんぞく · キャンディ ${count}個`;
+    if (s === 'christmas') return `チェックれんぞく · ギフト ${count}個`;
+    return `チェックれんぞく ✓ ${count}日`;
+  }
+
   /* Consecutive completed check-ins, ending today or yesterday. */
   function streak() {
     const meta = _meta();
@@ -944,12 +957,7 @@ window.BoohaDailyCheck = (function () {
           sub.textContent = `${pct}%  ·  ${content.curr.toUpperCase()}`; root.appendChild(sub);
 
           const streakEl = document.createElement('div'); streakEl.className = 'dc-streak';
-          const season = document.documentElement.dataset.season;
-          streakEl.textContent = season === 'halloween'
-            ? `キャンディ ${st}個`
-            : season === 'christmas'
-              ? `ギフト ${st}個`
-              : `✓ ${st}日`;
+          streakEl.textContent = streakLabel(st);
           root.appendChild(streakEl);
 
           const b = document.createElement('button');
@@ -1045,7 +1053,7 @@ window.BoohaDailyCheck = (function () {
   /* ── Public surface ──────────────────────────────────────────────────── */
   return {
     // state
-    isDoneToday, recordFor, todaySummary, todayState, streak, knownCurr, todayKey,
+    isDoneToday, recordFor, todaySummary, todayState, streak, streakLabel, knownCurr, todayKey,
     // records
     markDone: (pct, curr) => write('done', pct, curr),
     // "Skip today", confirmed by the student. Never written into checkIn.

@@ -1704,6 +1704,13 @@ else
   bad "Fixes-pass audit failed"
 fi
 
+echo "[labels] Sharp chip and Daily Check streak label"
+if node tests/labels-pass-audit.cjs >/dev/null 2>&1; then
+  ok "Labels pass audit passed (Sharp hidden at 0 and bilingual; one streak label)"
+else
+  bad "Labels pass audit failed"
+fi
+
 echo "[daily check] opening states and event log"
 if node tests/daily-check-states.test.cjs >/dev/null 2>&1; then
   ok "Daily Check states passed (pending/done/skipped/failed; × never grants entry; events kept apart)"

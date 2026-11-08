@@ -79,6 +79,26 @@
   var tierAudio = null;
   var timers = [];
 
+  /* Chips under the points. Sharp = a correct answer inside the item's
+     target time (+25 points each, js/game-utils.js). It is shown only when
+     earned ("Sharp 0" read as a failure), bilingual, with its meaning in the
+     accessible label. Pure, so tests can check it without a DOM. */
+  function runChips(run, fullCombo) {
+    var chips = [{ cls: 'bsc-chip', text: 'Best combo ' + run.maxCombo }];
+    var n = Number(run.sharp) || 0;
+    if (n > 0) {
+      chips.push({
+        cls: 'bsc-chip bsc-chip-sharp',
+        text: 'はやい ×' + n + ' · Sharp',
+        aria: 'Sharp: ' + n + ' fast correct answer' + (n === 1 ? '' : 's') +
+          ', +25 points each. はやく せいかい ' + n + 'かい',
+        title: 'Fast correct answers: +25 points each'
+      });
+    }
+    if (fullCombo) chips.push({ cls: 'bsc-chip bsc-chip-crown', text: '♛ Crown' });
+    return chips;
+  }
+
   function tierFor(correct, total, fullCombo) {
     var s = total > 0 ? (correct / total) * 15 : 0;
     if (s >= 15) return fullCombo === true ? 'legend' : 'perfect';
@@ -280,9 +300,12 @@
       }
       if (run) {
         var chips = el('div', 'bsc-chips');
-        chips.appendChild(el('span', 'bsc-chip', 'Best combo ' + run.maxCombo));
-        chips.appendChild(el('span', 'bsc-chip', 'Sharp ' + run.sharp));
-        if (fullCombo) chips.appendChild(el('span', 'bsc-chip bsc-chip-crown', '♛ Crown'));
+        runChips(run, fullCombo).forEach(function (c) {
+          var chip = el('span', c.cls, c.text);
+          if (c.aria) chip.setAttribute('aria-label', c.aria);
+          if (c.title) chip.title = c.title;
+          chips.appendChild(chip);
+        });
         card.appendChild(chips);
       }
     }
@@ -360,7 +383,7 @@
     return { tier: key, stars: stars, rainbow: rainbow, close: close };
   }
 
-  var api = { show: show, close: close, tierFor: tierFor, TIERS: TIERS };
+  var api = { show: show, close: close, tierFor: tierFor, runChips: runChips, TIERS: TIERS };
   window.BoohaScorecard = api;
   if (window.GAME_UTILS) {
     window.GAME_UTILS.showScorecard = function (opts) { return show(opts); };
