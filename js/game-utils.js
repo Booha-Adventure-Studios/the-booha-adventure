@@ -883,7 +883,9 @@ const UTILS = {
                   'build'  (Spell the Word / Sentence Order release, via
                            U.impactChain: no bolt, the ring lands on the
                            whole answer)
-                  a later pass adds 'match'
+                  'match'  (Vocab Tap / Sentence Tap: each graded slot lights
+                           like a connected rune — a turning diamond + ring;
+                           U.impactRound adds one finisher per round)
          squash   false when the game already animates the answer button
 
      Escalation: combo 1–2 a tight hit (4 fragments); 3–5 a stronger ring;
@@ -995,6 +997,12 @@ const UTILS = {
       play(p, [{ transform: 'translate(0,0) scale(1)', opacity: 1 },
         { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d + (plan.fragClass === 'dust' ? 14 : 0)}px) scale(.4)`, opacity: 0 }], 300);
     }
+    // 5b. Match: a rune (turning diamond) on the graded slot.
+    if (flavor === 'match' && plan.ring) {
+      const rune = fx('bimp-rune ' + plan.ring, at.x, at.y);
+      play(rune, [{ transform: 'rotate(45deg) scale(.4)', opacity: 1 }, { transform: 'rotate(135deg) scale(1.15)', opacity: .9, offset: .5 },
+        { transform: `rotate(180deg) scale(${(plan.ringScale * .7).toFixed(2)})`, opacity: 0 }], 260);
+    }
     // 6. Sharp: a critical-hit star.
     if (plan.crit) {
       const c = fx('bimp-crit', at.x, at.y - 6);
@@ -1060,6 +1068,22 @@ const UTILS = {
       setTimeout(() => UTILS.impact({ source: container || list[list.length - 1], outcome, combo, sharp, flavor: 'build', squash: false }), releaseAt);
     }
     return { kinds, releaseAt };
+  },
+
+  /* Razzle-dazzle Pass 6: one finisher after a Tap round's grading cascade,
+     sized by how many matches were right (0 = nothing, all = biggest, with
+     the critical star). Lands on the whole slot board, inside the game's
+     existing end-of-round pause. */
+  impactRound(container, correct, total = 5) {
+    const t = UTILS._roundTier(correct, total);
+    if (!t.combo || !container) return null;
+    return UTILS.impact({ source: container, outcome: 'hit', combo: t.combo, sharp: t.perfect, flavor: 'match', squash: false });
+  },
+  _roundTier(correct, total = 5) {
+    const c = Math.max(0, Number(correct) || 0), n = Math.max(1, Number(total) || 5);
+    if (!c) return { combo: 0, perfect: false };
+    const f = c / n;
+    return { combo: f >= 1 ? 10 : f >= .8 ? 6 : f >= .4 ? 3 : 1, perfect: c >= n };
   },
 
   /* Pure: per-piece effect for a built answer. */

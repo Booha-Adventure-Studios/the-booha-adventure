@@ -145,7 +145,7 @@ const plain = o => JSON.parse(JSON.stringify(o));
   assert.match(vs, /\? \(streak === 15 \? 620 : 560\)\s*: 320;/, 'next-question timing unchanged (320 ms)');
   for (const f of ['vocab-tap', 'sentence-tap']) {
     const src = read(`games/${f}.js`);
-    assert.strictEqual((src.match(/window\.__brunTap = \{ el, t: performance\.now\(\) \};\s*run\.(hit\(checkedAt\)|miss\(\));/g) || []).length, 2,
+    assert.strictEqual((src.match(/window\.__brunTap = \{ el, t: performance\.now\(\) \};\s*(const hit = )?run\.(hit\(checkedAt\)|miss\(\))/g) || []).length, 2,
       `${f}: combo sparks come from each graded slot (hit and miss), not the Check button`);
   }
   const css = read('theme/game.css');
@@ -360,4 +360,54 @@ const plain = o => JSON.parse(JSON.stringify(o));
   }
 }
 
-console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game, Sentence Speed wave, listening-game sound waves, built answers lock in.');
+// ── 9. Pass 6: Tap games — runes per match, one round finisher ──
+{
+  const U = makeCtx();
+  const slot = box(200, 300, 140, 56);
+  U.impact({ source: slot, outcome: 'hit', combo: 1, flavor: 'match', squash: false });
+  const rune = nodes.find(n => /bimp-rune/.test(n.className));
+  assert(rune && /t1/.test(rune.className), 'a correct match lights a rune');
+  assert.deepStrictEqual([rune.style.left, rune.style.top], ['270px', '328px'], 'on the graded slot');
+  assert(!nodes.some(n => /bimp-bolt|bimp-wave|bimp-arc/.test(n.className)), 'no bolt/wave/arcs');
+  const keys = new Set(); rune.anims[0].frames.forEach(f => Object.keys(f).forEach(k => keys.add(k))); keys.delete('offset');
+  assert.deepStrictEqual([...keys].sort(), ['opacity', 'transform']);
+  assert(rune.anims[0].opts.duration <= 320);
+
+  const Ua = makeCtx();
+  Ua.impact({ source: slot, outcome: 'hit', combo: 10, flavor: 'match', squash: false });
+  assert(nodes.some(n => /bimp-rune t4/.test(n.className)), 'runes climb with the streak');
+  const Ub = makeCtx();
+  Ub.impact({ source: slot, outcome: 'miss', flavor: 'match', squash: false });
+  assert(!nodes.some(n => /bimp-rune|bimp-ring/.test(n.className)), 'a wrong link is only a dusty poof');
+  const Uc = makeCtx({ reduced: true, power: 'full' });
+  Uc.impact({ source: slot, outcome: 'hit', combo: 6, flavor: 'match' });
+  assert(!nodes.some(n => /bimp-rune/.test(n.className)), 'reduced motion: no turning rune');
+
+  // Round finisher: sized by correct matches, nothing for 0, crit for a perfect round.
+  const Ud = makeCtx();
+  const T = (c, n) => plain(Ud._roundTier(c, n));
+  assert.deepStrictEqual([0, 1, 2, 3, 4, 5].map(c => T(c, 5).combo), [0, 1, 3, 3, 6, 10]);
+  assert.deepStrictEqual([T(4, 5).perfect, T(5, 5).perfect], [false, true]);
+  const board = box(20, 250, 360, 330);
+  assert.strictEqual(Ud.impactRound(board, 0, 5), null, '0 correct: no finisher');
+  assert.strictEqual(nodes.length, 0);
+  Ud.impactRound(board, 5, 5);
+  assert(nodes.some(n => /bimp-ring t4/.test(n.className)) && nodes.some(n => /bimp-crit/.test(n.className)), 'perfect round: the biggest blast and the critical star');
+  const fin = nodes.find(n => /bimp-ring/.test(n.className));
+  assert.deepStrictEqual([fin.style.left, fin.style.top], ['200px', '415px'], 'centred on the slot board');
+  const Ue = makeCtx();
+  Ue.impactRound(board, 2, 5);
+  assert(nodes.some(n => /bimp-ring t2/.test(n.className)) && !nodes.some(n => /bimp-crit/.test(n.className)), '2 of 5: a modest finisher');
+
+  // Wiring.
+  for (const f of ['vocab-tap', 'sentence-tap']) {
+    const src = read(`games/${f}.js`);
+    assert.match(src, /U\.createRun\(\{ total: 15, recoverPoints: 0, impactKit: true \}\)/, `${f}: on the full kit`);
+    assert.match(src, /const hit = run\.hit\(checkedAt\) \|\| \{\};[\s\S]{0,120}U\.impact\(\{ source: el, outcome: 'hit', combo: hit\.combo \|\| 1, sharp: !!hit\.sharp, flavor: 'match', squash: false \}\);/, `${f}: rune per match`);
+    assert.match(src, /run\.miss\(\);\s*U\.impact\(\{ source: el, outcome: 'miss', flavor: 'match', squash: false \}\);/, `${f}: poof per wrong link`);
+    assert.match(src, /U\.impactRound\(jpSlots, roundScore, slotEls\.length\);\s*score \+= roundScore;/, `${f}: one finisher after the cascade`);
+    assert.match(src, /const REVEAL_OK_MS = 220, REVEAL_MISS_MS = 300, REVEAL_END_MS = 350;/, `${f}: cascade timing unchanged`);
+  }
+}
+
+console.log('Impact kit test passed: escalation, smaller misses, sharp crit, tiers, ≤320 ms, no input delay, pilot wiring, contact for every tracker game, Sentence Speed wave, listening-game sound waves, built answers lock in, Tap-game runes and round finisher.');

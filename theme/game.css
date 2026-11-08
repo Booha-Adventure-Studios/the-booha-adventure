@@ -1271,3 +1271,10 @@ html.bsc-open .brun-hud, html.bsc-open .brun-banner, html.bsc-open .brun-edge { 
 .bimp-ring.mini { width: 36px; height: 36px; margin: -18px 0 0 -18px; border-width: 2px; }
 .bimp-flash.lock { border-radius: 12px; background: radial-gradient(ellipse at center, rgba(255,255,255,.9), rgba(255,226,122,.6) 60%, rgba(255,226,122,0) 85%); }
 .bimp-flash.anchor { border-radius: 12px; background: radial-gradient(ellipse at center, rgba(120,255,170,.7), rgba(120,255,170,0) 80%); }
+
+/* ── Razzle-dazzle Pass 6: Tap games' connected runes (flavor 'match') ── */
+.bimp-rune { width: 34px; height: 34px; margin: -17px 0 0 -17px; opacity: 0; border: 2px solid #a8f0ff;
+  box-shadow: 0 0 10px rgba(120,220,255,.8), inset 0 0 8px rgba(120,220,255,.5); }
+.bimp-rune.t2 { border-color: #c9f6ff; }
+.bimp-rune.t3 { border-width: 3px; border-color: #fff3c4; box-shadow: 0 0 14px rgba(255,214,90,.85), inset 0 0 10px rgba(255,214,90,.5); }
+.bimp-rune.t4 { border-width: 3px; border-color: #fff; box-shadow: 0 0 18px rgba(255,170,50,.95), inset 0 0 12px rgba(255,214,90,.6); }
