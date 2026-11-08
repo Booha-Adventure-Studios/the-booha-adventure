@@ -151,7 +151,8 @@ const CURRENT_CACHES = {
   // Labels pass: one Daily Check streak label on the opening stamp (index).
   // Step 5: Adventure Log summary card under the companion (profile.html).
   // Step 5 fixes: daily-check.js before profile-game.js; Maze/Blitz choice.
-  pages:  'booha-pages-2026-529',
+  // Summary buttons: accessible names, 44px choice buttons (profile.html).
+  pages:  'booha-pages-2026-530',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

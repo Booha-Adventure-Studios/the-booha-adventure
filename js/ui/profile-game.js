@@ -314,22 +314,26 @@ const BoohaProfileGame = (() => {
       let i = w.stars.findIndex(v => v == null);
       if (i < 0) i = w.stars.findIndex(v => v < 2);
       const g = s.games[i] || s.games[0];
-      mazeOpt = { kind: 'games', jp: `${g.name} を あそぼう`, en: `Play ${g.name}`, sub: `あと ${arcadeLeft}つ ★★ で アーケード` };
+      mazeOpt = { kind: 'games', jp: `${g.name} を あそぼう`, en: `Play ${g.name}`, sub: `あと ${arcadeLeft}つ ★★ で アーケード`,
+        label: `${g.name}へ · Go to ${g.name}` };
     }
     const blitzOpt = blitzLeft > 0
       ? { kind: 'blitz', jp: 'Blitz を あそぼう', en: 'Play a Blitz',
-          sub: skinLeft > 0 ? `あと ${skinLeft}つ で ${skin.name}` : `あと ${blitzLeft}つ · +3★ each` }
+          sub: skinLeft > 0 ? `あと ${skinLeft}つ で ${skin.name}` : `あと ${blitzLeft}つ · +3★ each`,
+          label: 'Blitzへ · Go to Blitz' }
       : null;
 
     let next;
     if (dcState === 'pending') {
-      next = { kind: 'daily', jp: 'きょうの チェックを しよう', en: 'Do today’s Daily Check', sub: '5ふん · +2★' };
+      next = { kind: 'daily', jp: 'きょうの チェックを しよう', en: 'Do today’s Daily Check', sub: '5ふん · +2★',
+        label: 'デイリーチェックへ · Go to the Daily Check' };
     } else if (mazeOpt && blitzOpt) {
       next = { kind: 'choice', jp: 'どちらからでも OK！', en: 'Maze or Blitz — any order', sub: '', options: [mazeOpt, blitzOpt] };
     } else if (mazeOpt || blitzOpt) {
       next = mazeOpt || blitzOpt;
     } else if (ready < n) {
-      next = { kind: 'games', jp: 'にじいろ★を ねらおう', en: 'Go for rainbow stars', sub: `じゅんび ${ready} / ${n}` };
+      next = { kind: 'games', jp: 'にじいろ★を ねらおう', en: 'Go for rainbow stars', sub: `じゅんび ${ready} / ${n}`,
+        label: 'ゲームへ · Go to this week’s games' };
     } else {
       next = { kind: 'none', jp: 'こんしゅう ぜんぶ クリア！', en: 'Everything done this week!', sub: 'すごい！' };
     }
@@ -405,14 +409,16 @@ const BoohaProfileGame = (() => {
     try { dcState = BoohaDailyCheck.todayState(); } catch (_) {}
     const sum = summaryFor(s, dcState);
     const nx = sum.next;
-    const goBtn = (kind, idx) =>
-      `<button type="button" class="pg-sum-go" data-i="${idx}">${kind === 'daily' ? 'チェック' : 'いく'} <span aria-hidden="true">→</span></button>`;
-    const go = nx.kind === 'none' || nx.kind === 'choice' ? '' : goBtn(nx.kind, -1);
+    // Each button names where it goes ("Vocabulary Tapへ", "Blitzへ"), so
+    // screen readers can tell the side-by-side choices apart.
+    const goBtn = (opt, idx) =>
+      `<button type="button" class="pg-sum-go" data-i="${idx}" aria-label="${esc(opt.label)}">${opt.kind === 'daily' ? 'チェック' : 'いく'} <span aria-hidden="true">→</span></button>`;
+    const go = nx.kind === 'none' || nx.kind === 'choice' ? '' : goBtn(nx, -1);
     const choices = nx.kind === 'choice'
       ? `<div class="pg-sum-choices">${nx.options.map((o, i) => `
           <div class="pg-sum-choice ${o.kind}">
             <div class="pg-sum-copy"><b>${phrases(o.jp)}</b><span>${phrases(o.sub)}</span></div>
-            ${goBtn(o.kind, i)}
+            ${goBtn(o, i)}
           </div>`).join('')}</div>`
       : '';
     const pills = sum.progress.map(p =>
