@@ -4,6 +4,8 @@
  *
  * Mounts (profile.html):
  *   #pg-hero        companion card: seasonal/selected Booha, name, rank coin, level bar
+ *   #pg-summary     child-first summary: next action (with a button that goes
+ *                   there), this week's progress, the nearest unlock
  *   #pg-skin        this week's Blitz skin
  *   #pg-trail       this week's trail: two parallel tracks, side by side —
  *                   9 maze games → arcade chest, and 3 Blitz → skin
@@ -286,6 +288,121 @@ const BoohaProfileGame = (() => {
           <p class="pg-level-next">${esc(nextLine)}${lv.max ? '' : ` <img src="${profileArt(`rank-coin-${lv.level + 1}.webp`)}" alt="" width="22" height="22">`}</p>
         </div>
       </div>`;
+  }
+
+  /* ── summary card (step 5, 2026-11-08) ─────────────────────────
+     A short first view under the companion card: what to do next (with a
+     button that goes there), this week's progress, and the nearest unlock.
+     Everything below stays as it was; this only answers "what now?".
+     Next-action order: today's Daily Check if it is still pending (a skip or
+     a technical problem is respected, not pushed), then the maze toward the
+     arcade, then Blitz toward the week's skin, then rainbow stars. The unlock
+     shown is the closest one, by the fraction still left. */
+  function summaryFor(s, dcState) {
+    const w = s.week;
+    const n = s.games.length;
+    const arcadeLeft = s.arcadeOpen ? 0 : Math.max(0, n - w.twoStarCount);
+    const skin = s.weeklySkin;
+    const blitzLeft = skin && !skin.unlocked ? Math.max(0, 3 - w.blitzCount) : 0;
+    const ready = readyCount(s);
+
+    let next;
+    if (dcState === 'pending') {
+      next = { kind: 'daily', jp: 'きょうの チェックを しよう', en: 'Do today’s Daily Check', sub: '5ふん · +2★' };
+    } else if (arcadeLeft > 0) {
+      let i = w.stars.findIndex(v => v == null);
+      if (i < 0) i = w.stars.findIndex(v => v < 2);
+      const g = s.games[i] || s.games[0];
+      next = { kind: 'games', jp: `${g.name} を あそぼう`, en: `Play ${g.name}`, sub: `あと ${arcadeLeft}つ ★★ で アーケード` };
+    } else if (blitzLeft > 0) {
+      next = { kind: 'blitz', jp: 'Blitz を あそぼう', en: 'Play a Blitz', sub: `あと ${blitzLeft}つ で ${skin.name}` };
+    } else if (ready < n) {
+      next = { kind: 'games', jp: 'にじいろ★を ねらおう', en: 'Go for rainbow stars', sub: `じゅんび ${ready} / ${n}` };
+    } else {
+      next = { kind: 'none', jp: 'こんしゅう ぜんぶ クリア！', en: 'Everything done this week!', sub: 'すごい！' };
+    }
+
+    const progress = [
+      { key: 'maze', jp: 'めいろ ★★', value: `${w.twoStarCount}/${n}`, done: w.twoStarCount >= n },
+      { key: 'blitz', jp: 'ブリッツ', value: `${w.blitzCount}/3`, done: w.blitzCount >= 3 },
+      { key: 'daily', jp: 'チェック', value: `${s.dailyThisWeek}日`, done: false },
+    ];
+
+    const candidates = [];
+    if (arcadeLeft > 0) {
+      candidates.push({ key: 'arcade', jp: 'アーケード', left: arcadeLeft, unit: 'つ ★★',
+        frac: arcadeLeft / n, img: profileArt('treasure-chest-closed.webp') });
+    }
+    if (blitzLeft > 0) {
+      candidates.push({ key: 'skin', jp: skin.name, left: blitzLeft, unit: 'つ Blitz',
+        frac: blitzLeft / 3, img: skin.src });
+    }
+    const lv = s.level;
+    if (lv && !lv.max && lv.span > 0) {
+      candidates.push({ key: 'level', jp: `Lv ${lv.level + 1} コイン`, left: lv.toNext, unit: '★',
+        frac: lv.toNext / lv.span, img: profileArt(`rank-coin-${lv.level + 1}.webp`) });
+    }
+    candidates.sort((a, b) => a.frac - b.frac);
+    return { next, progress, unlock: candidates[0] || null };
+  }
+
+  function goNext(kind, s) {
+    if (kind === 'daily') {
+      const sec = document.querySelector('.pg-daily');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const b = document.querySelector('.dc-today-action');
+      if (b) setTimeout(() => { try { b.focus({ preventScroll: true }); } catch (_) {} }, 450);
+      return;
+    }
+    if (kind === 'blitz') {
+      // The hub's Blitz arcade: return to the hub and scroll to it.
+      try {
+        sessionStorage.setItem('booha_return_to_hub', '1');
+        sessionStorage.setItem('booha_scroll_to_blitz', '1');
+      } catch (_) {}
+      window.location.href = 'index.html';
+      return;
+    }
+    if (kind === 'games') {
+      const cw = window.CALENDAR && CALENDAR.getCurrentCurriculumWeek ? CALENDAR.getCurrentCurriculumWeek() : null;
+      if (!cw) return;
+      const slug = `${s.curr}_${String(cw.monthSlug).slice(0, 3)}_w${cw.weekNumber}`;
+      window.location.href = `curriculum/${s.curr}/games-index.html?week=${encodeURIComponent(slug)}`;
+    }
+  }
+
+  // Japanese lines break only between phrases, never mid-word ("し｜よう").
+  const phrases = text => String(text).split(' ').map(w => `<span class="nw">${esc(w)}</span>`).join(' ');
+
+  function renderSummary(s) {
+    const host = document.getElementById('pg-summary');
+    if (!host) return;
+    let dcState = 'done';
+    try { if (window.BoohaDailyCheck && BoohaDailyCheck.todayState) dcState = BoohaDailyCheck.todayState(); } catch (_) {}
+    const sum = summaryFor(s, dcState);
+    const nx = sum.next;
+    const go = nx.kind === 'none' ? ''
+      : `<button type="button" class="pg-sum-go">${nx.kind === 'daily' ? 'チェック' : 'いく'} <span aria-hidden="true">→</span></button>`;
+    const pills = sum.progress.map(p =>
+      `<span class="pg-sum-pill ${p.key}${p.done ? ' done' : ''}"><small>${esc(p.jp)}</small><b>${esc(p.value)}</b></span>`).join('');
+    const u = sum.unlock;
+    host.innerHTML = `
+      <div class="pg-sum-next ${nx.kind}">
+        <div class="pg-sum-copy">
+          <span class="pg-kicker gold">NEXT · つぎは</span>
+          <b>${phrases(nx.jp)}</b>
+          <span>${phrases(nx.en)} · ${phrases(nx.sub)}</span>
+        </div>
+        ${go}
+      </div>
+      <div class="pg-sum-progress" aria-label="This week">${pills}</div>
+      ${u ? `<div class="pg-sum-unlock ${u.key}">
+        <img src="${esc(u.img)}" alt="" width="40" height="40">
+        <div><span class="pg-kicker">もうすぐ · SOON</span><b>${esc(u.jp)}</b></div>
+        <span class="pg-sum-left">あと ${u.left}${esc(u.unit)}</span>
+      </div>` : ''}`;
+    const btn = host.querySelector('.pg-sum-go');
+    if (btn) btn.addEventListener('click', () => goNext(nx.kind, s));
   }
 
   /* ── weekly Blitz skin ──────────────────────────────────────── */
@@ -863,6 +980,7 @@ const BoohaProfileGame = (() => {
     }
     [
       [renderHero, 'pg-hero', 'Your adventure card'],
+      [renderSummary, 'pg-summary', 'Next step'],
       [renderSkin, 'pg-skin', 'This week’s skin'],
       [renderTrail, 'pg-trail', 'This week’s trail'],
       [renderBonusGames, 'pg-extras', 'Bonus games'],
@@ -881,11 +999,12 @@ const BoohaProfileGame = (() => {
   else document.addEventListener('booha:ready', render, { once: true });
   document.addEventListener('booha:dayRecorded', render);
   document.addEventListener('booha:checkIn', render);
+  document.addEventListener('booha:dailyCheckEvent', render);
   document.addEventListener('booha:profileCurr', render);
   document.addEventListener('booha:medalEarned', render);
   document.addEventListener('booha:postcardUpdated', render);
 
-  return { render, _test: { kindFor, nodePos, speech, sealedKey } };
+  return { render, _test: { kindFor, nodePos, speech, sealedKey, summaryFor } };
 })();
 
 window.BoohaProfileGame = BoohaProfileGame;

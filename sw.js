@@ -149,7 +149,8 @@ const CURRENT_CACHES = {
   // Daily Check opening: pending / done / skipped / failed states, confirmed
   // Skip today, hub reminder, Adventure Log event marks (index + profile).
   // Labels pass: one Daily Check streak label on the opening stamp (index).
-  pages:  'booha-pages-2026-527',
+  // Step 5: Adventure Log summary card under the companion (profile.html).
+  pages:  'booha-pages-2026-528',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
