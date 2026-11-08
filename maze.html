@@ -1111,15 +1111,15 @@
   <div id="overlay1" class="overlay entryOverlay blitz-incomplete" aria-label="Maze entry briefing">
     <div class="entryShell">
       <div class="entryStateMark" id="mazeStateMark" aria-hidden="true">✦</div>
-      <p class="entryEyebrow" id="mazeStatusKicker">BLITZ BEFORE THE MAZE</p>
-      <h1 class="entryTitleEn" id="mazeQuestion">Your warm-up is waiting.</h1>
-      <p class="entryTitleJp" id="mazeQuestionJp"><ruby>準備<rt>じゅんび</rt></ruby>は まだ <ruby>終<rt>お</rt></ruby>わっていないよ。</p>
+      <p class="entryEyebrow" id="mazeStatusKicker">OPTIONAL WARM-UP</p>
+      <h1 class="entryTitleEn" id="mazeQuestion">Want a quick warm-up?</h1>
+      <p class="entryTitleJp" id="mazeQuestionJp">さきに ウォームアップ する？</p>
       <div class="entryPlayer">
         <span id="mazeNameLead">Hey,</span>&nbsp;<strong id="mazeEntryName">PLAYER</strong><span id="mazeNameTail">.</span>
         <span class="entryPlayerJp" id="mazeEntryNameJp"><ruby>きみ<rt>君</rt></ruby>の <ruby>冒険<rt>ぼうけん</rt></ruby>が <ruby>待<rt>ま</rt></ruby>っているよ。</span>
       </div>
-      <p class="entryMessageEn" id="mazeEntryMessageEn">Finish the 3 Blitz games first. You’ll be sharper when you enter.</p>
-      <p class="entryMessageJp" id="mazeEntryMessageJp"><ruby>3<rt>さん</rt></ruby>つの ブリッツを クリアしてから <ruby>入<rt>はい</rt></ruby>ろう。もっと たのしく なるよ。</p>
+      <p class="entryMessageEn" id="mazeEntryMessageEn">You can enter the Maze now, or sharpen up with Blitz first.</p>
+      <p class="entryMessageJp" id="mazeEntryMessageJp">いま めいろに <ruby>入<rt>はい</rt></ruby>っても いいし、さきに ブリッツで ウォームアップしても いいよ。</p>
       <div class="blitzProgress" aria-label="Blitz game progress">
         <div class="blitzProgressHead"><span id="blitzProgressCount">0 / 3 BLITZ GAMES</span><span id="blitzProgressLabel">READY WHEN YOU ARE</span></div>
         <div class="blitzPips">
@@ -1136,8 +1136,8 @@
         <div class="sparkleWrap">
           <div class="sparkleField" id="confirmSparkles" aria-hidden="true"></div>
           <button id="continueBtn" class="entryAction primary" type="button">
-            <span class="btnEn" id="continueBtnEn">Enter anyway</span>
-            <span class="btnJp" id="continueBtnJp"><ruby>先<rt>さき</rt></ruby>に めいろへ</span>
+            <span class="btnEn" id="continueBtnEn">Enter the Maze</span>
+            <span class="btnJp" id="continueBtnJp"><ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く</span>
           </button>
         </div>
       </div>
@@ -1568,15 +1568,20 @@ function personalizeMazeIntro() {
   const welcomeNameJp = document.querySelector('#mazeWelcomeNameJp span');
   if (welcomeNameJp) welcomeNameJp.textContent = name;
 
+  /* Blitz is an optional warm-up, never a gate: Enter the Maze is the
+     primary action in both states, and Play Blitz the secondary one. */
+  const rBtn = document.getElementById('returnBtn');
+  const cBtn = document.getElementById('continueBtn');
+  if (rBtn) { rBtn.classList.remove('primary'); rBtn.classList.add('secondary'); }
+  if (cBtn) { cBtn.classList.remove('secondary'); cBtn.classList.add('primary'); }
+  setText('continueBtnEn', 'Enter the Maze');
+  setHTML('continueBtnJp', '<ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く');
+
   if (blitzDone) {
-    const rBtn = document.getElementById('returnBtn');
-    const cBtn = document.getElementById('continueBtn');
-    if (rBtn) { rBtn.classList.remove('primary'); rBtn.classList.add('secondary'); }
-    if (cBtn) { cBtn.classList.remove('secondary'); cBtn.classList.add('primary'); }
     setText('mazeStateMark', '✓');
-    setText('mazeStatusKicker', 'BLITZ COMPLETE · MAZE ACCESS GRANTED');
-    setText('mazeQuestion', 'You earned your way in!');
-    setHTML('mazeQuestionJp', '<ruby>全部<rt>ぜんぶ</rt></ruby> クリア！ めいろへ いこう！');
+    setText('mazeStatusKicker', 'WARM-UP COMPLETE');
+    setText('mazeQuestion', 'You’re warmed up!');
+    setHTML('mazeQuestionJp', 'ウォームアップ かんりょう！ めいろへ いこう！');
     setText('mazeNameLead', 'Excellent work,');
     setText('mazeNameTail', '.');
     setHTML('mazeEntryNameJp', '<ruby>冒険<rt>ぼうけん</rt></ruby>の <ruby>準備<rt>じゅんび</rt></ruby>は できたよ。');
@@ -1585,27 +1590,19 @@ function personalizeMazeIntro() {
     setText('blitzProgressLabel', 'ALL CLEAR');
     setText('returnBtnEn', 'Back to hub');
     setHTML('returnBtnJp', '<ruby>戻<rt>もど</rt></ruby>る');
-    setText('continueBtnEn', 'Enter the Maze');
-    setHTML('continueBtnJp', '<ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く');
   } else {
-    const rBtn = document.getElementById('returnBtn');
-    const cBtn = document.getElementById('continueBtn');
-    if (rBtn) { rBtn.classList.remove('secondary'); rBtn.classList.add('primary'); }
-    if (cBtn) { cBtn.classList.remove('primary'); cBtn.classList.add('secondary'); }
     setText('mazeStateMark', '✦');
-    setText('mazeStatusKicker', 'BLITZ BEFORE THE MAZE');
-    setText('mazeQuestion', 'Your warm-up is waiting.');
-    setHTML('mazeQuestionJp', '<ruby>準備<rt>じゅんび</rt></ruby>は まだ <ruby>終<rt>お</rt></ruby>わっていないよ。');
+    setText('mazeStatusKicker', 'OPTIONAL WARM-UP');
+    setText('mazeQuestion', 'Want a quick warm-up?');
+    setHTML('mazeQuestionJp', 'さきに ウォームアップ する？');
     setText('mazeNameLead', 'Hey,');
     setText('mazeNameTail', '.');
     setHTML('mazeEntryNameJp', '<ruby>冒険<rt>ぼうけん</rt></ruby>が きみを <ruby>待<rt>ま</rt></ruby>っているよ。');
-    setText('mazeEntryMessageEn', completedCount ? `You’re ${completedCount} of 3 Blitz games in. Finish the warm-up before you enter.` : 'Finish the 3 Blitz games first. You’ll be sharper when you enter.');
-    setHTML('mazeEntryMessageJp', completedCount ? `あと <ruby>${3 - completedCount}<rt>${3 - completedCount}</rt></ruby>つの ブリッツを クリアしてから <ruby>入<rt>はい</rt></ruby>ろう。` : '<ruby>3<rt>さん</rt></ruby>つの ブリッツを クリアしてから <ruby>入<rt>はい</rt></ruby>ろう。もっと たのしく なるよ。');
+    setText('mazeEntryMessageEn', completedCount ? `You’ve cleared ${completedCount} of 3 Blitz. Enter the Maze now, or finish the warm-up first.` : 'You can enter the Maze now, or sharpen up with Blitz first.');
+    setHTML('mazeEntryMessageJp', completedCount ? `ブリッツ ${completedCount}/3 クリア！ いま めいろへ <ruby>行<rt>い</rt></ruby>っても、のこりで ウォームアップしても いいよ。` : 'いま めいろに <ruby>入<rt>はい</rt></ruby>っても いいし、さきに ブリッツで ウォームアップしても いいよ。');
     setText('blitzProgressLabel', completedCount ? 'KEEP GOING' : 'READY WHEN YOU ARE');
     setText('returnBtnEn', 'Play Blitz');
     setHTML('returnBtnJp', '<ruby>ブリッツ</ruby>へ');
-    setText('continueBtnEn', 'Enter anyway');
-    setHTML('continueBtnJp', '<ruby>先<rt>さき</rt></ruby>に めいろへ');
     if (rBtn) rBtn.addEventListener('click', () => sessionStorage.setItem('booha_scroll_to_blitz', '1'));
   }
 

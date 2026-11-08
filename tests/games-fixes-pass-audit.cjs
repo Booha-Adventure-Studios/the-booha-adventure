@@ -70,18 +70,26 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
   assert.match(sw, /classList\.toggle\('sw-word-wrap', fit < 18\)/, 'only an impossibly narrow screen wraps inside a word');
 }
 
-// ── 3. Profile trail: the skin path never runs through a Blitz node ──
+// ── 3. Profile trail: two parallel lanes (maze → arcade, Blitz → skin) ──
 {
   const pg = read('js/ui/profile-game.js');
-  assert(!/seg\(COLS\[1\], BLITZ_Y, COLS\[1\], SKIN_Y - 40/.test(pg), 'no straight drop through the middle Blitz labels');
-  assert.match(pg, /const GAPS = \[\(COLS\[0\] \+ COLS\[1\]\) \/ 2, \(COLS\[1\] \+ COLS\[2\]\) \/ 2\];/, 'the path drops from the gaps between nodes');
-  const BLITZ_Y = +pg.match(/const BLITZ_Y = (\d+);/)[1], SKIN_Y = +pg.match(/const SKIN_Y = (\d+);/)[1];
-  const elbow = BLITZ_Y + +pg.match(/const SKIN_ELBOW_Y = BLITZ_Y \+ (\d+);/)[1];
-  assert(elbow >= BLITZ_Y + 80, 'the join runs below the Blitz labels');
-  assert(elbow < SKIN_Y - 40, 'and above the skin');
+  const num = name => +pg.match(new RegExp(`const ${name} = (\\d+);`))[1];
+  const ys = pg.match(/const BLITZ_YS = \[(\d+), (\d+), (\d+)\];/).slice(1).map(Number);
+  const R = num('BLITZ_DISC_R'), GOAL_Y = num('GOAL_Y'), LANES_Y = num('LANES_Y');
+  const MAZE_X = num('MAZE_LANE_X'), BLITZ_X = num('BLITZ_LANE_X');
+  assert(BLITZ_X < 50 && MAZE_X > 50, 'Blitz lane on the left, maze lane on the right: side by side');
+  assert(ys[0] - R > LANES_Y + 30, 'the Blitz lane starts below the "any order" caption');
+  assert(ys[1] - ys[0] >= 2 * R + 10 && ys[2] - ys[1] >= 2 * R + 10, 'Blitz discs never overlap');
+  assert(GOAL_Y - 38 > ys[2] + R, 'the skin sits below the last Blitz disc');
+  // Blitz labels sit beside the discs, so the lane line only passes behind discs.
+  assert.match(pg, /class="pg-node blitz side/, 'Blitz nodes use the side-label layout');
+  assert.match(read('profile.html'), /\.pg-node\.blitz\.side \{ flex-direction:row;/, 'side-label layout is styled');
+  // The lanes never join: no segment runs from the maze lane into the Blitz lane.
+  assert(!/seg\([^)]*MAZE_LANE_X[^)]*BLITZ_LANE_X|seg\([^)]*BLITZ_LANE_X[^)]*MAZE_LANE_X/.test(pg), 'no path joins the two lanes');
+  assert(!/pg-divider/.test(pg), 'no stacked BLITZ · SKIN divider under the arcade');
   const html = read('profile.html');
   const boardH = +html.match(/\.pg-trail-board \{\s*position:relative; height:(\d+)px;/)[1];
-  assert(boardH >= SKIN_Y + 76, 'the board is tall enough for the skin and its label');
+  assert(boardH >= GOAL_Y + 90, 'the board is tall enough for both goals and their labels');
 }
 
 // ── 4. Rank coin: irregular flicker, glint, badge on the rim, reduced motion ──
