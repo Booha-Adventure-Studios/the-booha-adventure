@@ -336,7 +336,8 @@ const CURRENT_CACHES = {
   // fetch with no-store.
   // Christmas pose pass: guide sprites re-encoded in place at 1024 px.
   // Step 4 quiet board: theme/menu.css spotlight + folded extras row.
-  assets: 'booha-assets-2026-612',
+  // Razzle-dazzle Pass 1: impact kit styles (theme/game.css .bimp-*).
+  assets: 'booha-assets-2026-613',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

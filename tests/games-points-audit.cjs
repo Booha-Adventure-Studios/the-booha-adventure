@@ -51,7 +51,8 @@ const ENGINES = ['vocab-tap', 'spell-word', 'vocab-speed', 'sentence-tap', 'sent
   'sentence-speed', 'say-word', 'say-sentence', 'ask-question'];
 for (const name of ENGINES) {
   const src = read(`games/${name}.js`);
-  assert.match(src, /const run = U\.createRun\(\{ total: 15, recoverPoints: (0|50) \}\);/, `${name} must create a run tracker`);
+  // impactKit: true — games on the shared impact kit (Razzle-dazzle Pass 1+).
+  assert.match(src, /const run = U\.createRun\(\{ total: 15, recoverPoints: (0|50)(, impactKit: true)? \}\);/, `${name} must create a run tracker`);
   for (const call of ['run.hit(', 'run.miss()', 'run.reset()', 'run.ready(']) {
     assert(src.includes(call), `${name} must call ${call}`);
   }
@@ -61,7 +62,7 @@ for (const name of ENGINES) {
   assert.match(src, /U\.showScorecard\(Object\.assign\(\{\s*run:\s+runSum,/, `${name} must hand the run to the score card`);
 }
 for (const name of ['say-word', 'say-sentence', 'ask-question', 'vocab-tap', 'sentence-tap', 'vocab-speed', 'sentence-speed']) {
-  assert.match(read(`games/${name}.js`), /recoverPoints: 0 \}/, `${name} is multiple choice: second tries must earn 0`);
+  assert.match(read(`games/${name}.js`), /recoverPoints: 0(, impactKit: true)? \}/, `${name} is multiple choice: second tries must earn 0`);
 }
 for (const name of ['say-word', 'say-sentence', 'ask-question']) {
   const src = read(`games/${name}.js`);

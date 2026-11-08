@@ -871,6 +871,8 @@ async function gradeRound() {
     if (correct) {
       el.classList.add('slot-correct');
       run.ready(ROUND_PAR_MS, { at: roundStartedAt, minMs: 2000 });
+      // Combo sparks come from the slot being graded, not the Check button.
+      window.__brunTap = { el, t: performance.now() };
       run.hit(checkedAt);
       /* Pass 2: quick cascade; each correct answer in a row dings a step higher */
       U.playSFX('ding', { rate: Math.min(1.5, 1 + dingStep * 0.06) });
@@ -880,6 +882,7 @@ async function gradeRound() {
     } else {
       el.classList.add('slot-wrong');
       run.ready(ROUND_PAR_MS, { at: roundStartedAt, minMs: 2000 });
+      window.__brunTap = { el, t: performance.now() };
       run.miss();
       if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
       U.playSFX('fart');
