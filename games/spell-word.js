@@ -1241,6 +1241,7 @@ function showResults() {
   const backBtn   = document.getElementById('sw-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
+    POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
     /* Restore all gameplay elements */
     document.getElementById('sw-jp-box').style.display   = '';
     document.getElementById('sw-slots').style.display    = '';

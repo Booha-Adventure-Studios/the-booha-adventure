@@ -62,10 +62,12 @@ window.BoohaPop = (() => {
   let lastTink = 0;
   function ctx() { try { const S = window.BoohaSFX, c = S && S.context && S.context(); return c && c.state === 'running' ? c : null; } catch (_) { return null; } }
   let voices = 0; const MAX_VOICES = 10;   // grading can stack; never more than 10 layers at once
+  const liveNodes = new Set();              // so reset() can stop sounds mid-flight
+  const track = node => { voices++; liveNodes.add(node); node.onended = () => { voices--; liveNodes.delete(node); }; };
   function tone(c, type, f0, f1, t, dur, peak) {
     if (voices >= MAX_VOICES) return;
     const o = c.createOscillator(), g = c.createGain();
-    voices++; o.onended = () => { voices--; };
+    track(o);
     o.type = type; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .02);
@@ -76,7 +78,7 @@ window.BoohaPop = (() => {
     for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
     const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
     s.buffer = buf; f.type = type || 'bandpass'; f.frequency.value = freq; f.Q.value = q || 1; g.gain.value = peak;
-    voices++; s.onended = () => { voices--; };
+    track(s);
     s.connect(f); f.connect(g); g.connect(c.destination); s.start(t);
   }
   const PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51];
@@ -109,7 +111,16 @@ window.BoohaPop = (() => {
      older iPad), new bursts are halved until the frame time recovers.
      The big beats stay; only the number of pieces drops. */
   let slowAvg = 16, govern = 1;
-  const mul = () => (power() === 'minimal' ? .3 : power() === 'reduced' ? .55 : 1) * govern;
+  // Essential pieces (the answer's own sparks, score gems, debris) only follow
+  // the device tier; decorative ones (confetti, smoke, tap gems) also follow
+  // the governor and are the first to go when the pool fills up.
+  const tierMul = () => (power() === 'minimal' ? .3 : power() === 'reduced' ? .55 : 1);
+  const mul = deco => tierMul() * (deco ? govern : 1);
+  /* Resolution: Retina-sharp (2×) while frames are healthy; the first time the
+     governor trips, the canvas drops to 1× for the rest of the session (it is
+     resized only between bursts, never mid-animation). Labels are DOM text,
+     so they are always sharp. */
+  let wantDPR = Math.min(2, window.devicePixelRatio || 1), pendingResize = false;
   const flashes = [];
   function canFlash() { const t = performance.now(); while (flashes.length && t - flashes[0] > 1000) flashes.shift(); if (flashes.length >= 3) return false; flashes.push(t); return true; }
   function ensureCanvas() {
@@ -121,10 +132,11 @@ window.BoohaPop = (() => {
   }
   function size() {
     if (!cv) return;
-    // 1× on every tier: measured at 4× CPU throttle, a 2× full-screen effects
-    // canvas doubled the slow frames during the Check reveal; at 1× the
-    // reveal matches the game without effects. Fast sparks hide the softness.
-    W = innerWidth; H = innerHeight; DPR = 1;
+    // Measured at 4× CPU throttle: a 2× canvas doubled the slow frames during
+    // a Check reveal, 1× matched the game without effects. So 2× only while
+    // the device keeps up (see wantDPR).
+    W = innerWidth; H = innerHeight; DPR = power() === 'full' ? wantDPR : 1;
+    pendingResize = false;
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   }
   addEventListener('resize', size);
@@ -135,15 +147,16 @@ window.BoohaPop = (() => {
     gr.addColorStop(0, '#fff'); gr.addColorStop(.3, col); gr.addColorStop(1, col + '00');
     x.fillStyle = gr; x.fillRect(0, 0, 48, 48); glowCache.set(col, c); return c;
   }
-  function spawn(p) {
+  function spawn(p, deco) {
     if (reduced() || live >= cap() || !ensureCanvas()) return null;
+    if (deco && (govern < 1 || live >= cap() * .6) && live >= cap() * .35) return null;   // decorative goes first
     for (let n = 0; n < POOL; n++) {
       const o = pool[cur]; cur = (cur + 1) % POOL;
       if (!o.on) { Object.assign(o, { on: true, vx: 0, vy: 0, g: 0, drag: 0, rot: 0, vr: 0, size: 3, life: .5, kind: 'spark', col: '#fff', home: null, delay: 0 }, p); o.max = o.life; live++; wake(); return o; }
     }
     return null;
   }
-  const n = k => Math.max(1, Math.round(k * mul()));
+  const n = (k, deco) => Math.max(1, Math.round(k * mul(deco)));
   function edge(r) {
     const per = 2 * (r.width + r.height), s = Math.random() * per;
     if (s < r.width) return { x: r.left + s, y: r.top, nx: 0, ny: -1 };
@@ -156,21 +169,38 @@ window.BoohaPop = (() => {
       spawn({ x: e.x, y: e.y, vx: (e.nx + rnd(-.6, .6)) * sp, vy: (e.ny + rnd(-.6, .6)) * sp - 40, g: 420, drag: 2.2, life: rnd(.22, .45), size: rnd(1.6, 2.8), col: i < white ? '#ffffff' : col }); }
   }
   function gems(r, k, col, home) {
-    for (let i = 0; i < n(k); i++) { const e = edge(r);
-      spawn({ x: e.x, y: e.y, vx: (e.nx + rnd(-.8, .8)) * rnd(120, 300), vy: -rnd(160, 360), g: 900, drag: 1.2, life: home ? 1.6 : rnd(.5, .8), size: rnd(4, 6.5), rot: rnd(0, 6), vr: rnd(-12, 12), col, kind: 'gem', home, delay: home ? rnd(.16, .3) : 0 }); }
+    for (let i = 0; i < n(k, !home); i++) { const e = edge(r);
+      spawn({ x: e.x, y: e.y, vx: (e.nx + rnd(-.8, .8)) * rnd(120, 300), vy: -rnd(160, 360), g: 900, drag: 1.2, life: home ? 1.6 : rnd(.5, .8), size: rnd(4, 6.5), rot: rnd(0, 6), vr: rnd(-12, 12), col, kind: 'gem', home, delay: home ? rnd(.16, .3) : 0 }, !home); }
   }
   function debris(r, k) {
     for (let i = 0; i < n(k); i++) { const e = edge(r), pts = [];
       for (let j = 0; j < 5; j++) { const a = j / 5 * Math.PI * 2; pts.push([Math.cos(a) * rnd(.5, 1), Math.sin(a) * rnd(.5, 1)]); }
       spawn({ x: e.x, y: e.y, vx: (e.nx + rnd(-.7, .7)) * rnd(80, 260), vy: -rnd(60, 260), g: 1300, drag: .6, life: rnd(.6, .9), size: rnd(4, 9), rot: rnd(0, 6), vr: rnd(-14, 14), col: light() ? '#7a6a72' : pick(['#3a3442', '#4a4552', '#2a2530', '#5b5566']), kind: 'chunk', pts }); }
   }
-  function smoke(x, y, k) { for (let i = 0; i < n(k); i++) spawn({ x: x + rnd(-10, 10), y: y + rnd(-6, 6), vx: rnd(-30, 30), vy: rnd(-60, -20), g: -20, drag: 1.5, life: rnd(.45, .75), size: rnd(6, 11), col: light() ? '#b9a9b2' : '#6f6a7a', kind: 'smoke' }); }
+  function smoke(x, y, k) { for (let i = 0; i < n(k, true); i++) spawn({ x: x + rnd(-10, 10), y: y + rnd(-6, 6), vx: rnd(-30, 30), vy: rnd(-60, -20), g: -20, drag: 1.5, life: rnd(.45, .75), size: rnd(6, 11), col: light() ? '#b9a9b2' : '#6f6a7a', kind: 'smoke' }, true); }
   function confetti(x, y, k, spread) { const P = palette();
-    for (let i = 0; i < n(k); i++) { const a = rnd(-Math.PI, 0), sp = rnd(220, 620) * spread;
-      spawn({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 520, drag: 1.4, life: rnd(.9, 1.5), size: rnd(4, 8), rot: rnd(0, 6), vr: rnd(-16, 16), col: pick(P), kind: 'confetti' }); }
+    for (let i = 0; i < n(k, true); i++) { const a = rnd(-Math.PI, 0), sp = rnd(220, 620) * spread;
+      spawn({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 520, drag: 1.4, life: rnd(.9, 1.5), size: rnd(4, 8), rot: rnd(0, 6), vr: rnd(-16, 16), col: pick(P), kind: 'confetti' }, true); }
   }
   function ring(r, col, grow = 18, life = .32, width = 3) { if (reduced() || !ensureCanvas()) return; rings.push({ r, col, grow, life, t: 0, width }); wake(); }
-  function text(str, x, y, col, sz, life = .7, rise = 46) { if (reduced() || !ensureCanvas()) return; texts.push({ str, x, y, col, size: sz, life, t: 0, rise }); wake(); }
+  /* "+1" / "×3" labels are real text (always sharp on Retina), animated with
+     transform/opacity only, and removed by a tracked timer. */
+  const labels = new Set();
+  function text(str, x, y, col, sz, life = .7, rise = 46) {
+    if (reduced() || !document.body) return;
+    const el = document.createElement('i');
+    el.className = 'bpop-label'; el.setAttribute('aria-hidden', 'true'); el.textContent = str;
+    el.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:67;pointer-events:none;font:900 ${sz}px/1 ${titleFont || (titleFont = (getComputedStyle(document.documentElement).getPropertyValue('--game-font-title') || 'sans-serif').trim())};` +
+      `color:${col};font-style:normal;white-space:nowrap;transform:translate(-50%,-50%);-webkit-text-stroke:${light() ? '4px #fff' : '4px #0a0612'};paint-order:stroke fill;`;
+    document.body.appendChild(el); labels.add(el);
+    if (el.animate) el.animate([
+      { transform: 'translate(-50%,-50%) scale(.6)', opacity: 0 },
+      { transform: 'translate(-50%,-50%) scale(1.2)', opacity: 1, offset: .15 },
+      { transform: `translate(-50%,calc(-50% - ${rise * .7}px)) scale(1.05)`, opacity: 1, offset: .7 },
+      { transform: `translate(-50%,calc(-50% - ${rise}px)) scale(1)`, opacity: 0 },
+    ], { duration: life * 1000, easing: 'ease-out', fill: 'forwards' });
+    later(() => { el.remove(); labels.delete(el); }, life * 1000 + 40);
+  }
   function bolt(a, b, cols) {
     if (reduced() || power() === 'minimal' || !ensureCanvas()) return;
     const out = Math.max(a.right, b.right) + rnd(14, 22);
@@ -184,17 +214,22 @@ window.BoohaPop = (() => {
     const l = pts[pts.length - 1]; out.push([l.x, l.y]); return out;
   }
 
+  /* Every delayed effect goes through later(), so reset() can cancel it. */
+  const timers = new Set();
+  function later(fn, ms) { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); return id; }
+
   /* ── loop: runs only while something is on screen ── */
-  function busy() { return live || rings.length || texts.length || bolts.length || cracks.length || tint; }
+  function busy() { return live || rings.length || bolts.length || cracks.length || tint; }
   function wake() { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
   function frame(t) {
     raf = 0;
-    if (!busy()) { if (g) { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); } return; }
+    if (!busy()) { if (g) { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); } if (pendingResize) size(); return; }
     raf = requestAnimationFrame(frame);
     if (last && t - last < (power() === 'minimal' ? 31 : 14)) return;
     const raw = last ? t - last : 16, dt = Math.min(.05, raw / 1000); last = t;
     slowAvg = slowAvg * .85 + Math.min(raw, 120) * .15;
     govern = slowAvg > 28 ? .5 : slowAvg < 20 ? 1 : govern;
+    if (govern < 1 && wantDPR > 1) { wantDPR = 1; pendingResize = true; }   // drop to 1× once, between bursts
     step(dt); draw();
   }
   function step(dt) {
@@ -273,11 +308,24 @@ window.BoohaPop = (() => {
     g.globalAlpha = 1;
   }
 
+  /* ── cleanup: restart, close, hide, back/forward cache ── */
+  function reset() {
+    if (raf) cancelAnimationFrame(raf); raf = 0; last = 0;
+    timers.forEach(clearTimeout); timers.clear();
+    for (const p of pool) p.on = false; live = 0;
+    rings.length = 0; texts.length = 0; bolts.length = 0; cracks.length = 0; tint = null; prevOk = null;
+    labels.forEach(el => el.remove()); labels.clear();
+    liveNodes.forEach(node => { try { node.onended = null; node.stop(); } catch (_) {} }); liveNodes.clear(); voices = 0;
+    if (g && cv) { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); }
+  }
+  addEventListener('pagehide', reset);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) reset(); });
+
   /* ── events from the game ── */
   return {
-    newRound, color, paint, canFlash, inkFor, palette,
+    newRound, color, paint, canFlash, inkFor, palette, reset,
     init(opts = {}) { if (opts.pill) pillSel = opts.pill; },
-    stats() { return { live, rings: rings.length, texts: texts.length, bolts: bolts.length, cracks: cracks.length, running: !!raf, voices, govern }; },
+    stats() { return { live, rings: rings.length, labels: labels.size, bolts: bolts.length, cracks: cracks.length, running: !!raf, voices, timers: timers.size, govern, dpr: DPR }; },
     tap(key, btn, quiet) {
       const prev = colorOf[key], p = palette().filter(c => c !== prev);
       colorOf[key] = pick(p.length ? p : palette());
@@ -332,12 +380,12 @@ window.BoohaPop = (() => {
     spell(slots, keys, combo, stagger, board) {
       const pr = document.querySelector(pillSel); if (pr) { const b = pr.getBoundingClientRect(); pill = { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }
       const k = Math.max(1, combo || 1), list = Array.from(slots || []);
-      list.forEach((el, i) => setTimeout(() => {
+      list.forEach((el, i) => later(() => {
         if (!el.isConnected) return;
         const r = el.getBoundingClientRect(), c = color(keys[i]);
         sparks(r, 7, c, .8, 2); gems(r, 1 + (i % 2), c, 'pill'); SFX.note(i + 2);
       }, i * (stagger || 55)));
-      setTimeout(() => {
+      later(() => {
         const host = board && board.isConnected ? board : list[list.length - 1];
         if (!host) return;
         const r = host.getBoundingClientRect(), c = color(keys[keys.length - 1]);
@@ -355,7 +403,7 @@ window.BoohaPop = (() => {
       SFX.crunch();
       Array.from(slots || []).forEach((el, i) => {
         if (isRight && isRight(el, i)) return;
-        setTimeout(() => {
+        later(() => {
           if (!el.isConnected) return;
           const r = el.getBoundingClientRect();
           debris(r, 5); smoke(r.left + r.width / 2, r.top, 2);

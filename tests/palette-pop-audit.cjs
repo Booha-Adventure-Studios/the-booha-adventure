@@ -28,6 +28,7 @@ const utils = read('js/game-utils.js');
 const vt = read('games/vocab-tap.js');
 const sw = read('games/spell-word.js');
 const vs = read('games/vocab-speed.js');
+const st = read('games/sentence-tap.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -62,7 +63,7 @@ const gte = (p, q) => p[0] !== q[0] ? p[0] > q[0] : p[1] !== q[1] ? p[1] > q[1] 
 const ctx = {
   console, Math, setTimeout: () => 0, addEventListener() {}, innerWidth: 1024, innerHeight: 768, devicePixelRatio: 1,
   performance: { now: () => 0 }, requestAnimationFrame: () => 0,
-  document: { documentElement: { dataset: {} }, body: null, createElement: () => ({ getContext: () => null, style: {} }), querySelector: () => null },
+  document: { documentElement: { dataset: {} }, body: null, addEventListener() {}, createElement: () => ({ getContext: () => null, style: {} }), querySelector: () => null },
   getComputedStyle: () => ({ getPropertyValue: () => '' }),
 };
 ctx.window = ctx;
@@ -102,6 +103,18 @@ assert.match(pop, /function paint\(el, key\) \{[^}]*--c-ink', inkFor\(/, 'the en
 // Paired (placed) states never outrank a verdict.
 assert.match(vt, /\.vt-jp-slot\.has-pair\.vt-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{/, 'Tap: the placed ring switches off on correct/wrong');
 assert.match(skin, /\.vt-jp-slot\.slot-correct \{ background: var\(--ok\);/, 'Tap: correct still fills green');
+// Sentence Tap: same exception on the paper strips (shares the skin's selected rule).
+const stSel = 'html[data-skin="v2"][data-curriculum] .st-en-card.st-pal.selected[data-ci]';
+assert(st.includes(stSel + '{'), 'Sentence Tap selected palette rule present');
+assert(gte(spec(stSel), spec(skinSel)), `Sentence Tap palette selected ${spec(stSel)} must be ≥ skin selected ${spec(skinSel)}`);
+const stSkinSel = 'html[data-skin="v2"][data-curriculum] .st-en-card.selected[data-ci]';
+assert(skin.includes(stSkinSel) && gte(spec(stSel), spec(stSkinSel)), 'Sentence Tap palette selected outranks the paper-strip selected rule');
+assert.match(st, /\.st-en-card\.st-pal\.selected\[data-ci\]\{\s*background:var\(--c\);/, 'Sentence Tap: a selected strip fills with its own palette colour');
+assert.match(st, /\.st-en-card\.st-pal\.selected\[data-ci\] \.st-en-text\{ color:var\(--c-ink\); \}/, 'Sentence Tap: and uses the engine-picked ink');
+assert.match(st, /\.st-jp-slot\.has-pair\.st-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{/, 'Sentence Tap: the placed ring switches off on correct/wrong');
+assert.match(skin, /\.st-jp-slot\.slot-correct \{ background: var\(--ok\);/, 'Sentence Tap: correct still fills green');
+assert.match(st, /POP\.newRound\(roundCards\);/, 'Sentence Tap: five fresh colours per round');
+assert.strictEqual((st.match(/POP\.tap\(card\._key, btn\);/g) || []).length, 2, 'Sentence Tap: touch and click both pop');
 const swPal = 'html[data-skin="v2"][data-curriculum] .sw-tile.sw-pal[data-ti]';
 const swSkin = 'html[data-skin="v2"][data-curriculum] .sw-tile[data-ti]';
 assert(sw.includes(swPal + '{') && gte(spec(swPal), spec(swSkin)), 'Spell: tile palette rule outranks the skin tile rule (both !important)');
@@ -118,27 +131,49 @@ assert.match(vs, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'speed', s
 assert.match(vs, /POP\.fizzle\(heatEl\);/, 'Speed: a timeout smokes the timer bar');
 
 // ── 3. "Placed", never "right" ──
-for (const [name, src, rule] of [['Tap', vt, /\.vt-jp-slot\.has-pair\.vt-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Spell', sw, /\.sw-slot\.filled\.sw-pp\{([^}]*)\}/]]) {
+for (const [name, src, rule] of [['Tap', vt, /\.vt-jp-slot\.has-pair\.vt-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Sentence Tap', st, /\.st-jp-slot\.has-pair\.st-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Spell', sw, /\.sw-slot\.filled\.sw-pp\{([^}]*)\}/]]) {
   const body = src.match(rule)[1];
   assert(!/background/.test(body), `${name}: a placed pair is a ring, never a fill`);
   assert(!/--ok|#22c55e|#1f7a46/i.test(body), `${name}: a placed pair never uses the correct colour`);
 }
 assert.match(vt, /\.vt-drop\.filled::before\{\s*content:'';/, 'Tap: the placed pin is ::before (the skin keeps ::after for ✓/✗)');
 assert(!/\.vt-drop\.filled::before\{[^}]*content:'[^']/.test(vt), 'Tap: the pin carries no symbol');
+assert.match(st, /\.st-drop\.filled::before\{\s*content:'';/, 'Sentence Tap: the placed pin is ::before (the skin keeps ::after for ✓/✗)');
+assert(!/\.st-drop\.filled::before\{[^}]*content:'[^']/.test(st), 'Sentence Tap: the pin carries no symbol');
 
 // ── 4. The flash cap only drops the overlay ──
 const wrongBranch = vt.slice(vt.indexOf("el.classList.add('slot-wrong');"), vt.indexOf('flashWrong();', vt.indexOf("el.classList.add('slot-wrong');")));
 assert(/U\.playSFX\('fart'\)/.test(wrongBranch) && /POP\.wrong\(el\)/.test(wrongBranch) && /U\.impact\(\{ source: el, outcome: 'miss'/.test(wrongBranch),
   'Tap: the orange fill, ✗, bonk, recoil and debris all happen before flashWrong()');
 assert.match(vt, /function flashWrong\(\) \{\s*if \(!POP\.canFlash\(\)\) return;/, 'Tap: a capped flash returns before drawing anything else');
+{
+  const a = st.indexOf("el.classList.add('slot-wrong');"), b = st.indexOf('flashWrong();', a);
+  const br = st.slice(a, b);
+  assert(/U\.playSFX\('fart'\)/.test(br) && /POP\.wrong\(el\)/.test(br) && /U\.impact\(\{ source: el, outcome: 'miss'/.test(br),
+    'Sentence Tap: the orange fill, ✗, bonk, recoil and debris all happen before flashWrong()');
+  assert.match(st, /function flashWrong\(\) \{\s*if \(!POP\.canFlash\(\)\) return;/, 'Sentence Tap: a capped flash returns before drawing anything else');
+}
 assert.match(pop, /function canFlash\(\) \{[^}]*flashes\.length >= 3/, 'at most 3 bright flashes a second');
 
 // ── 5. Pileup: caps, reduced motion, idle stop, cleanup ──
 assert.match(pop, /const POOL = 360/, 'one fixed particle pool');
 assert.match(pop, /const cap = \(\) => \(power\(\) === 'minimal' \? 50 : power\(\) === 'reduced' \? 150 : POOL\)/, 'tier caps');
-assert.match(pop, /function spawn\(p\) \{\s*if \(reduced\(\) \|\| live >= cap\(\)/, 'nothing flies under reduced motion, never past the cap');
+assert.match(pop, /function spawn\(p, deco\) \{\s*if \(reduced\(\) \|\| live >= cap\(\)/, 'nothing flies under reduced motion, never past the cap');
+assert.match(pop, /if \(deco && \(govern < 1 \|\| live >= cap\(\) \* \.6\) && live >= cap\(\) \* \.35\) return null;/, 'when slow or crowded, decorative particles are refused first');
+for (const k of ['confetti', 'smoke']) assert.match(pop, new RegExp(`kind: '${k}'[^}]*\\}, true\\)`), `${k} is marked decorative`);
+assert.doesNotMatch(pop, /function sparks[^\n]*\n[^\n]*\}, true\)/, 'sparks (the tap/answer response) are never decorative');
 assert.match(pop, /const MAX_VOICES = 10/, 'never more than 10 effect voices at once');
-assert.match(pop, /if \(!busy\(\)\) \{ if \(g\) \{[^}]*clearRect[^}]*\} return; \}/, 'the canvas loop stops (and clears) when idle');
+assert.match(pop, /if \(!busy\(\)\) \{ if \(g\) \{[^}]*clearRect[^}]*\} if \(pendingResize\) size\(\); return; \}/, 'the canvas loop stops (and clears) when idle; a resolution drop waits for idle');
+// Cleanup on restart / close / hide: frames, timers, labels and sounds all cancelled.
+const resetFn = pop.slice(pop.indexOf('function reset() {'), pop.indexOf("addEventListener('pagehide', reset);"));
+for (const [re, what] of [[/cancelAnimationFrame\(raf\)/, 'animation frame'], [/timers\.forEach\(clearTimeout\)/, 'pending timers'], [/p\.on = false/, 'particles'],
+  [/labels\.forEach\(el => el\.remove\(\)\)/, 'DOM labels'], [/liveNodes\.forEach\([^)]*node\.stop\(\)/, 'playing sounds'], [/clearRect/, 'canvas pixels']])
+  assert.match(resetFn, re, `reset() cancels ${what}`);
+assert.match(pop, /addEventListener\('pagehide', reset\);/, 'reset on page close / navigation');
+assert.match(pop, /visibilitychange[^\n]*document\.hidden\) reset\(\)/, 'reset when the tab is hidden');
+assert.doesNotMatch(pop.replace(/function later[^\n]*/, ''), /\bsetTimeout\(/, 'every delayed effect goes through later() so reset() can cancel it');
+for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/]])
+  assert.match(src, re, `${name}: restart clears leftover effects`);
 assert.match(pop, /pointer-events:none/, 'the effects canvas never takes taps');
 assert.match(utils, /if \(now - \(last\.get\(el\) \|\| 0\) < 120\) return;/, 'score-pill pops are throttled');
 assert.match(utils, /const reduced = \(\) => \{ const m = window\.BoohaMotion; return !!\(m && m\.reduced && m\.reduced\(\)\); \};/, 'score-pill pops respect reduced motion');
@@ -204,7 +239,7 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-617'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS');

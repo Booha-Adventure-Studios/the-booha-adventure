@@ -67,9 +67,9 @@ html[data-skin="v2"][data-curriculum="pb"] {
    or a wrong-orange, so a coloured card never hints at an answer. Every
    colour reads at 4.5:1 or better with dark (#2b1a05) or white text, and
    the engine picks whichever is higher (tests/palette-pop-audit.cjs).
-   EXCEPTION to the "selected = lane colour" rule: in Vocabulary Tap a
-   selected card fills with its own palette colour (engine CSS, which loads
-   later and wins); in Spell the Word (tiles, placed slots) and Vocab Speed
+   EXCEPTION to the "selected = lane colour" rule: in Vocabulary Tap and
+   Sentence Tap a selected card fills with its own palette colour (engine
+   CSS, which loads later and wins); in Spell the Word (tiles, placed slots) and Vocab Speed
    (the four choices) cards wear a palette ring. Correct-green /
    wrong-orange still beat all of them. */
 html[data-skin="v2"][data-curriculum="br"] {   /* Toxic Neon */
