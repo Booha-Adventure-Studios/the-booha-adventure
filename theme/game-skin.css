@@ -60,6 +60,27 @@ html[data-skin="v2"][data-curriculum="pb"] {
   --jp-card: #fffaf2;
 }
 
+/* ── 1b. PALETTE (Palette Pop pass, 2026-11-12) ─────────────────
+   Twelve card colours per world. Vocabulary Tap gives every English card
+   one, re-rolls it on each tap, and the pair carries it to its Japanese
+   slot. MEANING stays untouchable: no palette colour is a correct-green
+   or a wrong-orange, so a coloured card never hints at an answer. */
+html[data-skin="v2"][data-curriculum="br"] {   /* Toxic Neon */
+  --pal-1: #FFE600; --pal-2: #C6FF1A; --pal-3: #00FFC2; --pal-4: #22DDFF;
+  --pal-5: #7DF9FF; --pal-6: #2E9BFF; --pal-7: #5B5CFF; --pal-8: #A855FF;
+  --pal-9: #D400FF; --pal-10: #F03CFF; --pal-11: #FF2288; --pal-12: #FF7AD9;
+}
+html[data-skin="v2"][data-curriculum="bc"] {   /* Cold Electric */
+  --pal-1: #00F0FF; --pal-2: #A6FBFF; --pal-3: #00E5D4; --pal-4: #2B8CFF;
+  --pal-5: #4455FF; --pal-6: #6B4DFF; --pal-7: #AA00FF; --pal-8: #C77DFF;
+  --pal-9: #FF2BD6; --pal-10: #FF8FCB; --pal-11: #E8F6FF; --pal-12: #B8B5FF;
+}
+html[data-skin="v2"][data-curriculum="pb"] {   /* Candy Shop */
+  --pal-1: #FF6EB4; --pal-2: #E8407A; --pal-3: #F2C200; --pal-4: #A8C800;
+  --pal-5: #2EC4A0; --pal-6: #22B8D6; --pal-7: #3D9BFF; --pal-8: #6E7CFF;
+  --pal-9: #8A5CFF; --pal-10: #B57BFF; --pal-11: #D85CF0; --pal-12: #FF8AD8;
+}
+
 /* ── 2. LANE tokens ────────────────────────────────────────────── */
 html[data-skin="v2"][data-lane="sentences"] { --lane: #5cb2ff; --lane-ink: #a9d4ff; --lane-soft: rgba(92,178,255,.18); --lane-ring: rgba(92,178,255,.55); }
 html[data-skin="v2"][data-lane="listen"]    { --lane: #a98bff; --lane-ink: #cdbcff; --lane-soft: rgba(169,139,255,.2); --lane-ring: rgba(169,139,255,.55); }

@@ -1148,31 +1148,59 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 
 /* ── In-game combo HUD + celebration (GAME_UTILS.createRun, Games Pass 9) ── */
 .brun-hud {
-  position: fixed; z-index: 60; pointer-events: none;
-  left: max(12px, env(safe-area-inset-left, 0px)); top: calc(14px + env(safe-area-inset-top, 0px));
-  display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px;
-  background: color-mix(in srgb, var(--game-bg) 84%, transparent);
-  box-shadow: inset 0 0 0 1.5px var(--game-border), 0 4px 14px rgba(0,0,0,.25);
-  font-family: var(--game-font-body); font-size: 14px; font-weight: 900; color: var(--game-ink);
+  position: fixed; z-index: 60; pointer-events: none; overflow: hidden;
+  left: max(12px, env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px));
+  display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 14px; border-radius: 999px;
+  background: color-mix(in srgb, var(--game-bg) 86%, transparent);
+  box-shadow: inset 0 0 0 2px var(--game-border), 0 4px 0 rgba(0,0,0,.28), 0 8px 18px rgba(0,0,0,.28);
+  font-family: var(--game-font-body); font-size: 15px; font-weight: 900; color: var(--game-ink);
   font-variant-numeric: tabular-nums; transform-origin: left center;
 }
+/* Palette Pop pass (2026-11-12): the streak number and points are the heroes. */
 .brun-mult:empty { display: none; }
-.brun-meter { display: inline-flex; gap: 3px; align-items: flex-end; height: 16px; }
-.brun-meter i { width: 5px; height: 7px; border-radius: 2px; background: color-mix(in srgb, var(--game-ink) 18%, transparent); transform-origin: bottom center; transition: transform .2s ease, background-color .2s; }
-.brun-meter i:nth-child(n+4) { height: 10px; } .brun-meter i:nth-child(n+7) { height: 13px; } .brun-meter i:nth-child(10) { height: 16px; }
-.brun-meter i.on { background: #ffc94a; }
-.brun-meter i.on:nth-child(n+7) { background: #ff9a3c; } .brun-meter i.on:nth-child(10) { background: #ff5e5e; }
-.brun-pts { display: inline-block; min-width: 3ch; text-align: right; }
+.brun-mult { white-space: nowrap; letter-spacing: .02em; }
+.brun-mult em { font-style: normal; display: inline-block; font-family: var(--game-font-title); font-size: 1.6em; line-height: 1; vertical-align: -3px; margin-right: 2px; color: #ffc94a; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
+[data-curriculum="pb"] .brun-mult em { color: #d17a00; text-shadow: none; }
+.brun-meter { display: inline-flex; gap: 3px; align-items: flex-end; height: 20px; }
+.brun-meter i { width: 6px; height: 8px; border-radius: 3px; background: color-mix(in srgb, var(--game-ink) 18%, transparent); transform-origin: bottom center; transition: transform .2s ease, background-color .2s; }
+.brun-meter i:nth-child(n+4) { height: 12px; } .brun-meter i:nth-child(n+7) { height: 16px; } .brun-meter i:nth-child(10) { height: 20px; }
+.brun-meter i.on { background: #ffc94a; box-shadow: 0 0 6px rgba(255,201,74,.75); }
+.brun-meter i.on:nth-child(n+7) { background: #ff9a3c; } .brun-meter i.on:nth-child(10) { background: #ff5e9a; }
+.brun-meter i.pop { animation: brunDot .42s cubic-bezier(.3,1.8,.5,1); }
+@keyframes brunDot { 35% { transform: scale(1.35, 1.8); } }
+.brun-pts { display: inline-block; min-width: 4ch; text-align: right; font-family: var(--game-font-title); font-size: 1.3em; letter-spacing: .02em; }
 .brun-pts.pop { animation: brunPop .38s cubic-bezier(.3,1.7,.5,1); }
-@keyframes brunPop { 40% { transform: scale(1.35); } }
-.brun-hud.hot { font-size: 16px; box-shadow: inset 0 0 0 2px #ffc94a, 0 0 18px rgba(255,190,60,.45); }
+@keyframes brunPop { 40% { transform: scale(1.5) rotate(-4deg); } }
+.brun-hud.tick { animation: brunTick .26s cubic-bezier(.3,1.6,.5,1); }
+@keyframes brunTick { 40% { transform: scale(1.09); } }
+.brun-hud.hot { font-size: 17px; box-shadow: inset 0 0 0 2px #ffc94a, 0 4px 0 #a8701a, 0 0 22px rgba(255,190,60,.5);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--game-bg) 68%, #ffc94a), color-mix(in srgb, var(--game-bg) 86%, transparent) 70%); }
 .brun-hud.hot .brun-mult { color: #e0a21a; }
-.brun-hud[data-level="3"] { box-shadow: inset 0 0 0 2px #ff9a3c, 0 0 24px rgba(255,120,40,.55); }
+.brun-hud[data-level="2"] { font-size: 18px; box-shadow: inset 0 0 0 2px #ff9a3c, 0 4px 0 #a8501a, 0 0 26px rgba(255,140,50,.55);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--game-bg) 60%, #ff9a3c), color-mix(in srgb, var(--game-bg) 84%, transparent) 70%); }
+.brun-hud[data-level="3"] { font-size: 19px; box-shadow: inset 0 0 0 2px #ff5e9a, 0 4px 0 #a02a5a, 0 0 30px rgba(255,90,150,.6);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--game-bg) 52%, #ff5e9a), color-mix(in srgb, var(--game-bg) 50%, #ff9a3c) 60%, color-mix(in srgb, var(--game-bg) 84%, transparent)); }
+.brun-hud[data-level="3"] .brun-mult em { color: #ffe08a; }
 [data-curriculum="br"] .brun-hud.hot .brun-mult, [data-curriculum="bc"] .brun-hud.hot .brun-mult { color: #ffc94a; }
-.brun-hud.pulse { animation: brunPulse .45s cubic-bezier(.3,1.6,.5,1); }
-@keyframes brunPulse { 40% { transform: scale(1.22); } }
-.brun-hud.break { animation: brunBreak .45s ease; }
-@keyframes brunBreak { 15% { transform: translateX(-7px) rotate(-3deg); } 35% { transform: translateX(6px) rotate(2deg); } 60% { transform: translateX(-3px); } }
+/* A light sweep across the pill while a combo is live. */
+.brun-hud.hot::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.38), transparent); transform: translateX(-150%);
+  animation: brunShine 1.7s ease-in-out infinite; }
+@keyframes brunShine { 55%, 100% { transform: translateX(380%); } }
+.brun-hud.pulse { animation: brunPulse .5s cubic-bezier(.3,1.6,.5,1); }
+@keyframes brunPulse { 35% { transform: scale(1.32) rotate(-3deg); } 65% { transform: scale(.96) rotate(1deg); } }
+.brun-hud.break { animation: brunBreak .5s ease; filter: grayscale(.85); }
+@keyframes brunBreak { 15% { transform: translateX(-9px) rotate(-4deg); } 35% { transform: translateX(8px) rotate(3deg); } 60% { transform: translateX(-4px); } }
+/* "+125" floating off the pill on every gain. */
+.brun-float { position: fixed; z-index: 61; pointer-events: none; margin: -12px 0 0 -10px; white-space: nowrap;
+  font: 900 18px/1 var(--game-font-title); color: #ffe08a; text-shadow: 0 2px 0 rgba(0,0,0,.5), 0 0 10px rgba(255,200,80,.6);
+  opacity: 0; animation: brunFloat .78s cubic-bezier(.2,.8,.3,1) forwards; }
+.brun-float.lv1 { font-size: 21px; } .brun-float.lv2 { font-size: 24px; color: #ffb35c; } .brun-float.lv3 { font-size: 28px; color: #ff9ac6; }
+[data-curriculum="pb"] .brun-float { color: #e08a00; text-shadow: 0 2px 0 #fff, 0 0 8px rgba(255,255,255,.9); }
+.brun-float.still { animation: brunFade .78s ease forwards; }
+@keyframes brunFloat { 0% { opacity: 0; transform: translate(0, 6px) scale(.6); } 18% { opacity: 1; transform: translate(4px, -10px) scale(1.25); } 100% { opacity: 0; transform: translate(14px, -46px) scale(1); } }
+@keyframes brunFade { 20% { opacity: 1; } 100% { opacity: 0; } }
+html.bsc-open .brun-float { display: none; }
 
 /* Milestone banner: sweeps across the middle, never blocks a tap. */
 .brun-banner {

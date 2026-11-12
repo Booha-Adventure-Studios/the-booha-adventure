@@ -1265,6 +1265,36 @@ const UTILS = {
       document.body.appendChild(el);
       setTimeout(() => el.remove(), fxReduced() ? 900 : 1100);
     };
+    /* Points roll up instead of jumping (text only, ~0.35 s). Reduced
+       motion, or no animation frames (tests), sets the value at once. */
+    const fxCount = (el, to) => {
+      if (!el) return;
+      const from = Number.isFinite(el._brunShown) ? el._brunShown : to;
+      el._brunShown = to;
+      const show = v => { el.textContent = Math.round(v).toLocaleString('en-US'); };
+      if (from === to || fxReduced() || typeof requestAnimationFrame !== 'function') { show(to); return; }
+      const t0 = performance.now(), dur = 350;
+      const step = now => {
+        if (el._brunShown !== to) return;               // a newer count took over
+        const k = Math.min(1, (now - t0) / dur);
+        show(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    /* "+125" floats up off the pill on every gain. */
+    const fxFloat = pts => {
+      if (!hudEl || !hudEl.getBoundingClientRect || fxPower() === 'minimal') return;
+      const r = hudEl.getBoundingClientRect();
+      if (!r || !r.width) return;
+      const f = document.createElement('i');
+      f.className = 'brun-float' + (st.combo >= 10 ? ' lv3' : st.combo >= 6 ? ' lv2' : st.combo >= 3 ? ' lv1' : '') + (fxReduced() ? ' still' : '');
+      f.setAttribute('aria-hidden', 'true');
+      f.textContent = '+' + pts;
+      f.style.left = (r.right - 18) + 'px'; f.style.top = (r.top + r.height / 2) + 'px';
+      document.body.appendChild(f);
+      setTimeout(() => f.remove(), 800);
+    };
     let edgeEl = null;
     const fxEdge = on => {
       if (typeof document === 'undefined' || !document.body) return;
@@ -1291,13 +1321,20 @@ const UTILS = {
       }
       const m = MULT(st.combo);
       window.__brunCombo = st.combo;   // the synth ting climbs with the streak
-      hudEl.querySelector('.brun-mult').textContent = st.combo >= 3 ? `COMBO ×${m}` : (st.combo ? `${st.combo} in a row` : '');
-      hudEl.querySelector('.brun-pts').textContent = st.points.toLocaleString('en-US');
+      // Palette Pop pass (2026-11-12): same words, but the number is the hero.
+      hudEl.querySelector('.brun-mult').innerHTML = st.combo >= 3 ? `COMBO <em>×${m}</em>` : (st.combo ? `<em>${st.combo}</em> in a row` : '');
+      fxCount(hudEl.querySelector('.brun-pts'), st.points);
       hudEl.querySelectorAll('.brun-meter i').forEach((dot, i) => dot.classList.toggle('on', i < Math.min(10, st.combo)));
       hudEl.classList.toggle('hot', st.combo >= 3);
       hudEl.dataset.level = String(m);
       const bump = (el, cls, ms) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); };
-      if (fx.gained) bump(hudEl.querySelector('.brun-pts'), 'pop', 400);
+      if (fx.gained) {
+        bump(hudEl.querySelector('.brun-pts'), 'pop', 400);
+        bump(hudEl, 'tick', 260);
+        const lit = hudEl.querySelectorAll('.brun-meter i')[Math.min(10, st.combo) - 1];
+        if (lit) bump(lit, 'pop', 420);
+        fxFloat(fx.gained);
+      }
       if (fx.milestone) {
         if (typeof UTILS !== 'undefined') UTILS._synthReplace('ding');
         bump(hudEl, 'pulse', 450);
@@ -1427,6 +1464,36 @@ const UTILS = {
   },
 
 };
+
+/* ── Palette Pop pass (2026-11-12): the score pill pops when it changes ──
+   One observer for all nine games, so no engine needs editing. Whenever a
+   score pill's text changes, the pill does a quick squash-and-stretch
+   (transform only, WAAPI, never blocks taps). Off under reduced motion. */
+(function scorePillPop() {
+  if (typeof document === 'undefined' || typeof MutationObserver !== 'function' || !document.documentElement) return;
+  const PILLS = '.vt-score-pill, .sw-pill, .vs-pill, .vs-streak-pill, .st-score-pill, .so-pill, .ssp-pill, .ssp-streak-pill, .stw-pill, .sas-pill, .aq-pill';
+  const last = new WeakMap();
+  const reduced = () => { const m = window.BoohaMotion; return !!(m && m.reduced && m.reduced()); };
+  const pop = el => {
+    if (!el || !el.animate || reduced()) return;
+    const now = performance.now();
+    if (now - (last.get(el) || 0) < 120) return;
+    last.set(el, now);
+    el.animate([
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.22) rotate(-2deg)', offset: .3 },
+      { transform: 'scale(.95)', offset: .62 },
+      { transform: 'scale(1)' },
+    ], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+  };
+  new MutationObserver(list => {
+    for (const m of list) {
+      const n = m.target && (m.target.nodeType === 1 ? m.target : m.target.parentElement);
+      const pill = n && n.closest && n.closest(PILLS);
+      if (pill) pop(pill);
+    }
+  }).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+})();
 
 window.GAME_UTILS = UTILS;
 
