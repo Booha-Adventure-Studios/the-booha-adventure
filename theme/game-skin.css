@@ -69,8 +69,9 @@ html[data-skin="v2"][data-curriculum="pb"] {
    the engine picks whichever is higher (tests/palette-pop-audit.cjs).
    EXCEPTION to the "selected = lane colour" rule: in Vocabulary Tap a
    selected card fills with its own palette colour (engine CSS, which loads
-   later and wins); in Spell the Word, tiles and placed slots wear a
-   palette ring. Correct-green / wrong-orange still beat both. */
+   later and wins); in Spell the Word (tiles, placed slots) and Vocab Speed
+   (the four choices) cards wear a palette ring. Correct-green /
+   wrong-orange still beat all of them. */
 html[data-skin="v2"][data-curriculum="br"] {   /* Toxic Neon */
   --pal-1: #FFE600; --pal-2: #C6FF1A; --pal-3: #00FFC2; --pal-4: #22DDFF;
   --pal-5: #7DF9FF; --pal-6: #2E9BFF; --pal-7: #5B5CFF; --pal-8: #B266FF;

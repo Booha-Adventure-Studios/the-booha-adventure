@@ -27,6 +27,7 @@ const pop = read('js/game-pop.js');
 const utils = read('js/game-utils.js');
 const vt = read('games/vocab-tap.js');
 const sw = read('games/spell-word.js');
+const vs = read('games/vocab-speed.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -107,6 +108,14 @@ assert(sw.includes(swPal + '{') && gte(spec(swPal), spec(swSkin)), 'Spell: tile 
 assert.match(sw, /\.sw-slot\.filled\.sw-pp\{\s*box-shadow:[^}]*\}/, 'Spell: placed slots get the colour ring');
 assert(!/\.sw-slot\.filled\.sw-pp\{[^}]*!important/.test(sw), 'Spell: the placed ring is NOT !important, so the skin\'s !important correct/wrong fills win');
 assert.match(sw, /sl\.classList\.remove\('sw-wrong', 'filled', 'empty'\);\s*sl\.classList\.add\('sw-correct'\);/, 'Spell: grading drops "filled", so the placed ring cannot sit on a verdict');
+
+const vsPal = 'html[data-skin="v2"][data-curriculum] .vs-choice.vs-pal[data-ci]';
+const vsSkin = 'html[data-skin="v2"][data-curriculum] .vs-choice[data-ci]';
+assert(vs.includes(vsPal + '{') && gte(spec(vsPal), spec(vsSkin)), 'Speed: choice palette ring outranks the skin card rule');
+assert(!/\.vs-choice\.vs-pal\[data-ci\][^{]*\{[^}]*!important/.test(vs), 'Speed: the ring is NOT !important, so the skin\'s !important correct/wrong fills win the moment a card is tapped');
+assert.match(vs, /POP\.newRound\(choices\.map\(\(_, ci\) => `vs\$\{idx\}-\$\{ci\}`\)\);/, 'Speed: four fresh colours per question');
+assert.match(vs, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'speed', squash: false \}\);[^\n]*\n\s*POP\.wrong\(btn\);/, 'Speed: a wrong pick crumbles after the existing recoil');
+assert.match(vs, /POP\.fizzle\(heatEl\);/, 'Speed: a timeout smokes the timer bar');
 
 // ── 3. "Placed", never "right" ──
 for (const [name, src, rule] of [['Tap', vt, /\.vt-jp-slot\.has-pair\.vt-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Spell', sw, /\.sw-slot\.filled\.sw-pp\{([^}]*)\}/]]) {
@@ -195,7 +204,7 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-617'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS');
