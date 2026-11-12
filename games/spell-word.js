@@ -626,6 +626,24 @@ S.textContent = `
   position:fixed; pointer-events:none; z-index:9999; border-radius:2px;
   animation:swConfetti 1.1s ease-out forwards;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PALETTE POP (2026-11-12, js/game-pop.js): every letter tile carries a
+   palette colour (--pal-1..12, game-skin.css), re-rolled when it is
+   tapped; the slot it lands in takes that colour as a ring + edge. That
+   means "you placed this", never "this is right": no fill, no icon. Check's
+   green/orange fills (!important in the skin) still replace it.
+   ══════════════════════════════════════════════════════════════ */
+html[data-skin="v2"][data-curriculum] .sw-tile.sw-pal[data-ti]{
+  box-shadow:inset 0 0 0 3px var(--c),0 5px 0 color-mix(in srgb,var(--c) 62%,#000),0 8px 14px rgba(0,0,0,.26) !important;
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1),opacity .2s;
+}
+html[data-skin="v2"][data-curriculum] .sw-tile.sw-pal[data-ti]:active{
+  box-shadow:inset 0 0 0 3px var(--c),0 2px 0 color-mix(in srgb,var(--c) 62%,#000),0 4px 8px rgba(0,0,0,.2) !important;
+}
+html[data-skin="v2"][data-curriculum] .sw-slot.filled.sw-pp{
+  box-shadow:inset 0 0 0 2.5px var(--pc),0 4px 0 color-mix(in srgb,var(--pc) 62%,#000),0 6px 12px rgba(0,0,0,.24);
+}
 `;
 document.head.appendChild(S);
 
@@ -722,6 +740,11 @@ const speakerBtn = document.getElementById('sw-speaker');
 const helpBtn    = document.getElementById('sw-help');
 const dotsRow    = document.getElementById('sw-dots');
 const modalOverlay = document.getElementById('sw-modal-overlay');
+
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load. */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
+POP.init({ pill: '#sw-score' });
 
 for (let i = 0; i < 15; i++) {
   const d = document.createElement('div');
@@ -842,6 +865,7 @@ function showCard() {
 function buildTiles(card) {
   tilesEl.innerHTML = '';
   const letters = U.shuffle(answerChars(card));
+  POP.newRound(letters.map((_, ti) => `sw${idx}-${ti}`));   /* Palette Pop: a colour per letter */
   letters.forEach((letter, ti) => {
     const tile = document.createElement('button');
     tile.type = 'button';
@@ -851,6 +875,9 @@ function buildTiles(card) {
     tile.dataset.ti = ti % 13;
     tile.dataset.tileIndex = ti;
     tile.dataset.letter = letter;
+    tile.dataset.popKey = `sw${idx}-${ti}`;
+    tile.classList.add('sw-pal');
+    POP.paint(tile, tile.dataset.popKey);
     tile.style.setProperty('--ti', ti);
     tile.addEventListener('touchstart', e => { e.preventDefault(); handleTileTap(tile); }, { passive: false });
     tile.addEventListener('click', e => {
@@ -912,8 +939,10 @@ function handleTileTap(tile) {
   if (emptyIdx === -1) return;
   tile.classList.add('used');
   placed[emptyIdx] = { letter: tile.dataset.letter, tileEl: tile };
+  POP.tap(tile.dataset.popKey, tile, true);   /* Palette Pop: the letter pops in a fresh colour… */
   renderSlots();
   updateAnswerControls();
+  POP.place(slotsEl.querySelector(`.sw-slot[data-idx="${emptyIdx}"]`), tile.dataset.popKey, emptyIdx);   /* …and lands: thump + clack + a climbing note */
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -925,6 +954,7 @@ function handleSlotTap(i) {
   placed[i] = null;
   renderSlots();
   updateAnswerControls();
+  POP.unlock(slotsEl.querySelector(`.sw-slot[data-idx="${i}"]`));
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -935,10 +965,12 @@ function renderSlots() {
     slot.classList.remove('sw-correct', 'sw-wrong', 'sw-dance');
     if (placed[i]) {
       slot.textContent = placed[i].letter; /* already lowercase */
-      slot.className = 'sw-slot filled';
+      slot.className = 'sw-slot filled sw-pp';
+      slot.style.setProperty('--pc', POP.color(placed[i].tileEl.dataset.popKey));   /* the colour travels with the letter */
     } else {
       slot.textContent = '';
       slot.className = 'sw-slot empty';
+      slot.style.removeProperty('--pc');
     }
     slot.dataset.idx = i;
     attachSlot(slot, i);
@@ -963,6 +995,7 @@ clearBtn.addEventListener('click', () => {
   placed.forEach(p => { if (p) p.tileEl.classList.remove('used'); });
   placed = new Array(answerChars(allCards[idx]).length).fill(null);
   renderSlots();
+  POP.unlock(null);
   feedbackEl.textContent = '';
   updateAnswerControls();
 });
@@ -995,6 +1028,9 @@ function resolveCorrect(card, slotEls) {
   // the blue-gold version.
   U.impactChain(slotEls, { outcome: isRecovery ? 'recover' : 'hit', stagger: 55,
     combo: res.combo || 1, sharp: !!res.sharp, container: slotsEl });
+  // Palette Pop: each letter bursts in its own colour on the same stagger,
+  // gems fly to the score, then the word rings with a +1.
+  POP.spell(slotEls, slotEls.map((_, i) => placed[i] && placed[i].tileEl.dataset.popKey), res.combo || 1, 55, slotsEl);
   const bankBefore = recoveryBank;
   if (isRecovery) {
     recoveredItems.add(idx);
@@ -1078,6 +1114,8 @@ function resolveWrong(card, slotEls) {
   // Wrong letters crack with a little dust; right ones glow: they stay anchored.
   U.impactChain(slotEls, { outcome: 'miss', stagger: 50,
     isRight: (el, i) => !!(placed[i] && placed[i].letter === target[i]) });
+  // Palette Pop: a crunch, and only the wrong letters crumble (never gems or colour).
+  POP.misspell(slotEls, (el, i) => !!(placed[i] && placed[i].letter === target[i]), 50);
 
   feedbackEl.textContent = isFinalAttempt
     ? 'Tough one — the answer is shown, then we move on.'

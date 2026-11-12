@@ -343,7 +343,9 @@ const CURRENT_CACHES = {
   // Razzle-dazzle Pass 6: Tap-game rune styles (theme/game.css .bimp-rune).
   // Palette Pop pass: world palettes (theme/game-skin.css --pal-*) and the
   // poppier combo pill + floating points (theme/game.css .brun-*).
-  assets: 'booha-assets-2026-618',
+  // Palette Pop pass 2: combo pill contrast (solid hot colours, sweep behind
+  // the text), screen-reader line, palette contrast tweaks, Spell the Word.
+  assets: 'booha-assets-2026-619',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

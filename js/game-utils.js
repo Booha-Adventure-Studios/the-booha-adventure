@@ -1269,13 +1269,16 @@ const UTILS = {
        motion, or no animation frames (tests), sets the value at once. */
     const fxCount = (el, to) => {
       if (!el) return;
-      const from = Number.isFinite(el._brunShown) ? el._brunShown : to;
-      el._brunShown = to;
-      const show = v => { el.textContent = Math.round(v).toLocaleString('en-US'); };
+      // Continue from the number on screen, so a gain that lands mid-roll
+      // never jumps back or restarts from a stale value.
+      const from = Number.isFinite(el._brunDisp) ? el._brunDisp : to;
+      const tok = (el._brunTok || 0) + 1;
+      el._brunTok = tok;
+      const show = v => { el._brunDisp = v; el.textContent = Math.round(v).toLocaleString('en-US'); };
       if (from === to || fxReduced() || typeof requestAnimationFrame !== 'function') { show(to); return; }
       const t0 = performance.now(), dur = 350;
       const step = now => {
-        if (el._brunShown !== to) return;               // a newer count took over
+        if (el._brunTok !== tok) return;                 // a newer count took over
         const k = Math.min(1, (now - t0) / dur);
         show(from + (to - from) * (1 - Math.pow(1 - k, 3)));
         if (k < 1) requestAnimationFrame(step);
@@ -1314,9 +1317,11 @@ const UTILS = {
       if (!hudEl) {
         hudEl = document.createElement('div');
         hudEl.className = 'brun-hud';
-        hudEl.setAttribute('aria-live', 'polite');
-        hudEl.innerHTML = '<span class="brun-mult"></span><span class="brun-meter" aria-hidden="true">' +
-          '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b class="brun-pts"></b>';
+        // Screen readers get one quiet line per change (.brun-sr); the
+        // rolling number and the meter are visual only.
+        hudEl.innerHTML = '<span class="brun-mult" aria-hidden="true"></span><span class="brun-meter" aria-hidden="true">' +
+          '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b class="brun-pts" aria-hidden="true"></b>' +
+          '<span class="brun-sr" role="status" aria-live="polite"></span>';
         document.body.appendChild(hudEl);
       }
       const m = MULT(st.combo);
@@ -1324,6 +1329,9 @@ const UTILS = {
       // Palette Pop pass (2026-11-12): same words, but the number is the hero.
       hudEl.querySelector('.brun-mult').innerHTML = st.combo >= 3 ? `COMBO <em>×${m}</em>` : (st.combo ? `<em>${st.combo}</em> in a row` : '');
       fxCount(hudEl.querySelector('.brun-pts'), st.points);
+      const sr = hudEl.querySelector('.brun-sr');
+      const said = (st.combo >= 3 ? `Combo ×${m}, ` : st.combo ? `${st.combo} in a row, ` : '') + `${st.points.toLocaleString('en-US')} points`;
+      if (sr && sr.textContent !== said) sr.textContent = said;
       hudEl.querySelectorAll('.brun-meter i').forEach((dot, i) => dot.classList.toggle('on', i < Math.min(10, st.combo)));
       hudEl.classList.toggle('hot', st.combo >= 3);
       hudEl.dataset.level = String(m);

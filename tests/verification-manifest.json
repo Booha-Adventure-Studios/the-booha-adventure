@@ -244,6 +244,11 @@
       "path": "tests/weekly-medals.test.cjs",
       "status": "verify",
       "reason": "Current weekly medals: rules, best-curriculum counting, fresh start, one popup per medal, bonus stars, and popup page wiring."
+    },
+    {
+      "path": "tests/palette-pop-audit.cjs",
+      "status": "verify",
+      "reason": "Palette Pop: palettes avoid verdict hues and read at 4.5:1, selected/placed palette states win against the skin and lose to verdicts, flash cap keeps wrong feedback, effect caps, combo roll and single screen-reader line."
     }
   ]
 }
