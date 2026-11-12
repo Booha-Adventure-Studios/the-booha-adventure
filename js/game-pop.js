@@ -363,6 +363,15 @@ window.BoohaPop = (() => {
         }, i * (stagger || 50));
       });
     },
+    // Time ran out: the timer bar smokes and fizzles (a miss, never a prize).
+    fizzle(el) {
+      prevOk = null;
+      SFX.unlock();
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      for (let i = 0; i < 5; i++) smoke(r.left + r.width * (i + .5) / 5, r.top + r.height / 2, 1);
+      sparks(r, 6, light() ? '#9a8a92' : '#8d8a99', .5);
+    },
     round(score, board, total = 5) {
       prevOk = null;
       score = Math.round(score / Math.max(1, total) * 5);   // finale sized on a 0–5 scale
