@@ -160,7 +160,18 @@ assert.match(pop, /const POOL = 360/, 'one fixed particle pool');
 assert.match(pop, /const cap = \(\) => \(power\(\) === 'minimal' \? 50 : power\(\) === 'reduced' \? 150 : POOL\)/, 'tier caps');
 assert.match(pop, /function spawn\(p, deco\) \{\s*if \(reduced\(\) \|\| live >= cap\(\)/, 'nothing flies under reduced motion, never past the cap');
 assert.match(pop, /if \(deco && \(govern < 1 \|\| live >= cap\(\) \* \.6\) && live >= cap\(\) \* \.35\) return null;/, 'when slow or crowded, decorative particles are refused first');
-for (const k of ['confetti', 'smoke']) assert.match(pop, new RegExp(`kind: '${k}'[^}]*\\}, true\\)`), `${k} is marked decorative`);
+for (const k of ['confetti', 'smoke']) assert.match(pop, new RegExp(`kind: '${k}'[^}]*\\}, !keep\\)`), `${k} is decorative unless it is the feedback itself`);
+// The timeout smoke and the streak/round finale ARE the feedback: thinned when slow, never dropped.
+const fizzleFn = pop.slice(pop.indexOf('fizzle(el) {'), pop.indexOf('round(score, board'));
+assert.match(fizzleFn, /smoke\([^;]*, 1, true\)/, 'timeout smoke is kept under the governor');
+const roundFn = pop.slice(pop.indexOf('round(score, board'), pop.indexOf('};\n})();'));
+assert.match(roundFn, /confetti\(cx, r\.top \+ r\.height \* \.45, 80, 1\.15, true\)/, '5/5 and 15-streak main burst is kept');
+assert.match(roundFn, /score >= 3\) \{ confetti\([^)]*, true\)/, '3+ burst is kept');
+// One firing per event.
+assert.match(pop, /function once\(tag, el\)/, 'a dedupe guard exists');
+assert.match(fizzleFn, /if \(!once\('fizzle', el\)\) return;/, 'a repeated timeout call cannot fizzle twice');
+assert.match(roundFn, /if \(!once\('round', board\)\) return;/, 'a repeated milestone call cannot fire twice');
+assert.match(vs, /function onTimeout\(\) \{\s*if \(locked \|\| feedbackState !== 'playing'\) return;/, 'Speed: the game itself fires a timeout once per question');
 assert.doesNotMatch(pop, /function sparks[^\n]*\n[^\n]*\}, true\)/, 'sparks (the tap/answer response) are never decorative');
 assert.match(pop, /const MAX_VOICES = 10/, 'never more than 10 effect voices at once');
 assert.match(pop, /if \(!busy\(\)\) \{ if \(g\) \{[^}]*clearRect[^}]*\} if \(pendingResize\) size\(\); return; \}/, 'the canvas loop stops (and clears) when idle; a resolution drop waits for idle');
@@ -172,7 +183,7 @@ for (const [re, what] of [[/cancelAnimationFrame\(raf\)/, 'animation frame'], [/
 assert.match(pop, /addEventListener\('pagehide', reset\);/, 'reset on page close / navigation');
 assert.match(pop, /visibilitychange[^\n]*document\.hidden\) reset\(\)/, 'reset when the tab is hidden');
 assert.doesNotMatch(pop.replace(/function later[^\n]*/, ''), /\bsetTimeout\(/, 'every delayed effect goes through later() so reset() can cancel it');
-for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/]])
+for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['vocab-speed replay', vs, /getElementById\('vs-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/]])
   assert.match(src, re, `${name}: restart clears leftover effects`);
 assert.match(pop, /pointer-events:none/, 'the effects canvas never takes taps');
 assert.match(utils, /if \(now - \(last\.get\(el\) \|\| 0\) < 120\) return;/, 'score-pill pops are throttled');
@@ -242,6 +253,8 @@ assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game
 for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
-assert(!/assets: 'booha-assets-2026-617'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS');
+assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');
+{ const swSrc = read('sw.js'); const core = swSrc.slice(swSrc.indexOf('const CORE_ASSETS = ['), swSrc.indexOf('const ASSET_PREFIXES = ['));
+  assert(core.includes('`${BASE}/js/game-pop.js`'), 'game-pop.js is precached at install, so a first offline game still has its effects'); }
 
 console.log('Palette Pop audit passed: palettes avoid verdict hues and read ≥ 4.5:1, the selected/placed exception wins the cascade and loses to verdicts, placed ≠ right, the flash cap keeps wrong feedback, effects capped/idle-safe, roll continues from screen value with one SR line, hot pill contrast OK, wiring present.');

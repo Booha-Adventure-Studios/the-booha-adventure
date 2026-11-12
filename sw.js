@@ -345,7 +345,9 @@ const CURRENT_CACHES = {
   // poppier combo pill + floating points (theme/game.css .brun-*).
   // Palette Pop pass 2: combo pill contrast (solid hot colours, sweep behind
   // the text), screen-reader line, palette contrast tweaks, Spell the Word.
-  assets: 'booha-assets-2026-619',
+  // Palette Pop pass 3: js/game-pop.js joins the install-time precache (beside
+  // booha-sfx.js / game-motion.js) so a first offline game still has effects.
+  assets: 'booha-assets-2026-620',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
@@ -443,6 +445,7 @@ const CORE_ASSETS = [
   `${BASE}/js/menu-core.js`,
   `${BASE}/js/booha-sfx.js`,
   `${BASE}/js/game-motion.js`,
+  `${BASE}/js/game-pop.js`,
   `${BASE}/assets/img/profile.webp`,
   `${BASE}/assets/img/pre-boo.webp`,
   `${BASE}/assets/img/boo-tree.webp`,

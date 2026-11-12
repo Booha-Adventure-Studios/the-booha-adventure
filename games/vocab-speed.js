@@ -1572,6 +1572,7 @@ function revealResults(runTime) {
    REPLAY / BACK
    ══════════════════════════════════════════════════════════════ */
 document.getElementById('vs-replay').addEventListener('click', () => {
+  POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
   clearResultEffects();
   if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
   finalClimaxTimer = null;
