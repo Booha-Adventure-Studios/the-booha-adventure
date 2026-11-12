@@ -1178,6 +1178,7 @@ function showResults() {
   const backBtn   = document.getElementById('vt-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
+    POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
     mainWrap.style.display = '';
     /* Re-shuffle everything on replay */
     allCards = buildShuffledDeck();

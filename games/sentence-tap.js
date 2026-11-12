@@ -552,6 +552,42 @@ body.hira-mode .st-hira-icon{ transform:rotate(180deg); }
   .st-hira-btn{ padding:9px 12px; }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PALETTE POP (2026-11-12): every English sentence strip carries a
+   colour from the world's palette (--pal-1..12 in game-skin.css). The
+   paper strip stays; the colour rings it and becomes its torn edge, and a
+   selected strip fills with it. A pair carries its colour to the Japanese
+   slot until Check, when correct-green / wrong-orange take over as always.
+   ══════════════════════════════════════════════════════════════ */
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]{
+  box-shadow:inset 0 0 0 3px var(--c),0 4px 0 color-mix(in srgb,var(--c) 62%,#000),0 10px 20px rgba(0,0,0,.28);
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background-color .2s,opacity .2s;
+}
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]:hover{ box-shadow:inset 0 0 0 3px var(--c),0 8px 0 color-mix(in srgb,var(--c) 62%,#000),0 16px 26px rgba(0,0,0,.3); }
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]:active{ box-shadow:inset 0 0 0 3px var(--c),0 1px 0 color-mix(in srgb,var(--c) 62%,#000),0 5px 10px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal.selected[data-ci]{
+  background:var(--c);
+  box-shadow:0 0 0 3px #fff,0 0 28px var(--c),0 9px 0 color-mix(in srgb,var(--c) 55%,#000),0 16px 26px rgba(0,0,0,.32);
+}
+html[data-skin="v2"][data-curriculum="pb"] .st-en-card.st-pal.selected[data-ci]{
+  box-shadow:0 0 0 3px #fff,0 0 0 6px color-mix(in srgb,var(--c) 55%,transparent),0 0 24px color-mix(in srgb,var(--c) 60%,transparent),0 9px 0 color-mix(in srgb,var(--c) 55%,#000);
+}
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal.selected[data-ci] .st-en-text{ color:var(--c-ink); }
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal.selected[data-ci]::after{ border-color:var(--c); }
+html[data-skin="v2"][data-curriculum] .st-jp-slot.has-pair.st-pp:not(.slot-correct):not(.slot-wrong){
+  box-shadow:inset 0 0 0 3px var(--pc),0 0 18px color-mix(in srgb,var(--pc) 55%,transparent),0 5px 0 rgba(0,0,0,.35);
+}
+html[data-skin="v2"][data-curriculum="pb"] .st-jp-slot.has-pair.st-pp:not(.slot-correct):not(.slot-wrong){
+  box-shadow:inset 0 0 0 3px var(--pc),0 0 14px color-mix(in srgb,var(--pc) 50%,transparent),0 5px 0 #c9dcf0;
+}
+html[data-skin="v2"][data-curriculum] .st-jp-slot.st-pp:not(.slot-correct):not(.slot-wrong) .st-drop.filled{ box-shadow:0 2px 0 var(--pc); }
+/* "You placed this here" (never "this is right"): a colour pin on the strip
+   that matches the sentence you tapped. No fill, no icon. Check's
+   green/orange fill and ✓/✗ replace it. */
+html[data-skin="v2"][data-curriculum] .st-jp-slot.st-pp:not(.slot-correct):not(.slot-wrong) .st-drop.filled::before{
+  content:''; display:inline-block; flex:none; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0;
+  background:var(--pc); box-shadow:0 0 0 2px rgba(43,26,5,.28);
+}
 `;
 document.head.appendChild(S);
 
@@ -660,6 +696,11 @@ const hiraLabel   = document.getElementById('st-hira-label');
 const helpBtn     = document.getElementById('st-help');
 const modalOverlay= document.getElementById('st-modal-overlay');
 
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load. */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
+POP.init({ pill: '.st-score-pill' });
+
 /* ══════════════════════════════════════════════════════════════
    HIRA TOGGLE
    ══════════════════════════════════════════════════════════════ */
@@ -712,6 +753,7 @@ function startRound(ri) {
   roundCards   = allCards.slice(ri * 5, ri * 5 + 5);
   /* Shuffle JP slots independently — ensure answers aren't aligned */
   roundJpOrder = U.shuffle(roundCards.slice());
+  POP.newRound(roundCards);   /* Palette Pop: five different palette colours */
   selectedEnKey = null;
   pairs         = {};
   globalLocked  = false;
@@ -763,6 +805,7 @@ function renderEnBank() {
         playSent(card.mp3);
         selectedEnKey = selectedEnKey === card._key ? null : card._key;
         render();
+        POP.tap(card._key, btn);   /* Palette Pop: re-roll the colour + pop */
       }, { passive: false });
 
       btn.addEventListener('click', (e) => {
@@ -773,6 +816,7 @@ function renderEnBank() {
         playSent(card.mp3);
         selectedEnKey = selectedEnKey === card._key ? null : card._key;
         render();
+        POP.tap(card._key, btn);   /* Palette Pop: re-roll the colour + pop */
       });
 
       enBank.appendChild(btn);
@@ -785,9 +829,10 @@ function renderEnBank() {
       }
     }
 
-    btn.className = 'st-en-card'
+    btn.className = 'st-en-card st-pal'
       + (isSelected ? ' selected' : '')
       + (isPaired   ? ' leaving'  : '');
+    POP.paint(btn, card._key);
   });
 }
 
@@ -800,7 +845,9 @@ function renderJpSlots() {
 
     const slot = document.createElement('button');
     slot.type = 'button';
-    slot.className = 'st-jp-slot' + (pairedCard ? ' has-pair' : '');
+    slot.dataset.key = card._key;
+    slot.className = 'st-jp-slot' + (pairedCard ? ' has-pair st-pp' : '');
+    if (pairedCard) slot.style.setProperty('--pc', POP.color(pairedEnKey));   /* the colour travels with the sentence */
     slot.innerHTML = `
       <div class="st-jp-word-wrap">
         <span class="st-jp-kanji">${card.jp}</span>
@@ -815,15 +862,18 @@ function renderJpSlots() {
       if (!selectedEnKey && pairedCard) {
         delete pairs[card._key];
         render();
+        POP.unlock(jpSlots.querySelector(`[data-key="${card._key}"]`));
         return;
       }
       if (selectedEnKey) {
         for (const [jk, ek] of Object.entries(pairs)) {
           if (ek === selectedEnKey) { delete pairs[jk]; break; }
         }
+        const lockedKey = selectedEnKey;
         pairs[card._key] = selectedEnKey;
         selectedEnKey = null;
         render();
+        POP.lock(jpSlots.querySelector(`[data-key="${card._key}"]`), lockedKey);   /* thump + clack */
       }
     });
 
@@ -837,6 +887,7 @@ function renderJpSlots() {
 
 
 function flashWrong() {
+  if (!POP.canFlash()) return;   // at most 3 bright flashes a second, shared with Palette Pop
   const div = document.createElement('div');
   div.className = 'st-wrong-flash';
   document.body.appendChild(div);
@@ -877,6 +928,7 @@ async function gradeRound() {
       const hit = run.hit(checkedAt) || {};
       // The match lights like a connected rune; it climbs with the streak.
       U.impact({ source: el, outcome: 'hit', combo: hit.combo || 1, sharp: !!hit.sharp, flavor: 'match', squash: false });
+      POP.correct(el, pairs[jpCard._key], hit.combo || 1);   // Palette Pop: burst, +1, gems to the score, chain
       /* Pass 2: quick cascade; each correct answer in a row dings a step higher */
       U.playSFX('ding', { rate: Math.min(1.5, 1 + dingStep * 0.06) });
       dingStep++;
@@ -888,6 +940,7 @@ async function gradeRound() {
       window.__brunTap = { el, t: performance.now() };
       run.miss();
       U.impact({ source: el, outcome: 'miss', flavor: 'match', squash: false });   // a dusty poof
+      POP.wrong(el);   // Palette Pop: crunch, debris, smoke, cracks (never gems or colour)
       if (jpCard && !missedItems.some(item => item.jp === jpCard.jp)) missedItems.push(jpCard);
       U.playSFX('fart');
       flashWrong();
@@ -898,6 +951,7 @@ async function gradeRound() {
 
   // One finisher for the whole round, sized by how many were right (none
   // for 0), inside the existing end-of-round pause.
+  POP.round(roundScore, jpSlots);   // Palette Pop: palette firework on 5/5
   U.impactRound(jpSlots, roundScore, slotEls.length);
   score += roundScore;
   scoreEl.textContent = String(score);
@@ -974,6 +1028,7 @@ U.emitGameEnd({
   const backBtn   = document.getElementById('st-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
+    POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
     mainWrap.style.display = '';
     allCards = buildShuffledDeck();
     score    = 0;

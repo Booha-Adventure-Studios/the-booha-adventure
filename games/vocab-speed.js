@@ -1122,6 +1122,7 @@ function bindSingleActivation(element, handler) {
 }
 
 function doStart() {
+  POP.reset();   /* Palette Pop: a restart starts clean */
   unlockAllAudio();
   feedbackState = 'playing';
   order = U.shuffle(CFG.cards.slice(0, 15));
