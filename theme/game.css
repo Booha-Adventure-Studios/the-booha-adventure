@@ -1154,10 +1154,11 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
   background: color-mix(in srgb, var(--game-bg) 86%, transparent);
   box-shadow: inset 0 0 0 2px var(--game-border), 0 4px 0 rgba(0,0,0,.28), 0 8px 18px rgba(0,0,0,.28);
   font-family: var(--game-font-body); font-size: 15px; font-weight: 900; color: var(--game-ink);
-  font-variant-numeric: tabular-nums; transform-origin: left center;
+  font-variant-numeric: tabular-nums; transform-origin: left center; isolation: isolate;
 }
 /* Palette Pop pass (2026-11-12): the streak number and points are the heroes. */
 .brun-mult:empty { display: none; }
+.brun-sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .brun-mult { white-space: nowrap; letter-spacing: .02em; }
 .brun-mult em { font-style: normal; display: inline-block; font-family: var(--game-font-title); font-size: 1.6em; line-height: 1; vertical-align: -3px; margin-right: 2px; color: #ffc94a; text-shadow: 0 2px 0 rgba(0,0,0,.35); }
 [data-curriculum="pb"] .brun-mult em { color: #d17a00; text-shadow: none; }
@@ -1173,18 +1174,19 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 @keyframes brunPop { 40% { transform: scale(1.5) rotate(-4deg); } }
 .brun-hud.tick { animation: brunTick .26s cubic-bezier(.3,1.6,.5,1); }
 @keyframes brunTick { 40% { transform: scale(1.09); } }
-.brun-hud.hot { font-size: 17px; box-shadow: inset 0 0 0 2px #ffc94a, 0 4px 0 #a8701a, 0 0 22px rgba(255,190,60,.5);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--game-bg) 68%, #ffc94a), color-mix(in srgb, var(--game-bg) 86%, transparent) 70%); }
-.brun-hud.hot .brun-mult { color: #e0a21a; }
-.brun-hud[data-level="2"] { font-size: 18px; box-shadow: inset 0 0 0 2px #ff9a3c, 0 4px 0 #a8501a, 0 0 26px rgba(255,140,50,.55);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--game-bg) 60%, #ff9a3c), color-mix(in srgb, var(--game-bg) 84%, transparent) 70%); }
-.brun-hud[data-level="3"] { font-size: 19px; box-shadow: inset 0 0 0 2px #ff5e9a, 0 4px 0 #a02a5a, 0 0 30px rgba(255,90,150,.6);
-  background: linear-gradient(135deg, color-mix(in srgb, var(--game-bg) 52%, #ff5e9a), color-mix(in srgb, var(--game-bg) 50%, #ff9a3c) 60%, color-mix(in srgb, var(--game-bg) 84%, transparent)); }
-.brun-hud[data-level="3"] .brun-mult em { color: #ffe08a; }
-[data-curriculum="br"] .brun-hud.hot .brun-mult, [data-curriculum="bc"] .brun-hud.hot .brun-mult { color: #ffc94a; }
-/* A light sweep across the pill while a combo is live. */
-.brun-hud.hot::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%; pointer-events: none;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,.38), transparent); transform: translateX(-150%);
+/* Hot pills are solid colour with dark ink (contrast ≥ 6:1 at every level);
+   the light sweep runs BEHIND the text, never over it. */
+.brun-hud.hot { font-size: 17px; color: #2b1a05; background: #ffc94a;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.55), 0 4px 0 #a8701a, 0 0 22px rgba(255,190,60,.55); }
+.brun-hud[data-level="2"] { font-size: 18px; background: #ff9a3c; box-shadow: inset 0 0 0 2px rgba(255,255,255,.55), 0 4px 0 #a8501a, 0 0 26px rgba(255,140,50,.6); }
+.brun-hud[data-level="3"] { font-size: 19px; color: #2a0610; background: linear-gradient(135deg, #ff6fa6, #ff9a3c);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.6), 0 4px 0 #a02a5a, 0 0 30px rgba(255,90,150,.6); }
+.brun-hud.hot :is(.brun-mult, .brun-mult em, .brun-pts) { color: inherit; text-shadow: none; }
+.brun-hud.hot .brun-meter i { background: rgba(43,26,5,.22); box-shadow: none; }
+.brun-hud.hot .brun-meter i.on { background: currentColor; }
+.brun-hud > :not(.brun-sr) { position: relative; z-index: 1; }
+.brun-hud.hot::after { content: ''; position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; width: 40%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: translateX(-150%);
   animation: brunShine 1.7s ease-in-out infinite; }
 @keyframes brunShine { 55%, 100% { transform: translateX(380%); } }
 .brun-hud.pulse { animation: brunPulse .5s cubic-bezier(.3,1.6,.5,1); }

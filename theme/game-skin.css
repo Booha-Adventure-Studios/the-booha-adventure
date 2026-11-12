@@ -64,11 +64,17 @@ html[data-skin="v2"][data-curriculum="pb"] {
    Twelve card colours per world. Vocabulary Tap gives every English card
    one, re-rolls it on each tap, and the pair carries it to its Japanese
    slot. MEANING stays untouchable: no palette colour is a correct-green
-   or a wrong-orange, so a coloured card never hints at an answer. */
+   or a wrong-orange, so a coloured card never hints at an answer. Every
+   colour reads at 4.5:1 or better with dark (#2b1a05) or white text, and
+   the engine picks whichever is higher (tests/palette-pop-audit.cjs).
+   EXCEPTION to the "selected = lane colour" rule: in Vocabulary Tap a
+   selected card fills with its own palette colour (engine CSS, which loads
+   later and wins); in Spell the Word, tiles and placed slots wear a
+   palette ring. Correct-green / wrong-orange still beat both. */
 html[data-skin="v2"][data-curriculum="br"] {   /* Toxic Neon */
   --pal-1: #FFE600; --pal-2: #C6FF1A; --pal-3: #00FFC2; --pal-4: #22DDFF;
-  --pal-5: #7DF9FF; --pal-6: #2E9BFF; --pal-7: #5B5CFF; --pal-8: #A855FF;
-  --pal-9: #D400FF; --pal-10: #F03CFF; --pal-11: #FF2288; --pal-12: #FF7AD9;
+  --pal-5: #7DF9FF; --pal-6: #2E9BFF; --pal-7: #5B5CFF; --pal-8: #B266FF;
+  --pal-9: #DC33FF; --pal-10: #F03CFF; --pal-11: #FF2288; --pal-12: #FF7AD9;
 }
 html[data-skin="v2"][data-curriculum="bc"] {   /* Cold Electric */
   --pal-1: #00F0FF; --pal-2: #A6FBFF; --pal-3: #00E5D4; --pal-4: #2B8CFF;
@@ -76,9 +82,9 @@ html[data-skin="v2"][data-curriculum="bc"] {   /* Cold Electric */
   --pal-9: #FF2BD6; --pal-10: #FF8FCB; --pal-11: #E8F6FF; --pal-12: #B8B5FF;
 }
 html[data-skin="v2"][data-curriculum="pb"] {   /* Candy Shop */
-  --pal-1: #FF6EB4; --pal-2: #E8407A; --pal-3: #F2C200; --pal-4: #A8C800;
+  --pal-1: #FF6EB4; --pal-2: #F0508A; --pal-3: #F2C200; --pal-4: #A8C800;
   --pal-5: #2EC4A0; --pal-6: #22B8D6; --pal-7: #3D9BFF; --pal-8: #6E7CFF;
-  --pal-9: #8A5CFF; --pal-10: #B57BFF; --pal-11: #D85CF0; --pal-12: #FF8AD8;
+  --pal-9: #7A45FF; --pal-10: #B57BFF; --pal-11: #D85CF0; --pal-12: #FF8AD8;
 }
 
 /* ── 2. LANE tokens ────────────────────────────────────────────── */
