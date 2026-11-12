@@ -33,6 +33,7 @@ This file is a factual map of the project for AI tools: what exists, where it li
 ## Implemented: story worlds
 
 - `karasuki.html` (`js/karasuki.js`): hub world; Wanderers (collectable characters with authored English/Japanese stories, `js/karasuki-wanderer-data.js`).
+- Karasuki Cards (`js/karasuki-cards.js`, `js/karasuki-card-challenge.js`): after all three weekly Blitz challenges are cleared, students can attempt a 10-round word-recall challenge in Karasuki. Each word is shown, hidden, then typed from memory; 8 correct answers win that Wanderer's collectible card. Students may make up to two attempts per week and win at most one card that week. Words are drawn from vocabulary in the previous 1–6 weeks, with current-week words used if there are not enough usable review words.
 - `grimmerglen.html` (`js/grimmerglen.js`, `js/grimmerglen-typing.js`): memory recovery through tiered typing (choices → clues → whole-memory recall) at Starter, Case, and Deep levels.
 - `utsuroba.html` (`js/utsuroba.js`, `js/utsuroba-reading.js`): reading episodes with sequence, detail, and inference tasks; drifter quests. `family-room.html` (Akiya) is a study space inside it.
 - `muenba.html` (`js/muenba.js`): ghost cemetery with briefings, hunts, hiding, and reading gates.
@@ -82,7 +83,6 @@ This file is a factual map of the project for AI tools: what exists, where it li
 
 ## Planned
 
-- A Wanderer recall challenge in Karasuki: after the weekly Blitz challenges, a Wanderer shows a word, hides it, and the student writes it from memory, using words from earlier weeks (scheduled review). Winning awards a collectable card.
 - Cloze (gap-fill) recall for Grimmerglen Deep Memory.
 
 ## Optional
