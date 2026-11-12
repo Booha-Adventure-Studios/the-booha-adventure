@@ -177,10 +177,12 @@ window.BoohaPop = (() => {
       for (let j = 0; j < 5; j++) { const a = j / 5 * Math.PI * 2; pts.push([Math.cos(a) * rnd(.5, 1), Math.sin(a) * rnd(.5, 1)]); }
       spawn({ x: e.x, y: e.y, vx: (e.nx + rnd(-.7, .7)) * rnd(80, 260), vy: -rnd(60, 260), g: 1300, drag: .6, life: rnd(.6, .9), size: rnd(4, 9), rot: rnd(0, 6), vr: rnd(-14, 14), col: light() ? '#7a6a72' : pick(['#3a3442', '#4a4552', '#2a2530', '#5b5566']), kind: 'chunk', pts }); }
   }
-  function smoke(x, y, k) { for (let i = 0; i < n(k, true); i++) spawn({ x: x + rnd(-10, 10), y: y + rnd(-6, 6), vx: rnd(-30, 30), vy: rnd(-60, -20), g: -20, drag: 1.5, life: rnd(.45, .75), size: rnd(6, 11), col: light() ? '#b9a9b2' : '#6f6a7a', kind: 'smoke' }, true); }
-  function confetti(x, y, k, spread) { const P = palette();
+  // keep = the smoke IS the feedback (a timeout): fewer pieces when slow, never dropped.
+  function smoke(x, y, k, keep) { for (let i = 0; i < n(k, true); i++) spawn({ x: x + rnd(-10, 10), y: y + rnd(-6, 6), vx: rnd(-30, 30), vy: rnd(-60, -20), g: -20, drag: 1.5, life: rnd(.45, .75), size: rnd(6, 11), col: light() ? '#b9a9b2' : '#6f6a7a', kind: 'smoke' }, !keep); }
+  // keep = the burst IS the feedback (a streak or round finale): fewer pieces when slow, never dropped.
+  function confetti(x, y, k, spread, keep) { const P = palette();
     for (let i = 0; i < n(k, true); i++) { const a = rnd(-Math.PI, 0), sp = rnd(220, 620) * spread;
-      spawn({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 520, drag: 1.4, life: rnd(.9, 1.5), size: rnd(4, 8), rot: rnd(0, 6), vr: rnd(-16, 16), col: pick(P), kind: 'confetti' }, true); }
+      spawn({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 520, drag: 1.4, life: rnd(.9, 1.5), size: rnd(4, 8), rot: rnd(0, 6), vr: rnd(-16, 16), col: pick(P), kind: 'confetti' }, !keep); }
   }
   function ring(r, col, grow = 18, life = .32, width = 3) { if (reduced() || !ensureCanvas()) return; rings.push({ r, col, grow, life, t: 0, width }); wake(); }
   /* "+1" / "×3" labels are real text (always sharp on Retina), animated with
@@ -216,6 +218,9 @@ window.BoohaPop = (() => {
 
   /* Every delayed effect goes through later(), so reset() can cancel it. */
   const timers = new Set();
+  // One firing per event: a repeated call for the same target inside 250 ms is ignored.
+  const lastFire = new Map();
+  function once(tag, el) { const t = performance.now(), k = lastFire.get(tag); if (k && k.el === el && t - k.t < 250) return false; lastFire.set(tag, { el, t }); return true; }
   function later(fn, ms) { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); return id; }
 
   /* ── loop: runs only while something is on screen ── */
@@ -313,6 +318,7 @@ window.BoohaPop = (() => {
     if (raf) cancelAnimationFrame(raf); raf = 0; last = 0;
     timers.forEach(clearTimeout); timers.clear();
     for (const p of pool) p.on = false; live = 0;
+    lastFire.clear();
     rings.length = 0; texts.length = 0; bolts.length = 0; cracks.length = 0; tint = null; prevOk = null;
     labels.forEach(el => el.remove()); labels.clear();
     liveNodes.forEach(node => { try { node.onended = null; node.stop(); } catch (_) {} }); liveNodes.clear(); voices = 0;
@@ -413,14 +419,16 @@ window.BoohaPop = (() => {
     },
     // Time ran out: the timer bar smokes and fizzles (a miss, never a prize).
     fizzle(el) {
+      if (!once('fizzle', el)) return;
       prevOk = null;
       SFX.unlock();
       if (!el) return;
       const r = el.getBoundingClientRect();
-      for (let i = 0; i < 5; i++) smoke(r.left + r.width * (i + .5) / 5, r.top + r.height / 2, 1);
+      for (let i = 0; i < 5; i++) smoke(r.left + r.width * (i + .5) / 5, r.top + r.height / 2, 1, true);
       sparks(r, 6, light() ? '#9a8a92' : '#8d8a99', .5);
     },
     round(score, board, total = 5) {
+      if (!once('round', board)) return;
       prevOk = null;
       score = Math.round(score / Math.max(1, total) * 5);   // finale sized on a 0–5 scale
       SFX.finale(score);
@@ -428,11 +436,11 @@ window.BoohaPop = (() => {
       const r = board.getBoundingClientRect(), cx = r.left + r.width / 2;
       if (score >= 5) {
         if (!reduced() && canFlash()) { tint = { col: pick(palette()), t: 0, life: .32 }; ensureCanvas() && wake(); }
-        confetti(cx, r.top + r.height * .45, 80, 1.15); confetti(r.left + r.width * .2, r.bottom, 26, .9); confetti(r.right - r.width * .2, r.bottom, 26, .9);
+        confetti(cx, r.top + r.height * .45, 80, 1.15, true); confetti(r.left + r.width * .2, r.bottom, 26, .9); confetti(r.right - r.width * .2, r.bottom, 26, .9);
         ring(r, pick(palette()), 30, .45, 6); ring(r, '#ffffff', 14, .3, 3);
-      } else if (score >= 3) { confetti(cx, r.top + r.height * .5, 50, .9); ring(r, pick(palette()), 18, .35, 4); }
-      else if (score >= 1) confetti(cx, r.top + r.height * .5, 16, .6);
-      else smoke(cx, r.top + r.height * .5, 10);
+      } else if (score >= 3) { confetti(cx, r.top + r.height * .5, 50, .9, true); ring(r, pick(palette()), 18, .35, 4); }
+      else if (score >= 1) confetti(cx, r.top + r.height * .5, 16, .6, true);
+      else smoke(cx, r.top + r.height * .5, 10, true);
     },
   };
 })();
