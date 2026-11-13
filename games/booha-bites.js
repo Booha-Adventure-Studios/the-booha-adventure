@@ -226,6 +226,11 @@ html[data-motion="reduced"] .bb-belly{transition:none}
 .bb-choice.locked{pointer-events:none}
 .bb-choice.enter{opacity:0;transform:translateY(8px) scale(.97)}
 @media (max-width:420px){.bb-choices{gap:8px}.bb-choice{min-height:54px}}
+/* PALETTE POP (2026-11-13, js/game-pop.js): the snacks are candy — each
+   card deals four fresh palette colours as solid fills with the
+   engine-picked ink. Correct-green (+ ✓) and the gobbled fade still win. */
+html[data-skin="v2"][data-curriculum] .bb-choice.bb-pal:not(.correct):not(.wrong){
+  background:var(--c);color:var(--c-ink);box-shadow:0 6px 0 color-mix(in srgb,var(--c) 55%,#000),inset 0 0 0 3px rgba(255,255,255,.4),0 10px 18px rgba(0,0,0,.22)}
 `;
 
 U.mount(`
@@ -252,6 +257,11 @@ const $ = id => document.getElementById(id);
 const sentenceEl = $('bb-sentence'), jpEl = $('bb-jp'), hiraEl = $('bb-hira'), choicesEl = $('bb-choices');
 const cardEl = $('bb-card'), boohaEl = $('bb-booha'), numEl = $('bb-num'), scoreEl = $('bb-score'), dotsEl = $('bb-dots');
 const bwrapEl = $('bb-bwrap');
+
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load. */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
+POP.init({ pill: '#bb-score' });
 
 /* ── Booha comes alive (Pass B1) ───────────────────────────────────────── */
 const IMG = '/the-booha-adventure/assets/img/';
@@ -361,6 +371,7 @@ function introBite(token, gap, done) {
     bounce('chomp');
     sfx('crunch');
     crumbs(g);
+    POP.burst(gap, null, 22, { mixed: true, confetti: 8, spread: .6 });   // Palette Pop: candy crumbs everywhere
     gap.classList.remove('is-hidden');
     replayClass(gap, 'pop');
   });
@@ -369,6 +380,7 @@ function introBite(token, gap, done) {
 }
 
 // Right answer: the word flies from Booha into the gap, then Booha cheers.
+let landKey = null;   // the right snack's colour: the burped-back word explodes in it
 function burpBack(token, word, gap, land) {
   pose('cheer');
   bounce('cheer');
@@ -391,6 +403,7 @@ function burpBack(token, word, gap, land) {
     replayClass(gap, 'pop');
     sfx('pop');
     if (window.GAME_UTILS && U.confetti) U.confetti(gap, 14);
+    if (landKey) POP.correct(gap, landKey, Math.max(1, streak));   // Palette Pop: the word explodes into gems for the score
   }, FLY_MS);
 }
 
@@ -433,6 +446,8 @@ function milestone(n) {
   pose(p);
   bounce(n >= 10 ? 'spin' : 'dance');
   sfx('pop');
+  POP.round(n >= 10 ? 5 : 3, cardEl, 5);            // Palette Pop: a palette firework at 3 / 6…
+  if (n >= 10) POP.fireworks(cardEl, 6, 200);       // …and a full volley at 10
   const token = cardToken;
   setTimeout(() => { boohaEl.classList.remove('dance', 'spin'); if (token === cardToken) pose('idle'); }, 1250);
   return true;
@@ -446,7 +461,13 @@ function finalBurp(done) {
   bwrapEl.appendChild(bubble);
   bellyEl.style.transform = calm() ? '' : 'scale(1.45)';
   sfx('gulp');
-  setTimeout(() => { bubble.classList.add('is-on'); sfx('burp'); }, calm() ? 0 : 280);
+  setTimeout(() => {
+    bubble.classList.add('is-on'); sfx('burp');
+    // Palette Pop: the BURP is an explosion of colour out of Booha.
+    POP.burst(bwrapEl, null, 40, { mixed: true, round: true, grow: 70, speed: 1.4, confetti: 30, spread: 1.1 });
+    POP.fireworks(bwrapEl, 4, 150);
+    if (score === 15) POP.fireworks(cardEl, 8, 180);
+  }, calm() ? 0 : 280);
   setTimeout(() => { setBelly(0); bubble.remove(); done(); }, 1300);
 }
 
@@ -459,6 +480,7 @@ function gobble(btn) {
     btn.classList.add('gone');
     bounce('bleh');
     sfx('gulp');
+    POP.burst(bwrapEl, btn.style.getPropertyValue('--c') || null, 14, { smoke: 6, speed: .7, white: 0 });   // Palette Pop: bleh! the snack comes out as smoke and crumbs
   }, calm() ? 0 : 400);
 }
 
@@ -498,11 +520,14 @@ function showCard() {
   busy = true;                                   // no picks while Booha is biting
 
   choicesEl.innerHTML = '';
+  POP.newRound(r.options.map((_, i) => `bb${idx}-${i}`));   // Palette Pop: four candy colours per card
   r.options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'bb-choice enter';
+    btn.className = 'bb-choice enter bb-pal';
     btn.textContent = opt;
+    btn.dataset.popKey = `bb${idx}-${i}`;
+    POP.paint(btn, btn.dataset.popKey);
     btn.addEventListener('click', () => pick(btn, opt));
     choicesEl.appendChild(btn);
     setTimeout(() => btn.classList.remove('enter'), 60 + i * 55);
@@ -528,6 +553,8 @@ function pick(btn, opt) {
     if (firstTry) { run.hit(); score++; scoreEl.textContent = score; dotState[idx] = 'ok'; streak++; }
     else { run.recover(); dotState[idx] = 'miss'; streak = 0; }
     setBelly(streak);
+    landKey = firstTry ? btn.dataset.popKey : null;   // only a first-try answer bursts into gems
+    if (firstTry && streak >= 3) POP.burst(bwrapEl, null, 6 + streak * 2, { ring: false, mixed: true, speed: .6 });   // a full Booha hiccups sparkles
     btn.classList.add('correct');
     Array.from(choicesEl.children).forEach(b => b.classList.add('locked'));
     const gapEl = $('bb-gap');
@@ -604,6 +631,7 @@ function showResults() {
 $('bb-replay').addEventListener('click', () => {
   cardToken++;
   streak = 0; setBelly(0); stopRing();
+  POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
   rounds = buildRounds();
   idx = 0; score = 0; missedItems = []; dotState.length = 0;
   scoreEl.textContent = '0';
