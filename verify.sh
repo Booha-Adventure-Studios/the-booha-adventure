@@ -2064,6 +2064,13 @@ else
   bad "image metadata guard failed"
 fi
 
+echo "[player] Pre-Boo hiragana default"
+if node tests/preboo-hiragana-default.test.cjs >/dev/null 2>&1; then
+  ok "Pre-Boo games start in hiragana; the switch still works; Replay keeps the default"
+else
+  bad "Pre-Boo hiragana default test failed"
+fi
+
 echo "[player] Polish pass 1"
 if node tests/player-polish-pass1.test.cjs >/dev/null 2>&1; then
   ok "warm-up greeting, Japanese line breaks, Daily Check names/results/inert, compact combo pill"
