@@ -1021,6 +1021,8 @@
     .entryMessageEn{ position:relative; max-width:500px; margin:0; font-family:inherit; font-size:clamp(14px,2.2vw,19px); line-height:1.5; color:rgba(255,255,255,.90); }
     .entryMessageJp{ position:relative; max-width:540px; margin:4px 0 0; font-size:clamp(12px,1.8vw,16px); line-height:1.5; color:rgba(214,220,255,.68); }
     /* Japanese lines break at the spaces between words and avoid a lone last word. */
+    /* The card appears once personalizeMazeIntro() has filled it in (or after a 2.5 s fallback). */
+    #overlay1.entryOverlay:not(.entry-ready) .entryShell{ opacity:0; }
     .entryMessageJp,.entryPlayerJp{ word-break:keep-all; overflow-wrap:anywhere; line-break:strict; text-wrap:pretty; }
     .blitzProgress{ position:relative; width:100%; max-width:470px; margin:clamp(15px,2.8vmin,25px) 0 clamp(18px,3.4vmin,30px); padding:13px 15px 12px; border-radius:18px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.11); }
     .blitzProgressHead{ display:flex; justify-content:space-between; gap:10px; margin-bottom:10px; font-size:10px; font-weight:1000; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.56); }
@@ -1509,6 +1511,7 @@ function personalizeMazeIntro() {
   const overlay = document.getElementById('overlay1');
   const name = getBoohaFirstName();
   if (!overlay) return;
+  overlay.classList.add('entry-ready');
 
   /* ── Weekly Blitz progress ──────────────────────────────
      Routed through BoohaSaveFile. Each of the three game types gets its
@@ -2893,6 +2896,24 @@ continueBtn.addEventListener('click',async()=>{
   try{await toMazeVideo.play();}catch(e){showOverlay2();}
 });
 
+/* Blitz 3/3 this week: the warm-up has nothing left to remind about, so a
+   fresh entry goes straight into the flyover. No tap has happened on this
+   page yet, and iPads only allow a video to start without one when it is
+   muted, so it plays muted. A pending skin reveal keeps the normal screen so
+   the reveal is seen first; returns from a game never reach here. */
+function autoEnterAfterBlitz(){
+  if(videoPlayed||mazeStarted)return;
+  if(!readBlitzCompletionState().completedCurriculum)return;
+  if(document.getElementById('battyUnlockPopup')?.classList.contains('show'))return;
+  videoPlayed=true;
+  loadMediaSource(toMazeVideo);
+  overlay1.classList.add('hidden','gone');
+  app.classList.add('inTransition');videoWrap.classList.add('show');
+  toMazeVideo.muted=true;
+  try{toMazeVideo.currentTime=0;}catch(e){}
+  toMazeVideo.play().catch(()=>showOverlay2());
+}
+
 let o2shown=false;
 function showOverlay2(){
   if(o2shown)return;o2shown=true;
@@ -2960,10 +2981,13 @@ function onSaveReady(){
   }
   applyEquippedMazeSkin();
   maybeShowSeasonalUnlockPopup();
+  autoEnterAfterBlitz();
   if (mazeStarted) buildWanderers();   // extra ghost count depends on the save
 }
 if (window.BOOHA_READY) onSaveReady();
 else document.addEventListener('booha:ready', onSaveReady, { once: true });
+// Never leave the warm-up card hidden if the save is slow or unavailable.
+setTimeout(() => overlay1.classList.add('entry-ready'), 2500);
 document.addEventListener('booha:weeklyReset', () => {
   mazeSeasonalUnlock.reset();
   onSaveReady();
