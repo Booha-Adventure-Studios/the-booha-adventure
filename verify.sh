@@ -2064,6 +2064,13 @@ else
   bad "image metadata guard failed"
 fi
 
+echo "[player] Daily Check reminders"
+if node tests/daily-check-reminder.test.cjs >/dev/null 2>&1; then
+  ok "Daily Check reminded on hub, maze and games boards until done; opens in place; never a gate"
+else
+  bad "Daily Check reminder test failed"
+fi
+
 echo "[player] Pre-Boo hiragana default"
 if node tests/preboo-hiragana-default.test.cjs >/dev/null 2>&1; then
   ok "Pre-Boo games start in hiragana; the switch still works; Replay keeps the default"

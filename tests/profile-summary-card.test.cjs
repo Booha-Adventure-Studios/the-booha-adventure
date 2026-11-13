@@ -35,10 +35,12 @@ function state({ stars = Array(9).fill(null), blitz = 0, skin = { name: 'Batty B
 // ── Next action ──
 {
   const s = state();
-  assert.strictEqual(summaryFor(s, 'pending').next.kind, 'daily', 'a pending Daily Check comes first');
-  for (const st of ['done', 'skipped', 'failed']) {
-    assert.notStrictEqual(summaryFor(s, st).next.kind, 'daily', `${st}: the summary does not push the check again`);
+  // Daily Check reminders (Nov 2026): the check stays the next action until it
+  // is done; a skip or a technical problem lets the student play meanwhile.
+  for (const st of ['pending', 'skipped', 'failed']) {
+    assert.strictEqual(summaryFor(s, st).next.kind, 'daily', `${st}: the Daily Check comes first until it is done`);
   }
+  assert.notStrictEqual(summaryFor(s, 'done').next.kind, 'daily', 'done: the summary moves on to the games');
   // Parallel tracks: while both have work, Maze and Blitz are offered side by
   // side (never maze-first); a single track only when the other is done.
   const fresh = summaryFor(s, 'done').next;

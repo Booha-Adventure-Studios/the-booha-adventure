@@ -300,8 +300,8 @@ const BoohaProfileGame = (() => {
      A short first view under the companion card: what to do next (with a
      button that goes there), this week's progress, and the nearest unlock.
      Everything below stays as it was; this only answers "what now?".
-     Next action: today's Daily Check first if it is still pending (a skip or
-     a technical problem is respected, not pushed). Then the two parallel
+     Next action: today's Daily Check first until it is done (a skip or a
+     technical problem lets the student play, but the reminder stays). Then the two parallel
      tracks — maze toward the arcade, Blitz toward the week's skin — offered
      side by side ("どちらからでも OK"), never one before the other; when only
      one track has work left, just that one. Then rainbow stars. The unlock
@@ -330,7 +330,7 @@ const BoohaProfileGame = (() => {
       : null;
 
     let next;
-    if (dcState === 'pending') {
+    if (dcState !== 'done') {
       next = { kind: 'daily', jp: 'きょうの チェックを しよう', en: 'Do today’s Daily Check', sub: '5ふん · +2★',
         label: 'デイリーチェックへ · Go to the Daily Check' };
     } else if (mazeOpt && blitzOpt) {

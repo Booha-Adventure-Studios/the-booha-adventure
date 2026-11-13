@@ -4541,12 +4541,13 @@ function renderDailyCheckOpening() {
   link.hidden = !copy.link || (state === 'pending' && !dcSkipLinkReady);
   renderHubDcReminder();
 }
-// Quiet hub nudge, only while today is still pending (a student can reach
-// the hub without the opening: return-to-hub, #hub, back/forward cache).
-// A deliberate skip or a technical failure silences it for the day.
+// Hub nudge until today's check is done (a student can reach the hub without
+// the opening: return-to-hub, #hub, back/forward cache). A skip or a technical
+// failure still lets the student play, but the reminder stays until the check
+// is done; the maze and games boards show the same reminder.
 function renderHubDcReminder() {
   const btn = document.getElementById('hubDcReminder');
-  if (btn) btn.hidden = !window.BOOHA_READY || dailyCheckState() !== 'pending';
+  if (btn) btn.hidden = !window.BOOHA_READY || dailyCheckState() === 'done';
 }
 function openSkipConfirm() {
   const dlg = document.getElementById('dcSkipConfirm');
