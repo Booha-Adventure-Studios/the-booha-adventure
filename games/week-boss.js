@@ -240,6 +240,79 @@ html[data-motion="reduced"] .wb-drift,html[data-motion="reduced"] .wb-bob,html[d
 .wb-lock h2{font-family:var(--game-font-title);margin:0;color:var(--game-ink)}
 .wb-lock p{margin:0;font-weight:800;color:var(--game-muted);line-height:1.6}
 .wb-lock .wb-go{padding:0 22px}
+
+/* ══ PALETTE POP (2026-11-13): the flashiest of the games ══════════════
+   Embers rise in the arena (faster as the boss gets angry), the HP bar
+   leaves a lagging "damage ghost", every choice wears a palette ring, and
+   answers fire palette orbs at the boss (js/game-pop.js). TYPE rounds use
+   the shared on-screen keyboard (js/booha-keys.js), like Echo. Keyframes
+   stay transform/opacity. */
+.wb-ember{position:absolute;bottom:-8px;width:7px;height:7px;border-radius:50%;background:var(--c);opacity:0;pointer-events:none;
+  box-shadow:0 0 10px 2px var(--c);animation:wbEmber var(--s,4s) linear var(--d,0s) infinite}
+.wb-arena.phase2 .wb-ember{animation-duration:calc(var(--s,4s) * .75)}
+.wb-arena.phase3 .wb-ember{animation-duration:calc(var(--s,4s) * .5)}
+.wb-arena.ko .wb-ember{animation-duration:calc(var(--s,4s) * .4)}
+@keyframes wbEmber{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.95}70%{opacity:.7}100%{opacity:0;transform:translate(var(--sx,0px),-210px) scale(1.1)}}
+html[data-motion="reduced"] .wb-ember,html[data-power]:not([data-power="full"]) .wb-ember{display:none}
+@media (prefers-reduced-motion:reduce){.wb-ember{display:none}}
+.wb-hp i{position:relative;z-index:1}
+.wb-hpghost{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:999px;background:#fff3b0;opacity:.9;transform-origin:left center;transition:transform .55s ease .38s}
+html[data-skin="v2"][data-curriculum] :is(.wb-opt, .wb-word).wb-pal[data-c]:not(.ok):not(.bad){
+  box-shadow:inset 0 0 0 3px var(--c-ring,var(--c)),0 5px 0 color-mix(in srgb,var(--c) 55%,#000),0 10px 18px rgba(0,0,0,.24);
+}
+/* TYPE: letter tiles in a charged box, the keyboard docked below */
+.wb-typed{flex:1;min-width:0;min-height:58px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;padding:10px 14px;border-radius:16px;box-sizing:border-box;
+  border:2px solid var(--game-primary);background:var(--game-answer-bg);color:var(--game-answer-text);text-align:left;-webkit-user-select:none;user-select:none;
+  transition:box-shadow .2s}
+.wb-typed.has-text{box-shadow:0 0 0 3px color-mix(in srgb,var(--game-primary) 35%,transparent),0 0 22px color-mix(in srgb,var(--game-primary) 45%,transparent)}
+.wb-typed.ok{border-color:#22c55e}.wb-typed.bad{border-color:#ef4444}.wb-typed.near{border-color:var(--game-amber)}
+.wb-tiles{display:inline-flex;flex-wrap:wrap;gap:5px;align-items:center}
+.wb-tile{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:1.45em;height:1.8em;padding:0 .15em;border-radius:10px;box-sizing:border-box;
+  background:var(--card-face,#fff);color:var(--card-ink,#2b1a05);box-shadow:inset 0 0 0 2.5px var(--c-ring,var(--c)),0 3px 0 color-mix(in srgb,var(--c) 55%,#000);font:900 22px/1 var(--game-font-body)}
+.wb-tile b{position:relative;z-index:1;font:inherit}
+.wb-tile::before{content:'';position:absolute;inset:0;border-radius:inherit;background:#22c55e;opacity:0}
+.wb-gap{display:inline-block;width:.5em}
+.wb-tile.is-new{animation:wbTileIn .26s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes wbTileIn{from{opacity:0;transform:scale(.3) translateY(12px)}to{opacity:1;transform:none}}
+.wb-typed.is-right .wb-tile{animation:wbFlip .5s ease both}
+.wb-typed.is-right .wb-tile::before{animation:wbGreen .5s ease both}
+@keyframes wbFlip{0%{transform:none}50%{transform:scale(1.25) translateY(-6px)}100%{transform:none}}
+@keyframes wbGreen{0%,40%{opacity:0}50%,100%{opacity:1}}
+.wb-typed.is-right .wb-tile b{color:#fff}
+.wb-tile.is-bad::before{background:#ef4444;opacity:.9}
+.wb-tile.is-bad b{color:#fff}
+.wb-tile.is-bad{animation:wbWobble .45s ease both}
+@keyframes wbWobble{20%{transform:rotate(-9deg)}45%{transform:rotate(8deg) translateY(-3px)}70%{transform:rotate(-4deg)}100%{transform:none}}
+.wb-caret{display:inline-block;width:2px;height:1.2em;border-radius:1px;background:var(--game-primary);animation:wbCaret 1s steps(1) infinite}
+@keyframes wbCaret{50%{opacity:0}}
+.wb-typed.is-done .wb-caret{display:none}
+.wb-ph{color:var(--game-muted);font-weight:700;font-size:16px}
+.wb-ph[hidden]{display:none}
+#wb-keys-dock{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;justify-content:center;box-sizing:border-box;
+  padding:0 max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));
+  pointer-events:none;opacity:0;transform:translateY(110%);transition:transform .28s ease-out,opacity .2s ease-out}
+#wb-keys-dock.is-open{opacity:1;transform:none}
+#wb-keys-dock[hidden]{display:none}
+#wb-keys-dock .wb-keys{width:min(800px,100%);pointer-events:auto;
+  --kc:var(--game-primary);--kd:var(--game-border);--cap:var(--game-surface);--cap2:var(--game-surface-2,var(--game-surface));
+  --kt:var(--game-ink);--kt2:var(--game-muted);--kok:#0b0614;--kbg:var(--game-bg,#fff);--kring:var(--game-border);--kshadow:rgba(0,0,0,.28);
+  box-shadow:inset 0 0 0 1.5px var(--kring),0 -6px 22px rgba(0,0,0,.22)}
+#wb-keys-dock .bk-key{font-family:var(--game-font-body);border-radius:14px;box-shadow:inset 0 0 0 2px var(--kd),0 5px 0 var(--kshadow);transition:transform .2s cubic-bezier(.3,1.7,.5,1)}
+#wb-keys-dock .bk-key.is-down{transform:translateY(4px) scale(.92);transition:transform .05s ease-out}
+#wb-keys-dock .bk-key.is-ok{background:linear-gradient(135deg,#ff6f91,#ffc94a);color:#2a0610}
+#wb-keys-dock .bk-pop{font-family:var(--game-font-title,var(--game-font-body))}
+@media (prefers-reduced-motion:reduce){#wb-keys-dock{transform:none}.wb-caret,.wb-tile,.wb-tile::before{animation:none !important}.wb-typed.is-right .wb-tile::before{opacity:1}}
+html[data-motion="reduced"] #wb-keys-dock,html[data-power]:not([data-power="full"]) #wb-keys-dock{transform:none}
+html[data-motion="reduced"] .wb-tile,html[data-motion="reduced"] .wb-tile::before,html[data-motion="reduced"] .wb-caret{animation:none !important}
+html[data-motion="reduced"] .wb-typed.is-right .wb-tile::before{opacity:1}
+/* The boss stays in view: arena + HP bar pinned at the top while the round
+   scrolls under it, and smaller while the keyboard is up. */
+.wb-stage{position:sticky;top:0;z-index:5;display:flex;flex-direction:column;gap:.55rem;margin:0 -1rem;padding:.35rem 1rem .6rem;
+  border-radius:0 0 24px 24px;background:color-mix(in srgb,var(--game-bg,#0b0614) 95%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.wb-arena{transition:height .3s ease}
+.wb-stage.compact .wb-arena{height:clamp(96px,13vw,124px)}
+.wb-stage.compact .wb-foe{--foe:clamp(70px,8.5vw,92px)}
+.wb-stage.compact .wb-hpwrap{gap:3px}
 `;
 
 /* ── Gate ── */
@@ -301,8 +374,10 @@ const POOL = [...new Set([].concat(...SENT.map(s => contentWordsOf(s.en)), VOCAB
 U.mount(`
 <style>${STYLE}</style>
 <div class="wb-wrap">
+  <div class="wb-stage" id="wb-stage">
   <div class="wb-arena" id="wb-arena" aria-hidden="true">
     <div class="wb-aura"></div>
+    ${Array.from({ length: 12 }, (_, i) => `<span class="wb-ember" style="left:${(4 + i * 8 + Math.random() * 5).toFixed(1)}%;--c:var(--pal-${(i % 12) + 1},#ff6f91);--s:${(3.2 + Math.random() * 2.4).toFixed(2)}s;--d:${(-Math.random() * 5).toFixed(2)}s;--sx:${(Math.random() * 60 - 30).toFixed(0)}px"></span>`).join('')}
     <div class="wb-floor"></div>
     <div class="wb-drift"><div class="wb-bob"><div class="wb-foe" id="wb-foe">
       <img class="wb-face" id="wb-face" src="${BOSS_IMG}" alt="">
@@ -315,7 +390,8 @@ U.mount(`
   </div>
   <div class="wb-hpwrap">
     <div class="wb-hprow"><span>BOSS BOOHA · ボス</span><span id="wb-hpnum">100%</span></div>
-    <div class="wb-hp" role="progressbar" aria-label="Boss health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="wb-hpbar"><i id="wb-hpfill"></i><em style="left:33.3%"></em><em style="left:66.6%"></em></div>
+    <div class="wb-hp" role="progressbar" aria-label="Boss health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="wb-hpbar"><b class="wb-hpghost" id="wb-hpghost"></b><i id="wb-hpfill"></i><em style="left:33.3%"></em><em style="left:66.6%"></em></div>
+  </div>
   </div>
   <div class="wb-hud">
     <span class="wb-pill">Round <b id="wb-num">1</b> / 15</span>
@@ -330,6 +406,83 @@ const $ = id => document.getElementById(id);
 const cardEl = $('wb-card'), face = $('wb-face'), hpFill = $('wb-hpfill'), hpNum = $('wb-hpnum'), hpBar = $('wb-hpbar'), dmgEl = $('wb-dmg');
 const arena = $('wb-arena'), foe = $('wb-foe'), tauntEl = $('wb-taunt'), bannerEl = $('wb-banner'), redEl = $('wb-redflash');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const hpGhost = $('wb-hpghost');
+
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load (orbs then land at once). */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true
+  : k === 'shoot' ? (a, b, o) => { if (o && o.onHit) o.onHit(); } : k === 'strikeBack' ? (a, b, f) => { if (f) f(); } : () => {}) });
+POP.init({ pill: '#wb-score' });
+let lastSrc = null;   // the element the last answer came from: the orb launches here, the boss strikes back here
+// Paint a round's choices with fresh palette colours.
+function paintChoices(sel) {
+  const els = Array.from(cardEl.querySelectorAll(sel));
+  POP.newRound(els.map((_, i) => `wb${idx}-${i}`));
+  els.forEach((el, i) => { el.dataset.popKey = `wb${idx}-${i}`; el.dataset.c = '1'; el.classList.add('wb-pal'); POP.paint(el, el.dataset.popKey); });
+}
+
+/* ── On-screen keyboard for TYPE rounds (shared js/booha-keys.js, as in Echo) ── */
+let dock = null, keys = null, typing = null;   // typing: the TYPE round that owns the keys now
+function keyClick(k) {
+  try {
+    const c = window.BoohaSFX && window.BoohaSFX.context && window.BoohaSFX.context();
+    if (!c || c.state !== 'running') return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(k === 'back' ? 520 : 900 + Math.random() * 220, t);
+    g.gain.setValueAtTime(0.05, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.06);
+  } catch (_) {}
+}
+function measureKeys() {
+  const wrap = document.querySelector('.wb-wrap');
+  if (!dock || !wrap) return;
+  wrap.style.paddingBottom = dock.classList.contains('is-open') ? `${dock.offsetHeight + 16}px` : '';
+}
+function showKeys() {
+  if (!window.BoohaKeys) return false;
+  if (!dock) {
+    dock = document.createElement('div');
+    dock.id = 'wb-keys-dock'; dock.hidden = true;
+    keys = window.BoohaKeys.create({
+      className: 'wb-keys', marks: ["'", '-'], okHTML: 'Hit!<small lang="ja">こうげき</small>',
+      label: 'Keyboard', repeatBack: true, bubble: true, sound: keyClick,
+      onKey: k => (typing ? typing(k) : false),
+    });
+    dock.appendChild(keys.el);
+    document.body.appendChild(dock);
+    window.addEventListener('resize', measureKeys, { passive: true });
+  }
+  dock.hidden = false; void dock.offsetWidth; dock.classList.add('is-open');
+  $('wb-stage').classList.add('compact');
+  measureKeys();
+  // Keep the answer box above the keys (iPad landscape).
+  setTimeout(() => {
+    const box = $('wb-typed'); if (!box || !dock.classList.contains('is-open')) return;
+    const r = box.getBoundingClientRect(), stageBottom = $('wb-stage').getBoundingClientRect().bottom;
+    const over = r.bottom + 60 - (window.innerHeight - dock.offsetHeight);
+    // Scroll up to keep the answer above the keys, but never past the Japanese prompt under the pinned boss.
+    const jp = cardEl.querySelector('.wb-jp'), room = jp ? jp.getBoundingClientRect().top - stageBottom - 8 : over;
+    if (over > 0) window.scrollBy(0, Math.min(over, Math.max(0, room)));
+  }, 320);
+  return true;
+}
+function hideKeys() {
+  typing = null;
+  if (!dock) return;
+  dock.classList.remove('is-open');
+  $('wb-stage').classList.remove('compact');
+  measureKeys();
+  setTimeout(() => { if (dock && !dock.classList.contains('is-open')) dock.hidden = true; }, 300);
+}
+// A physical keyboard (teacher Mac, iPad keyboard case) types the same keys.
+document.addEventListener('keydown', e => {
+  if (!keys || !typing || !dock || !dock.classList.contains('is-open')) return;
+  const k = keys.keyFromEvent(e);
+  if (k === null) return;
+  e.preventDefault();
+  keys.tap(k);
+});
 
 let plan, rounds, idx, score, hp, crits, missedItems, busy, token = 0;
 
@@ -360,6 +513,7 @@ function buildRounds() {
 function paintHP() {
   const pct = Math.max(0, hp) / BOSS_HP;
   hpFill.style.transform = `scaleX(${pct})`;
+  if (hpGhost) hpGhost.style.transform = `scaleX(${pct})`;   // the ghost lags behind: you see the chunk you knocked off
   hpNum.textContent = hp <= 0 ? 'BEATEN!' : Math.round(pct * 100) + '%';
   hpBar.setAttribute('aria-valuenow', String(Math.round(pct * 100)));
 }
@@ -424,6 +578,7 @@ function setPhase(n) {
   arena.classList.toggle('phase2', n === 2);
   arena.classList.toggle('phase3', n === 3);
   bossSound('phase');
+  POP.surge(arena, n === 3 ? '#ff2e55' : '#ff8a3c');   // Palette Pop: the arena flares up
   setTimeout(() => {
     if (n === 2) banner('BOSS IS ANGRY!', 'ボスが おこった！');
     if (n === 3) banner('LAST STAND!', 'さいごの ちから！');
@@ -438,6 +593,8 @@ function knockout() {
   setTimeout(() => {
     banner('BOSS DEFEATED!', 'ボスを たおした！ ♛', { gold: true, stay: true });
     U.confetti(arena, 60);
+    POP.round(5, arena, 5);            // Palette Pop: the biggest finale…
+    POP.fireworks(arena, 7, 230);      // …and a volley of fireworks over the arena
   }, 650);
 }
 function bossAttack() {
@@ -446,6 +603,7 @@ function bossAttack() {
   replay(redEl, 'on');
   bossSound('attack');
   taunt();
+  POP.strikeBack(foe, lastSrc);   // Palette Pop: the boss spits a dark orb back; your answer crumbles where it lands
 }
 
 function strike(kind, combo) {
@@ -454,6 +612,11 @@ function strike(kind, combo) {
   const crit = kind === 'hit' && combo >= 3;
   if (crit) crits++;
   hp = Math.max(0, hp - d);
+  // Palette Pop: the answer fires an orb at the boss; the boss reacts when it lands.
+  const my = token, col = lastSrc && lastSrc.dataset && lastSrc.dataset.popKey ? POP.color(lastSrc.dataset.popKey) : null;
+  POP.shoot(lastSrc, foe, { big: crit, size: crit ? 15 : 11, col: col || undefined, onHit: () => { if (my === token) landHit(d, crit); } });
+}
+function landHit(d, crit) {
   paintHP();
   dmgEl.className = 'wb-dmg' + (crit ? ' crit' : '');
   dmgEl.textContent = (crit ? 'CRITICAL! ' : '') + '−' + d;
@@ -469,16 +632,17 @@ function strike(kind, combo) {
 function stopAudio() {
   voiceGate.stop();
   const p = cardEl.querySelector('.wb-play');
-  if (p) p.classList.remove('playing');
+  if (p) { p.classList.remove('playing'); POP.speakerWait(p); }
 }
 function playClip(url, btn, onDone) {
   const my = token;
   const a = new Audio(url);
   a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
   if (btn) btn.classList.add('playing');
+  const spkId = btn ? POP.speaker(btn) : 0;   // Palette Pop: notes + sound waves, silent while the voice plays
   const end = () => {
     if (my !== token) return;          // a newer round owns the audio now
-    if (btn) btn.classList.remove('playing');
+    if (btn) { btn.classList.remove('playing'); POP.speakerEnd(btn, spkId); }
     if (onDone) onDone();
   };
   voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end });
@@ -492,15 +656,19 @@ function addMissed(card, type) {
 }
 const typeOf = kind => (kind === 'TYPE' ? 'vocab' : kind === 'HEAR' ? 'questions' : 'sentences');
 
-function resolve(kind, card) {
-  // kind: 'hit' | 'recover' | 'miss'
+function resolve(kind, card, src) {
+  // kind: 'hit' | 'recover' | 'miss'; src: the answer the orb flies from (or the boss strikes back at)
   busy = true;
-  if (kind === 'hit') { const r = run.hit(); score += 1; U.playSFX('ding'); strike('hit', r ? r.combo : 0); }
+  lastSrc = src || null;
+  if (kind === 'hit') { const r = run.hit(); score += 1; U.playSFX('ding'); strike('hit', r ? r.combo : 0);
+    if (src && src.dataset.popKey) POP.correct(src, src.dataset.popKey, r ? r.combo : 1); }   // Palette Pop: burst + gems to the score
   else if (kind === 'recover') { run.recover(); score += 0.5; U.playSFX('ding'); strike('recover', 0); }
   else { run.miss(); addMissed(card, typeOf(rounds[idx].kind)); bossAttack(); }
   $('wb-score').textContent = String(score);
   const my = token;
-  setTimeout(() => { if (my === token) next(); }, kind === 'miss' ? 1500 : 950);
+  // A knockout on the last round gets time for its finale before the score card.
+  const finale = kind !== 'miss' && hp <= 0 && idx === rounds.length - 1;
+  setTimeout(() => { if (my === token) next(); }, kind === 'miss' ? 1500 : finale ? 3000 : 950);
 }
 
 function showRound() {
@@ -508,6 +676,7 @@ function showRound() {
   stopAudio();
   busy = false;
   const r = rounds[idx];
+  if (r.kind !== 'TYPE') hideKeys();
   $('wb-num').textContent = idx + 1;
   const card = r.card;
   if (r.kind === 'CHECK') {
@@ -516,6 +685,7 @@ function showRound() {
       <p class="wb-en">${esc(card.en)}</p><p class="wb-jp">${esc(r.shownJp)}</p>
       <div class="wb-opts"><button type="button" class="wb-opt" data-v="1">Match ✓ あってる</button><button type="button" class="wb-opt" data-v="0">No match ✗ ちがう</button></div>
       <p class="wb-fb" id="wb-fb"></p>`;
+    paintChoices('.wb-opt');
     run.ready(1500 + 45 * card.en.length);
     cardEl.querySelectorAll('.wb-opt').forEach(b => b.addEventListener('click', () => {
       if (busy) return;
@@ -525,7 +695,7 @@ function showRound() {
       const fb = $('wb-fb');
       fb.className = 'wb-fb ' + (right ? 'ok' : 'bad');
       fb.textContent = r.truth ? 'It matched! · あってた！' : 'Not a match: ' + jpOf(card);
-      resolve(right ? 'hit' : 'miss', card);
+      resolve(right ? 'hit' : 'miss', card, b);
     }));
   } else if (r.kind === 'SPOT') {
     cardEl.innerHTML = `<span class="wb-kind">ROUND ${idx + 1} · DOES IT MATCH THE JAPANESE? · ちがう ことば</span>
@@ -533,6 +703,7 @@ function showRound() {
       <p class="wb-jp">${esc(jpOf(card))}</p>
       <div class="wb-words">${r.spot.tokens.map((t, i) => `<button type="button" class="wb-word" data-i="${i}">${esc(t)}</button>`).join('')}</div>
       <p class="wb-fb" id="wb-fb"></p>`;
+    paintChoices('.wb-word');
     run.ready(2500 + 500 * r.spot.tokens.length);
     cardEl.querySelectorAll('.wb-word').forEach(b => b.addEventListener('click', () => {
       if (busy) return;
@@ -544,7 +715,7 @@ function showRound() {
       const fb = $('wb-fb');
       fb.className = 'wb-fb ' + (right ? 'ok' : 'bad');
       fb.textContent = `“${r.spot.swapped}” should be “${r.spot.original}”`;
-      resolve(right ? 'hit' : 'miss', card);
+      resolve(right ? 'hit' : 'miss', card, b);
     }));
   } else if (r.kind === 'HEAR') {
     cardEl.innerHTML = `<span class="wb-kind">ROUND ${idx + 1} · WHICH DID YOU HEAR? · どれかな？</span>
@@ -552,6 +723,7 @@ function showRound() {
       <p class="wb-ask">${PB ? `<span class="jp">きいて、きこえた えいごを えらぼう！</span><span>Listen, then pick the English you heard.</span>` : `<span>Listen, then pick the English you heard.</span><span class="jp">きいて、きこえた えいごを えらぼう！</span>`}</p>
       <div class="wb-opts one">${r.opts.map((o, i) => `<button type="button" class="wb-opt" data-i="${i}">${esc(o.en)}</button>`).join('')}</div>
       <p class="wb-fb" id="wb-fb"></p>`;
+    paintChoices('.wb-opt');
     run.ready(3000, { waitAudio: true });
     let heard = false;
     const playBtn = $('wb-play');
@@ -566,7 +738,7 @@ function showRound() {
       const fb = $('wb-fb');
       fb.className = 'wb-fb ' + (right ? 'ok' : 'bad');
       fb.textContent = jpOf(card);
-      resolve(right ? 'hit' : 'miss', card);
+      resolve(right ? 'hit' : 'miss', card, b);
     }));
   } else {
     // TYPE: Japanese → type the English (first letters shown), one fix allowed
@@ -575,43 +747,75 @@ function showRound() {
       <p class="wb-ask">${PB ? `<span class="jp">この にほんごを えいごで かこう！</span><span>Type the English word for this Japanese.</span>` : `<span>Type the English word for this Japanese.</span><span class="jp">この にほんごを えいごで かこう！</span>`}</p>
       <p class="wb-jp">${esc(jpOf(card))}</p>
       <p class="wb-skel">${esc(skeleton(card.en))}</p>
-      <form class="wb-row" id="wb-form" autocomplete="off">
-        <label for="wb-input" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Type the English word</label>
-        <input class="wb-input" id="wb-input" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="type here · かこう">
-        <button type="submit" class="wb-go">Hit!</button>
-      </form>
+      <div class="wb-row">
+        <div class="wb-typed" id="wb-typed" role="textbox" aria-readonly="true" aria-label="Your answer"><span class="wb-tiles" id="wb-tiles"></span><span class="wb-caret" aria-hidden="true"></span><span class="wb-ph" id="wb-ph">type here · かこう</span></div>
+      </div>
       <p class="wb-fb" id="wb-fb"></p>`;
     run.ready(2500 + 900 * words);
-    const input = $('wb-input'), fb = $('wb-fb');
-    let tries = 0;
-    try { input.focus({ preventScroll: true }); } catch (_) {}
-    $('wb-form').addEventListener('submit', e => {
-      e.preventDefault();
-      if (busy || !normalize(input.value)) return;
+    const box = $('wb-typed'), tilesEl = $('wb-tiles'), ph = $('wb-ph'), fb = $('wb-fb');
+    const pal = (POP.palette && POP.palette()) || [];
+    let tries = 0, typed = '', restart = false, done = false;
+    // Each letter is a tile ringed in the next palette colour; the newest pops in.
+    const paintTyped = popLast => {
+      let li = 0;
+      tilesEl.innerHTML = typed.split('').map((ch, i) => {
+        if (ch === ' ') return '<span class="wb-gap"></span>';
+        const c = pal.length ? pal[li++ % pal.length] : '';
+        return `<span class="wb-tile${popLast && i === typed.length - 1 ? ' is-new' : ''}"${c ? ` style="--c:${c};--c-ring:${POP.ringFor ? POP.ringFor(c) : c}"` : ''}><b>${esc(ch)}</b></span>`;
+      }).join('');
+      box.setAttribute('aria-label', typed || 'Your answer');
+      ph.hidden = typed.length > 0;
+      box.classList.toggle('has-text', typed.length > 0);
+      box.classList.remove('bad', 'near');
+      if (popLast) POP.key(tilesEl.lastElementChild);
+    };
+    const submit = () => {
+      if (busy || done || !normalize(typed)) return;
       tries++;
-      const v = check(card.en, input.value);
+      const v = check(card.en, typed);
       if (v === 'exact') {
-        input.disabled = true;
+        done = true; hideKeys();
+        box.classList.add('ok', 'is-right', 'is-done');
+        tilesEl.querySelectorAll('.wb-tile').forEach((t, i) => { t.style.animationDelay = `${i * 55}ms`; t.classList.remove('is-new', 'is-bad'); });
         fb.className = 'wb-fb ok'; fb.textContent = tries === 1 ? 'Direct hit! · せいかい！' : 'Fixed it! +0.5';
         playClip(CFG.audioBase + card.mp3, null, null);
-        resolve(tries === 1 ? 'hit' : 'recover', card);
+        resolve(tries === 1 ? 'hit' : 'recover', card, box);
         return;
       }
       if (tries === 1) {
+        lastSrc = box;
         run.miss(); addMissed(card, 'vocab'); bossAttack();
         fb.className = 'wb-fb ' + (v === 'near' ? 'near' : 'bad');
         fb.textContent = v === 'near' ? 'So close! Check the spelling · おしい！' : 'Not quite. One more try · もう いちど';
-        try { input.select(); } catch (_) {}
+        box.classList.add(v === 'near' ? 'near' : 'bad');
+        tilesEl.querySelectorAll('.wb-tile').forEach(t => { t.classList.remove('is-new'); t.classList.add('is-bad'); });
+        restart = true;   // the next letter starts a fresh try
         return;
       }
-      input.disabled = true;
+      done = true; hideKeys();
+      box.classList.add('bad', 'is-done');
       fb.className = 'wb-fb bad'; fb.textContent = 'The answer: ' + card.en;
       playClip(CFG.audioBase + card.mp3, null, null);
       busy = true;
+      lastSrc = box;
       bossAttack();
       const my = token;
       setTimeout(() => { if (my === token) next(); }, 1800);
-    });
+    };
+    typing = k => {
+      if (done || busy) return false;
+      if (k === 'ok') { submit(); return true; }
+      let added = false;
+      if (k === 'back') { restart = false; typed = typed.slice(0, -1); }
+      else {
+        if (restart) { typed = ''; restart = false; }
+        if (typed.length < 40) { typed += k; added = k !== ' '; }
+      }
+      paintTyped(added && !reducedFx());
+      return true;
+    };
+    paintTyped(false);
+    if (!showKeys()) fb.textContent = 'Keyboard missing · キーボードが ありません';
   }
 }
 
@@ -624,6 +828,7 @@ function next() {
 function showResults() {
   token++;
   stopAudio();
+  hideKeys();
   const runSum = run.summary();
   const pct = Math.round((score / 15) * 100);
   const beaten = hp <= 0;
@@ -653,6 +858,8 @@ function showResults() {
 
 function start() {
   token++;
+  POP.reset();   // Palette Pop: a restart starts clean (orbs, fireworks, timers, sounds)
+  hideKeys();
   rounds = buildRounds();
   idx = 0; score = 0; hp = BOSS_HP; crits = 0; missedItems = []; phase = 1; tauntIdx = Math.floor(Math.random() * TAUNTS.length);
   arena.classList.remove('phase2', 'phase3', 'ko');
@@ -672,7 +879,7 @@ function start() {
 }
 
 $('wb-replay').addEventListener('click', start);
-$('wb-back').addEventListener('click', () => { token++; stopAudio(); backToMenu(); });
+$('wb-back').addEventListener('click', () => { token++; stopAudio(); hideKeys(); backToMenu(); });
 
 start();
 })();

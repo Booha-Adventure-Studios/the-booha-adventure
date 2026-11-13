@@ -34,6 +34,7 @@ const ssp = read('games/sentence-speed.js');
 const stw = read('games/say-word.js');
 const aq = read('games/ask-question.js');
 const sas = read('games/say-sentence.js');
+const wb = read('games/week-boss.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -320,6 +321,31 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
     assert.match(src, /if \(firstTry && STREAK_FIREWORKS\.includes\(streak\)\) POP\.round/, `${name}: fireworks at 5 / 10 / 15 in a row`);
     assert(new RegExp(`getElementById\\('${p}-replay'\\)\\.addEventListener\\('click', \\(\\) => \\{\\n  POP\\.reset\\(\\);`).test(src), `${name}: replay clears leftover effects`);
   }
+}
+
+// ── 7c. Week Boss: the flashiest, without breaking the fight ──
+{
+  // Orbs: state changes at once, the show lands with the orb; no canvas → it lands at once.
+  const shootFn = pop.slice(pop.indexOf('  function shoot(from, to, o = {}) {'), pop.indexOf('  /* Every delayed effect'));
+  assert.match(shootFn, /if \(reduced\(\) \|\| !ensureCanvas\(\)\) \{ if \(o\.onHit\) o\.onHit\(\); return; \}/, 'reduced motion / no canvas: the hit lands at once');
+  assert.match(pop, /shots\.length = 0;/, 'reset() drops orbs in flight');
+  assert.match(pop, /busy\(\) \{ return live \|\| rings\.length \|\| bolts\.length \|\| cracks\.length \|\| shots\.length \|\| tint; \}/, 'the loop runs while an orb flies');
+  assert.match(wb, /hp = Math\.max\(0, hp - d\);\n[\s\S]{0,320}POP\.shoot\(lastSrc, foe, \{[^\n]*onHit: \(\) => \{ if \(my === token\) landHit\(d, crit\); \} \}\);/, 'Boss: HP changes now; the boss flinches when the orb lands (never in a newer game)');
+  assert.match(wb, /function landHit\(d, crit\) \{\n  paintHP\(\);[\s\S]{0,400}if \(left <= 1 \/ 3\) setPhase\(3\); else if \(left <= 2 \/ 3\) setPhase\(2\);/, 'Boss: phases still at two thirds and one third');
+  assert.match(wb, /k === 'shoot' \? \(a, b, o\) => \{ if \(o && o\.onHit\) o\.onHit\(\); \}/, 'Boss: without game-pop.js hits still land');
+  assert.match(wb, /POP\.strikeBack\(foe, lastSrc\);/, 'Boss: a miss is answered by a dark orb back at the answer');
+  assert.match(wb, /function start\(\) \{\n  token\+\+;\n  POP\.reset\(\);/, 'Boss: replay starts clean');
+  assert.match(wb, /finale \? 3000 : 950/, 'Boss: a last-round knockout plays out before the score card');
+  assert(/\.wb-stage\{position:sticky;top:0;/.test(wb), 'Boss: the arena and HP bar stay in view while the round scrolls');
+  assert(/:is\(\.wb-opt, \.wb-word\)\.wb-pal\[data-c\]:not\(\.ok\):not\(\.bad\)\{/.test(wb), 'Boss: choice rings switch off on verdicts');
+  // On-screen keyboard (shared with Echo), never the iPad keyboard.
+  assert(!/<input[^>]*wb-input|<form[^>]*wb-form/.test(wb), 'Boss: no text box, so no iPad keyboard or autocorrect');
+  assert.match(wb, /window\.BoohaKeys\.create\(\{\s*className: 'wb-keys', marks: \["'", '-'\], okHTML: 'Hit!<small lang="ja">こうげき<\/small>',/, 'Boss: the shared keyboard with a Hit! key');
+  assert.match(wb, /const k = keys\.keyFromEvent\(e\);/, 'Boss: a physical keyboard types the same keys');
+  assert.match(wb, /function showResults\(\) \{\n  token\+\+;\n  stopAudio\(\);\n  hideKeys\(\);/, 'Boss: the keys leave with the score card');
+  assert.match(wb, /const v = check\(card\.en, typed\);/, 'Boss: typing is graded by the same check() as before');
+  for (const m of wb.matchAll(/@keyframes\s+(wb\w+)\s*\{([\s\S]*?\})\s*\}/g))
+    for (const prop of [...m[2].matchAll(/([a-z-]+)\s*:/g)].map(x => x[1])) assert(['opacity', 'transform'].includes(prop), `@keyframes ${m[1]} animates ${prop}`);
 }
 
 // ── 8. Wiring ──

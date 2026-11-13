@@ -108,6 +108,12 @@ window.BoohaPop = (() => {
       tone(c, 'triangle', f, 0, t, .09, .06); },
     tink() { const n = performance.now(); if (n - lastTink < 50) return; lastTink = n; const c = ctx(); if (!c) return; tone(c, 'sine', 2400 + Math.random() * 600, 0, c.currentTime + .003, .03, .03); },
     crunch() { const c = ctx(); if (!c) return; const t = c.currentTime + .005; noise(c, t, .12, .22, 700, .9); noise(c, t + .004, .03, .1, 5200, .7, 'highpass'); tone(c, 'square', 95, 48, t, .12, .04); },
+    zap() { const c = ctx(); if (!c) return; const t = c.currentTime + .005;
+      tone(c, 'sine', 320, 1500, t, .13, .08); tone(c, 'triangle', 640, 2600, t + .02, .1, .03); },
+    thud(big) { const c = ctx(); if (!c) return; const t = c.currentTime + .005;
+      tone(c, 'sine', big ? 120 : 160, 45, t, big ? .26 : .16, big ? .3 : .2); noise(c, t, big ? .14 : .08, big ? .22 : .14, 1800, .8); },
+    crackle() { const c = ctx(); if (!c) return; const t = c.currentTime + .005;
+      for (let i = 0; i < 4; i++) noise(c, t + i * .045 + Math.random() * .02, .03, .09, 3000 + Math.random() * 3000, 1.5, 'highpass'); },
     finale(n) { const c = ctx(); if (!c) return; const t = c.currentTime + .02;
       const notes = n >= 5 ? [523.25, 659.25, 783.99, 1046.5] : n >= 3 ? [523.25, 659.25, 783.99] : n >= 1 ? [523.25] : [];
       notes.forEach((f, i) => tone(c, 'triangle', f, 0, t + i * .045, .22, .07));
@@ -118,7 +124,7 @@ window.BoohaPop = (() => {
   let cv = null, g = null, W = 0, H = 0, DPR = 1, raf = 0, last = 0;
   const POOL = 360, pool = []; for (let i = 0; i < POOL; i++) pool.push({ on: false });
   let cur = 0, live = 0, prevOk = null, pill = null, pillBumpAt = 0;
-  const rings = [], texts = [], bolts = [], cracks = [];
+  const rings = [], texts = [], bolts = [], cracks = [], shots = [];
   let tint = null;
   const cap = () => (power() === 'minimal' ? 50 : power() === 'reduced' ? 150 : POOL);
   /* Self-governor: if frames run slow while effects are flying (a busy
@@ -267,7 +273,7 @@ window.BoohaPop = (() => {
   function speakerCss() {
     if (spkCss || !document.head) return; spkCss = true;
     const st = document.createElement('style'); st.id = 'bpop-speaker-css';
-    const B = 'html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn)';
+    const B = 'html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn, .wb-play, .ec-play)';
     st.textContent = `
 /* Palette Pop speaker (js/game-pop.js): each press glows in a fresh palette
    colour; the base stays the skin's violet speaker (never green). */
@@ -288,6 +294,39 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
     document.head.appendChild(st);
   }
 
+  /* ── Projectiles (Week Boss): an orb flies from one element to another on
+     a curve, trailing sparks, and lands with a burst. The game's own
+     reaction (damage, the boss flinching) runs in onHit, at the moment of
+     impact; with no canvas or reduced motion it runs at once. ── */
+  function centre(el) { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r }; }
+  function shotAt(sh, q) {
+    const e = 1 - Math.pow(1 - q, 2.2), u = 1 - e;   // fast launch, slowing a touch before impact
+    return [u * u * sh.x0 + 2 * u * e * sh.cx + e * e * sh.x1, u * u * sh.y0 + 2 * u * e * sh.cy + e * e * sh.y1];
+  }
+  function shotLand(sh) {
+    const r = sh.to && sh.to.isConnected ? sh.to.getBoundingClientRect() : { left: sh.x1 - 20, top: sh.y1 - 20, right: sh.x1 + 20, bottom: sh.y1 + 20, width: 40, height: 40 };
+    const k = sh.big ? 1.6 : 1;
+    ring(r, sh.col, 34 * k, .42, 5, true); ring(r, '#ffffff', 16 * k, .26, 3, true);
+    radial(sh.x1, sh.y1, Math.round(26 * k), sh.col, 1.1 * k, 6);
+    if (sh.big && !reduced() && canFlash()) { tint = { col: sh.col, t: 0, life: .26 }; }
+    if (sh.dark) debris(r, 10);
+    SFX.thud(sh.big);
+    try { if (sh.onHit) sh.onHit(); } catch (_) {}
+  }
+  // Sparks thrown out in a circle from a point.
+  function radial(x, y, k, col, speed = 1, white = 0) {
+    for (let i = 0; i < n(k); i++) { const a = rnd(0, Math.PI * 2), sp = rnd(160, 520) * speed;
+      spawn({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, g: 380, drag: 2, life: rnd(.25, .55), size: rnd(1.6, 3.2), col: i < white ? '#ffffff' : col }); }
+  }
+  function shoot(from, to, o = {}) {
+    if (!from || !to) { if (o.onHit) o.onHit(); return; }
+    if (reduced() || !ensureCanvas()) { if (o.onHit) o.onHit(); return; }
+    const a = centre(from), b = centre(to), lift = Math.min(220, Math.hypot(b.x - a.x, b.y - a.y) * .45);
+    shots.push({ x0: a.x, y0: a.y, x1: b.x, y1: b.y, cx: (a.x + b.x) / 2 + rnd(-90, 90), cy: Math.min(a.y, b.y) - lift,
+      t: 0, life: o.life || .34, col: o.col || pick(palette()), size: o.size || 11, big: !!o.big, dark: !!o.dark, to, onHit: o.onHit });
+    if (!o.dark) SFX.zap(); wake();
+  }
+
   /* Every delayed effect goes through later(), so reset() can cancel it. */
   const timers = new Set();
   // One firing per event: a repeated call for the same target inside 250 ms is ignored.
@@ -296,7 +335,7 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
   function later(fn, ms) { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); return id; }
 
   /* ── loop: runs only while something is on screen ── */
-  function busy() { return live || rings.length || bolts.length || cracks.length || tint; }
+  function busy() { return live || rings.length || bolts.length || cracks.length || shots.length || tint; }
   function wake() { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
   function frame(t) {
     raf = 0;
@@ -326,6 +365,11 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
       if (p.kind === 'confetti') p.vx += Math.sin(p.rot * 2) * 40 * dt;
     }
     for (const arr of [rings, texts, bolts, cracks]) for (let i = arr.length - 1; i >= 0; i--) { arr[i].t += dt; if (arr[i].t > arr[i].life) arr.splice(i, 1); }
+    for (let i = shots.length - 1; i >= 0; i--) {   // projectiles: a glowing head on a curve, a spark trail, an impact on arrival
+      const sh = shots[i]; sh.t += dt; const q = Math.min(1, sh.t / sh.life), [x, y] = shotAt(sh, q);
+      if (Math.random() < .8) spawn({ x, y, vx: rnd(-60, 60), vy: rnd(-60, 60), drag: 3, life: rnd(.18, .32), size: rnd(1.4, 2.6), col: Math.random() < .3 ? '#ffffff' : sh.col });
+      if (q >= 1) { shots.splice(i, 1); shotLand(sh); }
+    }
     if (tint) { tint.t += dt; if (tint.t > tint.life) tint = null; }
   }
   function bumpPill() {
@@ -340,6 +384,11 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
     const add = light() ? 'source-over' : 'lighter';
     if (tint) { g.globalAlpha = .18 * Math.sin(Math.PI * tint.t / tint.life); g.fillStyle = tint.col; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
     for (const r of rings) { const q = r.t / r.life, inf = 4 + q * r.grow, b = r.r; g.globalAlpha = 1 - q; g.strokeStyle = r.col; g.lineWidth = r.width * (1 - q) + .5; if (r.round) { g.beginPath(); g.arc(b.left + b.width / 2, b.top + b.height / 2, Math.max(b.width, b.height) / 2 + inf, 0, Math.PI * 2); } else rr(b.left - inf, b.top - inf, b.width + inf * 2, b.height + inf * 2, 16 + inf); g.stroke(); }
+    for (const sh of shots) {   // the orb: a glow sprite plus a white core
+      const [x, y] = shotAt(sh, Math.min(1, sh.t / sh.life)), r = sh.size;
+      g.globalCompositeOperation = add; g.globalAlpha = 1; g.drawImage(glow(sh.col), x - r * 2.2, y - r * 2.2, r * 4.4, r * 4.4);
+      g.globalCompositeOperation = 'source-over'; g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x, y, r * .45, 0, Math.PI * 2); g.fill();
+    }
     g.globalAlpha = 1; g.lineCap = 'round'; g.lineJoin = 'round';
     for (const c of cracks) { const q = c.t / c.life; g.globalAlpha = 1 - q * q; g.strokeStyle = light() ? '#3a2a30' : '#f2eee6'; g.lineWidth = 1.6;
       g.beginPath(); let x = c.x, y = c.y; g.moveTo(x, y); const L = c.len * Math.min(1, q * 5) / 3;
@@ -391,7 +440,7 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
     timers.forEach(clearTimeout); timers.clear();
     for (const p of pool) p.on = false; live = 0;
     lastFire.clear(); spk = null;
-    rings.length = 0; texts.length = 0; bolts.length = 0; cracks.length = 0; tint = null; prevOk = null;
+    rings.length = 0; texts.length = 0; bolts.length = 0; cracks.length = 0; shots.length = 0; tint = null; prevOk = null;
     labels.forEach(el => el.remove()); labels.clear();
     liveNodes.forEach(node => { try { node.onended = null; node.stop(); } catch (_) {} }); liveNodes.clear(); voices = 0;
     if (g && cv) { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); }
@@ -403,7 +452,7 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
   return {
     newRound, color, paint, canFlash, inkFor, ringFor, palette, reset,
     init(opts = {}) { if (opts.pill) pillSel = opts.pill; },
-    stats() { return { speaker: !!spk, live, rings: rings.length, labels: labels.size, bolts: bolts.length, cracks: cracks.length, running: !!raf, voices, timers: timers.size, govern, dpr: DPR }; },
+    stats() { return { shots: shots.length, speaker: !!spk, live, rings: rings.length, labels: labels.size, bolts: bolts.length, cracks: cracks.length, running: !!raf, voices, timers: timers.size, govern, dpr: DPR }; },
     tap(key, btn, quiet) {
       const prev = colorOf[key], p = palette().filter(c => c !== prev);
       colorOf[key] = pick(p.length ? p : palette());
@@ -525,6 +574,37 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
       if (reduced()) return;
       if (b.animate) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)', offset: .4 }, { transform: 'scale(1)' }], { duration: 260, easing: 'ease-out' });
       const r = b.getBoundingClientRect(); ring(r, col, 14, .3, 3, true); sparks(r, 8, col, .6, 2);
+    },
+    /* ── Week Boss ── */
+    // Your answer fires a palette orb at the target; onHit runs on impact.
+    shoot(from, to, opts) { shoot(from, to, opts); },
+    // The target strikes back: a dark orb, then the answer it lands on crumbles.
+    strikeBack(from, to, onHit) { shoot(from, to, { col: '#ff2e55', size: 13, life: .3, dark: true, onHit: () => { if (to && to.isConnected) this.wrong(to); if (onHit) onHit(); } }); },
+    // A typed letter lands: a tiny ring and a few sparks (silent: the key click is the sound).
+    key(el, key) {
+      if (!el || reduced()) return;
+      const r = el.getBoundingClientRect(), c = key ? color(key) : pick(palette());
+      ring(r, c, 8, .2, 2); sparks(r, 4, c, .5);
+    },
+    // A volley of fireworks over an element (the knockout).
+    fireworks(el, count = 5, gap = 260) {
+      if (!el || reduced()) return;
+      for (let i = 0; i < count; i++) later(() => {
+        if (!el.isConnected) return;
+        const r = el.getBoundingClientRect(), x = r.left + r.width * rnd(.12, .88), y = r.top + r.height * rnd(.15, .6), col = pick(palette());
+        const box = { left: x - 14, top: y - 14, right: x + 14, bottom: y + 14, width: 28, height: 28 };
+        ring(box, col, 60, .55, 4, true); ring(box, '#ffffff', 26, .3, 2, true);
+        radial(x, y, 34, col, 1.25, 8); confetti(x, y, 14, .7);
+        SFX.crackle();
+      }, i * gap);
+    },
+    // Fireworks from the bottom corners plus a ring sweep: anger rising, a phase change.
+    surge(el, col) {
+      if (!el || reduced()) return;
+      const r = el.getBoundingClientRect();
+      ring(r, col || '#ff2e55', 26, .5, 6); ring(r, '#ffffff', 12, .3, 2);
+      if (canFlash()) { tint = { col: col || '#ff2e55', t: 0, life: .32 }; ensureCanvas() && wake(); }
+      radial(r.left + 20, r.bottom - 10, 18, col || '#ff2e55', 1); radial(r.right - 20, r.bottom - 10, 18, col || '#ff2e55', 1);
     },
     // Time ran out: the timer bar smokes and fizzles (a miss, never a prize).
     fizzle(el) {
