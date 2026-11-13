@@ -36,6 +36,7 @@ const aq = read('games/ask-question.js');
 const sas = read('games/say-sentence.js');
 const wb = read('games/week-boss.js');
 const ec = read('games/echo.js');
+const bb = read('games/booha-bites.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -362,10 +363,22 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
   assert(!/\.ec-tile\.ec-pal\{[^}]*!important/.test(ec), 'Echo: the tile ring never beats the verdict colours');
 }
 
+// ── 7e. Booha Bites: candy snacks, verdicts still win ──
+{
+  const pal = 'html[data-skin="v2"][data-curriculum] .bb-choice.bb-pal:not(.correct):not(.wrong)';
+  assert(bb.includes(pal + '{'), 'Bites: candy fill only while undecided (green ✓ and the gobbled fade win)');
+  assert(gte(spec(pal), spec('html[data-skin="v2"][data-curriculum] :is(.bb-choice.correct, .wb-opt.ok, .wb-word.ok)')), 'Bites: the candy rule cannot leak onto a verdict');
+  assert.match(bb, /background:var\(--c\);color:var\(--c-ink\);/, 'Bites: candy ink is the engine-picked readable ink');
+  assert.match(bb, /landKey = firstTry \? btn\.dataset\.popKey : null;/, 'Bites: only a first-try answer bursts into gems');
+  assert.match(bb, /streak = 0; setBelly\(0\); stopRing\(\);\n  POP\.reset\(\);/, 'Bites: replay clears leftover effects');
+  const burstFn = pop.slice(pop.indexOf('    burst(el, col, k = 20, o = {}) {'), pop.indexOf('    // A volley of fireworks'));
+  assert(burstFn && !/SFX\./.test(burstFn), 'Bites: bursts are silent (the game has its own crunch, gulp and burp)');
+}
+
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw], ['ask-question', aq], ['say-sentence', sas], ['echo', ec], ['week-boss', wb]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw], ['ask-question', aq], ['say-sentence', sas], ['echo', ec], ['week-boss', wb], ['booha-bites', bb]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');

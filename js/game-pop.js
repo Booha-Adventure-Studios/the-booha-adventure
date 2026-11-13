@@ -586,6 +586,17 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
       const r = el.getBoundingClientRect(), c = key ? color(key) : pick(palette());
       ring(r, c, 8, .2, 2); sparks(r, 4, c, .5);
     },
+    // A silent splash at an element: ring + sparks thrown out in a circle,
+    // optionally smoke and confetti (Booha Bites: crunches, gulps, hiccups).
+    burst(el, col, k = 20, o = {}) {
+      if (!el || reduced()) return;
+      const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, c = col || pick(palette());
+      if (o.ring !== false) ring(r, c, o.grow || 22, .38, 4, !!o.round);
+      radial(x, y, k, c, o.speed || 1, o.white || 3);
+      if (o.mixed) radial(x, y, Math.round(k / 2), pick(palette()), (o.speed || 1) * .8);
+      if (o.smoke) smoke(x, y, o.smoke);
+      if (o.confetti) confetti(x, y, o.confetti, o.spread || .8);
+    },
     // A volley of fireworks over an element (the knockout).
     fireworks(el, count = 5, gap = 260) {
       if (!el || reduced()) return;
