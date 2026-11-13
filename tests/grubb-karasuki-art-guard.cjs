@@ -20,7 +20,9 @@ const ROOT = path.resolve(__dirname, '..');
 const DIR = 'assets/skins/grubb_booha';
 const EXPECTED = {
   'static.webp': '998d6c33171a86f3d8b2157b2096675428cc3fdc6057270c5229edfc658b4ad6',
-  'karasuki-knit.webp': '9cf23ea5460d65af382114c3b3c3f5f696dc0af60c0266cd9db88751112ffba5',
+  // 2026-11-13: metadata-only strip (provenance chunk removed); decoded pixels
+  // and dimensions are identical, so no rename or cache change was needed.
+  'karasuki-knit.webp': '266ecbfcea95a60687a371faabfb2d86764ec36098e8f5bb020c5ee9e19dc7c9',
 };
 const sha = rel => crypto.createHash('sha256').update(fs.readFileSync(path.join(ROOT, rel))).digest('hex');
 
