@@ -909,10 +909,10 @@ S.textContent = `
    once; the colour only returns as the burst from the card.
    ══════════════════════════════════════════════════════════════ */
 html[data-skin="v2"][data-curriculum] .vs-choice.vs-pal[data-ci]{
-  box-shadow:inset 0 0 0 3px var(--c),0 6px 0 color-mix(in srgb,var(--c) 62%,#000),0 12px 22px rgba(0,0,0,.28);
+  box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 6px 0 color-mix(in srgb,var(--c) 62%,#000),0 12px 22px rgba(0,0,0,.28);
 }
-html[data-skin="v2"][data-curriculum] .vs-choice.vs-pal[data-ci]:hover{ box-shadow:inset 0 0 0 3px var(--c),0 10px 0 color-mix(in srgb,var(--c) 62%,#000),0 18px 28px rgba(0,0,0,.3); }
-html[data-skin="v2"][data-curriculum] .vs-choice.vs-pal[data-ci]:active{ box-shadow:inset 0 0 0 3px var(--c),0 2px 0 color-mix(in srgb,var(--c) 62%,#000),0 6px 12px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] .vs-choice.vs-pal[data-ci]:hover{ box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 10px 0 color-mix(in srgb,var(--c) 62%,#000),0 18px 28px rgba(0,0,0,.3); }
+html[data-skin="v2"][data-curriculum] .vs-choice.vs-pal[data-ci]:active{ box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 2px 0 color-mix(in srgb,var(--c) 62%,#000),0 6px 12px rgba(0,0,0,.24); }
 `;
 document.head.appendChild(S);
 
