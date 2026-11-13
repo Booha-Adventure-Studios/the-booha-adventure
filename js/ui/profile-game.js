@@ -22,6 +22,12 @@
 const BoohaProfileGame = (() => {
   'use strict';
 
+  // Retired Nov 2026: the old Week Sealed seen flag was device-wide, so one student's
+  // value could suppress another student's "week sealed" celebration. Seen
+  // state lives in each student's save (sealedSeen). Remove the old key
+  // without reading or migrating its value.
+  try { localStorage.removeItem('booha_week_sealed_seen'); } catch (_) {}
+
   const IMG = 'assets/img/profile/';
   // Profile art URLs carry the shared revision tag (js/core/profile-art.js).
   const profileArt = file => (window.BoohaProfileArt ? window.BoohaProfileArt.url(file) : IMG + file);
@@ -963,9 +969,6 @@ const BoohaProfileGame = (() => {
     // Seen state lives in this student's save, so two students sealing the
     // same week on one iPad each see their own celebration exactly once.
     if (s.sealedSeen === s.keys.week) return;
-    let legacy = '';
-    try { legacy = localStorage.getItem('booha_week_sealed_seen') || ''; } catch (_) {}
-    if (legacy === sealedKey(s)) { markSeen('sealedSeen', s.keys.week); return; }
     const pct = s.weekPct == null ? '—' : `${s.weekPct}%`;
     const tier = s.weekPct == null ? 'SEAL' : s.weekPct >= 90 ? 'GOLD SEAL' : s.weekPct >= 75 ? 'SILVER SEAL' : 'BRONZE SEAL';
     const rewards = [

@@ -60,4 +60,16 @@ for (const [name, src] of [['booha_blocks.html', blocks], ['js/destruction_1.js'
 assert.match(destruction, /forEach\(\(key\) => \{\s*try \{ window\.localStorage && window\.localStorage\.removeItem\(key\); \} catch/,
   'Destruction retirement must only call removeItem on the listed keys');
 
+// Week Sealed (retired Nov 2026): the device-wide seen flag is removed and
+// never read; seen state lives in each student's save.
+const profileGame = fs.readFileSync(path.join(root, 'js', 'ui', 'profile-game.js'), 'utf8');
+assert.match(profileGame, /try \{ localStorage\.removeItem\('booha_week_sealed_seen'\); \} catch/,
+  'profile-game.js must retire booha_week_sealed_seen on load');
+assert.doesNotMatch(withoutRemovals(profileGame), /booha_week_sealed_seen/,
+  'booha_week_sealed_seen must not be read, written or migrated');
+assert.deepStrictEqual(removedKeys(profileGame), ['booha_week_sealed_seen'],
+  'profile-game.js must retire exactly booha_week_sealed_seen');
+assert.match(profileGame, /if \(s\.sealedSeen === s\.keys\.week\) return;/,
+  'Week Sealed seen state comes from the student save');
+
 console.log('storage scope audit passed');
