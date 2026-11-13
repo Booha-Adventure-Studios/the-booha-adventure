@@ -560,11 +560,11 @@ body.hira-mode .st-hira-icon{ transform:rotate(180deg); }
    slot until Check, when correct-green / wrong-orange take over as always.
    ══════════════════════════════════════════════════════════════ */
 html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]{
-  box-shadow:inset 0 0 0 3px var(--c),0 4px 0 color-mix(in srgb,var(--c) 62%,#000),0 10px 20px rgba(0,0,0,.28);
+  box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 4px 0 color-mix(in srgb,var(--c) 62%,#000),0 10px 20px rgba(0,0,0,.28);
   transition:transform .16s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background-color .2s,opacity .2s;
 }
-html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]:hover{ box-shadow:inset 0 0 0 3px var(--c),0 8px 0 color-mix(in srgb,var(--c) 62%,#000),0 16px 26px rgba(0,0,0,.3); }
-html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]:active{ box-shadow:inset 0 0 0 3px var(--c),0 1px 0 color-mix(in srgb,var(--c) 62%,#000),0 5px 10px rgba(0,0,0,.24); }
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]:hover{ box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 8px 0 color-mix(in srgb,var(--c) 62%,#000),0 16px 26px rgba(0,0,0,.3); }
+html[data-skin="v2"][data-curriculum] .st-en-card.st-pal[data-ci]:active{ box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 1px 0 color-mix(in srgb,var(--c) 62%,#000),0 5px 10px rgba(0,0,0,.24); }
 html[data-skin="v2"][data-curriculum] .st-en-card.st-pal.selected[data-ci]{
   background:var(--c);
   box-shadow:0 0 0 3px #fff,0 0 28px var(--c),0 9px 0 color-mix(in srgb,var(--c) 55%,#000),0 16px 26px rgba(0,0,0,.32);

@@ -754,6 +754,19 @@ S.textContent = `
   position:fixed; pointer-events:none; z-index:9999; border-radius:2px;
   animation:sspConfetti 1.1s ease-out forwards;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PALETTE POP (2026-11-13, js/game-pop.js): each question deals four
+   fresh palette colours (--pal-1..12, game-skin.css) onto the paper
+   sentence strips as a ring + coloured torn edge. Tapping is answering,
+   so the skin's correct-green / wrong-orange fills (!important) take over
+   at once; the colour only returns as the burst from the strip.
+   ══════════════════════════════════════════════════════════════ */
+html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-pal[data-ci]{
+  box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 5px 0 color-mix(in srgb,var(--c) 62%,#000),0 12px 22px rgba(0,0,0,.28);
+}
+html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-pal[data-ci]:hover{ box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 9px 0 color-mix(in srgb,var(--c) 62%,#000),0 18px 28px rgba(0,0,0,.3); }
+html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-pal[data-ci]:active{ box-shadow:inset 0 0 0 3px var(--c-ring, var(--c)),0 1px 0 color-mix(in srgb,var(--c) 62%,#000),0 6px 12px rgba(0,0,0,.24); }
 `;
 document.head.appendChild(S);
 
@@ -913,6 +926,11 @@ const dotsRow     = document.getElementById('ssp-dots');
 const startOverlay= document.getElementById('ssp-start-overlay');
 const helpBtn     = document.getElementById('ssp-help');
 const modalOverlay= document.getElementById('ssp-modal-overlay');
+
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load. */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
+POP.init({ pill: '#ssp-score' });
 const feedbackOverlay = document.getElementById('ssp-feedback-overlay');
 const feedbackTitle = document.getElementById('ssp-feedback-title');
 const feedbackCopy = document.getElementById('ssp-feedback-copy');
@@ -958,6 +976,7 @@ function bindSingleActivation(element, handler) {
 }
 
 function doStart() {
+  POP.reset();   /* Palette Pop: a restart starts clean */
   unlockAllAudio();
   feedbackState = 'playing';
   order = U.shuffle(CFG.cards.slice(0, 15));
@@ -1138,12 +1157,15 @@ function renderQ() {
   const pool        = order.filter((_, i) => i !== idx);
   const distractors = U.shuffle(pool).slice(0, 3);
   const choices     = U.shuffle([card, ...distractors]);
+  POP.newRound(choices.map((_, ci) => `ssp${idx}-${ci}`));   /* Palette Pop: four fresh colours per question */
 
   choices.forEach((c, ci) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'ssp-choice';
+    btn.className = 'ssp-choice ssp-pal';
     btn.setAttribute('data-ci', ci);
+    btn.dataset.popKey = `ssp${idx}-${ci}`;
+    POP.paint(btn, btn.dataset.popKey);
     btn.setAttribute('aria-label', c.en);
     btn.textContent = c.en;
 
@@ -1203,6 +1225,8 @@ function handlePick(btn, en) {
     // flash, ring and fragments; broader and brighter with the streak.
     // (squash:false — the button keeps its own sspCorrectPop.)
     U.impact({ source: btn, target: promptBox, outcome: 'hit', combo: hit.combo || 1, sharp: !!hit.sharp, flavor: 'wave', squash: false });
+    // Palette Pop: the strip bursts in its own colour, gems fly to the score, +1.
+    POP.correct(btn, btn.dataset.popKey, hit.combo || 1);
 
     score++;
     streak++;
@@ -1212,6 +1236,8 @@ function handlePick(btn, en) {
     updateStreakBanner();
     updateDots();
     pulseCorrectUI();
+    // Palette Pop: streak milestones (3/6/9/12) get a palette firework; 15 the biggest.
+    if (STREAK_MILESTONES.includes(streak)) POP.round(streak === 15 ? 5 : 3, promptBox, 5);
 
     const transitionMs = STREAK_MILESTONES.includes(streak)
       ? (streak === 15 ? 620 : 560)
@@ -1222,6 +1248,7 @@ function handlePick(btn, en) {
     btn.classList.add('ssp-wrong');
     run.miss();
     U.impact({ source: btn, outcome: 'miss', flavor: 'wave', squash: false });   // keeps sspWrongShake
+    POP.wrong(btn);   // Palette Pop: crunch, debris, smoke, cracks (never gems or colour)
     if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     streak   = 0;
     updateStreakUI();
@@ -1242,6 +1269,7 @@ function onTimeout() {
   run.miss();
   // Time ran out: the heat bar jolts and flashes red.
   U.impact({ source: heatEl, outcome: 'timeout', flavor: 'wave' });
+  POP.fizzle(heatEl);   // Palette Pop: the timer bar smokes out
   locked   = true;
   streak   = 0;
   updateStreakUI();
@@ -1430,6 +1458,7 @@ function revealResults(runTime) {
    REPLAY / BACK
    ══════════════════════════════════════════════════════════════ */
 document.getElementById('ssp-replay').addEventListener('click', () => {
+  POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
   clearResultEffects();
   if (finalClimaxTimer) clearTimeout(finalClimaxTimer);
   finalClimaxTimer = null;

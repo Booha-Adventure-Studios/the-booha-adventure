@@ -30,6 +30,7 @@ const sw = read('games/spell-word.js');
 const vs = read('games/vocab-speed.js');
 const st = read('games/sentence-tap.js');
 const so = read('games/sentence-order.js');
+const ssp = read('games/sentence-speed.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -90,6 +91,22 @@ for (const cur of ['br', 'bc', 'pb']) {
   }
 }
 
+// Rings on cream faces (card faces, paper strips) must stand apart: the palest
+// colours are deepened for the ring only (P.ringFor); fills keep the true colour.
+{
+  const CREAMS = ['#fff8e6', '#ffffff', '#f3e8d1', '#fffaf2'];
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16));
+  const far = h => Math.min(...CREAMS.map(b => { const [x, y] = [rgb(h), rgb(b)]; return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]); }));
+  assert.strictEqual(typeof P.ringFor, 'function', 'game-pop.js exposes ringFor');
+  for (const cur of ['br', 'bc', 'pb']) {
+    const block = skin.match(new RegExp(`html\\[data-skin="v2"\\]\\[data-curriculum="${cur}"\\] \\{[^}]*--pal-1:[^}]*\\}`))[0];
+    for (const [, c] of block.matchAll(/--pal-\d+:\s*(#[0-9A-Fa-f]{6})/g))
+      assert(far(P.ringFor(c)) >= 110, `${cur} ${c}: its ring stands apart from cream (${Math.round(far(P.ringFor(c)))})`);
+  }
+  for (const [name, src, sel] of [['Tap', vt, 'vt-en-card.vt-pal'], ['Sentence Tap', st, 'st-en-card.st-pal'], ['Speed', vs, 'vs-choice.vs-pal'], ['Sentence Speed', ssp, 'ssp-choice.ssp-pal']])
+    assert.strictEqual((src.match(new RegExp(`\\.${sel.replace('.', '\\.')}\\[data-ci\\](:hover|:active)?\\{[^}]*inset 0 0 0 3px var\\(--c-ring, var\\(--c\\)\\)`, 'g')) || []).length, 3, `${name}: cream-face rings use --c-ring (rest, hover, active)`);
+}
+
 // ── 2. The documented exception wins the cascade; verdicts still win ──
 assert.match(skin, /EXCEPTION to the "selected = lane colour" rule/, 'game-skin.css documents the Vocabulary Tap exception');
 const skinSel = 'html[data-skin="v2"][data-curriculum] :is(.vt-en-card, .st-en-card).selected[data-ci]';
@@ -144,6 +161,18 @@ assert(!/\.vs-choice\.vs-pal\[data-ci\][^{]*\{[^}]*!important/.test(vs), 'Speed:
 assert.match(vs, /POP\.newRound\(choices\.map\(\(_, ci\) => `vs\$\{idx\}-\$\{ci\}`\)\);/, 'Speed: four fresh colours per question');
 assert.match(vs, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'speed', squash: false \}\);[^\n]*\n\s*POP\.wrong\(btn\);/, 'Speed: a wrong pick crumbles after the existing recoil');
 assert.match(vs, /POP\.fizzle\(heatEl\);/, 'Speed: a timeout smokes the timer bar');
+// Sentence Speed: the same hooks on the paper strips.
+const sspPal = 'html[data-skin="v2"][data-curriculum] .ssp-choice.ssp-pal[data-ci]';
+const sspSkin = 'html[data-skin="v2"][data-curriculum] .ssp-choice[data-ci]';
+assert(ssp.includes(sspPal + '{') && skin.includes(sspSkin) && gte(spec(sspPal), spec(sspSkin)), 'Sentence Speed: strip palette ring outranks the skin strip rule');
+assert(!/\.ssp-choice\.ssp-pal\[data-ci\][^{]*\{[^}]*!important/.test(ssp), 'Sentence Speed: the ring is NOT !important, so the skin\'s !important correct/wrong fills win');
+assert.match(skin, /\.ssp-choice\.ssp-correct \{\s*background: var\(--ok\) !important;/, 'Sentence Speed: correct still fills green');
+assert.match(ssp, /POP\.newRound\(choices\.map\(\(_, ci\) => `ssp\$\{idx\}-\$\{ci\}`\)\);/, 'Sentence Speed: four fresh colours per question');
+assert.match(ssp, /flavor: 'wave', squash: false \}\);\n[^\n]*\n\s*POP\.correct\(btn, btn\.dataset\.popKey, hit\.combo \|\| 1\);/, 'Sentence Speed: the burst follows the existing wave');
+assert.match(ssp, /if \(STREAK_MILESTONES\.includes\(streak\)\) POP\.round\(streak === 15 \? 5 : 3, promptBox, 5\);/, 'Sentence Speed: one firework per milestone');
+assert.match(ssp, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'wave', squash: false \}\);[^\n]*\n\s*POP\.wrong\(btn\);/, 'Sentence Speed: a wrong pick crumbles after the existing recoil');
+assert.match(ssp, /U\.impact\(\{ source: heatEl, outcome: 'timeout', flavor: 'wave' \}\);\n\s*POP\.fizzle\(heatEl\);/, 'Sentence Speed: a timeout smokes the timer bar');
+assert.match(ssp, /function onTimeout\(\) \{\s*if \(locked \|\| feedbackState !== 'playing'\) return;/, 'Sentence Speed: one timeout per question');
 
 // ── 3. "Placed", never "right" ──
 for (const [name, src, rule] of [['Order', so, /\.so-placed-chip\.so-pp:not\(\.so-correct\):not\(\.so-wrong\)\{([^}]*)\}/], ['Tap', vt, /\.vt-jp-slot\.has-pair\.vt-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Sentence Tap', st, /\.st-jp-slot\.has-pair\.st-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Spell', sw, /\.sw-slot\.filled\.sw-pp\{([^}]*)\}/]]) {
@@ -198,7 +227,7 @@ for (const [re, what] of [[/cancelAnimationFrame\(raf\)/, 'animation frame'], [/
 assert.match(pop, /addEventListener\('pagehide', reset\);/, 'reset on page close / navigation');
 assert.match(pop, /visibilitychange[^\n]*document\.hidden\) reset\(\)/, 'reset when the tab is hidden');
 assert.doesNotMatch(pop.replace(/function later[^\n]*/, ''), /\bsetTimeout\(/, 'every delayed effect goes through later() so reset() can cancel it');
-for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['vocab-speed replay', vs, /getElementById\('vs-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['sentence-order', so, /replayBtn\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/]])
+for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['vocab-speed replay', vs, /getElementById\('vs-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['sentence-speed start', ssp, /function doStart\(\) \{\s*POP\.reset\(\);/], ['sentence-speed replay', ssp, /getElementById\('ssp-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-order', so, /replayBtn\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/]])
   assert.match(src, re, `${name}: restart clears leftover effects`);
 assert.match(pop, /pointer-events:none/, 'the effects canvas never takes taps');
 assert.match(utils, /if \(now - \(last\.get\(el\) \|\| 0\) < 120\) return;/, 'score-pill pops are throttled');
@@ -265,7 +294,7 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');

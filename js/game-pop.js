@@ -47,7 +47,21 @@ window.BoohaPop = (() => {
     const l = lum(hex), dark = (l + .05) / (DARK_L + .05), white = 1.05 / (l + .05);
     return dark >= white ? DARK_INK : '#ffffff';
   }
-  function paint(el, key) { if (!el || !colorOf[key]) return; el.style.setProperty('--c', colorOf[key]); el.style.setProperty('--c-ink', inkFor(colorOf[key])); }
+  /* A ring that still shows on cream card faces and paper strips: the
+     palest colours (e.g. #E8F6FF) are deepened, same hue, until they stand
+     apart from every cream surface. Fills and bursts keep the true colour. */
+  const CREAMS = ['#fff8e6', '#ffffff', '#f3e8d1', '#fffaf2'].map(h => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16)));
+  const ringCache = new Map();
+  function ringFor(hex) {
+    if (ringCache.has(hex)) return ringCache.get(hex);
+    let c = [1, 3, 5].map(i => parseInt(String(hex).substr(i, 2), 16));
+    if (c.some(isNaN)) return hex;
+    const far = v => Math.min(...CREAMS.map(b => Math.hypot(v[0] - b[0], v[1] - b[1], v[2] - b[2])));
+    for (let i = 0; i < 12 && far(c) < 110; i++) c = c.map(v => Math.round(v * .9));
+    const out = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+    ringCache.set(hex, out); return out;
+  }
+  function paint(el, key) { if (!el || !colorOf[key]) return; el.style.setProperty('--c', colorOf[key]); el.style.setProperty('--c-ring', ringFor(colorOf[key])); el.style.setProperty('--c-ink', inkFor(colorOf[key])); }
 
   /* ── colours ── */
   /* Different palette colours for a new set of items (keys or {_key}). */
@@ -329,7 +343,7 @@ window.BoohaPop = (() => {
 
   /* ── events from the game ── */
   return {
-    newRound, color, paint, canFlash, inkFor, palette, reset,
+    newRound, color, paint, canFlash, inkFor, ringFor, palette, reset,
     init(opts = {}) { if (opts.pill) pillSel = opts.pill; },
     stats() { return { live, rings: rings.length, labels: labels.size, bolts: bolts.length, cracks: cracks.length, running: !!raf, voices, timers: timers.size, govern, dpr: DPR }; },
     tap(key, btn, quiet) {
