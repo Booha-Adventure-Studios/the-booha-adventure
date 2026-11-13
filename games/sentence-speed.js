@@ -150,7 +150,7 @@ S.textContent = `
   background:var(--game-bg); padding:1rem;
   transition:opacity .35s ease;
 }
-.ssp-start-overlay.hiding{ opacity:0; pointer-events:none; }
+.ssp-start-overlay.hiding{ opacity:0; }   /* still catches taps while it fades: extra START presses never reach an answer */
 .ssp-start-card{
   max-width:480px; width:100%; border-radius:32px; overflow:hidden;
   background:var(--game-surface); border:2px solid var(--game-primary);
@@ -595,7 +595,7 @@ S.textContent = `
   padding:1rem; background:rgba(5,3,10,.76); backdrop-filter:blur(8px);
 }
 .ssp-feedback-overlay.show{ display:flex; animation:sspFeedbackIn .22s ease both; }
-.ssp-feedback-overlay.closing{ animation:sspFeedbackOut .18s ease both; pointer-events:none; }
+.ssp-feedback-overlay.closing{ animation:sspFeedbackOut .18s ease both; }   /* still catches taps while it closes */
 .ssp-feedback-card{
   width:min(460px,100%); padding:2rem; border:2px solid #ef4444; border-radius:28px;
   background:var(--game-surface); color:var(--game-text); text-align:center;
@@ -975,7 +975,30 @@ function bindSingleActivation(element, handler) {
   });
 }
 
+/* Stale-tap guard (low-end iPads): a START / OK press repeated during a
+   lag, or delivered late, must never count as an answer to the question
+   that appears underneath it. An answer must be pressed on that button
+   (pointerdown there) and must have started after the answers opened,
+   by the event's own time-stamp; nobody answers in under 350 ms. */
+const TAP_ARM_MS = 350;
+let answersOpenAt = Infinity;
+function tapTime(e) {
+  const now = performance.now(), t = e && e.timeStamp;
+  return t > 0 && t <= now + 50 ? t : now;   // older browsers: epoch time-stamps → use now
+}
+function armChoice(btn) {
+  btn.addEventListener('pointerdown', e => { btn._downAt = tapTime(e); }, { passive: true });
+}
+function freshTap(btn, e) {
+  const t = e && e.type === 'pointerup' ? btn._downAt : tapTime(e);
+  btn._downAt = undefined;
+  return t !== undefined && t - answersOpenAt >= TAP_ARM_MS;
+}
+
+let started = false;   // START works once; replays go through the score card
 function doStart() {
+  if (started) return;
+  started = true;
   POP.reset();   /* Palette Pop: a restart starts clean */
   unlockAllAudio();
   feedbackState = 'playing';
@@ -1091,6 +1114,7 @@ function startHeat() {
 }
 
 function setAnswerInputEnabled(enabled) {
+  answersOpenAt = enabled ? performance.now() : Infinity;
   grid.setAttribute('aria-disabled', String(!enabled));
   grid.querySelectorAll('.ssp-choice').forEach(btn => {
     btn.disabled = !enabled;
@@ -1169,7 +1193,9 @@ function renderQ() {
     btn.setAttribute('aria-label', c.en);
     btn.textContent = c.en;
 
+    armChoice(btn);
     bindSingleActivation(btn, event => {
+      if (!freshTap(btn, event)) return;   // a late START / OK tap is not an answer
       unlockAllAudio();
       handlePick(btn, c.en, event);
     });

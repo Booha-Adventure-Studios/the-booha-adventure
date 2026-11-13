@@ -233,7 +233,7 @@ for (const [re, what] of [[/cancelAnimationFrame\(raf\)/, 'animation frame'], [/
 assert.match(pop, /addEventListener\('pagehide', reset\);/, 'reset on page close / navigation');
 assert.match(pop, /visibilitychange[^\n]*document\.hidden\) reset\(\)/, 'reset when the tab is hidden');
 assert.doesNotMatch(pop.replace(/function later[^\n]*/, ''), /\bsetTimeout\(/, 'every delayed effect goes through later() so reset() can cancel it');
-for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['vocab-speed replay', vs, /getElementById\('vs-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['sentence-speed start', ssp, /function doStart\(\) \{\s*POP\.reset\(\);/], ['sentence-speed replay', ssp, /getElementById\('ssp-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-order', so, /replayBtn\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/]])
+for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*if \(started\) return;\s*started = true;\s*POP\.reset\(\);/], ['vocab-speed replay', vs, /getElementById\('vs-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['sentence-speed start', ssp, /function doStart\(\) \{\s*if \(started\) return;\s*started = true;\s*POP\.reset\(\);/], ['sentence-speed replay', ssp, /getElementById\('ssp-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-order', so, /replayBtn\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/]])
   assert.match(src, re, `${name}: restart clears leftover effects`);
 assert.match(pop, /pointer-events:none/, 'the effects canvas never takes taps');
 assert.match(utils, /if \(now - \(last\.get\(el\) \|\| 0\) < 120\) return;/, 'score-pill pops are throttled');
@@ -373,6 +373,25 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
   assert.match(bb, /streak = 0; setBelly\(0\); stopRing\(\);\n  POP\.reset\(\);/, 'Bites: replay clears leftover effects');
   const burstFn = pop.slice(pop.indexOf('    burst(el, col, k = 20, o = {}) {'), pop.indexOf('    // A volley of fireworks'));
   assert(burstFn && !/SFX\./.test(burstFn), 'Bites: bursts are silent (the game has its own crunch, gulp and burp)');
+}
+
+// ── 7f. Fixes (2026-11-13) ──
+{
+  // Week Boss: the next round never cuts off a clip.
+  assert.match(wb, /afterVoice\(kind === 'miss' \? 1500 : finale \? 3000 : 950, /, 'Boss: answers wait for the clip');
+  assert.match(wb, /afterVoice\(1800, /, 'Boss: a shown answer is said in full');
+  assert(!/setTimeout\(\(\) => \{ if \(my === token\) next\(\); \}/.test(wb), 'Boss: no fixed-timer advance is left');
+  assert.match(wb, /clipBusy = true;\n  if \(!voiceGate\.play\(a, [^\n]*\)\) clipFinished\(\);/, 'Boss: a clip that cannot start never blocks the game');
+  assert.match(wb, /setTimeout\(go, 6000\);/, 'Boss: a clip that never ends gives up after 6 s');
+  // Speed games: a late START / OK tap is never an answer.
+  for (const [name, src, p] of [['Vocab Speed', vs, 'vs'], ['Sentence Speed', ssp, 'ssp']]) {
+    assert(!new RegExp(`\\.${p}-start-overlay\\.hiding\\{[^}]*pointer-events:none`).test(src), `${name}: START keeps catching taps while it fades`);
+    assert(!new RegExp(`\\.${p}-feedback-overlay\\.closing\\{[^}]*pointer-events:none`).test(src), `${name}: OK keeps catching taps while it closes`);
+    assert.match(src, /answersOpenAt = enabled \? performance\.now\(\) : Infinity;/, `${name}: answers record when they open`);
+    assert.match(src, /if \(!freshTap\(btn, event\)\) return;/, `${name}: answers ignore stale taps`);
+    assert.match(src, /const t = e && e\.type === 'pointerup' \? btn\._downAt : tapTime\(e\);/, `${name}: a touch must begin on the answer itself`);
+    assert.match(src, /return t !== undefined && t - answersOpenAt >= TAP_ARM_MS;/, `${name}: and after the answers opened`);
+  }
 }
 
 // ── 8. Wiring ──
