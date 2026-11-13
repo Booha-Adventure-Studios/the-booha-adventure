@@ -744,6 +744,14 @@
   let roundRecords = {};
   if (!LEVELS.length) console.error('Booha: no levels');
 
+  // Retired Nov 2026: round records and roster unlocks used to be device-wide,
+  // so one student's progress showed for the next on shared iPads. Progress now
+  // lives in the signed-in student's save. Remove the old keys without reading
+  // their values; the ambiguous shared records are intentionally not migrated.
+  ['booha_destruction_round_records_v1', 'booha_destruction_roster_unlocks_v1'].forEach((key) => {
+    try { window.localStorage && window.localStorage.removeItem(key); } catch (_) {}
+  });
+
   // ── Helpers ─────────────────────────────────────────
   const rnd   = (a=0, b=1) => a + Math.random() * (b - a);
   const clamp = (n, mn, mx) => Math.max(mn, Math.min(mx, n));

@@ -156,7 +156,8 @@ const CURRENT_CACHES = {
   // the old path stays as a tiny redirect page during the transition.
   // Shared-iPad storage pass: booha_blocks.html no longer carries a name
   // between students; refresh the precached page shell for returning iPads.
-  pages:  'booha-pages-2026-532',
+  // Legacy key retirement: booha_blocks.html removes the old shared name key.
+  pages:  'booha-pages-2026-533',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
