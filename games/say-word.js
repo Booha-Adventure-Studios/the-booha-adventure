@@ -177,6 +177,18 @@ S.textContent = `
 .stw-how-jp{font-family:var(--game-font-jp);font-size:clamp(9px,1.5vw,11px);color:var(--game-muted);margin-top:2px;line-height:1.4}
 .stw-modal-close{display:block;width:100%;margin-top:.9rem;font-family:var(--game-font-title);font-size:clamp(13px,2.4vw,16px);letter-spacing:.06em;padding:10px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--game-primary),var(--game-secondary));color:#000;font-weight:900;transition:transform .15s}
 .stw-modal-close:hover{transform:scale(1.03)}
+
+/* ══════════════════════════════════════════════════════════════
+   PALETTE POP (2026-11-13, js/game-pop.js): each question deals four
+   fresh palette colours onto the answer panels as a ring + coloured edge.
+   Tapping is answering, so the skin's correct-green / wrong-orange fills
+   (!important) take over at once. The speaker's own effects (notes, sound
+   waves, equaliser, a fresh glow colour per press) live in game-pop.js.
+   ══════════════════════════════════════════════════════════════ */
+html[data-skin="v2"][data-curriculum] .stw-choice.stw-pal[data-ci]{
+  box-shadow:inset 0 0 0 3px var(--c-ring,var(--c)),0 5px 0 color-mix(in srgb,var(--c) 55%,#000),0 10px 18px rgba(0,0,0,.22);
+}
+html[data-skin="v2"][data-curriculum] .stw-choice.stw-pal[data-ci]:hover{ box-shadow:inset 0 0 0 3px var(--c-ring,var(--c)),0 8px 0 color-mix(in srgb,var(--c) 55%,#000),0 14px 22px rgba(0,0,0,.25); }
 `;
 document.head.appendChild(S);
 
@@ -275,6 +287,13 @@ document.getElementById('stw-modal-ok').addEventListener('click', () => modalOve
 modalOver.addEventListener('click', e => { if (e.target === modalOver) modalOver.classList.remove('open'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') modalOver.classList.remove('open'); });
 
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load. */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
+POP.init({ pill: '#stw-score' });
+let popCombo = 1;   // the combo of the current first-try hit, for the burst
+const STREAK_FIREWORKS = [5, 10, 15];
+
 /* ═══ STATE ═══ */
 let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, streak = 0;
@@ -331,6 +350,8 @@ playBtn.addEventListener('click', () => {
   playBtn.disabled = true;
   playBtn.classList.add('playing');
   playBtn.textContent = '♪';
+  POP.eq(playBtn);                        // Palette Pop: equaliser bars while it plays
+  const spkId = POP.speaker(playBtn);     // squash, shock ring, music notes, sound waves (silent: the voice comes first)
   U.unlockAudio();
   try {
     const a = new Audio(CFG.audioBase + card.mp3);
@@ -338,11 +359,12 @@ playBtn.addEventListener('click', () => {
     const myIdx = idx;   // the card this clip belongs to
     const done = () => {
       if (myIdx !== idx) return;   // a clip from an earlier question: ignore it
-      run.audioDone(); playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶'; };
+      run.audioDone(); playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶';
+      POP.speakerEnd(playBtn, spkId); };   // settle pop + a soft "your turn" tink
     // A new press always replaces whatever is still sounding.
     const started = voiceGate.play(a, { button: playBtn, onEnd: done, replace: true, ignoreCooldown: true });
     if (!started) done();
-  } catch(e) { playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶'; }
+  } catch(e) { playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶'; POP.speakerWait(playBtn); }
 });
 playBtn.addEventListener('touchstart', e => { e.preventDefault(); playBtn.click(); }, { passive:false });
 
@@ -352,11 +374,14 @@ function buildChoices(card) {
   const pool = order.filter((c, i) => i !== idx && c.jp !== card.jp);
   const distractors = U.shuffle(pool).slice(0, 3);
   const choices = U.shuffle([card, ...distractors]);
+  POP.newRound(choices.map((_, ci) => `stw${idx}-${ci}`));   /* Palette Pop: four fresh colours per question */
   choices.forEach((c, ci) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'stw-choice';
+    btn.className = 'stw-choice stw-pal';
     btn.setAttribute('data-ci', ci);
+    btn.dataset.popKey = `stw${idx}-${ci}`;
+    POP.paint(btn, btn.dataset.popKey);
     btn.innerHTML = `
       <span class="stw-choice-kanji" style="${showKanji ? '' : 'display:none'}">${c.jp || ''}</span>
       <span class="stw-choice-hira"  style="${showKanji ? 'display:none' : ''}">${c.hira || c.jp || ''}</span>
@@ -383,6 +408,7 @@ function handleChoice(btn, card) {
   if (correct) {
     if (firstTry) {
       const hit = run.hit() || {};
+      popCombo = hit.combo || 1;
       // The answer sends a sound wave into the listening card. Short and
       // silent of speech: the next clip only starts after the ding + 220 ms.
       U.impact({ source: btn, target: stwCard, outcome: 'hit', combo: hit.combo || 1, sharp: !!hit.sharp, flavor: 'listen', squash: false });
@@ -392,9 +418,12 @@ function handleChoice(btn, card) {
     isBusy = true; answered = true;
     voiceGate.stop();   // answered: the clip is done, move on cleanly
     btn.classList.add('correct');
+    // Palette Pop: a first-try answer bursts in its own colour, gems fly to the score, +1.
+    if (firstTry) POP.correct(btn, btn.dataset.popKey, popCombo);
     Array.from(choicesEl.children).forEach(b => b.classList.add('locked'));
     if (firstTry) { score++; scoreEl.textContent = score; }
     updateStreak(streak + 1);
+    if (firstTry && STREAK_FIREWORKS.includes(streak)) POP.round(streak === 15 ? 5 : 3, stwCard, 5);   // 5 / 10 / 15 in a row
     updateDots();
     playSuccessThenAdvance();
   } else {
@@ -402,6 +431,7 @@ function handleChoice(btn, card) {
     run.miss();
     // A small grey puff on the button; the card keeps its own soft shake.
     U.impact({ source: btn, outcome: 'miss', flavor: 'listen', squash: false });
+    POP.wrong(btn);   // Palette Pop: crunch, debris, smoke, cracks (never gems or colour)
     if (order[idx] && !missedItems.some(item => item.jp === order[idx].jp)) missedItems.push(order[idx]);
     updateStreak(0);
     btn.classList.add('wrong');
@@ -417,6 +447,7 @@ function showCard() {
   isBusy = false; answered = false; firstTry = true;
   pickCooldown = false; advancedThisCard = false;
   playBtn.disabled = false; playBtn.classList.remove('playing'); playBtn.textContent = '▶';
+  POP.speakerWait(playBtn);   // Palette Pop: the speaker hops now and then until it is played
   stwCard.classList.remove('wrong-state');
   numEl.textContent = idx + 1;
   updateDots();
@@ -469,6 +500,7 @@ function showResults() {
 
 /* ═══ REPLAY / BACK ═══ */
 document.getElementById('stw-replay').addEventListener('click', () => {
+  POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
   mainWrap.style.display = '';
   idx = 0; score = 0; streak = 0;
   missedItems = [];

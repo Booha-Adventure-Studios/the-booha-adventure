@@ -31,6 +31,7 @@ const vs = read('games/vocab-speed.js');
 const st = read('games/sentence-tap.js');
 const so = read('games/sentence-order.js');
 const ssp = read('games/sentence-speed.js');
+const stw = read('games/say-word.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -291,10 +292,36 @@ for (const [bg, ink] of [['#ffc94a', '#2b1a05'], ['#ff9a3c', '#2b1a05'], ['#ff6f
 assert.match(css, /\.brun-hud > :not\(\.brun-sr\) \{ position: relative; z-index: 1; \}/, 'pill text sits above the light sweep');
 assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs behind the text');
 
+// ── 7b. Say the Word: the speaker never covers the voice ──
+{
+  const spkFn = pop.slice(pop.indexOf('    speaker(btn) {'), pop.indexOf('    speakerEnd(btn, id) {'));
+  assert(spkFn.length > 200, 'speaker() present');
+  assert(!/SFX\.|tone\(|noise\(|\bding\b|playSFX/.test(spkFn), 'pressing play makes no effect sound: the word is heard clean from its first sound');
+  const beatFn = pop.slice(pop.indexOf('function spkBeat() {'), pop.indexOf('let spkCss'));
+  assert(!/SFX\.|tone\(|noise\(/.test(beatFn), 'the sound waves while the clip plays are silent');
+  const endFn = pop.slice(pop.indexOf('    speakerEnd(btn, id) {'), pop.indexOf('    // Time ran out'));
+  assert.match(endFn, /\(id && spk\.id !== id\)\) return;/, 'an old clip ending cannot stop a newer press');
+  assert.match(endFn, /SFX\.tink\(\);/, 'only after the clip ends: a soft tink');
+  assert.match(pop, /lastFire\.clear\(\); spk = null;/, 'reset() stops the speaker loop');
+  assert.match(pop, /until: performance\.now\(\) \+ 9000/, 'the wave loop gives up after 9 s even if the clip never reports its end');
+  assert.match(pop, /html\[data-motion="reduced"\] \.bpop-eq i/, 'equaliser and hop stop under reduced motion');
+  assert.match(stw, /POP\.eq\(playBtn\);[^\n]*\n\s*const spkId = POP\.speaker\(playBtn\);[^\n]*\n\s*U\.unlockAudio\(\);/, 'Say the Word: the speaker effect starts with the press');
+  assert.match(stw, /playBtn\.textContent = '▶';\n\s*POP\.speakerEnd\(playBtn, spkId\);/, 'Say the Word: it ends when that clip ends');
+  assert.match(stw, /function showCard\(\) \{\n  voiceGate\.stop\(\);[\s\S]{0,400}POP\.speakerWait\(playBtn\);/, 'Say the Word: a new question stops any speaker loop and waits for a press');
+  const stwPal = 'html[data-skin="v2"][data-curriculum] .stw-choice.stw-pal[data-ci]';
+  const stwSkin = 'html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice)[data-ci]';
+  assert(stw.includes(stwPal + '{') && gte(spec(stwPal), spec(stwSkin)), 'Say the Word: answer palette ring outranks the skin panel rule');
+  assert(!/\.stw-choice\.stw-pal\[data-ci\][^{]*\{[^}]*!important/.test(stw), 'Say the Word: the ring is NOT !important, so correct/wrong fills win');
+  assert.match(stw, /if \(firstTry\) POP\.correct\(btn, btn\.dataset\.popKey, popCombo\);/, 'Say the Word: only a first-try answer bursts');
+  assert.match(stw, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'listen', squash: false \}\);\n\s*POP\.wrong\(btn\);/, 'Say the Word: a wrong pick crumbles after the existing puff');
+  assert.match(stw, /if \(firstTry && STREAK_FIREWORKS\.includes\(streak\)\) POP\.round/, 'Say the Word: fireworks at 5 / 10 / 15 in a row');
+  assert.match(stw, /getElementById\('stw-replay'\)\.addEventListener\('click', \(\) => \{\n  POP\.reset\(\);/, 'Say the Word: replay clears leftover effects');
+}
+
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');
