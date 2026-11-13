@@ -59,6 +59,7 @@ function boot({ day = '2026-11-09', ready = true, save = {}, failPatch = false }
   };
   Object.assign(ctx, window);              // bare CALENDAR / BoohaSync lookups
   ctx.window = ctx;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'js', 'core', 'media-config.js'), 'utf8'), ctx); // pages load media-config.js first
   vm.runInNewContext(SRC, ctx);
   return {
     DC: ctx.BoohaDailyCheck,

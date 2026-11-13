@@ -13,7 +13,7 @@
 
 const CFG        = window.DECK_CONFIG;
 const FX         = window.DeckEffects;
-const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
+const AUDIO_ROOT = window.BOOHA_MEDIA.audioRoot; // js/core/media-config.js
 
 const searchParams = new URLSearchParams(window.location.search);
 const weekParam    = searchParams.get('week') || '';

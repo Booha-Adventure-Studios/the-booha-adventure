@@ -47,7 +47,7 @@ window.BoohaDailyCheck = (function () {
   'use strict';
 
   /* ── Config mirrors deck-core / curriculum-config ────────────────────── */
-  const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
+  const AUDIO_ROOT = window.BOOHA_MEDIA.audioRoot; // js/core/media-config.js
   const AUDIO_FOLDER = { pb: 'pre_boo', br: 'boo_riculum', bc: 'boo_continuum' };
   const MON_CODE = {
     january:'jan', february:'feb', march:'mar', april:'apr', may:'may',

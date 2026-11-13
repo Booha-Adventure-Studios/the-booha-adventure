@@ -2064,6 +2064,13 @@ else
   bad "image metadata guard failed"
 fi
 
+echo "[media] Audio root single source"
+if node tests/audio-root-single-source.test.cjs >/dev/null 2>&1; then
+  ok "remote audio location defined once in js/core/media-config.js; every page loads it first"
+else
+  bad "audio root single-source test failed"
+fi
+
 echo "[media] Video loading guard"
 if node tests/video-loading-guard.test.cjs >/dev/null 2>&1; then
   ok "every <video> is preload=none without autoplay; JS videos inventoried; no video precached"

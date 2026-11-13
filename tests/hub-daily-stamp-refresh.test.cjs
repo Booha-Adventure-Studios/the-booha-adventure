@@ -79,6 +79,7 @@ const realStreakLabel = (() => {
     document: { addEventListener() {}, dispatchEvent() {}, documentElement: { dataset: {} } },
   };
   ctx.window = ctx;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'js', 'core', 'media-config.js'), 'utf8'), ctx); // pages load media-config.js first
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'js', 'daily-check.js'), 'utf8'), ctx);
   return ctx.BoohaDailyCheck.streakLabel;
 })();
