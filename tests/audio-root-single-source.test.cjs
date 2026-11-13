@@ -55,6 +55,10 @@ before('profile.html', 'js/daily-check.js');
 before('game.html', 'js/game-core.js');
 before('study-deck.html', "js/stream-core.js'");
 before('juku.html', "'js/juku-config.js'");
+// Daily Check reminder pages load daily-check.js too.
+for (const page of ['maze.html', 'curriculum/pb/games-index.html', 'curriculum/br/games-index.html', 'curriculum/bc/games-index.html']) {
+  before(page, 'js/daily-check.js');
+}
 assert(/'js\/calendar\.js', 'js\/core\/media-config\.js', 'js\/juku-config\.js'/.test(read('juku.html')),
   'juku.html loads media-config.js in its sequential engine list, before juku-config.js');
 
