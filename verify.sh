@@ -89,7 +89,10 @@ if git rev-parse --git-dir >/dev/null 2>&1; then
   # JavaScript is served network-first with the asset cache only as an
   # offline fallback. A JS-only change therefore does not require a cache
   # version bump; keep the reminder for cache-first/content-sensitive files.
-  cached_changed=$(echo "$changed" | grep -cE '\.(html|css|json)$' || true)
+  # Test manifests are not shipped content, so a tests/*.json-only change
+  # should not produce a false cache-bump reminder.
+  cache_relevant_changed=$(echo "$changed" | grep -vE '^tests/[^/]+\.json$' || true)
+  cached_changed=$(echo "$cache_relevant_changed" | grep -cE '\.(html|css|json)$' || true)
   network_first_js_changed=$(echo "$changed" | grep -cE '\.m?js$' || true)
   sw_bumped=$(echo "$changed" | grep -c '^sw\.js$' || true)
   if [ "$cached_changed" -gt 0 ] && [ "$sw_bumped" -eq 0 ]; then

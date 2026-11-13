@@ -17,6 +17,10 @@ assert.match(source, /allowed_empty_json\(\)/, 'verify.sh must define an explici
 assert.match(source, /data\/core-games\.json\|data\/maze\.json/, 'the known empty JSON placeholders must be named explicitly');
 assert.match(source, /unexpected empty JSON:/, 'unexpected empty JSON files must fail verification');
 assert.doesNotMatch(source, /wc -c < "\$f"\)" -le 2/, 'empty JSON handling must not rely on a size-only shortcut');
+assert.ok(
+  source.includes("cache_relevant_changed=$(echo \"$changed\" | grep -vE '^tests/[^/]+\\.json$' || true)"),
+  'cache-bump reminder must ignore tests/*.json changes'
+);
 assert.match(source, /MANIFEST_EXTRA_TESTS/, 'verify.sh must retain the manifest extras runner marker');
 assert.match(source, /if \[ \$FAIL -gt 0 \]; then/, 'verification failures must produce a non-zero exit');
 
