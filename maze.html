@@ -135,29 +135,15 @@
         linear-gradient(180deg, rgba(232,244,255,.16) 0%, transparent 14%, transparent 88%, rgba(232,244,255,.18) 100%);
     }
     #mazeCanvas{ position:absolute; left:0; top:0; z-index:6; cursor:default; }
-    #mazeCanvas.bryan{ cursor:crosshair; }
     #mazeCanvas.locked{ cursor:not-allowed; pointer-events:none; }
     #travelLock{ position:absolute; inset:0; z-index:30; display:none; cursor:wait; pointer-events:none; }
     #travelLock.active{ display:block; pointer-events:all; }
-    #grid{ position:absolute; inset:0; display:none; pointer-events:none; z-index:7; background-image:linear-gradient(to right,rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.12) 1px,transparent 1px); background-size:80px 80px; mix-blend-mode:screen; opacity:.55; }
-    #grid.show{ display:block; }
-    .hudTitle{ font-family:'Bowlby One',sans-serif; font-size:clamp(13px,1.8vw,18px); letter-spacing:2px; line-height:1.15; color:#fff; text-shadow:0 0 22px rgba(255,140,255,.7),0 0 60px rgba(255,80,200,.35),0 2px 6px rgba(0,0,0,.9); user-select:none; pointer-events:none; }
-    #hud{ position:absolute; left:calc(12px + var(--safe-left)); top:calc(12px + var(--safe-top)); display:flex; gap:10px; align-items:flex-start; z-index:10; }
     .pill{ border-radius:999px; padding:10px 14px; font-weight:900; letter-spacing:.4px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.16); backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 14px 30px rgba(0,0,0,.35); color:rgba(255,255,255,.92); user-select:none; }
-    #coordPill{ display:none; } #coordPill.show{ display:block; }
-    .coordSmall{ font-size:12px; color:rgba(255,255,255,.7); font-weight:800; letter-spacing:1px; }
-    .coordBig{ font-size:14px; margin-top:4px; }
-    #bryanTip{ position:absolute; left:50%; top:calc(10px + var(--safe-top)); transform:translateX(-50%); z-index:10; display:none; background:rgba(0,0,0,.72); border:1px solid rgba(255,59,189,.3); border-radius:12px; padding:8px 16px; font-size:12px; font-weight:700; letter-spacing:.3px; color:rgba(255,255,255,.7); text-align:center; line-height:1.6; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); pointer-events:none; white-space:nowrap; }
-    #bryanTip.show{ display:block; }
-    #bryanBtn{ position:absolute; left:calc(10px + var(--safe-left)); bottom:calc(10px + var(--safe-bottom)); z-index:20; border-radius:999px; padding:6px 10px; font-size:9px; font-weight:1000; letter-spacing:1.4px; text-transform:uppercase; color:rgba(255,255,255,.45); background:rgba(0,0,0,.30); border:1px solid rgba(255,255,255,.10); backdrop-filter:blur(10px) saturate(140%); -webkit-backdrop-filter:blur(10px) saturate(140%); cursor:pointer; -webkit-tap-highlight-color:transparent; }
-    #bryanBtn.on{ color:#fff; border-color:rgba(255,255,255,.22); box-shadow:0 0 0 2px rgba(255,59,189,.18),0 0 18px rgba(255,59,189,.25); }
-    #bryanBtn:active{ transform:scale(.96); }
     #backBtn{ position:absolute; right:calc(8px + var(--safe-right)); bottom:calc(8px + var(--safe-bottom)); z-index:20; appearance:none; border:0; border-radius:999px; padding:5px 12px; font-size:11px; font-weight:1000; letter-spacing:.5px; cursor:pointer; color:#000; background:linear-gradient(180deg,var(--pink2),var(--pink)); box-shadow:0 4px 10px rgba(255,59,189,.28),0 0 0 1px rgba(255,59,189,.15),0 0 14px rgba(255,59,189,.28); opacity:0.75; -webkit-tap-highlight-color:transparent; transform:translateZ(0); transition:opacity 200ms; }
     #backBtn:hover{ opacity:1; }
     #backBtn:active{ transform:scale(.96); opacity:1; }
-    @media (min-width:900px) and (pointer:fine){ #backBtn{ padding:7px 14px; font-size:12px; opacity:0.85; } #bryanBtn{ padding:8px 12px; font-size:10px; color:rgba(255,255,255,.6); } }
-    @media (pointer:coarse){ .hudTitle{ display:none; } #bryanBtn{ display:none; } #hud{ display:none; } }
-    #app.inTransition #bryanBtn,#app.inTransition #hud,#app.inTransition #backBtn{ display:none !important; }
+    @media (min-width:900px) and (pointer:fine){ #backBtn{ padding:7px 14px; font-size:12px; opacity:0.85; } }
+    #app.inTransition #backBtn{ display:none !important; }
     #cpScrim{ position:fixed; inset:0; z-index:55; background:rgba(0,0,0,.48); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); display:none; }
     #cpScrim.show{ display:block; }
     #cpPopup{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:60; min-width:260px; max-width:360px; width:min(92vw,360px); background:linear-gradient(150deg,rgba(8,3,26,.98) 0%,rgba(3,8,34,.98) 100%); border-radius:24px; padding:22px 24px 20px; backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); text-align:center; border:1px solid rgba(255,255,255,.12); box-shadow:0 0 0 1px rgba(255,255,255,.05),0 32px 90px rgba(0,0,0,.85),0 0 80px rgba(160,60,255,.14), inset 0 1px 0 rgba(255,255,255,.10); display:none; pointer-events:auto; }
@@ -1167,21 +1153,7 @@
       <div id="seasonFrost" aria-hidden="true"></div>
       <canvas id="mazeCanvas"></canvas>
       <div id="travelLock"></div>
-      <div id="grid"></div>
     </div>
-    <div id="hud">
-      <div class="hudTitle">BOOHA<br>ADVENTURE</div>
-      <div id="coordPill" class="pill">
-        <div class="coordSmall">画像座標 (1600×900)</div>
-        <div class="coordBig" id="coordText">x: —  y: —</div>
-        <div class="coordSmall" style="margin-top:6px;opacity:.85;">クリックでコピー</div>
-      </div>
-    </div>
-    <div id="bryanTip">
-      座標は <strong>画像サイズ 1600×900</strong> で固定されています。<br>
-      マウスを動かして座標を確認し、クリックでコピーできます。
-    </div>
-    <button id="bryanBtn" type="button" aria-label="Bryan mode">BRYAN</button>
     <button id="backBtn" type="button" aria-label="もどる">もどる</button>
   </section>
   <div id="cpScrim"></div>
@@ -1357,8 +1329,6 @@ const { getCurrentCurriculumWeek, getAcademicWeekNumber } = window.CALENDAR;
   return capped.charAt(0).toUpperCase() + capped.slice(1).toLowerCase();
 }
 
-const BRYAN_PASS = 'him141amra803';
-const SHOW_BRYAN_BTN = false; // set true to re-enable dev mode button
 const IMG_W = 1600;
 const IMG_H = 900;
 
@@ -1431,12 +1401,6 @@ const EXTRA_BOOHA_GHOSTS = [
   'assets/img/extra-boo-violet.webp'
 ];
 
-// DEV switches.
-// Type b_4822() in the browser console.
-window.__boohaMazeDev = false;
-window.__boohaShowAllCheckpoints = false;
-window.__boohaExtraGhosts = false;
-
 const HW_TREE_IW = 100;
 const KR_TREE_IW = 78;
 const JUKU_TREE_IW = 78;
@@ -1493,10 +1457,8 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   confirmSp=document.getElementById('confirmSparkles'),startSp=document.getElementById('startSparkles'),
   fade=document.getElementById('fade'),bgMusic=document.getElementById('bgMusic'),
   mazeImg=document.getElementById('mazeImg'),canvas=document.getElementById('mazeCanvas'),
-  travelLock=document.getElementById('travelLock'),gridEl=document.getElementById('grid'),
-  bryanBtn=document.getElementById('bryanBtn'),bryanTip=document.getElementById('bryanTip'),
-  backBtn=document.getElementById('backBtn'),coordPill=document.getElementById('coordPill'),
-  coordText=document.getElementById('coordText'),cpScrim=document.getElementById('cpScrim'),
+  travelLock=document.getElementById('travelLock'),
+  backBtn=document.getElementById('backBtn'),cpScrim=document.getElementById('cpScrim'),
   cpPopup=document.getElementById('cpPopup'),cpPopupDate=document.getElementById('cpPopupDate'),
   cpTitle=document.getElementById('cpPopupTitle'),cpPopupBar=document.getElementById('cpPopupBar'),
   cpCloseBtn=document.getElementById('cpCloseBtn'),cpWeekBadge=document.getElementById('cpWeekBadge'),
@@ -1827,7 +1789,7 @@ function tickKarasuki(now,cx,cy){
 }
 
 // State
-let mazeStarted=false,bryanOn=false,activeWeek=CURRENT_WEEK,ghostLocked=false;
+let mazeStarted=false,activeWeek=CURRENT_WEEK,ghostLocked=false;
 let introPhase='idle',introGlowStart=0,introDropStart=0,introHoverStart=0,introSettleStart=0;
 let introHoverIX=0,introHoverIY=0;
 const startCP=CHECKPOINTS.find(c=>c.w===CURRENT_WEEK);
@@ -1850,7 +1812,7 @@ const CP_FAIRIES=CHECKPOINTS.map(()=>Array.from({length:8},(_,i)=>({
   twinklePhase:Math.random()*Math.PI*2,useSecondary:i%3===2
 })));
 
-let bMouseX=-1,bMouseY=-1,rafHandle=null;
+let rafHandle=null;
 
 function restoreMazeFromCheckpoint(){
   const returnWeek=parseInt(sessionStorage.getItem('booha_return_week')||'',10);
@@ -1930,7 +1892,7 @@ function getGamesThisWeekForMaze() {
 }
 
 function getExtraVisitorCount() {
-  const games = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
+  const games = getGamesThisWeekForMaze();
   return SEASONAL_VISUALS.extraVisitorCount(games, EXTRA_BOOHA_GHOSTS.length);
 }
 
@@ -1999,7 +1961,7 @@ function buildWanderers() {
     // The reward starts with four copies of one seasonal sprite. Regular
     // weekly Maze games then grow that flock using the old extra-visitor
     // progression, while performance and reduced-motion gates still apply.
-    const seasonalGames = window.__boohaExtraGhosts ? 9 : getGamesThisWeekForMaze();
+    const seasonalGames = getGamesThisWeekForMaze();
     const seasonalGrowth = SEASONAL_VISUALS.extraVisitorCount(
       seasonalGames,
       EXTRA_BOOHA_GHOSTS.length - SEASONAL_VISITOR_SLOTS,
@@ -2243,7 +2205,7 @@ function popupOpen(){
 
 function setTravelLock(on){
   ghostLocked=on;travelLock.classList.toggle('active',on);
-  backBtn.style.pointerEvents=on?'none':'';bryanBtn.style.pointerEvents=on?'none':'';
+  backBtn.style.pointerEvents=on?'none':'';
 }
 
 function ease(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
@@ -2389,7 +2351,6 @@ function drawFrame(now){
     }
   } else if(introPhase==='done'){
     OPEN_WEEKS.forEach(w=>{cpState[w]={alpha:1,extra:0};});
-    if(bryanOn)CHECKPOINTS.forEach(cp=>{if(!cpState[cp.w])cpState[cp.w]={alpha:.65,extra:.15};});
     if(ghostT<1){
       const el=now-ghostAnimStart;ghostT=Math.min(el/ghostTravelMs,1);const et=ease(ghostT);
       ghostIX=ghostSrcIX+(ghostDstIX-ghostSrcIX)*et;ghostIY=ghostSrcIY+(ghostDstIY-ghostSrcIY)*et;
@@ -2504,10 +2465,6 @@ function drawFrame(now){
     ctx.restore();
   }
 
-  if(bryanOn&&bMouseX>=0){
-    ctx.save();ctx.strokeStyle='rgba(255,255,255,.50)';ctx.lineWidth=1;ctx.shadowBlur=8;ctx.shadowColor='rgba(255,255,255,.25)';ctx.setLineDash([5,5]);
-    ctx.beginPath();ctx.moveTo(0,bMouseY);ctx.lineTo(cssW,bMouseY);ctx.stroke();ctx.beginPath();ctx.moveTo(bMouseX,0);ctx.lineTo(bMouseX,cssH);ctx.stroke();ctx.restore();
-  }
 }
 
 // Season phase ("first-snow", "lights-on") is date-based. Re-check it a few
@@ -2583,7 +2540,7 @@ worldPerf.enableOverlay(() => ({
 const HIT_R=40;
 function hitTest(clientX,clientY){
   const rect=canvas.getBoundingClientRect();const cx=clientX-rect.left,cy=clientY-rect.top;const{ix,iy}=cssToImg(cx,cy);
-  const pool=bryanOn?CHECKPOINTS:CHECKPOINTS.filter(c=>OPEN_WEEKS.includes(c.w));
+  const pool=CHECKPOINTS.filter(c=>OPEN_WEEKS.includes(c.w));
   let best=null,bestD=Infinity;pool.forEach(cp=>{const d=Math.hypot(cp.ix-ix,cp.iy-iy);if(d<HIT_R&&d<bestD){bestD=d;best=cp;}});return best;
 }
 function hitHomeworkTree(clientX,clientY){
@@ -2639,11 +2596,6 @@ canvas.addEventListener('click',e=>{
   if(hitKarasukiTree(e.clientX,e.clientY)){ startGhostTravelToKRTree(); return; }
   if(hitJukuTree(e.clientX,e.clientY)){ startGhostTravelToJukuTree(); return; }
   
-  if(bryanOn){
-    const rect=canvas.getBoundingClientRect();const{ix,iy}=cssToImg(e.clientX-rect.left,e.clientY-rect.top);
-    coordText.textContent=`x: ${ix}  y: ${iy}`;
-    copyText(`${ix},${iy}`).then(ok=>{if(ok){coordPill.style.transform='scale(1.04)';setTimeout(()=>coordPill.style.transform='',130);}});
-  }
   const cp=hitTest(e.clientX,e.clientY);if(cp)startGhostTravel(cp);
 });
 canvas.addEventListener('touchend',e=>{
@@ -2659,12 +2611,6 @@ canvas.addEventListener('touchend',e=>{
   
   const cp=hitTest(t0.clientX,t0.clientY);if(cp){startGhostTravel(cp);e.preventDefault();}
 },{passive:false});
-canvas.addEventListener('mousemove',e=>{
-  if(!bryanOn)return;const rect=canvas.getBoundingClientRect();bMouseX=e.clientX-rect.left;bMouseY=e.clientY-rect.top;
-  const{ix,iy}=cssToImg(bMouseX,bMouseY);coordText.textContent=`x: ${ix}  y: ${iy}`;
-});
-canvas.addEventListener('mouseleave',()=>{bMouseX=-1;bMouseY=-1;});
-
 function startGhostTravel(cp){
   if(ghostLocked)return;closePopup();
   pendingHomework=false;pendingKarasuki=false;pendingJuku=false;
@@ -2904,24 +2850,6 @@ iconContTree.addEventListener('click',()=>{
   setTimeout(()=>{window.location.href=`curriculum/bc/games-index.html?week=${encodeURIComponent(weekSlug)}`;},FADE_MS);
 });
 
-function applyBryan(){
-  bryanBtn.classList.toggle('on',bryanOn);gridEl.classList.toggle('show',bryanOn);
-  coordPill.classList.toggle('show',bryanOn);bryanTip.classList.toggle('show',bryanOn);
-  canvas.classList.toggle('bryan',bryanOn);
-  if(!bryanOn){bMouseX=-1;bMouseY=-1;coordText.textContent='x: —  y: —';}
-}
-bryanBtn.addEventListener('click',()=>{
-  if(ghostLocked)return;
-  if(bryanOn){bryanOn=false;applyBryan();return;}
-  const pw=prompt('Bryan mode password:');if(pw===null)return;
-  if(String(pw).trim()===BRYAN_PASS){bryanOn=true;applyBryan();}else alert('Nope.');
-});
-coordPill.addEventListener('click',()=>{const m=coordText.textContent.match(/x:\s*(\d+)\s*y:\s*(\d+)/);if(m)copyText(`${m[1]},${m[2]}`);});
-async function copyText(txt){
-  try{await navigator.clipboard.writeText(txt);return true;}catch(e){}
-  try{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);return true;}catch(e){return false;}
-}
-
 window.addEventListener('resize',resizeCanvas,{passive:true});
 window.addEventListener('orientationchange',()=>setTimeout(resizeCanvas,200),{passive:true});
 if(mazeImg.complete)setTimeout(resizeCanvas,0);else mazeImg.addEventListener('load',()=>setTimeout(resizeCanvas,0));
@@ -2983,7 +2911,6 @@ mazeStartBtn.addEventListener('click',async()=>{
 });
 
 
-if (!SHOW_BRYAN_BTN) bryanBtn.style.display = 'none';  
 backBtn.addEventListener('click',()=>{
   if(ghostLocked)return;
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
@@ -3069,90 +2996,6 @@ window.addEventListener('pageshow',(e)=>{
   jkPromptScrim.classList.remove('show','active');
 });
 
-  /* ═══════════════════════════════════════
-   BRYAN DEV CONSOLE TOOL
-   Type b_4822() in browser console.
-═══════════════════════════════════════ */
-
-window.b_4822 = function b_4822() {
-  window.__boohaMazeDev = true;
-  window.__boohaShowAllCheckpoints = true;
-  window.__boohaExtraGhosts = true;
-
-  bryanOn = true;
-  applyBryan();
-
-  // Show all checkpoint orbs.
-  CHECKPOINTS.forEach(cp => {
-    if (!OPEN_WEEKS.includes(cp.w)) OPEN_WEEKS.push(cp.w);
-  });
-
-  mazeStarted = true;
-  ghostVisible = true;
-  introPhase = 'done';
-  setTravelLock(false);
-
-  const cp = CHECKPOINTS.find(c => c.w === CURRENT_WEEK) || CHECKPOINTS[0];
-
-  // Put the player ghost at the current week checkpoint when DEV starts.
-ghostIX = cp.ix;
-ghostIY = cp.iy;
-ghostSrcIX = cp.ix;
-ghostSrcIY = cp.iy;
-ghostDstIX = cp.ix;
-ghostDstIY = cp.iy;
-ghostT = 1;
-activeWeek = cp.w;
-  
-
-  buildWanderers();
-  resizeCanvas();
-  startLoop();
-
-  console.log('👻 b_4822 DEV ON');
-  console.log('Coords ON. All checkpoints visible. Extra Booha visitors visible.');
-  console.log('Playable ghosts are still ONLY the main five.');
-
-  return {
-    dev: true,
-    playableGhosts: GHOSTS.length,
-    extraGhostsAvailable: EXTRA_BOOHA_GHOSTS.length,
-    seasonalVisitor: window.BoohaSkins?.seasonalVisitor?.() || null,
-    activeGhostIdx,
-    activeGhostSrc: GHOSTS[activeGhostIdx],
-    wanderers: wanderers.length,
-    checkpoints: CHECKPOINTS.length
-  };
-};
-
-window.b_4822_off = function b_4822_off() {
-  window.__boohaMazeDev = false;
-  window.__boohaShowAllCheckpoints = false;
-  window.__boohaExtraGhosts = false;
-
-  bryanOn = false;
-  applyBryan();
-
-  // Restore normal open weeks.
-  OPEN_WEEKS.length = 0;
-  OPEN_WEEKS.push(Math.max(1, _lastW), CURRENT_WEEK);
-
-  if (_nextData.weekId !== CURRENT_WEEK_DATA.weekId) {
-    OPEN_WEEKS.push(Math.min(48, _nextW));
-  }
-
-  buildWanderers();
-  resizeCanvas();
-
-  console.log('👻 b_4822 DEV OFF');
-
-  return {
-    dev: false,
-    openWeeks: OPEN_WEEKS.slice(),
-    wanderers: wanderers.length
-  };
-};
-  
 </script>
 </body>
 </html>

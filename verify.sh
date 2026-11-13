@@ -2078,6 +2078,13 @@ else
   bad "video loading guard failed"
 fi
 
+echo "[security] Maze production surface guard"
+if node tests/maze-production-surface.test.cjs >/dev/null 2>&1; then
+  ok "Maze ships without the client-side password or private debug bypass"
+else
+  bad "Maze production surface guard failed"
+fi
+
 echo "[privacy] Shared-iPad storage boundary audit"
 if node tests/storage-scope-audit.test.cjs >/dev/null 2>&1; then
   ok "student progress is identity-scoped; explicit device-wide preferences remain allowed"
