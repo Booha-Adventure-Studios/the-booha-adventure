@@ -2049,9 +2049,16 @@ fi
 
 echo "[repo] Tracked-file guard"
 if node tests/tracked-file-guard.test.cjs >/dev/null 2>&1; then
-  ok "no forbidden tracked archives/source files or unexpected files over 5 MiB"
+  ok "no forbidden archives/masters; audio ≤5 MiB, video ≤10 MiB, other ≤5 MiB (1 named exception)"
 else
   bad "tracked-file guard failed"
+fi
+
+echo "[media] Video loading guard"
+if node tests/video-loading-guard.test.cjs >/dev/null 2>&1; then
+  ok "every <video> is preload=none without autoplay; JS videos inventoried; no video precached"
+else
+  bad "video loading guard failed"
 fi
 
 echo "[repo] Snap rename redirect"
