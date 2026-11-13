@@ -1465,6 +1465,9 @@ function escapeHTML(value) {
   })[ch]);
 }
 const LB_KEY='booha_blocks_lb_v2';
+// Retired Nov 2026: a device-wide saved name carried one student's name to the
+// next on shared iPads. Remove the old key without reading its value.
+try{localStorage.removeItem('booha_blocks_name');}catch(_){}
 function getBoard(){try{const b=JSON.parse(localStorage.getItem(LB_KEY)||'[]');return Array.isArray(b)?b:[];}catch(_){return[];}}
 function setBoard(a){try{localStorage.setItem(LB_KEY,JSON.stringify(a));}catch(_){}}
 function saveScore(name){
