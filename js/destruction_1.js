@@ -637,7 +637,6 @@
   ];
 
   const ROSTER_UNLOCK_KEY = 'booha_destruction:roster:';
-  const ROSTER_UNLOCK_STORAGE_KEY = 'booha_destruction_roster_unlocks_v1';
   const ROSTER_UNLOCKS = [
     { unlockEN:'Starter Booha', unlockJP:'最初から使えます' },
     { unlockEN:'Clear 1 round', unlockJP:'1ラウンドをクリア', test:p=>p.rounds>=1 },
@@ -742,7 +741,6 @@
 
   const LEVELS = window.BOOHA_DESTRUCTION_LEVELS || [];
   const CHAPTERS = window.BOOHA_DESTRUCTION_CHAPTERS || [];
-  const ROUND_RECORD_KEY = 'booha_destruction_round_records_v1';
   let roundRecords = {};
   if (!LEVELS.length) console.error('Booha: no levels');
 
@@ -812,17 +810,29 @@
   }
 
   function loadRoundRecords() {
+    const api = destructionSaveApi();
+    if (!api) { roundRecords = {}; return; }
     try {
-      const stored = window.localStorage && window.localStorage.getItem(ROUND_RECORD_KEY);
-      const parsed = stored ? JSON.parse(stored) : {};
+      const data = api.load();
+      const page = data?.pageState?.[DESTRUCTION_PAGE_ID];
+      const parsed = page?.roundRecords;
       roundRecords = parsed && typeof parsed === 'object' ? parsed : {};
-    } catch (e) { roundRecords = {}; }
+    } catch (_) { roundRecords = {}; }
   }
 
   function saveRoundRecords() {
+    const api = destructionSaveApi();
+    if (!api) return false;
     try {
-      if (window.localStorage) window.localStorage.setItem(ROUND_RECORD_KEY, JSON.stringify(roundRecords));
-    } catch (e) { /* Storage can be unavailable in private browsing. */ }
+      const data = api.load();
+      const previous = data?.pageState?.[DESTRUCTION_PAGE_ID];
+      return api.patch('pageState', {
+        [DESTRUCTION_PAGE_ID]: {
+          ...(previous && typeof previous === 'object' ? previous : {}),
+          roundRecords,
+        },
+      });
+    } catch (_) { return false; }
   }
 
   function medalThresholds(level) {
@@ -885,10 +895,6 @@
       const data = window.BoohaAdventure?.save?.load?.();
       saved = data?.unlocks || {};
     } catch (e) {}
-    try {
-      const local = JSON.parse(window.localStorage?.getItem(ROSTER_UNLOCK_STORAGE_KEY) || '{}');
-      saved = {...local, ...saved};
-    } catch (e) {}
     bst.unlocked = ROSTER.map((booha, index) => index === 0 || !!saved[ROSTER_UNLOCK_KEY + booha.id]);
   }
 
@@ -897,11 +903,6 @@
     const item = { unlockedAt:Date.now(), source:'booha_destruction' };
     try {
       window.BoohaAdventure?.save?.patch?.('unlocks', { [ROSTER_UNLOCK_KEY + booha.id]:item });
-    } catch (e) {}
-    try {
-      const local = JSON.parse(window.localStorage?.getItem(ROSTER_UNLOCK_STORAGE_KEY) || '{}');
-      local[ROSTER_UNLOCK_KEY + booha.id] = item;
-      window.localStorage?.setItem(ROSTER_UNLOCK_STORAGE_KEY, JSON.stringify(local));
     } catch (e) {}
   }
 
