@@ -704,12 +704,17 @@ POP.init({ pill: '.st-score-pill' });
 /* ══════════════════════════════════════════════════════════════
    HIRA TOGGLE
    ══════════════════════════════════════════════════════════════ */
+// Pre-Boo starts in hiragana (small children need not read kanji), like the
+// listening games; the あ switch still flips to kanji, and Replay returns here.
+const HIRA_DEFAULT = (document.documentElement.dataset.curriculum || CFG.curriculum) === 'pb';
 let hiraMode = false;
-hiraBtn.addEventListener('click', () => {
-  hiraMode = !hiraMode;
+function setHiraMode(on) {
+  hiraMode = on;
   document.body.classList.toggle('hira-mode', hiraMode);
   hiraLabel.textContent = hiraMode ? '漢字' : 'ひらがな';
-});
+}
+hiraBtn.addEventListener('click', () => setHiraMode(!hiraMode));
+setHiraMode(HIRA_DEFAULT);
 
 /* ══════════════════════════════════════════════════════════════
    MODAL
@@ -1035,9 +1040,7 @@ U.emitGameEnd({
     missedItems = [];
     run.reset();
     scoreEl.textContent   = '0';
-    document.body.classList.remove('hira-mode');
-    hiraMode              = false;
-    hiraLabel.textContent = 'ひらがな';
+    setHiraMode(HIRA_DEFAULT);
     startRound(0);
   }, { once: true });
 

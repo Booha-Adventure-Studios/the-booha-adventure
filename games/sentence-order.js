@@ -792,12 +792,17 @@ for (let i = 0; i < 15; i++) {
 }
 
 /* hira toggle */
+// Pre-Boo starts in hiragana (small children need not read kanji), like the
+// listening games; the あ switch still flips to kanji, and Replay returns here.
+const HIRA_DEFAULT = (document.documentElement.dataset.curriculum || CFG.curriculum) === 'pb';
 let hiraMode = false;
-hiraBtn.addEventListener('click', () => {
-  hiraMode = !hiraMode;
+function setHiraMode(on) {
+  hiraMode = on;
   document.body.classList.toggle('hira-mode', hiraMode);
   hiraLabel.textContent = hiraMode ? '漢字' : 'ひらがな';
-});
+}
+hiraBtn.addEventListener('click', () => setHiraMode(!hiraMode));
+setHiraMode(HIRA_DEFAULT);
 
 /* modal */
 helpBtn.addEventListener('click', () => modalOverlay.classList.add('open'));
@@ -1293,9 +1298,7 @@ function showResults() {
     run.reset();
     recoveredItems.clear();
     scoreEl.textContent = '0';
-    document.body.classList.remove('hira-mode');
-    hiraMode = false;
-    hiraLabel.textContent = 'ひらがな';
+    setHiraMode(HIRA_DEFAULT);
      
     allCards = U.shuffle(allCards);
     showCard();
