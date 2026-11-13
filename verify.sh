@@ -2061,6 +2061,13 @@ else
   bad "video loading guard failed"
 fi
 
+echo "[privacy] Shared-iPad storage boundary audit"
+if node tests/storage-scope-audit.test.cjs >/dev/null 2>&1; then
+  ok "student progress is identity-scoped; explicit device-wide preferences remain allowed"
+else
+  bad "shared-iPad storage boundary audit failed"
+fi
+
 echo "[repo] Snap rename redirect"
 if node tests/snap-rename.test.cjs >/dev/null 2>&1; then
   ok "Mister Happy's Snap lives at mister_happys_snap.html; old path is a precached redirect"

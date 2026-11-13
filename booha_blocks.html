@@ -1464,13 +1464,11 @@ function escapeHTML(value) {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[ch]);
 }
-const LB_KEY='booha_blocks_lb_v2',NAME_KEY='booha_blocks_name';
+const LB_KEY='booha_blocks_lb_v2';
 function getBoard(){try{const b=JSON.parse(localStorage.getItem(LB_KEY)||'[]');return Array.isArray(b)?b:[];}catch(_){return[];}}
 function setBoard(a){try{localStorage.setItem(LB_KEY,JSON.stringify(a));}catch(_){}}
-function getSavedName(){try{return(localStorage.getItem(NAME_KEY)||'').trim();}catch(_){return'';}}
-function saveName(n){try{localStorage.setItem(NAME_KEY,n);}catch(_){}}
 function saveScore(name){
-  name=String(name||'').trim().slice(0,18)||'ブーハー'; saveName(name);
+  name=String(name||'').trim().slice(0,18)||'ブーハー';
   const b=getBoard();
   b.push({name,lines:linesTotal,score,level:currentLevel,time:elapsedMs,at:Date.now()});
   b.sort((a,b2)=>(b2.score-a.score)||(b2.lines-a.lines)||(b2.at-a.at));
@@ -1556,7 +1554,8 @@ function openNameOverlay(){
   document.getElementById('goScore').textContent=score;
   document.getElementById('goLevel').textContent=currentLevel;
   document.getElementById('goTime').textContent=fmtTime(elapsedMs);
-  nameInput.value=getSavedName();
+  // Names are entered per run; do not carry one student's name to the next.
+  nameInput.value='';
   nameOverlay.style.display='flex';
   setTimeout(()=>{try{nameInput.focus();}catch(_){}},80);
 }
