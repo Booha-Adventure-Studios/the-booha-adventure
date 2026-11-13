@@ -35,6 +35,7 @@ const stw = read('games/say-word.js');
 const aq = read('games/ask-question.js');
 const sas = read('games/say-sentence.js');
 const wb = read('games/week-boss.js');
+const ec = read('games/echo.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -348,10 +349,23 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
     for (const prop of [...m[2].matchAll(/([a-z-]+)\s*:/g)].map(x => x[1])) assert(['opacity', 'transform'].includes(prop), `@keyframes ${m[1]} animates ${prop}`);
 }
 
+// ── 7d. Echo: dictation stays clean ──
+{
+  assert.match(ec, /POP\.eq\(playBtn\);[^\n]*\n\s*const spkId = POP\.speaker\(playBtn\);/, 'Echo: the speaker show starts with the press (silent)');
+  assert.match(ec, /playBtn\.innerHTML = PLAY_HTML; POP\.speakerEnd\(playBtn, spkId\);/, 'Echo: ▶ and its pulse come back when the clip ends');
+  assert.match(ec, /const r = run\.hit\(\); score \+= 1;\s*U\.confetti\(input, 18\);[\s\S]{0,260}POP\.spell\(tl, tl\.map\(\(_, i\) => tileKey\(i\)\), \(r && r\.combo\) \|\| 1, 55, input\);/, 'Echo: a first-try answer bursts letter by letter on the existing 55 ms wave');
+  assert.match(ec, /POP\.spell\([^\n]*'\+½'\)/, 'Echo: a fix is labelled +½, not +1');
+  assert.match(ec, /POP\.misspell\(tilesNow\(\), el => el\.classList\.contains\('is-good'\), 50\);/, 'Echo: wrong letters crumble, the right start stays');
+  assert.match(ec, /perfectRun = 0;\n  if \(tries >= 2\) POP\.misspell/, 'Echo: a miss ends the firework streak');
+  assert.match(ec, /run\.miss\(\);   \/\/ a hint ends the combo[^\n]*\n  perfectRun = 0;/, 'Echo: a hint ends it too');
+  assert.match(ec, /\$\('ec-replay'\)\.addEventListener\('click', \(\) => \{\n  POP\.reset\(\);/, 'Echo: replay clears leftover effects');
+  assert(!/\.ec-tile\.ec-pal\{[^}]*!important/.test(ec), 'Echo: the tile ring never beats the verdict colours');
+}
+
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw], ['ask-question', aq], ['say-sentence', sas]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw], ['ask-question', aq], ['say-sentence', sas], ['echo', ec], ['week-boss', wb]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');
