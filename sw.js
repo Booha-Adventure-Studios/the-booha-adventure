@@ -152,7 +152,9 @@ const CURRENT_CACHES = {
   // Step 5: Adventure Log summary card under the companion (profile.html).
   // Step 5 fixes: daily-check.js before profile-game.js; Maze/Blitz choice.
   // Summary buttons: accessible names, 44px choice buttons (profile.html).
-  pages:  'booha-pages-2026-530',
+  // Snap rename: mister_happys_snap_test.html -> mister_happys_snap.html;
+  // the old path stays as a tiny redirect page during the transition.
+  pages:  'booha-pages-2026-531',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -375,6 +377,8 @@ const CORE_FILES = [
   `${BASE}/karasuki.html`,
   `${BASE}/happy_house.html`,
   `${BASE}/liar_machine.html`,
+  `${BASE}/mister_happys_snap.html`,
+  // Transition redirect for old bookmarks/cached links; remove after Dec 2026.
   `${BASE}/mister_happys_snap_test.html`,
   `${BASE}/maze.html`,
   `${BASE}/study-deck.html`,

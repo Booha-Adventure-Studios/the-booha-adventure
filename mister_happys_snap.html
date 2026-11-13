@@ -1,0 +1,1354 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="/the-booha-adventure/icons/icon-192.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>MISTER HAPPY'S SNAP TEST</title>
+
+<!-- ═══ PWA ═══════════════════════════════════════════════ -->
+<link rel="manifest" href="/the-booha-adventure/manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Booha Adventure">
+<link rel="apple-touch-icon" href="/the-booha-adventure/icons/icon-512.png">
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<!-- ═══ TOKEN GATE ════════════════════════════════════════ -->
+<style>
+  html.token-checking,
+  html.token-checking body {
+    background: #000;
+    visibility: hidden;
+  }
+</style>
+<script>document.documentElement.classList.add('token-checking');</script>
+<script src="./js/token.js"></script>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Share+Tech+Mono&family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+  :root {
+    --bg:       #07070c;
+    --panel:    #11111b;
+    --panel2:   #171727;
+    --border:   #303047;
+    --text:     #f4f4f4;
+    --dim:      #777790;
+    --gold:     #e8c84a;
+    --red:      #ff4e4e;
+    --blue:     #4ecaff;
+    --green:    #2ecc71;
+    --pink:     #ff5cc8;
+    --jp:       #ffd96a;
+
+    /* PLAYER COLOURS — P1 (top, student) GREEN · P2 (bottom) WHITE */
+    --p1:       #34e07a;
+    --p2:       #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .screen {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+
+  .screen.active { opacity: 1; pointer-events: auto; }
+
+  #screen-title {
+    gap: 22px;
+    text-align: center;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(52,224,122,.13), transparent 28%),
+      radial-gradient(circle at 80% 75%, rgba(255,255,255,.08), transparent 30%),
+      radial-gradient(ellipse at center, #1b182a 0%, #07070c 72%);
+  }
+
+  .badge {
+    border: 2px solid var(--gold);
+    padding: 7px 18px;
+    color: var(--gold);
+    font-size: 12px;
+    letter-spacing: 4px;
+  }
+
+  .title-main {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(34px, 8vw, 76px);
+    color: var(--gold);
+    line-height: .95;
+    letter-spacing: 2px;
+    text-shadow: 0 0 34px rgba(232,200,74,.35), 0 0 80px rgba(232,200,74,.13);
+  }
+
+  .title-sub, .rules {
+    max-width: 520px;
+    color: var(--text);
+    font-size: clamp(14px, 3.3vw, 20px);
+    line-height: 1.5;
+    letter-spacing: 1px;
+  }
+
+  .jp {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--jp);
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .warn {
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 10px 14px;
+    font-size: clamp(12px, 3vw, 16px);
+    letter-spacing: 1px;
+    animation: blink 1.2s step-end infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: center; }
+
+  button {
+    font-family: 'Share Tech Mono', monospace;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .big-btn {
+    border: 2px solid var(--gold);
+    background: rgba(232,200,74,.08);
+    color: var(--gold);
+    padding: 16px 28px;
+    min-height: 58px;
+    font-size: clamp(15px, 3.7vw, 23px);
+    letter-spacing: 2px;
+    line-height: 1.25;
+    text-transform: uppercase;
+    box-shadow: 0 0 22px rgba(232,200,74,.16);
+  }
+
+  .big-btn:active { transform: scale(.97); }
+
+  .big-btn.ghost {
+    border-color: var(--border);
+    color: var(--dim);
+    background: transparent;
+    box-shadow: none;
+    font-size: clamp(13px, 3vw, 18px);
+  }
+
+  .sep {
+    width: min(460px, 92vw);
+    height: 1px;
+    background: var(--border);
+  }
+
+  #screen-setup { gap: 18px; text-align: center; }
+
+  .setup-title {
+    font-family: 'Black Han Sans', sans-serif;
+    color: var(--gold);
+    font-size: clamp(24px, 6vw, 46px);
+    letter-spacing: 2px;
+  }
+
+  .label {
+    color: var(--dim);
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .btn-group { display:flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+  .sel-btn {
+    border: 2px solid var(--border);
+    background: var(--panel);
+    color: var(--dim);
+    padding: 13px 18px;
+    min-width: 104px;
+    min-height: 54px;
+    font-size: clamp(14px, 3.5vw, 20px);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .sel-btn.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(232,200,74,.08);
+    box-shadow: 0 0 14px rgba(232,200,74,.18);
+  }
+
+  .rules strong { color: var(--green); }
+
+  /* ═══ GAME SCREEN ═══════════════════════════════════════ */
+
+  #screen-game {
+    padding: 0;
+    justify-content: stretch;
+    background: var(--bg);
+  }
+
+  .arena {
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-rows: 1fr auto 1fr;
+    min-height: 0;
+  }
+
+  /* a player half — full interaction lives here, oriented to its player */
+  .half {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    text-align: center;
+    transition: background .15s ease, filter .15s ease;
+  }
+
+  /* TOP half belongs to PLAYER 1 — rotate so it faces the player seated at the top edge */
+  .half.p1 { transform: rotate(180deg); border-bottom: 1px solid var(--border); }
+  .half.p2 { border-top: 1px solid var(--border); }
+
+  /* base (idle/arming) look */
+  .half.p1 { background: radial-gradient(circle at center, rgba(52,224,122,.05), rgba(52,224,122,.015)); }
+  .half.p2 { background: radial-gradient(circle at center, rgba(255,255,255,.04), rgba(255,255,255,.01)); }
+
+  /* armed-but-not-live: dimmed, "GET READY" */
+  .half.locked { filter: grayscale(.6) brightness(.55); }
+
+  /* live: bright, "TAP!" */
+  .half.live.p1 {
+    background: radial-gradient(circle at center, rgba(52,224,122,.22), rgba(52,224,122,.05));
+    animation: livePulseP1 .7s ease-in-out infinite;
+  }
+  .half.live.p2 {
+    background: radial-gradient(circle at center, rgba(255,255,255,.18), rgba(255,255,255,.04));
+    animation: livePulseP2 .7s ease-in-out infinite;
+  }
+  @keyframes livePulseP1 { 0%,100%{ box-shadow: inset 0 0 50px rgba(52,224,122,.18);} 50%{ box-shadow: inset 0 0 110px rgba(52,224,122,.4);} }
+  @keyframes livePulseP2 { 0%,100%{ box-shadow: inset 0 0 50px rgba(255,255,255,.14);} 50%{ box-shadow: inset 0 0 110px rgba(255,255,255,.3);} }
+
+  /* answering: the winner — strong steady glow */
+  .half.answering.p1 {
+    background: radial-gradient(circle at center, rgba(52,224,122,.30), rgba(52,224,122,.07) 60%);
+    box-shadow: inset 0 0 120px rgba(52,224,122,.5);
+  }
+  .half.answering.p2 {
+    background: radial-gradient(circle at center, rgba(255,255,255,.24), rgba(255,255,255,.06) 60%);
+    box-shadow: inset 0 0 120px rgba(255,255,255,.38);
+  }
+
+  /* waiting: the loser / passed-from player */
+  .half.waiting { filter: grayscale(.7) brightness(.35); }
+
+  .half-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .half-name {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(16px, 4vw, 26px);
+    letter-spacing: 2px;
+  }
+  .half-score {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(22px, 6vw, 40px);
+  }
+  .p1c { color: var(--p1); }
+  .p2c { color: var(--p2); }
+
+  /* the SNAP cue (only thing visible before a tap) */
+  .snap-hint {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(40px, 13vw, 96px);
+    letter-spacing: 3px;
+    line-height: 1;
+  }
+  .snap-hint .hint-jp {
+    display: block;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: clamp(16px, 4.5vw, 28px);
+    font-weight: 900;
+    margin-top: 6px;
+    color: var(--dim);
+  }
+  .half.p1 .snap-hint { color: var(--p1); }
+  .half.p2 .snap-hint { color: var(--p2); }
+  .half.answering .snap-hint { display: none; }
+
+  /* the question (revealed only in the active answerer's half) */
+  .prompt { display: none; flex-direction: column; align-items: center; gap: 8px; }
+  .half.answering .prompt { display: flex; }
+
+  .word-en {
+    font-family:'Black Han Sans', sans-serif;
+    font-size: clamp(28px, 8vw, 56px);
+    color: var(--blue);
+    text-shadow: 0 0 24px rgba(78,202,255,.25);
+    line-height: 1.05;
+    max-width: 92vw;
+  }
+  .word-jp {
+    font-family:'Noto Sans JP', sans-serif;
+    font-size: clamp(26px, 7.5vw, 52px);
+    color: var(--jp);
+    font-weight: 900;
+    text-shadow: 0 0 24px rgba(255,217,106,.22);
+    line-height: 1.05;
+    max-width: 92vw;
+  }
+  .word-hira {
+    font-family:'Noto Sans JP', sans-serif;
+    font-size: clamp(14px, 3.8vw, 22px);
+    color: rgba(255,217,106,.65);
+    font-weight: 600;
+  }
+
+  /* YES / NO */
+  .answers { display: none; gap: 12px; width: min(460px, 92%); margin-top: 4px; }
+  .half.answering .answers { display: flex; }
+
+  .answer-btn {
+    flex: 1 1 0;
+    min-height: 78px;
+    border: 2px solid var(--border);
+    font-family:'Black Han Sans', sans-serif;
+    font-size: clamp(26px, 7vw, 44px);
+    line-height: 1.05;
+    letter-spacing: 2px;
+  }
+  .answer-btn span {
+    display:block;
+    margin-top: 4px;
+    font-family:'Noto Sans JP', sans-serif;
+    font-size: clamp(16px, 4.5vw, 26px);
+    font-weight: 900;
+    letter-spacing: 0;
+  }
+  .answer-btn:active { transform: scale(.96); }
+  .yes { color: var(--green); background: rgba(46,204,113,.14); border-color: rgba(46,204,113,.7); }
+  .no  { color: var(--red);   background: rgba(255,78,78,.14);  border-color: rgba(255,78,78,.7); }
+
+  /* answer countdown bar */
+  .timer-track {
+    visibility: hidden;
+    width: min(460px, 92%);
+    height: 12px;
+    border: 1px solid var(--border);
+    background: rgba(0,0,0,.4);
+    overflow: hidden;
+    border-radius: 8px;
+    margin-top: 2px;
+  }
+  .half.answering .timer-track { visibility: visible; }
+  .timer-fill {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    transform: scaleX(1);
+    background: linear-gradient(90deg, var(--green), var(--gold) 60%, var(--red));
+  }
+
+  /* PASS announce — receiver's own half pulses YOUR TURN (oriented) before the question shows */
+  .half.announce .snap-hint   { display: block; animation: announcePulse .4s ease-in-out 2; }
+  .half.announce .prompt      { display: none; }
+  .half.announce .answers     { display: none; }
+  .half.announce .timer-track { visibility: hidden; }
+  @keyframes announcePulse { 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.18);} }
+
+  /* thin centre divider — round counter + go signal */
+  .center-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 46px;
+    padding: 4px 12px;
+    background: linear-gradient(180deg, #171727, #101018);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .round-num { font-family:'Black Han Sans', sans-serif; font-size: clamp(16px, 4vw, 24px); color: var(--text); }
+  .round-num small { color: var(--dim); }
+  .state-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--dim);
+    transition: background .15s, box-shadow .15s;
+  }
+  .state-dot.go {
+    background: var(--gold);
+    box-shadow: 0 0 16px var(--gold);
+    animation: dotPulse .55s ease-in-out infinite;
+  }
+  @keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .mode-tag { font-size: 10px; letter-spacing: 2px; color: var(--dim); }
+
+  /* ═══ FEEDBACK ══════════════════════════════════════════ */
+
+  .toast {
+    position: fixed;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2500;
+    display:none;
+    width: min(92vw, 480px);
+    padding: 24px 18px;
+    text-align:center;
+    background: rgba(10,10,15,.94);
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 48px rgba(232,200,74,.25);
+  }
+  .toast.show { display:block; animation: pop .8s ease forwards; }
+  @keyframes pop { 0%{opacity:0; transform:translate(-50%,-50%) scale(.92)} 15%,85%{opacity:1; transform:translate(-50%,-50%) scale(1)} 100%{opacity:0; transform:translate(-50%,-50%) scale(1.04)} }
+  .toast-inner { transition: none; }
+  .toast-main { font-family:'Black Han Sans', sans-serif; font-size: clamp(26px, 8vw, 54px); color: var(--gold); line-height: 1; }
+  .toast-jp { font-family:'Noto Sans JP', sans-serif; font-weight:900; color:var(--jp); font-size: clamp(17px, 5vw, 28px); margin-top: 10px; }
+  .toast-sub { color: var(--dim); font-size: clamp(12px, 3vw, 17px); margin-top: 10px; line-height: 1.3; }
+
+  .flash {
+    position: fixed; inset: 0;
+    z-index: 2000;
+    pointer-events:none;
+    opacity:0;
+  }
+  .flash.correct { background: var(--green); animation: flash .28s ease-out forwards; }
+  .flash.wrong   { background: var(--red);   animation: flash .42s ease-out forwards; }
+  .flash.snap1   { background: var(--p1);    animation: flash .22s ease-out forwards; }
+  .flash.snap2   { background: var(--p2);    animation: flash .22s ease-out forwards; }
+  .flash.gold    { background: var(--gold);  animation: flash .22s ease-out forwards; }
+  @keyframes flash { 0%{opacity:.4} 100%{opacity:0} }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    15% { transform: translateX(-12px); } 30% { transform: translateX(10px); }
+    45% { transform: translateX(-8px); } 60% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); } 90% { transform: translateX(2px); }
+  }
+  .shaking { animation: shake .45s ease-out; }
+
+  /* ═══ RESULT ════════════════════════════════════════════ */
+
+  #screen-result, #screen-records {
+    gap: 16px;
+    text-align:center;
+    background: radial-gradient(ellipse at center, #11201a, #07070c 70%);
+  }
+
+  .result-crown {
+    font-family:'Black Han Sans', sans-serif;
+    font-size: clamp(11px, 3vw, 15px);
+    letter-spacing: 6px;
+    color: var(--gold);
+  }
+  .result-title {
+    font-family:'Black Han Sans', sans-serif;
+    font-size: clamp(38px, 11vw, 88px);
+    line-height: .96;
+    text-shadow: 0 0 40px rgba(52,224,122,.35);
+    animation: titlePop .5s cubic-bezier(.2,1.4,.4,1) both;
+  }
+  @keyframes titlePop { 0%{opacity:0; transform:scale(.7)} 100%{opacity:1; transform:scale(1)} }
+  .result-title.win-p1 { color: var(--p1); }
+  .result-title.win-p2 { color: var(--p2); }
+  .result-title.draw   { color: var(--gold); }
+  .result-jp { font-family:'Noto Sans JP', sans-serif; font-weight:900; color: var(--jp); font-size: clamp(18px, 5vw, 30px); }
+
+  .bigscore {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(14px, 5vw, 40px);
+    margin: 4px 0 6px;
+  }
+  .bs-side { display:flex; flex-direction:column; gap: 2px; }
+  .bs-name { font-size: clamp(11px, 3vw, 15px); letter-spacing: 2px; }
+  .bs-num {
+    font-family:'Black Han Sans', sans-serif;
+    font-size: clamp(54px, 17vw, 130px);
+    line-height: .9;
+    transition: all .2s;
+  }
+  .bs-num.win { text-shadow: 0 0 40px currentColor; }
+  .bs-num.lose { opacity: .45; }
+  .bs-dash { font-family:'Black Han Sans', sans-serif; font-size: clamp(30px, 9vw, 60px); color: var(--dim); }
+
+  .cmp {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 6px 14px;
+    width: min(480px, 94vw);
+    align-items: center;
+    background: rgba(17,17,27,.7);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .cmp-label { font-size: 10px; letter-spacing: 2px; color: var(--dim); text-align:center; }
+  .cmp-v1 { font-family:'Black Han Sans', sans-serif; font-size: clamp(18px, 5vw, 26px); color: var(--p1); text-align:right; }
+  .cmp-v2 { font-family:'Black Han Sans', sans-serif; font-size: clamp(18px, 5vw, 26px); color: var(--p2); text-align:left; }
+
+  .rec-box {
+    width: min(560px, 94vw);
+    max-height: 64vh;
+    overflow:auto;
+    border: 1px solid var(--border);
+    background: rgba(17,17,27,.82);
+    padding: 14px;
+    text-align:left;
+  }
+  .rec-row {
+    display:grid;
+    grid-template-columns: 70px 1fr auto;
+    gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    padding: 8px 0;
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  #snap-exit-btn {
+    position: fixed;
+    right: 14px; top: 12px;
+    z-index: 850;
+    border: none;
+    background: transparent;
+    color: var(--dim);
+    font-size: 24px;
+    padding: 4px 10px;
+  }
+
+  /* landscape fallback — portrait is the intended orientation for face-to-face play */
+  @media (orientation: landscape) and (max-height: 560px) {
+    .arena { grid-template-rows: 1fr auto 1fr; }
+    .snap-hint { font-size: clamp(34px, 9vw, 64px); }
+    .word-en { font-size: clamp(24px, 6vw, 42px); }
+    .word-jp { font-size: clamp(22px, 6vw, 40px); }
+    .answer-btn { min-height: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<button id="snap-exit-btn" onclick="exitToGameRoom()">×</button>
+
+<!-- ═══ TITLE ════════════════════════════════════════════ -->
+<div id="screen-title" class="screen active">
+  <div class="badge">▸ MISTER HAPPY'S HOUSE ◂</div>
+  <div class="title-main">SNAP<br>TEST</div>
+  <div class="title-sub">
+    PLAY SOLO VS MISTER HAPPY, OR 2 PLAYER<br>
+    <span class="jp">1人でミスターハッピーと対戦、または2人対戦</span><br><br>
+    WAIT FOR <strong style="color:var(--green)">SNAP!</strong> — THEN TAP FAST.<br>
+    <span class="jp">「SNAP!」が出たら、はやく押す！</span><br><br>
+    FASTEST TAP ANSWERS THE QUESTION.<br>
+    <span class="jp">先に押した人が答えます。</span>
+  </div>
+  <div class="warn">TOO FAST OR TOO SLOW = POINT TO OPPONENT<br>早すぎ・おそすぎ → 相手に1点</div>
+  <div class="btn-row">
+    <button class="big-btn" onclick="enterSetup(true)">1 PLAYER — vs MISTER HAPPY<br><span class="jp"><ruby>一人<rt>ひとり</rt></ruby>でハッピーと<ruby>対戦<rt>たいせん</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="enterSetup(false)">2 PLAYER BATTLE<br><span class="jp"><ruby>二人<rt>ふたり</rt></ruby><ruby>対戦<rt>たいせん</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="showScreen('records'); renderRecords();">RECORDS<br><span class="jp"><ruby>記録<rt>きろく</rt></ruby></span></button>
+  </div>
+</div>
+
+<!-- ═══ SETUP ════════════════════════════════════════════ -->
+<div id="screen-setup" class="screen">
+  <div class="setup-title">CONFIGURE SNAP TEST</div>
+  <div class="sep"></div>
+
+  <div>
+    <div class="label">Curriculum</div>
+    <div class="btn-group" id="curr-group">
+      <button class="sel-btn" onclick="selectOpt('curr','pb',this)">PB</button>
+      <button class="sel-btn active" onclick="selectOpt('curr','br',this)">BR</button>
+      <button class="sel-btn" onclick="selectOpt('curr','bc',this)">BC</button>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">Mode</div>
+    <div class="btn-group" id="mode-group">
+      <button class="sel-btn active" onclick="selectOpt('mode','vocab',this)">VOCAB<br><span class="jp"><ruby>単語<rt>たんご</rt></ruby></span></button>
+      <button class="sel-btn" onclick="selectOpt('mode','sentences',this)">SENTENCES<br><span class="jp"><ruby>文<rt>ぶん</rt></ruby></span></button>
+      <button class="sel-btn" onclick="selectOpt('mode','questions',this)">QUESTIONS<br><span class="jp"><ruby>質問<rt>しつもん</rt></ruby></span></button>
+    </div>
+  </div>
+
+  <div id="difficulty-setup-block" style="display:none;">
+    <div class="label">Mister Happy's Reflexes</div>
+    <div class="btn-group" id="difficulty-group">
+      <button class="sel-btn" onclick="selectOpt('difficulty','sleepy',this)">SLEEPY<br><span class="jp">ねむい</span></button>
+      <button class="sel-btn active" onclick="selectOpt('difficulty','alert',this)">ALERT<br><span class="jp">げんき</span></button>
+      <button class="sel-btn" onclick="selectOpt('difficulty','genius',this)">GENIUS<br><span class="jp"><ruby>天才<rt>てんさい</rt></ruby></span></button>
+    </div>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="rules">
+    <strong>15 ROUNDS</strong> · <span class="jp">15ラウンド</span><br><br>
+    TAP FIRST WHEN YOU SEE <strong>SNAP!</strong><br>
+    <span class="jp">「SNAP!」で先に押す</span><br><br>
+    WINNER ANSWERS <strong>YES / NO</strong> BEFORE THE TIMER<br>
+    <span class="jp">勝った人がタイマー内に YES / NO</span><br><br>
+    WRONG = POINT TO OPPONENT · TOO SLOW = OTHER PLAYER'S TURN<br>
+    <span class="jp">まちがい→相手に1点 ／ おそい→相手の番</span>
+  </div>
+
+  <div class="btn-row">
+    <button class="big-btn" onclick="startMatch()">LOAD WEEKLY CONTENT<br><span class="jp"><ruby>今週<rt>こんしゅう</rt></ruby>の<ruby>内容<rt>ないよう</rt></ruby>で<ruby>始<rt>はじ</rt></ruby>める</span></button>
+    <button class="big-btn ghost" onclick="showScreen('title')">BACK<br><span class="jp">もどる</span></button>
+  </div>
+</div>
+
+<!-- ═══ GAME ═════════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <div class="arena" id="arena">
+
+    <!-- PLAYER 1 (top, rotated to face the top player) -->
+    <div class="half p1" id="p1-half" onclick="playerHit(1)">
+      <div class="half-head">
+        <div class="half-name p1c" id="p1-name">PLAYER 1</div>
+        <div class="half-score p1c" id="p1-score">0</div>
+      </div>
+      <div class="snap-hint" id="p1-hint">…<span class="hint-jp">まて</span></div>
+      <div class="prompt">
+        <div class="word-en" id="p1-en">—</div>
+        <div class="word-jp" id="p1-jp">—</div>
+        <div class="word-hira" id="p1-hira"></div>
+      </div>
+      <div class="answers">
+        <button class="answer-btn yes" onclick="answer(1,true,event)">YES<span><ruby>同<rt>おな</rt></ruby>じ</span></button>
+        <button class="answer-btn no"  onclick="answer(1,false,event)">NO<span>ちがう</span></button>
+      </div>
+      <div class="timer-track"><div class="timer-fill" id="p1-fill"></div></div>
+    </div>
+
+    <!-- CENTRE -->
+    <div class="center-strip">
+      <div class="round-num"><span id="round-now">1</span><small>/15</small></div>
+      <div class="state-dot" id="state-dot"></div>
+      <div class="mode-tag" id="mode-tag">BR · VOCAB</div>
+    </div>
+
+    <!-- PLAYER 2 (bottom, normal orientation) -->
+    <div class="half p2" id="p2-half" onclick="playerHit(2)">
+      <div class="half-head">
+        <div class="half-name p2c" id="p2-name">PLAYER 2</div>
+        <div class="half-score p2c" id="p2-score">0</div>
+      </div>
+      <div class="snap-hint" id="p2-hint">…<span class="hint-jp">まて</span></div>
+      <div class="prompt">
+        <div class="word-en" id="p2-en">—</div>
+        <div class="word-jp" id="p2-jp">—</div>
+        <div class="word-hira" id="p2-hira"></div>
+      </div>
+      <div class="answers">
+        <button class="answer-btn yes" onclick="answer(2,true,event)">YES<span><ruby>同<rt>おな</rt></ruby>じ</span></button>
+        <button class="answer-btn no"  onclick="answer(2,false,event)">NO<span>ちがう</span></button>
+      </div>
+      <div class="timer-track"><div class="timer-fill" id="p2-fill"></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ RESULT ═══════════════════════════════════════════ -->
+<div id="screen-result" class="screen">
+  <div class="result-crown">▸ FINAL ◂</div>
+  <div class="result-title" id="winner-title">PLAYER 1 WINS</div>
+  <div class="result-jp" id="winner-jp">プレイヤー1の勝ち</div>
+  <div class="bigscore" id="bigscore"></div>
+  <div class="cmp" id="cmp"></div>
+  <div class="btn-row">
+    <button class="big-btn" onclick="startMatch()">PLAY AGAIN<br><span class="jp">もう<ruby>一回<rt>いっかい</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="enterSetup(STATE.vsCpu)">SETUP<br><span class="jp"><ruby>設定<rt>せってい</rt></ruby></span></button>
+    <button class="big-btn ghost" onclick="showScreen('title')">MENU<br><span class="jp">メニュー</span></button>
+  </div>
+</div>
+
+<!-- ═══ RECORDS ══════════════════════════════════════════ -->
+<div id="screen-records" class="screen">
+  <div class="result-title" style="color:var(--gold);font-size:clamp(28px,8vw,56px)">SNAP RECORDS</div>
+  <div class="rec-box" id="records-content"></div>
+  <div class="btn-row">
+    <button class="big-btn ghost" onclick="showScreen('title')">BACK<br><span class="jp">もどる</span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-inner" id="toast-inner">
+    <div class="toast-main" id="toast-main">LOOK!</div>
+    <div class="toast-jp" id="toast-jp">見て！</div>
+    <div class="toast-sub" id="toast-sub"></div>
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<script src="js/calendar.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+//  MISTER HAPPY'S SNAP TEST
+//  Blind reflex race → first tap wins → question revealed (oriented to winner)
+//  → answer before the timer. Too slow passes the question to the other player.
+//  Content path style matches the Liar Machine: content/{curr}/{month}/{mode}.json
+// ─────────────────────────────────────────────────────────────────────────────
+
+const STORE_KEY = 'booha_snap_test_records';
+
+// Tunables ────────────────────────────────────────────────────────────────────
+const LIVE_MS   = 4000;   // how long the SNAP! window stays open before a dead round
+function answerMs() { return STATE.mode === 'vocab' ? 4500 : 6000; }  // read+answer window
+const ARM_MIN = 600, ARM_RANGE = 800;  // random anti-mash delay before SNAP!
+
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  })[ch]);
+}
+function getP1Name() {
+  const raw = (localStorage.getItem('booha_first_name') || '').trim();
+  if (!raw) return 'PLAYER 1';
+  return (raw.length > 12 ? raw.slice(0, 12) : raw).toUpperCase();
+}
+function getP2Name() { return 'PLAYER 2'; }
+function pName(n) { return n === 1 ? STATE.p1Name : STATE.p2Name; }
+function other(p) { return p === 1 ? 2 : 1; }
+
+const STATE = {
+  curr: 'br',
+  mode: 'vocab',
+  p1Name: getP1Name(),
+  p2Name: getP2Name(),
+  weekKey: '',
+
+  vsCpu: false,
+  difficulty: 'alert',
+
+  seed: 0,
+  cards: [],
+  items: [],
+  pairs: [],
+  pair: null,           // current round's pair
+  round: 0,
+  p1: 0,
+  p2: 0,
+  phase: 'idle',        // idle | arming | live | answering | feedback | done
+  activePlayer: null,
+  passed: false,        // has this round already been passed once?
+  timers: [],
+
+  stats: { snaps:{1:0,2:0}, attempts:{1:0,2:0}, correct:{1:0,2:0}, tooFast:{1:0,2:0} }
+};
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.getElementById('snap-exit-btn').style.display = id === 'title' ? 'block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('snap-exit-btn').style.display = 'block';
+});
+
+function exitToGameRoom() {
+  try { localStorage.setItem('hh_return_scene', 'game-room'); } catch (_) {}
+  flashColor('gold');
+  setTimeout(() => { window.location.href = 'happy_house.html'; }, 260);
+}
+
+function selectOpt(group, val, el) {
+  STATE[group] = val;
+  const groupEl = document.getElementById(group + '-group');
+  if (groupEl) groupEl.querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function enterSetup(vsCpu) {
+  if (typeof vsCpu === 'boolean') STATE.vsCpu = vsCpu;
+  const diffBlock = document.getElementById('difficulty-setup-block');
+  if (diffBlock) diffBlock.style.display = STATE.vsCpu ? '' : 'none';
+  showScreen('setup');
+}
+
+function clearTimers() {
+  STATE.timers.forEach(t => clearTimeout(t));
+  STATE.timers = [];
+}
+function later(fn, ms) {
+  const t = setTimeout(fn, ms);
+  STATE.timers.push(t);
+  return t;
+}
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+  return h >>> 0;
+}
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, rng) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function getWeekKey() {
+  if (window.CALENDAR && window.CALENDAR.getCurrentCurriculumWeek) {
+    const cw = window.CALENDAR.getCurrentCurriculumWeek();
+    return cw.weekId || deriveDateWeekKey();
+  }
+  return deriveDateWeekKey();
+}
+function deriveDateWeekKey() {
+  const now = new Date();
+  const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${now.getFullYear()}_w${String(weekNo).padStart(2,'0')}`;
+}
+function getMonthFolder() {
+  if (window.CALENDAR && window.CALENDAR.getCurrentCurriculumWeek) {
+    return window.CALENDAR.getCurrentCurriculumWeek().monthSlug;
+  }
+  const months = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+  return months[new Date().getMonth()];
+}
+
+async function loadContent() {
+  const month = getMonthFolder();
+  const path = `content/${STATE.curr}/${month}/${STATE.mode}.json`;
+  try {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    return Array.isArray(data) ? data : (data.cards || data.items || []);
+  } catch (e) {
+    console.warn('Failed to load content:', path, e);
+    return null;
+  }
+}
+
+function normalizeCard(card) {
+  const en = card.en || card.q || card.question || card.text || card.eng || '';
+  const jp = card.jp || card.ja || card.answerJp || card.translation || '';
+  const hira = card.hira || card.hiragana || card.kana || '';
+  return { en: String(en).trim(), jp: String(jp).trim(), hira: String(hira).trim() };
+}
+
+function buildPairs(items, rng) {
+  return items.map((card, i) => {
+    const isDifferent = rng() < 0.5;
+    if (!isDifferent) return { ...card, isDifferent: false };
+    const candidates = items.filter((c, ci) => ci !== i && c.jp && c.jp !== card.jp);
+    if (!candidates.length) return { ...card, isDifferent: false };
+    const wrong = candidates[Math.floor(rng() * candidates.length)];
+    return { en: card.en, jp: wrong.jp, hira: wrong.hira, isDifferent: true };
+  });
+}
+
+// ─── CPU OPPONENT (solo mode) ───
+// P2 is always the CPU slot ("MISTER HAPPY") -- P1 is always framed as the
+// student (getP1Name()). The CPU plays through the exact same real
+// functions a human tap would (playerHit / beginAnswer / answer), just
+// triggered by a timer instead of a touch, so every existing scoring,
+// animation, and feedback path already works unchanged.
+const CPU_SLOT = 2;
+const CPU_NAME = 'MISTER HAPPY';
+const CPU_DIFFICULTIES = {
+  sleepy: { label:'SLEEPY', jp:'ねむい', earlyRate:0.03, reactAvg:1100, reactJitter:500, minReact:350,
+            answerAcc:0.55, answerFrac:0.55, answerJitter:0.20 },
+  alert:  { label:'ALERT',  jp:'げんき', earlyRate:0.06, reactAvg:650,  reactJitter:300, minReact:220,
+            answerAcc:0.75, answerFrac:0.40, answerJitter:0.15 },
+  genius: { label:'GENIUS', jp:'天才',   earlyRate:0.10, reactAvg:380,  reactJitter:180, minReact:150,
+            answerAcc:0.90, answerFrac:0.28, answerJitter:0.12 },
+};
+function cpuProfile() { return CPU_DIFFICULTIES[STATE.difficulty] || CPU_DIFFICULTIES.alert; }
+
+// Called once per round (from nextRound(), alongside the real later(goLive, armDelay)
+// call) to decide what Mister Happy does this round: either jump the gun during the
+// arming window (a real "too fast" mistake, scaled by difficulty), or react to the
+// live "TAP!" cue after a randomized delay. Both paths call playerHit(CPU_SLOT) --
+// the exact function a real tap on his half would call -- which already no-ops
+// safely if the round has moved on by the time this timer fires (a human beat him
+// to it, or the round reset).
+function scheduleCpuSnap(armDelay) {
+  const p = cpuProfile();
+
+  if (Math.random() < p.earlyRate) {
+    const jumpAt = 40 + Math.random() * Math.max(40, armDelay - 80);
+    later(() => playerHit(CPU_SLOT), jumpAt);
+    return;
+  }
+
+  const jitter  = (Math.random() + Math.random() - 1) * p.reactJitter;
+  const reactMs = Math.max(p.minReact, p.reactAvg + jitter);
+  later(() => playerHit(CPU_SLOT), armDelay + reactMs);
+}
+
+// Called from startAnswerTimer() whenever the CPU is the active answerer -- either
+// because it won the snap itself, or because a human timed out and it got the
+// "pass" chance. Answers correctly with probability p.answerAcc, after a delay
+// that's a randomized fraction of the real answer window (never instant, never
+// so slow it risks its own timeout).
+function scheduleCpuAnswer(windowMs) {
+  const p = cpuProfile();
+  const jitter  = (Math.random() + Math.random() - 1) * p.answerJitter;
+  const frac    = Math.min(0.85, Math.max(0.15, p.answerFrac + jitter));
+  const delayMs = Math.max(300, windowMs * frac);
+
+  later(() => {
+    if (STATE.phase !== 'answering' || STATE.activePlayer !== CPU_SLOT) return;
+    const correctIsYes = !STATE.pair.isDifferent;
+    const saysYes = Math.random() < p.answerAcc ? correctIsYes : !correctIsYes;
+    answer(CPU_SLOT, saysYes, null);
+  }, delayMs);
+}
+
+async function startMatch() {
+  clearTimers();
+  const rawCards = await loadContent();
+  const cards = (rawCards || []).map(normalizeCard).filter(c => c.en && c.jp);
+
+  if (!cards || cards.length < 15) {
+    alert(`Content not found or not enough cards for ${STATE.curr.toUpperCase()} / ${STATE.mode.toUpperCase()}. Need at least 15 items.`);
+    return;
+  }
+
+  STATE.weekKey = getWeekKey();
+  STATE.seed = (Math.random() * 0xFFFFFFFF) >>> 0;  // fresh random seed every match
+  STATE.cards = cards;
+  STATE.items = seededShuffle(cards, mulberry32(STATE.seed)).slice(0, 15);
+  STATE.pairs = buildPairs(STATE.items, mulberry32(STATE.seed + 999));
+
+  STATE.round = 0;
+  STATE.p1 = 0;
+  STATE.p2 = 0;
+  STATE.phase = 'idle';
+  STATE.activePlayer = null;
+  STATE.passed = false;
+  STATE.stats = { snaps:{1:0,2:0}, attempts:{1:0,2:0}, correct:{1:0,2:0}, tooFast:{1:0,2:0} };
+  STATE.p1Name = getP1Name();
+  STATE.p2Name = STATE.vsCpu ? CPU_NAME : getP2Name();
+
+  document.getElementById('p1-name').textContent = STATE.p1Name;
+  document.getElementById('p2-name').textContent = STATE.p2Name;
+
+  updateHud();
+  showScreen('game');
+  showToast('GET READY', '準備して', `${STATE.p1Name} top · ${STATE.p2Name} bottom`, 0);
+  later(nextRound, 1000);
+}
+
+function updateHud() {
+  document.getElementById('p1-score').textContent = STATE.p1;
+  document.getElementById('p2-score').textContent = STATE.p2;
+  document.getElementById('round-now').textContent = Math.min(STATE.round + 1, 15);
+  document.getElementById('mode-tag').textContent = `${STATE.curr.toUpperCase()} · ${STATE.mode.toUpperCase()}`;
+}
+
+// ── half visual helpers ───────────────────────────────────────────────────────
+function half(p) { return document.getElementById('p' + p + '-half'); }
+function setHalfClass(p, ...classes) {
+  const h = half(p);
+  h.classList.remove('locked','live','answering','waiting');
+  classes.filter(Boolean).forEach(c => h.classList.add(c));
+}
+function setHint(p, en, jp) {
+  document.getElementById('p' + p + '-hint').innerHTML = `${en}<span class="hint-jp">${jp}</span>`;
+}
+function setPromptFor(p, pair) {
+  document.getElementById('p' + p + '-en').textContent = pair.en;
+  document.getElementById('p' + p + '-jp').textContent = pair.jp;
+  document.getElementById('p' + p + '-hira').textContent = pair.hira || '';
+}
+function setDot(go) { document.getElementById('state-dot').classList.toggle('go', !!go); }
+
+// ── round flow ────────────────────────────────────────────────────────────────
+function nextRound() {
+  clearTimers();
+  if (STATE.round >= 15) return finishMatch();
+
+  STATE.phase = 'arming';
+  STATE.activePlayer = null;
+  STATE.passed = false;
+  STATE.pair = STATE.pairs[STATE.round];
+
+  [1,2].forEach(p => {
+    setHalfClass(p, 'locked');
+    setHint(p, '…', 'まて');
+  });
+  setDot(false);
+  updateHud();
+
+  const rng = mulberry32(STATE.seed + STATE.round * 77 + 1234);
+  const armDelay = ARM_MIN + Math.floor(rng() * ARM_RANGE);
+  later(goLive, armDelay);
+
+  if (STATE.vsCpu) scheduleCpuSnap(armDelay);
+}
+
+function goLive() {
+  STATE.phase = 'live';
+  [1,2].forEach(p => {
+    setHalfClass(p, 'live');
+    setHint(p, 'TAP!', '押せ！');
+  });
+  setDot(true);
+  beep('go');
+  later(noSnap, LIVE_MS);
+}
+
+function noSnap() {
+  if (STATE.phase !== 'live') return;
+  STATE.phase = 'feedback';
+  flashColor('gold');
+  showToast('NO SNAP', 'だれも押さなかった', 'No point this round.', 0);
+  STATE.round++;
+  updateHud();
+  later(nextRound, 900);
+}
+
+function playerHit(player) {
+  if (STATE.phase === 'arming') { tooFast(player); return; }
+  if (STATE.phase !== 'live') return;   // ignores taps once someone has won / during answering
+  beginAnswer(player, false);
+}
+
+function beginAnswer(player, isPass) {
+  clearTimers();                 // cancel live window or previous answer timer
+  STATE.phase = 'answering';
+  STATE.activePlayer = player;
+
+  const opp = other(player);
+  setPromptFor(player, STATE.pair);
+  setHalfClass(opp, 'waiting');
+  setHint(opp, 'WAIT', 'まて');
+  setDot(false);
+
+  STATE.stats.attempts[player]++;
+  if (!isPass) STATE.stats.snaps[player]++;
+
+  flashColor(player === 1 ? 'snap1' : 'snap2');
+  beep('hit');
+
+  if (isPass) {
+    // brief oriented "YOUR TURN" pulse in the receiver's own half, then reveal the question
+    setHalfClass(player, 'answering', 'announce');
+    setHint(player, 'YOUR TURN', '君の番');
+    later(() => {
+      half(player).classList.remove('announce');
+      startAnswerTimer(player);
+    }, 800);
+  } else {
+    setHalfClass(player, 'answering');
+    startAnswerTimer(player);
+  }
+}
+
+function startAnswerTimer(player) {
+  const fill = document.getElementById('p' + player + '-fill');
+  fill.style.transition = 'none';
+  fill.style.transform = 'scaleX(1)';
+  void fill.offsetWidth;
+  const ms = answerMs();
+  fill.style.transition = `transform ${ms}ms linear`;
+  fill.style.transform = 'scaleX(0)';
+  later(() => onTimeout(player), ms);
+
+  if (STATE.vsCpu && player === CPU_SLOT) scheduleCpuAnswer(ms);
+}
+
+function onTimeout(player) {
+  if (STATE.phase !== 'answering' || STATE.activePlayer !== player) return;
+
+  if (!STATE.passed) {
+    STATE.passed = true;
+    beep('wrong');
+    beginAnswer(other(player), true);   // give the other player one chance
+  } else {
+    deadRound();                        // both ran out — nobody scores
+  }
+}
+
+function deadRound() {
+  STATE.phase = 'feedback';
+  clearTimers();
+  setHalfClass(1, ''); setHalfClass(2, '');
+  flashColor('wrong'); shakeArena(); beep('wrong');
+  showToast('NO ANSWER', '時間切れ', 'No point this round.', 0);
+  STATE.round++;
+  updateHud();
+  later(nextRound, 950);
+}
+
+function answer(player, saidYes, ev) {
+  if (ev) ev.stopPropagation();
+  if (STATE.phase !== 'answering' || player !== STATE.activePlayer) return;
+  clearTimers();   // stop the countdown
+
+  const pair = STATE.pair;
+  const correctIsYes = !pair.isDifferent;
+  const correct = (saidYes === correctIsYes);
+  const opp = other(player);
+
+  STATE.phase = 'feedback';
+  setHalfClass(1, ''); setHalfClass(2, '');
+
+  if (correct) {
+    addScore(player, 1);
+    STATE.stats.correct[player]++;
+    flashColor('correct'); beep('correct');
+    showToast('CORRECT', '正解', `${pName(player)} +1`, player);
+  } else {
+    addScore(opp, 1);
+    flashColor('wrong'); shakeArena(); beep('wrong');
+    showToast('WRONG', 'ちがう', `Point to ${pName(opp)}`, opp);
+  }
+
+  STATE.round++;
+  updateHud();
+  later(nextRound, 950);
+}
+
+function tooFast(player) {
+  STATE.phase = 'feedback';
+  clearTimers();
+  const opp = other(player);
+  addScore(opp, 1);
+  STATE.stats.tooFast[player]++;
+  setHalfClass(1, ''); setHalfClass(2, '');
+  flashColor('wrong'); shakeArena(); beep('wrong');
+  showToast('TOO FAST', '早すぎる', `Point to ${pName(opp)}`, opp);
+  STATE.round++;
+  updateHud();
+  later(nextRound, 900);
+}
+
+function addScore(player, amount) {
+  if (player === 1) STATE.p1 += amount; else STATE.p2 += amount;
+}
+
+// ── result ─────────────────────────────────────────────────────────────────────
+function finishMatch() {
+  STATE.phase = 'done';
+  clearTimers();
+
+  let winner = 'draw';
+  if (STATE.p1 > STATE.p2) winner = 'p1';
+  if (STATE.p2 > STATE.p1) winner = 'p2';
+
+  const title = document.getElementById('winner-title');
+  const jp = document.getElementById('winner-jp');
+  title.className = 'result-title ' + (winner === 'draw' ? 'draw' : 'win-' + winner);
+
+  if (winner === 'p1')      { title.textContent = `${STATE.p1Name} WINS!`; jp.textContent = `${STATE.p1Name} の勝ち！`; }
+  else if (winner === 'p2') { title.textContent = `${STATE.p2Name} WINS!`; jp.textContent = `${STATE.p2Name} の勝ち！`; }
+  else                      { title.textContent = 'DEAD HEAT'; jp.textContent = '引き分け'; }
+
+  // big head-to-head score
+  document.getElementById('bigscore').innerHTML = `
+    <div class="bs-side">
+      <div class="bs-name p1c">${escapeHTML(STATE.p1Name)}</div>
+      <div class="bs-num p1c ${winner==='p1'?'win':winner==='p2'?'lose':''}">${STATE.p1}</div>
+    </div>
+    <div class="bs-dash">—</div>
+    <div class="bs-side">
+      <div class="bs-name p2c">${escapeHTML(STATE.p2Name)}</div>
+      <div class="bs-num p2c ${winner==='p2'?'win':winner==='p1'?'lose':''}">${STATE.p2}</div>
+    </div>`;
+
+  // accuracy = correct answers ÷ questions you got to answer
+  const acc = p => {
+    const a = STATE.stats.attempts[p];
+    return a ? Math.round(STATE.stats.correct[p] / a * 100) + '%' : '—';
+  };
+  const row = (label, v1, v2) =>
+    `<div class="cmp-v1">${v1}</div><div class="cmp-label">${label}</div><div class="cmp-v2">${v2}</div>`;
+
+  document.getElementById('cmp').innerHTML =
+    row('SNAPS WON', STATE.stats.snaps[1], STATE.stats.snaps[2]) +
+    row('CORRECT',   STATE.stats.correct[1], STATE.stats.correct[2]) +
+    row('ACCURACY',  acc(1), acc(2));
+
+  saveRecord({
+    date: new Date().toISOString().slice(0,10),
+    weekKey: STATE.weekKey,
+    curr: STATE.curr,
+    mode: STATE.mode,
+    p1Name: STATE.p1Name,
+    p1: STATE.p1,
+    p2: STATE.p2,
+    winner,
+    snaps1: STATE.stats.snaps[1], snaps2: STATE.stats.snaps[2],
+    acc1: acc(1), acc2: acc(2)
+  });
+
+  showScreen('result');
+}
+
+function saveRecord(run) {
+  const rec = loadRecords();
+  rec.runs.unshift(run);
+  if (rec.runs.length > 30) rec.runs.length = 30;
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(rec)); } catch(e) {}
+}
+function loadRecords() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { runs: [] };
+}
+
+function renderRecords() {
+  const rec = loadRecords();
+  const box = document.getElementById('records-content');
+  if (!rec.runs.length) {
+    box.innerHTML = '<div style="text-align:center;color:var(--dim);padding:20px;">No Snap Test records yet.<br><span class="jp">まだ記録がありません。</span></div>';
+    return;
+  }
+  box.innerHTML = rec.runs.map(r => {
+    const p1n = escapeHTML(r.p1Name || 'P1');
+    const p2n = 'P2';
+    const winner = r.winner === 'p1' ? `${p1n} WIN` : r.winner === 'p2' ? `${p2n} WIN` : 'DRAW';
+    return `
+      <div class="rec-row">
+        <div>${escapeHTML(String(r.curr || '').toUpperCase())}<br>${escapeHTML(String(r.mode || '').toUpperCase())}</div>
+        <div>
+          ${winner} · ${p1n} ${r.p1} — ${p2n} ${r.p2}<br>
+          <span class="jp">正解率 ${p1n} ${escapeHTML(r.acc1 || '—')} / ${p2n} ${escapeHTML(r.acc2 || '—')}</span>
+        </div>
+        <div>${escapeHTML(r.date)}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── fx ──────────────────────────────────────────────────────────────────────────
+function showToast(main, jp, sub, face) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-main').textContent = main;
+  document.getElementById('toast-jp').textContent = jp;
+  document.getElementById('toast-sub').textContent = sub || '';
+  // face the player the message concerns (P1 top = rotated)
+  document.getElementById('toast-inner').style.transform = (face === 1) ? 'rotate(180deg)' : 'none';
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+}
+
+function flashColor(type) {
+  const f = document.getElementById('flash');
+  f.className = 'flash';
+  void f.offsetWidth;
+  f.classList.add(type);
+}
+
+function shakeArena() {
+  const a = document.getElementById('arena');
+  a.classList.remove('shaking');
+  void a.offsetWidth;
+  a.classList.add('shaking');
+  setTimeout(() => a.classList.remove('shaking'), 520);
+}
+
+let _ctx = null;
+function audioCtx() {
+  if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_ctx.state === 'suspended') _ctx.resume();
+  return _ctx;
+}
+function beep(type) {
+  try {
+    const ctx = audioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+
+    if (type === 'correct') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + .14);
+      gain.gain.setValueAtTime(.22, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .22);
+      osc.start(); osc.stop(ctx.currentTime + .23);
+    } else if (type === 'go') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(740, ctx.currentTime);
+      gain.gain.setValueAtTime(.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .16);
+      osc.start(); osc.stop(ctx.currentTime + .17);
+    } else if (type === 'hit') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      gain.gain.setValueAtTime(.13, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .09);
+      osc.start(); osc.stop(ctx.currentTime + .1);
+    } else {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(130, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(58, ctx.currentTime + .32);
+      gain.gain.setValueAtTime(.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .38);
+      osc.start(); osc.stop(ctx.currentTime + .4);
+    }
+  } catch(e) {}
+}
+</script>
+</body>
+</html>

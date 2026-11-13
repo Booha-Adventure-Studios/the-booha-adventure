@@ -20,19 +20,31 @@ const tracked = childProcess.execFileSync('git', ['ls-files', '-z'], {
   cwd: root,
 }).toString('utf8').split('\0').filter(Boolean);
 
-const violations = [];
-for (const relative of tracked) {
+function checkTrackedPath(relative) {
   const extension = path.extname(relative).toLowerCase();
   if (forbiddenExtensions.has(extension)) {
-    violations.push(`${relative}: forbidden tracked extension ${extension}`);
-    continue;
+    return [`${relative}: forbidden tracked extension ${extension}`];
   }
 
-  const bytes = fs.statSync(path.join(root, relative)).size;
+  // A tracked path deleted in Finder before `git rm` is not bloat; skip it
+  // instead of letting statSync throw ENOENT and fail verify.sh confusingly.
+  const absolute = path.join(root, relative);
+  if (!fs.existsSync(absolute)) return [];
+
+  const bytes = fs.statSync(absolute).size;
   if (bytes > maxBytes && !allowlistedOversized.has(relative)) {
-    violations.push(`${relative}: ${bytes} bytes exceeds ${maxBytes}-byte limit`);
+    return [`${relative}: ${bytes} bytes exceeds ${maxBytes}-byte limit`];
   }
+  return [];
 }
+
+// Self-check: an absent tracked path is skipped without throwing, while an
+// absent path with a forbidden extension is still reported.
+assert.deepStrictEqual(checkTrackedPath('tests/__absent-guard-probe__.bin'), []);
+assert.strictEqual(checkTrackedPath('tests/__absent-guard-probe__.zip').length, 1);
+
+const violations = [];
+for (const relative of tracked) violations.push(...checkTrackedPath(relative));
 
 for (const relative of allowlistedOversized) {
   assert(tracked.includes(relative), `allowlisted oversized file is missing: ${relative}`);

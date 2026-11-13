@@ -2054,6 +2054,13 @@ else
   bad "tracked-file guard failed"
 fi
 
+echo "[repo] Snap rename redirect"
+if node tests/snap-rename.test.cjs >/dev/null 2>&1; then
+  ok "Mister Happy's Snap lives at mister_happys_snap.html; old path is a precached redirect"
+else
+  bad "snap rename test failed"
+fi
+
 echo "[games] Pace record audit (Rainbow Pass A, silent)"
 if node tests/games-pace-record-audit.cjs >/dev/null 2>&1; then
   ok "Run tracker records first responses vs par; saved silently in recentRun; report tool reads saves"
