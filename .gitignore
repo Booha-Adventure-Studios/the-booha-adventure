@@ -14,3 +14,6 @@ playwright-report/
 # Local generated artifacts (keep deployed source at the repository root)
 /output/
 /tmp/
+
+# Temporary source/media staging area; never commit its contents
+_to_delete/

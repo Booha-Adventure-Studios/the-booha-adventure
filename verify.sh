@@ -2047,6 +2047,13 @@ else
   bad "Performance asset-budget audit failed"
 fi
 
+echo "[repo] Tracked-file guard"
+if node tests/tracked-file-guard.test.cjs >/dev/null 2>&1; then
+  ok "no forbidden tracked archives/source files or unexpected files over 5 MiB"
+else
+  bad "tracked-file guard failed"
+fi
+
 echo "[games] Pace record audit (Rainbow Pass A, silent)"
 if node tests/games-pace-record-audit.cjs >/dev/null 2>&1; then
   ok "Run tracker records first responses vs par; saved silently in recentRun; report tool reads saves"
