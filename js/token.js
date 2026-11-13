@@ -373,6 +373,24 @@
     });
   }
 
+  // ── Token verification request ───────────────────────────────────────────
+  // The token travels in a POST body so it never appears in a URL, where it
+  // would be written to server, proxy and browser history logs. Until the Wix
+  // POST route is confirmed live in production, a 404/405 falls back once to
+  // the legacy GET. Remove the fallback (and its test allowance) in a later
+  // release.
+  async function fetchVerifyToken(token) {
+    const res = await fetch(VERIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    if (res.status === 404 || res.status === 405) {
+      return fetch(`${VERIFY_URL}?token=${encodeURIComponent(token)}`); // LEGACY_GET_FALLBACK
+    }
+    return res;
+  }
+
   // ── Main boot ─────────────────────────────────────────────────────────────
 
   async function boot() {
@@ -414,10 +432,10 @@
         // Publish order can briefly leave the new frontend ahead of Wix. A
         // missing route falls back to the established identity-only gate.
         if (res.status === 404 || res.status === 405) {
-          res = await fetch(`${VERIFY_URL}?token=${encodeURIComponent(token)}`);
+          res = await fetchVerifyToken(token);
         }
       } else {
-        res = await fetch(`${VERIFY_URL}?token=${encodeURIComponent(token)}`);
+        res = await fetchVerifyToken(token);
       }
       data = await res.json();
       
