@@ -37,7 +37,7 @@ This file is a factual map of the project for AI tools: what exists, where it li
 - `grimmerglen.html` (`js/grimmerglen.js`, `js/grimmerglen-typing.js`): memory recovery through tiered typing (choices → clues → whole-memory recall) at Starter, Case, and Deep levels.
 - `utsuroba.html` (`js/utsuroba.js`, `js/utsuroba-reading.js`): reading episodes with sequence, detail, and inference tasks; drifter quests. `family-room.html` (Akiya) is a study space inside it.
 - `muenba.html` (`js/muenba.js`): ghost cemetery with briefings, hunts, hiding, and reading gates.
-- `happy_house.html`: Mister Happy's House; `liar_machine.html` (local two-player pass-and-play versus) and `mister_happys_snap_test.html`.
+- `happy_house.html`: Mister Happy's House; `liar_machine.html` (local two-player pass-and-play versus) and `mister_happys_snap.html`.
 - Arcade games unlocked by the weekly trail: `booha_invaders.html`, `booha_blocks.html`, `booha_destruction.html`, `feed_booha.html`.
 
 ## Implemented: profile and progress
