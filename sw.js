@@ -347,7 +347,8 @@ const CURRENT_CACHES = {
   // the text), screen-reader line, palette contrast tweaks, Spell the Word.
   // Palette Pop pass 3: js/game-pop.js joins the install-time precache (beside
   // booha-sfx.js / game-motion.js) so a first offline game still has effects.
-  assets: 'booha-assets-2026-620',
+  // Hiragana answers in the listening games get full ink (theme/game-skin.css).
+  assets: 'booha-assets-2026-621',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

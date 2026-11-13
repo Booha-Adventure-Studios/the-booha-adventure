@@ -394,6 +394,10 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
   }
 }
 
+// Listening games: hiragana mode shows only hiragana, so it reads at full ink (not muted grey).
+assert.match(skin, /:is\(\.stw-choice-hira, \.sas-choice-hira, \.aq-choice-hira\) \{ color: var\(--game-ink\); \}/, 'hiragana answers use full ink');
+assert.match(skin, /\.correct :is\(\.stw-choice-hira, \.sas-choice-hira, \.aq-choice-hira\) \{ color: var\(--ok-ink\) !important; \}/, 'and full ink on the green fill');
+
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
