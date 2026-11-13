@@ -477,6 +477,162 @@ window.BoohaDailyCheck = (function () {
   };
 
   let styleInjected = false;
+
+  /* ── Daily Pop (2026-11-13) ─────────────────────────────────────────────
+     Listening gate + bounce. つぎ unlocks only after the card's audio has
+     played (sentences/questions add a short "Your turn!" beat so students
+     repeat it). Tapping the locked button wobbles it and — at most once per
+     card, with a cooldown — Booha pops up with "Hey! Read and listen!".
+     The nag gives nothing and speeds nothing, so it can't be farmed.
+     If audio fails (offline / blocked) a text-length timer unlocks instead,
+     so nobody is ever stuck. Content, quiz, scoring and records unchanged. */
+  const GATE_CAP_MS = 12000;         // never wait longer than this for 'ended'
+  const SAY_MIN_MS = 1000, SAY_MAX_MS = 4000;
+  const NAG_COOLDOWN_MS = 2500;
+  const TAP_GRACE_MS = 450;          // laggy double-taps right after a card appears are ignored
+  const SILENT_WAV = 'data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+  const POP_CSS = `
+    @keyframes dcCardIn{0%{opacity:0;transform:translateY(26px) scale(.86)}
+      60%{opacity:1;transform:translateY(-6px) scale(1.04)}80%{transform:translateY(2px) scale(.985)}
+      100%{opacity:1;transform:none}}
+    .dc-card{animation:dcCardIn .46s cubic-bezier(.3,1.4,.5,1) both;position:relative;}
+    .dc-dots{display:flex;gap:14px;margin:0 0 18px;}
+    .dc-dots .grp{display:flex;gap:5px;}
+    .dc-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,.2);
+      transition:background .25s,box-shadow .25s;}
+    .dc-dot.done{background:var(--pink2,#ff79d7);}
+    .dc-dot.on{background:var(--pink,#ff3bbd);box-shadow:0 0 0 3px rgba(255,255,255,.18),0 0 14px var(--pink,#ff3bbd);
+      animation:dcDotPop .5s cubic-bezier(.3,1.8,.5,1) both;}
+    @keyframes dcDotPop{0%{transform:scale(.4)}60%{transform:scale(1.6)}100%{transform:scale(1.25)}}
+    .dc-en .dc-w{display:inline-block;transition:color .18s,transform .18s,text-shadow .18s;}
+    .dc-en.karaoke{color:rgba(255,255,255,.5);}
+    .dc-en.karaoke .dc-w.lit{color:#fff;transform:translateY(-2px);
+      text-shadow:0 0 12px var(--pink,#ff3bbd);}
+    .dc-en.all-lit{color:#fff;}
+    .dc-audio{position:relative;}
+    .dc-audio.playing{animation:dcSpk .42s ease-in-out infinite alternate;}
+    .dc-audio.playing::after{content:'';position:absolute;inset:-4px;border-radius:50%;
+      border:3px solid var(--pink2,#ff79d7);animation:dcWave .84s ease-out infinite;pointer-events:none;}
+    @keyframes dcSpk{from{transform:scale(1)}to{transform:scale(1.1)}}
+    @keyframes dcWave{from{transform:scale(1);opacity:.9}to{transform:scale(1.9);opacity:0}}
+    .dc-audio.nudge{animation:dcNudge 1.2s ease-in-out infinite;}
+    @keyframes dcNudge{0%,100%{transform:scale(1)}50%{transform:scale(1.16)}}
+    .dc-turn{position:absolute;right:14px;top:-18px;transform:rotate(-3deg);white-space:nowrap;
+      padding:7px 16px;border-radius:999px;font-weight:900;font-size:.98rem;color:#1a0b1f;
+      background:linear-gradient(135deg,#ffe36e,#ffb84d);box-shadow:0 6px 18px rgba(255,190,70,.5);
+      animation:dcTurnIn .42s cubic-bezier(.3,1.8,.5,1) both,dcTurnBob 1s ease-in-out .42s infinite;pointer-events:none;}
+    @keyframes dcTurnIn{0%{opacity:0;transform:rotate(-3deg) scale(.3)}100%{opacity:1;transform:rotate(-3deg) scale(1)}}
+    @keyframes dcTurnBob{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(2deg) translateY(-5px)}}
+    .dc-btn.dc-next{position:relative;overflow:hidden;}
+    .dc-btn .dc-lbl{position:relative;z-index:1;}
+    .dc-fill{position:absolute;inset:0;transform-origin:left center;transform:scaleX(0);
+      background:linear-gradient(90deg,rgba(255,255,255,.18),rgba(255,255,255,.38));
+      transition:transform .25s linear;pointer-events:none;}
+    .dc-btn.locked{filter:saturate(.45) brightness(.8);box-shadow:none;}
+    .dc-btn.ready{animation:dcReady .5s cubic-bezier(.3,1.8,.5,1) both,dcReadyBob 1.3s ease-in-out .5s infinite;}
+    .dc-btn.ready .dc-fill{opacity:0;transition:opacity .3s;}
+    @keyframes dcReady{0%{transform:scale(.9)}55%{transform:scale(1.14)}100%{transform:scale(1)}}
+    @keyframes dcReadyBob{0%,100%{transform:scale(1)}50%{transform:scale(1.06) translateY(-2px);
+      box-shadow:0 10px 30px rgba(255,59,189,.7),0 0 0 6px rgba(255,121,215,.2);}}
+    .dc-nag{position:fixed;left:50%;top:9%;z-index:3;display:flex;align-items:center;gap:10px;
+      transform:translateX(-50%);pointer-events:none;
+      animation:dcNagIn .5s cubic-bezier(.3,1.7,.5,1) both;}
+    .dc-nag.out{animation:dcNagOut .3s ease-in both;}
+    .dc-nag img{width:78px;height:78px;object-fit:contain;animation:dcNagHop .5s ease-in-out infinite alternate;}
+    .dc-nag .bub{position:relative;padding:12px 18px;border-radius:18px;background:#fff;color:#2a0d2e;
+      font-weight:900;font-size:1.12rem;line-height:1.3;text-align:left;box-shadow:0 10px 28px rgba(0,0,0,.45);}
+    .dc-nag .bub small{display:block;font-size:.86rem;font-weight:800;color:#b0207f;}
+    .dc-nag .bub::before{content:'';position:absolute;left:-10px;top:50%;margin-top:-9px;
+      border:9px solid transparent;border-right-color:#fff;border-left:0;}
+    @keyframes dcNagIn{0%{opacity:0;transform:translateX(-50%) scale(.2) rotate(-12deg)}
+      70%{opacity:1;transform:translateX(-50%) scale(1.1) rotate(3deg)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+    @keyframes dcNagOut{to{opacity:0;transform:translateX(-50%) scale(.6) translateY(-20px)}}
+    @keyframes dcNagHop{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-8px) rotate(6deg)}}
+    .dc-banner{position:fixed;left:0;right:0;top:40%;z-index:3;text-align:center;pointer-events:none;
+      font-weight:900;font-size:2.4rem;letter-spacing:.04em;color:#fff;
+      text-shadow:0 4px 0 var(--pink,#ff3bbd),0 0 30px var(--pink,#ff3bbd);
+      animation:dcBanner 1s cubic-bezier(.3,1.5,.5,1) both;}
+    .dc-banner small{display:block;font-size:1.05rem;letter-spacing:.2em;text-shadow:0 2px 10px rgba(0,0,0,.6);}
+    @keyframes dcBanner{0%{opacity:0;transform:scale(2.6)}22%{opacity:1;transform:scale(.92)}
+      34%{transform:scale(1.04)}78%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.8) translateY(-30px)}}
+    .dc-choice{transition:transform .1s,background .2s,border-color .2s,opacity .2s;}
+    .dc-choice.right{animation:dcRight .5s cubic-bezier(.3,1.8,.5,1) both;
+      box-shadow:0 0 0 3px rgba(56,224,138,.35),0 0 22px rgba(56,224,138,.45);}
+    .dc-choice.wrong{animation:dcShake .4s ease both;}
+    @keyframes dcRight{0%{transform:scale(1)}45%{transform:scale(1.07)}100%{transform:scale(1)}}
+    @keyframes dcShake{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(7px)}
+      60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+    .dc-plus{position:absolute;z-index:3;pointer-events:none;font-weight:900;font-size:1.5rem;color:#7dffb4;
+      text-shadow:0 2px 0 #0b5a33,0 0 14px rgba(56,224,138,.8);animation:dcPlus .8s ease-out both;}
+    @keyframes dcPlus{0%{opacity:0;transform:translate(-50%,0) scale(.5)}25%{opacity:1;transform:translate(-50%,-14px) scale(1.25)}
+      100%{opacity:0;transform:translate(-50%,-60px) scale(1)}}
+    .dc-result-score.slam{animation:dcSlam .6s cubic-bezier(.3,1.5,.5,1) both;}
+    @keyframes dcSlam{0%{opacity:0;transform:scale(3.2) rotate(-8deg)}55%{opacity:1;transform:scale(.88) rotate(2deg)}
+      75%{transform:scale(1.08)}100%{transform:scale(1)}}
+    .dc-perfect{font-weight:900;font-size:1.4rem;color:#ffe36e;letter-spacing:.08em;margin-top:4px;
+      text-shadow:0 0 16px rgba(255,210,80,.8);animation:dcSlam .6s cubic-bezier(.3,1.5,.5,1) .35s both;}
+    .dc-ghost.hop{animation:dcHop .7s cubic-bezier(.3,1.6,.5,1) 2,dcFloat 3.4s ease-in-out 1.4s infinite;}
+    @keyframes dcHop{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-34px) scale(1.08,.94)}
+      70%{transform:translateY(0) scale(1.1,.88)}}
+    @media (orientation:landscape) and (max-height:600px){
+      .dc-dots{margin-bottom:8px;} .dc-banner{font-size:1.8rem;}
+      .dc-turn{top:-14px;font-size:.86rem;padding:5px 12px;}
+      .dc-nag{top:10%;} .dc-nag img{width:56px;height:56px;}
+    }
+    @media (prefers-reduced-motion: reduce){
+      .dc-card,.dc-dot.on,.dc-audio.playing,.dc-audio.nudge,.dc-turn,.dc-btn.ready,.dc-nag,.dc-nag img,
+      .dc-banner,.dc-choice.right,.dc-choice.wrong,.dc-plus,.dc-result-score.slam,.dc-perfect,.dc-ghost.hop{animation:none;}
+      .dc-audio.playing::after{display:none;}
+      .dc-nag{transform:translateX(-50%);}
+      .dc-banner{opacity:0;}
+    }`;
+
+  function reducedMotion() {
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    catch (e) { return false; }
+  }
+
+  /* Tiny WebAudio sound kit — quiet, short, and never over the voice except
+     the nag boing. Silently does nothing where WebAudio is missing. */
+  let sfxCtx = null;
+  function sfxWake() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      if (!sfxCtx) sfxCtx = new AC();
+      if (sfxCtx.state === 'suspended' && sfxCtx.resume) sfxCtx.resume().catch(() => {});
+      return sfxCtx;
+    } catch (e) { return null; }
+  }
+  function blip(c, type, f0, f1, at, dur, peak) {
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f0, at);
+    if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, at + dur);
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(peak, at + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(at); o.stop(at + dur + 0.02);
+  }
+  function sfx(name, level) {
+    const c = sfxWake();
+    if (!c || c.state !== 'running') return;
+    try {
+      const t = c.currentTime + 0.01;
+      const up = Math.pow(2, Math.min(7, level || 0) / 12);
+      if (name === 'tap') blip(c, 'triangle', 620, 820, t, 0.07, 0.10);
+      else if (name === 'unlock') { blip(c, 'triangle', 880, 0, t, 0.09, 0.12); blip(c, 'triangle', 1320, 0, t + 0.07, 0.16, 0.12); }
+      else if (name === 'turn') { blip(c, 'sine', 523, 0, t, 0.08, 0.09); blip(c, 'sine', 784, 0, t + 0.07, 0.12, 0.09); }
+      else if (name === 'boing') { blip(c, 'sine', 180, 520, t, 0.12, 0.14); blip(c, 'sine', 520, 140, t + 0.12, 0.26, 0.12); }
+      else if (name === 'wobble') blip(c, 'square', 160, 120, t, 0.06, 0.04);
+      else if (name === 'section') { [392, 523, 659].forEach((f, i) => blip(c, 'triangle', f, 0, t + i * 0.06, 0.14, 0.10)); }
+      else if (name === 'right') { [660, 880, 1100].forEach((f, i) => blip(c, 'triangle', f * up, 0, t + i * 0.06, 0.16, 0.12)); }
+      else if (name === 'wrong') blip(c, 'square', 220, 150, t, 0.22, 0.05);
+      else if (name === 'slam') { blip(c, 'sine', 150, 50, t, 0.32, 0.28); blip(c, 'triangle', 1200, 600, t, 0.08, 0.06); }
+      else if (name === 'fanfare') { [523, 659, 784, 1047, 1319].forEach((f, i) => blip(c, 'triangle', f, 0, t + 0.25 + i * 0.09, i === 4 ? 0.5 : 0.16, 0.11)); }
+    } catch (e) {}
+  }
   function injectStyles() {
     if (styleInjected) return;
     styleInjected = true;
@@ -622,15 +778,59 @@ window.BoohaDailyCheck = (function () {
     }`;
     const el = document.createElement('style');
     el.id = 'dc-styles';
-    el.textContent = css;
+    el.textContent = css + POP_CSS;
     document.head.appendChild(el);
   }
 
   // Single persistent audio element — stays unlocked on iOS after first gesture.
   let audioEl = null;
+  // Whoever is listening right now (one card or one quiz answer). Events from
+  // an older card are ignored because the hook is replaced on every card.
+  let audioHook = null;
   function getAudio() {
-    if (!audioEl) { audioEl = new Audio(); audioEl.preload = 'auto'; }
+    if (!audioEl) {
+      audioEl = new Audio(); audioEl.preload = 'auto';
+      const fire = (name) => () => {
+        const h = audioHook;
+        if (h && typeof h[name] === 'function' && audioEl.src === h.url) h[name](audioEl);
+      };
+      audioEl.addEventListener('timeupdate', fire('time'));
+      audioEl.addEventListener('playing', fire('playing'));
+      audioEl.addEventListener('ended', fire('ended'));
+      audioEl.addEventListener('error', fire('error'));
+    }
     return audioEl;
+  }
+
+  let playSeq = 0;
+  function playUrl(url, hook) {
+    const a = getAudio();
+    const seq = ++playSeq;
+    audioHook = hook ? Object.assign(hook, { url }) : null;
+    try { a.pause(); } catch (e) {}
+    try { a.src = url; a.currentTime = 0; } catch (e) {}
+    const failed = (err) => {
+      if (seq !== playSeq || audioHook !== hook || !hook) return;
+      if (err && err.name === 'AbortError') return;          // replaced by a newer play
+      if (typeof hook.error === 'function') hook.error(a);
+    };
+    let p = null;
+    try { p = a.play(); } catch (e) { failed(e); return; }
+    if (p && typeof p.catch === 'function') p.catch(failed);
+  }
+  // Unlock the shared <audio> inside a tap so the first card can autoplay
+  // after the content loads (iOS needs a gesture-started play()).
+  function primeAudio() {
+    sfxWake();
+    const a = getAudio();
+    if (a.src) return;
+    try {
+      a.src = SILENT_WAV;
+      const p = a.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => { try { if (a.src === SILENT_WAV) a.pause(); } catch (e) {} }).catch(() => {});
+      }
+    } catch (e) {}
   }
 
   function burst(root, x, y) {
@@ -680,8 +880,32 @@ window.BoohaDailyCheck = (function () {
       { detail: { open: true } }));
 
     let closed = false;
+    let lastNagAt = 0;
+    primeAudio();
+    // Timers die with the overlay; callbacks never run after teardown.
+    function later(fn, ms) {
+      return setTimeout(() => { if (!closed) fn(); }, ms);
+    }
+    function nag(sayIt) {
+      const old = root.querySelector ? root.querySelector('.dc-nag') : null;
+      if (old) old.remove();
+      const n = document.createElement('div'); n.className = 'dc-nag';
+      n.setAttribute('role', 'status');
+      const img = ghost(); img.className = '';
+      n.appendChild(img);
+      const bub = document.createElement('div'); bub.className = 'bub';
+      bub.textContent = sayIt ? 'Say it out loud!' : 'Hey! Read and listen!';
+      const sm = document.createElement('small');
+      sm.textContent = sayIt ? 'こえに だして いってみよう！' : 'よんで、きいてね！';
+      bub.appendChild(sm);
+      n.appendChild(bub);
+      root.appendChild(n);
+      sfx('boing');
+      later(() => { n.classList.add('out'); later(() => n.remove(), 320); }, 1700);
+    }
     function teardown() {
       if (closed) return; closed = true;
+      audioHook = null;
       try { getAudio().pause(); } catch (e) {}
       root.remove();
       document.dispatchEvent(new CustomEvent('booha:dailyCheckVisibility',
@@ -759,6 +983,7 @@ window.BoohaDailyCheck = (function () {
       if (!selected) go.style.opacity = '.5';
       go.addEventListener('click', () => {
         if (!selected) return;
+        primeAudio();
         if (window.BoohaCurriculum?.set) BoohaCurriculum.set(selected);
         else localStorage.setItem('booha_last_curr', selected);
         stepLoading(selected);
@@ -800,25 +1025,46 @@ window.BoohaDailyCheck = (function () {
     /* ── Tap-through sections ────────────────────────────────────────── */
     function runSections(content, day) {
       const order = ['vocab', 'sentences', 'questions'];
-      let si = 0, ci = 0;
+      let si = 0, ci = 0, cardToken = 0;
+
+      function sectionBanner(type) {
+        if (reducedMotion()) return;
+        const b = document.createElement('div'); b.className = 'dc-banner';
+        b.textContent = SECTION_LABEL[type].jp + '!';
+        const sm = document.createElement('small'); sm.textContent = SECTION_LABEL[type].en.toUpperCase();
+        b.appendChild(sm);
+        root.appendChild(b);
+        later(() => b.remove(), 1050);
+        sfx('section');
+      }
 
       function showCard() {
         clear();
         addClose(bailToCancel);
+        const tok = ++cardToken;
+        const live = () => tok === cardToken && !closed;
         const type = order[si];
         const cards = day.picks[type];
         const card = cards[ci];
+        const shownAt = Date.now();
+        const sayPhase = type !== 'vocab';
+        let state = 'listen';              // listen → (say) → ready
+        let nagShown = false, lastWobble = 0;
 
         const count = document.createElement('div'); count.className = 'dc-count';
         count.textContent = `${SECTION_LABEL[type].jp} ${ci + 1}/${cards.length}`;
         root.appendChild(count);
 
-        // progress pips: 3 sections
-        const prog = document.createElement('div'); prog.className = 'dc-progress';
-        order.forEach((_, k) => {
-          const p = document.createElement('div');
-          p.className = 'dc-pip' + (k < si ? ' done' : k === si ? ' on' : '');
-          prog.appendChild(p);
+        // progress: 15 dots in three groups of five
+        const prog = document.createElement('div'); prog.className = 'dc-dots';
+        order.forEach((t, k) => {
+          const grp = document.createElement('div'); grp.className = 'grp';
+          day.picks[t].forEach((_, j) => {
+            const d = document.createElement('div');
+            d.className = 'dc-dot' + (k < si || (k === si && j < ci) ? ' done' : (k === si && j === ci) ? ' on' : '');
+            grp.appendChild(d);
+          });
+          prog.appendChild(grp);
         });
         root.appendChild(prog);
 
@@ -826,28 +1072,132 @@ window.BoohaDailyCheck = (function () {
         const jp = document.createElement('div'); jp.className = 'dc-jp';
         jp.textContent = (content.curr === 'pb' ? card.hira : card.jp) || card.jp || card.en;
         box.appendChild(jp);
-        const en = document.createElement('div'); en.className = 'dc-en';
-        en.textContent = card.en;
+        const en = document.createElement('div'); en.className = 'dc-en karaoke';
+        // Word spans for the karaoke light-up; each weighted by its length.
+        const words = String(card.en || '').split(/\s+/).filter(Boolean);
+        const totalChars = words.reduce((n, w) => n + w.length + 1, 0) || 1;
+        const spans = [];
+        let acc = 0;
+        words.forEach((w, i) => {
+          const sp = document.createElement('span'); sp.className = 'dc-w';
+          sp.textContent = w;
+          sp._at = acc / totalChars;
+          acc += w.length + 1;
+          spans.push(sp);
+          en.appendChild(sp);
+          if (i < words.length - 1) en.appendChild(document.createTextNode ? document.createTextNode(' ') : (() => { const t = document.createElement('span'); t.textContent = ' '; return t; })());
+        });
+        if (!spans.length) en.textContent = card.en || '';
         box.appendChild(en);
+        function lightTo(frac) {
+          spans.forEach(sp => { if (sp._at <= frac + 0.02) sp.classList.add('lit'); });
+        }
+        function lightAll() { spans.forEach(sp => sp.classList.add('lit')); en.classList.add('all-lit'); }
 
         const audioBtn = document.createElement('button');
         audioBtn.className = 'dc-audio'; audioBtn.type = 'button';
         audioBtn.setAttribute('aria-label', 'きく'); audioBtn.textContent = '▶';
         const url = audioUrl(content.curr, type, card.mp3, content.monCode);
-        audioBtn.addEventListener('click', () => {
-          const a = getAudio();
-          try { a.pause(); } catch (e) {}
-          a.src = url; a.currentTime = 0;
-          a.play().catch(() => {});
-        });
         box.appendChild(audioBtn);
         root.appendChild(box);
 
         const next = document.createElement('button');
-        next.className = 'dc-btn'; next.type = 'button';
+        next.className = 'dc-btn dc-next locked'; next.type = 'button';
         const last = (si === order.length - 1) && (ci === cards.length - 1);
-        next.textContent = last ? 'クイズへ' : 'つぎ';
+        next.textContent = '';
+        const lbl = document.createElement('span'); lbl.className = 'dc-lbl';
+        lbl.textContent = last ? 'クイズへ' : 'つぎ';
+        const fill = document.createElement('span'); fill.className = 'dc-fill';
+        next.appendChild(fill); next.appendChild(lbl);
+        next.setAttribute('aria-disabled', 'true');
+        function fillTo(frac, ms) {
+          fill.style.transitionDuration = (ms || 250) + 'ms';
+          fill.style.transform = `scaleX(${Math.max(0, Math.min(1, frac))})`;
+        }
+
+        let turnEl = null;
+        function unlock() {
+          if (!live() || state === 'ready') return;
+          state = 'ready';
+          if (turnEl) { turnEl.remove(); turnEl = null; }
+          lightAll();
+          fillTo(1, 120);
+          next.classList.remove('locked');
+          next.classList.add('ready');
+          next.setAttribute('aria-disabled', 'false');
+          sfx('unlock');
+        }
+        function audioDone(heardMs) {
+          if (!live() || state !== 'listen') return;
+          audioBtn.classList.remove('playing');
+          lightAll();
+          if (!sayPhase) { unlock(); return; }
+          state = 'say';
+          turnEl = document.createElement('div'); turnEl.className = 'dc-turn';
+          turnEl.textContent = '🗣 Your turn! いってみよう！';
+          box.appendChild(turnEl);
+          sfx('turn');
+          const ms = Math.max(SAY_MIN_MS, Math.min(SAY_MAX_MS, heardMs || 0));
+          fillTo(1, ms);
+          later(() => { if (live()) unlock(); }, ms);
+        }
+        // No usable audio: light the words over a reading-time estimate instead.
+        function fallback() {
+          if (!live() || state !== 'listen' || hook.fellBack) return;
+          hook.fellBack = true;
+          audioBtn.classList.remove('playing');
+          audioBtn.classList.add('nudge');
+          const ms = Math.max(1000, Math.min(3500, 600 + String(card.en || '').length * 35));
+          fillTo(sayPhase ? 0.6 : 0.95, ms);
+          spans.forEach(sp => later(() => { if (live()) sp.classList.add('lit'); }, sp._at * ms));
+          later(() => audioDone(Math.round(ms / 2)), ms);    // shorter "say it" beat with no voice to copy
+        }
+        let startAt = 0;
+        const hook = {
+          playing() { if (!live()) return; startAt = startAt || Date.now(); audioBtn.classList.remove('nudge'); audioBtn.classList.add('playing'); },
+          time(a) {
+            if (!live()) return;
+            const d = a.duration;
+            if (!d || !isFinite(d)) return;
+            const f = a.currentTime / d;
+            lightTo(f);
+            if (state === 'listen') fillTo(f * (sayPhase ? 0.6 : 0.95));
+          },
+          ended(a) {
+            if (!live()) return;
+            audioBtn.classList.remove('playing');
+            const d = a && a.duration && isFinite(a.duration) ? a.duration * 1000 : 0;
+            audioDone(d || (startAt ? Date.now() - startAt : 1500));
+          },
+          error() { fallback(); }
+        };
+
+        audioBtn.addEventListener('click', () => {
+          sfxWake();
+          if (state === 'listen') hook.fellBack = false;
+          playUrl(url, hook);
+        });
+
         next.addEventListener('click', () => {
+          if (state !== 'ready') {
+            if (Date.now() - shownAt < TAP_GRACE_MS) return;     // laggy double tap
+            const now = Date.now();
+            if (now - lastWobble > 300) {
+              lastWobble = now;
+              sfx('wobble');
+              if (!reducedMotion() && next.animate) next.animate([
+                { transform: 'translateX(0) rotate(0)' }, { transform: 'translateX(-9px) rotate(-3deg)' },
+                { transform: 'translateX(8px) rotate(3deg)' }, { transform: 'translateX(-4px) rotate(-1deg)' },
+                { transform: 'translateX(0) rotate(0)' }], { duration: 320, easing: 'ease-out' });
+            }
+            if (!nagShown && now - lastNagAt > NAG_COOLDOWN_MS) {
+              nagShown = true; lastNagAt = now;
+              nag(state === 'say');
+            }
+            return;
+          }
+          sfx('tap');
+          audioHook = null;
           try { getAudio().pause(); } catch (e) {}
           ci++;
           if (ci >= cards.length) { si++; ci = 0; }
@@ -856,16 +1206,28 @@ window.BoohaDailyCheck = (function () {
         });
         root.appendChild(next);
 
-        // auto-play the card audio on show (already unlocked by earlier taps)
-        const a = getAudio();
-        try { a.pause(); a.src = url; a.currentTime = 0; a.play().catch(() => {}); } catch (e) {}
+        // Section start: banner first, then the voice.
+        const begin = () => {
+          if (!live()) return;
+          playUrl(url, hook);
+          later(() => audioDone(GATE_CAP_MS), GATE_CAP_MS);      // never stuck
+        };
+        if (ci === 0) { sectionBanner(type); later(begin, reducedMotion() ? 0 : 650); }
+        else begin();
       }
       showCard();
     }
 
     /* ── Quiz ────────────────────────────────────────────────────────── */
     function startQuiz(content, day) {
-      let qi = 0, correct = 0;
+      let qi = 0, correct = 0, combo = 0, qToken = 0;
+      // Spaced-review items come from an older month's audio folder.
+      const reviewMon = content.spacedReview && content.spacedReview.week
+        ? (MON_CODE[content.spacedReview.week.monthSlug] || content.monCode) : content.monCode;
+      function quizAudioUrl(q) {
+        if (!q || !q.mp3) return null;
+        return audioUrl(content.curr, q.type, q.mp3, q.isSpacedReview ? reviewMon : content.monCode);
+      }
 
       function showQ() {
         clear();
@@ -884,6 +1246,7 @@ window.BoohaDailyCheck = (function () {
 
         const list = document.createElement('div'); list.className = 'dc-choices';
         let answered = false;
+        const tok = ++qToken;
         q.choices.forEach(choice => {
           const b = document.createElement('button');
           b.className = 'dc-choice'; b.type = 'button';
@@ -893,10 +1256,22 @@ window.BoohaDailyCheck = (function () {
             const isRight = choice.n === q.answerN;
             if (isRight) {
               correct++;
+              combo++;
               b.classList.add('right');
               const r = root.getBoundingClientRect();
               burst(root, ev.clientX - r.left, ev.clientY - r.top);
+              sfx('right', (combo - 1) * 2);
+              if (!reducedMotion()) {
+                const plus = document.createElement('div'); plus.className = 'dc-plus';
+                plus.textContent = combo > 1 ? `+1  ×${combo}` : '+1';
+                plus.style.left = (ev.clientX - r.left) + 'px';
+                plus.style.top = (ev.clientY - r.top - 20) + 'px';
+                root.appendChild(plus);
+                later(() => plus.remove(), 820);
+              }
             } else {
+              combo = 0;
+              sfx('wrong');
               b.classList.add('wrong');
               Array.from(list.children).forEach(cb => {
                 const n = q.choices[Array.from(list.children).indexOf(cb)].n;
@@ -904,11 +1279,24 @@ window.BoohaDailyCheck = (function () {
                 else if (cb !== b) cb.classList.add('dim');
               });
             }
-            setTimeout(() => {
+            // Play the right answer, and let it finish before moving on
+            // (capped, and never shorter than the old feedback beat).
+            let waitBeat = true, waitVoice = true, moved = false;
+            const go = () => {
+              if (moved || waitBeat || waitVoice || tok !== qToken || closed) return;
+              moved = true;
+              audioHook = null;
               qi++;
               if (qi >= day.quiz.length) finish();
               else showQ();
-            }, isRight ? 620 : 1100);
+            };
+            const voiceDone = () => { waitVoice = false; go(); };
+            const qUrl = quizAudioUrl(q);
+            if (qUrl) {
+              later(() => playUrl(qUrl, { ended: voiceDone, error: voiceDone }), isRight ? 180 : 320);
+              later(voiceDone, 5000);
+            } else waitVoice = false;
+            later(() => { waitBeat = false; go(); }, isRight ? 620 : 1100);
           });
           list.appendChild(b);
         });
@@ -951,8 +1339,14 @@ window.BoohaDailyCheck = (function () {
           const g = ghost(); root.appendChild(g);
           const t = document.createElement('div'); t.className = 'dc-title';
           t.textContent = 'よくできました！'; root.appendChild(t);
-          const sc = document.createElement('div'); sc.className = 'dc-result-score';
+          const sc = document.createElement('div'); sc.className = 'dc-result-score slam';
           sc.textContent = `${correct}/${day.quiz.length}`; root.appendChild(sc);
+          if (correct === day.quiz.length) {
+            const pf = document.createElement('div'); pf.className = 'dc-perfect';
+            pf.textContent = '✨ PERFECT! ✨'; root.appendChild(pf);
+          }
+          g.classList.add('hop');
+          sfx('slam'); sfx('fanfare');
           const sub = document.createElement('div'); sub.className = 'dc-sub';
           sub.textContent = `${pct}%  ·  ${content.curr.toUpperCase()}`; root.appendChild(sub);
 
@@ -971,6 +1365,12 @@ window.BoohaDailyCheck = (function () {
             const r = root.getBoundingClientRect();
             const gr = g.getBoundingClientRect();
             burst(root, gr.left + gr.width / 2 - r.left, gr.top + gr.height / 2 - r.top);
+            const sr = sc.getBoundingClientRect();
+            later(() => burst(root, sr.left + sr.width / 2 - r.left, sr.top + sr.height / 2 - r.top), 260);
+            if (correct === day.quiz.length) {
+              later(() => burst(root, sr.left - r.left, sr.top - r.top), 480);
+              later(() => burst(root, sr.right - r.left, sr.top - r.top), 620);
+            }
           });
         }
 
