@@ -2054,6 +2054,13 @@ else
   bad "tracked-file guard failed"
 fi
 
+echo "[media] Image metadata guard"
+if node tests/image-metadata-guard.test.cjs >/dev/null 2>&1; then
+  ok "tracked images: no provenance manifests, XMP, text chunks, or sensitive EXIF"
+else
+  bad "image metadata guard failed"
+fi
+
 echo "[media] Video loading guard"
 if node tests/video-loading-guard.test.cjs >/dev/null 2>&1; then
   ok "every <video> is preload=none without autoplay; JS videos inventoried; no video precached"

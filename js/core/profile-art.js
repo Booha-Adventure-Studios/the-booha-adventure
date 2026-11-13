@@ -13,7 +13,8 @@
 (function (root) {
   'use strict';
 
-  const ART_REV = '2026-10-24';
+  // 2026-11-13: metadata-only strip of the profile art (pixels identical).
+  const ART_REV = '2026-11-13';
   const DIR = 'assets/img/profile/';
 
   /** url('medal-warm-up.webp') → 'assets/img/profile/medal-warm-up.webp?v=2026-10-24'
