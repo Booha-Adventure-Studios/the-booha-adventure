@@ -157,7 +157,8 @@ const CURRENT_CACHES = {
   // Shared-iPad storage pass: booha_blocks.html no longer carries a name
   // between students; refresh the precached page shell for returning iPads.
   // Legacy key retirement: booha_blocks.html removes the old shared name key.
-  pages:  'booha-pages-2026-533',
+  // Local-record labels: Liar Machine and Snap say their records live on this iPad.
+  pages:  'booha-pages-2026-534',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

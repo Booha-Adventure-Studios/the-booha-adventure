@@ -556,6 +556,14 @@
     text-align: center;
     margin-bottom: 16px;
   }
+  /* Records are stored on this device and shared by everyone who plays here. */
+  .records-local {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-align: center;
+    margin: -10px 0 16px;
+  }
   .records-section {
     border-top: 1px solid var(--border);
     padding-top: 12px;
@@ -1177,6 +1185,7 @@
   <div class="records-box">
     <div class="records-title">THE LIAR MACHINE</div>
     <div class="records-sub" id="records-sub">RECORDS</div>
+    <div class="records-local">RECORDS ON THIS iPAD / この端末の記録</div>
     <div id="records-content"></div>
     <button id="records-close-btn" onclick="closeRecords()">CLOSE<br><span class="jp-line"><ruby>閉<rt>と</rt></ruby>じる</span></button>
   </div>
