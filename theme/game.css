@@ -1193,6 +1193,16 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 @keyframes brunPulse { 35% { transform: scale(1.32) rotate(-3deg); } 65% { transform: scale(.96) rotate(1deg); } }
 .brun-hud.break { animation: brunBreak .5s ease; filter: grayscale(.85); }
 @keyframes brunBreak { 15% { transform: translateX(-9px) rotate(-4deg); } 35% { transform: translateX(8px) rotate(3deg); } 60% { transform: translateX(-4px); } }
+/* Narrower screens: the full pill (with its 10-dot meter) reached the centred
+   game title at 1024 px and covered the close button on phones. Below 1200 px
+   the meter steps aside (COMBO ×n and points stay); on phones the pill shrinks. */
+@media (max-width: 1199px) {
+  .brun-hud { gap: 8px; padding: 6px 14px 6px 12px; }
+  .brun-hud .brun-meter { display: none; }
+}
+@media (max-width: 600px) {
+  .brun-hud, .brun-hud.hot, .brun-hud[data-level] { font-size: 13px; padding: 5px 12px 5px 10px; }
+}
 /* "+125" floating off the pill on every gain. */
 .brun-float { position: fixed; z-index: 61; pointer-events: none; margin: -12px 0 0 -10px; white-space: nowrap;
   font: 900 18px/1 var(--game-font-title); color: #ffe08a; text-shadow: 0 2px 0 rgba(0,0,0,.5), 0 0 10px rgba(255,200,80,.6);

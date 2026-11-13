@@ -1018,8 +1018,10 @@
     .entryPlayer{ position:relative; display:flex; align-items:baseline; justify-content:center; flex-wrap:wrap; gap:0 .35em; margin:clamp(12px,2.4vmin,22px) 0 clamp(10px,2vmin,16px); font-size:clamp(12px,1.9vw,15px); color:rgba(255,255,255,.64); }
     .entryPlayer strong{ color:#fff; font-size:1.2em; letter-spacing:.08em; text-shadow:0 0 20px rgba(255,255,255,.4); }
     .entryPlayerJp{ width:100%; margin-top:3px; font-size:.92em; color:rgba(215,220,255,.72); }
-    .entryMessageEn{ position:relative; max-width:500px; margin:0; font-family:Georgia,serif; font-size:clamp(14px,2.2vw,19px); line-height:1.5; color:rgba(255,255,255,.90); }
+    .entryMessageEn{ position:relative; max-width:500px; margin:0; font-family:inherit; font-size:clamp(14px,2.2vw,19px); line-height:1.5; color:rgba(255,255,255,.90); }
     .entryMessageJp{ position:relative; max-width:540px; margin:4px 0 0; font-size:clamp(12px,1.8vw,16px); line-height:1.5; color:rgba(214,220,255,.68); }
+    /* Japanese lines break at the spaces between words and avoid a lone last word. */
+    .entryMessageJp,.entryPlayerJp{ word-break:keep-all; overflow-wrap:anywhere; line-break:strict; text-wrap:pretty; }
     .blitzProgress{ position:relative; width:100%; max-width:470px; margin:clamp(15px,2.8vmin,25px) 0 clamp(18px,3.4vmin,30px); padding:13px 15px 12px; border-radius:18px; background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.11); }
     .blitzProgressHead{ display:flex; justify-content:space-between; gap:10px; margin-bottom:10px; font-size:10px; font-weight:1000; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.56); }
     .blitzPips{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
@@ -1101,7 +1103,7 @@
       <h1 class="entryTitleEn" id="mazeQuestion">Want a quick warm-up?</h1>
       <p class="entryTitleJp" id="mazeQuestionJp">さきに ウォームアップ する？</p>
       <div class="entryPlayer">
-        <span id="mazeNameLead">Hey,</span>&nbsp;<strong id="mazeEntryName">PLAYER</strong><span id="mazeNameTail">.</span>
+        <span class="entryPlayerEn"><span id="mazeNameLead">Hey,</span>&nbsp;<strong id="mazeEntryName">PLAYER</strong><span id="mazeNameTail">.</span></span>
         <span class="entryPlayerJp" id="mazeEntryNameJp"><ruby>きみ<rt>君</rt></ruby>の <ruby>冒険<rt>ぼうけん</rt></ruby>が <ruby>待<rt>ま</rt></ruby>っているよ。</span>
       </div>
       <p class="entryMessageEn" id="mazeEntryMessageEn">You can enter the Maze now, or sharpen up with Blitz first.</p>

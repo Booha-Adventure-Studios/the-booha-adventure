@@ -160,7 +160,8 @@ const CURRENT_CACHES = {
   // Local-record labels: Liar Machine and Snap say their records live on this iPad.
   // Shared AUDIO_ROOT: index/profile/game/study-deck/juku load js/core/media-config.js.
   // Maze production-surface pass: remove the client-side password and debug UI.
-  pages:  'booha-pages-2026-536',
+  // Player polish 1: maze warm-up greeting spacing, one typeface, Japanese line breaks.
+  pages:  'booha-pages-2026-537',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -356,7 +357,8 @@ const CURRENT_CACHES = {
   // Palette Pop pass 3: js/game-pop.js joins the install-time precache (beside
   // booha-sfx.js / game-motion.js) so a first offline game still has effects.
   // Hiragana answers in the listening games get full ink (theme/game-skin.css).
-  assets: 'booha-assets-2026-621',
+  // Compact combo pill below 1200 px; smaller on phones (theme/game.css .brun-hud).
+  assets: 'booha-assets-2026-622',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

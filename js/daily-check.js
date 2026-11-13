@@ -659,7 +659,7 @@ window.BoohaDailyCheck = (function () {
     .dc-pip.done{background:var(--pink2,#ff79d7);}
     .dc-card{width:min(92vw,520px);background:rgba(20,6,24,.72);border:1px solid rgba(255,121,215,.35);
       border-radius:20px;padding:24px 22px;backdrop-filter:blur(8px);}
-    .dc-jp{font-size:1.7rem;font-weight:700;line-height:1.4;margin-bottom:10px;word-break:break-word;}
+    .dc-jp{font-size:1.7rem;font-weight:700;line-height:1.4;margin-bottom:10px;word-break:keep-all;overflow-wrap:anywhere;line-break:strict;text-wrap:pretty;}
     .dc-en{font-size:1.05rem;color:var(--muted,rgba(255,255,255,.75));line-height:1.4;
       min-height:1.4em;transition:opacity .2s;}
     .dc-en.hidden{opacity:0;}
@@ -875,6 +875,12 @@ window.BoohaDailyCheck = (function () {
     root.className = 'dc-root';
     root.setAttribute('role', 'dialog');
     root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-label', 'デイリーチェック / Daily Check');
+    // Everything already on the page sits behind the check: inert keeps
+    // keyboard and screen-reader focus inside the dialog until it closes.
+    const inertBehind = Array.from(document.body.children)
+      .filter(el => el.tagName !== 'SCRIPT' && !el.inert);
+    inertBehind.forEach(el => { el.inert = true; });
     document.body.appendChild(root);
     document.dispatchEvent(new CustomEvent('booha:dailyCheckVisibility',
       { detail: { open: true } }));
@@ -908,6 +914,7 @@ window.BoohaDailyCheck = (function () {
       audioHook = null;
       try { getAudio().pause(); } catch (e) {}
       root.remove();
+      inertBehind.forEach(el => { el.inert = false; });
       document.dispatchEvent(new CustomEvent('booha:dailyCheckVisibility',
         { detail: { open: false } }));
     }
@@ -1107,6 +1114,7 @@ window.BoohaDailyCheck = (function () {
         next.textContent = '';
         const lbl = document.createElement('span'); lbl.className = 'dc-lbl';
         lbl.textContent = last ? 'クイズへ' : 'つぎ';
+        next.setAttribute('aria-label', last ? 'クイズへ / To the quiz' : 'つぎ / Next');
         const fill = document.createElement('span'); fill.className = 'dc-fill';
         next.appendChild(fill); next.appendChild(lbl);
         next.setAttribute('aria-disabled', 'true');
@@ -1339,6 +1347,8 @@ window.BoohaDailyCheck = (function () {
           const g = ghost(); root.appendChild(g);
           const t = document.createElement('div'); t.className = 'dc-title';
           t.textContent = 'よくできました！'; root.appendChild(t);
+          const en = document.createElement('div'); en.className = 'dc-sub dc-result-en';
+          en.textContent = 'Well done! Daily Check complete.'; root.appendChild(en);
           const sc = document.createElement('div'); sc.className = 'dc-result-score slam';
           sc.textContent = `${correct}/${day.quiz.length}`; root.appendChild(sc);
           if (correct === day.quiz.length) {
@@ -1348,7 +1358,8 @@ window.BoohaDailyCheck = (function () {
           g.classList.add('hop');
           sfx('slam'); sfx('fanfare');
           const sub = document.createElement('div'); sub.className = 'dc-sub';
-          sub.textContent = `${pct}%  ·  ${content.curr.toUpperCase()}`; root.appendChild(sub);
+          const currTile = CURR_TILES.find(c => c.id === content.curr);
+          sub.textContent = `${pct}%  ·  ${currTile ? currTile.name : String(content.curr).toUpperCase()}`; root.appendChild(sub);
 
           const streakEl = document.createElement('div'); streakEl.className = 'dc-streak';
           streakEl.textContent = streakLabel(st);
