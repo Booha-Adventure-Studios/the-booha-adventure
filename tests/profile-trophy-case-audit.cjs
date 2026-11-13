@@ -147,7 +147,8 @@ const item = (res, id) => res.items.find(t => t.id === id);
   T.DEFS.forEach(d => { if (typeof d.img === 'string') imgs.add(d.img); });
   imgs.forEach(f => assert(fs.existsSync(path.join(ROOT, 'assets/img/profile', f)), `trophy art missing: ${f}`));
   assert(!fs.existsSync(path.join(ROOT, 'assets/img/profile/medal-word-keeper.png')), 'PNG sources are not shipped');
-  assert(fs.existsSync(path.join(ROOT, 'assets/source/profile/token-rainbow-master.png')), 'Rainbow Master PNG source is present');
+  // Source masters live outside the repository (PERFORMANCE-BUDGETS.md, Replacing art).
+  assert(!fs.existsSync(path.join(ROOT, 'assets/source/profile/token-rainbow-master.png')), 'Rainbow Master PNG source is kept outside the repository');
 }
 
 /* ── wiring ── */
