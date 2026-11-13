@@ -44,6 +44,7 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
     CustomEvent: function () {}, setTimeout: fn => fn(),
   };
   ctx.window = ctx;
+  vm.runInNewContext(read('js/core/media-config.js'), ctx); // pages load media-config.js first
   vm.runInNewContext(read('js/daily-check.js'), ctx);
   const label = ctx.BoohaDailyCheck.streakLabel;
   assert.strictEqual(label(1), 'チェックれんぞく · ギフト 1個', 'uses the page season by default');

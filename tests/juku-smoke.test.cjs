@@ -86,7 +86,8 @@ context.window.CALENDAR = {
 context.CALENDAR = context.window.CALENDAR;
 
 vm.createContext(context);
-for (const file of ['js/juku-config.js', 'js/juku-engine.js']) {
+// juku.html loads js/core/media-config.js before juku-config.js.
+for (const file of ['js/core/media-config.js', 'js/juku-config.js', 'js/juku-engine.js']) {
   vm.runInContext(fs.readFileSync(path.join(ROOT, file), 'utf8'), context, { filename: file });
 }
 

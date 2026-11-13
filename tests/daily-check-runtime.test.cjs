@@ -212,6 +212,8 @@ context.window.BoohaSaveFile = saveFile;
 context.window.BoohaSync = context.BoohaSync;
 context.window.Audio = FakeAudio;
 vm.createContext(context);
+// index.html and profile.html load js/core/media-config.js before daily-check.js.
+vm.runInContext(fs.readFileSync(path.join(__dirname, '..', 'js', 'core', 'media-config.js'), 'utf8'), context, { filename: 'js/core/media-config.js' });
 vm.runInContext(source, context, { filename: 'js/daily-check.js' });
 const daily = context.window.BoohaDailyCheck;
 

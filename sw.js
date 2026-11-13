@@ -158,7 +158,8 @@ const CURRENT_CACHES = {
   // between students; refresh the precached page shell for returning iPads.
   // Legacy key retirement: booha_blocks.html removes the old shared name key.
   // Local-record labels: Liar Machine and Snap say their records live on this iPad.
-  pages:  'booha-pages-2026-534',
+  // Shared AUDIO_ROOT: index/profile/game/study-deck/juku load js/core/media-config.js.
+  pages:  'booha-pages-2026-535',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

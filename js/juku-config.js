@@ -134,7 +134,7 @@ window.JUKU_CONFIG = {
     // Audio base — same URLs game-core.js builds; Juku records nothing new.
     // type: 'vocab' | 'sentences'. Accepts monthSlug in either form.
     audioBase: function (curr, cw, type) {
-      const AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
+      const AUDIO_ROOT = window.BOOHA_MEDIA.audioRoot; // js/core/media-config.js
       const FOLDER = { pb: 'pre_boo', br: 'boo_riculum', bc: 'boo_continuum' };
       const SHORT = { january:'jan', february:'feb', march:'mar', april:'apr',
                       may:'may', june:'jun', july:'jul', august:'aug',

@@ -49,6 +49,7 @@
 <script>document.documentElement.classList.add('token-checking');</script>
 <script src="./js/token.js"></script>
 <script src="./js/calendar.js"></script>
+<script src="./js/core/media-config.js"></script>
 <script src="./js/core/booha-skins.js"></script>
 <script>
   (function () {
@@ -3656,7 +3657,7 @@ const HOMEWORK_SECTIONS = [
   { key: 'sentences', label: 'SENTENCES', jp: 'ぶんしょう', blitz: 'Sentence Blitz', scene: 'SPOOKY FOREST', color: '#ff7ac4', image: 'assets/img/blitz/sentence-spooky.webp',    focus: 'center 40%' },
   { key: 'questions', label: 'QUESTIONS', jp: 'しつもん',   blitz: 'Question Blitz', scene: 'FIREFLY GLADE', color: '#b9ff7a', image: 'assets/img/blitz/question-fireflies.webp', focus: 'center 55%' },
 ];
-const HOMEWORK_AUDIO_ROOT = 'https://pub-8d5941f302df44b899ce9d9a4606dcb7.r2.dev/audio-2027';
+const HOMEWORK_AUDIO_ROOT = window.BOOHA_MEDIA.audioRoot; // js/core/media-config.js
 const HOMEWORK_AUDIO_FOLDER = { pb: 'pre_boo', br: 'boo_riculum', bc: 'boo_continuum' };
 const HOMEWORK_ICON_SPEAK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
 const HOMEWORK_ICON_TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>';
