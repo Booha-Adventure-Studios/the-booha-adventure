@@ -629,8 +629,26 @@ function landHit(d, crit) {
   if (left <= 1 / 3) setPhase(3); else if (left <= 2 / 3) setPhase(2);
 }
 
+/* Never cut a clip off: the next round waits for whatever is still playing
+   (the typed word said back, or the HEAR question) to finish, plus a beat.
+   A clip that never reports its end gives up after 6 s. */
+let clipBusy = false, clipWaiters = [];
+function clipFinished() { clipBusy = false; const w = clipWaiters; clipWaiters = []; w.forEach(f => f()); }
+function afterVoice(minMs, fn) {
+  const my = token;
+  setTimeout(() => {
+    if (my !== token) return;
+    if (!clipBusy) { fn(); return; }
+    let done = false;
+    const go = () => { if (done) return; done = true; setTimeout(() => { if (my === token) fn(); }, 250); };
+    clipWaiters.push(go);
+    setTimeout(go, 6000);
+  }, minMs);
+}
+
 function stopAudio() {
   voiceGate.stop();
+  clipBusy = false; clipWaiters = [];
   const p = cardEl.querySelector('.wb-play');
   if (p) { p.classList.remove('playing'); POP.speakerWait(p); }
 }
@@ -641,11 +659,13 @@ function playClip(url, btn, onDone) {
   if (btn) btn.classList.add('playing');
   const spkId = btn ? POP.speaker(btn) : 0;   // Palette Pop: notes + sound waves, silent while the voice plays
   const end = () => {
+    if (my === token) clipFinished();   // a round waiting on this clip may go on now
     if (my !== token) return;          // a newer round owns the audio now
     if (btn) { btn.classList.remove('playing'); POP.speakerEnd(btn, spkId); }
     if (onDone) onDone();
   };
-  voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end });
+  clipBusy = true;
+  if (!voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end })) clipFinished();
 }
 
 // Review rows play audio from the vocab folder, so sentence and question
@@ -668,7 +688,7 @@ function resolve(kind, card, src) {
   const my = token;
   // A knockout on the last round gets time for its finale before the score card.
   const finale = kind !== 'miss' && hp <= 0 && idx === rounds.length - 1;
-  setTimeout(() => { if (my === token) next(); }, kind === 'miss' ? 1500 : finale ? 3000 : 950);
+  afterVoice(kind === 'miss' ? 1500 : finale ? 3000 : 950, () => { if (my === token) next(); });   // never mid-clip
 }
 
 function showRound() {
@@ -800,7 +820,7 @@ function showRound() {
       lastSrc = box;
       bossAttack();
       const my = token;
-      setTimeout(() => { if (my === token) next(); }, 1800);
+      afterVoice(1800, () => { if (my === token) next(); });   // the answer is said in full first
     };
     typing = k => {
       if (done || busy) return false;
