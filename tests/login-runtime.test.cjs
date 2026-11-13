@@ -19,7 +19,7 @@ class Storage {
   removeItem(key) { this.values.delete(key); }
 }
 
-function makeHarness({ token, verifyResponse, online = true, legacyFullName = null, legacyCurriculum = null }) {
+function makeHarness({ token, verifyResponse, online = true, legacyFullName = null, legacyCurriculum = null, postStatus = 200 }) {
   const storage = new Storage(token
     ? {
       booha_token: token,
@@ -80,10 +80,13 @@ function makeHarness({ token, verifyResponse, online = true, legacyFullName = nu
     CustomEvent: class CustomEvent {
       constructor(type, init = {}) { this.type = type; this.detail = init.detail; }
     },
-    fetch: async url => {
+    fetch: async (url, init = {}) => {
       context.fetchCalls = (context.fetchCalls || 0) + 1;
       context.fetchUrl = url;
-      return { json: async () => verifyResponse };
+      context.fetchLog = (context.fetchLog || []).concat([{ url, init }]);
+      const isPost = init.method === 'POST';
+      const status = isPost ? postStatus : 200;
+      return { status, json: async () => verifyResponse };
     },
     setTimeout,
     clearTimeout,
@@ -121,7 +124,12 @@ async function bootCase(options) {
     },
   });
   assert.strictEqual(accepted.context.fetchCalls, 1);
-  assert.match(accepted.context.fetchUrl, /verifyToken\?token=student%20token$/);
+  // The token travels in a POST body, never in the URL.
+  assert.match(accepted.context.fetchUrl, /\/_functions\/verifyToken$/);
+  assert.strictEqual(accepted.context.fetchLog[0].init.method, 'POST');
+  assert.deepStrictEqual(JSON.parse(accepted.context.fetchLog[0].init.body), { token: 'student token' });
+  assert.ok(!accepted.context.fetchLog.some(call => String(call.url).includes('token=')),
+    'a live POST route must never put the token in a URL');
   assert.strictEqual(accepted.storage.getItem('booha_userid'), 'student-42');
   assert.strictEqual(accepted.storage.getItem('booha_first_name'), 'Mina');
   assert.strictEqual(accepted.storage.getItem('booha_user_name'), null,
@@ -143,7 +151,29 @@ async function bootCase(options) {
     'rejected sessions must clear the token before redirecting');
   assert.ok(!rejected.events.includes('booha:identityReady'));
 
-  console.log('Login runtime passed: missing-token gate, verified identity boot, encoded token request, identity storage, rejected-token cleanup, and redirects hold.');
+  // Until the Wix POST route is confirmed live, a missing route (404/405)
+  // falls back exactly once to the legacy GET.
+  for (const postStatus of [404, 405]) {
+    const legacy = await bootCase({
+      token: 'student token',
+      postStatus,
+      verifyResponse: { ok: true, userId: 'student-42', firstName: 'Mina' },
+    });
+    assert.strictEqual(legacy.context.fetchCalls, 2, `POST ${postStatus} must fall back once`);
+    assert.strictEqual(legacy.context.fetchLog[0].init.method, 'POST');
+    assert.match(legacy.context.fetchLog[1].url, /verifyToken\?token=student%20token$/);
+    assert.strictEqual(legacy.redirects.length, 0);
+  }
+
+  // Source contract: the only URL that may carry the token is the single
+  // marked legacy fallback, and it must sit behind the 404/405 check.
+  const urlTokenUses = source.match(/\?token=\$\{/g) || [];
+  assert.strictEqual(urlTokenUses.length, 1, 'exactly one legacy GET may put the token in a URL');
+  assert.match(source,
+    /if \(res\.status === 404 \|\| res\.status === 405\) \{\s*return fetch\(`\$\{VERIFY_URL\}\?token=\$\{encodeURIComponent\(token\)\}`\); \/\/ LEGACY_GET_FALLBACK/,
+    'the legacy GET must only run after the POST route reports 404/405');
+
+  console.log('Login runtime passed: missing-token gate, POST-body token verification, single legacy GET fallback, identity storage, rejected-token cleanup, and redirects hold.');
 })().catch(error => {
   console.error(error);
   process.exitCode = 1;
