@@ -206,6 +206,11 @@ html[data-motion="reduced"] #ec-keys-dock,html[data-power]:not([data-power="full
 .ec-feedback.ok{color:#22c55e}.ec-feedback.near{color:var(--game-amber)}.ec-feedback.bad{color:#ef4444}
 .ec-answer{font-family:var(--game-font-title);font-size:clamp(22px,4.6vw,32px);color:var(--game-primary);margin:0}
 .ec-typed b{color:#22c55e;font-weight:900}.ec-typed s{color:#ef4444;text-decoration:none}
+/* PALETTE POP (2026-11-13, js/game-pop.js): every typed letter is ringed in
+   its own palette colour; the box glows as it fills. Verdict colours
+   (green wave, red wobble) still cover the ring. */
+.ec-tile.ec-pal{box-shadow:inset 0 0 0 2.5px var(--c-ring,var(--c)),0 3px 0 color-mix(in srgb,var(--c) 55%,#000)}
+.ec-input.has-text{box-shadow:0 0 0 3px color-mix(in srgb,var(--game-primary) 35%,transparent),0 0 22px color-mix(in srgb,var(--game-primary) 45%,transparent)}
 `;
 
 U.mount(`
@@ -242,6 +247,15 @@ const playBtn = $('ec-play'), slowBtn = $('ec-slow'), jpEl = $('ec-jp'), hintEl 
 const input = $('ec-input'), typedEl = $('ec-typed'), phEl = $('ec-ph'), fb = $('ec-feedback'), hintBtn = $('ec-hintbtn'), nextBtn = $('ec-next');
 const cardEl = $('ec-card'), numEl = $('ec-num'), scoreEl = $('ec-score'), dotsEl = $('ec-dots');
 
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load. */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
+POP.init({ pill: '#ec-score' });
+const PLAY_HTML = playBtn.innerHTML;          // ▶ + its pulse ring, restored after the equaliser
+const tileKey = i => `ec${idx}-t${i}`;        // each letter position keeps its colour on this card
+const tilesNow = () => Array.prototype.slice.call(typedEl.querySelectorAll('.ec-tile'));
+let perfectRun = 0;                           // first-try answers in a row, for the fireworks
+
 let order = U.shuffle(CFG.cards.slice(0, 15));
 let idx = 0, score = 0, tries = 0, hinted = false, heard = false, done = false;
 let typed = '', restartWord = false;   // restartWord: the next letter replaces a wrong try
@@ -263,6 +277,11 @@ function showTyped(popLast) {
     ? '<span class="ec-gap"></span>'
     : `<span class="ec-tile${popLast && i === typed.length - 1 ? ' is-new' : ''}"><b>${esc(ch)}</b></span>`).join('');
   typedEl.setAttribute('aria-label', typed);
+  // Palette Pop: ring each tile in its colour; the newest one sparks.
+  const tl = tilesNow();
+  tl.forEach((t, i) => { t.classList.add('ec-pal'); POP.paint(t, tileKey(i)); });
+  if (popLast && tl.length) POP.key(tl[tl.length - 1], tileKey(tl.length - 1));
+  input.classList.toggle('has-text', typed.length > 0);
   phEl.hidden = typed.length > 0;
   input.classList.remove('bad', 'is-near');
 }
@@ -381,6 +400,7 @@ function renderDots() {
 function stopVoice() {
   voiceGate.stop();                       // stop() never fires the old onEnd
   playBtn.classList.remove('playing');
+  playBtn.innerHTML = PLAY_HTML; POP.speakerWait(playBtn);   // Palette Pop: the speaker hops until it is played
 }
 
 function play(rate) {
@@ -393,8 +413,11 @@ function play(rate) {
   a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
   try { a.playbackRate = rate || 1; a.preservesPitch = true; a.webkitPreservesPitch = true; } catch (_) {}
   playBtn.classList.add('playing');
+  POP.eq(playBtn);                         // Palette Pop: equaliser bars…
+  const spkId = POP.speaker(playBtn);      // …notes and sound waves: all silent, the word is heard clean
   const end = () => {
     if (myIdx !== idx) return;            // a clip from an earlier card: ignore
+    playBtn.innerHTML = PLAY_HTML; POP.speakerEnd(playBtn, spkId);
     playBtn.classList.remove('playing', 'is-waiting');
     heard = true; run.audioDone();   // also resumes the clock after a replay
   };
@@ -412,6 +435,7 @@ function showCard() {
   hintEl.textContent = '';
   typed = ''; restartWord = false;
   input.className = 'ec-input';
+  POP.newRound(Array.from({ length: MAX_TYPED }, (_, i) => tileKey(i)));   // Palette Pop: fresh colours per card
   showTyped();
   playBtn.classList.add('is-waiting');   // ▶ pulses until the clip has been heard
   hintEl.removeAttribute('aria-label');
@@ -450,7 +474,7 @@ function finishItem(result) {
     hideKeys();                         // the answer and Next stay in view
     nextBtn.hidden = false; try { nextBtn.focus({ preventScroll: true }); } catch (_) {}
   }
-  else setTimeout(advance, 900);
+  else setTimeout(advance, result === 'ok' && perfectRun === 15 ? 2200 : 900);   // a perfect run's fireworks play out first
 }
 
 function advance() {
@@ -470,12 +494,20 @@ function submit() {
     markTiles('right');
     U.playSFX('ding');
     if (tries === 1 && !hinted) {
-      run.hit(); score += 1;
+      const r = run.hit(); score += 1;
       U.confetti(input, 18);
+      // Palette Pop: each letter bursts in its colour on the green wave, gems fly to the score, +1.
+      const tl = tilesNow();
+      POP.spell(tl, tl.map((_, i) => tileKey(i)), (r && r.combo) || 1, 55, input);
+      perfectRun++;
+      if (perfectRun === 15) POP.fireworks(cardEl, 7, 220);                              // a perfect run
+      else if (perfectRun % 5 === 0) POP.round(perfectRun >= 10 ? 5 : 3, cardEl, 5);   // 5 / 10 in a row
       fb.className = 'ec-feedback ok'; fb.textContent = 'Perfect! · せいかい！';
       finishItem('ok');
     } else {
       run.recover(); score += 0.5;
+      perfectRun = 0;
+      { const tl = tilesNow(); POP.spell(tl, tl.map((_, i) => tileKey(i)), 1, 55, input, '+½'); }
       fb.className = 'ec-feedback ok'; fb.textContent = hinted && tries === 1 ? 'Right, with a hint! +0.5' : 'Fixed it! +0.5';
       finishItem('half');
     }
@@ -488,8 +520,11 @@ function submit() {
   U.playSFX('fart');
   cardEl.classList.remove('shake'); void cardEl.offsetWidth; cardEl.classList.add('shake');
   input.className = 'ec-input bad';
+  perfectRun = 0;
+  if (tries >= 2) POP.misspell(tilesNow(), null, 40);   // Palette Pop: the missed word crumbles as it tumbles
   if (tries >= 2) { markTiles('drop'); finishItem('miss'); return; }
   markTiles('miss', rightPrefix(card.en, typed));
+  POP.misspell(tilesNow(), el => el.classList.contains('is-good'), 50);   // Palette Pop: the wrong letters crumble; the right start stays
   fb.className = 'ec-feedback ' + (verdict === 'near' ? 'near' : 'bad');
   fb.innerHTML = (verdict === 'near' ? 'So close! Check the spelling: ' : 'Not quite. Listen again: ') + typedHTML(card.en, typed);
   keepCardVisible();
@@ -503,6 +538,7 @@ hintBtn.addEventListener('click', () => {
   hinted = true;
   hintBtn.disabled = true;
   run.miss();   // a hint ends the combo: the item can still earn +0.5, never a first try
+  perfectRun = 0;
   if (!missedItems.includes(order[idx])) missedItems.push(order[idx]);
   hintEl.setAttribute('aria-label', hintFor(order[idx].en));
   hintEl.innerHTML = hintSlots(order[idx].en);
@@ -551,6 +587,8 @@ function showResults() {
 }
 
 $('ec-replay').addEventListener('click', () => {
+  POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
+  perfectRun = 0;
   order = U.shuffle(CFG.cards.slice(0, 15));
   idx = 0; score = 0; missedItems = []; dotState.length = 0;
   scoreEl.textContent = '0';

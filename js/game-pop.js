@@ -504,7 +504,7 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
     },
     // A correct word: each letter bursts in its own colour as it turns green
     // (on the game's own stagger), gems fly to the score, then the word rings.
-    spell(slots, keys, combo, stagger, board) {
+    spell(slots, keys, combo, stagger, board, label = '+1') {
       const pr = document.querySelector(pillSel); if (pr) { const b = pr.getBoundingClientRect(); pill = { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }
       const k = Math.max(1, combo || 1), list = Array.from(slots || []);
       list.forEach((el, i) => later(() => {
@@ -518,7 +518,7 @@ html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-sp
         const r = host.getBoundingClientRect(), c = color(keys[keys.length - 1]);
         SFX.sparkle(k);
         ring(r, c, 18 + Math.min(5, k) * 3, .38, 4); ring(r, '#ffffff', 8, .22, 2);
-        text('+1', r.right - 10, r.top - 4, c, 30 + Math.min(5, k) * 2);
+        text(label, r.right - 10, r.top - 4, c, 30 + Math.min(5, k) * 2);
         if (k >= 2) text('×' + k, r.right - 52, r.top - 8, '#ffffff', 20, .6, 30);
         confetti(r.left + r.width / 2, r.top, 10 + Math.min(5, k) * 4, .7);
       }, list.length * (stagger || 55) + 20);
