@@ -198,7 +198,7 @@ window.BoohaPop = (() => {
     for (let i = 0; i < n(k, true); i++) { const a = rnd(-Math.PI, 0), sp = rnd(220, 620) * spread;
       spawn({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 520, drag: 1.4, life: rnd(.9, 1.5), size: rnd(4, 8), rot: rnd(0, 6), vr: rnd(-16, 16), col: pick(P), kind: 'confetti' }, !keep); }
   }
-  function ring(r, col, grow = 18, life = .32, width = 3) { if (reduced() || !ensureCanvas()) return; rings.push({ r, col, grow, life, t: 0, width }); wake(); }
+  function ring(r, col, grow = 18, life = .32, width = 3, round = false) { if (reduced() || !ensureCanvas()) return; rings.push({ r, col, grow, life, t: 0, width, round }); wake(); }
   /* "+1" / "×3" labels are real text (always sharp on Retina), animated with
      transform/opacity only, and removed by a tracked timer. */
   const labels = new Set();
@@ -228,6 +228,64 @@ window.BoohaPop = (() => {
     for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1], dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1, st = Math.max(1, Math.round(len / 9));
       for (let s = 0; s < st; s++) { const t = s / st, o = s ? rnd(-amp, amp) : 0; out.push([a.x + dx * t - dy / len * o, a.y + dy * t + dx / len * o]); } }
     const l = pts[pts.length - 1]; out.push([l.x, l.y]); return out;
+  }
+
+  /* ── Listening speaker (Say the Word, and later Say the Sentence / Ask a
+     Question). Everything here is visual while the voice plays: no effect
+     sound may ever cover the word. The only sound is a soft "tink" after
+     the clip has ended ("your turn"). ── */
+  const NOTES = ['♪', '♫', '♬', '♩'];
+  function notes(x, y, k, col) {   // DOM, so they stay crisp on Retina at any canvas size
+    if (reduced() || !document.body) return;
+    for (let i = 0; i < n(k, true) && labels.size < 40; i++) {
+      const el = document.createElement('i'), sz = rnd(20, 32), dx = rnd(-95, 95), up = rnd(80, 160), sway = rnd(-26, 26), life = rnd(.9, 1.35);
+      el.className = 'bpop-note'; el.setAttribute('aria-hidden', 'true'); el.textContent = pick(NOTES);
+      el.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:67;pointer-events:none;font:900 ${sz}px/1 system-ui,sans-serif;font-style:normal;` +
+        `color:${col || pick(palette())};-webkit-text-stroke:${light() ? '3px #fff' : '3px #0a0612'};paint-order:stroke fill;transform:translate(-50%,-50%);`;
+      document.body.appendChild(el); labels.add(el);
+      if (el.animate) el.animate([
+        { transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 },
+        { transform: `translate(calc(-50% + ${(dx * .35).toFixed(1)}px),calc(-50% - ${(up * .3).toFixed(1)}px)) scale(1.15) rotate(${(sway * .5).toFixed(1)}deg)`, opacity: 1, offset: .25 },
+        { transform: `translate(calc(-50% + ${(dx * .7 + sway).toFixed(1)}px),calc(-50% - ${(up * .7).toFixed(1)}px)) scale(1) rotate(${(-sway * .4).toFixed(1)}deg)`, opacity: 1, offset: .65 },
+        { transform: `translate(calc(-50% + ${dx.toFixed(1)}px),calc(-50% - ${up.toFixed(1)}px)) scale(.8) rotate(${sway.toFixed(1)}deg)`, opacity: 0 },
+      ], { duration: life * 1000, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+      later(() => { el.remove(); labels.delete(el); }, life * 1000 + 40);
+    }
+  }
+  let spk = null, spkSeq = 0;   // the speaker that is playing now
+  function spkStop() { if (spk) { clearTimeout(spk.timer); timers.delete(spk.timer); spk = null; } }
+  function spkBeat() {          // a sound wave (and a note) every 420 ms while the voice plays
+    if (!spk) return;
+    if (!spk.btn.isConnected || performance.now() > spk.until) { spkStop(); return; }
+    const r = spk.btn.getBoundingClientRect();
+    spk.beat++;
+    ring(r, spk.beat % 2 ? spk.col : '#ffffff', 30, .55, spk.beat % 2 ? 4 : 2, true);
+    if (spk.beat % 2) notes(r.left + r.width / 2 + rnd(-18, 18), r.top + r.height * .2, 1);
+    spk.timer = later(spkBeat, 420);
+  }
+  let spkCss = false;
+  function speakerCss() {
+    if (spkCss || !document.head) return; spkCss = true;
+    const st = document.createElement('style'); st.id = 'bpop-speaker-css';
+    const B = 'html[data-skin="v2"][data-curriculum] :is(.stw-play-btn, .sas-play-btn, .aq-play-btn)';
+    st.textContent = `
+/* Palette Pop speaker (js/game-pop.js): each press glows in a fresh palette
+   colour; the base stays the skin's violet speaker (never green). */
+${B}.bpop-spk.playing{ box-shadow:0 0 0 5px color-mix(in srgb,var(--c) 45%,transparent),0 0 46px var(--c),0 6px 0 #3d2a85; }
+${B}.bpop-spk.playing::before,${B}.bpop-spk.playing::after{ border-color:var(--c-ring,var(--c)); }
+.bpop-eq{ display:inline-flex; align-items:flex-end; gap:4px; height:30px; pointer-events:none; }
+.bpop-eq i{ display:block; width:6px; height:100%; border-radius:3px; background:currentColor; transform-origin:50% 100%; animation:bpopEq .46s ease-in-out infinite alternate; }
+.bpop-eq i:nth-child(2){ animation-delay:-.18s; animation-duration:.38s; }
+.bpop-eq i:nth-child(3){ animation-delay:-.31s; animation-duration:.52s; }
+.bpop-eq i:nth-child(4){ animation-delay:-.07s; animation-duration:.42s; }
+@keyframes bpopEq{ from{ transform:scaleY(.25); } to{ transform:scaleY(1); } }
+/* Waiting to be played: a little hop every few seconds says "tap me first". */
+${B}.bpop-spk-wait:not(.playing):not(:disabled){ animation:bpopSpkHop 2.6s ease-in-out 1.2s infinite; }
+@keyframes bpopSpkHop{ 0%,72%,100%{ transform:none; } 78%{ transform:translateY(-9px) rotate(-6deg) scale(1.05); } 86%{ transform:translateY(0) rotate(4deg) scale(.98); } 92%{ transform:rotate(-2deg); } }
+html[data-motion="reduced"] .bpop-eq i, html[data-motion="reduced"] ${B}.bpop-spk-wait{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .bpop-eq i, ${B}.bpop-spk-wait{ animation:none !important; } }
+`;
+    document.head.appendChild(st);
   }
 
   /* Every delayed effect goes through later(), so reset() can cancel it. */
@@ -281,7 +339,7 @@ window.BoohaPop = (() => {
     g.setTransform(DPR, 0, 0, DPR, 0, 0); g.clearRect(0, 0, W, H);
     const add = light() ? 'source-over' : 'lighter';
     if (tint) { g.globalAlpha = .18 * Math.sin(Math.PI * tint.t / tint.life); g.fillStyle = tint.col; g.fillRect(0, 0, W, H); g.globalAlpha = 1; }
-    for (const r of rings) { const q = r.t / r.life, inf = 4 + q * r.grow, b = r.r; g.globalAlpha = 1 - q; g.strokeStyle = r.col; g.lineWidth = r.width * (1 - q) + .5; rr(b.left - inf, b.top - inf, b.width + inf * 2, b.height + inf * 2, 16 + inf); g.stroke(); }
+    for (const r of rings) { const q = r.t / r.life, inf = 4 + q * r.grow, b = r.r; g.globalAlpha = 1 - q; g.strokeStyle = r.col; g.lineWidth = r.width * (1 - q) + .5; if (r.round) { g.beginPath(); g.arc(b.left + b.width / 2, b.top + b.height / 2, Math.max(b.width, b.height) / 2 + inf, 0, Math.PI * 2); } else rr(b.left - inf, b.top - inf, b.width + inf * 2, b.height + inf * 2, 16 + inf); g.stroke(); }
     g.globalAlpha = 1; g.lineCap = 'round'; g.lineJoin = 'round';
     for (const c of cracks) { const q = c.t / c.life; g.globalAlpha = 1 - q * q; g.strokeStyle = light() ? '#3a2a30' : '#f2eee6'; g.lineWidth = 1.6;
       g.beginPath(); let x = c.x, y = c.y; g.moveTo(x, y); const L = c.len * Math.min(1, q * 5) / 3;
@@ -332,7 +390,7 @@ window.BoohaPop = (() => {
     if (raf) cancelAnimationFrame(raf); raf = 0; last = 0;
     timers.forEach(clearTimeout); timers.clear();
     for (const p of pool) p.on = false; live = 0;
-    lastFire.clear();
+    lastFire.clear(); spk = null;
     rings.length = 0; texts.length = 0; bolts.length = 0; cracks.length = 0; tint = null; prevOk = null;
     labels.forEach(el => el.remove()); labels.clear();
     liveNodes.forEach(node => { try { node.onended = null; node.stop(); } catch (_) {} }); liveNodes.clear(); voices = 0;
@@ -345,7 +403,7 @@ window.BoohaPop = (() => {
   return {
     newRound, color, paint, canFlash, inkFor, ringFor, palette, reset,
     init(opts = {}) { if (opts.pill) pillSel = opts.pill; },
-    stats() { return { live, rings: rings.length, labels: labels.size, bolts: bolts.length, cracks: cracks.length, running: !!raf, voices, timers: timers.size, govern, dpr: DPR }; },
+    stats() { return { speaker: !!spk, live, rings: rings.length, labels: labels.size, bolts: bolts.length, cracks: cracks.length, running: !!raf, voices, timers: timers.size, govern, dpr: DPR }; },
     tap(key, btn, quiet) {
       const prev = colorOf[key], p = palette().filter(c => c !== prev);
       colorOf[key] = pick(p.length ? p : palette());
@@ -430,6 +488,43 @@ window.BoohaPop = (() => {
           if (!reduced() && ensureCanvas()) { const e = edge(r); cracks.push({ x: e.x, y: e.y, nx: e.nx, ny: e.ny, len: rnd(10, 18), t: 0, life: .45, segs: [rnd(-.6, .6), rnd(-.6, .6), rnd(-.6, .6)] }); wake(); }
         }, i * (stagger || 50));
       });
+    },
+    /* ── Listening speaker ── */
+    // A new question: the speaker waits (a little hop now and then) for its first press.
+    speakerWait(btn) {
+      spkStop(); speakerCss();
+      if (btn) { btn.classList.remove('bpop-spk'); btn.classList.add('bpop-spk-wait'); }
+    },
+    // Equaliser bars inside the button while the voice plays.
+    eq(btn) { if (btn) btn.innerHTML = '<span class="bpop-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>'; },
+    // The press: squash-and-stretch, a shock ring in a fresh palette colour,
+    // a fountain of music notes, then sound waves while the clip plays.
+    // Silent on purpose: the voice must be heard clean from its first sound.
+    speaker(btn) {
+      if (!btn) return 0;
+      speakerCss(); spkStop();
+      const prev = btn.style.getPropertyValue('--c'), p = palette().filter(c => c !== prev), col = pick(p.length ? p : palette());
+      btn.style.setProperty('--c', col); btn.style.setProperty('--c-ring', ringFor(col));
+      btn.classList.remove('bpop-spk-wait'); btn.classList.add('bpop-spk');
+      spk = { btn, col, beat: 0, timer: 0, id: ++spkSeq, until: performance.now() + 9000 };   // the clip gate gives up at 8 s
+      if (reduced()) return spk.id;
+      if (btn.animate) btn.animate([{ transform: 'scale(1)' }, { transform: 'scale(.8,1.15)', offset: .18 }, { transform: 'scale(1.2,.86)', offset: .45 }, { transform: 'scale(.95,1.05)', offset: .7 }, { transform: 'scale(1)' }], { duration: 420, easing: 'ease-out' });
+      const r = btn.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      ring(r, col, 48, .5, 6, true); ring(r, '#ffffff', 22, .3, 3, true);
+      sparks(r, 16, col, 1, 4);
+      notes(cx, cy - r.height * .15, 7);
+      spk.timer = later(spkBeat, 300);
+      return spk.id;
+    },
+    // The clip ended: the button settles with a pop and a soft tink — your turn.
+    speakerEnd(btn, id) {
+      if (!spk || (btn && spk.btn !== btn) || (id && spk.id !== id)) return;
+      const b = spk.btn, col = spk.col; spkStop();
+      if (!b.isConnected) return;
+      SFX.tink();
+      if (reduced()) return;
+      if (b.animate) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)', offset: .4 }, { transform: 'scale(1)' }], { duration: 260, easing: 'ease-out' });
+      const r = b.getBoundingClientRect(); ring(r, col, 14, .3, 3, true); sparks(r, 8, col, .6, 2);
     },
     // Time ran out: the timer bar smokes and fizzles (a miss, never a prize).
     fizzle(el) {
