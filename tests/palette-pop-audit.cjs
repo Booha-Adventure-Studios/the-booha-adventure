@@ -29,6 +29,7 @@ const vt = read('games/vocab-tap.js');
 const sw = read('games/spell-word.js');
 const vs = read('games/vocab-speed.js');
 const st = read('games/sentence-tap.js');
+const so = read('games/sentence-order.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -122,6 +123,20 @@ assert.match(sw, /\.sw-slot\.filled\.sw-pp\{\s*box-shadow:[^}]*\}/, 'Spell: plac
 assert(!/\.sw-slot\.filled\.sw-pp\{[^}]*!important/.test(sw), 'Spell: the placed ring is NOT !important, so the skin\'s !important correct/wrong fills win');
 assert.match(sw, /sl\.classList\.remove\('sw-wrong', 'filled', 'empty'\);\s*sl\.classList\.add\('sw-correct'\);/, 'Spell: grading drops "filled", so the placed ring cannot sit on a verdict');
 
+// Sentence Order: tray tiles ring like Spell's letters; placed chips ring until Check.
+const soPal = 'html[data-skin="v2"][data-curriculum] .so-tile.so-pal[data-ti]';
+for (const soSkin of ['html[data-skin="v2"][data-curriculum] .so-tile[data-ti]', 'html[data-skin="v2"][data-curriculum="pb"] .so-tile[data-ti]'])
+  assert(so.includes(soPal + '{') && skin.includes(soSkin) && gte(spec(soPal), spec(soSkin)), `Order: tile palette rule outranks ${soSkin} (both !important)`);
+const soChip = 'html[data-skin="v2"][data-curriculum] .so-placed-chip.so-pp:not(.so-correct):not(.so-wrong)';
+assert(so.includes(soChip + '{'), 'Order: placed chips get the colour ring, switched off on correct/wrong');
+assert(!/\.so-placed-chip\.so-pp[^{]*\{[^}]*!important/.test(so), 'Order: the chip ring is NOT !important, so the skin\'s !important correct/wrong fills win');
+assert.match(skin, /\.so-placed-chip\.so-correct \{ background: var\(--ok\) !important;/, 'Order: correct still fills green');
+assert.match(so, /POP\.newRound\(tokens\.map\(\(_, i\) => popKey\(i\)\)\);/, 'Order: fresh colours per sentence');
+assert.match(so, /U\.impactChain\(chips, \{ outcome: isRecovery \? 'recover' : 'hit', stagger: 55,\s*combo: res\.combo \|\| 1, sharp: !!res\.sharp, container: answerEl \}\);[^\n]*\n[^\n]*\n\s*POP\.spell\(chips, [^\n]*, 55, answerEl\);/, 'Order: words burst on the existing 55 ms green stagger');
+assert.match(so, /isRight: chip => [^\n]*\}\);[^\n]*\n[^\n]*\n\s*POP\.misspell\(chips, [^\n]*, 55\);/, 'Order: misplaced words crumble on the same stagger; right ones stay anchored');
+assert.match(so, /POP\.tap\(popKey\(origIdx\), tile, true\);/, 'Order: tile tap pops quietly (the landing plays the note)');
+assert.match(so, /POP\.init\(\{ pill: '#so-score' \}\);/, 'Order: gems fly to the Score pill, not the Sentence counter');
+
 const vsPal = 'html[data-skin="v2"][data-curriculum] .vs-choice.vs-pal[data-ci]';
 const vsSkin = 'html[data-skin="v2"][data-curriculum] .vs-choice[data-ci]';
 assert(vs.includes(vsPal + '{') && gte(spec(vsPal), spec(vsSkin)), 'Speed: choice palette ring outranks the skin card rule');
@@ -131,7 +146,7 @@ assert.match(vs, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'speed', s
 assert.match(vs, /POP\.fizzle\(heatEl\);/, 'Speed: a timeout smokes the timer bar');
 
 // ── 3. "Placed", never "right" ──
-for (const [name, src, rule] of [['Tap', vt, /\.vt-jp-slot\.has-pair\.vt-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Sentence Tap', st, /\.st-jp-slot\.has-pair\.st-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Spell', sw, /\.sw-slot\.filled\.sw-pp\{([^}]*)\}/]]) {
+for (const [name, src, rule] of [['Order', so, /\.so-placed-chip\.so-pp:not\(\.so-correct\):not\(\.so-wrong\)\{([^}]*)\}/], ['Tap', vt, /\.vt-jp-slot\.has-pair\.vt-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Sentence Tap', st, /\.st-jp-slot\.has-pair\.st-pp:not\(\.slot-correct\):not\(\.slot-wrong\)\{([^}]*)\}/], ['Spell', sw, /\.sw-slot\.filled\.sw-pp\{([^}]*)\}/]]) {
   const body = src.match(rule)[1];
   assert(!/background/.test(body), `${name}: a placed pair is a ring, never a fill`);
   assert(!/--ok|#22c55e|#1f7a46/i.test(body), `${name}: a placed pair never uses the correct colour`);
@@ -183,7 +198,7 @@ for (const [re, what] of [[/cancelAnimationFrame\(raf\)/, 'animation frame'], [/
 assert.match(pop, /addEventListener\('pagehide', reset\);/, 'reset on page close / navigation');
 assert.match(pop, /visibilitychange[^\n]*document\.hidden\) reset\(\)/, 'reset when the tab is hidden');
 assert.doesNotMatch(pop.replace(/function later[^\n]*/, ''), /\bsetTimeout\(/, 'every delayed effect goes through later() so reset() can cancel it');
-for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['vocab-speed replay', vs, /getElementById\('vs-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/]])
+for (const [name, src, re] of [['vocab-tap', vt, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['spell-word', sw, /replay[\s\S]{0,200}POP\.reset\(\);/], ['vocab-speed', vs, /function doStart\(\) \{\s*POP\.reset\(\);/], ['vocab-speed replay', vs, /getElementById\('vs-replay'\)\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/], ['sentence-tap', st, /replayBtn[\s\S]{0,120}POP\.reset\(\);/], ['sentence-order', so, /replayBtn\.addEventListener\('click', \(\) => \{\s*POP\.reset\(\);/]])
   assert.match(src, re, `${name}: restart clears leftover effects`);
 assert.match(pop, /pointer-events:none/, 'the effects canvas never takes taps');
 assert.match(utils, /if \(now - \(last\.get\(el\) \|\| 0\) < 120\) return;/, 'score-pill pops are throttled');
@@ -250,7 +265,7 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');
