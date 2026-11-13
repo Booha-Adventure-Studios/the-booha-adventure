@@ -68,3 +68,31 @@ lossy-by-default encoding, lazy loading and the decoded-image cache limits
 above. The total only bounds what a student downloads after visiting every
 world, and the service worker never precaches world art in bulk. A small raise
 for the new trophy art keeps every per-file and per-directory ceiling in place.
+
+## Replacing art
+
+Every committed version of a binary file remains in Git history unless
+history is deliberately rewritten, whether the file is overwritten in place or
+replaced under a new filename. A new filename protects students from stale
+cached art; it does not keep the old version out of the repository. The way to
+keep history small is fewer, more deliberate art swaps.
+
+1. **Drafts stay out of Git.** Source masters, experiments and work-in-progress
+   art live outside the repository or in the local-only, ignored `_drafts/`
+   folder. Only finished art is promoted into the live asset tree.
+2. **Batch art changes.** Group related replacements into one visual pass or
+   release. Avoid tiny iterative swaps; replace art only when the improvement
+   is worth another permanent copy in history.
+3. **New filename for student-visible replacements.** When a replacement must
+   reach iPads that may hold the old file in cache, give it a new filename
+   rather than overwriting. Art not yet deployed to students can be
+   overwritten.
+4. **Update everything together.** Update every reference (HTML, JS, JSON) and
+   the relevant cache version in `sw.js`: `pages` for changed precached pages,
+   `assets` for changed cache-first assets or `CORE_ASSETS`, and `decks` for
+   curriculum/content JSON. Add or remove precache entries when applicable.
+   Runtime assets under `/assets/` are cache-first even when they are not in
+   `CORE_ASSETS`.
+5. **Check before committing.** Run `./verify.sh`; the asset-budget,
+   tracked-file and video-loading guards must pass. Review the size of the
+   change with `git diff --cached --stat` before committing art.

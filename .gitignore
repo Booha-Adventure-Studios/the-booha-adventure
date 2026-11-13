@@ -15,5 +15,8 @@ playwright-report/
 /output/
 /tmp/
 
+# Local-only art drafts and source masters (never committed)
+/_drafts/
+
 # Temporary source/media staging area; never commit its contents
 _to_delete/
