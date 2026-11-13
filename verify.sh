@@ -2078,6 +2078,13 @@ else
   bad "shared-iPad storage boundary audit failed"
 fi
 
+echo "[storage] Dead homework code removed"
+if node tests/dead-homework-removed.test.cjs >/dev/null 2>&1; then
+  ok "js/homework.js stays removed; no file loads it or uses booha_hw_known_* keys"
+else
+  bad "dead homework guard failed"
+fi
+
 echo "[repo] Snap rename redirect"
 if node tests/snap-rename.test.cjs >/dev/null 2>&1; then
   ok "Mister Happy's Snap lives at mister_happys_snap.html; old path is a precached redirect"
@@ -2085,11 +2092,25 @@ else
   bad "snap rename test failed"
 fi
 
+echo "[storage] Whole-codebase storage inventory"
+if node tests/device-storage-inventory.test.cjs >/dev/null 2>&1; then
+  ok "every localStorage/sessionStorage key is classified; retired keys removal-only; no clear()"
+else
+  bad "storage inventory failed (classify the new key in tests/device-storage-inventory.test.cjs)"
+fi
+
 echo "[games] Pace record audit (Rainbow Pass A, silent)"
 if node tests/games-pace-record-audit.cjs >/dev/null 2>&1; then
   ok "Run tracker records first responses vs par; saved silently in recentRun; report tool reads saves"
 else
   bad "Pace record audit failed"
+fi
+
+echo "[storage] Local record labels"
+if node tests/local-record-labels.test.cjs >/dev/null 2>&1; then
+  ok "Liar Machine and Snap label their shared records as stored on this iPad"
+else
+  bad "local record labels test failed"
 fi
 
 echo "[profile] Trophy Case audit"
