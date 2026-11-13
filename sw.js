@@ -162,7 +162,8 @@ const CURRENT_CACHES = {
   // Maze production-surface pass: remove the client-side password and debug UI.
   // Player polish 1: maze warm-up greeting spacing, one typeface, Japanese line breaks.
   // Daily Check reminders: maze + games boards load daily-check.js and the reminder.
-  pages:  'booha-pages-2026-538',
+  // Blitz 3/3: maze skips the warm-up and plays the flyover muted; card shows once filled in.
+  pages:  'booha-pages-2026-539',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
