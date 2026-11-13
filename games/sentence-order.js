@@ -650,6 +650,24 @@ body.hira-mode .so-hira-icon{ transform:rotate(180deg); }
   animation:soSparkle var(--sd,1s) ease-out forwards;
   animation-delay:var(--sdel,0s); user-select:none;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PALETTE POP (2026-11-13, js/game-pop.js): every word tile carries a
+   palette colour (--pal-1..12, game-skin.css), re-rolled when it is
+   tapped; the chip it becomes in the sentence keeps that colour as a ring
+   + edge. That means "you placed this", never "this is right": no fill,
+   no icon. Check's green/orange fills (!important in the skin) replace it.
+   ══════════════════════════════════════════════════════════════ */
+html[data-skin="v2"][data-curriculum] .so-tile.so-pal[data-ti]{
+  box-shadow:inset 0 0 0 3px var(--c),0 5px 0 color-mix(in srgb,var(--c) 62%,#000),0 8px 14px rgba(0,0,0,.26) !important;
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1),opacity .2s;
+}
+html[data-skin="v2"][data-curriculum] .so-tile.so-pal[data-ti]:active{
+  box-shadow:inset 0 0 0 3px var(--c),0 2px 0 color-mix(in srgb,var(--c) 62%,#000),0 4px 8px rgba(0,0,0,.2) !important;
+}
+html[data-skin="v2"][data-curriculum] .so-placed-chip.so-pp:not(.so-correct):not(.so-wrong){
+  box-shadow:inset 0 0 0 2.5px var(--pc),0 3px 0 color-mix(in srgb,var(--pc) 62%,#000),0 5px 10px rgba(0,0,0,.2);
+}
 `;
 document.head.appendChild(S);
 
@@ -760,6 +778,12 @@ const hiraBtn    = document.getElementById('so-hira-toggle');
 const hiraLabel  = document.getElementById('so-hira-label');
 const dotsRow    = document.getElementById('so-dots');
 const modalOverlay = document.getElementById('so-modal-overlay');
+
+/* Palette Pop (js/game-pop.js). A no-op stand-in keeps the game playable
+   if that file ever fails to load. */
+const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
+POP.init({ pill: '#so-score' });   /* the Score pill, not the Sentence counter */
+const popKey = origIdx => `so${idx}-${origIdx}`;   /* a word keeps its colour from tray to sentence */
 
 for (let i = 0; i < 15; i++) {
   const d = document.createElement('div');
@@ -909,15 +933,17 @@ function buildTiles() {
   tilesEl.innerHTML = ''; tileEls = [];
   const n = tokens.length;
   const shuffled = U.shuffle(tokens.map((t, i) => ({ token: t, origIdx: i })));
+  POP.newRound(tokens.map((_, i) => popKey(i)));   /* Palette Pop: a colour per word */
 
   shuffled.forEach(({ token, origIdx }, ti) => {
     const label = displayTile(token);
     const tile = document.createElement('button');
     tile.type = 'button';
-    tile.className = 'so-tile so-tile-in';
+    tile.className = 'so-tile so-tile-in so-pal';
     tile.textContent = label;       /* lowercase, no audio */
     tile.dataset.ti = ti;
     tile.dataset.origIdx = origIdx;
+    POP.paint(tile, popKey(origIdx));
     tile.style.setProperty('--ti', ti);
 
     tile.addEventListener('touchstart', e => { e.preventDefault(); handleTileTap(tile, origIdx); }, { passive: false });
@@ -938,10 +964,12 @@ function handleTileTap(tile, origIdx) {
   if (locked || tile.classList.contains('used')) return;
   const slotIndex = placed.indexOf(null);
   if (slotIndex === -1) return;
+  POP.tap(popKey(origIdx), tile, true);   /* Palette Pop: the word pops in a fresh colour… */
   tile.classList.add('used');
   placed[slotIndex] = origIdx;
   renderAnswer();
   updateAnswerControls();
+  POP.place(answerEl.querySelector(`.so-placed-chip[data-pi="${slotIndex}"]`), popKey(origIdx), slotIndex);   /* …and lands: thump + clack + a climbing note */
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -972,7 +1000,8 @@ function renderAnswer() {
 
     const chip = document.createElement('button');
     chip.type = 'button';
-    chip.className = 'so-placed-chip';
+    chip.className = 'so-placed-chip so-pp';
+    chip.style.setProperty('--pc', POP.color(popKey(origIdx)));   /* the colour travels with the word */
     chip.textContent = label;
     chip.dataset.pi = pi;
 
@@ -990,6 +1019,7 @@ function handleChipTap(pi) {
   if (locked) return;
   const origIdx = placed[pi];
   if (origIdx == null) return;
+  POP.unlock(answerEl.querySelector(`.so-placed-chip[data-pi="${pi}"]`));   /* Palette Pop: a soft un-clack + puff */
   placed[pi] = null;
   if (tileEls[origIdx]) tileEls[origIdx].classList.remove('used');
   renderAnswer();
@@ -999,6 +1029,7 @@ function handleChipTap(pi) {
 /* ── clear ── */
 clearBtn.addEventListener('click', () => {
   if (locked) return;
+  if (placed.some(v => v != null)) POP.unlock(null);
   placed.forEach(origIdx => { if (origIdx != null && tileEls[origIdx]) tileEls[origIdx].classList.remove('used'); });
   placed = new Array(tokens.length).fill(null);
   renderAnswer();
@@ -1026,6 +1057,8 @@ function resolveCorrect(chips) {
   // (same 55 ms stagger), then the whole sentence releases on the ding.
   U.impactChain(chips, { outcome: isRecovery ? 'recover' : 'hit', stagger: 55,
     combo: res.combo || 1, sharp: !!res.sharp, container: answerEl });
+  // Palette Pop: each word bursts in its own colour as it turns green, gems fly to the score.
+  POP.spell(chips, chips.map(chip => popKey(placed[Number(chip.dataset.pi)])), res.combo || 1, 55, answerEl);
   const bankBefore = recoveryBank;
   if (isRecovery) {
     recoveredItems.add(idx);
@@ -1109,6 +1142,8 @@ function resolveWrong() {
   // Wrong words crack with a little dust; right ones glow: they stay anchored.
   U.impactChain(chips, { outcome: 'miss', stagger: 55,
     isRight: chip => placed[Number(chip.dataset.pi)] === Number(chip.dataset.pi) });
+  // Palette Pop: the crunch once, then the misplaced words crumble on the same stagger.
+  POP.misspell(chips, chip => placed[Number(chip.dataset.pi)] === Number(chip.dataset.pi), 55);
 
   feedbackEl.textContent = isFinalAttempt
     ? 'Tough one — the answer is shown, then we move on.'
@@ -1234,6 +1269,7 @@ function showResults() {
   const backBtn   = document.getElementById('so-back');
 
   if (replayBtn) replayBtn.addEventListener('click', () => {
+    POP.reset();   /* Palette Pop: cancel any frames, timers and sounds still in flight */
     /* Restore gameplay elements */
     document.getElementById('so-jp-box').style.display    = '';
     document.getElementById('so-answer').style.display    = '';
