@@ -185,6 +185,8 @@ const SCOLDS = [
       }
       @keyframes vbWordPop {
         from { transform: scale(0.5); opacity: 0; }
+        65%  { transform: scale(1.08); opacity: 1; }   /* Blitz Pop: the word bounces in */
+        82%  { transform: scale(.97);  opacity: 1; }
         to   { transform: scale(1);   opacity: 1; }
       }
 

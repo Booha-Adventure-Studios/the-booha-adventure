@@ -193,6 +193,8 @@ window.QuestionBlitz = (() => {
       }
       @keyframes qbWordPop {
         from { transform: scale(0.85); opacity: 0; }
+        65%  { transform: scale(1.05); opacity: 1; }   /* Blitz Pop: the line bounces in */
+        84%  { transform: scale(.985); opacity: 1; }
         to   { transform: scale(1);    opacity: 1; }
       }
 

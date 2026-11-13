@@ -114,6 +114,33 @@ window.BoohaBlitzEngine = (() => {
   // Keep palette-era fields and hooks available while the engine transitions
   // to scene-owned celebrations, but keep the legacy outputs disabled.
   const LEGACY_BLITZ_CELEBRATIONS_ENABLED = false;
+  /* BLITZ POP (2026-11-13): bounce and sound only — squishy answer buttons,
+     a boing + one pop ring on each right answer, a note that climbs the
+     scale with the streak, bumps on the counter / combo pill / new light,
+     and a bouncing START. No particle storms, no full-screen flashes, and
+     nothing waits on an animation: the run's 200 ms pace is untouched.
+     Bounces use the CSS `scale` property, which the correct-answer
+     `transform: none !important` lock does not touch (older iPads without
+     it simply skip the bounce). Off for reduced motion and minimal power. */
+  const BLITZ_POP_ENABLED = true;
+  const POP_SCALE_STEPS = Object.freeze([0, 2, 4, 5, 7, 9, 11, 12]);   // major scale, one octave
+  function popMotionOk(overlay) {
+    return BLITZ_POP_ENABLED && !REDUCED_MOTION && !isMinimalPower()
+      && !(overlay && overlay.classList.contains('low-power'));
+  }
+  function popBump(el, overlay, peak = 1.14, ms = 260) {
+    if (!el || typeof el.animate !== 'function' || !popMotionOk(overlay)) return;
+    try {
+      el.animate([{ scale: '1' }, { scale: String(peak), offset: 0.35 }, { scale: '.96', offset: 0.7 }, { scale: '1' }],
+        { duration: ms, easing: 'ease-out' });
+    } catch (_) {}
+  }
+  // The streak's note: one step up a major scale every two answers in a row,
+  // capped so the brightest cue never gets shrill on tablet speakers.
+  function popClimbRatio(streak, topNote) {
+    const step = POP_SCALE_STEPS[Math.max(0, Math.min(POP_SCALE_STEPS.length - 1, Math.floor((Math.max(1, streak) - 1) / 2)))];
+    return Math.min(Math.pow(2, step / 12), 2600 / Math.max(1, topNote));
+  }
   const STREAK_EVENT_NOTES = Object.freeze({
     playful: Object.freeze({
       3: [523, 659], 6: [587, 740, 880], 9: [659, 784, 988],
@@ -1757,6 +1784,11 @@ window.BoohaBlitzEngine = (() => {
         transition: transform 100ms ease, box-shadow 100ms ease;
       }
       .booha-blitz-start-button:hover { transform: translateY(-2px); }
+      /* Blitz Pop: START bounces gently until it is tapped. */
+      .booha-blitz-start-button { animation: boohaBlitzStartBounce 1.5s cubic-bezier(.3,1.4,.5,1) .6s infinite; }
+      @keyframes boohaBlitzStartBounce { 0%, 62%, 100% { scale: 1; } 72% { scale: 1.07; } 82% { scale: .97; } 90% { scale: 1.02; } }
+      @media (prefers-reduced-motion: reduce) { .booha-blitz-start-button { animation: none; } }
+      .low-power .booha-blitz-start-button { animation: none; }
       .booha-blitz-start-button:active {
         transform: translateY(1px) scale(.96);
         box-shadow: 0 5px 14px var(--blitz-start-glow, var(--blitz-glow));
@@ -3195,6 +3227,10 @@ window.BoohaBlitzEngine = (() => {
             opacity: 0;
             transform: translate(var(--blitz-option-x, 0px), var(--blitz-option-y, 12px)) scale(var(--blitz-option-scale, .96));
           }
+          70% {
+            opacity: 1;
+            transform: translate(0, 0) scale(var(--blitz-option-overshoot, 1.03));
+          }
           to {
             opacity: 1;
             transform: translate(0, 0) scale(1);
@@ -3205,6 +3241,28 @@ window.BoohaBlitzEngine = (() => {
           isolation: isolate;
           transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
         }
+        /* Blitz Pop: answers land with a little overshoot (per scene feel),
+           squash when pressed and spring back on release. */
+        #${config.overlayId}.blitz-feel-playful { --blitz-option-overshoot: 1.05; }
+        #${config.overlayId}.blitz-feel-arcade { --blitz-option-overshoot: 1.03; }
+        #${config.overlayId}.blitz-feel-sleek { --blitz-option-overshoot: 1.015; }
+        #${config.overlayId}.blitz-compositor .${config.optionClass} {
+          scale: 1;
+          transition: transform 120ms ease, background 120ms ease, opacity 120ms ease, scale 280ms cubic-bezier(.3,1.8,.5,1);
+        }
+        #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-press {
+          scale: .93;
+          transition: transform 120ms ease, background 120ms ease, opacity 120ms ease, scale 70ms ease-out;
+        }
+        .booha-blitz-pop-ring {
+          position: absolute;
+          z-index: 9;
+          box-sizing: border-box;
+          border: 3px solid var(--pop-ring, #fff);
+          pointer-events: none;
+          opacity: 0;
+        }
+        #${config.overlayId}.low-power .booha-blitz-pop-ring { display: none; }
         #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-enter {
           animation: boohaBlitzOptionEnter var(--blitz-option-duration, 320ms) var(--blitz-motion-ease, ease-out) var(--blitz-enter-delay, 0ms) both;
           will-change: transform, opacity;
@@ -3523,6 +3581,7 @@ window.BoohaBlitzEngine = (() => {
         streakMarkerEl.textContent = marker;
         streakEl.textContent = `${label} ×${streak}`;
         nameplate.classList.remove('streak-pop');
+        popBump(nameplate, overlay, eventThreshold ? 1.16 : 1.08, eventThreshold ? 340 : 220);   // Blitz Pop: the combo pill bumps
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
           void nameplate.offsetWidth;
           nameplate.classList.add('streak-pop');
@@ -3862,9 +3921,11 @@ window.BoohaBlitzEngine = (() => {
               }, reverseIndex * 24 + 190);
             });
           } else {
+            const wasLit = Number(fill.dataset.litCount) || 0;
             items.forEach((item, index) => {
               item.classList.toggle('is-lit', index < count);
               item.classList.remove('is-popping-out');
+              if (index >= wasLit && index < count) popBump(item, overlay, 1.7, 320);   // Blitz Pop: the new light pops on
             });
           }
           fill.dataset.litCount = String(count);
@@ -4281,7 +4342,9 @@ window.BoohaBlitzEngine = (() => {
           }
           const now = streakAudioCtx.currentTime + 0.008;
           const intensity = event === 'streak' ? Math.min(1.25, 0.8 + threshold / 30) : 1;
-          cues.notes.forEach((frequency, index) => {
+          // Blitz Pop: each right answer in a row plays a step higher up the scale.
+          const climb = BLITZ_POP_ENABLED && event === 'correct' ? popClimbRatio(streak, Math.max(...cues.notes)) : 1;
+          cues.notes.map(f => f * climb).forEach((frequency, index) => {
             const startAt = now + index * cues.spacing;
             const oscillator = streakAudioCtx.createOscillator();
             const gain = streakAudioCtx.createGain();
@@ -4441,12 +4504,16 @@ window.BoohaBlitzEngine = (() => {
         let downX = 0;
         let downY = 0;
         let suppressClickUntil = 0;
+        const release = () => button.classList.remove('blitz-press');   // Blitz Pop: spring back
         button.addEventListener('pointerdown', event => {
           downId = event.pointerId;
           downX = event.clientX;
           downY = event.clientY;
+          if (popMotionOk(overlay) && !button.disabled) button.classList.add('blitz-press');   // Blitz Pop: squash
         });
+        button.addEventListener('pointerleave', release);
         button.addEventListener('pointerup', event => {
+          release();
           const sameTouch = event.pointerId === downId;
           const moved = Math.hypot(event.clientX - downX, event.clientY - downY) > 10;
           downId = null;
@@ -4456,7 +4523,7 @@ window.BoohaBlitzEngine = (() => {
           suppressClickUntil = performance.now() + 500;
           handler(event);
         }, { passive: false });
-        button.addEventListener('pointercancel', () => { downId = null; });
+        button.addEventListener('pointercancel', () => { downId = null; release(); });
         button.addEventListener('click', event => {
           if (performance.now() < suppressClickUntil) {
             event.preventDefault();
@@ -4647,6 +4714,7 @@ window.BoohaBlitzEngine = (() => {
         // dead-to-alive build-up, not a fixed palette color.
         const stepColor = progressColorFor(palette, (streak / (initialQueueLength || 1)) * 100).css;
         correctBtn.style.background = stepColor;
+        emitCorrectBoing(correctBtn, answerRect, overlayRect, stepColor, milestone);
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
           const impactRect = answerRect || correctBtn.getBoundingClientRect();
           const impactOverlayRect = overlayRect || overlay.getBoundingClientRect();
@@ -4744,6 +4812,41 @@ window.BoohaBlitzEngine = (() => {
             });
           }
         }, nextDelay);
+      }
+
+      // Blitz Pop: the right answer jiggles (scale property: the correct-state
+      // transform lock stays intact) and one ring pops out of it. The ring is
+      // a single element on the overlay, so it keeps popping while the next
+      // question slides in. A milestone (3/6/9/12/15) gets a bigger ring.
+      function emitCorrectBoing(correctBtn, answerRect, overlayRect, color, milestone = 0) {
+        if (!popMotionOk(overlay)) return;
+        try {
+          if (typeof correctBtn.animate === 'function') {
+            correctBtn.animate([{ scale: '1' }, { scale: '1.09' }, { scale: '.97' }, { scale: '1.02' }, { scale: '1' }],
+              { duration: 220, easing: 'ease-out' });
+          }
+          const r = answerRect || correctBtn.getBoundingClientRect();
+          const ovr = overlayRect || overlay.getBoundingClientRect();
+          const ring = document.createElement('span');
+          ring.className = 'booha-blitz-pop-ring';
+          ring.style.cssText = `left:${r.left - ovr.left}px;top:${r.top - ovr.top}px;width:${r.width}px;height:${r.height}px;`
+            + `border-radius:${getComputedStyle(correctBtn).borderRadius};--pop-ring:${color};`;
+          overlay.appendChild(ring);
+          const big = milestone ? 1.32 : 1.16;
+          const anim = typeof ring.animate === 'function'
+            ? ring.animate([{ opacity: 0.95, transform: 'scale(1)' }, { opacity: 0, transform: `scale(${big}, ${1 + (big - 1) * 2.2})` }],
+              { duration: milestone ? 420 : 300, easing: 'cubic-bezier(.2,.8,.3,1)' })
+            : null;
+          if (anim) anim.onfinish = () => ring.remove(); else ring.remove();
+          setTimeout(() => ring.remove(), 600);   // never leave one behind
+          popBump(progressEl, overlay, 1.22, 240);
+          if (milestone) popBump(promptPopEl(), overlay, 1.06, 360);
+        } catch (_) {
+          // Pop is decoration: it must never interrupt an answer.
+        }
+      }
+      function promptPopEl() {
+        return overlay.querySelector('#vb-stage, #sb-prompt, #qb-prompt') || jpWordEl;
       }
 
       function emitWrongMicroFeedback(wrongBtn, answerRect, overlayRect) {
