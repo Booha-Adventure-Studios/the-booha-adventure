@@ -32,6 +32,7 @@ const st = read('games/sentence-tap.js');
 const so = read('games/sentence-order.js');
 const ssp = read('games/sentence-speed.js');
 const stw = read('games/say-word.js');
+const aq = read('games/ask-question.js');
 const shell = read('game.html');
 
 // ── helpers ──
@@ -305,23 +306,25 @@ assert.match(css, /\.brun-hud\.hot::after \{[^}]*z-index: 0;/, 'the sweep runs b
   assert.match(pop, /lastFire\.clear\(\); spk = null;/, 'reset() stops the speaker loop');
   assert.match(pop, /until: performance\.now\(\) \+ 9000/, 'the wave loop gives up after 9 s even if the clip never reports its end');
   assert.match(pop, /html\[data-motion="reduced"\] \.bpop-eq i/, 'equaliser and hop stop under reduced motion');
-  assert.match(stw, /POP\.eq\(playBtn\);[^\n]*\n\s*const spkId = POP\.speaker\(playBtn\);[^\n]*\n\s*U\.unlockAudio\(\);/, 'Say the Word: the speaker effect starts with the press');
-  assert.match(stw, /playBtn\.textContent = '▶';\n\s*POP\.speakerEnd\(playBtn, spkId\);/, 'Say the Word: it ends when that clip ends');
-  assert.match(stw, /function showCard\(\) \{\n  voiceGate\.stop\(\);[\s\S]{0,400}POP\.speakerWait\(playBtn\);/, 'Say the Word: a new question stops any speaker loop and waits for a press');
-  const stwPal = 'html[data-skin="v2"][data-curriculum] .stw-choice.stw-pal[data-ci]';
-  const stwSkin = 'html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice)[data-ci]';
-  assert(stw.includes(stwPal + '{') && gte(spec(stwPal), spec(stwSkin)), 'Say the Word: answer palette ring outranks the skin panel rule');
-  assert(!/\.stw-choice\.stw-pal\[data-ci\][^{]*\{[^}]*!important/.test(stw), 'Say the Word: the ring is NOT !important, so correct/wrong fills win');
-  assert.match(stw, /if \(firstTry\) POP\.correct\(btn, btn\.dataset\.popKey, popCombo\);/, 'Say the Word: only a first-try answer bursts');
-  assert.match(stw, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'listen', squash: false \}\);\n\s*POP\.wrong\(btn\);/, 'Say the Word: a wrong pick crumbles after the existing puff');
-  assert.match(stw, /if \(firstTry && STREAK_FIREWORKS\.includes\(streak\)\) POP\.round/, 'Say the Word: fireworks at 5 / 10 / 15 in a row');
-  assert.match(stw, /getElementById\('stw-replay'\)\.addEventListener\('click', \(\) => \{\n  POP\.reset\(\);/, 'Say the Word: replay clears leftover effects');
+  for (const [name, src, p] of [['Say the Word', stw, 'stw'], ['Ask the Question', aq, 'aq']]) {
+    assert.match(src, /POP\.eq\(playBtn\);[^\n]*\n\s*const spkId = POP\.speaker\(playBtn\);[^\n]*\n\s*U\.unlockAudio\(\);/, `${name}: the speaker effect starts with the press`);
+    assert.match(src, /playBtn\.textContent = '▶';\n\s*POP\.speakerEnd\(playBtn, spkId\);/, `${name}: it ends when that clip ends`);
+    assert.match(src, /function showCard\(\) \{\n  voiceGate\.stop\(\);[\s\S]{0,400}POP\.speakerWait\(playBtn\);/, `${name}: a new question stops any speaker loop and waits for a press`);
+    const palSel = `html[data-skin="v2"][data-curriculum] .${p}-choice.${p}-pal[data-ci]`;
+    const skinSel2 = 'html[data-skin="v2"][data-curriculum] :is(.stw-choice, .sas-choice, .aq-choice)[data-ci]';
+    assert(src.includes(palSel + '{') && skin.includes(skinSel2) && gte(spec(palSel), spec(skinSel2)), `${name}: answer palette ring outranks the skin panel rule`);
+    assert(!new RegExp(`\\.${p}-choice\\.${p}-pal\\[data-ci\\][^{]*\\{[^}]*!important`).test(src), `${name}: the ring is NOT !important, so correct/wrong fills win`);
+    assert.match(src, /if \(firstTry\) POP\.correct\(btn, btn\.dataset\.popKey, popCombo\);/, `${name}: only a first-try answer bursts`);
+    assert.match(src, /U\.impact\(\{ source: btn, outcome: 'miss', flavor: 'listen', squash: false \}\);\n\s*POP\.wrong\(btn\);/, `${name}: a wrong pick crumbles after the existing puff`);
+    assert.match(src, /if \(firstTry && STREAK_FIREWORKS\.includes\(streak\)\) POP\.round/, `${name}: fireworks at 5 / 10 / 15 in a row`);
+    assert(new RegExp(`getElementById\\('${p}-replay'\\)\\.addEventListener\\('click', \\(\\) => \\{\\n  POP\\.reset\\(\\);`).test(src), `${name}: replay clears leftover effects`);
+  }
 }
 
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw], ['ask-question', aq]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');
