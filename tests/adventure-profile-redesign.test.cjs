@@ -75,10 +75,11 @@ for (const page of ['profile.html', 'adventure-profile.html']) {
   assert.ok(source.includes('.profile-network a.is-locked'), `${page} must style locked portals`);
 }
 
-// Skin closet: missed weekly skins are gone for good; only this week's skin can be worn.
+// Skin closet: missed past-week skins are hidden (Closet Pass, Nov 2026; see
+// tests/closet-no-missed-weeks.test.cjs); only this week's skin can be worn.
 const game = read('js/ui/adventure-game.js');
-assert.match(game, /missed: 'ロック'/, 'missed skins should read as locked forever');
-assert.match(game, /みのがした スキンは もう もどって こないよ/, 'the closet should explain missed skins do not return');
+assert.ok(!/missed: 'ロック'/.test(game), 'missed skins must not show as locked slots');
+assert.ok(!/みのがした/.test(game), 'the closet must not talk about missed skins');
 assert.match(game, /BoohaSkins\.equip/, 'the wear button should use the shared equip rule');
 const advPage = read('adventure-profile.html');
 ['js/core/booha-skins.js', 'js/core/traveler-record.js', 'js/ui/adventure-game.js']
