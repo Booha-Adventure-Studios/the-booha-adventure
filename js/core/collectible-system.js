@@ -159,11 +159,9 @@ const BoohaCollectibleSystem = (() => {
     if (window.BoohaSync && BoohaSync.checkpoint) {
       try { BoohaSync.checkpoint('adventure'); } catch (_) {}
     }
-    awards.forEach(award => {
-      document.dispatchEvent(new CustomEvent('booha:collectibleEarned', {
-        detail: { ...award, collectible: award.item },
-      }));
-    });
+    document.dispatchEvent(new CustomEvent('booha:collectibleEarned', {
+      detail: { awards },
+    }));
     return awards;
   }
 

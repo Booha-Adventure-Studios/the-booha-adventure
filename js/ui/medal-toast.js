@@ -28,6 +28,7 @@
   // Reserve each week/id pair at enqueue time so queued medals cannot be
   // added a second time before their popup begins and marks them as shown.
   var queuedMedalKeys = new Set();
+  var queuedFindKeys = new Set();
   var showing = false;
   var host = null;
 
@@ -160,6 +161,85 @@
     });
   }
 
+  function findAsset(item) {
+    var src = item && item.asset;
+    if (!src) return profileArt('portal-adventure.webp');
+    return /^(https?:|\/)/.test(src) ? src : ROOT + src;
+  }
+
+  function markFindsRevealed(awards) {
+    if (!window.BoohaAdventure || !BoohaAdventure.save) return;
+    try {
+      var data = BoohaAdventure.save.load() || {};
+      var meta = data.meta && typeof data.meta === 'object' ? data.meta : {};
+      var log = meta.findsLog && typeof meta.findsLog === 'object' ? meta.findsLog : {};
+      var changed = false;
+      awards.forEach(function (award) {
+        var entry = log[award.week];
+        var record = entry && entry[award.pool];
+        if (record && record.itemId === (award.record && award.record.itemId) && !record.revealedAt) {
+          record.revealedAt = Date.now();
+          changed = true;
+        }
+      });
+      if (changed) {
+        meta.findsLog = log;
+        data.meta = meta;
+        BoohaAdventure.save.save(data);
+      }
+    } catch (e) { console.warn('[MedalToast] oddity reveal could not be marked:', e); }
+  }
+
+  function enqueueFinds(awards) {
+    var fresh = awards.filter(function (award) {
+      if (!award || !award.week || !award.pool) return false;
+      var key = award.week + '|' + award.pool;
+      if (queuedFindKeys.has(key)) return false;
+      queuedFindKeys.add(key);
+      return true;
+    });
+    if (!fresh.length) return;
+    var items = fresh.filter(function (award) { return award.item; }).map(function (award) { return award.item; });
+    var title = items.length === 1 ? items[0].name : "THIS WEEK'S FINDS";
+    var sub;
+    if (items.length > 1) {
+      sub = items.map(function (item) { return item.name; }).join(' + ');
+    } else if (items.length === 1) {
+      sub = items[0].discovery;
+    } else {
+      sub = 'A future reward has been added to your oddity record.';
+    }
+    queue.push({
+      tier: fresh.some(function (award) { return award.pool === 'special'; }) ? 'gold' : 'bronze',
+      img: findAsset(items[0]),
+      kicker: 'ODDITY FIND · ふしぎなもの ゲット！',
+      title: title,
+      sub: sub,
+      onShow: function () { markFindsRevealed(fresh); },
+    });
+    next();
+  }
+
+  function pendingFindsFromSave() {
+    if (!window.BoohaAdventure || !BoohaAdventure.save) return [];
+    try {
+      var data = BoohaAdventure.save.load() || {};
+      var meta = data.meta && typeof data.meta === 'object' ? data.meta : {};
+      var log = meta.findsLog && typeof meta.findsLog === 'object' ? meta.findsLog : {};
+      var catalogue = Array.isArray(window.BoohaCollectiblesData) ? window.BoohaCollectiblesData : [];
+      var out = [];
+      Object.keys(log).forEach(function (week) {
+        var entry = log[week];
+        ['standard', 'special'].forEach(function (pool) {
+          var record = entry && entry[pool];
+          if (!record || record.revealedAt) return;
+          out.push({ week: week, pool: pool, record: record, item: catalogue.find(function (item) { return item.id === record.itemId; }) || null });
+        });
+      });
+      return out;
+    } catch (_) { return []; }
+  }
+
   function updateLevel() {
     var W = window.BoohaWeeklyMedals;
     var s = W && W.snapshot ? W.snapshot() : null;
@@ -196,6 +276,7 @@
     try {
       W.sync();
       W.pendingPopups().forEach(enqueueMedal);
+      enqueueFinds(pendingFindsFromSave());
       updateLevel();
       updateBadge();
       next();
@@ -215,6 +296,10 @@
   // Game and Blitz results are recorded on booha:gameEnd → booha:dayRecorded.
   document.addEventListener('booha:dayRecorded', function () { soon(700); });
   document.addEventListener('booha:checkIn', function () { soon(900); });
+  document.addEventListener('booha:collectibleEarned', function (event) {
+    var awards = event.detail && Array.isArray(event.detail.awards) ? event.detail.awards : [];
+    enqueueFinds(awards);
+  });
   document.addEventListener('booha:medalsSeen', updateBadge);
 
   window.BoohaMedalToast = { check: check, updateBadge: updateBadge };
