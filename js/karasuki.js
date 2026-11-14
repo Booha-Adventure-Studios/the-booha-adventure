@@ -457,10 +457,11 @@ const HAPPY_HOUSE_PORTAL = {
 
   function showOddityPickup(item) {
     if (!oddityPickupEl) return;
-    oddityPickupEl.textContent = `You found ${item.name}. That's weird.`;
+    // The pickup is the reveal: the earn toast never named the item.
+    oddityPickupEl.textContent = item.discovery || `You found ${item.name}.`;
     oddityPickupEl.classList.add('show');
     window.clearTimeout(oddityPickupTimer);
-    oddityPickupTimer = window.setTimeout(() => oddityPickupEl.classList.remove('show'), 2600);
+    oddityPickupTimer = window.setTimeout(() => oddityPickupEl.classList.remove('show'), 5000);
   }
 
   function drawOddities(now) {
@@ -4894,7 +4895,7 @@ const HAPPY_HOUSE_PORTAL = {
       #oddity-clue[hidden]{display:none;}
       #oddity-clue .oddity-clue-en,#oddity-clue .oddity-clue-jp{display:block;}
       #oddity-clue .oddity-clue-jp{margin-top:2px;color:rgba(255,244,194,.68);font-size:.9em;font-weight:400;}
-      #oddity-pickup{position:fixed;left:50%;top:76px;transform:translate(-50%,-8px);z-index:7100;max-width:min(440px,calc(100vw - 28px));padding:10px 16px;border:1px solid rgba(255,226,112,.55);border-radius:999px;background:rgba(30,15,2,.94);box-shadow:0 0 24px rgba(255,196,50,.24);color:#fff8d3;font:700 13px/1.3 Georgia,serif;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;}
+      #oddity-pickup{position:fixed;left:50%;top:76px;transform:translate(-50%,-8px);z-index:7100;max-width:min(440px,calc(100vw - 28px));padding:10px 16px;border:1px solid rgba(255,226,112,.55);border-radius:14px;background:rgba(30,15,2,.94);box-shadow:0 0 24px rgba(255,196,50,.24);color:#fff8d3;font:700 13px/1.3 Georgia,serif;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;}
       #oddity-pickup.show{opacity:1;transform:translate(-50%,0);}
       @media(max-width:700px){#oddity-clue{left:9px;top:72px;max-width:calc(100vw - 18px);}#oddity-pickup{top:68px;font-size:12px;}}
       /* ── Shared "world popup" component ───────────────

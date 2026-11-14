@@ -173,7 +173,9 @@ const CURRENT_CACHES = {
   // so completion events can be recorded on the page where they happen.
   // Oddity placement: Karasuki now places earned finds in stable room spots
   // and loads the collectible system before the world script.
-  pages:  'booha-pages-2026-546',
+  // Oddity fixes: every page re-checks draws on load, the curriculum game
+  // boards load the draw logic, and the earn toast keeps the find a mystery.
+  pages:  'booha-pages-2026-547',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

@@ -199,19 +199,21 @@
       return true;
     });
     if (!fresh.length) return;
+    // The earn moment is a mystery: the item is waiting in Karasuki, so the
+    // toast never names it or shows its art. The pickup reveals it.
     var items = fresh.filter(function (award) { return award.item; }).map(function (award) { return award.item; });
-    var title = items.length === 1 ? items[0].name : "THIS WEEK'S FINDS";
+    var title = items.length > 1 ? "THIS WEEK'S FINDS" : 'SOMETHING STRANGE';
     var sub;
     if (items.length > 1) {
-      sub = items.map(function (item) { return item.name; }).join(' + ');
+      sub = 'Two strange things appeared in Karasuki. Go and find them! · からすきに ふしぎな ものが 2つ あらわれたよ。さがしに いこう！';
     } else if (items.length === 1) {
-      sub = items[0].discovery;
+      sub = 'Something strange appeared in Karasuki. Go and find it! · からすきに ふしぎな ものが あらわれたよ。さがしに いこう！';
     } else {
       sub = 'A future reward has been added to your oddity record.';
     }
     queue.push({
       tier: fresh.some(function (award) { return award.pool === 'special'; }) ? 'gold' : 'bronze',
-      img: findAsset(items[0]),
+      img: findAsset(null),
       kicker: 'ODDITY FIND · ふしぎなもの ゲット！',
       title: title,
       sub: sub,

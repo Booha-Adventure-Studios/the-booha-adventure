@@ -61,9 +61,10 @@ assert.match(karasuki, /function oddityPlacementFor\(find, index, used\)/, 'plac
 assert.match(karasuki, /generateOrbPosition\(roomId, rng\)/, 'oddities should reuse the safe room-position generator');
 assert.match(karasuki, /function drawOddities\(now\)/, 'Karasuki should render the oddity art and glint');
 assert.match(karasuki, /function clickCheckOddities\(worldX, worldY\)/, 'oddities should have a canvas hit target');
-assert.match(karasuki, /You found \$\{item\.name\}\. That's weird\./, 'pickup should acknowledge the oddity');
+assert.match(karasuki, /oddityPickupEl\.textContent = item\.discovery/, 'pickup should reveal the oddity with its discovery line');
 assert.ok(page.indexOf('js/core/collectibles-data.js') < page.indexOf('js/core/collectible-system.js'), 'Karasuki must load data before the system');
 assert.ok(page.indexOf('js/core/collectible-system.js') < page.indexOf('js/karasuki.js'), 'Karasuki must load the system before the world');
-assert.match(read('sw.js'), /booha-pages-2026-546/, 'the Karasuki page cache must be bumped');
+const pagesCache = Number((read('sw.js').match(/booha-pages-2026-(\d+)/) || [])[1]);
+assert.ok(pagesCache >= 546, 'the Karasuki page cache must be bumped (546 or later)');
 
 console.log('Oddities placement and pickup tests passed.');

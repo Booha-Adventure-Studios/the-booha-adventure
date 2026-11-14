@@ -18,6 +18,11 @@ assert.match(toast, /function markFindsRevealed\(awards\)/, 'the reveal should b
 assert.match(toast, /pendingFindsFromSave/, 'an unshown reveal should survive a page change and retry later');
 assert.match(toast, /if \(busy\(\)\) \{ setTimeout\(next, 1500\); return; \}/, 'oddity reveals should use the existing quiet-moment gate');
 assert.match(toast, /ODDITY FIND/, 'the reveal should identify the reward type');
+// Oddity fixes: the earn toast is a mystery; the Karasuki pickup is the reveal.
+assert.match(toast, /SOMETHING STRANGE/, 'a single earn should announce a mystery');
+assert.ok(!/title = items\.length === 1 \? items\[0\]\.name/.test(toast), 'the earn toast must not name the item');
+assert.ok(!/sub = items\[0\]\.discovery/.test(toast), 'the discovery line belongs to the pickup, not the earn toast');
+assert.match(toast, /img: findAsset\(null\)/, 'the earn toast must not show the item art');
 
 for (const page of ['index.html', 'maze.html', 'profile.html']) {
   const html = read(page);
