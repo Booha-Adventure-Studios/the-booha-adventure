@@ -375,6 +375,149 @@ const HAPPY_HOUSE_PORTAL = {
     return { x: Math.round(cx + 300), y: Math.round(cy + 250) };
   }
 
+  /* Oddities are earned elsewhere, but their physical home is Karasuki. A
+     stable hash keeps a find in the same room after a reload, while the
+     existing orb placement rules keep it away from doors and characters. */
+  const ODDITY_DRAW_SIZE = { small: 30, medium: 54, large: 82 };
+  const ODDITY_HIT_RADIUS = { small: 34, medium: 42, large: 54 };
+  let oddityFinds = [];
+  let oddityClueEl = null;
+  let oddityPickupEl = null;
+  let oddityPickupTimer = 0;
+
+  function oddityHash(value) {
+    let hash = 2166136261;
+    for (const char of String(value)) {
+      hash ^= char.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function oddityPlacementFor(find, index, used) {
+    const rooms = Object.keys(NPP).filter(roomId => DATA.rooms[roomId]);
+    if (!rooms.length) return null;
+    const seed = oddityHash(`${find.week}|${find.pool}|${find.item.id}`);
+    const start = seed % rooms.length;
+    const rng = seededRng(seed ^ 0x9e3779b9);
+    for (let roomOffset = 0; roomOffset < rooms.length; roomOffset++) {
+      const roomId = rooms[(start + roomOffset + index) % rooms.length];
+      for (let attempt = 0; attempt < 30; attempt++) {
+        const point = generateOrbPosition(roomId, rng);
+        const crowded = used.some(other => other.room === roomId && Math.hypot(point.x - other.x, point.y - other.y) < 150);
+        if (!crowded) return { room: roomId, x: point.x, y: point.y };
+      }
+    }
+    return null;
+  }
+
+  function refreshOddityFinds() {
+    if (!window.BoohaCollectibleSystem || typeof BoohaCollectibleSystem.pendingFinds !== 'function') {
+      oddityFinds = [];
+      renderOddityClue();
+      return;
+    }
+    const used = [];
+    oddityFinds = BoohaCollectibleSystem.pendingFinds().map((find, index) => {
+      let placement = find.record.room && Number.isFinite(Number(find.record.x)) && Number.isFinite(Number(find.record.y))
+        ? { room: find.record.room, x: Number(find.record.x), y: Number(find.record.y) }
+        : oddityPlacementFor(find, index, used);
+      if (placement && !find.record.room && BoohaCollectibleSystem.recordPlacement(find.item.id, placement)) {
+        find.record.room = placement.room;
+        find.record.x = placement.x;
+        find.record.y = placement.y;
+      }
+      if (!placement) return null;
+      used.push(placement);
+      const image = new Image();
+      image.decoding = 'async';
+      image.src = find.item.asset;
+      return { ...find, roomId: placement.room, x: placement.x, y: placement.y, image, collected: false };
+    }).filter(Boolean);
+    renderOddityClue();
+  }
+
+  function currentOddities() {
+    return oddityFinds.filter(find => find.roomId === state.roomId && !find.collected);
+  }
+
+  function renderOddityClue() {
+    if (!oddityClueEl) return;
+    const next = oddityFinds.find(find => !find.collected);
+    if (!next) {
+      oddityClueEl.hidden = true;
+      return;
+    }
+    const here = next.roomId === state.roomId;
+    oddityClueEl.hidden = false;
+    oddityClueEl.innerHTML = here
+      ? '<span class="oddity-clue-en">Something strange is here.</span><span class="oddity-clue-jp">この へやに ふしぎな ものが あるよ。</span>'
+      : `<span class="oddity-clue-en">A strange thing is waiting in Room ${next.roomId.replace('room_', '')}.</span><span class="oddity-clue-jp">${next.roomId.replace('room_', '')}ばんの へやで ふしぎな ものが まっているよ。</span>`;
+  }
+
+  function showOddityPickup(item) {
+    if (!oddityPickupEl) return;
+    oddityPickupEl.textContent = `You found ${item.name}. That's weird.`;
+    oddityPickupEl.classList.add('show');
+    window.clearTimeout(oddityPickupTimer);
+    oddityPickupTimer = window.setTimeout(() => oddityPickupEl.classList.remove('show'), 2600);
+  }
+
+  function drawOddities(now) {
+    const finds = currentOddities();
+    if (!finds.length) return;
+    const sec = now / 1000;
+    finds.forEach((find, index) => {
+      const base = ODDITY_DRAW_SIZE[find.item.scale] || ODDITY_DRAW_SIZE.medium;
+      const bob = Math.sin(sec * 1.5 + index * 1.7) * 3;
+      const pulse = 0.5 + 0.5 * Math.sin(sec * 2.2 + index);
+      const x = find.x;
+      const y = find.y + bob;
+      ctx.save();
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, base * 1.25 + pulse * 7);
+      glow.addColorStop(0, 'rgba(255,226,112,.30)');
+      glow.addColorStop(1, 'rgba(255,226,112,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(x, y, base * 1.25 + pulse * 7, 0, Math.PI * 2); ctx.fill();
+      const image = find.image;
+      if (image && image.complete && image.naturalWidth > 0) {
+        const ratio = image.naturalWidth / image.naturalHeight;
+        const w = ratio >= 1 ? base : base * ratio;
+        const h = ratio >= 1 ? base / ratio : base;
+        ctx.globalAlpha = 0.98;
+        ctx.shadowBlur = shadowsEnabled ? 9 : 0;
+        ctx.shadowColor = '#ffe270';
+        ctx.drawImage(image, x - w / 2, y - h / 2, w, h);
+      } else {
+        ctx.fillStyle = '#ffe270';
+        ctx.globalAlpha = 0.9;
+        ctx.beginPath(); ctx.moveTo(x, y - 12); ctx.lineTo(x + 12, y); ctx.lineTo(x, y + 12); ctx.lineTo(x - 12, y); ctx.closePath(); ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#fff6bd';
+      ctx.translate(x + base * 0.42, y - base * 0.46);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillRect(-2, -7, 4, 14); ctx.fillRect(-7, -2, 14, 4);
+      ctx.restore();
+    });
+  }
+
+  function clickCheckOddities(worldX, worldY) {
+    for (const find of currentOddities()) {
+      const radius = ODDITY_HIT_RADIUS[find.item.scale] || ODDITY_HIT_RADIUS.medium;
+      if (Math.hypot(worldX - find.x, worldY - find.y) > radius) continue;
+      const result = BoohaCollectibleSystem.collect(find.item.id);
+      if (!result || result.saveFailed) return true;
+      find.collected = true;
+      playCollectChime();
+      showOddityPickup(find.item);
+      renderOddityClue();
+      return true;
+    }
+    return false;
+  }
+
   function getQuestEpisode(quest) {
     return quest && quest.episodeId && window.UTSUROBA_EPISODES
       ? window.UTSUROBA_EPISODES[quest.episodeId] : null;
@@ -3232,7 +3375,7 @@ const HAPPY_HOUSE_PORTAL = {
   function initWanderers() { refreshWanderersForRoom(); }
   
   function onRoomChanged() { refreshWanderersForRoom(); onRoomChangedNuppi(); onRoomChangedBarba();
-  KarasukiAtmos.setRoom(state.roomId, getObserverRoomId()); }
+  KarasukiAtmos.setRoom(state.roomId, getObserverRoomId()); renderOddityClue(); }
 
   function updateWanderers(now) {
     if (!activeWanderers.length) return;
@@ -4747,6 +4890,13 @@ const HAPPY_HOUSE_PORTAL = {
       #pin-log .clear-btn:hover{color:#fff;border-color:rgba(255,138,226,.6);}
       #copy-toast{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(20,0,30,.92);color:#fff;font:700 12px/1 monospace;padding:6px 18px;border-radius:20px;pointer-events:none;opacity:0;transition:opacity .18s;letter-spacing:.05em;}
       #copy-toast.show{opacity:1;}
+      #oddity-clue{position:fixed;left:14px;top:82px;z-index:6999;max-width:min(330px,calc(100vw - 28px));padding:7px 12px 8px;border:1px solid rgba(255,226,112,.34);border-radius:10px;background:rgba(20,12,3,.84);box-shadow:0 0 18px rgba(255,196,50,.12);color:#fff4c2;font:700 12px/1.35 Georgia,serif;pointer-events:none;text-shadow:0 1px 2px #000;}
+      #oddity-clue[hidden]{display:none;}
+      #oddity-clue .oddity-clue-en,#oddity-clue .oddity-clue-jp{display:block;}
+      #oddity-clue .oddity-clue-jp{margin-top:2px;color:rgba(255,244,194,.68);font-size:.9em;font-weight:400;}
+      #oddity-pickup{position:fixed;left:50%;top:76px;transform:translate(-50%,-8px);z-index:7100;max-width:min(440px,calc(100vw - 28px));padding:10px 16px;border:1px solid rgba(255,226,112,.55);border-radius:999px;background:rgba(30,15,2,.94);box-shadow:0 0 24px rgba(255,196,50,.24);color:#fff8d3;font:700 13px/1.3 Georgia,serif;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;}
+      #oddity-pickup.show{opacity:1;transform:translate(-50%,0);}
+      @media(max-width:700px){#oddity-clue{left:9px;top:72px;max-width:calc(100vw - 18px);}#oddity-pickup{top:68px;font-size:12px;}}
       /* ── Shared "world popup" component ───────────────
          One shell used by every destination confirm dialog
          (locked games, Happy House, Utsuroba, profile). Themed
@@ -4989,6 +5139,14 @@ const HAPPY_HOUSE_PORTAL = {
     // dev UI removed
     
     document.body.appendChild(toast);
+    oddityClueEl = document.createElement('div');
+    oddityClueEl.id = 'oddity-clue';
+    oddityClueEl.hidden = true;
+    oddityPickupEl = document.createElement('div');
+    oddityPickupEl.id = 'oddity-pickup';
+    oddityPickupEl.setAttribute('role', 'status');
+    document.body.appendChild(oddityClueEl);
+    document.body.appendChild(oddityPickupEl);
     document.body.appendChild(portalOverlay);
     injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectMuenbaPopOverlay(); injectOrbPanel(); injectObserverPop(); injectHappyHousePop();
     
@@ -5454,7 +5612,7 @@ const HAPPY_HOUSE_PORTAL = {
     }
     trail=trail.filter(p=>p.life>0);
     drawPortalOrb(now); drawMuenbaOrb(now); drawGrimmerglenPortal(now); drawExitArrows(now); drawMazeExitArrow(now); drawHappyHouseOrb(now);
-    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawBarba(now); drawNuppi(now); drawCardHosts(now);
+    drawBonusTrees(now); drawUtsurobPortalMarker(now); drawWanderers(now); drawObserver(now); drawOrbs(now); drawOddities(now); drawBarba(now); drawNuppi(now); drawCardHosts(now);
     
     const bobFreq=(Math.PI*2)/(HOVER_PERIOD/1000); const bobPhase=sec*bobFreq;
     const bob=Math.sin(bobPhase)*HOVER_AMP; const wobble=Math.sin(bobPhase*2)*2.2;
@@ -6529,6 +6687,7 @@ function drawObserver(now) {
     const p=stagePointToWorld(clientX,clientY);
     if(state.coordMode){dropPin(p.x,p.y);ripples.push({x:p.x,y:p.y,life:1});return;}
     // Interactive elements always respond immediately regardless of tap cooldown
+    if(clickCheckOddities(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckOrbs(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
     if(isNearPortal(p)){openPortal();ripples.push({x:p.x,y:p.y,life:1});return;}
     if(clickCheckUtsuobaPortal(p.x,p.y)){ripples.push({x:p.x,y:p.y,life:1});return;}
@@ -6584,7 +6743,7 @@ function drawObserver(now) {
     injectStyles(); buildApp(); injectTrailHud(); injectEchoesTracker(); KarasukiAtmos.init(stage);
     restoreProfileRoom();
     fitStage(); resizeCanvas();
-    initOrbs(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); initBarba(); bindInput();
+    initOrbs(); refreshOddityFinds(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); initBarba(); bindInput();
     worldPerf.enableOverlay(() => {
       const cache = wandererImageCache.stats();
       return {

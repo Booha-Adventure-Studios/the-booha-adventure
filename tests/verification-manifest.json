@@ -56,6 +56,11 @@
       "reason": "Oddities reveal queue: combined weekly-find announcement, quiet-moment gating, persistence across page changes, and shared reward toast wiring."
     },
     {
+      "path": "tests/oddities-placement.test.cjs",
+      "status": "verify",
+      "reason": "Karasuki oddity placement and pickup: stable saved locations, safe room positioning, visible glint/clue, and permanent collection on tap."
+    },
+    {
       "path": "tests/feed-booha-reactions.test.cjs",
       "status": "verify",
       "reason": "Current Feed Booha reaction-hop unit test."

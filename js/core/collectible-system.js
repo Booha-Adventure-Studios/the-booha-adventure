@@ -112,6 +112,43 @@ const BoohaCollectibleSystem = (() => {
     return null;
   }
 
+  function pendingFinds() {
+    const data = BoohaAdventure.save.load() || {};
+    const found = _isObject(data.collectibles) ? data.collectibles : {};
+    const log = _isObject(data.meta?.findsLog) ? data.meta.findsLog : {};
+    const pending = [];
+    Object.keys(log).sort().forEach(week => {
+      const entry = log[week];
+      if (!_isObject(entry)) return;
+      POOLS.forEach(pool => {
+        const record = entry[pool];
+        if (!_isObject(record) || !record.itemId || record.foundAt || found[record.itemId]) return;
+        const item = _byId[record.itemId];
+        if (item) pending.push({ week, pool, item, record });
+      });
+    });
+    return pending;
+  }
+
+  function recordPlacement(id, placement) {
+    if (!_byId[id] || !_isObject(placement)) return false;
+    const x = Number(placement.x);
+    const y = Number(placement.y);
+    if (!placement.room || !Number.isFinite(x) || !Number.isFinite(y)) return false;
+    const data = BoohaAdventure.save.load() || {};
+    const earned = _earnedRecord(data.meta || {}, id);
+    if (!earned || earned.entry.foundAt || earned.entry.room) return false;
+    earned.entry.room = String(placement.room);
+    earned.entry.x = Math.round(x);
+    earned.entry.y = Math.round(y);
+    earned.entry.placedAt = Date.now();
+    if (!BoohaAdventure.save.save(data)) return false;
+    if (window.BoohaSync && BoohaSync.checkpoint) {
+      try { BoohaSync.checkpoint('adventure'); } catch (_) {}
+    }
+    return true;
+  }
+
   /**
    * Evaluate both permanent oddity channels after a completed Daily Check or
    * Blitz clear. This records the draw, not the physical Karasuki pickup.
@@ -236,6 +273,8 @@ const BoohaCollectibleSystem = (() => {
   // ── System interface ──────────────────────────────────────────────────────
   const api = {
     collect,
+    pendingFinds,
+    recordPlacement,
     isFound,
     totalFound,
     totalDefined,

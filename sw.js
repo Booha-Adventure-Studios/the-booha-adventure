@@ -171,7 +171,9 @@ const CURRENT_CACHES = {
   // forgotten-things collection without precaching its lazy-loaded art.
   // Oddities earning pass: hub, Maze, and Adventure Log load the draw logic
   // so completion events can be recorded on the page where they happen.
-  pages:  'booha-pages-2026-545',
+  // Oddity placement: Karasuki now places earned finds in stable room spots
+  // and loads the collectible system before the world script.
+  pages:  'booha-pages-2026-546',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
