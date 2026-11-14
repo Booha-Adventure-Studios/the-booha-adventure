@@ -1,7 +1,7 @@
 # Booha Adventure rewards: design rules
 
-Status: draft for review (Pass 3, November 2026). No code follows this
-document until it is approved. Later reward passes consume it.
+Status: **Karasuki finds are live** (November 2026). This document records
+the rules the code follows. Change the rules here first, then the code.
 
 ## 1. Principles
 
@@ -10,28 +10,29 @@ document until it is approved. Later reward passes consume it.
    taps and page visits never earn a reward on their own.
 2. **No one ever sees a week they missed.** Anything time-limited shows only
    what the player owns. Anything that never expires may show what is still
-   ahead. (The closet follows this as of the Closet Pass.)
+   ahead. The closet (missed skins hidden, counts from the visible set) and
+   the oddities cabinet (owned items only, no total) both follow this.
 3. **Many rewards, few systems.** Adding a reward should mean adding art and
-   one data entry, not new code. `js/core/trophy-case.js` is the model: one
-   list, and an entry appears with nothing else to wire.
-4. **One reveal at a quiet moment.** Rewards announce themselves through one
-   shared queue that waits for a natural break. `js/ui/medal-toast.js` is the
-   model: it never interrupts a Blitz run, a Daily Check question or an intro.
+   one data entry, not new code. `js/core/trophy-case.js` and
+   `js/core/collectibles-data.js` are the models.
+4. **One reveal at a quiet moment.** Rewards announce themselves through
+   `js/ui/medal-toast.js`, which queues and waits for a natural break (never
+   during a Blitz run, a Daily Check question or an intro).
 5. **Per student, never device-wide.** Every reward lives in the student's
    own save, so shared iPads stay separate.
 
 ## 2. Three kinds of reward
 
-| Kind | Resets | Examples today |
+| Kind | Resets | Examples |
 | --- | --- | --- |
 | Weekly | Sunday (Tokyo) | stars, link stars, rainbow stars, crowns, weekly medals, arcade unlocks, wearable weekly skin, maze arrival reward |
 | Permanent | never | level and rank coin, trophies, postcards, skin collection, Wanderers, travelers, Karasuki Cards, world records |
-| Odd finds | never (earned weekly) | Karasuki finds (this document, section 3) |
+| Odd finds | never (earned weekly) | Karasuki finds (section 3) |
 
 Weekly rewards show this week's effort and vanish on Sunday without leaving
 a "missed" mark. Permanent rewards only ever grow.
 
-## 3. Karasuki finds
+## 3. Karasuki finds (oddities)
 
 Odd, permanent collectibles found in Karasuki, the place where forgotten
 things go. Two explicit reward channels, each with its own pool.
@@ -53,8 +54,7 @@ other way to earn a find.
   (`meta.dailyCheckEvents`) and the legacy `st: 'skip'` never count.
 - **Distinct days:** Tokyo day keys from `CALENDAR`. A Daily Check redone the
   same day (`retries`) still counts as one day.
-- **3/3 Blitz:** the same rule as the weekly skin
-  (`hasCurrentBlitzTriple` in `js/core/booha-skins.js`): all three Blitz types
+- **3/3 Blitz:** the same rule as the weekly skin: all three Blitz types
   cleared in one curriculum this week.
 - **Calendar week:** the current occurrence key from `CALENDAR`. Never the
   browser clock; if `CALENDAR` is missing, nothing is evaluated.
@@ -64,109 +64,115 @@ other way to earn a find.
 1. Each channel can trigger at most **once per calendar week**.
 2. Repeated Daily Check events on one day do not count twice.
 3. Standard and special finds use **separate pools**.
-4. **Duplicates:** draw from items the student does not own yet. Only when a
-   pool is exhausted for that student does a duplicate convert into a
-   separate currency (see open question 2).
-5. If both channels are earned, they are announced in **one queued "This
-   week's finds" reveal**, not two interruptions.
-6. Order does not matter: a 7/7 week without Blitz earns the special bonus,
+4. Order does not matter: a 7/7 week without Blitz earns the special bonus,
    and completing Blitz later that week still earns the standard draw.
-7. Past weeks are never back-filled. The first evaluated week is the week
-   the feature ships.
+5. Past weeks are never back-filled. Finds start the week the feature
+   shipped.
+6. **Never lost:** draws are checked when a Daily Check or Blitz game
+   finishes **and** on every page load once the student is identified. The
+   curriculum game boards load the draw logic, because the Daily Check runs
+   there too. Checking again is always safe (rule 1).
 
-### 3.4 Placement and clue
+### 3.4 Drawing an item
 
-- Each earned find is placed at a **deterministic "random" spot in
-  Karasuki** for that student, week and channel. The seed combines the
-  student's save identity, the week's occurrence key and the channel, so
-  reloads and other devices agree.
-- Spots reuse Karasuki's existing placement rules (the seeded orb placement
-  and `isOrbPositionClear`: away from trees, exits and screen edges).
-- The chosen item and spot are **written to the save when the find is
-  earned**, so later art additions never change a find already waiting.
-- **No pixel hunt:** the find shows a visible glint in its room, and the
-  player gets a small clue naming the room when they enter Karasuki.
-- Picking it up is the player's own action, so the pickup moment is not an
-  interruption.
+- **Per student:** each student has a random seed in their own save
+  (`meta.findsSeed`, synced, never device-wide, not derived from the
+  student id). Classmates draw different items in a different order.
+- The draw picks from items the student **does not own and is not already
+  hunting**. An item waiting in Karasuki is never drawn a second time.
+- **Duplicates:** only when that set is empty is a **second copy** of an
+  owned item drawn. It is placed and picked up like any other find, and the
+  cabinet shows it as **×2** (×3 and so on). There is no conversion currency.
+- The chosen item is written to the save the moment it is earned, so adding
+  new art later never changes a find that is already waiting.
 
-### 3.5 Display
+### 3.5 Announcing, the clue, and pickup
 
-- A **cabinet of finds** on the Adventure profile shows only owned items,
-  each with its name, art and a short lore line (English and Japanese).
-- The cabinet shows how many the student has found, **without a total**
-  ("12 found", never "12 of 40"), so the pool can grow without creating
-  gaps.
-- Standard and special finds sit on separate shelves; the special shelf stays
-  hidden until the first special find (no hints, like the Special Card
-  shelf).
+- **Earning is a mystery.** The reveal queue shows "SOMETHING STRANGE" (or
+  "THIS WEEK'S FINDS" when both channels are earned together, in one
+  reveal, not two). It never shows the item's name or art.
+- **The clue.** When a student enters Karasuki with a find waiting, a dark,
+  odd popup appears (shared world-popup frame) and has to be closed. It
+  shows once per visit and waits until no other dialog is open.
+- **Directions, not room numbers.** Players never see room numbers, so the
+  clue gives the first step along Karasuki's doors ("→ Go right. /
+  みぎへ いこう。"), or "It is in this room. Look for the glint." A small hint
+  panel keeps showing the direction after the popup is closed.
+- **Placement:** a stable spot per student, week and item, using Karasuki's
+  existing safe-spot rules (away from trees, exits and edges). The spot is
+  saved once placed, so reloads and other devices agree. The find bobs and
+  glints; no invisible pixel hunt.
+- **Unpicked finds** stay in Karasuki until picked up. They never block the
+  next week's draws.
+- **Pickup is the reveal:** the item's own discovery line in English and
+  Japanese. A duplicate adds "Another one! / もう ひとつ！".
+- **Juku students** follow the same rules as everyone else.
 
-### 3.6 Data
+### 3.6 Cabinet
+
+- On the Adventure profile. Shows **only owned items**: no ??? slots and
+  **no total** ("2 found · 2こ みつけた", never "2 of 12"), so the pool can grow
+  without creating gaps.
+- The **special shelf** (SPECIAL · とくべつ) stays hidden until the first
+  special find.
+- Each card: art, English and Japanese name, material, description, a ×N
+  badge for copies, and a closed **"✦ ひみつ · A secret"** line that opens to
+  the item's story hook.
+
+### 3.7 Data
 
 Permanent, in the student's save (never device-wide):
 
 ```
-collectibles[<itemId>] = { found: true, foundAt, channel, week }
+collectibles[<itemId>] = { found: true, foundAt, channel, week, copies? }
+meta.findsSeed = '<random string>'            // per-student draw order
 meta.findsLog[<occurrenceKey>] = {
-  standard: { itemId, room, x, y, earnedAt, foundAt },   // when earned
-  special:  { itemId, room, x, y, earnedAt, foundAt }
+  standard: { itemId, earnedAt, foundAt, duplicate, room, x, y, placedAt, revealedAt },
+  special:  { ...same... }
 }
 ```
 
-`collectibles` already exists in the save. `meta.findsLog` survives the
-Sunday reset, which is what lets one channel trigger only once per week.
+`meta.findsLog` survives the Sunday reset, which is what lets one channel
+trigger only once per week. `revealedAt` marks the earn announcement as
+shown, so an unshown one is retried on the next page.
 
-### 3.7 Catalogue
+### 3.8 Catalogue
 
-One data file lists every find (trophy-case style). Proposed entry shape:
+`js/core/collectibles-data.js` lists every find. Adding an oddity means art
+plus one entry; nothing else changes. Entry shape:
 
 ```
-{ id, pool: 'standard' | 'special', en, jp, loreEn, loreJp, img, addedAt }
+{ id, pool: 'standard' | 'special', scale: 'small' | 'medium' | 'large', asset,
+  name, material, discovery, collection, storyHook,
+  nameJp, materialJp, discoveryJp, collectionJp, storyHookJp }
 ```
 
-Art: square WebP, lossy, within the profile art budget (48 KiB and 256 px
-per file; see PERFORMANCE-BUDGETS.md), kept in its own image directory with
-its own budget line. The standard pool should hold at least 40 items so a
-full school year does not exhaust it.
+- Every English line has a Japanese twin: kid-facing hiragana and katakana
+  with word spaces. No em dashes in any line. A test requires all fields.
+- **Launch pool:** 9 standard and 3 special (apothecary theme). New finds
+  join the pool whenever they are ready; the cabinet never shows a total, so
+  growth never shows as a gap.
+- **Art:** square-ish WebP with transparency in `assets/img/collectibles/`.
+  Finds are drawn at 30 to 82 px in Karasuki and 112 px in the cabinet.
+  Recommended export for new art: about 256 to 320 px wide, under 48 KB.
+  The 12 launch images are 768 px wide (47 to 92 KB); re-exporting them
+  smaller is optional and would cut decoded memory on older iPads. There is
+  no per-directory budget line for this folder yet.
 
-### 3.8 Existing Collectibles system
+## 4. Still to do
 
-`js/core/collectible-system.js` becomes the home for finds once its
-curriculum-week and page fields are removed (they tie items to weeks, which
-breaks principle 2). Its one unused placeholder item (the Secret Scroll) is
-retired. Its `collect()` entry point stays.
-
-## 4. Shared foundation (Pass 4)
-
-Built before the first finds, and used by them first:
-
-1. **Reward catalogue:** one registry that reward types plug into.
-2. **Reveal queue:** extend the medal-toast queue so any reward type can
-   queue a reveal, including the combined "This week's finds".
-3. **Cabinet:** one collection view on the Adventure profile.
-
-Existing systems (medals, trophies, postcards, cards, skins) are not moved in
-Pass 4. Each moves later, one per pass, only if it fits.
-
-## 5. Pass plan
-
-| Pass | Scope | Code |
-| --- | --- | --- |
-| 3 | This document | no |
-| 4 | Shared foundation: catalogue, reveal queue, cabinet | yes |
-| 5 | Karasuki finds: triggers, placement, glint and clue, first items | yes (needs Bryan's art) |
-| 6+ | Move existing systems onto the foundation, one per pass | yes |
+1. **Reveal moments.** About six separate "you got something!" moments
+   remain (level-up, skin popup, card reveal, maze congratulations, week
+   sealed, plus medals and oddities already on the shared queue). Move them
+   onto the shared queue one per pass, only where it fits, so popups never
+   stack.
+2. **One reward list.** A single registry of every reward type, worth
+   building once more kinds of reward are added.
+3. **Adventure Log past weeks.** The past-week strip labels a logged week
+   with nothing completed "休 おやすみ". Check whether that reads as a missed
+   week.
+4. **Art budget.** Add an `assets/img/collectibles/` line to
+   PERFORMANCE-BUDGETS.md when the export size is settled.
 
 Every code pass: read-only first, approval per pass, `./verify.sh` after every
 change, a test in `tests/` for each change.
-
-## 6. Open questions
-
-1. **Unpicked finds at the week's end.** Recommended: an earned find stays in
-   Karasuki until picked up (it was earned, so it is never lost), and does
-   not block the next week's draws.
-2. **Duplicate currency.** What duplicates convert into once a pool runs out,
-   and what it buys. Not needed until a pool is exhausted.
-3. **Who gives the clue.** A Karasuki host, Mister Happy, or a plain line of
-   text.
-4. **Juku students.** Same rules, or separate? Recommended: same rules.
-5. **Initial pool sizes** for the first release (standard and special).
