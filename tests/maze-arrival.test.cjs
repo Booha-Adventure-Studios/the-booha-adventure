@@ -97,7 +97,17 @@ assert.match(fly, /const p=toMazeVideo\.play\(\);\s*if\(p&&p\.catch\)p\.catch\(\
 assert.match(between('function finishFlyover(){', '\n}\n'), /launchMaze\(\);/, 'the Maze opens straight after the flyover (no second Start tap)');
 const launch = between('function launchMaze(){', '\n}\n');
 assert.match(launch, /playBgMusic\(\)\.catch\(\(\)=>armMusicOnFirstGesture\(\)\);/, 'music plays, or starts on the first tap');
-assert.match(between('function enterMazeStraight(){', '\n}\n'), /launchMaze\(\);/, 'straight path opens the Maze with no card and no video');
+const straight = between('function enterMazeStraight(){', '\n}\n');
+assert.match(straight, /showMazeGuide\(\);/, 'straight path: no card, no video; the guide flies over the still Maze');
+assert.doesNotMatch(straight, /launchMaze|startLoop|armMusicOnFirstGesture/, 'the Maze waits, still, until the guide is tapped (no start-on-any-tap)');
+const guide = between('function showMazeGuide(){', '\n}\n');
+assert.match(guide, /btn\.addEventListener\('click',\(\)=>\{[\s\S]*?playBgMusic\(\)[\s\S]*?launchMaze\(\);/, 'tapping the guide starts the music, then opens the Maze');
+assert.doesNotMatch(guide.slice(guide.indexOf("btn.addEventListener('click'"), guide.indexOf('playBgMusic')), /await|setTimeout/, 'music starts directly inside the tap');
+assert.doesNotMatch(guide, /scrim|entryShell/, 'not a popup: no scrim or card');
+const lookup = between('function currentGuide(){', '\n}\n');
+assert.match(lookup, /pick\(S\?\.selectedId\?\.\(\)\)\|\|pick\(S\?\.rotationCharacterId\?\.\(\)\)/, 'guide: the companion they have on, else this week’s unlocked one');
+assert.match(lookup, /S\.isUnlocked\?\.\(id\)/, 'only an unlocked companion is shown');
+assert.match(maze, /@media \(prefers-reduced-motion:reduce\)\{\s*#mazeGuide\{ animation:none; \}/, 'reduced motion: the guide does not fly');
 
 const decide = between('function decideArrival(){', '\n}\n');
 assert.match(decide, /booha_return_to_checkpoint/, 'returns from a game are restored separately');
