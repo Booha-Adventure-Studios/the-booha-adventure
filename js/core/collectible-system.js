@@ -285,6 +285,12 @@ const BoohaCollectibleSystem = (() => {
 
   document.addEventListener('booha:checkIn', evaluateWeekly);
   document.addEventListener('booha:gameEnd', evaluateWeekly);
+  // Also evaluate once the student is identified on every page load. A
+  // trigger met on a page that did not evaluate it (or before a failed save)
+  // is caught on the next visit in the same week instead of being lost.
+  // evaluateWeekly is idempotent: each channel awards at most once per week.
+  if (window.BOOHA_READY) evaluateWeekly();
+  else document.addEventListener('booha:ready', evaluateWeekly, { once: true });
 
   BoohaAdventure.registerSystem('collectibleSystem', api);
   return api;
