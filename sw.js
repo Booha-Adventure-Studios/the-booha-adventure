@@ -165,7 +165,8 @@ const CURRENT_CACHES = {
   // Blitz 3/3: maze skips the warm-up and plays the flyover muted; card shows once filled in.
   // Weekly intro videos: index, maze and karasuki load js/core/intro-videos.js.
   // Maze arrival: maze loads js/core/maze-arrival.js (earned weekly path, no muted flyover).
-  pages:  'booha-pages-2026-541',
+  // Maze guide: the straight-through path waits for a tap on the flying weekly guide (music in the tap).
+  pages:  'booha-pages-2026-542',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
