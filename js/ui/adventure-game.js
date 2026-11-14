@@ -6,6 +6,7 @@
  *   #adv-title        "<NAME>の ぼうけん"
  *   #adv-score        collection ring: wanderers + skins + arcade records
  *   #adv-closet       seasonal skin closet
+ *   #adv-collectibles forgotten things cabinet
  *   #adv-travelers    Nuppi and seasonal travelers the player has tapped
  *
  * Skins: only this week's skin can be worn (after the Blitz triple), so past
@@ -285,6 +286,39 @@ const BoohaAdventureGame = (() => {
       <div class="adv-traveler-row">${cards.join('')}</div>`;
   }
 
+  function renderCollectibles() {
+    const host = document.getElementById('adv-collectibles');
+    if (!host) return;
+    const system = window.BoohaCollectibleSystem;
+    const all = system && system.getAll ? system.getAll() : [];
+    const found = all.filter(item => item.found).length;
+    const cards = all.map(item => {
+      const known = !!item.found;
+      const special = item.pool === 'special';
+      const badge = known && special ? '<span class="collectible-badge special">SPECIAL</span>' : '';
+      const art = known
+        ? `<img src="${esc(item.asset)}" alt="${esc(item.name)}" width="160" height="112" loading="lazy" decoding="async">`
+        : '<span class="collectible-question" aria-hidden="true">?</span>';
+      const name = known ? item.name : '???';
+      const material = known ? `<span class="collectible-material">${esc(item.material)}</span>` : '';
+      const copy = known ? item.collection : 'A strange thing is still waiting to be found.';
+      return `<article class="collectible-card ${known ? 'found' : 'unknown'}${special ? ' special' : ''}">
+        <div class="collectible-art">${art}</div>
+        ${badge}
+        <b class="collectible-name">${esc(name)}</b>
+        ${material}
+        <span class="collectible-copy">${esc(copy)}</span>
+      </article>`;
+    }).join('');
+    host.innerHTML = `
+      <div class="adv-head">
+        <div><h2 id="oddities-title">ふしぎな もの</h2><span class="adv-kicker cyan">ODDITIES CABINET · Forgotten Things</span></div>
+        <b class="adv-head-num cyan">${found}/${all.length}</b>
+      </div>
+      <p class="collectible-note">Strange things found in the wider world. They do not belong to any missed week.</p>
+      <div class="collectible-grid" aria-live="polite">${cards || '<p class="adv-note">The cabinet is waiting for its first strange thing.</p>'}</div>`;
+  }
+
   function render() {
     renderTitle();
     let data = {};
@@ -294,6 +328,7 @@ const BoohaAdventureGame = (() => {
     [
       [() => renderScore(data, closet), 'adv-score', 'Collection score'],
       [() => renderCloset(data, closet), 'adv-closet', 'Skin closet'],
+      [renderCollectibles, 'adv-collectibles', 'Oddities cabinet'],
       [renderTravelers, 'adv-travelers', 'Travelers'],
     ].forEach(([fn, id, label]) => {
       try { fn(); } catch (error) { fallback(document.getElementById(id), label, error); }
@@ -303,6 +338,7 @@ const BoohaAdventureGame = (() => {
   if (window.BOOHA_READY) render();
   else document.addEventListener('booha:ready', render, { once: true });
   document.addEventListener('booha:saved', render);
+  document.addEventListener('booha:collectibleFound', render);
   document.addEventListener('booha:weeklyReset', render);
 
   return { render, _test: { skinStates, blitzCount } };

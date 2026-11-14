@@ -167,7 +167,9 @@ const CURRENT_CACHES = {
   // Maze arrival: maze loads js/core/maze-arrival.js (earned weekly path, no muted flyover).
   // Maze guide: later earned visits wait for a tap on the flying weekly guide (music in the tap).
   // Maze guide: this week's companion comes first; wording renamed to the guide path.
-  pages:  'booha-pages-2026-543',
+  // Oddities cabinet: adventure-profile.html now displays the data-driven
+  // forgotten-things collection without precaching its lazy-loaded art.
+  pages:  'booha-pages-2026-544',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
