@@ -41,6 +41,11 @@
       "reason": "Current adventure-profile collection contract."
     },
     {
+      "path": "tests/oddities-collectibles.test.cjs",
+      "status": "verify",
+      "reason": "Oddities cabinet: 12 data-driven collectible definitions, public assets, profile mount, and lazy display contract."
+    },
+    {
       "path": "tests/feed-booha-reactions.test.cjs",
       "status": "verify",
       "reason": "Current Feed Booha reaction-hop unit test."

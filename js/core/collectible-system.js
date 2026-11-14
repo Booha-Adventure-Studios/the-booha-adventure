@@ -3,44 +3,15 @@
  * collectible-system.js
  * The Booha Adventure — Collectible System
  * Tracks hidden items found across all pages/games.
- * Define collectibles here; pages call collect() when found.
+ * Definitions live in collectibles-data.js; pages call collect() when found.
  */
 
 const BoohaCollectibleSystem = (() => {
   'use strict';
 
-  /**
-   * COLLECTIBLE DEFINITIONS
-   * id       — unique key stored in save
-   * name     — display name
-   * hint     — vague hint for the UI (don't spoil it)
-   * page     — which page/game it's found on
-   * week     — curriculum week
-   */
-  const COLLECTIBLES = [
-    {
-      id:   'booha_stamp_1',
-      name: 'Booha Stamp #1',
-      hint: 'Hidden in the maze…',
-      page: 'maze',
-      week: 1,
-    },
-    {
-      id:   'booha_stamp_2',
-      name: 'Booha Stamp #2',
-      hint: 'Somewhere in karasuki…',
-      page: 'karasuki',
-      week: 2,
-    },
-    {
-      id:   'secret_scroll',
-      name: 'Secret Scroll',
-      hint: 'Finish your homework perfectly.',
-      page: 'homework',
-      week: 3,
-    },
-    // Add more as you build pages
-  ];
+  const COLLECTIBLES = Array.isArray(window.BoohaCollectiblesData)
+    ? window.BoohaCollectiblesData
+    : [];
 
   const _byId = {};
   COLLECTIBLES.forEach(c => { _byId[c.id] = c; });
@@ -55,7 +26,8 @@ const BoohaCollectibleSystem = (() => {
   }
 
   function totalFound() {
-    return Object.keys(_getCollectibles()).length;
+    const found = _getCollectibles();
+    return COLLECTIBLES.filter(c => !!found[c.id]).length;
   }
 
   function totalDefined() {

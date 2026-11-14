@@ -240,6 +240,22 @@
     .closet-silhouettes { display:flex; flex-wrap:wrap; gap:4px; }
     .closet-silhouettes img { width:26px; height:26px; object-fit:contain; filter:brightness(0) invert(.32); opacity:.8; }
 
+    /* oddities cabinet */
+    .collectibles-section { padding:14px 12px 16px; border-radius:24px; background:linear-gradient(145deg,rgba(61,232,255,.1),rgba(255,95,200,.08)),var(--night-2); border:2px solid rgba(61,232,255,.45); }
+    .collectible-note { margin:0 2px 12px; font-size:12px; line-height:1.6; color:var(--muted); }
+    .collectible-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .collectible-card { min-width:0; display:flex; flex-direction:column; gap:6px; padding:9px; border-radius:17px; background:#160b2c; border:1px solid var(--line); }
+    .collectible-card.found { border-color:rgba(61,232,255,.65); box-shadow:inset 0 0 18px rgba(61,232,255,.06); }
+    .collectible-card.special.found { border-color:rgba(255,228,92,.7); box-shadow:inset 0 0 18px rgba(255,228,92,.08); }
+    .collectible-art { display:flex; align-items:center; justify-content:center; min-height:112px; border-radius:12px; background:radial-gradient(circle at 50% 45%,rgba(61,232,255,.13),rgba(0,0,0,.22) 72%); overflow:hidden; }
+    .collectible-art img { width:100%; height:112px; object-fit:contain; }
+    .collectible-question { display:flex; align-items:center; justify-content:center; width:58px; height:58px; border:2px dashed #5b4a72; border-radius:50%; color:#7c6b91; font-family:var(--font-display); font-size:25px; }
+    .collectible-badge { align-self:flex-start; padding:2px 7px; border-radius:999px; color:var(--cyan); border:1px solid rgba(61,232,255,.5); font-family:var(--font-display); font-size:8px; letter-spacing:.12em; }
+    .collectible-badge.special { color:var(--lemon); border-color:rgba(255,228,92,.55); }
+    .collectible-name { font-size:12px; line-height:1.35; overflow-wrap:anywhere; }
+    .collectible-copy { color:var(--muted); font-size:10px; line-height:1.55; font-weight:500; }
+    .collectible-material { color:var(--pink-soft); font-size:9px; line-height:1.35; }
+
     /* wanderer atlas */
     .wanderer-intro { display:grid; gap:4px; margin:0 2px 12px; font-size:12px; line-height:1.7; color:#e6d8f2; }
     .wanderer-intro-jp { line-height:2.3; }
@@ -427,6 +443,10 @@
     <div id="adv-closet"></div>
   </section>
 
+  <section class="collectibles-section" id="oddities" aria-labelledby="oddities-title">
+    <div id="adv-collectibles"></div>
+  </section>
+
   <section class="wanderer-section" id="atlas" aria-labelledby="wanderer-title">
     <div class="adv-head">
       <div><h2 id="wanderer-title">たびびと ずかん</h2><span class="adv-kicker lime">WANDERER ATLAS · Wanderers Found</span></div>
@@ -520,6 +540,7 @@
 <script src="js/core/unlock-system.js"></script>
 <script src="js/ui/bonus-games.js"></script>
 <script src="js/core/stats-system.js"></script>
+<script src="js/core/collectibles-data.js"></script>
 <script src="js/core/collectible-system.js"></script>
 <script src="js/core/page-state.js"></script>
 <script src="js/core/week-system.js"></script>
