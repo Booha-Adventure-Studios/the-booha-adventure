@@ -46,6 +46,11 @@
       "reason": "Oddities cabinet: 12 data-driven collectible definitions, public assets, profile mount, and lazy display contract."
     },
     {
+      "path": "tests/oddities-earning.test.cjs",
+      "status": "verify",
+      "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
+    },
+    {
       "path": "tests/feed-booha-reactions.test.cjs",
       "status": "verify",
       "reason": "Current Feed Booha reaction-hop unit test."
