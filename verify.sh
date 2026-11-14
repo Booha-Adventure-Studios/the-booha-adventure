@@ -2064,6 +2064,13 @@ else
   bad "image metadata guard failed"
 fi
 
+echo "[player] Weekly intro videos"
+if node tests/intro-videos-weekly.test.cjs >/dev/null 2>&1; then
+  ok "7 intro videos play on the first visit of the calendar week, per student"
+else
+  bad "weekly intro videos test failed"
+fi
+
 echo "[player] Blitz-complete maze entry"
 if node tests/blitz-complete-entry.test.cjs >/dev/null 2>&1; then
   ok "warm-up reminds until Blitz 3/3; then muted flyover (reveal first); card shown once filled in"

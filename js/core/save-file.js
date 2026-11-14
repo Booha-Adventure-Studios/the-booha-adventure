@@ -103,6 +103,7 @@ const BoohaSaveFile = (() => {
         visitDays:         {},   // { "2026-11-05": 1 } Tokyo days this student opened the hub this week
         homework:          _defaultHomework(), // hub list "copied into my notebook" ticks (this week)
         worlds:            _defaultWeeklyWorlds(),
+        introsSeen:        {},   // { [introId]: occurrenceKey } intro videos seen this week (js/core/intro-videos.js)
       },
 
       // ── Collection — permanent discoveries ──────────────────────────────
@@ -374,6 +375,7 @@ const BoohaSaveFile = (() => {
         visitDays:          {},
         homework:           _defaultHomework(),
         worlds:             _defaultWeeklyWorlds(),
+        introsSeen:         {},
       };
     }
     save.weekly.homework = _normalizeHomework(save.weekly.homework);
@@ -622,6 +624,7 @@ const BoohaSaveFile = (() => {
       visitDays:          carriedVisitDays,
       homework:           carriedHomework,
       worlds:             _defaultWeeklyWorlds(),
+      introsSeen:         {},   // intro videos play again in the new week
     };
     data.weekly.worlds.occurrenceKey = occurrenceKey || '';
 

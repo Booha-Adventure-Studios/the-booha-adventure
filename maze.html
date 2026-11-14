@@ -1312,6 +1312,7 @@
 <script src="./js/calendar.js"></script>
 <script src="./js/core/adventure-core.js"></script>
 <script src="./js/core/save-file.js"></script>
+<script src="./js/core/intro-videos.js"></script>
 <script src="./js/core/booha-skins.js"></script>
 <script src="./js/core/seasonal-visuals.js"></script>
 <script src="./js/sync-client.js"></script>
@@ -2684,10 +2685,14 @@ function closeHomeworkPrompt(){
 function playHomeworkVideoAndGo(){
   closeHomeworkPrompt();
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
-  loadMediaSource(hwTreeVideo);
-  try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
-  void hwVideoWrap.offsetWidth;
-  hwVideoWrap.classList.add('show');
+  const playIntro=introDue('homework');
+  if(playIntro){
+    introSeen('homework');
+    loadMediaSource(hwTreeVideo);
+    try{hwTreeVideo.pause();hwTreeVideo.currentTime=0;}catch(e){}
+    void hwVideoWrap.offsetWidth;
+    hwVideoWrap.classList.add('show');
+  }
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
@@ -2699,6 +2704,7 @@ function playHomeworkVideoAndGo(){
     fade.classList.add('on');
     setTimeout(()=>{ window.location.href='homework.html'; },FADE_MS+100);
   }
+  if(!playIntro){leaveNow();return;}
   hwTreeVideo.onended=leaveNow;
   hwTreeVideo.onerror=leaveNow;
   hwTreeVideo.ontimeupdate=()=>{
@@ -2737,10 +2743,14 @@ function closeKarasukiPrompt(){
 function playKarasukiVideoAndGo(){
   closeKarasukiPrompt();
   try{bgMusic.pause();bgMusic.currentTime=0;}catch(e){}
-  loadMediaSource(krVideo);
-  try{krVideo.pause();krVideo.currentTime=0;}catch(e){}
-  void krVideoWrap.offsetWidth;
-  krVideoWrap.classList.add('show');
+  const playIntro=introDue('karasuki');
+  if(playIntro){
+    introSeen('karasuki');
+    loadMediaSource(krVideo);
+    try{krVideo.pause();krVideo.currentTime=0;}catch(e){}
+    void krVideoWrap.offsetWidth;
+    krVideoWrap.classList.add('show');
+  }
   sessionStorage.setItem('booha_return_to_checkpoint','1');
   sessionStorage.setItem('booha_return_week',String(activeWeek));
   sessionStorage.setItem('booha_return_ghost',String(activeGhostIdx));
@@ -2752,6 +2762,7 @@ function playKarasukiVideoAndGo(){
     fade.classList.add('on');
     setTimeout(()=>{ window.location.href='karasuki.html?from=maze'; },FADE_MS+100);
   }
+  if(!playIntro){leaveNow();return;}
   krVideo.onended=leaveNow;
   krVideo.onerror=leaveNow;
   krVideo.ontimeupdate=()=>{
@@ -2887,10 +2898,15 @@ buildSparkles(confirmSp,24);buildSparkles(startSp,28,false);
 returnBtn.addEventListener('click',()=>{fadeOut();setTimeout(()=>goToHub(),FADE_MS);});
 
 let videoPlayed=false;
+/* Intro videos play on the first visit of the week (js/core/intro-videos.js). */
+function introDue(id){return !window.BoohaIntroVideos||BoohaIntroVideos.shouldPlay(id);}
+function introSeen(id){if(window.BoohaIntroVideos)BoohaIntroVideos.markSeen(id);}
 continueBtn.addEventListener('click',async()=>{
   if(videoPlayed)return;videoPlayed=true;
-  loadMediaSource(toMazeVideo);
   overlay1.classList.add('hidden');overlay1.addEventListener('transitionend',()=>overlay1.classList.add('gone'),{once:true});
+  if(!introDue('maze')){showOverlay2();return;}
+  introSeen('maze');
+  loadMediaSource(toMazeVideo);
   app.classList.add('inTransition');videoWrap.classList.add('show');
   try{toMazeVideo.currentTime=0;}catch(e){}
   try{await toMazeVideo.play();}catch(e){showOverlay2();}
@@ -2906,8 +2922,10 @@ function autoEnterAfterBlitz(){
   if(!readBlitzCompletionState().completedCurriculum)return;
   if(document.getElementById('battyUnlockPopup')?.classList.contains('show'))return;
   videoPlayed=true;
-  loadMediaSource(toMazeVideo);
   overlay1.classList.add('hidden','gone');
+  if(!introDue('maze')){showOverlay2();return;}
+  introSeen('maze');
+  loadMediaSource(toMazeVideo);
   app.classList.add('inTransition');videoWrap.classList.add('show');
   toMazeVideo.muted=true;
   try{toMazeVideo.currentTime=0;}catch(e){}

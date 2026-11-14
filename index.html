@@ -4701,6 +4701,8 @@ async function startIntro() {
   if (started) return;
   started = true;
   ghostWrap.classList.add('flyAway');
+  // The hub intro plays on the first visit of the week (js/core/intro-videos.js).
+  if (window.BoohaIntroVideos && !BoohaIntroVideos.shouldPlay('hub')) { goToHub(); return; }
   fadeToBlack(true);
   await new Promise(r => setTimeout(r, 900));
   showScene(videoScene);
@@ -4716,6 +4718,7 @@ async function startIntro() {
   requestAnimationFrame(() => requestAnimationFrame(() => fadeToBlack(false)));
   try {
     await introVideo.play();
+    if (window.BoohaIntroVideos) BoohaIntroVideos.markSeen('hub');
   } catch (err) {
     started = false; fadingOut = false;
     ghostWrap.classList.remove('flyAway');
@@ -4827,6 +4830,7 @@ window.addEventListener('pageshow', ev => {
 <script src="pwa-init.js"></script>
 <script src="js/core/adventure-core.js"></script>
 <script src="js/core/save-file.js"></script>
+<script src="js/core/intro-videos.js"></script>
 <script src="js/core/curriculum.js"></script>
 <script src="js/sync-client.js"></script>
 <script src="js/core/day-record.js"></script>
