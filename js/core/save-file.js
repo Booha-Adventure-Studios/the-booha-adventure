@@ -83,6 +83,8 @@ const BoohaSaveFile = (() => {
         allTimeStars:   0,       // running total, only goes up
         dayLog:         {},      // { "2026-07-22": { s, g } }  — accountability
         weekLog:        {},      // { "2026-w27": { adv, blitz, duel } }
+        findsLog:       {},      // permanent oddity draws by calendar occurrence
+        findsDuplicateCount: { standard: 0, special: 0 }, // future conversion currency
         lastActivityTs: 0,
         selectedBoohaSkin: null,
         boohaSkinCollection: {}, // permanent seasonal Booha unlock history
@@ -361,6 +363,15 @@ const BoohaSaveFile = (() => {
     if (!['pb', 'br', 'bc'].includes(save.meta.curriculum)) save.meta.curriculum = null;
     if (!save.meta.dayLog)  save.meta.dayLog  = {};
     if (!save.meta.weekLog) save.meta.weekLog = {};
+    if (!save.meta.findsLog || typeof save.meta.findsLog !== 'object' || Array.isArray(save.meta.findsLog)) save.meta.findsLog = {};
+    if (!save.meta.findsDuplicateCount || typeof save.meta.findsDuplicateCount !== 'object' || Array.isArray(save.meta.findsDuplicateCount)) {
+      save.meta.findsDuplicateCount = { standard: 0, special: 0 };
+    }
+    for (const pool of ['standard', 'special']) {
+      if (!Number.isSafeInteger(save.meta.findsDuplicateCount[pool]) || save.meta.findsDuplicateCount[pool] < 0) {
+        save.meta.findsDuplicateCount[pool] = 0;
+      }
+    }
 
     if (!save.weekly) {
       save.weekly = {

@@ -169,7 +169,9 @@ const CURRENT_CACHES = {
   // Maze guide: this week's companion comes first; wording renamed to the guide path.
   // Oddities cabinet: adventure-profile.html now displays the data-driven
   // forgotten-things collection without precaching its lazy-loaded art.
-  pages:  'booha-pages-2026-544',
+  // Oddities earning pass: hub, Maze, and Adventure Log load the draw logic
+  // so completion events can be recorded on the page where they happen.
+  pages:  'booha-pages-2026-545',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

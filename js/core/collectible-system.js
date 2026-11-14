@@ -15,10 +15,156 @@ const BoohaCollectibleSystem = (() => {
 
   const _byId = {};
   COLLECTIBLES.forEach(c => { _byId[c.id] = c; });
+  const POOLS = Object.freeze(['standard', 'special']);
+  const BLITZ_TYPES = Object.freeze(['vocab', 'sentences', 'questions']);
+  const CURRICULA = Object.freeze(['pb', 'br', 'bc']);
 
   // ── Read ──────────────────────────────────────────────────────────────────
   function _getCollectibles() {
     return BoohaAdventure.save.load().collectibles || {};
+  }
+
+  function _currentWeek() {
+    try {
+      if (!window.CALENDAR || !CALENDAR.getCurrentCurriculumWeek) return null;
+      const current = CALENDAR.getCurrentCurriculumWeek();
+      const key = CALENDAR.getCurriculumWeekOccurrenceKey
+        ? CALENDAR.getCurriculumWeekOccurrenceKey(current)
+        : current.occurrenceKey;
+      return key && current.weekStart ? { key, start: current.weekStart } : null;
+    } catch (_) { return null; }
+  }
+
+  function _isObject(value) {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function _dailyDoneCount(meta, weekStart) {
+    const checkIn = _isObject(meta.checkIn) ? meta.checkIn : {};
+    const start = Date.parse(`${String(weekStart).slice(0, 10)}T00:00:00Z`);
+    if (!Number.isFinite(start)) return 0;
+    let count = 0;
+    for (let day = 0; day < 7; day++) {
+      const key = new Date(start + day * 86400000).toISOString().slice(0, 10);
+      if (_isObject(checkIn[key]) && checkIn[key].st === 'done') count++;
+    }
+    return count;
+  }
+
+  function _blitzTripleDone(meta, weekKey) {
+    const blitz = meta.blitz;
+    if (!_isObject(blitz) || blitz.weeklyKey !== weekKey || !_isObject(blitz.weekly)) return false;
+    return CURRICULA.some(curriculum => BLITZ_TYPES.every(type => !!blitz.weekly[type]?.[curriculum]));
+  }
+
+  function _hash(value) {
+    let hash = 2166136261;
+    for (const char of String(value)) {
+      hash ^= char.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function _ownedIds(data) {
+    const found = _isObject(data.collectibles) ? data.collectibles : {};
+    return new Set(Object.keys(found).filter(id => !!found[id]));
+  }
+
+  function _draw(pool, weekKey, data) {
+    const poolItems = COLLECTIBLES.filter(item => item.pool === pool);
+    const owned = _ownedIds(data);
+    const available = poolItems.filter(item => !owned.has(item.id));
+    if (!available.length) return { item: null, duplicate: true };
+    const index = _hash(`${weekKey}|${pool}`) % available.length;
+    return { item: available[index], duplicate: false };
+  }
+
+  function _emptyFindsEntry() {
+    return { standard: null, special: null };
+  }
+
+  function _findsLog(meta) {
+    if (!_isObject(meta.findsLog)) meta.findsLog = {};
+    return meta.findsLog;
+  }
+
+  function _duplicateCounts(meta) {
+    if (!_isObject(meta.findsDuplicateCount)) meta.findsDuplicateCount = { standard: 0, special: 0 };
+    POOLS.forEach(pool => {
+      if (!Number.isSafeInteger(meta.findsDuplicateCount[pool]) || meta.findsDuplicateCount[pool] < 0) {
+        meta.findsDuplicateCount[pool] = 0;
+      }
+    });
+    return meta.findsDuplicateCount;
+  }
+
+  function _earnedRecord(meta, id) {
+    const log = _isObject(meta.findsLog) ? meta.findsLog : {};
+    const weeks = Object.keys(log).reverse();
+    for (const week of weeks) {
+      const entry = log[week];
+      if (!_isObject(entry)) continue;
+      for (const pool of POOLS) {
+        if (entry[pool] && entry[pool].itemId === id) return { week, pool, entry: entry[pool] };
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Evaluate both permanent oddity channels after a completed Daily Check or
+   * Blitz clear. This records the draw, not the physical Karasuki pickup.
+   */
+  function evaluateWeekly() {
+    const current = _currentWeek();
+    const save = BoohaAdventure.save;
+    if (!current || !save || typeof save.save !== 'function') return [];
+
+    const data = save.load() || {};
+    const meta = _isObject(data.meta) ? data.meta : {};
+    const log = _findsLog(meta);
+    const entry = _isObject(log[current.key]) ? log[current.key] : _emptyFindsEntry();
+    const dailyCount = _dailyDoneCount(meta, current.start);
+    const blitzDone = _blitzTripleDone(meta, current.key);
+    const awards = [];
+    const now = Date.now();
+
+    const channels = [
+      { pool: 'standard', eligible: dailyCount >= 3 && blitzDone },
+      { pool: 'special', eligible: dailyCount >= 7 },
+    ];
+    const duplicateCounts = _duplicateCounts(meta);
+    channels.forEach(({ pool, eligible }) => {
+      if (!eligible || entry[pool]) return;
+      const draw = _draw(pool, current.key, data);
+      if (draw.duplicate) duplicateCounts[pool] += 1;
+      const record = {
+        itemId: draw.item ? draw.item.id : null,
+        earnedAt: now,
+        foundAt: null,
+        converted: draw.duplicate,
+      };
+      entry[pool] = record;
+      awards.push({ pool, item: draw.item || null, record, week: current.key });
+    });
+
+    if (!awards.length) return [];
+    log[current.key] = entry;
+    meta.findsLog = log;
+    meta.findsDuplicateCount = duplicateCounts;
+    data.meta = meta;
+    if (!save.save(data)) return [];
+
+    if (window.BoohaSync && BoohaSync.checkpoint) {
+      try { BoohaSync.checkpoint('adventure'); } catch (_) {}
+    }
+    awards.forEach(award => {
+      document.dispatchEvent(new CustomEvent('booha:collectibleEarned', {
+        detail: { ...award, collectible: award.item },
+      }));
+    });
+    return awards;
   }
 
   function isFound(id) {
@@ -55,12 +201,22 @@ const BoohaCollectibleSystem = (() => {
       return null;
     }
 
-    const found = _getCollectibles();
+    const data = BoohaAdventure.save.load() || {};
+    const found = _isObject(data.collectibles) ? data.collectibles : {};
     const alreadyFound = !!found[id];
 
     if (!alreadyFound) {
-      found[id] = { foundAt: Date.now() };
-      BoohaAdventure.save.patch('collectibles', found);
+      const now = Date.now();
+      const earned = _earnedRecord(data.meta || {}, id);
+      found[id] = {
+        found: true,
+        foundAt: now,
+        channel: earned ? earned.pool : null,
+        week: earned ? earned.week : null,
+      };
+      data.collectibles = found;
+      if (earned) earned.entry.foundAt = now;
+      if (!BoohaAdventure.save.save(data)) return { alreadyFound: false, collectible: _byId[id], saveFailed: true };
 
       // Update stat counter
       if (BoohaAdventure.stats) {
@@ -86,8 +242,12 @@ const BoohaCollectibleSystem = (() => {
     totalFound,
     totalDefined,
     getAll,
-    init() { /* reads from save, no setup needed */ }
+    evaluateWeekly,
+    init() { /* event listeners below evaluate after completed work */ }
   };
+
+  document.addEventListener('booha:checkIn', evaluateWeekly);
+  document.addEventListener('booha:gameEnd', evaluateWeekly);
 
   BoohaAdventure.registerSystem('collectibleSystem', api);
   return api;
