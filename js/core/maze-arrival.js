@@ -10,7 +10,9 @@
  *                   the flyover with sound and starts the Maze music, and
  *                   earns the week.
  *   Same, reward already earned this week
- *     → 'straight'  straight into the Maze; music starts on the first tap.
+ *     → 'guide'     no card and no video: this week's guide flies over the
+ *                   still Maze, and tapping it (the reward) starts the music
+ *                   and opens the Maze.
  *   Anything missing
  *     → 'reminder'  names exactly what is missing: Go back, Do the Daily
  *                   Check now, or Continue anyway. Continuing plays the
@@ -22,7 +24,7 @@
  * weekly.mazeReward.earned (the calendar's occurrenceKey), so it is per
  * student and resets with the Sunday-started Tokyo week. The Daily Check is
  * daily, so a student who earned the week on Monday is reminded again on
- * Tuesday until Tuesday's check is done, then goes straight through.
+ * Tuesday until Tuesday's check is done, then gets the guide.
  *
  * If the calendar or the save is unavailable, nothing counts as earned.
  */
@@ -67,7 +69,7 @@
 
   function decide({ blitzDone, dcDone, earned }) {
     if (!blitzDone || !dcDone) return 'reminder';
-    return earned ? 'straight' : 'congrats';
+    return earned ? 'guide' : 'congrats';
   }
 
   function state(blitzDone) {

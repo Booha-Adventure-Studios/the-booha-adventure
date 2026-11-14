@@ -1053,7 +1053,7 @@
     .dcRow.done i{ background:#79ffd5; box-shadow:0 0 0 3px rgba(121,255,213,.13),0 0 15px rgba(121,255,213,.8); }
     .entryCompanion{ display:block; width:clamp(84px,16vmin,132px); height:clamp(84px,16vmin,132px); object-fit:contain; margin:0 auto -6px; filter:drop-shadow(0 10px 22px rgba(0,0,0,.65)) drop-shadow(0 0 18px rgba(255,200,90,.35)); }
     .entryCompanion:not([hidden]) + .entryStateMark{ display:none; }
-    /* Straight-through reward: this week's guide flies over the still Maze.
+    /* Guide reward: this week's guide flies over the still Maze.
        No scrim or card; tapping it starts the music and opens the Maze. */
     #mazeGuide{ position:absolute; left:50%; top:50%; z-index:35; appearance:none; border:0; padding:0; margin:0; background:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; transform:translate(-50%,-50%); animation:mazeGuideFly 14s ease-in-out infinite; -webkit-tap-highlight-color:transparent; }
     #mazeGuide img{ width:clamp(104px,19vmin,176px); height:clamp(104px,19vmin,176px); object-fit:contain; pointer-events:none; filter:drop-shadow(0 0 22px rgba(255,214,120,.85)) drop-shadow(0 12px 22px rgba(0,0,0,.6)); animation:mazeGuideBob 1.7s ease-in-out infinite; }
@@ -1557,7 +1557,8 @@ function playBgMusic(){
      congrats  Daily Check today + Blitz 3/3, first time this week: one card
                (with this week's companion); its tap plays the flyover with
                sound and starts the music, and earns the week.
-     straight  the same, already earned this week: straight into the Maze.
+     guide     the same, already earned this week: no card, no video; this
+               week's guide flies over the still Maze and its tap is the reward.
      reminder  anything missing: the card names it. Go back, Do the Daily
                Check now, or Continue anyway (flyover + music every time).
    Re-read on every Daily Check record: only a 'done' check counts. */
@@ -1620,7 +1621,7 @@ function personalizeMazeIntro() {
   delete overlay.dataset.revealId;
   if (art) art.hidden = true;
 
-  if (arrivalMode === 'straight') return;   // decided in onSaveReady: no card
+  if (arrivalMode === 'guide') return;   // decided in onSaveReady: no card
 
   if (arrivalMode === 'congrats') {
     // This week's companion joins the congratulations (one popup, not two).
@@ -3055,7 +3056,7 @@ function startFlyover(){
 // waits, still, while this week's guide flies over it. Tapping the guide is
 // the reward: it starts the music (inside the tap, so iPads allow it) and
 // opens the Maze.
-function enterMazeStraight(){
+function enterMazeWithGuide(){
   if(videoPlayed||mazeStarted)return;
   videoPlayed=true;o2shown=true;
   overlay1.classList.add('hidden','gone');
@@ -3063,8 +3064,8 @@ function enterMazeStraight(){
   showMazeGuide();
 }
 
-// The student's guide: the companion they have on, else this week's
-// unlocked companion, else their own Booha.
+// The student's guide: this week's unlocked companion (the reward), else the
+// companion they have on, else their own Booha (outside a season).
 function currentGuide(){
   const S=window.BoohaSkins;
   const pick=id=>{
@@ -3073,7 +3074,7 @@ function currentGuide(){
       return k&&S.isUnlocked?.(id)?{id,name:k.name,nameJp:k.nameJp||'',art:k.assets?.maze||''}:null;
     }catch(e){return null;}
   };
-  return pick(S?.selectedId?.())||pick(S?.rotationCharacterId?.())||null;
+  return pick(S?.rotationCharacterId?.())||pick(S?.selectedId?.())||null;
 }
 
 function showMazeGuide(){
@@ -3106,7 +3107,7 @@ function showMazeGuide(){
 function decideArrival(){
   if(videoPlayed||mazeStarted)return;
   if(sessionStorage.getItem('booha_return_to_checkpoint')==='1')return;   // back from a game: restored separately
-  if(arrivalMode==='straight')enterMazeStraight();
+  if(arrivalMode==='guide')enterMazeWithGuide();
 }
 function refreshArrival(){
   if(videoPlayed||mazeStarted||!window.BOOHA_READY)return;

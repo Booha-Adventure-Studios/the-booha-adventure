@@ -2095,7 +2095,7 @@ fi
 
 echo "[player] Maze arrival (earned path)"
 if node tests/maze-arrival.test.cjs >/dev/null 2>&1; then
-  ok "Daily Check + Blitz done: congratulations once a week, then straight in; otherwise reminder + flyover with music; no muted video"
+  ok "Daily Check + Blitz done: congratulations once a week, then tap the flying guide; otherwise reminder + flyover with music; no muted video"
 else
   bad "Maze arrival test failed"
 fi
