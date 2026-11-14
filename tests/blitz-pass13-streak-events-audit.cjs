@@ -34,7 +34,7 @@ assert.match(engine, /const sceneFeel = sceneMotion\.feel \|\| palette\.feel \|\
   'streak personality must resolve from the active game scene before the curriculum fallback');
 assert.match(engine, /STREAK_EVENT_THRESHOLDS\.includes\(streak\)/,
   'the answer flow must fire only on exact threshold hits');
-assert.match(engine, /if \(!LEGACY_BLITZ_CELEBRATIONS_ENABLED\) \{\s*playSceneSfx\('streak', \{ threshold: eventThreshold \}\);\s*return eventThreshold;/,
+assert.match(engine, /if \(!LEGACY_BLITZ_CELEBRATIONS_ENABLED\) \{\s*playSceneSfx\('streak', \{ threshold: eventThreshold \}\);\s*sceneFill\.milestone\?\.\(eventThreshold\);[^\n]*\s*return eventThreshold;/,
   'scene streak SFX must replace legacy streak celebration output while the streak count remains functional');
 assert.match(engine, /spotlight\.announce\(copy\[sceneFeel\]\?\.\[eventThreshold\]/,
   'each threshold must announce its scene-specific milestone copy');

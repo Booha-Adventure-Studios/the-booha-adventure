@@ -2078,6 +2078,13 @@ else
   bad "Blitz streak heat B2 test failed"
 fi
 
+echo "[blitz] Milestones B3 (3/6/9/12/15 in each game's motif)"
+if node tests/blitz-milestone-b3.test.cjs >/dev/null 2>&1; then
+  ok "all three Blitz: lightbulbs, pink smoke, fireflies at each streak milestone, equally strong"
+else
+  bad "Blitz milestone B3 test failed"
+fi
+
 echo "[player] Weekly intro videos"
 if node tests/intro-videos-weekly.test.cjs >/dev/null 2>&1; then
   ok "7 intro videos play on the first visit of the calendar week, per student"

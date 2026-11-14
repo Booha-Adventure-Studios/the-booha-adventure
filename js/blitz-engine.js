@@ -963,6 +963,44 @@ window.BoohaBlitzEngine = (() => {
         from { opacity: .32; transform: scale(1); }
         to { opacity: .9; transform: scale(1.18); }
       }
+      /* B3 milestone flash: colour only, so every power tier gets it. */
+      .blitz-scene-fill-circus.milestone-flash .booha-blitz-scene-fill-item {
+        opacity: 1;
+        background: radial-gradient(circle at 35% 30%, #ffffff 0 18%, var(--streak-color, #ffe27a) 52%, #ff6fb5 100%);
+        border-color: #fffbe1;
+        box-shadow: 0 0 12px 3px var(--streak-color, rgba(255, 226, 122, .9)), 0 0 30px 9px rgba(255, 111, 181, .5);
+      }
+      .blitz-compositor:not(.low-power) .blitz-scene-fill-circus.milestone-flash .booha-blitz-scene-fill-item {
+        animation: boohaBlitzMilestoneBulb 480ms ease-out calc(var(--bulb-i, 0) * 22ms) 2 both;
+      }
+      @keyframes boohaBlitzMilestoneBulb {
+        0%, 100% { scale: 1; filter: brightness(1); }
+        30% { scale: 1.6; filter: brightness(1.8); }
+      }
+      .blitz-scene-fill-spooky.milestone-flash::after {
+        opacity: .95 !important;
+      }
+      .blitz-scene-fill-spooky.milestone-flash::before {
+        background-color: rgba(255, 108, 207, .28);
+        opacity: .7 !important;
+      }
+      .blitz-scene-fill-fireflies.milestone-flash .booha-blitz-scene-fill-item.is-lit {
+        filter: brightness(1.8) saturate(1.3);
+      }
+      .booha-blitz-milestone-piece {
+        position: absolute;
+        z-index: 8;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0;
+        will-change: transform, opacity;
+      }
+      .booha-blitz-milestone-piece.is-smoke { mix-blend-mode: screen; filter: blur(4px); }
+      .booha-blitz-milestone-piece.is-bulb {
+        background: radial-gradient(circle at 35% 30%, #fffbe1 0 18%, #ffe27a 40%, #ff9b52 70%, #ff6fb5 100%);
+        box-shadow: 0 0 10px 3px rgba(255, 226, 122, .85), 0 0 22px 6px rgba(255, 111, 181, .45);
+      }
+      .blitz-compositor.low-power .booha-blitz-milestone-piece { display: none; }
       .blitz-compositor.low-power .blitz-scene-fill-circus.is-finale .booha-blitz-scene-fill-item.is-lit,
       .blitz-compositor.low-power .blitz-scene-fill-spooky.is-finale::before,
       .blitz-compositor.low-power .blitz-scene-fill-spooky.is-finale::after {
@@ -1095,7 +1133,8 @@ window.BoohaBlitzEngine = (() => {
           transition: none;
         }
         .blitz-scene-fill-circus .booha-blitz-scene-fill-item.is-lit,
-        .blitz-scene-fill-circus .booha-blitz-scene-fill-item.is-popping-out {
+        .blitz-scene-fill-circus .booha-blitz-scene-fill-item.is-popping-out,
+        .blitz-scene-fill-circus.milestone-flash .booha-blitz-scene-fill-item {
           animation: none;
         }
         .blitz-scene-fill-fireflies .booha-blitz-scene-fill-item.is-lit,
@@ -3799,6 +3838,48 @@ window.BoohaBlitzEngine = (() => {
       }
 
       const kind = fillConfig.kind || 'generic';
+
+      /* B3 milestones (streak 3/6/9/12/15): one big moment in each game's own
+         motif, equally strong. Vocab's bulbs flash and throw sparks, Sentence
+         bursts into pink smoke, Question releases a firefly swarm. A colour
+         flash on the scene runs at every power tier; the moving pieces follow
+         Blitz Pop (off for reduced motion and minimal power). Nothing here
+         waits: the run's pace is set elsewhere. */
+      const flashFill = (ms) => {
+        fill.classList.remove('milestone-flash');
+        void fill.offsetWidth;
+        fill.classList.add('milestone-flash');
+        clearTimeout(fill._boohaMilestoneTimer);
+        fill._boohaMilestoneTimer = setTimeout(() => fill.classList.remove('milestone-flash'), ms);
+      };
+      const milestoneMs = (threshold) => (threshold >= 15 ? 1300 : 1000);
+      const milestoneCount = (threshold) => (isLowPower() ? 10 : 16) + (threshold >= 9 ? 6 : 0);
+      const milestonePieces = (threshold, build) => {
+        if (!popMotionOk(overlay)) return;
+        try {
+          const ovr = overlay.getBoundingClientRect();
+          if (!ovr.width) return;
+          const fragment = document.createDocumentFragment();
+          const count = milestoneCount(threshold);
+          const ms = milestoneMs(threshold);
+          for (let i = 0; i < count; i++) {
+            const piece = document.createElement('span');
+            piece.className = 'booha-blitz-milestone-piece';
+            piece.setAttribute('aria-hidden', 'true');
+            const frames = build(piece, i, count, ovr);
+            fragment.appendChild(piece);
+            if (frames && typeof piece.animate === 'function') {
+              const anim = piece.animate(frames, { duration: ms, delay: (i % 5) * 18, easing: 'cubic-bezier(.2,.75,.3,1)', fill: 'both' });
+              anim.onfinish = () => piece.remove();
+            }
+            setTimeout(() => piece.remove(), ms + 400);   // never leave one behind
+          }
+          overlay.appendChild(fragment);
+        } catch (_) {
+          // Decoration only: it must never interrupt a run.
+        }
+      };
+
       if (kind === 'spooky-fog') {
         return {
           setCount(correctCount = 0) {
@@ -3811,6 +3892,27 @@ window.BoohaBlitzEngine = (() => {
           },
           celebrate() {
             fill.classList.add('is-finale');
+          },
+          // Pink smoke bursts out from the middle of the forest.
+          milestone(threshold) {
+            flashFill(milestoneMs(threshold));
+            const pinks = ['#ff6ccf', '#ff8fe0', '#ffb3ec', '#ff4fb8'];
+            milestonePieces(threshold, (piece, i, count, ovr) => {
+              const color = pinks[i % pinks.length];
+              const size = Math.min(ovr.width, ovr.height) * (0.18 + Math.random() * 0.14);
+              const angle = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+              const dist = Math.min(ovr.width, ovr.height) * (0.22 + Math.random() * 0.16);
+              piece.classList.add('is-smoke');
+              piece.style.cssText = `left:${ovr.width / 2 - size / 2}px;top:${ovr.height * 0.45 - size / 2}px;width:${size}px;height:${size}px;`
+                + `background:radial-gradient(circle, ${color} 0%, ${color}cc 30%, transparent 70%);`;
+              const dx = Math.cos(angle) * dist;
+              const dy = Math.sin(angle) * dist * 0.75;
+              return [
+                { transform: 'translate(0,0) scale(.35)', opacity: 0 },
+                { transform: `translate(${dx * 0.55}px,${dy * 0.55}px) scale(1)`, opacity: 0.8, offset: 0.3 },
+                { transform: `translate(${dx}px,${dy - 30}px) scale(1.6)`, opacity: 0 },
+              ];
+            });
           },
         };
       }
@@ -4000,6 +4102,58 @@ window.BoohaBlitzEngine = (() => {
             });
           }
           fill.dataset.litCount = String(count);
+        },
+        // Vocab: every bulb flashes and chases, and sparks fly off the sign.
+        // Question: the lit fireflies flare and a swarm bursts across the glade.
+        milestone(threshold) {
+          items.forEach((item, index) => item.style.setProperty('--bulb-i', String(index)));
+          flashFill(milestoneMs(threshold));
+          if (isFirefly) {
+            milestonePieces(threshold, (piece, i, count, ovr) => {
+              const hue = fireflyHues[i % fireflyHues.length];
+              const size = 15 + Math.random() * 9;
+              const color = `hsl(${hue} 100% 68%)`;
+              piece.classList.add('is-firefly');
+              const sx = ovr.width * (0.3 + Math.random() * 0.4);
+              const sy = ovr.height * (0.35 + Math.random() * 0.3);
+              piece.style.cssText = `left:${sx}px;top:${sy}px;width:${size}px;height:${size}px;`
+                + `background:radial-gradient(circle, #ffffff 0%, ${color} 45%, ${color} 100%);box-shadow:0 0 ${Math.round(size * 1.6)}px ${Math.round(size * 0.4)}px ${color};`;
+              const angle = (i / count) * Math.PI * 2 + Math.random() * 0.6;
+              const dist = Math.min(ovr.width, ovr.height) * (0.3 + Math.random() * 0.25);
+              const dx = Math.cos(angle) * dist;
+              const dy = Math.sin(angle) * dist;
+              const wob = (Math.random() - 0.5) * 60;
+              return [
+                { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+                { transform: `translate(${dx * 0.35 + wob}px,${dy * 0.35 - wob}px) scale(1.2)`, opacity: 1, offset: 0.25 },
+                { transform: `translate(${dx * 0.65 - wob}px,${dy * 0.65}px) scale(.9)`, opacity: 0.35, offset: 0.5 },
+                { transform: `translate(${dx * 0.85}px,${dy * 0.85 + wob}px) scale(1.1)`, opacity: 1, offset: 0.72 },
+                { transform: `translate(${dx}px,${dy}px) scale(.5)`, opacity: 0 },
+              ];
+            });
+            return;
+          }
+          const sign = fill.closest('.booha-blitz-marquee') || fill;
+          milestonePieces(threshold, (piece, i, count, ovr) => {
+            const r = sign.getBoundingClientRect();
+            // Start on the sign's edge, as if a bulb popped off it.
+            const t = i / count;
+            const angle = t * Math.PI * 2;
+            const ex = (r.left - ovr.left) + r.width / 2 + Math.cos(angle) * r.width / 2;
+            const ey = (r.top - ovr.top) + r.height / 2 + Math.sin(angle) * r.height / 2;
+            const size = 18 + Math.random() * 10;
+            piece.classList.add('is-bulb');
+            piece.style.cssText = `left:${ex - size / 2}px;top:${ey - size / 2}px;width:${size}px;height:${size}px;`;
+            const dist = 70 + Math.random() * 70;
+            const dx = Math.cos(angle) * dist;
+            const dy = Math.sin(angle) * dist;
+            return [
+              { transform: 'translate(0,0) scale(.5)', opacity: 0 },
+              { transform: `translate(${dx * 0.45}px,${dy * 0.45}px) scale(1.25)`, opacity: 1, offset: 0.25 },
+              { transform: `translate(${dx * 0.8}px,${dy * 0.8 + 10}px) scale(1)`, opacity: 1, offset: 0.65 },
+              { transform: `translate(${dx}px,${dy + 24}px) scale(.6)`, opacity: 0 },
+            ];
+          });
         },
         // Finish finale: every light comes on, whatever the run's streak.
         // Circus bulbs race around the sign; fireflies circle the glade.
@@ -4710,6 +4864,7 @@ window.BoohaBlitzEngine = (() => {
         if (eventThreshold) {
           if (!LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
             playSceneSfx('streak', { threshold: eventThreshold });
+            sceneFill.milestone?.(eventThreshold);   // B3: the game's own big moment
             return eventThreshold;
           }
           playStreakBeat(eventThreshold);
