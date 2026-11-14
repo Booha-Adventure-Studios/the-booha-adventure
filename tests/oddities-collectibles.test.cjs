@@ -25,7 +25,8 @@ assert.strictEqual(new Set(items.map(item => item.id)).size, items.length, 'coll
 assert.ok(!/\bweek\s*:/.test(dataSource), 'oddities must not be tied to curriculum weeks');
 
 for (const item of items) {
-  for (const field of ['id', 'name', 'material', 'pool', 'scale', 'asset', 'discovery', 'collection', 'storyHook']) {
+  for (const field of ['id', 'name', 'material', 'pool', 'scale', 'asset', 'discovery', 'collection', 'storyHook',
+    'nameJp', 'materialJp', 'discoveryJp', 'collectionJp', 'storyHookJp']) {
     assert.ok(item[field], `${item.id} must define ${field}`);
   }
   const assetPath = path.join(ROOT, item.asset);

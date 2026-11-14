@@ -301,8 +301,11 @@ const BoohaAdventureGame = (() => {
         <div class="collectible-art"><img src="${esc(item.asset)}" alt="${esc(item.name)}" width="160" height="112" loading="lazy" decoding="async">${copies}</div>
         ${special ? '<span class="collectible-badge special">SPECIAL</span>' : ''}
         <b class="collectible-name">${esc(item.name)}</b>
-        <span class="collectible-material">${esc(item.material)}</span>
+        ${item.nameJp ? `<span class="collectible-name-jp">${esc(item.nameJp)}</span>` : ''}
+        <span class="collectible-material">${esc(item.material)}${item.materialJp ? ` · ${esc(item.materialJp)}` : ''}</span>
         <span class="collectible-copy">${esc(item.collection)}</span>
+        ${item.collectionJp ? `<span class="collectible-copy jp">${esc(item.collectionJp)}</span>` : ''}
+        ${item.storyHook ? `<details class="collectible-secret"><summary>✦ ひみつ · A secret</summary><p>${esc(item.storyHook)}</p>${item.storyHookJp ? `<p class="jp">${esc(item.storyHookJp)}</p>` : ''}</details>` : ''}
       </article>`;
     };
     const standard = owned.filter(item => item.pool !== 'special');

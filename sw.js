@@ -177,7 +177,9 @@ const CURRENT_CACHES = {
   // boards load the draw logic, and the earn toast keeps the find a mystery.
   // Oddity fixes part 2: adventure-profile.html cabinet shows owned finds
   // only (special shelf hidden until earned, ×2 duplicates).
-  pages:  'booha-pages-2026-548',
+  // Oddities in Japanese: bilingual cabinet cards with a tap-to-open secret
+  // line on adventure-profile.html; bilingual pickup line in Karasuki.
+  pages:  'booha-pages-2026-549',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
