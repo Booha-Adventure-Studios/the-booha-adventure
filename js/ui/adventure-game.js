@@ -9,8 +9,10 @@
  *   #adv-travelers    Nuppi and seasonal travelers the player has tapped
  *
  * Skins: only this week's skin can be worn (after the Blitz triple), so past
- * skins show as collected trophies. A weekly skin that was missed is gone for
- * good and shows as locked.
+ * skins show as collected trophies. A weekly skin from a past week that the
+ * player did not earn is not shown at all: no locked slots, no gaps, and it
+ * never counts toward the totals. This week's skin and future "coming soon"
+ * skins stay visible.
  */
 const BoohaAdventureGame = (() => {
   'use strict';
@@ -100,8 +102,12 @@ const BoohaAdventureGame = (() => {
         else state = 'soon';
         return { id: skin.id, name: skin.name.replace(/ Booha$/, ''), src: skin.assets.maze || skin.assets.static, date, collected: collected || state === 'wearing' || state === 'wearable', state };
       });
+      // Missed past-week skins are hidden, not locked: a player who joined
+      // late (or skipped a week) never sees a slot they can no longer fill.
+      // Every count and percentage is built from this visible set.
+      const visible = skins.filter(s => s.state !== 'missed');
       const mascot = season.mascotId && S.get ? S.get(season.mascotId) : null;
-      return { season, started, skins, mascot };
+      return { season, started, skins: visible, mascot };
     });
   }
 
@@ -151,12 +157,11 @@ const BoohaAdventureGame = (() => {
     wearing: 'きている！',
     wearable: 'きる',
     owned: 'ゲット！',
-    missed: 'ロック',
     soon: '',
   };
 
-  // First visit to the closet: explain once that missed skins are gone but
-  // this week's skin can still be earned.
+  // First visit to the closet: explain the weekly rule once. It only talks
+  // about what the player can still earn, never about weeks they missed.
   const CLOSET_INTRO_KEY = 'booha_closet_intro_v1';
   function closetIntroSeen() {
     try { return localStorage.getItem(CLOSET_INTRO_KEY) === '1'; } catch (_) { return true; }
@@ -173,6 +178,9 @@ const BoohaAdventureGame = (() => {
       // This week's skin (the one a student can still get) leads its shelf.
       const skins = allSkins.slice().sort((a, b) => (a.state in NOW_FIRST ? 0 : 1) - (b.state in NOW_FIRST ? 0 : 1));
       const mascotSrc = mascot && mascot.assets ? mascot.assets.static : '';
+      // A started season with nothing left to show (every past skin missed,
+      // nothing this week or ahead) gets no shelf at all.
+      if (started && !skins.length) return '';
       const style = SEASON_STYLE[season.themeId] || { jp: season.name, cls: 'other' };
       const year = String(season.startDate || '').slice(0, 4);
       if (!started) {
@@ -215,10 +223,10 @@ const BoohaAdventureGame = (() => {
       </div>
       ${closetIntroSeen() ? '' : `<div class="closet-intro" role="note">
         <b>スキンは 1しゅうかんに 1つ！</b>
-        <p>みのがした スキンは もう もどって こないよ。でも こんしゅうの スキンは まだ まにあう！ Blitz を 3つ クリアしよう。</p>
+        <p>こんしゅうの スキンは Blitz を 3つ クリアすると ゲットできるよ。ゲットした スキンは ずっと ここに のこるよ！</p>
         <button type="button" class="closet-intro-ok" data-closet-intro>わかった！</button>
       </div>`}
-      <p class="adv-note"${closetIntroSeen() ? '' : ' hidden'}>こんしゅうの スキンは Blitz を 3つ クリアすると きられるよ。みのがした スキンは もう もどって こないよ！</p>
+      <p class="adv-note"${closetIntroSeen() ? '' : ' hidden'}>こんしゅうの スキンは Blitz を 3つ クリアすると きられるよ。ゲットした スキンは ずっと ここに のこるよ！</p>
       ${shelves || '<p class="adv-note">スキンは まだ ないよ。</p>'}`;
     // Art for later skins may not exist yet. Show the season mascot as a
     // dashed "coming soon" silhouette instead; if that fails too, a "?".
