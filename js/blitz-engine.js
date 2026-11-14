@@ -17,7 +17,7 @@ window.BoohaBlitzEngine = (() => {
       correct: Object.freeze({ color: '#00ff86', glow: 'rgba(0,255,134,.58)' }),
       wrong: Object.freeze({ color: '#ff536d', glow: 'rgba(255,83,109,.58)' }),
       popup: Object.freeze({ background: 'rgba(92,24,68,.92)', accent: '#ffb7dc' }),
-      streak: Object.freeze({ label: 'STREAK', marker: '★', colors: ['#ffffff', '#ffe66b', '#ffad55', '#ff6d78', '#ff6ccf'], glow: 'rgba(255,125,196,.62)' }),
+      streak: Object.freeze({ label: 'STREAK', marker: '★', colors: ['#ffffff', '#ffe66b', '#ffad55', '#ff6d78', '#ff6ccf'], heat: ['#ffd84a', '#ff9f2e', '#ff5a5f', '#ff3fa4', '#d94bff'], glow: 'rgba(255,125,196,.62)' }),
       reward: Object.freeze({ colors: ['#fffbe1', '#ffe27a', '#ff8ec8', '#ffffff'], glow: 'rgba(255,184,72,.72)' }),
       shape: Object.freeze({ optionRadius: 'round', popupRadius: '28px', particle: 'round' }),
       // Compatibility fallback; scene motion is the runtime source of truth.
@@ -35,7 +35,7 @@ window.BoohaBlitzEngine = (() => {
       correct: Object.freeze({ color: '#39ff14', glow: 'rgba(57,255,20,.62)' }),
       wrong: Object.freeze({ color: '#ff3b5c', glow: 'rgba(255,59,92,.62)' }),
       popup: Object.freeze({ background: 'rgba(3,18,24,.94)', accent: '#00ffee' }),
-      streak: Object.freeze({ label: 'COMBO', marker: '⚡', colors: ['#f5ffcf', '#39ff14', '#00ffee', '#8affff', '#ffffff'], glow: 'rgba(0,255,210,.72)' }),
+      streak: Object.freeze({ label: 'COMBO', marker: '⚡', colors: ['#f5ffcf', '#39ff14', '#00ffee', '#8affff', '#ffffff'], heat: ['#39ff14', '#00ffb0', '#00e5ff', '#4d8bff', '#b84dff'], glow: 'rgba(0,255,210,.72)' }),
       reward: Object.freeze({ colors: ['#f5ffcf', '#39ff14', '#00ffee', '#ffffff'], glow: 'rgba(0,255,210,.78)' }),
       shape: Object.freeze({ optionRadius: 'arcade', popupRadius: '18px', particle: 'arcade' }),
       motion: Object.freeze({ feel: 'arcade', particleEasing: 'ease-out', nameEasing: 'cubic-bezier(.2,.75,.3,1)', hueStep: 51, optionDurationMs: 260, optionStaggerMs: 30, optionX: '0px', optionY: '8px', optionScale: '.97' }),
@@ -52,7 +52,7 @@ window.BoohaBlitzEngine = (() => {
       correct: Object.freeze({ color: '#9fffc4', glow: 'rgba(159,255,196,.5)' }),
       wrong: Object.freeze({ color: '#e8758d', glow: 'rgba(232,117,141,.5)' }),
       popup: Object.freeze({ background: 'rgba(8,14,31,.95)', accent: '#f0c96a' }),
-      streak: Object.freeze({ label: 'CHAIN', marker: '✦', colors: ['#fff6cf', '#f0c96a', '#dfeaff', '#b8d1ff', '#ffffff'], glow: 'rgba(240,201,106,.58)' }),
+      streak: Object.freeze({ label: 'CHAIN', marker: '✦', colors: ['#fff6cf', '#f0c96a', '#dfeaff', '#b8d1ff', '#ffffff'], heat: ['#f0c96a', '#ffb347', '#ff8a5c', '#ff5e8a', '#c46bff'], glow: 'rgba(240,201,106,.58)' }),
       reward: Object.freeze({ colors: ['#fff6cf', '#f0c96a', '#dfeaff', '#ffffff'], glow: 'rgba(240,201,106,.72)' }),
       shape: Object.freeze({ optionRadius: 'diamond', popupRadius: '14px', particle: 'diamond' }),
       motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
@@ -1885,15 +1885,41 @@ window.BoohaBlitzEngine = (() => {
         width: var(--streak-progress, 0%);
         height: 100%;
         border-radius: inherit;
-        background: var(--streak-color, var(--blitz-accent));
+        background: linear-gradient(90deg, var(--streak-heat-from, var(--streak-color, var(--blitz-accent))), var(--streak-color, var(--blitz-accent)));
         box-shadow: 0 0 10px var(--streak-color, var(--blitz-accent));
         transition: width 220ms cubic-bezier(.2,1.2,.3,1), background 180ms ease, box-shadow 180ms ease;
       }
-      .booha-blitz-nameplate.streak-tier-1 .booha-blitz-streak-meter { height: 4px; }
-      .booha-blitz-nameplate.streak-tier-2 .booha-blitz-streak-meter { height: 4px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 0 7px rgba(255,230,107,.22); }
-      .booha-blitz-nameplate.streak-tier-3 .booha-blitz-streak-meter { height: 5px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 10px rgba(255,157,46,.3); }
-      .booha-blitz-nameplate.streak-tier-4 .booha-blitz-streak-meter { height: 6px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.24), 0 0 14px rgba(255,75,62,.38); }
-      .booha-blitz-nameplate.streak-tier-5 .booha-blitz-streak-meter { height: 7px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3), 0 0 18px rgba(255,59,189,.5); }
+      .booha-blitz-heat,
+      .booha-blitz-heat-sweep {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        pointer-events: none;
+      }
+      .booha-blitz-heat {
+        background: linear-gradient(90deg, var(--streak-heat-from, var(--streak-color, var(--blitz-accent))), var(--streak-color, var(--blitz-accent)));
+        opacity: 0;
+        transition: opacity 180ms ease;
+      }
+      .booha-blitz-nameplate[data-heat="1"] .booha-blitz-heat { opacity: .16; }
+      .booha-blitz-nameplate[data-heat="2"] .booha-blitz-heat { opacity: .24; }
+      .booha-blitz-nameplate[data-heat="3"] .booha-blitz-heat { opacity: .3; }
+      .booha-blitz-nameplate[data-heat="4"] .booha-blitz-heat { opacity: .36; }
+      .booha-blitz-nameplate[data-heat="5"] .booha-blitz-heat { opacity: .42; }
+      .booha-blitz-heat-sweep {
+        overflow: hidden;
+        inset: 0 auto 0 0;
+        width: 40%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent);
+        opacity: 0;
+        will-change: transform, opacity;
+      }
+      .booha-blitz-nameplate.streak-tier-1 .booha-blitz-streak-meter { height: 6px; }
+      .booha-blitz-nameplate.streak-tier-2 .booha-blitz-streak-meter { height: 6px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), 0 0 7px rgba(255,230,107,.22); }
+      .booha-blitz-nameplate.streak-tier-3 .booha-blitz-streak-meter { height: 7px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 10px rgba(255,157,46,.3); }
+      .booha-blitz-nameplate.streak-tier-4 .booha-blitz-streak-meter { height: 8px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.24), 0 0 14px rgba(255,75,62,.38); }
+      .booha-blitz-nameplate.streak-tier-5 .booha-blitz-streak-meter { height: 9px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.3), 0 0 18px rgba(255,59,189,.5); }
       .booha-blitz-nameplate.streak-tier-2 .booha-blitz-streak-meter-fill { box-shadow: 0 0 12px var(--streak-color), 0 0 18px rgba(255,230,107,.35); }
       .booha-blitz-nameplate.streak-tier-3 .booha-blitz-streak-meter-fill { box-shadow: 0 0 14px var(--streak-color), 0 0 22px rgba(255,157,46,.42); }
       .booha-blitz-nameplate.streak-tier-4 .booha-blitz-streak-meter-fill { box-shadow: 0 0 16px var(--streak-color), 0 0 26px rgba(255,75,62,.48); }
@@ -2020,8 +2046,11 @@ window.BoohaBlitzEngine = (() => {
         font-size: 18px;
         text-shadow: 0 0 12px var(--streak-color);
       }
+      /* Each game keeps its own texture on the same heat colours. */
       .blitz-feel-arcade .booha-blitz-streak-meter-fill {
-        background: repeating-linear-gradient(90deg, #39ff14 0 8px, #00ffee 8px 14px);
+        background:
+          repeating-linear-gradient(90deg, transparent 0 8px, rgba(0,0,0,.22) 8px 10px),
+          linear-gradient(90deg, var(--streak-heat-from, var(--streak-color, var(--blitz-accent))), var(--streak-color, var(--blitz-accent)));
       }
       .blitz-feel-arcade .booha-blitz-nameplate.streak-event-6::before {
         content: 'COMBO';
@@ -2044,7 +2073,9 @@ window.BoohaBlitzEngine = (() => {
         text-shadow: 0 0 10px #39ff14;
       }
       .blitz-feel-sleek .booha-blitz-streak-meter-fill {
-        background: linear-gradient(90deg, #f0c96a, #dfeaff);
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.45), transparent 60%),
+          linear-gradient(90deg, var(--streak-heat-from, var(--streak-color, var(--blitz-accent))), var(--streak-color, var(--blitz-accent)));
       }
       .blitz-compositor.correct-impact::after {
         content: '';
@@ -3473,7 +3504,15 @@ window.BoohaBlitzEngine = (() => {
       const streakMeterFill = document.createElement('span');
       streakMeterFill.className = 'booha-blitz-streak-meter-fill';
       streakMeter.appendChild(streakMeterFill);
-      nameplate.append(nameEl, streakMarkerEl, streakEl, streakMeter);
+      // B2 heat: a colour wash behind the pill that gets hotter each level.
+      // Colour only, so it stays on at every power tier and with reduced motion.
+      const heatEl = document.createElement('span');
+      heatEl.className = 'booha-blitz-heat';
+      heatEl.setAttribute('aria-hidden', 'true');
+      const sweepEl = document.createElement('span');
+      sweepEl.className = 'booha-blitz-heat-sweep';
+      sweepEl.setAttribute('aria-hidden', 'true');
+      nameplate.append(heatEl, sweepEl, nameEl, streakMarkerEl, streakEl, streakMeter);
       feedback.appendChild(nameplate);
 
       const callout = document.createElement('div');
@@ -3563,8 +3602,11 @@ window.BoohaBlitzEngine = (() => {
           streakMarkerEl.textContent = '';
           nameplate.style.setProperty('--streak-progress', '0%');
           nameplate.style.removeProperty('--streak-color');
+          nameplate.style.removeProperty('--streak-heat-from');
           overlay.style.removeProperty('--streak-color');
           nameplate.removeAttribute('data-streak');
+          nameplate.removeAttribute('data-heat');
+          nameplate.dataset.lastStreak = '0';
           nameplate.classList.remove('streak-active');
           overlay.classList.remove(...tierClasses);
           return;
@@ -3578,14 +3620,19 @@ window.BoohaBlitzEngine = (() => {
         nameplate.classList.add('streak-active', `streak-tier-${tier}`);
         overlay.classList.add(`streak-tier-${tier}`);
         nameplate.dataset.streak = String(streak);
-        const streakColors = palette.streak?.colors || [];
-        const colorIndex = eventThreshold
-          ? Math.max(0, STREAK_EVENT_THRESHOLDS.indexOf(eventThreshold))
-          : Math.min(streakColors.length - 1, Math.max(0, tier - 1));
-        if (streakColors[colorIndex]) {
-          nameplate.style.setProperty('--streak-color', streakColors[colorIndex]);
-          overlay.style.setProperty('--streak-color', streakColors[colorIndex]);
+        // Same five heat levels in every game: the pill, its border, glow and
+        // meter all take the level's saturated colour (never the pale first one).
+        const heat = palette.streak?.heat || palette.streak?.colors || [];
+        const colorIndex = Math.min(heat.length - 1, Math.max(0, tier - 1));
+        if (heat[colorIndex]) {
+          nameplate.style.setProperty('--streak-color', heat[colorIndex]);
+          overlay.style.setProperty('--streak-color', heat[colorIndex]);
+          nameplate.style.setProperty('--streak-heat-from', heat[Math.max(0, colorIndex - 1)]);
         }
+        nameplate.dataset.heat = String(tier);
+        const prevStreak = Number(nameplate.dataset.lastStreak || 0);
+        nameplate.dataset.lastStreak = String(streak);
+        if (streak > prevStreak) sweepHeat(eventThreshold);
         nameplate.style.setProperty('--streak-progress', `${Math.min(100, (streak / Math.max(1, runLength)) * 100)}%`);
         streakMarkerEl.textContent = marker;
         streakEl.textContent = `${label} ×${streak}`;
@@ -3595,6 +3642,21 @@ window.BoohaBlitzEngine = (() => {
           void nameplate.offsetWidth;
           nameplate.classList.add('streak-pop');
           if (eventThreshold) showStreakEvent(eventThreshold);
+        }
+      }
+
+      // A bright band sweeps across the pill on every streak step (wider and
+      // slower on a 3/6/9/12/15 milestone). Motion, so off when pop is off.
+      function sweepHeat(milestone) {
+        if (typeof sweepEl.animate !== 'function' || !popMotionOk(overlay)) return;
+        try {
+          sweepEl.animate([
+            { transform: 'translateX(-120%) skewX(-18deg)', opacity: 0 },
+            { opacity: milestone ? 1 : 0.85, offset: 0.25 },
+            { transform: 'translateX(220%) skewX(-18deg)', opacity: 0 },
+          ], { duration: milestone ? 560 : 380, easing: 'cubic-bezier(.3,.6,.3,1)' });
+        } catch (_) {
+          // Decoration only.
         }
       }
 

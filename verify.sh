@@ -2071,6 +2071,13 @@ else
   bad "Blitz feedback B1 test failed"
 fi
 
+echo "[blitz] Streak heat B2 (pill colour levels, sweep, meter)"
+if node tests/blitz-streak-heat-b2.test.cjs >/dev/null 2>&1; then
+  ok "all three Blitz: same five hot streak levels, sweep on each step, colour on at every power tier"
+else
+  bad "Blitz streak heat B2 test failed"
+fi
+
 echo "[player] Weekly intro videos"
 if node tests/intro-videos-weekly.test.cjs >/dev/null 2>&1; then
   ok "7 intro videos play on the first visit of the calendar week, per student"
