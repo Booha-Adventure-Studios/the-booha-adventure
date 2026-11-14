@@ -2085,6 +2085,13 @@ else
   bad "Blitz milestone B3 test failed"
 fi
 
+echo "[blitz] Sound balance B4 (equal volume across the three games)"
+if node tests/blitz-sound-balance-b4.test.cjs >/dev/null 2>&1; then
+  ok "all three Blitz: right, wrong and milestone sounds at the same volume"
+else
+  bad "Blitz sound balance B4 test failed"
+fi
+
 echo "[player] Weekly intro videos"
 if node tests/intro-videos-weekly.test.cjs >/dev/null 2>&1; then
   ok "7 intro videos play on the first visit of the calendar week, per student"

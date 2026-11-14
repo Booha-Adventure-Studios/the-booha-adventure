@@ -6,11 +6,11 @@ const fs = require('fs');
 
 const engine = fs.readFileSync('js/blitz-engine.js', 'utf8');
 
-assert.match(engine, /sfx: Object\.freeze\(\{ start: 'bell', correct: 'pop', streak: 'bell', wrong: 'soft-drop', finish: 'fanfare' \}\)/,
+assert.match(engine, /sfx: Object\.freeze\(\{ start: 'bell', correct: 'pop', streak: 'bulb-chase', wrong: 'soft-drop', finish: 'fanfare' \}\)/,
   'Circus must own pop, bell, and fanfare cues');
-assert.match(engine, /sfx: Object\.freeze\(\{ start: 'wood-click', correct: 'fog-chime', streak: 'chime', wrong: 'fog-thud', finish: 'chime' \}\)/,
+assert.match(engine, /sfx: Object\.freeze\(\{ start: 'wood-click', correct: 'fog-chime', streak: 'smoke-swell', wrong: 'fog-thud', finish: 'chime' \}\)/,
   'Spooky Forest must own wood-click, fog-chime, fog-thud and chime cues');
-assert.match(engine, /sfx: Object\.freeze\(\{ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'firefly-dim', finish: 'warm-pulse' \}\)/,
+assert.match(engine, /sfx: Object\.freeze\(\{ start: 'sparkle', correct: 'sparkle', streak: 'firefly-twinkle', wrong: 'firefly-dim', finish: 'warm-pulse' \}\)/,
   'Firefly Glade must own sparkle, warm-pulse and firefly-dim cues');
 // B1 feedback (Nov 2026): in every scene, right and wrong never share a sound,
 // and a wrong answer never uses a start, streak or finish (reward) sound.

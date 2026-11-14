@@ -71,7 +71,7 @@ window.BoohaBlitzEngine = (() => {
       label: 'CIRCUS TENT',
       image: BLITZ_SCENE_IMAGE_ROOT + 'vocab-circus' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '22% center' }),
-      sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bell', wrong: 'soft-drop', finish: 'fanfare' }),
+      sfx: Object.freeze({ start: 'bell', correct: 'pop', streak: 'bulb-chase', wrong: 'soft-drop', finish: 'fanfare' }),
       // Bulbs are spaced evenly around the sign at runtime (layoutMarquee).
       fill: Object.freeze({ kind: 'circus-marquee', count: 15 }),
       motion: Object.freeze({ feel: 'playful', particleEasing: 'cubic-bezier(.16,1.5,.3,1)', nameEasing: 'cubic-bezier(.2,.9,.25,1)', hueStep: 72, optionDurationMs: 340, optionStaggerMs: 36, optionX: '0px', optionY: '16px', optionScale: '.92' }),
@@ -82,7 +82,7 @@ window.BoohaBlitzEngine = (() => {
       image: BLITZ_SCENE_IMAGE_ROOT + 'sentence-spooky' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: 'center center' }),
       // B1 feedback: correct and wrong never share a sound (was wood-click for both).
-      sfx: Object.freeze({ start: 'wood-click', correct: 'fog-chime', streak: 'chime', wrong: 'fog-thud', finish: 'chime' }),
+      sfx: Object.freeze({ start: 'wood-click', correct: 'fog-chime', streak: 'smoke-swell', wrong: 'fog-thud', finish: 'chime' }),
       fill: Object.freeze({ kind: 'spooky-fog', count: 15 }),
       motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
     }),
@@ -92,7 +92,7 @@ window.BoohaBlitzEngine = (() => {
       image: BLITZ_SCENE_IMAGE_ROOT + 'question-fireflies' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '78% center' }),
       // B1 feedback: a wrong answer never sounds like a reward (was warm-pulse, the streak sound).
-      sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'firefly-dim', finish: 'warm-pulse' }),
+      sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'firefly-twinkle', wrong: 'firefly-dim', finish: 'warm-pulse' }),
       fill: Object.freeze({
         kind: 'firefly-swarm',
         count: 15,
@@ -4551,20 +4551,34 @@ window.BoohaBlitzEngine = (() => {
         try {
           if (!streakAudioCtx) streakAudioCtx = new AudioCtor();
           if (streakAudioCtx.state === 'suspended') streakAudioCtx.resume().catch(() => {});
+          // B4 loudness: peaks are set so each game's right-answer sound, wrong-answer
+          // sound and milestone sound come out at the same perceived volume
+          // (A-weighted, within about 1 dB); wrong sits a little under right.
+          // Change a cue's notes or wave and re-balance its peak to match.
+          // B4 milestone sounds: the same shape in every game (3 notes at ×3/×6,
+          // 4 at ×9/×12, 5 at ×15, same length) so none is louder than another;
+          // each keeps its own voice to match its scene's big moment.
+          const steps = (list) => list.slice(0, threshold >= 15 ? 5 : threshold >= 9 ? 4 : 3);
           const cues = {
-            pop: { notes: [660, 330], spacing: 0.018, duration: 0.11, type: 'triangle', peak: 0.085 },
+            pop: { notes: [660, 330], spacing: 0.018, duration: 0.11, type: 'triangle', peak: 0.17 },
             bell: { notes: [784, 1175], spacing: 0.035, duration: 0.2, type: 'sine', peak: 0.08 },
             fanfare: { notes: isRecord ? [659, 831, 1047, 1319] : isPerfectRun ? [523, 659, 784, 1047] : [392, 523, 659], spacing: 0.075, duration: 0.24, type: 'triangle', peak: 0.12 },
-            'soft-drop': { notes: [420, 315], spacing: 0.035, duration: 0.18, type: 'triangle', peak: 0.07 },
+            'soft-drop': { notes: [420, 315], spacing: 0.035, duration: 0.18, type: 'triangle', peak: 0.11 },
             'wood-click': { notes: [420, 315], spacing: 0.035, duration: 0.12, type: 'triangle', peak: 0.075 },
             chime: { notes: threshold >= 12 ? [659, 831, 1047, 1319] : [523, 659, 831], spacing: 0.09, duration: 0.24, type: 'sine', peak: 0.08 },
-            sparkle: { notes: [880, 1319, 1760], spacing: 0.045, duration: 0.16, type: 'sine', peak: 0.08 },
+            sparkle: { notes: [880, 1319, 1760], spacing: 0.045, duration: 0.16, type: 'sine', peak: 0.06 },
             'warm-pulse': { notes: [330, 440, 660], spacing: 0.08, duration: 0.34, type: 'sine', peak: 0.085 },
             // B1 feedback cues: a bright two-note chime for a right answer in the fog,
             // and low falling notes that clearly read as a miss.
             'fog-chime': { notes: [784, 1175], spacing: 0.03, duration: 0.14, type: 'sine', peak: 0.085 },
-            'fog-thud': { notes: [262, 175], spacing: 0.05, duration: 0.2, type: 'triangle', peak: 0.085 },
-            'firefly-dim': { notes: [587, 440, 294], spacing: 0.05, duration: 0.16, type: 'sine', peak: 0.08 },
+            'fog-thud': { notes: [349, 233], spacing: 0.05, duration: 0.2, type: 'triangle', peak: 0.12 },
+            'firefly-dim': { notes: [587, 440, 294], spacing: 0.05, duration: 0.16, type: 'sine', peak: 0.07 },
+            // Vocab: bright bell-like dings racing up, like bulbs chasing round the sign.
+            'bulb-chase': { notes: steps([784, 988, 1175, 1568, 1976]), spacing: 0.07, duration: 0.22, type: 'triangle', peak: 0.1, attack: 0.01 },
+            // Sentence: soft notes that swell in, like smoke rolling out.
+            'smoke-swell': { notes: steps([523, 659, 784, 1047, 1319]), spacing: 0.07, duration: 0.22, type: 'sine', peak: 0.105, attack: 0.045 },
+            // Question: high twinkles hopping about, like fireflies blinking on.
+            'firefly-twinkle': { notes: steps([1319, 1760, 1568, 2093, 2637]), spacing: 0.07, duration: 0.22, type: 'sine', peak: 0.07, attack: 0.006 },
           }[kind];
           if (!cues) return;
           if (event === 'streak' || event === 'wrong' || event === 'finish') {
@@ -4581,7 +4595,7 @@ window.BoohaBlitzEngine = (() => {
             oscillator.type = cues.type;
             oscillator.frequency.setValueAtTime(frequency, startAt);
             gain.gain.setValueAtTime(0.0001, startAt);
-            gain.gain.exponentialRampToValueAtTime(cues.peak * intensity, startAt + 0.01);
+            gain.gain.exponentialRampToValueAtTime(cues.peak * intensity, startAt + (cues.attack || 0.01));
             gain.gain.exponentialRampToValueAtTime(0.0001, startAt + cues.duration);
             oscillator.connect(gain);
             gain.connect(streakAudioCtx.destination);
