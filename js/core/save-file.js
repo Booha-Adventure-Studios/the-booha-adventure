@@ -104,6 +104,7 @@ const BoohaSaveFile = (() => {
         homework:          _defaultHomework(), // hub list "copied into my notebook" ticks (this week)
         worlds:            _defaultWeeklyWorlds(),
         introsSeen:        {},   // { [introId]: occurrenceKey } intro videos seen this week (js/core/intro-videos.js)
+        mazeReward:        {},   // { earned: occurrenceKey } Maze arrival reward earned this week (js/core/maze-arrival.js)
       },
 
       // ── Collection — permanent discoveries ──────────────────────────────
@@ -376,6 +377,7 @@ const BoohaSaveFile = (() => {
         homework:           _defaultHomework(),
         worlds:             _defaultWeeklyWorlds(),
         introsSeen:         {},
+        mazeReward:         {},
       };
     }
     save.weekly.homework = _normalizeHomework(save.weekly.homework);
@@ -625,6 +627,7 @@ const BoohaSaveFile = (() => {
       homework:           carriedHomework,
       worlds:             _defaultWeeklyWorlds(),
       introsSeen:         {},   // intro videos play again in the new week
+      mazeReward:         {},   // the Maze reward is earned again in the new week
     };
     data.weekly.worlds.occurrenceKey = occurrenceKey || '';
 

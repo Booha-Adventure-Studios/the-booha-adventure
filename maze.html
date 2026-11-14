@@ -1040,6 +1040,19 @@
     .entryAction .btnJp ruby rt{ font-size:.55em; }
     .entryAction.primary{ color:#090415; background:linear-gradient(145deg,#e4d8ff,#a98bff 52%,#8065ff); box-shadow:0 8px 28px rgba(139,108,255,.42),0 0 0 1px rgba(222,212,255,.44),inset 0 1px 0 rgba(255,255,255,.8); }
     .entryAction.secondary{ color:rgba(255,255,255,.82); background:rgba(255,255,255,.08); box-shadow:0 7px 20px rgba(0,0,0,.24),inset 0 0 0 1px rgba(255,255,255,.14); }
+    /* Maze arrival (js/core/maze-arrival.js): a small "Continue anyway", the
+       Daily Check row, and this week's companion on the congratulations card. */
+    .entryAction.quiet{ min-width:0; padding:8px 14px 7px; color:rgba(255,255,255,.6); background:transparent; box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); }
+    .entryAction.quiet .btnEn{ font-size:clamp(12px,1.7vw,14px); }
+    .entryAction.quiet .btnJp{ font-size:clamp(10px,1.4vw,12px); }
+    .entryAction[hidden],.entryCompanion[hidden]{ display:none !important; }
+    .dcRow{ display:flex; align-items:center; gap:8px; margin-bottom:11px; padding:7px 10px; border-radius:10px; font-size:10px; font-weight:1000; letter-spacing:.08em; color:rgba(255,255,255,.62); background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09); }
+    .dcRow i{ width:8px; height:8px; flex:none; border-radius:50%; background:#ff8a6b; box-shadow:0 0 0 3px rgba(255,138,107,.14); }
+    .dcRow .dcRowName{ flex:1; text-align:left; }
+    .dcRow.done{ color:#fff; border-color:rgba(125,255,212,.35); background:rgba(64,213,168,.13); }
+    .dcRow.done i{ background:#79ffd5; box-shadow:0 0 0 3px rgba(121,255,213,.13),0 0 15px rgba(121,255,213,.8); }
+    .entryCompanion{ display:block; width:clamp(84px,16vmin,132px); height:clamp(84px,16vmin,132px); object-fit:contain; margin:0 auto -6px; filter:drop-shadow(0 10px 22px rgba(0,0,0,.65)) drop-shadow(0 0 18px rgba(255,200,90,.35)); }
+    .entryCompanion:not([hidden]) + .entryStateMark{ display:none; }
 
     /* Completed: celebratory gold/green signal */
     #overlay1.blitz-complete{ background:radial-gradient(ellipse at 50% 10%,rgba(255,196,68,.22) 0%,transparent 42%),radial-gradient(ellipse at 50% 100%,rgba(58,255,194,.12) 0%,transparent 48%),rgba(8,6,16,.82); }
@@ -1098,20 +1111,22 @@
     <h1 class="rotateTitle">よこにしてね！</h1>
     <p class="rotateSub">めいろをあそぶには<br>スマホを<strong style="color:#ff79d7">よこむき</strong>にしてください</p>
   </div>
-  <div id="overlay1" class="overlay entryOverlay blitz-incomplete" aria-label="Maze entry briefing">
+  <div id="overlay1" class="overlay entryOverlay blitz-incomplete" aria-label="Maze arrival">
     <div class="entryShell">
-      <div class="entryStateMark" id="mazeStateMark" aria-hidden="true">✦</div>
-      <p class="entryEyebrow" id="mazeStatusKicker">OPTIONAL WARM-UP</p>
-      <h1 class="entryTitleEn" id="mazeQuestion">Want a quick warm-up?</h1>
-      <p class="entryTitleJp" id="mazeQuestionJp">さきに ウォームアップ する？</p>
+      <img id="mazeCompanionArt" class="entryCompanion" alt="" decoding="async" hidden>
+      <div class="entryStateMark" id="mazeStateMark" aria-hidden="true">!</div>
+      <p class="entryEyebrow" id="mazeStatusKicker">NOT FINISHED YET</p>
+      <h1 class="entryTitleEn" id="mazeQuestion">You didn’t finish your warm-up.</h1>
+      <p class="entryTitleJp" id="mazeQuestionJp">ウォームアップが まだ おわっていないよ。</p>
       <div class="entryPlayer">
         <span class="entryPlayerEn"><span id="mazeNameLead">Hey,</span>&nbsp;<strong id="mazeEntryName">PLAYER</strong><span id="mazeNameTail">.</span></span>
-        <span class="entryPlayerJp" id="mazeEntryNameJp"><ruby>きみ<rt>君</rt></ruby>の <ruby>冒険<rt>ぼうけん</rt></ruby>が <ruby>待<rt>ま</rt></ruby>っているよ。</span>
+        <span class="entryPlayerJp" id="mazeEntryNameJp">もどって、さきに おわらせよう。</span>
       </div>
-      <p class="entryMessageEn" id="mazeEntryMessageEn">You can enter the Maze now, or sharpen up with Blitz first.</p>
-      <p class="entryMessageJp" id="mazeEntryMessageJp">いま めいろに <ruby>入<rt>はい</rt></ruby>っても いいし、さきに ブリッツで ウォームアップしても いいよ。</p>
-      <div class="blitzProgress" aria-label="Blitz game progress">
-        <div class="blitzProgressHead"><span id="blitzProgressCount">0 / 3 BLITZ GAMES</span><span id="blitzProgressLabel">READY WHEN YOU ARE</span></div>
+      <p class="entryMessageEn" id="mazeEntryMessageEn">Go back and finish, or continue anyway.</p>
+      <p class="entryMessageJp" id="mazeEntryMessageJp">もどって おわらせよう。</p>
+      <div class="blitzProgress" aria-label="Daily Check and Blitz progress">
+        <div class="dcRow" id="mazeDcRow"><i></i><span class="dcRowName">TODAY’S DAILY CHECK</span><span class="dcRowState" id="mazeDcState">NOT DONE</span></div>
+        <div class="blitzProgressHead"><span id="blitzProgressCount">0 / 3 BLITZ GAMES</span><span id="blitzProgressLabel">NOT STARTED</span></div>
         <div class="blitzPips">
           <span class="blitzPip" data-blitz-type="vocab"><i></i>WORDS</span>
           <span class="blitzPip" data-blitz-type="sentences"><i></i>SENTENCES</span>
@@ -1119,15 +1134,19 @@
         </div>
       </div>
       <div class="entryActions">
-        <button id="returnBtn" class="entryAction secondary" type="button">
-          <span class="btnEn" id="returnBtnEn">Play Blitz</span>
-          <span class="btnJp" id="returnBtnJp"><ruby>ブリッツ</ruby>へ</span>
+        <button id="returnBtn" class="entryAction primary" type="button">
+          <span class="btnEn" id="returnBtnEn">Go back</span>
+          <span class="btnJp" id="returnBtnJp"><ruby>戻<rt>もど</rt></ruby>る</span>
+        </button>
+        <button id="dcNowBtn" class="entryAction secondary" type="button" hidden>
+          <span class="btnEn">Do the Daily Check now</span>
+          <span class="btnJp">いま デイリーチェック</span>
         </button>
         <div class="sparkleWrap">
           <div class="sparkleField" id="confirmSparkles" aria-hidden="true"></div>
-          <button id="continueBtn" class="entryAction primary" type="button">
-            <span class="btnEn" id="continueBtnEn">Enter the Maze</span>
-            <span class="btnJp" id="continueBtnJp"><ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く</span>
+          <button id="continueBtn" class="entryAction quiet" type="button">
+            <span class="btnEn" id="continueBtnEn">Continue anyway</span>
+            <span class="btnJp" id="continueBtnJp">このまま すすむ</span>
           </button>
         </div>
       </div>
@@ -1320,6 +1339,7 @@
 <script src="./js/core/media-config.js"></script>
 <script src="./js/daily-check.js"></script>
 <script src="./js/ui/daily-check-reminder.js"></script>
+<script src="./js/core/maze-arrival.js"></script>
 <script src="./js/core/adventure-performance.js"></script>
 <script src="./js/maze-seasonal-unlock.js"></script>
 <script src="./js/core/level-stars.js"></script>
@@ -1508,22 +1528,34 @@ function playBgMusic(){
   return bgMusic.play();
 }
 
+/* Maze arrival (js/core/maze-arrival.js). Doing the work earns the short,
+   quiet path; it is never a gate:
+     congrats  Daily Check today + Blitz 3/3, first time this week: one card
+               (with this week's companion); its tap plays the flyover with
+               sound and starts the music, and earns the week.
+     straight  the same, already earned this week: straight into the Maze.
+     reminder  anything missing: the card names it. Go back, Do the Daily
+               Check now, or Continue anyway (flyover + music every time).
+   Re-read on every Daily Check record: only a 'done' check counts. */
+let arrivalMode = 'reminder';
+const BLITZ_NAMES = { vocab: ['Words', 'ことば'], sentences: ['Sentences', 'ぶん'], questions: ['Questions', 'しつもん'] };
+
 function personalizeMazeIntro() {
   const overlay = document.getElementById('overlay1');
   const name = getBoohaFirstName();
   if (!overlay) return;
-  overlay.classList.add('entry-ready');
 
-  /* ── Weekly Blitz progress ──────────────────────────────
-     Routed through BoohaSaveFile. Each of the three game types gets its
-     own visual pip, while the complete state still requires all three. */
   const blitzState = readBlitzCompletionState();
   const progress = blitzState.progress;
-
   const completedCount = Object.values(progress).filter(Boolean).length;
   const blitzDone = !!blitzState.completedCurriculum;
-  overlay.classList.toggle('blitz-complete', blitzDone);
-  overlay.classList.toggle('blitz-incomplete', !blitzDone);
+  const arrival = window.BoohaMazeArrival
+    ? window.BoohaMazeArrival.state(blitzDone)
+    : { blitzDone, dcDone: false, earned: false, mode: 'reminder' };
+  arrivalMode = arrival.mode;
+  overlay.dataset.arrival = arrivalMode;
+  overlay.classList.toggle('blitz-complete', arrivalMode === 'congrats');
+  overlay.classList.toggle('blitz-incomplete', arrivalMode !== 'congrats');
 
   const setText = (id, value) => {
     const el = document.getElementById(id);
@@ -1533,6 +1565,16 @@ function personalizeMazeIntro() {
     const el = document.getElementById(id);
     if (el) el.innerHTML = value;
   };
+  const show = (id, on) => {
+    const el = document.getElementById(id);
+    if (el) el.hidden = !on;
+  };
+  const setRole = (id, role) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('primary', 'secondary', 'quiet');
+    el.classList.add(role);
+  };
 
   /* Names are always inserted with textContent, never HTML. */
   setText('mazeEntryName', name);
@@ -1540,49 +1582,86 @@ function personalizeMazeIntro() {
   const welcomeNameJp = document.querySelector('#mazeWelcomeNameJp span');
   if (welcomeNameJp) welcomeNameJp.textContent = name;
 
-  /* Blitz is an optional warm-up, never a gate: Enter the Maze is the
-     primary action in both states, and Play Blitz the secondary one. */
-  const rBtn = document.getElementById('returnBtn');
-  const cBtn = document.getElementById('continueBtn');
-  if (rBtn) { rBtn.classList.remove('primary'); rBtn.classList.add('secondary'); }
-  if (cBtn) { cBtn.classList.remove('secondary'); cBtn.classList.add('primary'); }
-  setText('continueBtnEn', 'Enter the Maze');
-  setHTML('continueBtnJp', '<ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く');
-
-  if (blitzDone) {
-    setText('mazeStateMark', '✓');
-    setText('mazeStatusKicker', 'WARM-UP COMPLETE');
-    setText('mazeQuestion', 'You’re warmed up!');
-    setHTML('mazeQuestionJp', 'ウォームアップ かんりょう！ めいろへ いこう！');
-    setText('mazeNameLead', 'Excellent work,');
-    setText('mazeNameTail', '.');
-    setHTML('mazeEntryNameJp', '<ruby>冒険<rt>ぼうけん</rt></ruby>の <ruby>準備<rt>じゅんび</rt></ruby>は できたよ。');
-    setText('mazeEntryMessageEn', 'All 3 Blitz games are complete. The Maze is ready for you.');
-    setHTML('mazeEntryMessageJp', '<ruby>3<rt>さん</rt></ruby>つの ブリッツを クリアしたよ。めいろが <ruby>待<rt>ま</rt></ruby>っている！');
-    setText('blitzProgressLabel', 'ALL CLEAR');
-    setText('returnBtnEn', 'Back to hub');
-    setHTML('returnBtnJp', '<ruby>戻<rt>もど</rt></ruby>る');
-  } else {
-    setText('mazeStateMark', '✦');
-    setText('mazeStatusKicker', 'OPTIONAL WARM-UP');
-    setText('mazeQuestion', 'Want a quick warm-up?');
-    setHTML('mazeQuestionJp', 'さきに ウォームアップ する？');
-    setText('mazeNameLead', 'Hey,');
-    setText('mazeNameTail', '.');
-    setHTML('mazeEntryNameJp', '<ruby>冒険<rt>ぼうけん</rt></ruby>が きみを <ruby>待<rt>ま</rt></ruby>っているよ。');
-    setText('mazeEntryMessageEn', completedCount ? `You’ve cleared ${completedCount} of 3 Blitz. Enter the Maze now, or finish the warm-up first.` : 'You can enter the Maze now, or sharpen up with Blitz first.');
-    setHTML('mazeEntryMessageJp', completedCount ? `ブリッツ ${completedCount}/3 クリア！ いま めいろへ <ruby>行<rt>い</rt></ruby>っても、のこりで ウォームアップしても いいよ。` : 'いま めいろに <ruby>入<rt>はい</rt></ruby>っても いいし、さきに ブリッツで ウォームアップしても いいよ。');
-    setText('blitzProgressLabel', completedCount ? 'KEEP GOING' : 'READY WHEN YOU ARE');
-    setText('returnBtnEn', 'Play Blitz');
-    setHTML('returnBtnJp', '<ruby>ブリッツ</ruby>へ');
-    if (rBtn) rBtn.addEventListener('click', () => sessionStorage.setItem('booha_scroll_to_blitz', '1'));
-  }
-
+  // Checklist: today's Daily Check and this week's three Blitz games.
+  document.getElementById('mazeDcRow')?.classList.toggle('done', arrival.dcDone);
+  setText('mazeDcState', arrival.dcDone ? 'DONE ✓' : 'NOT DONE');
   setText('blitzProgressCount', `${completedCount} / 3 BLITZ GAMES`);
+  setText('blitzProgressLabel', blitzDone ? 'ALL CLEAR' : completedCount ? 'KEEP GOING' : 'NOT STARTED');
   Object.keys(progress).forEach(type => {
     const pip = document.querySelector(`[data-blitz-type="${type}"]`);
     if (pip) pip.classList.toggle('done', progress[type]);
   });
+
+  const art = document.getElementById('mazeCompanionArt');
+  delete overlay.dataset.revealId;
+  if (art) art.hidden = true;
+
+  if (arrivalMode === 'straight') return;   // decided in onSaveReady: no card
+
+  if (arrivalMode === 'congrats') {
+    // This week's companion joins the congratulations (one popup, not two).
+    const reveal = mazeSeasonalUnlock.pendingReveal?.() || null;
+    if (reveal && art && reveal.art) {
+      art.src = reveal.art;
+      art.alt = reveal.name;
+      art.hidden = false;
+      overlay.dataset.revealId = reveal.id;
+    }
+    setText('mazeStateMark', '✓');
+    setText('mazeStatusKicker', 'WARM-UP COMPLETE');
+    setText('mazeQuestion', 'Congratulations!');
+    setHTML('mazeQuestionJp', 'おめでとう！');
+    setText('mazeNameLead', 'Excellent work,');
+    setText('mazeNameTail', '.');
+    setHTML('mazeEntryNameJp', 'よく がんばったね！');
+    setText('mazeEntryMessageEn', reveal
+      ? `Today’s Daily Check and all 3 Blitz games are done. ${reveal.name} joins you in the Maze this week!`
+      : 'Today’s Daily Check and all 3 Blitz games are done. The Maze is waiting for you.');
+    setHTML('mazeEntryMessageJp', reveal
+      ? 'きょうの デイリーチェックと ブリッツ 3つ、ぜんぶ クリア！ あたらしい ともだちが いっしょに めいろへ いくよ！'
+      : 'きょうの デイリーチェックと ブリッツ 3つ、ぜんぶ クリア！ めいろへ いこう！');
+    setText('continueBtnEn', 'Enter the Maze');
+    setHTML('continueBtnJp', '<ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く');
+    setRole('continueBtn', 'primary');
+    show('returnBtn', false);
+    show('dcNowBtn', false);
+  } else {
+    // Reminder: say exactly what is missing.
+    const missingEn = [];
+    const missingJp = [];
+    if (!arrival.dcDone) {
+      missingEn.push('You didn’t do today’s Daily Check.');
+      missingJp.push('きょうの デイリーチェックを まだ やっていないよ。');
+    }
+    if (!blitzDone) {
+      const left = Object.keys(BLITZ_NAMES).filter(type => !progress[type]);
+      if (!completedCount) {
+        missingEn.push('You didn’t play the Blitz games.');
+        missingJp.push('ブリッツを まだ あそんでいないよ。');
+      } else {
+        missingEn.push(`You finished ${completedCount} of 3 Blitz games. Left: ${left.map(t => BLITZ_NAMES[t][0]).join(', ')}.`);
+        missingJp.push(`ブリッツ ${completedCount}/3 クリア。のこり：${left.map(t => BLITZ_NAMES[t][1]).join('、')}。`);
+      }
+    }
+    setText('mazeStateMark', '!');
+    setText('mazeStatusKicker', 'NOT FINISHED YET');
+    setText('mazeQuestion', 'You didn’t finish your warm-up.');
+    setHTML('mazeQuestionJp', 'ウォームアップが まだ おわっていないよ。');
+    setText('mazeNameLead', 'Hey,');
+    setText('mazeNameTail', '.');
+    setHTML('mazeEntryNameJp', 'もどって、さきに おわらせよう。');
+    setText('mazeEntryMessageEn', missingEn.join(' '));
+    setHTML('mazeEntryMessageJp', missingJp.join(' '));
+    setText('returnBtnEn', 'Go back');
+    setHTML('returnBtnJp', '<ruby>戻<rt>もど</rt></ruby>る');
+    setRole('returnBtn', 'primary');
+    show('returnBtn', true);
+    show('dcNowBtn', !arrival.dcDone && !!window.BoohaDailyCheckReminder);
+    setText('continueBtnEn', 'Continue anyway');
+    setHTML('continueBtnJp', 'このまま すすむ');
+    setRole('continueBtn', 'quiet');
+  }
+  overlay.classList.add('entry-ready');
 }
 
 const mazeSeasonalUnlock = window.MazeSeasonalUnlock.create({
@@ -2895,56 +2974,96 @@ function buildSparkles(container,count=24,wide=false){
   
 buildSparkles(confirmSp,24);buildSparkles(startSp,28,false);
 
-returnBtn.addEventListener('click',()=>{fadeOut();setTimeout(()=>goToHub(),FADE_MS);});
+// Go back: to the hub, scrolled to Blitz when Blitz is what is missing.
+returnBtn.addEventListener('click',()=>{
+  if(!readBlitzCompletionState().completedCurriculum)sessionStorage.setItem('booha_scroll_to_blitz','1');
+  fadeOut();setTimeout(()=>goToHub(),FADE_MS);
+});
+// Do the Daily Check now: it opens right here; the card updates when it is recorded.
+document.getElementById('dcNowBtn')?.addEventListener('click',()=>{window.BoohaDailyCheckReminder?.open();});
 
 let videoPlayed=false;
-/* Intro videos play on the first visit of the week (js/core/intro-videos.js). */
+/* Homework and Karasuki tree videos play on the first visit of the week
+   (js/core/intro-videos.js). The Maze flyover follows js/core/maze-arrival.js. */
 function introDue(id){return !window.BoohaIntroVideos||BoohaIntroVideos.shouldPlay(id);}
 function introSeen(id){if(window.BoohaIntroVideos)BoohaIntroVideos.markSeen(id);}
-continueBtn.addEventListener('click',async()=>{
-  if(videoPlayed)return;videoPlayed=true;
-  overlay1.classList.add('hidden');overlay1.addEventListener('transitionend',()=>overlay1.classList.add('gone'),{once:true});
-  if(!introDue('maze')){showOverlay2();return;}
-  introSeen('maze');
-  loadMediaSource(toMazeVideo);
-  app.classList.add('inTransition');videoWrap.classList.add('show');
-  try{toMazeVideo.currentTime=0;}catch(e){}
-  try{await toMazeVideo.play();}catch(e){showOverlay2();}
+
+/* iPads only let audio start from a tap. Starting and pausing the Maze music
+   inside the arrival tap lets it start on its own once the flyover ends. */
+function primeBgMusic(){
+  try{loadMediaSource(bgMusic);const p=bgMusic.play();bgMusic.pause();if(p&&p.catch)p.catch(()=>{});}catch(e){}
+}
+function armMusicOnFirstGesture(){
+  ['pointerdown','touchstart','keydown'].forEach(ev=>{
+    document.addEventListener(ev,function _once(){
+      if(bgMusic.paused&&!document.hidden){bgMusic.volume=.65;playBgMusic().catch(()=>{});}
+    },{once:true,passive:true});
+  });
+}
+
+// One tap: congratulations ("Enter the Maze") or reminder ("Continue anyway").
+// Both play the flyover with sound, then the Maze opens with music.
+// Only the congratulations tap earns the week (and equips the companion).
+continueBtn.addEventListener('click',()=>{
+  if(videoPlayed||mazeStarted)return;
+  if(arrivalMode==='congrats'){
+    const revealId=overlay1.dataset.revealId;
+    if(revealId)mazeSeasonalUnlock.claimReveal(revealId);
+    window.BoohaMazeArrival?.markRewardEarned();
+  }
+  startFlyover();
 });
 
-/* Blitz 3/3 this week: the warm-up has nothing left to remind about, so a
-   fresh entry goes straight into the flyover. No tap has happened on this
-   page yet, and iPads only allow a video to start without one when it is
-   muted, so it plays muted. A pending skin reveal keeps the normal screen so
-   the reveal is seen first; returns from a game never reach here. */
-function autoEnterAfterBlitz(){
-  if(videoPlayed||mazeStarted)return;
-  if(!readBlitzCompletionState().completedCurriculum)return;
-  if(document.getElementById('battyUnlockPopup')?.classList.contains('show'))return;
-  videoPlayed=true;
-  overlay1.classList.add('hidden','gone');
-  if(!introDue('maze')){showOverlay2();return;}
-  introSeen('maze');
+// Must run inside the tap, so the video and the music may play with sound.
+function startFlyover(){
+  if(videoPlayed)return;videoPlayed=true;
+  primeBgMusic();
+  overlay1.classList.add('hidden');overlay1.addEventListener('transitionend',()=>overlay1.classList.add('gone'),{once:true});
   loadMediaSource(toMazeVideo);
   app.classList.add('inTransition');videoWrap.classList.add('show');
-  toMazeVideo.muted=true;
+  toMazeVideo.muted=false;
   try{toMazeVideo.currentTime=0;}catch(e){}
-  toMazeVideo.play().catch(()=>showOverlay2());
+  const p=toMazeVideo.play();
+  if(p&&p.catch)p.catch(()=>finishFlyover());
 }
+
+// Earned this week and today's check done: no card, no video.
+function enterMazeStraight(){
+  if(videoPlayed||mazeStarted)return;
+  videoPlayed=true;o2shown=true;
+  overlay1.classList.add('hidden','gone');
+  launchMaze();
+}
+
+// Called with the save (and again after a Daily Check is recorded).
+function decideArrival(){
+  if(videoPlayed||mazeStarted)return;
+  if(sessionStorage.getItem('booha_return_to_checkpoint')==='1')return;   // back from a game: restored separately
+  if(arrivalMode==='straight')enterMazeStraight();
+}
+function refreshArrival(){
+  if(videoPlayed||mazeStarted||!window.BOOHA_READY)return;
+  personalizeMazeIntro();
+  decideArrival();
+}
+document.addEventListener('booha:checkIn',refreshArrival);
 
 let o2shown=false;
-function showOverlay2(){
+function finishFlyover(){
   if(o2shown)return;o2shown=true;
   try{toMazeVideo.pause();toMazeVideo.currentTime=0;}catch(e){}
-  videoWrap.classList.remove('show');overlay2.classList.add('show');app.classList.add('inTransition');resizeCanvas();
+  videoWrap.classList.remove('show');
+  launchMaze();
 }
-toMazeVideo.addEventListener('ended',showOverlay2);toMazeVideo.addEventListener('error',showOverlay2);
-toMazeVideo.addEventListener('timeupdate',()=>{const d=toMazeVideo.duration;if(!isFinite(d)||d<=0)return;if(d-toMazeVideo.currentTime<=.5)showOverlay2();});
+toMazeVideo.addEventListener('ended',finishFlyover);toMazeVideo.addEventListener('error',finishFlyover);
+toMazeVideo.addEventListener('timeupdate',()=>{const d=toMazeVideo.duration;if(!isFinite(d)||d<=0)return;if(d-toMazeVideo.currentTime<=.5)finishFlyover();});
 
+// The Maze opens straight after the flyover (no second "Start" tap). The
+// music plays if the arrival tap primed it; otherwise on the first tap.
 let mazeLaunched=false;
-mazeStartBtn.addEventListener('click',async()=>{
+function launchMaze(){
   if(mazeLaunched)return;mazeLaunched=true;
-  overlay2.classList.add('hidden');overlay2.addEventListener('transitionend',()=>overlay2.remove(),{once:true});
+  overlay2.classList.remove('show');overlay2.classList.add('hidden');setTimeout(()=>overlay2.remove(),600);
   app.classList.remove('inTransition');
   mazeStarted=true;ghostVisible=false;
   ghostIX=INTRO_TOP_CENTER_START.ix;ghostIY=INTRO_TOP_CENTER_START.iy;
@@ -2952,8 +3071,12 @@ mazeStartBtn.addEventListener('click',async()=>{
   introPhase='allGlow';introGlowStart=performance.now();
   requestMazeVisuals();
   resizeCanvas();buildWanderers();startLoop();
-  try{bgMusic.volume=.65;await playBgMusic();}catch(e){console.warn('Music blocked',e);}
-});
+  try{
+    bgMusic.loop=true;bgMusic.volume=.65;
+    playBgMusic().catch(()=>armMusicOnFirstGesture());
+  }catch(e){armMusicOnFirstGesture();}
+}
+mazeStartBtn.addEventListener('click',launchMaze);
 
 
 backBtn.addEventListener('click',()=>{
@@ -2998,8 +3121,8 @@ function onSaveReady(){
     window.BoohaSkins.equip(scheduledSkinId);
   }
   applyEquippedMazeSkin();
-  maybeShowSeasonalUnlockPopup();
-  autoEnterAfterBlitz();
+  // The companion reveal is part of the congratulations card (maze-arrival.js).
+  decideArrival();
   if (mazeStarted) buildWanderers();   // extra ghost count depends on the save
 }
 if (window.BOOHA_READY) onSaveReady();

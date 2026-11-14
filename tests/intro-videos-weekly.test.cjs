@@ -59,10 +59,9 @@ assert.match(index, /ghostWrap\.classList\.add\('flyAway'\);\s*\/\/[^\n]*\n\s*if
 assert.match(index, /await introVideo\.play\(\);\s*if \(window\.BoohaIntroVideos\) BoohaIntroVideos\.markSeen\('hub'\);/, 'hub: marked seen once it plays');
 
 const maze = read('maze.html');
-const tap = maze.slice(maze.indexOf("continueBtn.addEventListener('click'"), maze.indexOf('\n});', maze.indexOf("continueBtn.addEventListener('click'")));
-assert.match(tap, /if\(!introDue\('maze'\)\)\{showOverlay2\(\);return;\}\s*introSeen\('maze'\);\s*loadMediaSource\(toMazeVideo\);/, 'maze (tap): not due goes to the welcome');
-const auto = maze.slice(maze.indexOf('function autoEnterAfterBlitz(){'), maze.indexOf('let o2shown=false;'));
-assert.match(auto, /if\(!introDue\('maze'\)\)\{showOverlay2\(\);return;\}\s*introSeen\('maze'\);/, 'maze (Blitz 3/3): not due goes to the welcome');
+// The Maze flyover follows its own earned rule (js/core/maze-arrival.js,
+// tests/maze-arrival.test.cjs), so it never uses the generic weekly flag.
+assert.doesNotMatch(maze, /introDue\('maze'\)|introSeen\('maze'\)/, 'maze flyover: not the generic weekly intro flag');
 for (const [fn, id] of [['playHomeworkVideoAndGo', 'homework'], ['playKarasukiVideoAndGo', 'karasuki']]) {
   const body = maze.slice(maze.indexOf(`function ${fn}(){`), maze.indexOf('\n}\n', maze.indexOf(`function ${fn}(){`)));
   assert.match(body, new RegExp(`const playIntro=introDue\\('${id}'\\);\\s*if\\(playIntro\\)\\{\\s*introSeen\\('${id}'\\);`), `${id}: checks and marks`);
