@@ -6,7 +6,8 @@
 //   Daily Check done today + Blitz 3/3 + not yet earned this week → congratulations
 //     card (with this week's companion); its tap plays the flyover with sound and
 //     starts the music, and earns the week.
-//   Same, already earned → straight into the Maze.
+//   Same, already earned → no card, no video: this week's guide flies over the
+//     still Maze; tapping it starts the music and opens the Maze.
 //   Anything missing → a reminder that names it; Go back / Do the Daily Check now /
 //     Continue anyway (flyover with sound + music every time, never earns the week).
 // Replaces the Nov 8 "optional warm-up" contract and the R2 muted flyover.
@@ -49,12 +50,12 @@ for (const dc of ['skipped', 'failed']) { // a skip or a failed attempt is not d
   const { A } = sandbox({ dc: 'done' });
   assert.strictEqual(A.state(false).mode, 'reminder', 'Blitz 2/3 + Daily Check done → reminder');
 }
-{ // Everything done → congrats once, then straight through
+{ // Everything done → congrats once, then the guide
   const { A, data } = sandbox({ dc: 'done' });
   assert.strictEqual(A.state(true).mode, 'congrats', 'all done, first time this week → congratulations');
   assert.strictEqual(A.markRewardEarned(), true, 'reward recorded');
   assert.strictEqual(data().weekly.mazeReward.earned, '2026-11-08|november-w2', 'stored per student with the week key');
-  assert.strictEqual(A.state(true).mode, 'straight', 'later visits this week → straight through');
+  assert.strictEqual(A.state(true).mode, 'guide', 'later visits this week → the guide');
 }
 { // Daily Check completed later the same day: re-reading the state flips the mode
   const { A, win } = sandbox({ dc: 'pending' });
@@ -67,7 +68,7 @@ for (const dc of ['skipped', 'failed']) { // a skip or a failed attempt is not d
   const { A, win } = sandbox({ dc: 'pending', save });
   assert.strictEqual(A.state(true).mode, 'reminder', 'earned this week + today’s check not done → reminder, video every time');
   win.__dc = 'done';
-  assert.strictEqual(A.state(true).mode, 'straight', 'earned + today’s check done → straight, no second congratulations');
+  assert.strictEqual(A.state(true).mode, 'guide', 'earned + today’s check done → the guide, no second congratulations');
 }
 { // A new week earns again; no calendar or save means nothing is earned
   const save = { weekly: { mazeReward: { earned: '2026-11-01|november-w1' } } };
@@ -97,21 +98,21 @@ assert.match(fly, /const p=toMazeVideo\.play\(\);\s*if\(p&&p\.catch\)p\.catch\(\
 assert.match(between('function finishFlyover(){', '\n}\n'), /launchMaze\(\);/, 'the Maze opens straight after the flyover (no second Start tap)');
 const launch = between('function launchMaze(){', '\n}\n');
 assert.match(launch, /playBgMusic\(\)\.catch\(\(\)=>armMusicOnFirstGesture\(\)\);/, 'music plays, or starts on the first tap');
-const straight = between('function enterMazeStraight(){', '\n}\n');
-assert.match(straight, /showMazeGuide\(\);/, 'straight path: no card, no video; the guide flies over the still Maze');
-assert.doesNotMatch(straight, /launchMaze|startLoop|armMusicOnFirstGesture/, 'the Maze waits, still, until the guide is tapped (no start-on-any-tap)');
+const guidePath = between('function enterMazeWithGuide(){', '\n}\n');
+assert.match(guidePath, /showMazeGuide\(\);/, 'guide path: no card, no video; the guide flies over the still Maze');
+assert.doesNotMatch(guidePath, /launchMaze|startLoop|armMusicOnFirstGesture/, 'the Maze waits, still, until the guide is tapped (no start-on-any-tap)');
 const guide = between('function showMazeGuide(){', '\n}\n');
 assert.match(guide, /btn\.addEventListener\('click',\(\)=>\{[\s\S]*?playBgMusic\(\)[\s\S]*?launchMaze\(\);/, 'tapping the guide starts the music, then opens the Maze');
 assert.doesNotMatch(guide.slice(guide.indexOf("btn.addEventListener('click'"), guide.indexOf('playBgMusic')), /await|setTimeout/, 'music starts directly inside the tap');
 assert.doesNotMatch(guide, /scrim|entryShell/, 'not a popup: no scrim or card');
 const lookup = between('function currentGuide(){', '\n}\n');
-assert.match(lookup, /pick\(S\?\.selectedId\?\.\(\)\)\|\|pick\(S\?\.rotationCharacterId\?\.\(\)\)/, 'guide: the companion they have on, else this week’s unlocked one');
+assert.match(lookup, /pick\(S\?\.rotationCharacterId\?\.\(\)\)\|\|pick\(S\?\.selectedId\?\.\(\)\)/, 'guide: this week’s unlocked companion first, else the one they have on');
 assert.match(lookup, /S\.isUnlocked\?\.\(id\)/, 'only an unlocked companion is shown');
 assert.match(maze, /@media \(prefers-reduced-motion:reduce\)\{\s*#mazeGuide\{ animation:none; \}/, 'reduced motion: the guide does not fly');
 
 const decide = between('function decideArrival(){', '\n}\n');
 assert.match(decide, /booha_return_to_checkpoint/, 'returns from a game are restored separately');
-assert.match(decide, /if\(arrivalMode==='straight'\)enterMazeStraight\(\);/, 'straight only when earned + today’s check done');
+assert.match(decide, /if\(arrivalMode==='guide'\)enterMazeWithGuide\(\);/, 'the guide only when earned + today’s check done');
 assert.match(maze, /document\.addEventListener\('booha:checkIn',refreshArrival\);/, 'the card is re-read after every Daily Check record');
 assert.match(between('function refreshArrival(){', '\n}\n'), /personalizeMazeIntro\(\);\s*decideArrival\(\);/, 're-read decides again');
 
@@ -151,7 +152,7 @@ function card({ cleared = 3, dcDone = false, mode, reveal = null }) {
   const document = { getElementById: id => els[id] || (els[id] = fakeEl(id)), querySelector: () => null };
   const ctx = {
     document,
-    window: { BoohaMazeArrival: { state: blitzDone => ({ blitzDone, dcDone, earned: mode === 'straight', mode }) }, BoohaDailyCheckReminder: {} },
+    window: { BoohaMazeArrival: { state: blitzDone => ({ blitzDone, dcDone, earned: mode === 'guide', mode }) }, BoohaDailyCheckReminder: {} },
     getBoohaFirstName: () => 'Aiko',
     readBlitzCompletionState: () => ({ progress, completedCurriculum: cleared === 3 ? 'br' : null }),
     mazeSeasonalUnlock: { pendingReveal: () => reveal },
@@ -198,10 +199,10 @@ function card({ cleared = 3, dcDone = false, mode, reveal = null }) {
   assert.strictEqual(els.mazeCompanionArt.hidden, true, 'no companion art');
   assert.strictEqual(els.overlay1.dataset.revealId, undefined, 'nothing to claim');
 }
-{ // Straight: the card is never shown
-  const { els, mode } = card({ cleared: 3, dcDone: true, mode: 'straight' });
-  assert.strictEqual(mode, 'straight');
-  assert(!els.overlay1.classList.contains('entry-ready'), 'no card on the straight path');
+{ // Guide: the card is never shown
+  const { els, mode } = card({ cleared: 3, dcDone: true, mode: 'guide' });
+  assert.strictEqual(mode, 'guide');
+  assert(!els.overlay1.classList.contains('entry-ready'), 'no card on the guide path');
 }
 
-console.log('Maze arrival passed: congratulations once a week when Daily Check + Blitz are done, straight through after, reminder + flyover with music otherwise; no muted video.');
+console.log('Maze arrival passed: congratulations once a week when Daily Check + Blitz are done, the flying guide after, reminder + flyover with music otherwise; no muted video.');
