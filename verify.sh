@@ -2064,6 +2064,13 @@ else
   bad "image metadata guard failed"
 fi
 
+echo "[blitz] Feedback B1 (equal taps, correct, wrong)"
+if node tests/blitz-feedback-b1.test.cjs >/dev/null 2>&1; then
+  ok "all three Blitz: same bounce, motif spray on right answers, distinct right/wrong sounds"
+else
+  bad "Blitz feedback B1 test failed"
+fi
+
 echo "[player] Weekly intro videos"
 if node tests/intro-videos-weekly.test.cjs >/dev/null 2>&1; then
   ok "7 intro videos play on the first visit of the calendar week, per student"

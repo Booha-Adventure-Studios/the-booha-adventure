@@ -81,7 +81,8 @@ window.BoohaBlitzEngine = (() => {
       label: 'SPOOKY FOREST',
       image: BLITZ_SCENE_IMAGE_ROOT + 'sentence-spooky' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: 'center center' }),
-      sfx: Object.freeze({ start: 'wood-click', correct: 'wood-click', streak: 'chime', wrong: 'wood-click', finish: 'chime' }),
+      // B1 feedback: correct and wrong never share a sound (was wood-click for both).
+      sfx: Object.freeze({ start: 'wood-click', correct: 'fog-chime', streak: 'chime', wrong: 'fog-thud', finish: 'chime' }),
       fill: Object.freeze({ kind: 'spooky-fog', count: 15 }),
       motion: Object.freeze({ feel: 'sleek', particleEasing: 'cubic-bezier(.2,.7,.2,1)', nameEasing: 'cubic-bezier(.33,.05,.55,.9)', hueStep: 24, optionDurationMs: 380, optionStaggerMs: 44, optionX: '16px', optionY: '0px', optionScale: '.96' }),
     }),
@@ -90,7 +91,8 @@ window.BoohaBlitzEngine = (() => {
       label: 'FIREFLY GLADE',
       image: BLITZ_SCENE_IMAGE_ROOT + 'question-fireflies' + BLITZ_SCENE_IMAGE_EXT,
       backgroundPosition: Object.freeze({ landscape: 'center center', portrait: '78% center' }),
-      sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'warm-pulse', finish: 'warm-pulse' }),
+      // B1 feedback: a wrong answer never sounds like a reward (was warm-pulse, the streak sound).
+      sfx: Object.freeze({ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'firefly-dim', finish: 'warm-pulse' }),
       fill: Object.freeze({
         kind: 'firefly-swarm',
         count: 15,
@@ -3244,8 +3246,8 @@ window.BoohaBlitzEngine = (() => {
         /* Blitz Pop: answers land with a little overshoot (per scene feel),
            squash when pressed and spring back on release. */
         #${config.overlayId}.blitz-feel-playful { --blitz-option-overshoot: 1.05; }
-        #${config.overlayId}.blitz-feel-arcade { --blitz-option-overshoot: 1.03; }
-        #${config.overlayId}.blitz-feel-sleek { --blitz-option-overshoot: 1.015; }
+        #${config.overlayId}.blitz-feel-arcade { --blitz-option-overshoot: 1.05; }   /* B1: equal in all three */
+        #${config.overlayId}.blitz-feel-sleek { --blitz-option-overshoot: 1.05; }
         #${config.overlayId}.blitz-compositor .${config.optionClass} {
           scale: 1;
           transition: transform 120ms ease, background 120ms ease, opacity 120ms ease, scale 280ms cubic-bezier(.3,1.8,.5,1);
@@ -3263,6 +3265,13 @@ window.BoohaBlitzEngine = (() => {
           opacity: 0;
         }
         #${config.overlayId}.low-power .booha-blitz-pop-ring { display: none; }
+        .booha-blitz-spray {
+          position: absolute;
+          z-index: 9;
+          pointer-events: none;
+          will-change: transform, opacity;
+        }
+        #${config.overlayId}.low-power .booha-blitz-spray { display: none; }
         #${config.overlayId}.blitz-compositor .${config.optionClass}.blitz-enter {
           animation: boohaBlitzOptionEnter var(--blitz-option-duration, 320ms) var(--blitz-motion-ease, ease-out) var(--blitz-enter-delay, 0ms) both;
           will-change: transform, opacity;
@@ -4335,6 +4344,11 @@ window.BoohaBlitzEngine = (() => {
             chime: { notes: threshold >= 12 ? [659, 831, 1047, 1319] : [523, 659, 831], spacing: 0.09, duration: 0.24, type: 'sine', peak: 0.08 },
             sparkle: { notes: [880, 1319, 1760], spacing: 0.045, duration: 0.16, type: 'sine', peak: 0.08 },
             'warm-pulse': { notes: [330, 440, 660], spacing: 0.08, duration: 0.34, type: 'sine', peak: 0.085 },
+            // B1 feedback cues: a bright two-note chime for a right answer in the fog,
+            // and low falling notes that clearly read as a miss.
+            'fog-chime': { notes: [784, 1175], spacing: 0.03, duration: 0.14, type: 'sine', peak: 0.085 },
+            'fog-thud': { notes: [262, 175], spacing: 0.05, duration: 0.2, type: 'triangle', peak: 0.085 },
+            'firefly-dim': { notes: [587, 440, 294], spacing: 0.05, duration: 0.16, type: 'sine', peak: 0.08 },
           }[kind];
           if (!cues) return;
           if (event === 'streak' || event === 'wrong' || event === 'finish') {
@@ -4715,6 +4729,7 @@ window.BoohaBlitzEngine = (() => {
         const stepColor = progressColorFor(palette, (streak / (initialQueueLength || 1)) * 100).css;
         correctBtn.style.background = stepColor;
         emitCorrectBoing(correctBtn, answerRect, overlayRect, stepColor, milestone);
+        emitCorrectSpray(correctBtn, answerRect, overlayRect, milestone);
         if (LEGACY_BLITZ_CELEBRATIONS_ENABLED) {
           const impactRect = answerRect || correctBtn.getBoundingClientRect();
           const impactOverlayRect = overlayRect || overlay.getBoundingClientRect();
@@ -4845,6 +4860,73 @@ window.BoohaBlitzEngine = (() => {
           // Pop is decoration: it must never interrupt an answer.
         }
       }
+      /* B1 feedback: a burst you can actually see on every right answer.
+         Same count, travel and timing in all three games (equally loud);
+         the pieces take the scene's motif -- marquee bulbs (Vocab), pink
+         smoke puffs (Sentence), glowing fireflies (Question) -- and its
+         saturated streak colours, never the dull early progress colour.
+         Transform/opacity only, one fragment, runs beside the 200 ms pace
+         without delaying it. Fewer pieces on reduced power; off at minimal
+         power and for reduced motion. */
+      // One look per game, equally strong: Vocab throws lightbulb streaks,
+      // Sentence puffs pink smoke, Question scatters bright fireflies.
+      const SPRAY_LOOK = {
+        'circus-marquee': { size: 15, glow: 1.4, soft: false, streak: true },
+        'spooky-fog': { size: 34, glow: 0.5, soft: true },
+        'firefly-swarm': { size: 17, glow: 2.4, soft: false, core: true },
+      };
+      const SPRAY_FIREFLY_HUES = [52, 160, 200, 290, 330, 95, 25, 240, 180, 310, 70, 130];
+      function emitCorrectSpray(correctBtn, answerRect, overlayRect, milestone = 0) {
+        if (!popMotionOk(overlay)) return;
+        try {
+          const look = SPRAY_LOOK[scene.fill?.kind] || SPRAY_LOOK['circus-marquee'];
+          // Saturated colours first; white is a single accent, not the main colour.
+          const colors = (palette.streak?.colors || []).filter((c) => c && c.toLowerCase() !== '#ffffff');
+          const pool = colors.length ? colors.concat('#ffffff') : ['#ffe66b', '#ff6ccf', '#ffad55', '#ffffff'];
+          const r = answerRect || correctBtn.getBoundingClientRect();
+          const ovr = overlayRect || overlay.getBoundingClientRect();
+          const cx = r.left - ovr.left + r.width / 2;
+          const cy = r.top - ovr.top + r.height / 2;
+          const count = (isLowPower() ? 8 : 14) + (milestone ? 8 : 0);
+          const fragment = document.createDocumentFragment();
+          for (let i = 0; i < count; i++) {
+            const piece = document.createElement('span');
+            piece.className = 'booha-blitz-spray';
+            const color = look.core
+              ? `hsl(${SPRAY_FIREFLY_HUES[i % SPRAY_FIREFLY_HUES.length]} 100% 68%)`
+              : pool[i % pool.length];
+            const size = look.size * (0.8 + Math.random() * 0.5);
+            const width = look.streak ? size * 2.6 : size;
+            const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+            const dist = (milestone ? 130 : 95) + Math.random() * 50;
+            const bg = look.soft
+              ? `radial-gradient(circle, ${color} 0%, ${color} 40%, transparent 72%)`
+              : look.core
+                ? `radial-gradient(circle, #ffffff 0%, ${color} 45%, ${color} 100%)`
+                : color;
+            piece.style.cssText = `left:${cx - width / 2}px;top:${cy - size / 2}px;width:${width}px;height:${size}px;`
+              + `border-radius:${look.streak ? `${size}px` : '50%'};background:${bg};`
+              + `box-shadow:0 0 ${Math.round(size * look.glow)}px ${color};`;
+            fragment.appendChild(piece);
+            const dx = Math.cos(angle) * dist;
+            const dy = Math.sin(angle) * dist;
+            const turn = look.streak ? ` rotate(${angle.toFixed(3)}rad)` : '';
+            const anim = typeof piece.animate === 'function'
+              ? piece.animate([
+                  { transform: `translate(0,0)${turn} scale(.6)`, opacity: 1 },
+                  { transform: `translate(${dx * 0.7}px,${dy * 0.7}px)${turn} scale(1.15)`, opacity: 1, offset: 0.55 },
+                  { transform: `translate(${dx}px,${dy}px)${turn} scale(${look.soft ? 1.6 : 0.4})`, opacity: 0 },
+                ], { duration: milestone ? 620 : 480, easing: 'cubic-bezier(.2,.8,.3,1)' })
+              : null;
+            if (anim) anim.onfinish = () => piece.remove();
+            setTimeout(() => piece.remove(), 900);   // never leave one behind
+          }
+          overlay.appendChild(fragment);
+        } catch (_) {
+          // Decoration only: it must never interrupt an answer.
+        }
+      }
+
       function promptPopEl() {
         return overlay.querySelector('#vb-stage, #sb-prompt, #qb-prompt') || jpWordEl;
       }

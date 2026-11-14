@@ -8,10 +8,23 @@ const engine = fs.readFileSync('js/blitz-engine.js', 'utf8');
 
 assert.match(engine, /sfx: Object\.freeze\(\{ start: 'bell', correct: 'pop', streak: 'bell', wrong: 'soft-drop', finish: 'fanfare' \}\)/,
   'Circus must own pop, bell, and fanfare cues');
-assert.match(engine, /sfx: Object\.freeze\(\{ start: 'wood-click', correct: 'wood-click', streak: 'chime', wrong: 'wood-click', finish: 'chime' \}\)/,
-  'Spooky Forest must own wood-click and chime cues');
-assert.match(engine, /sfx: Object\.freeze\(\{ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'warm-pulse', finish: 'warm-pulse' \}\)/,
-  'Firefly Glade must own sparkle and warm-pulse cues');
+assert.match(engine, /sfx: Object\.freeze\(\{ start: 'wood-click', correct: 'fog-chime', streak: 'chime', wrong: 'fog-thud', finish: 'chime' \}\)/,
+  'Spooky Forest must own wood-click, fog-chime, fog-thud and chime cues');
+assert.match(engine, /sfx: Object\.freeze\(\{ start: 'sparkle', correct: 'sparkle', streak: 'warm-pulse', wrong: 'firefly-dim', finish: 'warm-pulse' \}\)/,
+  'Firefly Glade must own sparkle, warm-pulse and firefly-dim cues');
+// B1 feedback (Nov 2026): in every scene, right and wrong never share a sound,
+// and a wrong answer never uses a start, streak or finish (reward) sound.
+{
+  const maps = [...engine.matchAll(/sfx: Object\.freeze\(\{ start: '([^']+)', correct: '([^']+)', streak: '([^']+)', wrong: '([^']+)', finish: '([^']+)' \}\)/g)];
+  assert.strictEqual(maps.length, 3, 'three scene sound maps');
+  for (const [, start, correct, streak, wrong, finish] of maps) {
+    assert.notStrictEqual(correct, wrong, `correct (${correct}) and wrong must differ`);
+    assert(![start, streak, finish].includes(wrong), `wrong (${wrong}) must not reuse a reward sound`);
+    for (const kind of [start, correct, streak, wrong, finish]) {
+      assert(new RegExp(`'?${kind}'?: \\{ notes: `).test(engine), `cue ${kind} is defined`);
+    }
+  }
+}
 assert.match(engine, /fill: Object\.freeze\(\{ kind: 'circus-marquee', count: 15 \}\)/,
   'Circus must own a fifteen-step persistent marquee fill');
 assert.match(engine, /const step = \(2 \* \(w \+ h\)\) \/ items\.length/,
