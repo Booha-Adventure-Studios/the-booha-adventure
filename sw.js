@@ -163,7 +163,8 @@ const CURRENT_CACHES = {
   // Player polish 1: maze warm-up greeting spacing, one typeface, Japanese line breaks.
   // Daily Check reminders: maze + games boards load daily-check.js and the reminder.
   // Blitz 3/3: maze skips the warm-up and plays the flyover muted; card shows once filled in.
-  pages:  'booha-pages-2026-539',
+  // Weekly intro videos: index, maze and karasuki load js/core/intro-videos.js.
+  pages:  'booha-pages-2026-540',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

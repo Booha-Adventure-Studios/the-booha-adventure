@@ -3884,6 +3884,12 @@ const HAPPY_HOUSE_PORTAL = {
   }
  
   function _playHappyHouseVideo() {
+    // Portal intros play on the first visit of the week (js/core/intro-videos.js).
+    if (window.BoohaIntroVideos && !BoohaIntroVideos.shouldPlay('happyHouse')) {
+      window.location.href = HAPPY_HOUSE_PORTAL.href;
+      return;
+    }
+    if (window.BoohaIntroVideos) BoohaIntroVideos.markSeen('happyHouse');
     let vOverlay = document.getElementById('happy-house-video-overlay');
     if (!vOverlay) {
       vOverlay = document.createElement('div');
@@ -4075,6 +4081,12 @@ const HAPPY_HOUSE_PORTAL = {
   }
 
   function _playUtsuobaIntroVideo() {
+    // Portal intros play on the first visit of the week (js/core/intro-videos.js).
+    if (window.BoohaIntroVideos && !BoohaIntroVideos.shouldPlay('utsuroba')) {
+      window.location.href = window.__devUtsuroba ? `${UTSUROBA_PORTAL.href}?dev=1` : UTSUROBA_PORTAL.href;
+      return;
+    }
+    if (window.BoohaIntroVideos) BoohaIntroVideos.markSeen('utsuroba');
     let vOverlay = document.getElementById('utsuroba-video-overlay');
     if (!vOverlay) {
       vOverlay = document.createElement('div');
@@ -4219,6 +4231,12 @@ const HAPPY_HOUSE_PORTAL = {
   // (or on error / a 60s failsafe) so the video IS the transition into the
   // new area rather than something layered on top of a separate fade.
   function _playMuenbaIntroVideo() {
+    // Portal intros play on the first visit of the week (js/core/intro-videos.js).
+    if (window.BoohaIntroVideos && !BoohaIntroVideos.shouldPlay('muenba')) {
+      window.location.href = window.__devMuenba ? `${MUENBA_PORTAL.href}&dev=1` : MUENBA_PORTAL.href;
+      return;
+    }
+    if (window.BoohaIntroVideos) BoohaIntroVideos.markSeen('muenba');
     let vOverlay = document.getElementById('muenba-video-overlay');
     if (!vOverlay) {
       vOverlay = document.createElement('div');
