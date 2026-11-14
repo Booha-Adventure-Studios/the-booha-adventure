@@ -118,8 +118,8 @@ function markBlitz(data) {
   assert.strictEqual(h.api.evaluateWeekly().length, 0, 'two distinct check days cannot earn the standard draw');
 }
 
-// When a pool is exhausted, the channel records a future-conversion duplicate
-// instead of inventing another item or touching the permanent collection.
+// When a pool is exhausted, the draw is a second copy of an owned item
+// (shown as ×2 in the cabinet), not an empty record or a counter.
 {
   const h = harness();
   h.items.filter(item => item.pool === 'standard').forEach(item => {
@@ -129,8 +129,9 @@ function markBlitz(data) {
   markBlitz(h.data);
   const awards = h.api.evaluateWeekly();
   assert.strictEqual(awards[0].pool, 'standard', 'an exhausted standard pool still records the weekly channel');
-  assert.strictEqual(awards[0].item, null, 'an exhausted pool should not invent a duplicate item');
-  assert.strictEqual(h.data.meta.findsDuplicateCount.standard, 1, 'the duplicate conversion counter should increment');
+  assert.ok(awards[0].item && awards[0].item.pool === 'standard', 'an exhausted pool draws a copy of an owned item');
+  assert.strictEqual(awards[0].record.duplicate, true, 'the draw is marked as a duplicate copy');
+  assert.strictEqual(h.data.meta.findsDuplicateCount, undefined, 'there is no conversion counter');
 }
 
 // Picking up a drawn item records its permanent channel and week metadata.

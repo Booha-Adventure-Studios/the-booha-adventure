@@ -397,7 +397,9 @@ const HAPPY_HOUSE_PORTAL = {
   function oddityPlacementFor(find, index, used) {
     const rooms = Object.keys(NPP).filter(roomId => DATA.rooms[roomId]);
     if (!rooms.length) return null;
-    const seed = oddityHash(`${find.week}|${find.pool}|${find.item.id}`);
+    // earnedAt is unique to this student's draw, so classmates who drew the
+    // same item still hunt in different spots. The spot is saved once placed.
+    const seed = oddityHash(`${find.week}|${find.pool}|${find.item.id}|${find.record.earnedAt || 0}`);
     const start = seed % rooms.length;
     const rng = seededRng(seed ^ 0x9e3779b9);
     for (let roomOffset = 0; roomOffset < rooms.length; roomOffset++) {
@@ -441,24 +443,120 @@ const HAPPY_HOUSE_PORTAL = {
     return oddityFinds.filter(find => find.roomId === state.roomId && !find.collected);
   }
 
+  /* Players never see room numbers, so the clue gives a direction: the first
+     exit on the shortest path through Karasuki's doors (NPP) to the find. */
+  const ODDITY_DIRECTION = {
+    right: { arrow: '→', en: 'Go right.', jp: 'みぎへ いこう。' },
+    left:  { arrow: '←', en: 'Go left.',  jp: 'ひだりへ いこう。' },
+    up:    { arrow: '↑', en: 'Go up.',    jp: 'うえへ いこう。' },
+    down:  { arrow: '↓', en: 'Go down.',  jp: 'したへ いこう。' },
+  };
+
+  function oddityFirstStep(fromRoom, toRoom) {
+    if (!fromRoom || !toRoom || fromRoom === toRoom) return null;
+    const seen = new Set([fromRoom]);
+    const queue = (NPP[fromRoom] || []).map(exit => ({ room: exit.to, first: exit.dir }));
+    while (queue.length) {
+      const { room, first } = queue.shift();
+      if (room === toRoom) return first;
+      if (seen.has(room)) continue;
+      seen.add(room);
+      (NPP[room] || []).forEach(exit => { if (!seen.has(exit.to)) queue.push({ room: exit.to, first }); });
+    }
+    return null;
+  }
+
+  function oddityClueText() {
+    const next = oddityFinds.find(find => !find.collected);
+    if (!next) return null;
+    if (next.roomId === state.roomId) {
+      return { here: true, arrow: '✦', en: 'It is in this room. Look for the glint.', jp: 'この へやに あるよ。ひかりを さがそう。' };
+    }
+    const dir = ODDITY_DIRECTION[oddityFirstStep(state.roomId, next.roomId)];
+    return dir
+      ? { here: false, arrow: dir.arrow, en: `Something strange is that way. ${dir.en}`, jp: `ふしぎな ものは あっちだよ。${dir.jp}` }
+      : { here: false, arrow: '?', en: 'Something strange is somewhere in Karasuki.', jp: 'からすきの どこかに ふしぎな ものが あるよ。' };
+  }
+
   function renderOddityClue() {
     if (!oddityClueEl) return;
-    const next = oddityFinds.find(find => !find.collected);
-    if (!next) {
+    const clue = oddityClueText();
+    if (!clue) {
       oddityClueEl.hidden = true;
       return;
     }
-    const here = next.roomId === state.roomId;
     oddityClueEl.hidden = false;
-    oddityClueEl.innerHTML = here
-      ? '<span class="oddity-clue-en">Something strange is here.</span><span class="oddity-clue-jp">この へやに ふしぎな ものが あるよ。</span>'
-      : `<span class="oddity-clue-en">A strange thing is waiting in Room ${next.roomId.replace('room_', '')}.</span><span class="oddity-clue-jp">${next.roomId.replace('room_', '')}ばんの へやで ふしぎな ものが まっているよ。</span>`;
+    oddityClueEl.innerHTML = `<span class="oddity-clue-en"><b class="oddity-clue-arrow" aria-hidden="true">${clue.arrow}</b> ${clue.en}</span><span class="oddity-clue-jp">${clue.jp}</span>`;
   }
 
-  function showOddityPickup(item) {
+  /* The clue popup: dark, odd, and it has to be closed. Shown once per visit
+     to Karasuki while a find is waiting, at a quiet moment (no other dialog
+     open), using the shared world-popup frame. */
+  const ODDITY_THEME = {
+    bg: 'linear-gradient(160deg,#07050b 0%,#120a18 60%,#050307 100%)',
+    border: 'rgba(255,226,112,.38)',
+    accent1: '#ffe270', accent2: '#8f6bd8',
+    glow1: 'rgba(255,226,112,.18)', glow2: 'rgba(120,80,200,.22)',
+    shadow: '0 0 0 1px rgba(255,226,112,.2),0 0 46px rgba(0,0,0,.9),0 0 80px rgba(120,80,200,.25),inset 0 0 60px rgba(0,0,0,.85)',
+  };
+  let oddityPopOverlay = null;
+  let oddityPopShown = false;
+
+  function anyDialogOpen() {
+    return Array.from(document.querySelectorAll('[aria-modal="true"]')).some(el => el.offsetParent !== null);
+  }
+
+  function closeOddityPopup() {
+    if (oddityPopOverlay) closeWpopOverlay(oddityPopOverlay, 400);
+  }
+
+  function openOddityPopup() {
+    const clue = oddityClueText();
+    if (!clue) return;
+    if (!oddityPopOverlay) {
+      oddityPopOverlay = document.createElement('div');
+      oddityPopOverlay.id = 'oddity-pop-overlay';
+      oddityPopOverlay.className = 'wpop-overlay';
+      oddityPopOverlay.innerHTML = wpopMarkup('oddity-pop');
+      document.body.appendChild(oddityPopOverlay);
+    }
+    wpopThemeBox('oddity-pop', ODDITY_THEME);
+    wpopSetIconOrb('oddity-pop', 'radial-gradient(circle at 50% 45%,#fff6bd 0%,#ffe270 18%,rgba(60,30,90,.9) 55%,#050307 100%)', '0 0 26px rgba(255,226,112,.55)');
+    wpopSetLock('oddity-pop', false);
+    const count = oddityFinds.filter(find => !find.collected).length;
+    wpopSetText(document.getElementById('oddity-pop-eyebrow-en'), 'SOMETHING STRANGE');
+    wpopSetText(document.getElementById('oddity-pop-eyebrow-jp'), 'ふしぎな もの');
+    wpopSetText(document.getElementById('oddity-pop-title-en'), '');
+    wpopSetText(document.getElementById('oddity-pop-title-jp'), '');
+    const bodyEn = document.getElementById('oddity-pop-body-en');
+    const bodyJp = document.getElementById('oddity-pop-body-jp');
+    bodyEn.style.color = '#f3e9c6';
+    bodyJp.style.color = 'rgba(243,233,198,.7)';
+    wpopSetText(bodyEn, `${count > 1 ? 'Things that do not belong here are' : 'Something that does not belong here is'} hiding in Karasuki.\n${clue.arrow} ${clue.en}`);
+    wpopSetText(bodyJp, `からすきに ふしぎな ものが かくれているよ。\n${clue.arrow} ${clue.jp}`);
+    wpopSetActions('oddity-pop', [
+      { en: 'Close', jp: 'とじる', border: '1px solid rgba(255,226,112,.45)', color: '#ffe270', onClick: closeOddityPopup },
+    ]);
+    const closeX = document.getElementById('oddity-pop-close');
+    if (closeX) closeX.onclick = closeOddityPopup;
+    openWpopOverlay(oddityPopOverlay, 'rgba(0,0,0,.82)');
+  }
+
+  function maybeShowOddityPopup(tries = 0) {
+    if (oddityPopShown || !oddityFinds.some(find => !find.collected)) return;
+    if (anyDialogOpen()) {
+      if (tries < 20) window.setTimeout(() => maybeShowOddityPopup(tries + 1), 1500);
+      return;
+    }
+    oddityPopShown = true;
+    openOddityPopup();
+  }
+
+  function showOddityPickup(item, duplicate) {
     if (!oddityPickupEl) return;
     // The pickup is the reveal: the earn toast never named the item.
-    oddityPickupEl.textContent = item.discovery || `You found ${item.name}.`;
+    const line = item.discovery || `You found ${item.name}.`;
+    oddityPickupEl.textContent = duplicate ? `${line} Another one! もう ひとつ！` : line;
     oddityPickupEl.classList.add('show');
     window.clearTimeout(oddityPickupTimer);
     oddityPickupTimer = window.setTimeout(() => oddityPickupEl.classList.remove('show'), 5000);
@@ -512,7 +610,7 @@ const HAPPY_HOUSE_PORTAL = {
       if (!result || result.saveFailed) return true;
       find.collected = true;
       playCollectChime();
-      showOddityPickup(find.item);
+      showOddityPickup(find.item, !!result.duplicate);
       renderOddityClue();
       return true;
     }
@@ -6744,7 +6842,7 @@ function drawObserver(now) {
     injectStyles(); buildApp(); injectTrailHud(); injectEchoesTracker(); KarasukiAtmos.init(stage);
     restoreProfileRoom();
     fitStage(); resizeCanvas();
-    initOrbs(); refreshOddityFinds(); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); initBarba(); bindInput();
+    initOrbs(); refreshOddityFinds(); window.setTimeout(maybeShowOddityPopup, 1200); updateTrailHud(); renderInitialRoom(); initWanderers(); initNuppi(); initBarba(); bindInput();
     worldPerf.enableOverlay(() => {
       const cache = wandererImageCache.stats();
       return {

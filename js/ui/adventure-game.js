@@ -286,37 +286,39 @@ const BoohaAdventureGame = (() => {
       <div class="adv-traveler-row">${cards.join('')}</div>`;
   }
 
+  // Oddities cabinet: only what the student owns. No ??? slots and no total,
+  // so the pool can grow without creating gaps. The special shelf stays
+  // hidden until the first special find. Duplicates show as ×2.
   function renderCollectibles() {
     const host = document.getElementById('adv-collectibles');
     if (!host) return;
     const system = window.BoohaCollectibleSystem;
-    const all = system && system.getAll ? system.getAll() : [];
-    const found = all.filter(item => item.found).length;
-    const cards = all.map(item => {
-      const known = !!item.found;
+    const owned = (system && system.getAll ? system.getAll() : []).filter(item => item.found);
+    const card = item => {
       const special = item.pool === 'special';
-      const badge = known && special ? '<span class="collectible-badge special">SPECIAL</span>' : '';
-      const art = known
-        ? `<img src="${esc(item.asset)}" alt="${esc(item.name)}" width="160" height="112" loading="lazy" decoding="async">`
-        : '<span class="collectible-question" aria-hidden="true">?</span>';
-      const name = known ? item.name : '???';
-      const material = known ? `<span class="collectible-material">${esc(item.material)}</span>` : '';
-      const copy = known ? item.collection : 'A strange thing is still waiting to be found.';
-      return `<article class="collectible-card ${known ? 'found' : 'unknown'}${special ? ' special' : ''}">
-        <div class="collectible-art">${art}</div>
-        ${badge}
-        <b class="collectible-name">${esc(name)}</b>
-        ${material}
-        <span class="collectible-copy">${esc(copy)}</span>
+      const copies = Number(item.copies) > 1 ? `<span class="collectible-copies">×${Number(item.copies)}</span>` : '';
+      return `<article class="collectible-card found${special ? ' special' : ''}">
+        <div class="collectible-art"><img src="${esc(item.asset)}" alt="${esc(item.name)}" width="160" height="112" loading="lazy" decoding="async">${copies}</div>
+        ${special ? '<span class="collectible-badge special">SPECIAL</span>' : ''}
+        <b class="collectible-name">${esc(item.name)}</b>
+        <span class="collectible-material">${esc(item.material)}</span>
+        <span class="collectible-copy">${esc(item.collection)}</span>
       </article>`;
-    }).join('');
+    };
+    const standard = owned.filter(item => item.pool !== 'special');
+    const special = owned.filter(item => item.pool === 'special');
+    const shelves = [
+      standard.length ? `<div class="collectible-grid" aria-live="polite">${standard.map(card).join('')}</div>` : '',
+      special.length ? `<h3 class="collectible-shelf-title">SPECIAL · とくべつ</h3><div class="collectible-grid special-shelf">${special.map(card).join('')}</div>` : '',
+    ].join('');
     host.innerHTML = `
       <div class="adv-head">
         <div><h2 id="oddities-title">ふしぎな もの</h2><span class="adv-kicker cyan">ODDITIES CABINET · Forgotten Things</span></div>
-        <b class="adv-head-num cyan">${found}/${all.length}</b>
+        <b class="adv-head-num cyan">${owned.length}</b>
       </div>
-      <p class="collectible-note">Strange things found in the wider world. They do not belong to any missed week.</p>
-      <div class="collectible-grid" aria-live="polite">${cards || '<p class="adv-note">The cabinet is waiting for its first strange thing.</p>'}</div>`;
+      ${owned.length
+        ? `<p class="collectible-note">${owned.length} found · ${owned.length}こ みつけた</p>${shelves}`
+        : '<p class="adv-note">The cabinet is waiting for its first strange thing. · まだ なにも ないよ。からすきで ふしぎな ものを さがそう。</p>'}`;
   }
 
   function render() {

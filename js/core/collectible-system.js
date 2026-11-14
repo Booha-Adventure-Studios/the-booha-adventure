@@ -71,13 +71,46 @@ const BoohaCollectibleSystem = (() => {
     return new Set(Object.keys(found).filter(id => !!found[id]));
   }
 
-  function _draw(pool, weekKey, data) {
+  // Items earned but still waiting in Karasuki. They are not drawn again
+  // while they wait, so one item is never placed twice.
+  function _waitingIds(meta) {
+    const log = _isObject(meta.findsLog) ? meta.findsLog : {};
+    const ids = new Set();
+    Object.keys(log).forEach(week => {
+      const entry = log[week];
+      if (!_isObject(entry)) return;
+      POOLS.forEach(pool => {
+        const record = entry[pool];
+        if (_isObject(record) && record.itemId && !record.foundAt) ids.add(record.itemId);
+      });
+    });
+    return ids;
+  }
+
+  // A per-student seed kept in the student's own save (synced, never
+  // device-wide). Each student draws in their own order, so a class does not
+  // all find the same item in the same week.
+  function _studentSeed(meta) {
+    if (typeof meta.findsSeed !== 'string' || !meta.findsSeed) {
+      meta.findsSeed = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    }
+    return meta.findsSeed;
+  }
+
+  // Draw from items the student does not own and is not already hunting.
+  // Only when that set is empty is a duplicate drawn: a second copy of an
+  // owned item, shown as ×2 in the cabinet.
+  function _draw(pool, weekKey, data, seed) {
     const poolItems = COLLECTIBLES.filter(item => item.pool === pool);
+    if (!poolItems.length) return { item: null, duplicate: false };
     const owned = _ownedIds(data);
-    const available = poolItems.filter(item => !owned.has(item.id));
-    if (!available.length) return { item: null, duplicate: true };
-    const index = _hash(`${weekKey}|${pool}`) % available.length;
-    return { item: available[index], duplicate: false };
+    const waiting = _waitingIds(data.meta || {});
+    const available = poolItems.filter(item => !owned.has(item.id) && !waiting.has(item.id));
+    const hash = _hash(`${seed}|${weekKey}|${pool}`);
+    if (available.length) return { item: available[hash % available.length], duplicate: false };
+    const copies = poolItems.filter(item => !waiting.has(item.id));
+    if (!copies.length) return { item: null, duplicate: false };
+    return { item: copies[hash % copies.length], duplicate: true };
   }
 
   function _emptyFindsEntry() {
@@ -89,32 +122,27 @@ const BoohaCollectibleSystem = (() => {
     return meta.findsLog;
   }
 
-  function _duplicateCounts(meta) {
-    if (!_isObject(meta.findsDuplicateCount)) meta.findsDuplicateCount = { standard: 0, special: 0 };
-    POOLS.forEach(pool => {
-      if (!Number.isSafeInteger(meta.findsDuplicateCount[pool]) || meta.findsDuplicateCount[pool] < 0) {
-        meta.findsDuplicateCount[pool] = 0;
-      }
-    });
-    return meta.findsDuplicateCount;
-  }
-
+  // The draw record for an item: the one still waiting to be picked up if
+  // there is one (a duplicate copy), otherwise the most recent.
   function _earnedRecord(meta, id) {
     const log = _isObject(meta.findsLog) ? meta.findsLog : {};
-    const weeks = Object.keys(log).reverse();
+    const weeks = Object.keys(log).sort().reverse();
+    let latest = null;
     for (const week of weeks) {
       const entry = log[week];
       if (!_isObject(entry)) continue;
       for (const pool of POOLS) {
-        if (entry[pool] && entry[pool].itemId === id) return { week, pool, entry: entry[pool] };
+        if (!entry[pool] || entry[pool].itemId !== id) continue;
+        const hit = { week, pool, entry: entry[pool] };
+        if (!entry[pool].foundAt) return hit;
+        if (!latest) latest = hit;
       }
     }
-    return null;
+    return latest;
   }
 
   function pendingFinds() {
     const data = BoohaAdventure.save.load() || {};
-    const found = _isObject(data.collectibles) ? data.collectibles : {};
     const log = _isObject(data.meta?.findsLog) ? data.meta.findsLog : {};
     const pending = [];
     Object.keys(log).sort().forEach(week => {
@@ -122,7 +150,7 @@ const BoohaCollectibleSystem = (() => {
       if (!_isObject(entry)) return;
       POOLS.forEach(pool => {
         const record = entry[pool];
-        if (!_isObject(record) || !record.itemId || record.foundAt || found[record.itemId]) return;
+        if (!_isObject(record) || !record.itemId || record.foundAt) return;
         const item = _byId[record.itemId];
         if (item) pending.push({ week, pool, item, record });
       });
@@ -171,16 +199,17 @@ const BoohaCollectibleSystem = (() => {
       { pool: 'standard', eligible: dailyCount >= 3 && blitzDone },
       { pool: 'special', eligible: dailyCount >= 7 },
     ];
-    const duplicateCounts = _duplicateCounts(meta);
+    const seed = _studentSeed(meta);
+    data.meta = meta;
     channels.forEach(({ pool, eligible }) => {
       if (!eligible || entry[pool]) return;
-      const draw = _draw(pool, current.key, data);
-      if (draw.duplicate) duplicateCounts[pool] += 1;
+      const draw = _draw(pool, current.key, data, seed);
+      if (!draw.item) return;
       const record = {
-        itemId: draw.item ? draw.item.id : null,
+        itemId: draw.item.id,
         earnedAt: now,
         foundAt: null,
-        converted: draw.duplicate,
+        duplicate: draw.duplicate,
       };
       entry[pool] = record;
       awards.push({ pool, item: draw.item || null, record, week: current.key });
@@ -189,7 +218,6 @@ const BoohaCollectibleSystem = (() => {
     if (!awards.length) return [];
     log[current.key] = entry;
     meta.findsLog = log;
-    meta.findsDuplicateCount = duplicateCounts;
     data.meta = meta;
     if (!save.save(data)) return [];
 
@@ -221,6 +249,7 @@ const BoohaCollectibleSystem = (() => {
       ...c,
       found:   !!found[c.id],
       foundAt: found[c.id] ? found[c.id].foundAt : null,
+      copies:  found[c.id] ? Math.max(1, Number(found[c.id].copies) || 1) : 0,
     }));
   }
 
@@ -239,6 +268,24 @@ const BoohaCollectibleSystem = (() => {
     const data = BoohaAdventure.save.load() || {};
     const found = _isObject(data.collectibles) ? data.collectibles : {};
     const alreadyFound = !!found[id];
+
+    // A duplicate draw waiting in Karasuki: picking it up adds a copy (×2).
+    if (alreadyFound) {
+      const waiting = _earnedRecord(data.meta || {}, id);
+      if (!waiting || waiting.entry.foundAt) return { alreadyFound, collectible: _byId[id] };
+      const now = Date.now();
+      found[id].copies = Math.max(1, Number(found[id].copies) || 1) + 1;
+      waiting.entry.foundAt = now;
+      data.collectibles = found;
+      if (!BoohaAdventure.save.save(data)) return { alreadyFound, duplicate: true, collectible: _byId[id], saveFailed: true };
+      if (window.BoohaSync && BoohaSync.checkpoint) {
+        try { BoohaSync.checkpoint('adventure'); } catch (_) {}
+      }
+      document.dispatchEvent(new CustomEvent('booha:collectibleFound', {
+        detail: { collectible: _byId[id], foundAt: now, duplicate: true, copies: found[id].copies }
+      }));
+      return { alreadyFound, duplicate: true, copies: found[id].copies, collectible: _byId[id] };
+    }
 
     if (!alreadyFound) {
       const now = Date.now();
