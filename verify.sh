@@ -1742,12 +1742,6 @@ else
   bad "Daily Check states test failed"
 fi
 
-echo "[games] maze entry: Blitz is an optional warm-up"
-if node tests/maze-entry-warmup-audit.cjs >/dev/null 2>&1; then
-  ok "Maze entry audit passed (Enter the Maze primary, no gate wording)"
-else
-  bad "Maze entry audit failed"
-fi
 
 echo "[games] engine markup audit"
 if node tests/games-markup-audit.cjs >/dev/null 2>&1; then
@@ -2099,11 +2093,11 @@ else
   bad "weekly intro videos test failed"
 fi
 
-echo "[player] Blitz-complete maze entry"
-if node tests/blitz-complete-entry.test.cjs >/dev/null 2>&1; then
-  ok "warm-up reminds until Blitz 3/3; then muted flyover (reveal first); card shown once filled in"
+echo "[player] Maze arrival (earned path)"
+if node tests/maze-arrival.test.cjs >/dev/null 2>&1; then
+  ok "Daily Check + Blitz done: congratulations once a week, then straight in; otherwise reminder + flyover with music; no muted video"
 else
-  bad "Blitz-complete entry test failed"
+  bad "Maze arrival test failed"
 fi
 
 echo "[player] Daily Check reminders"

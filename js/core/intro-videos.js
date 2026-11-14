@@ -2,9 +2,10 @@
  * intro-videos.js
  * The Booha Adventure: intro videos play once per curriculum week.
  *
- * Each intro video (hub, maze flyover, homework tree, Karasuki tree, Happy
- * House, Utsuroba, Muenba) plays on the student's first visit of the week
- * and is skipped on later visits that week. The week is the calendar's own
+ * Each intro video (hub, homework tree, Karasuki tree, Happy House,
+ * Utsuroba, Muenba) plays on the student's first visit of the week and is
+ * skipped on later visits that week. The Maze flyover has its own earned
+ * rule (js/core/maze-arrival.js); 'maze' stays in IDS for older saves. The week is the calendar's own
  * Sunday-started Tokyo week (CALENDAR occurrenceKey). Seen state lives in the
  * student's save under weekly.introsSeen, which the weekly reset clears, and
  * each entry also stores the week key, so a missed reset cannot hide a video

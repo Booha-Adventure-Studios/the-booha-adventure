@@ -26,12 +26,15 @@ assert(maze.includes('function playBgMusic(){'), 'BGM playback must use a centra
 assert(!/<source\b/i.test(maze), 'Maze media must not include eager source children');
 assert(!/id="(?:toMazeVideo|hwTreeVideo|krVideo|bgMusic)"[^>]*preload="auto"/.test(maze), 'Maze media must not use eager preload');
 
-// Weekly intros (Nov 2026): the tap handler loads the flyover only when it is
-// due this week, still from the user action and never earlier.
+// Maze arrival (Nov 2026, js/core/maze-arrival.js): the flyover loads inside
+// startFlyover(), which only the arrival tap calls; never earlier.
 {
-  const start = maze.indexOf("continueBtn.addEventListener('click'");
-  const tap = maze.slice(start, maze.indexOf('\n});', start));
-  assert(/introSeen\('maze'\);\s*loadMediaSource\(toMazeVideo\);/.test(tap), 'transition video must load from its user action');
+  const start = maze.indexOf('function startFlyover(){');
+  const fly = maze.slice(start, maze.indexOf('\n}\n', start));
+  assert(start > 0 && /loadMediaSource\(toMazeVideo\);/.test(fly), 'transition video must load from its user action');
+  const tap = maze.slice(maze.indexOf("continueBtn.addEventListener('click'"), maze.indexOf('\n});', maze.indexOf("continueBtn.addEventListener('click'")));
+  assert(/startFlyover\(\);/.test(tap), 'the arrival tap starts the flyover');
+  assert.strictEqual((maze.match(/startFlyover\(\);/g) || []).length, 1, 'only the arrival tap starts the flyover');
 }
 assert(maze.includes('loadMediaSource(hwTreeVideo);'), 'Homework video must load from its confirmation action');
 assert(maze.includes('loadMediaSource(krVideo);'), 'Karasuki video must load from its confirmation action');

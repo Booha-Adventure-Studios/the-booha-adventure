@@ -285,6 +285,26 @@
       raf(() => raf(() => ui.popup?.classList.add('visible')));
     }
 
+    /* Maze arrival (js/core/maze-arrival.js): the companion reveal is part of
+       the one congratulations popup instead of a popup of its own. The
+       arrival card asks what to show, and its Enter tap claims it. */
+    function pendingReveal() {
+      if (!skins) return null;
+      const id = skins.rotationCharacterId?.();
+      if (!id || !blitzTripleCompleteForAnyCurriculum()) return null;
+      if (skins.isUnlocked?.(id) && skins.isRevealSeen?.(id)) return null;
+      const skin = skins.get?.(id);
+      if (!skin) return null;
+      return { id, name: skin.name, art: skin.assets?.maze || '' };
+    }
+
+    function claimReveal(id) {
+      if (!id || !skins?.unlockAndEquip?.(id)) return false;
+      skins.markRevealSeen?.(id);
+      options.applyEquippedMazeSkin?.();
+      return true;
+    }
+
     function reset() {
       popupShown = false;
       unlockId = null;
@@ -299,6 +319,8 @@
       prepareSeasonalUnlockPopup,
       equipSeasonalFromUnlockPopup,
       maybeShowSeasonalUnlockPopup,
+      pendingReveal,
+      claimReveal,
       reset,
     };
   }
