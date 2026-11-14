@@ -378,8 +378,64 @@ const HAPPY_HOUSE_PORTAL = {
   /* Oddities are earned elsewhere, but their physical home is Karasuki. A
      stable hash keeps a find in the same room after a reload, while the
      existing orb placement rules keep it away from doors and characters. */
-  const ODDITY_DRAW_SIZE = { small: 30, medium: 54, large: 82 };
-  const ODDITY_HIT_RADIUS = { small: 34, medium: 42, large: 54 };
+  // Each oddity has its own drawn size (collectibles-data.js `size`, longest
+  // side in world px). The tap target grows with it and never drops below 34.
+  const ODDITY_DEFAULT_SIZE = 56;
+  function odditySize(item) {
+    const n = Number(item && item.size);
+    return Number.isFinite(n) && n > 0 ? n : ODDITY_DEFAULT_SIZE;
+  }
+  function oddityHitRadius(item) {
+    return Math.max(34, Math.round(odditySize(item) * 0.6));
+  }
+
+  /* oddity-placement:start
+     The stage is scaled to COVER the screen, so edges are cropped: about 85
+     world px off each side on a 4:3 iPad, about 158 off the top and bottom on
+     a wide phone in landscape. A find must sit fully inside the part every
+     landscape screen shows, with a margin, and clear of the top-left HUD
+     (memory trail and clue panel). */
+  const ODDITY_SAFE = { left: 126, right: 1410, top: 198, bottom: 826 };
+  const ODDITY_HUD  = { right: 520, bottom: 330 };
+  const ODDITY_PAD  = 8;   // bob, glow and the glint sparkle
+
+  function oddityFits(x, y, size) {
+    const half = size / 2 + ODDITY_PAD;
+    if (x - half < ODDITY_SAFE.left || x + half > ODDITY_SAFE.right) return false;
+    if (y - half < ODDITY_SAFE.top || y + half > ODDITY_SAFE.bottom) return false;
+    if (x - half < ODDITY_HUD.right && y - half < ODDITY_HUD.bottom) return false;
+    return true;
+  }
+
+  // Pure: picks a spot from the seed, trying rooms in a seeded order. isClear
+  // is the room's own obstacle check (trees, doors, Wanderers, centre).
+  function pickOddityPlacement(rooms, size, seed, index, used, isClear) {
+    if (!rooms.length) return null;
+    const start = seed % rooms.length;
+    const rng = seededRng(seed ^ 0x9e3779b9);
+    const half = size / 2 + ODDITY_PAD;
+    const spanX = ODDITY_SAFE.right - ODDITY_SAFE.left - half * 2;
+    const spanY = ODDITY_SAFE.bottom - ODDITY_SAFE.top - half * 2;
+    const ok = (roomId, x, y) => oddityFits(x, y, size) && isClear(x, y, roomId)
+      && !used.some(o => o.room === roomId && Math.hypot(x - o.x, y - o.y) < 150);
+    for (let roomOffset = 0; roomOffset < rooms.length; roomOffset++) {
+      const roomId = rooms[(start + roomOffset + index) % rooms.length];
+      for (let attempt = 0; attempt < 40; attempt++) {
+        const x = Math.round(ODDITY_SAFE.left + half + rng() * spanX);
+        const y = Math.round(ODDITY_SAFE.top + half + rng() * spanY);
+        if (ok(roomId, x, y)) return { room: roomId, x, y };
+      }
+      // Fallback: a coarse grid over the safe area, so a spot is always found.
+      for (let gy = ODDITY_SAFE.top + half; gy <= ODDITY_SAFE.bottom - half; gy += 40) {
+        for (let gx = ODDITY_SAFE.left + half; gx <= ODDITY_SAFE.right - half; gx += 40) {
+          const x = Math.round(gx), y = Math.round(gy);
+          if (ok(roomId, x, y)) return { room: roomId, x, y };
+        }
+      }
+    }
+    return null;
+  }
+  /* oddity-placement:end */
   let oddityFinds = [];
   let oddityClueEl = null;
   let oddityPickupEl = null;
@@ -396,21 +452,10 @@ const HAPPY_HOUSE_PORTAL = {
 
   function oddityPlacementFor(find, index, used) {
     const rooms = Object.keys(NPP).filter(roomId => DATA.rooms[roomId]);
-    if (!rooms.length) return null;
     // earnedAt is unique to this student's draw, so classmates who drew the
     // same item still hunt in different spots. The spot is saved once placed.
     const seed = oddityHash(`${find.week}|${find.pool}|${find.item.id}|${find.record.earnedAt || 0}`);
-    const start = seed % rooms.length;
-    const rng = seededRng(seed ^ 0x9e3779b9);
-    for (let roomOffset = 0; roomOffset < rooms.length; roomOffset++) {
-      const roomId = rooms[(start + roomOffset + index) % rooms.length];
-      for (let attempt = 0; attempt < 30; attempt++) {
-        const point = generateOrbPosition(roomId, rng);
-        const crowded = used.some(other => other.room === roomId && Math.hypot(point.x - other.x, point.y - other.y) < 150);
-        if (!crowded) return { room: roomId, x: point.x, y: point.y };
-      }
-    }
-    return null;
+    return pickOddityPlacement(rooms, odditySize(find.item), seed, index, used, isOrbPositionClear);
   }
 
   function refreshOddityFinds() {
@@ -421,10 +466,14 @@ const HAPPY_HOUSE_PORTAL = {
     }
     const used = [];
     oddityFinds = BoohaCollectibleSystem.pendingFinds().map((find, index) => {
-      let placement = find.record.room && Number.isFinite(Number(find.record.x)) && Number.isFinite(Number(find.record.y))
+      const saved = find.record.room && Number.isFinite(Number(find.record.x)) && Number.isFinite(Number(find.record.y))
         ? { room: find.record.room, x: Number(find.record.x), y: Number(find.record.y) }
-        : oddityPlacementFor(find, index, used);
-      if (placement && !find.record.room && BoohaCollectibleSystem.recordPlacement(find.item.id, placement)) {
+        : null;
+      // A spot saved before the safe-area rule (or with an older, smaller
+      // size) is moved once if it would be cut off; otherwise it never moves.
+      const savedFits = saved && DATA.rooms[saved.room] && oddityFits(saved.x, saved.y, odditySize(find.item));
+      let placement = savedFits ? saved : oddityPlacementFor(find, index, used);
+      if (placement && !savedFits && BoohaCollectibleSystem.recordPlacement(find.item.id, placement, { replace: !!saved })) {
         find.record.room = placement.room;
         find.record.x = placement.x;
         find.record.y = placement.y;
@@ -578,7 +627,7 @@ const HAPPY_HOUSE_PORTAL = {
     if (!finds.length) return;
     const sec = now / 1000;
     finds.forEach((find, index) => {
-      const base = ODDITY_DRAW_SIZE[find.item.scale] || ODDITY_DRAW_SIZE.medium;
+      const base = odditySize(find.item);
       const bob = Math.sin(sec * 1.5 + index * 1.7) * 3;
       const pulse = 0.5 + 0.5 * Math.sin(sec * 2.2 + index);
       const x = find.x;
@@ -615,7 +664,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function clickCheckOddities(worldX, worldY) {
     for (const find of currentOddities()) {
-      const radius = ODDITY_HIT_RADIUS[find.item.scale] || ODDITY_HIT_RADIUS.medium;
+      const radius = oddityHitRadius(find.item);
       if (Math.hypot(worldX - find.x, worldY - find.y) > radius) continue;
       const result = BoohaCollectibleSystem.collect(find.item.id);
       if (!result || result.saveFailed) return true;

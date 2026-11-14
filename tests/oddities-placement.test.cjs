@@ -58,7 +58,7 @@ assert.strictEqual(h.api.pendingFinds().length, 0, 'a picked-up item should leav
 
 assert.match(karasuki, /function refreshOddityFinds\(\)/, 'Karasuki should load pending finds');
 assert.match(karasuki, /function oddityPlacementFor\(find, index, used\)/, 'placement should be deterministic and collision-aware');
-assert.match(karasuki, /generateOrbPosition\(roomId, rng\)/, 'oddities should reuse the safe room-position generator');
+assert.match(karasuki, /pickOddityPlacement\(rooms, odditySize\(find\.item\), seed, index, used, isOrbPositionClear\)/, 'oddities should use the safe-area placement and the room obstacle check');
 assert.match(karasuki, /function drawOddities\(now\)/, 'Karasuki should render the oddity art and glint');
 assert.match(karasuki, /function clickCheckOddities\(worldX, worldY\)/, 'oddities should have a canvas hit target');
 assert.match(karasuki, /const line = item\.discovery/, 'pickup should reveal the oddity with its discovery line');

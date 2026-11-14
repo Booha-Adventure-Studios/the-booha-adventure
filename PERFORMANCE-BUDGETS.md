@@ -11,6 +11,7 @@ These are enforceable file/cache limits or runtime targets, not claims about eve
 | Maximum decoded Wanderer cache | 48 MiB |
 | Maximum deployed image payload | 52 MiB (every raster under assets/img counts) |
 | Profile medal / trophy art | 48 KiB and 256 px per file |
+| Oddity (Karasuki find) art, `assets/img/collectibles/` | 48 KiB and 320 px per file, lossy, no metadata; 0.6 MiB directory |
 | Profile, Blitz, Menu image directories | 1.6 / 1.4 / 0.5 MiB |
 | Lossless WebP policy | explicit allowlist only; all other deployed WebP images must be lossy |
 | Root image-directory payload | 8 MiB |

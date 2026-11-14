@@ -98,10 +98,15 @@ other way to earn a find.
   clue gives the first step along Karasuki's doors ("→ Go right. /
   みぎへ いこう。"), or "It is in this room. Look for the glint." A small hint
   panel keeps showing the direction after the popup is closed.
-- **Placement:** a stable spot per student, week and item, using Karasuki's
-  existing safe-spot rules (away from trees, exits and edges). The spot is
-  saved once placed, so reloads and other devices agree. The find bobs and
-  glints; no invisible pixel hunt.
+- **Placement:** a stable spot per student, week and item, away from trees,
+  doors, Wanderers and the centre. The stage is scaled to cover the screen,
+  so edges are cropped (about 85 px each side on a 4:3 iPad, about 158 px
+  top and bottom on a wide phone in landscape). A find must sit **fully
+  inside the part every landscape screen shows** (x 126 to 1410, y 198 to
+  826 in world px, including its size) and clear of the top-left HUD. The
+  spot is saved once placed, so reloads and other devices agree; a saved
+  spot that would be cut off is moved once. The find bobs and glints; no
+  invisible pixel hunt.
 - **Unpicked finds** stay in Karasuki until picked up. They never block the
   next week's draws.
 - **Pickup is the reveal:** the item's own discovery line in English and
@@ -142,7 +147,7 @@ shown, so an unshown one is retried on the next page.
 plus one entry; nothing else changes. Entry shape:
 
 ```
-{ id, pool: 'standard' | 'special', scale: 'small' | 'medium' | 'large', asset,
+{ id, pool: 'standard' | 'special', size, asset,
   name, material, discovery, collection, storyHook,
   nameJp, materialJp, discoveryJp, collectionJp, storyHookJp }
 ```
@@ -152,12 +157,16 @@ plus one entry; nothing else changes. Entry shape:
 - **Launch pool:** 9 standard and 3 special (apothecary theme). New finds
   join the pool whenever they are ready; the cabinet never shows a total, so
   growth never shows as a gap.
-- **Art:** square-ish WebP with transparency in `assets/img/collectibles/`.
-  Finds are drawn at 30 to 82 px in Karasuki and 112 px in the cabinet.
-  Recommended export for new art: about 256 to 320 px wide, under 48 KB.
-  The 12 launch images are 768 px wide (47 to 92 KB); re-exporting them
-  smaller is optional and would cut decoded memory on older iPads. There is
-  no per-directory budget line for this folder yet.
+- **Size:** each find has its own drawn `size` in Karasuki world px
+  (longest side). The Booha ghost is 52; nothing is smaller than 48, so
+  every find stays readable and tappable, and big pieces look big (launch
+  sizes: 48 to 112). The tap target grows with the size (never below 34).
+- **Art:** WebP with transparency in `assets/img/collectibles/`, exported at
+  **300 px on the longest side** (320 max), lossy, **under 48 KiB**, and
+  **zero metadata** (image chunks only: no EXIF, XMP or colour profile).
+  New art gets a new filename (`…-300.webp`) so installed iPads never show a
+  stale copy. Masters stay in `_drafts/`, outside Git. Budget: 0.6 MiB for
+  the folder (PERFORMANCE-BUDGETS.md). A test checks every file.
 
 ## 4. Still to do
 
@@ -168,11 +177,6 @@ plus one entry; nothing else changes. Entry shape:
    stack.
 2. **One reward list.** A single registry of every reward type, worth
    building once more kinds of reward are added.
-3. **Adventure Log past weeks.** The past-week strip labels a logged week
-   with nothing completed "休 おやすみ". Check whether that reads as a missed
-   week.
-4. **Art budget.** Add an `assets/img/collectibles/` line to
-   PERFORMANCE-BUDGETS.md when the export size is settled.
 
 Every code pass: read-only first, approval per pass, `./verify.sh` after every
 change, a test in `tests/` for each change.

@@ -51,6 +51,11 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/oddities-art-and-placement.test.cjs",
+      "status": "verify",
+      "reason": "Oddity art budget (320 px, 48 KiB, lossy, zero metadata, no orphans), per-item drawn sizes, and placement that is never cut off on any landscape screen or hidden under the HUD."
+    },
+    {
       "path": "tests/oddities-japanese.test.cjs",
       "status": "verify",
       "reason": "Oddities in Japanese: every oddity line has a Japanese twin, shown in the cabinet and the Karasuki pickup; the story hook is a tap-to-open secret."

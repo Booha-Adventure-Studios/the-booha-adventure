@@ -158,14 +158,17 @@ const BoohaCollectibleSystem = (() => {
     return pending;
   }
 
-  function recordPlacement(id, placement) {
+  // Saves a find's Karasuki spot once. { replace: true } is only for moving a
+  // spot that would be cut off on screen (a waiting find, never a found one).
+  function recordPlacement(id, placement, options) {
     if (!_byId[id] || !_isObject(placement)) return false;
     const x = Number(placement.x);
     const y = Number(placement.y);
     if (!placement.room || !Number.isFinite(x) || !Number.isFinite(y)) return false;
     const data = BoohaAdventure.save.load() || {};
     const earned = _earnedRecord(data.meta || {}, id);
-    if (!earned || earned.entry.foundAt || earned.entry.room) return false;
+    const replace = !!(options && options.replace);
+    if (!earned || earned.entry.foundAt || (earned.entry.room && !replace)) return false;
     earned.entry.room = String(placement.room);
     earned.entry.x = Math.round(x);
     earned.entry.y = Math.round(y);
