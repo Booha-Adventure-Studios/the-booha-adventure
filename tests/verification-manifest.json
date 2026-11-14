@@ -51,6 +51,11 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/oddities-japanese.test.cjs",
+      "status": "verify",
+      "reason": "Oddities in Japanese: every oddity line has a Japanese twin, shown in the cabinet and the Karasuki pickup; the story hook is a tap-to-open secret."
+    },
+    {
       "path": "tests/oddities-cabinet-duplicates-clue.test.cjs",
       "status": "verify",
       "reason": "Oddity fixes part 2: owned-only cabinet with no total and a hidden special shelf, duplicates as ×2 copies, a closeable clue popup with directions instead of room numbers, and per-student draws."

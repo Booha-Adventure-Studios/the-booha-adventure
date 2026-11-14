@@ -1,6 +1,8 @@
 /*
  * Collectible definitions only. Earning, saving, and display stay in their
  * own modules so a new oddity can be added without changing the cabinet.
+ * Every English line has a Japanese twin (…Jp): kid-facing hiragana and
+ * katakana with word spaces, like the rest of the app.
  */
 window.BoohaCollectiblesData = Object.freeze([
   {
@@ -13,6 +15,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: "You found a Bronze Mortar and Double-Ended Pestles. That's weird. It's heavy, too. Into your bag for later. Or not.",
     collection: 'Heavy flared bronze bowls with two mismatched pestles, dark handling patina, crushed herbs caught in the grooves, and bright metal worn around the rims. Someone used this recently. The two pestles do not leave the same marks.',
     storyHook: 'The smaller pestle fits the bowl perfectly. The larger one was made for something else.',
+    nameJp: "ブロンズの すりばちと りょうはしの すりこぎ",
+    materialJp: "ブロンズ",
+    discoveryJp: "ブロンズの すりばちと すりこぎを みつけた。へんなの。しかも おもたい。かばんに いれておこう。…やっぱり やめとく？",
+    collectionJp: "ずっしり おもい ブロンズの すりばちと、かたちの ちがう すりこぎが 2ほん。くろっぽく すりへって、みぞには つぶした ハーブが のこっている。ふちだけ ぴかぴか。だれかが さいきん つかったみたい。2ほんの すりこぎは、ちがう あとを のこす。",
+    storyHookJp: "ちいさい すりこぎは すりばちに ぴったり。おおきい ほうは、なにか ほかの ものの ために つくられた。",
   },
   {
     id: 'apothecary-balance-scale',
@@ -24,6 +31,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found an Apothecary Countertop Balance Scale. It weighs things. Probably. Put it in your bag and try not to lean.',
     collection: 'Two shallow brass pans hang from fine chains above a dark walnut base. A tiny drawer holds graduated weights, though one of them is not brass and has no number. The scale looks balanced until you place nothing on it.',
     storyHook: 'The empty left pan always settles a little lower. It does not matter where the scale is placed.',
+    nameJp: "くすりやさんの てんびん",
+    materialJp: "しんちゅう・クルミの き・てつ",
+    discoveryJp: "くすりやさんの てんびんを みつけた。ものの おもさを はかるんだって。たぶん。かばんに いれて、かたむかないように きを つけてね。",
+    collectionJp: "こげちゃの クルミの だいの うえで、ほそい くさりに つるされた しんちゅうの おさらが 2まい。ちいさな ひきだしには おもりが ならんでいる。でも ひとつだけ しんちゅうじゃなくて、すうじも かいていない。つりあって みえるのに、なにも のせないと なぜか かたむく。",
+    storyHookJp: "からっぽの ひだりの おさらは、いつも ちょっとだけ さがる。どこに おいても おなじ。",
   },
   {
     id: 'cast-iron-crocodile-cork-press',
@@ -35,6 +47,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found a Cast-Iron Crocodile Cork Press. That is a very weird crocodile. It is also a tool. Into the bag.',
     collection: 'An antique counter-mounted press shaped like a crocodile, with a hinged jaw, chipped black paint, rusty bolts, polished metal on the snout, and old cork fragments caught between its teeth. It was built to squeeze bottle stoppers.',
     storyHook: "The jaw closes perfectly, but the press has no maker's mark. The bolt holes do not match any counter you can find.",
+    nameJp: "てつの ワニの コルクしめき",
+    materialJp: "いもの・はがね・コルク",
+    discoveryJp: "てつの ワニの コルクしめきを みつけた。すごく へんな ワニ。しかも どうぐ なんだって。かばんに ポイ。",
+    collectionJp: "ワニの かたちを した、むかしの どうぐ。あごが パカッと ひらいて、くろい ペンキは はげはげ、ボルトは さびさび。はなさきだけ つるつる ひかって、はの あいだには ふるい コルクの かけらが はさまっている。びんの せんを ぎゅっと しめる ための ものだ。",
+    storyHookJp: "あごは ぴったり しまる。でも つくった ひとの しるしが どこにも ない。ボルトの あなが あう だいも、どこにも みつからない。",
   },
   {
     id: 'nesting-brass-cup-weights',
@@ -46,6 +63,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found Nesting Brass Cup Weights. They all fit together. One of them does not belong.',
     collection: 'A graduated set of heavy brass cups tucked beneath a hinged lid and clasp. Each cup is marked with tiny measurement lines, though the smallest cup has no number at all.',
     storyHook: 'When the cups are nested, the set weighs more than when they are separated.',
+    nameJp: "いれこの しんちゅう おもり",
+    materialJp: "しんちゅう",
+    discoveryJp: "いれこの しんちゅう おもりを みつけた。ぜんぶ ぴったり かさなる。でも ひとつだけ、なかまじゃ ないのが いる。",
+    collectionJp: "ふたと とめがねの ついた いれものに、おおきさの ちがう おもい カップが しまってある。どの カップにも こまかい めもりが あるのに、いちばん ちいさい カップだけ すうじが ない。",
+    storyHookJp: "かさねて いれると、ばらばらの ときより おもくなる。",
   },
   {
     id: 'wooden-pill-roller-dividing-board',
@@ -57,6 +79,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found a Wooden Pill Roller and Dividing Board. It has grooves, stains, and a lot of opinions.',
     collection: 'Dark and pale hardwood boards with matching grooved paddles for rolling herbal paste into neat little pills. The working grooves are polished smooth, but a few of them are still sticky.',
     storyHook: 'The board makes twelve pills at a time. There are only eleven grooves.',
+    nameJp: "きの がんやく ころがし",
+    materialJp: "マホガニー・つげの き",
+    discoveryJp: "きの がんやく ころがしを みつけた。みぞと しみと、いいたい ことが いっぱい ありそう。",
+    collectionJp: "こい いろと うすい いろの かたい いたと、みぞの ついた へら。ハーブの ねりものを ころころ ころがして、ちいさな まるい くすりを つくる どうぐ。みぞは つるつるに すりへっている。でも いくつかは まだ ベタベタ。",
+    storyHookJp: "この いたは いちどに 12こ くすりが できる。でも みぞは 11こしか ない。",
   },
   {
     id: 'label-under-glass-apothecary-jar',
@@ -68,6 +95,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found a Label-Under-Glass Apothecary Jar. The label is protected. The powder is not.',
     collection: 'A tall pharmacy jar with a curved glass panel protecting its worn gold-leaf label. The Latin name promises white wax. The powder inside looks nothing like wax.',
     storyHook: 'The label is sealed beneath the glass from the inside.',
+    nameJp: "ガラスの なかに ラベルが ある くすりびん",
+    materialJp: "ガラス・きんぱく・こな",
+    discoveryJp: "ガラスに まもられた ラベルの くすりびんを みつけた。ラベルは まもられている。こなは まもられていない。",
+    collectionJp: "せの たかい くすりやさんの びん。まるい ガラスの むこうに、すりきれた きんいろの ラベル。ラテンごで「しろい ろう」と かいてある。でも なかの こなは、ぜんぜん ろうに みえない。",
+    storyHookJp: "ラベルは ガラスの うちがわから ふうを されている。",
   },
   {
     id: 'victorian-ceramic-ointment-pots',
@@ -79,6 +111,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found Victorian Ceramic Ointment Pots. They look helpful. Probably.',
     collection: 'Small white stoneware pots with crazed glaze, chipped edges, and black transfer-printed lids. One still holds a pale smear of old cold cream.',
     storyHook: 'Every lid promises a different remedy. All three pots smell the same.',
+    nameJp: "むかしの ぬりぐすりの つぼ",
+    materialJp: "せっき・うわぐすり",
+    discoveryJp: "むかしの ぬりぐすりの つぼを みつけた。やくに たちそう。たぶん。",
+    collectionJp: "ちいさくて しろい つぼ。ひびの もようが はいって、ふちは かけている。ふたには くろい えが いんさつされている。ひとつには まだ、ふるい クリームが うっすら のこっている。",
+    storyHookJp: "ふたは どれも ちがう くすりを やくそくしている。なのに 3つとも おなじ においが する。",
   },
   {
     id: 'apothecary-herb-drawer-cabinet',
@@ -90,6 +127,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found an Apothecary Herb-Drawer Cabinet. There are too many tiny drawers. Open one later.',
     collection: 'A narrow wooden cabinet filled with small drawers, worn brass pulls, porcelain labels, and dust in the seams. Most drawers are labeled. One has no handle.',
     storyHook: 'The unlabeled drawer is the only one that is warm.',
+    nameJp: "くすりやさんの ハーブの ひきだし",
+    materialJp: "クルミ・マホガニー・しんちゅう・じき",
+    discoveryJp: "くすりやさんの ハーブの ひきだしを みつけた。ちいさい ひきだしが おおすぎる。ひとつ、あとで あけてみよう。",
+    collectionJp: "ほそながい きの たなに、ちいさな ひきだしが ぎっしり。すりへった しんちゅうの とって、せとものの ラベル、すきまには ほこり。ほとんどの ひきだしに ラベルが ある。ひとつだけ、とっての ない ひきだしが ある。",
+    storyHookJp: "ラベルの ない ひきだしだけ、ほんのり あたたかい。",
   },
   {
     id: 'lithographed-tin-remedy-boxes',
@@ -101,6 +143,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found Lithographed Remedy Tins. Old medicine, cheerful pictures, no useful instructions.',
     collection: 'Small battered tins with peeling color, dented corners, faded herbs, smiling faces, and a few chalky lozenges inside. The pictures are much more confident than the remedies.',
     storyHook: 'The same little plant appears on every box, but it is never named.',
+    nameJp: "えの かいてある くすりの カンカン",
+    materialJp: "いろを ぬった ブリキ・のどあめ",
+    discoveryJp: "えの かいてある くすりの カンカンを みつけた。ふるい くすりに、たのしそうな え。つかいかたは どこにも かいてない。",
+    collectionJp: "でこぼこの ちいさな カンカン。いろは はげて、かどは へこんで、ハーブの えは うすれている。にこにこ わらう かおの えも。なかには こなっぽい のどあめが すこし。くすりより、えの ほうが ずっと じしんまんまん。",
+    storyHookJp: "どの はこにも おなじ ちいさな くさが かいてある。でも その なまえは どこにも ない。",
   },
   {
     id: 'cobalt-ribbed-poison-bottles',
@@ -112,6 +159,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found Cobalt Blue Ribbed Poison Bottles. They are beautiful. Do not drink from them.',
     collection: 'Thick blue and green pharmacy bottles with raised diamond and lattice textures, uneven rims, tiny bubbles in the glass, and heavy bases. They are empty now. Probably.',
     storyHook: 'The green bottle is always colder than the blue ones.',
+    nameJp: "あおい どくの びん",
+    materialJp: "いろガラス",
+    discoveryJp: "あおい どくの びんを みつけた。とっても きれい。でも のんじゃ だめ。",
+    collectionJp: "あつくて おもい、あおと みどりの くすりびん。ひしがたや こうしの もようが でこぼこ うきでて、ふちは ゆがみ、ガラスには ちいさな あわ。いまは からっぽ。たぶん。",
+    storyHookJp: "みどりの びんだけ、いつも あおい びんより つめたい。",
   },
   {
     id: 'brass-horn-medicine-spoons',
@@ -123,6 +175,11 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found Brass and Horn Medicine Spoons. One end is sensible. The other is worrying.',
     collection: 'Double-ended measuring spoons, a curved pewter dosing spoon, and a folding dark-horn spoon with tiny dosage marks. None of them agree about what a small amount means.',
     storyHook: 'The tiny bowl holds exactly one drop more than the large bowl should allow.',
+    nameJp: "しんちゅうと つのの くすりスプーン",
+    materialJp: "しんちゅう・しろめ・つの",
+    discoveryJp: "しんちゅうと つのの くすりスプーンを みつけた。かたほうは ふつう。もう かたほうは、ちょっと しんぱい。",
+    collectionJp: "りょうはしで はかれる スプーン、まがった しろめの スプーン、それに こまかい めもりの ついた、たためる くろい つのの スプーン。「すこし」が どれくらいか、どの スプーンも いけんが あわない。",
+    storyHookJp: "ちいさい ほうの スプーンには、おおきい ほうより ちょうど 1てき おおく はいる。",
   },
   {
     id: 'handwritten-pharmacy-prescription-ledger',
@@ -134,5 +191,10 @@ window.BoohaCollectiblesData = Object.freeze([
     discovery: 'You found a Handwritten Pharmacy Prescription Ledger. It is full of tiny writing. None of it is yours.',
     collection: 'A warped leather logbook with foxed pages, faded formulas, crossed-out lines, loose slips, pressed plant fragments, and a brass clasp that no longer closes. Several entries have been carefully removed.',
     storyHook: 'The missing pages were taken from the middle, not the beginning or the end.',
+    nameJp: "てがきの くすりの ちょうめん",
+    materialJp: "かわ・かみ・インク・おしばな",
+    discoveryJp: "てがきの くすりの ちょうめんを みつけた。ちいさな じが びっしり。でも あなたの じは ひとつも ない。",
+    collectionJp: "そりかえった かわの ちょうめん。ページには ちゃいろい しみ、うすれた レシピ、けされた ぎょう、はさまった かみきれ、おしばなの かけら。しんちゅうの とめがねは もう しまらない。なんページか、ていねいに ぬきとられている。",
+    storyHookJp: "ぬきとられた ページは、はじめでも おわりでもなく、まんなかから だった。",
   },
 ]);

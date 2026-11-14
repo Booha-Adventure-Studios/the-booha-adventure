@@ -556,10 +556,21 @@ const HAPPY_HOUSE_PORTAL = {
     if (!oddityPickupEl) return;
     // The pickup is the reveal: the earn toast never named the item.
     const line = item.discovery || `You found ${item.name}.`;
-    oddityPickupEl.textContent = duplicate ? `${line} Another one! もう ひとつ！` : line;
+    const lineJp = item.discoveryJp || '';
+    oddityPickupEl.textContent = '';
+    const en = document.createElement('span');
+    en.className = 'oddity-pickup-en';
+    en.textContent = duplicate ? `${line} Another one!` : line;
+    oddityPickupEl.appendChild(en);
+    if (lineJp || duplicate) {
+      const jp = document.createElement('span');
+      jp.className = 'oddity-pickup-jp';
+      jp.textContent = duplicate ? `${lineJp} もう ひとつ！`.trim() : lineJp;
+      oddityPickupEl.appendChild(jp);
+    }
     oddityPickupEl.classList.add('show');
     window.clearTimeout(oddityPickupTimer);
-    oddityPickupTimer = window.setTimeout(() => oddityPickupEl.classList.remove('show'), 5000);
+    oddityPickupTimer = window.setTimeout(() => oddityPickupEl.classList.remove('show'), 6500);
   }
 
   function drawOddities(now) {
@@ -4995,6 +5006,8 @@ const HAPPY_HOUSE_PORTAL = {
       #oddity-clue .oddity-clue-jp{margin-top:2px;color:rgba(255,244,194,.68);font-size:.9em;font-weight:400;}
       #oddity-pickup{position:fixed;left:50%;top:76px;transform:translate(-50%,-8px);z-index:7100;max-width:min(440px,calc(100vw - 28px));padding:10px 16px;border:1px solid rgba(255,226,112,.55);border-radius:14px;background:rgba(30,15,2,.94);box-shadow:0 0 24px rgba(255,196,50,.24);color:#fff8d3;font:700 13px/1.3 Georgia,serif;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;}
       #oddity-pickup.show{opacity:1;transform:translate(-50%,0);}
+      #oddity-pickup .oddity-pickup-en,#oddity-pickup .oddity-pickup-jp{display:block;}
+      #oddity-pickup .oddity-pickup-jp{margin-top:4px;color:rgba(255,248,211,.74);font:500 .92em/1.45 sans-serif;}
       @media(max-width:700px){#oddity-clue{left:9px;top:72px;max-width:calc(100vw - 18px);}#oddity-pickup{top:68px;font-size:12px;}}
       /* ── Shared "world popup" component ───────────────
          One shell used by every destination confirm dialog
