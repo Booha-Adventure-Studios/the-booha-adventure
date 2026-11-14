@@ -48,6 +48,6 @@ assert.match(renderer, /function renderCollectibles\(\)/, 'the adventure rendere
 assert.match(renderer, /system && system\.getAll/, 'the cabinet must use the collectible system');
 assert.match(renderer, /loading="lazy" decoding="async"/, 'oddity art must load lazily');
 assert.match(renderer, /booha:collectibleFound/, 'the cabinet must refresh after a collectible is found');
-assert.match(renderer, /A strange thing is still waiting to be found/, 'unfound oddities need a non-spoiler state');
+assert.ok(!/A strange thing is still waiting to be found/.test(renderer), 'unfound oddities are not shown as ??? slots');
 
 console.log('Oddities collectible cabinet tests passed.');

@@ -51,6 +51,11 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/oddities-cabinet-duplicates-clue.test.cjs",
+      "status": "verify",
+      "reason": "Oddity fixes part 2: owned-only cabinet with no total and a hidden special shelf, duplicates as ×2 copies, a closeable clue popup with directions instead of room numbers, and per-student draws."
+    },
+    {
       "path": "tests/oddities-fixes.test.cjs",
       "status": "verify",
       "reason": "Oddity fixes: draws re-checked on every page load, curriculum game boards load the draw logic, and the earn toast is a mystery with the Karasuki pickup as the reveal."
