@@ -11,6 +11,11 @@
   },
   "exceptions": [
     {
+      "path": "tests/interaction-guard.test.cjs",
+      "status": "verify",
+      "reason": "App-wide touch and language guard: suppress accidental selection, tap flashes, and automatic translation while preserving text-entry controls."
+    },
+    {
       "path": "tests/grimmerglen-scrapbook.test.cjs",
       "status": "verify",
       "reason": "Current Grimmerglen scrapbook profile, tree portal icon on every profile, weekly memory jar, and maze-order trail and record book."

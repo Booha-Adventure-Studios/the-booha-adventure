@@ -5,6 +5,73 @@
 
 (function () {
 
+  // Booha is a touch-first app. Keep browser selection, callouts, tap flashes,
+  // and automatic page translation from changing the game surface. Text-entry
+  // controls remain selectable so typing, paste, and teacher PIN entry work.
+  function installInteractionGuards() {
+    const root = document.documentElement;
+    if (!root) return;
+    if (typeof root.setAttribute === 'function') root.setAttribute('translate', 'no');
+    if (root.classList && typeof root.classList.add === 'function') root.classList.add('notranslate');
+
+    if (typeof document.addEventListener === 'function') {
+      document.addEventListener('gesturestart', event => event.preventDefault(), { passive: false });
+    }
+
+    const parent = document.head && typeof document.head.appendChild === 'function'
+      ? document.head
+      : (typeof root.appendChild === 'function' ? root : null);
+    if (!parent || typeof document.createElement !== 'function') return;
+
+    let viewport = typeof document.querySelector === 'function'
+      ? document.querySelector('meta[name="viewport"]')
+      : null;
+    if (!viewport) {
+      viewport = document.createElement('meta');
+      viewport.name = 'viewport';
+      parent.appendChild(viewport);
+    }
+    if (typeof viewport.getAttribute === 'function' && typeof viewport.setAttribute === 'function') {
+      const current = viewport.getAttribute('content') || '';
+      const settings = current.split(',')
+        .map(part => part.trim())
+        .filter(part => part && !/^(?:maximum-scale|user-scalable)\s*=/i.test(part));
+      settings.push('maximum-scale=1', 'user-scalable=no');
+      viewport.setAttribute('content', settings.join(', '));
+    }
+
+    const meta = document.createElement('meta');
+    meta.name = 'google';
+    meta.content = 'notranslate';
+    parent.appendChild(meta);
+
+    const style = document.createElement('style');
+    style.id = 'booha-interaction-guard';
+    style.textContent = `
+      html, body, body * {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        touch-action: manipulation;
+      }
+      body, body * {
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      input, textarea, [contenteditable]:not([contenteditable="false"]) {
+        -webkit-user-select: text;
+        user-select: text;
+        -webkit-touch-callout: default;
+      }
+      img, svg, canvas {
+        -webkit-user-drag: none;
+        user-drag: none;
+      }
+    `;
+    parent.appendChild(style);
+  }
+
+  installInteractionGuards();
+
   const GATE_URL      = 'https://www.bryanharper.tokyo/booha-gate';
   const VERIFY_URL    = 'https://www.bryanharper.tokyo/_functions/verifyToken';
   const VERIFY_AND_LOAD_URL = 'https://www.bryanharper.tokyo/_functions/verifyAndLoad';
