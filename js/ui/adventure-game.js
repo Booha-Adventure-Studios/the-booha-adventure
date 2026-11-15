@@ -27,6 +27,8 @@ const BoohaAdventureGame = (() => {
   const TRAVELERS = [
     { id: 'nuppi', name: 'Nuppi', img: 'assets/img/wanderers/nuppi-1.webp', note: 'いつも たびしてる', always: true },
     { id: 'barba', name: 'Barba', img: 'assets/img/wanderers/barba.webp', seasonId: 'halloween-2026', note: 'ハロウィン 2026' },
+    { id: 'grubb', name: 'Grubb', img: 'assets/skins/grubb_booha/karasuki-knit.webp', seasonId: 'christmas-2026', note: 'クリスマス 2026' },
+    { id: 'marshy', name: 'Marshy', img: 'assets/skins/marshy_booha/karasuki.webp', seasonId: 'japan-winter-2027', note: 'ふゆ 2027' },
   ];
 
   function esc(value) {

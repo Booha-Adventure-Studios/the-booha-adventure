@@ -111,7 +111,7 @@ assert(profile.indexOf('id="pg-hero"') < profile.indexOf('id="profile-highlights
   assert.match(read(page), /js\/core\/traveler-record\.js/, `${page} must load the traveler recorder`);
 });
 assert.match(read('js/karasuki.js'), /BoohaTravelers\.record\('nuppi'\)/, 'tapping Nuppi in Karasuki must be recorded');
-assert.match(read('js/karasuki.js'), /BoohaTravelers\.record\('barba'/, 'tapping Barba must be recorded');
+assert.match(read('js/karasuki.js'), /BoohaTravelers\.record\(config\?\.kind \|\| 'barba'/, 'tapping a seasonal visitor (Barba, Grubb, Marshy) must be recorded under its own id');
 assert.match(read('js/muenba.js'), /BoohaTravelers\.record\('nuppi'\)/, 'tapping Nuppi in Muenba must be recorded');
 ['rank-coin-1', 'rank-coin-9', 'medal-first-step', 'medal-br-champion', 'treasure-chest-open', 'adventure-trail-forest']
   .forEach(name => assert(fs.existsSync(path.join(ROOT, `assets/img/profile/${name}.webp`)), `profile art must exist: ${name}`));

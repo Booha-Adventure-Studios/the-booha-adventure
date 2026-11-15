@@ -58,6 +58,10 @@ const BoohaProfileGame = (() => {
       note: 'いつも たびしている · ALWAYS TRAVELING', hint: 'からすき や むえんば で さがしてね', always: true },
     { id: 'barba', name: 'Barba', img: 'assets/img/wanderers/barba.webp', seasonId: 'halloween-2026',
       note: 'ハロウィン 2026 · SEASONAL', hint: 'ハロウィンの からすき に いるよ' },
+    { id: 'grubb', name: 'Grubb', img: 'assets/skins/grubb_booha/karasuki-knit.webp', seasonId: 'christmas-2026',
+      note: 'クリスマス 2026 · SEASONAL', hint: 'クリスマスの からすき に いるよ' },
+    { id: 'marshy', name: 'Marshy', img: 'assets/skins/marshy_booha/karasuki.webp', seasonId: 'japan-winter-2027',
+      note: 'ふゆ 2027 · SEASONAL', hint: 'ふゆの からすき に いるよ' },
   ];
 
   let collectionFilter = 'all';

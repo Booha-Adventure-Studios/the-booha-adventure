@@ -6797,8 +6797,10 @@ const NUPPI_LINES = [
     barbaPopEl.style.background = 'rgba(8,0,15,.92)';
     state.clickTarget = null;
     if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
+    // Record the visitor actually tapped (Barba, Grubb, Marshy, ...), not
+    // always Barba: the popup is shared by every season's Karasuki visitor.
     if (window.BoohaTravelers) {
-      BoohaTravelers.record('barba', { seasonId: window.BoohaSkins?.seasonIdForDate?.() || null });
+      BoohaTravelers.record(config?.kind || 'barba', { seasonId: window.BoohaSkins?.seasonIdForDate?.() || null });
     }
   }
 

@@ -42,11 +42,36 @@ window.BoohaTravelers = (function () {
     }
   }
 
+  // Until Nov 15 2026, Karasuki recorded every seasonal visitor as "barba".
+  // Christmas taps on Grubb therefore landed in Barba's record and relabeled
+  // it christmas-2026. Read-time repair, the save is not rewritten: a Barba
+  // record first met on or after Nov 1 2026 was only ever Grubb; an older one
+  // is a real Halloween Barba (its visit count may include Grubb taps).
+  var CHRISTMAS_2026_START = Date.parse('2026-11-01T00:00:00+09:00');
+  function repaired(travelers) {
+    var barba = travelers.barba;
+    if (!isObject(barba) || barba.seasonId !== 'christmas-2026') return travelers;
+    var out = Object.assign({}, travelers);
+    if ((Number(barba.firstMetAt) || 0) >= CHRISTMAS_2026_START) {
+      var grubb = isObject(out.grubb) ? out.grubb : null;
+      out.grubb = {
+        id: 'grubb',
+        visits: (Number(barba.visits) || 0) + (grubb ? Number(grubb.visits) || 0 : 0),
+        firstMetAt: grubb ? Math.min(Number(grubb.firstMetAt) || Infinity, Number(barba.firstMetAt)) : Number(barba.firstMetAt),
+        lastMetAt: Math.max(Number(barba.lastMetAt) || 0, grubb ? Number(grubb.lastMetAt) || 0 : 0),
+        seasonId: 'christmas-2026'
+      };
+      delete out.barba;
+    } else {
+      out.barba = Object.assign({}, barba, { seasonId: 'halloween-2026' });
+    }
+    return out;
+  }
   function all() {
     try {
       var data = window.BoohaAdventure && BoohaAdventure.save ? BoohaAdventure.save.load() : null;
       var travelers = data && isObject(data.collection) ? data.collection.travelers : null;
-      return isObject(travelers) ? travelers : {};
+      return isObject(travelers) ? repaired(travelers) : {};
     } catch (_) {
       return {};
     }

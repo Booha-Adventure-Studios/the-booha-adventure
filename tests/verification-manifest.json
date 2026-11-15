@@ -288,7 +288,12 @@
     {
       "path": "tests/japan-winter-season.test.cjs",
       "status": "verify",
-      "reason": "Japan winter 2027 season wiring: Marshy, the Jan 3–Mar 6 guide schedule, Boffo repeat, complete pose assets, Tokyo boundaries, and winter closet styling."
+      "reason": "Japan winter 2027 season wiring: Marshy, the Jan 3–Mar 6 guide schedule, Doorknob Setsubun repeat, complete pose assets, Tokyo boundaries, winter closet styling, greetings, Karasuki visit, unlock copy, and return reveals."
+    },
+    {
+      "path": "tests/seasonal-traveler-record.test.cjs",
+      "status": "verify",
+      "reason": "Seasonal Karasuki visitors are recorded by their own id, Grubb and Marshy appear in both Travelers lists, and old Grubb-as-Barba saves are repaired at read time."
     },
     {
       "path": "tests/invaders-pass10.test.cjs",

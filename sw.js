@@ -390,7 +390,9 @@ const CURRENT_CACHES = {
   // Compact combo pill below 1200 px; smaller on phones (theme/game.css .brun-hud).
   // Japan winter follow-up: Marshy's greetings, snow and Karasuki visit
   // (marshy_booha/karasuki.webp), winter unlock copy, Setsubun repeat week.
-  assets: 'booha-assets-2026-624',
+  // Travelers: Karasuki records each seasonal visitor by its own id; Grubb
+  // and Marshy join the Travelers lists; old Grubb-as-Barba saves read back fixed.
+  assets: 'booha-assets-2026-625',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
