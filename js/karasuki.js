@@ -5271,7 +5271,7 @@ const HAPPY_HOUSE_PORTAL = {
 
   function guardWorldEntry() {
     if (_utsurobaCurriculumUnlocked() || hasTrustedKarasukiEntry()) return true;
-    showLockedWorld('Karasuki', 'カラスキ');
+    showLockedWorld('Karasuki', 'カラスキー');
     return false;
   }
 
@@ -5313,7 +5313,7 @@ const HAPPY_HOUSE_PORTAL = {
     injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectMuenbaPopOverlay(); injectOrbPanel(); injectObserverPop(); injectHappyHousePop();
     
     const rotateOverlay = document.createElement("div"); rotateOverlay.id = "rotate-overlay";
-    rotateOverlay.innerHTML = `<span class="rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="rotate-bar"></div><p class="rotate-title-en">Turn your device sideways!</p><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
+    rotateOverlay.innerHTML = `<span class="rotate-phone" aria-hidden="true"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.4"></rect><line x1="11" y1="18.4" x2="13" y2="18.4"></line></svg></span><div class="rotate-bar"></div><p class="rotate-title-en">Turn your device sideways!</p><p class="rotate-title">横にして遊ぼう！</p><p class="rotate-sub">カラスキーは<strong style="color:#ff79d7">横画面</strong>で遊べるよ。<br>スマホを横にしてね。</p>`;
     document.body.appendChild(rotateOverlay);
     ctx = canvas.getContext("2d");
 

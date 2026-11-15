@@ -13,6 +13,6 @@ assert.match(page, /href="karasuki\.html\?from=profile"/, 'Adventure profile bac
 assert.match(source, /const firstVisit = !previous\.firstFoundAt/, 'first discovery should be detected before incrementing visits');
 assert.match(source, /showWandererDiscovery\(w\)/, 'first wanderer visits should trigger a discovery moment');
 assert.match(source, /showKarasukiArrival\(\)/, 'Karasuki should trigger its arrival moment during init');
-assert.match(source, /カラスキへおかえりなさい/, 'arrival moment should include Japanese support text');
+assert.match(source, /カラスキーへおかえりなさい/, 'arrival moment should include Japanese support text');
 
 console.log('Karasuki arrival tests passed.');

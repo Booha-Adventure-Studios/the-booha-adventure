@@ -776,7 +776,7 @@
       .muenba-lock a small{display:block;margin-top:2px;color:#9fc3af;font-size:.9em;}
     `;
     document.head.appendChild(style);
-    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.webp" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>Complete nine lessons in one path this week before it will open to you.</small></p><p class="jp-line"><ruby>墓地<rt>ぼち</rt></ruby>の<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
+    document.body.innerHTML = `<main class="muenba-lock" aria-labelledby="muenba-lock-title"><img src="assets/img/muenba/muenba_logo.webp" alt="Muenba"><h1 id="muenba-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something waits beyond the cemetery path.<small>Complete nine lessons in one path this week before it will open to you.</small></p><p class="jp-line"><ruby>墓地<rt>ぼち</rt></ruby>の<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキーに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
   }
 
   function primeDangerScreamSamples() {
@@ -6860,9 +6860,9 @@
     returnPortalOverlay.innerHTML = `
       <div class="muenba-return-box">
         <h2>Leave Muenba?</h2>
-        <p class="jp">カラスキに戻りますか？</p>
+        <p class="jp">カラスキーに戻りますか？</p>
         <p>The path back to Karasuki is open here.</p>
-        <p class="jp-line">ここからカラスキへ<ruby>戻<rt>もど</rt></ruby>る<ruby>道<rt>みち</rt></ruby>が<ruby>開<rt>ひら</rt></ruby>いています。</p>
+        <p class="jp-line">ここからカラスキーへ<ruby>戻<rt>もど</rt></ruby>る<ruby>道<rt>みち</rt></ruby>が<ruby>開<rt>ひら</rt></ruby>いています。</p>
         <div class="muenba-return-actions">
           <button id="muenba-return-yes" type="button"><span>Yes, return</span><small>はい、<ruby>戻<rt>もど</rt></ruby>る</small></button>
           <button id="muenba-return-no" type="button"><span>Stay</span><small>ここにいる</small></button>

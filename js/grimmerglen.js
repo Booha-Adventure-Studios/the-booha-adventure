@@ -2480,9 +2480,9 @@
     returnPortalOverlay.innerHTML = `
       <div class="grimmerglen-return-box">
         <h2>Leave Grimmerglen?</h2>
-        <p class="jp">${furiJP('カラスキに戻りますか？', MARIETTA_UI_READINGS)}</p>
+        <p class="jp">${furiJP('カラスキーに戻りますか？', MARIETTA_UI_READINGS)}</p>
         <p>The path back to Karasuki is open here.</p>
-        <p class="jp-line">${furiJP('ここからカラスキへ戻る道が開いています。', MARIETTA_UI_READINGS)}</p>
+        <p class="jp-line">${furiJP('ここからカラスキーへ戻る道が開いています。', MARIETTA_UI_READINGS)}</p>
         <div class="grimmerglen-return-actions">
           <button id="grimmerglen-return-yes" type="button"><span>Yes, return</span><small>${furiJP('はい、戻る', MARIETTA_UI_READINGS)}</small></button>
           <button id="grimmerglen-return-no" type="button"><span>Stay</span><small>ここにいる</small></button>
@@ -3135,7 +3135,7 @@
       .grimmerglen-lock a small{display:block;margin-top:2px;color:#b06a94;font-size:.9em;}
     `;
     document.head.appendChild(style);
-    document.body.innerHTML = `<main class="grimmerglen-lock" aria-labelledby="grimmerglen-lock-title"><img src="assets/img/grimmerglen/marietta/marietta_01.webp" alt="Marietta"><h1 id="grimmerglen-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something dreamy waits beyond this path.<small>Complete nine lessons in one path this week before it will open to you.</small></p><p class="jp-line">この<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で、<ruby>夢<rt>ゆめ</rt></ruby>のような<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
+    document.body.innerHTML = `<main class="grimmerglen-lock" aria-labelledby="grimmerglen-lock-title"><img src="assets/img/grimmerglen/marietta/marietta_01.webp" alt="Marietta"><h1 id="grimmerglen-lock-title">This world is locked</h1><p class="jp">この世界は封印されています</p><p>Something dreamy waits beyond this path.<small>Complete nine lessons in one path this week before it will open to you.</small></p><p class="jp-line">この<ruby>道<rt>みち</rt></ruby>の<ruby>先<rt>さき</rt></ruby>で、<ruby>夢<rt>ゆめ</rt></ruby>のような<ruby>何<rt>なに</rt></ruby>かが<ruby>待<rt>ま</rt></ruby>っている。<br><small>今週、ひとつの道で九つの学びを終えよ。それまで、ここは開かない。</small></p><a href="karasuki.html">Return to Karasuki<small>カラスキーに<ruby>戻<rt>もど</rt></ruby>る</small></a></main>`;
   }
 
   function init() {

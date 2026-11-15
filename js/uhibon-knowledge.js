@@ -458,16 +458,16 @@ window.UHIBON_KNOWLEDGE = {
     /* ── KARASUKI (global fallback) ───────────────────────── */
 
     {
-      keywords: ["karasuki","what is karasuki","tell me about karasuki","カラスキ"],
+      keywords: ["karasuki","what is karasuki","tell me about karasuki","カラスキー"],
       answer: {
         en: "Karasuki is darker and more mysterious. Strange and quiet. Not exactly scary. Just different.",
-        jp: "カラスキは くらくて もっと ふしぎだよ。しずかで へんな ばしょ。こわいわけじゃないけど、なんか ちがう。"
+        jp: "カラスキーは くらくて もっと ふしぎだよ。しずかで へんな ばしょ。こわいわけじゃないけど、なんか ちがう。"
       }
     },
 
     {
       keywords: ["do you like karasuki"],
-      answer: { en: "Karasuki is strange. I like strange.", jp: "カラスキは へんだよ。ぼくは へんなの すき。" }
+      answer: { en: "Karasuki is strange. I like strange.", jp: "カラスキーは へんだよ。ぼくは へんなの すき。" }
     },
 
     /* ── HOMEWORK TREE (global fallback) ──────────────────── */
@@ -531,7 +531,7 @@ window.UHIBON_KNOWLEDGE = {
       keywords: ["what can you do","what do you know","what should i ask","what can i ask","help question"],
       answer: {
         en: "Ask me about the maze, Karasuki, homework, games, study decks, or what I am.",
-        jp: "めいろ、カラスキ、しゅくだい、ゲーム、べんきょうデッキ、ぼくのことを きけるよ。"
+        jp: "めいろ、カラスキー、しゅくだい、ゲーム、べんきょうデッキ、ぼくのことを きけるよ。"
       }
     }
 

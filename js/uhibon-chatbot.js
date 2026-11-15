@@ -459,13 +459,13 @@ const PAGE_CONTEXTS = {
 
   karasuki: {
     intro: [
-      { en: "Uuu-hi-hi-hi-hi. Karasuki. Darker here. Quieter. Something is always nearby.", jp: "うーひひひひ。カラスキだよ。ここは くらい。しずか。なにかが いつも ちかくに いるんだ。" },
-      { en: "Heehee. You found Karasuki. Strange place. Good strange.", jp: "えへへ。カラスキを みつけたね。へんな ばしょだよ。いい へんさだけど。" },
+      { en: "Uuu-hi-hi-hi-hi. Karasuki. Darker here. Quieter. Something is always nearby.", jp: "うーひひひひ。カラスキーだよ。ここは くらい。しずか。なにかが いつも ちかくに いるんだ。" },
+      { en: "Heehee. You found Karasuki. Strange place. Good strange.", jp: "えへへ。カラスキーを みつけたね。へんな ばしょだよ。いい へんさだけど。" },
       { en: "Uuu-hi-hi-hi-hi. Welcome to the strange dark quiet place.", jp: "うーひひひひ。へんで くらくて しずかな ばしょへ ようこそ。" }
     ],
 
     quickReplies: [
-      { en: "What even is Karasuki?",       jp: "カラスキって なに？" },
+      { en: "What even is Karasuki?",       jp: "カラスキーって なに？" },
       { en: "Why does it feel so strange?", jp: "なんで こんなに へんな かんじがするの？" },
       { en: "Is something hiding in here?", jp: "なにかが かくれてる？" },
       { en: "Is it okay to explore here?",  jp: "ここを たんけんしても いい？" }
@@ -477,84 +477,84 @@ const PAGE_CONTEXTS = {
         answer: [
           { en: "Uuu-hi-hi-hi-hi. Hello. Quietly.", jp: "うーひひひひ。こんにちは。しずかにね。" },
           { en: "Heehee. Someone arrived. Hello, quiet adventurer.", jp: "えへへ。だれか きた。こんにちは、しずかな ぼうけんしゃ。" },
-          { en: "Hi. Karasuki noticed you came in.", jp: "こんにちは。カラスキは きみが はいってきたの しってるよ。" },
+          { en: "Hi. Karasuki noticed you came in.", jp: "こんにちは。カラスキーは きみが はいってきたの しってるよ。" },
           { en: "Oh. Hello. This place gets quieter when someone arrives. Strange.", jp: "あ。こんにちは。だれかが くると もっと しずかになるんだ。ふしぎだね。" }
         ]
       },
       {
-        keywords: ["karasuki","what is karasuki","カラスキ","なに"],
+        keywords: ["karasuki","what is karasuki","カラスキー","なに"],
         answer: [
-          { en: "Karasuki is a strange place. Darker than usual. Quieter too. Not scary exactly. Just different.", jp: "カラスキは ふしぎな ばしょだよ。いつもより くらくて しずか。こわいわけじゃないけど、なんか ちがうんだ。" },
+          { en: "Karasuki is a strange place. Darker than usual. Quieter too. Not scary exactly. Just different.", jp: "カラスキーは ふしぎな ばしょだよ。いつもより くらくて しずか。こわいわけじゃないけど、なんか ちがうんだ。" },
           { en: "Old. Strange. Quiet. Full of things that don't quite say what they are.", jp: "ふるくて へんで しずか。なにかを かくしてる ものが いっぱいあるよ。" }
         ]
       },
       {
         keywords: ["where am i","where is this","ここは","どこ"],
         answer: [
-          { en: "You are in Karasuki. It feels a little lost and a little alive at the same time.", jp: "カラスキに いるよ。ちょっと まよったみたいで、でも ちょっと いきてる みたいな ばしょなんだ。" },
-          { en: "Karasuki. Somewhere between here and somewhere else.", jp: "カラスキ。ここと どこかの あいだに ある ばしょだよ。" }
+          { en: "You are in Karasuki. It feels a little lost and a little alive at the same time.", jp: "カラスキーに いるよ。ちょっと まよったみたいで、でも ちょっと いきてる みたいな ばしょなんだ。" },
+          { en: "Karasuki. Somewhere between here and somewhere else.", jp: "カラスキー。ここと どこかの あいだに ある ばしょだよ。" }
         ]
       },
       {
         keywords: ["why dark","dark","dim","くらい"],
         answer: [
-          { en: "Karasuki likes mystery more than brightness. They don't agree on that point.", jp: "カラスキは あかるさより ふしぎが すきなんだ。そこは なかよくできないみたい。" },
-          { en: "Some places just like the dark. Karasuki is one of them.", jp: "くらいのが すきな ばしょって あるんだよ。カラスキは そういう ばしょ。" }
+          { en: "Karasuki likes mystery more than brightness. They don't agree on that point.", jp: "カラスキーは あかるさより ふしぎが すきなんだ。そこは なかよくできないみたい。" },
+          { en: "Some places just like the dark. Karasuki is one of them.", jp: "くらいのが すきな ばしょって あるんだよ。カラスキーは そういう ばしょ。" }
         ]
       },
       {
         keywords: ["scary","creepy","こわい"],
         answer: [
           { en: "A little spooky. Not the loud kind. More like a quiet strange feeling.", jp: "ちょっと こわい。でも うるさい こわさじゃなくて、しずかに へんな かんじ。" },
-          { en: "Heehee. Karasuki is the kind of spooky that makes you look twice.", jp: "えへへ。カラスキは もう いちど みたくなる こわさだよ。" }
+          { en: "Heehee. Karasuki is the kind of spooky that makes you look twice.", jp: "えへへ。カラスキーは もう いちど みたくなる こわさだよ。" }
         ]
       },
       {
         keywords: ["what do i do here","what should i do","なにをする","どうする"],
         answer: [
-          { en: "Look around carefully. Karasuki is better if you take your time.", jp: "まわりを よく みてみて。カラスキは ゆっくり みると もっと いいんだよ。" },
-          { en: "Slow down. Let Karasuki show you things.", jp: "ゆっくりして。カラスキが みせてくれるのを まってみて。" }
+          { en: "Look around carefully. Karasuki is better if you take your time.", jp: "まわりを よく みてみて。カラスキーは ゆっくり みると もっと いいんだよ。" },
+          { en: "Slow down. Let Karasuki show you things.", jp: "ゆっくりして。カラスキーが みせてくれるのを まってみて。" }
         ]
       },
       {
         keywords: ["weird","strange","why strange","へん","ふしぎ"],
         answer: [
-          { en: "Because normal places don't become Karasuki.", jp: "ふつうの ばしょは カラスキに ならないからだよ。" },
-          { en: "Strange is just how Karasuki is. It's comfortable with it.", jp: "へんなのが カラスキの ふつうなんだ。なれてるよ。" }
+          { en: "Because normal places don't become Karasuki.", jp: "ふつうの ばしょは カラスキーに ならないからだよ。" },
+          { en: "Strange is just how Karasuki is. It's comfortable with it.", jp: "へんなのが カラスキーの ふつうなんだ。なれてるよ。" }
         ]
       },
       {
         keywords: ["lost","i'm lost","i am lost","まよった"],
         answer: [
-          { en: "Being a little lost in Karasuki is maybe part of seeing it properly.", jp: "カラスキで ちょっと まようのも、ちゃんと みるための ひとつかもね。" },
-          { en: "Heehee. Karasuki likes it when you stay a while.", jp: "えへへ。カラスキは すこし いてくれると うれしいんだよ。" }
+          { en: "Being a little lost in Karasuki is maybe part of seeing it properly.", jp: "カラスキーで ちょっと まようのも、ちゃんと みるための ひとつかもね。" },
+          { en: "Heehee. Karasuki likes it when you stay a while.", jp: "えへへ。カラスキーは すこし いてくれると うれしいんだよ。" }
         ]
       },
       {
         keywords: ["secret","hidden","ひみつ"],
         answer: [
-          { en: "Karasuki feels full of secrets even when nothing is speaking.", jp: "カラスキは なにも しゃべってなくても、ひみつが いっぱい ありそうな かんじがするよ。" },
+          { en: "Karasuki feels full of secrets even when nothing is speaking.", jp: "カラスキーは なにも しゃべってなくても、ひみつが いっぱい ありそうな かんじがするよ。" },
           { en: "Yes. Many. Don't rush.", jp: "あるよ。たくさん。いそがないでね。" }
         ]
       },
       {
         keywords: ["crow","crows","bird","からす","とり"],
         answer: [
-          { en: "Karasuki and crows seem to understand each other.", jp: "カラスキと からすは なんとなく わかりあってるみたい。" },
-          { en: "Crows know things. So does Karasuki. They get along.", jp: "からすは いろいろ しってるんだ。カラスキも そう。だから なかよし。" }
+          { en: "Karasuki and crows seem to understand each other.", jp: "カラスキーと からすは なんとなく わかりあってるみたい。" },
+          { en: "Crows know things. So does Karasuki. They get along.", jp: "からすは いろいろ しってるんだ。カラスキーも そう。だから なかよし。" }
         ]
       },
       {
         keywords: ["can i leave","go back","exit","でられる","もどれる"],
         answer: [
-          { en: "Probably yes. But Karasuki prefers not to be rushed.", jp: "たぶん だいじょうぶ。でも カラスキは いそがれるのが すきじゃないんだ。" },
+          { en: "Probably yes. But Karasuki prefers not to be rushed.", jp: "たぶん だいじょうぶ。でも カラスキーは いそがれるのが すきじゃないんだ。" },
           { en: "You can leave. But look around a little more first.", jp: "でられるよ。でも もう すこし みていって。" }
         ]
       },
       {
         keywords: ["who lives here","who is here","だれが いる"],
         answer: [
-          { en: "Karasuki feels like the kind of place where something is always nearby.", jp: "カラスキは なんか いつも なにかが ちかくに いそうな ばしょだよ。" },
+          { en: "Karasuki feels like the kind of place where something is always nearby.", jp: "カラスキーは なんか いつも なにかが ちかくに いそうな ばしょだよ。" },
           { en: "Hard to say. But you probably aren't alone.", jp: "むずかしい しつもんだね。でも たぶん ひとりじゃ ないよ。" }
         ]
       }
