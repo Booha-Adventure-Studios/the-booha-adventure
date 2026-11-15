@@ -40,8 +40,11 @@ const htmlFiles = childProcess.execFileSync('git', ['ls-files', '*.html'], { cwd
 
 for (const file of htmlFiles) {
   const relative = path.relative(root, file).replaceAll(path.sep, '/');
-  if (relative === 'mister_happys_snap_test.html' || relative === 'ui/save-panel.html') continue;
   const source = fs.readFileSync(file, 'utf8');
+  // Skip by what a file is, not by name: a fragment loaded into other pages
+  // (no <html> of its own) or a redirect page (meta refresh) never shows UI.
+  if (!/<html[\s>]/i.test(source)) continue;
+  if (/<meta[^>]+http-equiv=["']refresh["']/i.test(source)) continue;
   assert.match(source, /(?:^|["'])(?:\/?the-booha-adventure\/)?(?:\.\.\/|\.\/)*js\/token\.js["']/, 
     `${relative} must load the token gate, which installs the interaction guard`);
 }
