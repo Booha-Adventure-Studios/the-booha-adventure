@@ -1,3 +1,10 @@
+/**
+ * Booha Adventure — weekly Booha skin registry.
+ *
+ * World scripts ask this registry for an asset instead of knowing where a
+ * skin's files live. Unknown, locked, or malformed selections fall back to
+ * the original yellow Booha so an incomplete save can never break a world.
+ */
 const BoohaSkins = (() => {
   'use strict';
 
@@ -42,11 +49,16 @@ const BoohaSkins = (() => {
     CHRISTMAS_GLOW.gold,
     CHRISTMAS_GLOW.white,
   ]);
+  // November is the quiet "First Snow" phase: frosty white, ice, and silver
+  // sparkles around the red/green checkpoint core. December's "Lights On"
+  // phase brings the gold back (see the Christmas season phases below).
   const CHRISTMAS_FIRST_SNOW_SPARK_COLORS = Object.freeze([
     '#ffffff',
     '#cfeaff',
     '#dfe5ee',
   ]);
+  // After Christmas (Dec 26 on) Japan turns to New Year, so the red/green
+  // fades to quieter gold-and-white winter lights.
   const WINTER_GOLD_SPARK_COLORS = Object.freeze([
     '#ffe9a3',
     '#ffffff',
@@ -165,6 +177,55 @@ const BoohaSkins = (() => {
       }),
     ]),
   });
+  // Japan winter: snowflakes in a colder blue, and Marshy (an Otafuku mask)
+  // visiting Karasuki with winter facts from Japan and the U.S.
+  const WINTER_SNOWFLAKE_VISITOR = Object.freeze({
+    kind: 'snowflake',
+    asset: 'assets/img/seasonal-snowflake.webp',
+    color: '#c1f8ff',
+    requires: 'blitz-triple',
+  });
+  const WINTER_KARASUKI = Object.freeze({
+    kind: 'marshy',
+    name: 'Marshy',
+    nameJp: 'マーシー',
+    asset: 'assets/skins/marshy_booha/karasuki.webp',
+    color: '#ffe6a0',
+    popupLabel: 'MARSHY SAYS',
+    popupLabelJp: 'マーシーからのひとこと',
+    lines: Object.freeze([
+      Object.freeze({
+        en: '{name}, hello! Did you know? In Japan, many people eat mochi at New Year.',
+        jp: '{name}、こんにちは！ しってる？ にほんでは、お正月に おもちを たべる 人が おおいよ。',
+        furigana: Object.freeze({ '正月': 'しょうがつ', '人': 'ひと' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? On Setsubun, people throw beans and shout, "Oni wa soto! Fuku wa uchi!"',
+        jp: '{name}、こんにちは！ しってる？ せつぶんには まめを まいて、「おにはそと！ ふくはうち！」って いうよ。',
+        furigana: Object.freeze({}),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? In the U.S., February 2 is Groundhog Day. If the groundhog sees its shadow, people say winter will last six more weeks.',
+        jp: '{name}、こんにちは！ しってる？ アメリカでは、２がつ ふつかは グラウンドホッグ・デー。グラウンドホッグが じぶんの かげを 見たら、冬が あと６しゅうかん つづくと いわれているよ。',
+        furigana: Object.freeze({ '見': 'み', '冬': 'ふゆ' }),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Every February, Sapporo has a snow festival with giant snow sculptures.',
+        jp: '{name}、こんにちは！ しってる？ さっぽろでは まいとし ２がつに ゆきまつりが あって、おおきな ゆきの ぞうが ならぶよ。',
+        furigana: Object.freeze({}),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? Some snow monkeys in Nagano warm up in hot springs.',
+        jp: '{name}、こんにちは！ しってる？ ながのの スノーモンキーは、おんせんで あったまるよ。',
+        furigana: Object.freeze({}),
+      }),
+      Object.freeze({
+        en: '{name}, hello! Did you know? On March 3, Hinamatsuri, families set out hina dolls.',
+        jp: '{name}、こんにちは！ しってる？ ３がつ みっかの ひなまつりには、ひなにんぎょうを かざるよ。',
+        furigana: Object.freeze({}),
+      }),
+    ]),
+  });
   // One shared table keeps the checkpoint/room atmosphere aligned across
   // Maze, Karasuki, and Utsuroba. October is the Halloween orange/purple
   // month; December has an explicit Christmas red/green pair instead of a fallback.
@@ -186,13 +247,16 @@ const BoohaSkins = (() => {
     'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
     'marking', 'hiding', 'danceArmsUp', 'danceSway', 'danceWave',
   ]);
+  // Mascots are seasonal visitors, not weekly player skins. They need one
+  // everyday sprite plus an optional warmer Karasuki interaction pose, not
+  // the full gameplay/dance set required by an unlockable character.
   const MASCOT_POSE_KEYS = Object.freeze(['static', 'karasuki']);
   const BLITZ_GAME_TYPES = Object.freeze(['vocab', 'sentences', 'questions']);
   const BLITZ_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
   const JAPAN_WINTER = 'japan-winter-2027';
   const JAPAN_WINTER_GUIDES = Object.freeze({
-    meatball: 'ミートボール', noodle: 'ヌードル', gruffles: 'グラッフルズ', boffo: 'ボッフォ',
-    wumble: 'ワンブル', socks: 'ソックス', doorknob: 'ドアノブ', bloopus: 'ブループス',
+    meatball: 'ミートボール', noodle: 'ヌードル', gruffles: 'グラッフルズ', doorknob: 'ドアノブ',
+    wumble: 'ワンブル', socks: 'ソックス', boffo: 'ボッフォ', bloopus: 'ブループス',
   });
   const winterGuideSkins = Object.fromEntries(Object.entries(JAPAN_WINTER_GUIDES).map(([id, nameJp]) => [id, makeSeasonalUnlockable(id, id[0].toUpperCase() + id.slice(1), nameJp, true, JAPAN_WINTER)]));
   function makeSeasonalUnlockable(id, name, nameJp, enabled = false, seasonId = 'christmas-2026') {
@@ -367,9 +431,13 @@ const BoohaSkins = (() => {
       nameJp: 'マーシー',
       assets: Object.freeze({
         static: 'assets/skins/marshy_booha/static.webp',
-        karasuki: 'assets/skins/marshy_booha/static.webp',
+        // Smaller copy of static.webp for the Karasuki visitor.
+        karasuki: 'assets/skins/marshy_booha/karasuki.webp',
       }),
     }),
+    // Art-complete unlockables are enabled one at a time as their full pose
+    // sets land. The schedule is defined up front, but missing art can never
+    // become a playable selection by accident.
     thumpkin: makeSeasonalUnlockable('thumpkin', 'Thumpkin', 'ソンプキン', true),
     crumbly: makeSeasonalUnlockable('crumbly', 'Crumbly', 'クランブリー', true),
     gnasher: makeSeasonalUnlockable('gnasher', 'Gnasher', 'ナーシャー', true),
@@ -525,14 +593,87 @@ const BoohaSkins = (() => {
       endDate: '2027-03-06',
       rotationStartOccurrenceKey: '2027-01-03|january-w1',
       characterIds: Object.freeze(Object.keys(JAPAN_WINTER_GUIDES)),
-      weeklyCharacterIds: Object.freeze(Object.fromEntries('2027-01-03:meatball,2027-01-10:noodle,2027-01-17:gruffles,2027-01-24:boffo,2027-01-31:boffo,2027-02-07:wumble,2027-02-14:socks,2027-02-21:doorknob,2027-02-28:bloopus'.split(',').map(pair => pair.split(':')))),
+      // Jan 31 is January's fifth Sunday, which repeats Week 4's content, so
+      // Week 4's guide repeats with it. Doorknob (an oni) holds both weeks so
+      // the oni week is the week of Setsubun (Feb 3).
+      weeklyCharacterIds: Object.freeze({
+        '2027-01-03': 'meatball',
+        '2027-01-10': 'noodle',
+        '2027-01-17': 'gruffles',
+        '2027-01-24': 'doorknob',
+        '2027-01-31': 'doorknob',
+        '2027-02-07': 'wumble',
+        '2027-02-14': 'socks',
+        '2027-02-21': 'boffo',
+        '2027-02-28': 'bloopus',
+      }),
+      // Marshy is the seasonal mascot, not a weekly reward: on the landing
+      // page and in Daily Check for the whole season.
       menuSchedule: Object.freeze([
         Object.freeze({ start: '2027-01-03', end: '2027-03-06', characterId: 'marshy' }),
       ]),
       palette: WINTER_PALETTE,
       glow: WINTER_GLOW,
+      // Japan's winter calendar, picked by date like the Christmas phases.
+      phases: Object.freeze([
+        Object.freeze({
+          id: 'new-year',
+          start: '2027-01-03',
+          end: '2027-01-10',
+          mazeSnow: true,
+          lights: 'gold',
+          greeting: Object.freeze({ en: "Happy New Year! Let's do our best!", jp: 'ことしも よろしくね！' }),
+        }),
+        Object.freeze({
+          id: 'deep-winter',
+          start: '2027-01-11',
+          end: '2027-01-30',
+          mazeSnow: true,
+          mazeFrost: true,
+          greeting: Object.freeze({ en: "Brr! It's cold today!", jp: 'さむいね！ あったかく してね。' }),
+        }),
+        Object.freeze({
+          id: 'setsubun',
+          start: '2027-01-31',
+          end: '2027-02-03',
+          mazeSnow: true,
+          mazeFrost: true,
+          greeting: Object.freeze({ en: 'Setsubun is coming!', jp: 'もうすぐ せつぶん！' }),
+          countdown: Object.freeze({
+            to: '2027-02-03',
+            fromDays: 3,
+            many: Object.freeze({ en: '{n} more days to Setsubun!', jp: 'せつぶんまで あと{n}日！' }),
+            tomorrow: Object.freeze({ en: 'Tomorrow is Setsubun!', jp: 'あしたは せつぶん！' }),
+            today: Object.freeze({ en: 'Oni wa soto! Fuku wa uchi!', jp: 'おにはそと！ ふくはうち！' }),
+          }),
+        }),
+        Object.freeze({
+          id: 'late-winter',
+          start: '2027-02-04',
+          end: '2027-02-28',
+          mazeSnow: true,
+          greeting: Object.freeze({ en: 'Spring is on its way!', jp: 'もうすぐ はるだね！' }),
+        }),
+        Object.freeze({
+          id: 'hinamatsuri',
+          start: '2027-03-01',
+          end: '2027-03-06',
+          greeting: Object.freeze({ en: 'Spring is almost here!', jp: 'はるが きたね！' }),
+          countdown: Object.freeze({
+            to: '2027-03-03',
+            fromDays: 2,
+            many: Object.freeze({ en: '{n} more days to Hinamatsuri!', jp: 'ひなまつりまで あと{n}日！' }),
+            tomorrow: Object.freeze({ en: 'Tomorrow is Hinamatsuri!', jp: 'あしたは ひなまつり！' }),
+            today: Object.freeze({ en: 'Happy Hinamatsuri!', jp: 'ひなまつり おめでとう！' }),
+          }),
+        }),
+      ]),
+      seasonalVisitor: WINTER_SNOWFLAKE_VISITOR,
+      seasonalKarasuki: WINTER_KARASUKI,
     }),
   };
+  // Keep the old unversioned lookup working for existing world code while
+  // canonical season IDs remain year-scoped for collection storage.
   Object.defineProperty(seasonDefinitions, 'halloween', {
     value: seasonDefinitions['halloween-2026'],
     enumerable: false,
@@ -825,6 +966,21 @@ const BoohaSkins = (() => {
     } catch (_) { return false; }
   }
 
+  // True when the student collected this character in an earlier week. A
+  // repeat week (a fifth Sunday) then reveals "is back!" instead of a new
+  // unlock. Old collection entries without a time count as new.
+  function collectedBeforeThisWeek(id) {
+    const skin = get(id);
+    if (!skin) return false;
+    try {
+      const entry = save()?.load()?.meta?.boohaSkinCollection?.[collectionKey(skin)];
+      const at = Number(entry?.unlockedAt);
+      const weekStart = String(currentWeekKey() || '').split('|')[0];
+      const startMs = Date.parse(`${weekStart}T00:00:00+09:00`);
+      return Number.isFinite(at) && Number.isFinite(startMs) && at < startMs;
+    } catch (_) { return false; }
+  }
+
   function collectedSkinIds(seasonId = currentSeasonId()) {
     return seasonCharacters(seasonId)
       .filter(skin => isCollected(skin.id))
@@ -952,6 +1108,7 @@ const BoohaSkins = (() => {
     isRevealSeen,
     markRevealSeen,
     isCollected,
+    collectedBeforeThisWeek,
     selectedId,
     asset,
     unlockAndEquip,

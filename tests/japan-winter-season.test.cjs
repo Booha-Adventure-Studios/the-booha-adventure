@@ -2,7 +2,9 @@
 'use strict';
 
 // Japan winter 2027 season wiring: Marshy, the eight guide rotation, the
-// Boffo repeat week, complete pose assets, Tokyo date boundaries, and closet styling.
+// Doorknob repeat week (Setsubun), complete pose assets, Tokyo date boundaries,
+// closet styling, Marshy's greetings and Karasuki visit, winter unlock copy,
+// and the "is back" reveal for repeat weeks.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -31,8 +33,8 @@ vm.runInContext(read('js/core/booha-skins.js'), skinsContext, { filename: 'js/co
 const skins = skinsContext.window.BoohaSkins;
 const season = skins.getSeason('japan-winter-2027');
 const characterIds = [
-  'meatball', 'noodle', 'gruffles', 'boffo',
-  'wumble', 'socks', 'doorknob', 'bloopus',
+  'meatball', 'noodle', 'gruffles', 'doorknob',
+  'wumble', 'socks', 'boffo', 'bloopus',
 ];
 const poseKeys = [
   'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
@@ -74,11 +76,11 @@ const expectedWeeks = [
   ['2027-01-03', 'meatball'],
   ['2027-01-10', 'noodle'],
   ['2027-01-17', 'gruffles'],
-  ['2027-01-24', 'boffo'],
-  ['2027-01-31', 'boffo'],
+  ['2027-01-24', 'doorknob'],
+  ['2027-01-31', 'doorknob'],
   ['2027-02-07', 'wumble'],
   ['2027-02-14', 'socks'],
-  ['2027-02-21', 'doorknob'],
+  ['2027-02-21', 'boffo'],
   ['2027-02-28', 'bloopus'],
 ];
 expectedWeeks.forEach(([date, expected]) => {
@@ -105,4 +107,81 @@ const adventureProfile = read('adventure-profile.html');
 assert.match(adventureProfile, /\.closet-shelf\.winter\s*\{/,
   'the profile needs a winter closet shelf style');
 
-console.log('Japan winter season passed: Marshy, nine-week guide rotation, complete assets, Tokyo boundaries, and winter closet styling.');
+// Marshy's greetings follow Japan's winter calendar.
+const greeting = date => {
+  const line = skins.seasonGreeting('japan-winter-2027', date);
+  return line && line.en;
+};
+assert.strictEqual(greeting('2027-01-03'), "Happy New Year! Let's do our best!");
+assert.strictEqual(greeting('2027-01-20'), "Brr! It's cold today!");
+assert.strictEqual(greeting('2027-01-31'), '3 more days to Setsubun!');
+assert.strictEqual(greeting('2027-02-02'), 'Tomorrow is Setsubun!');
+assert.strictEqual(greeting('2027-02-03'), 'Oni wa soto! Fuku wa uchi!');
+assert.strictEqual(greeting('2027-02-04'), 'Spring is on its way!');
+assert.strictEqual(greeting('2027-03-01'), '2 more days to Hinamatsuri!');
+assert.strictEqual(greeting('2027-03-03'), 'Happy Hinamatsuri!');
+assert.strictEqual(greeting('2027-03-05'), 'Spring is almost here!');
+for (let t = Date.parse('2027-01-03T00:00:00Z'); t <= Date.parse('2027-03-06T00:00:00Z'); t += 86400000) {
+  const date = new Date(t).toISOString().slice(0, 10);
+  const line = skins.seasonGreeting('japan-winter-2027', date);
+  assert.ok(line && line.en && line.jp, `${date} needs a Marshy greeting in English and Japanese`);
+}
+assert.strictEqual(skins.seasonPhase('japan-winter-2027', '2027-02-01').id, 'setsubun');
+
+// Seasonal snowflakes in the Maze, and Marshy visiting Karasuki.
+const visitors = skins.seasonalVisitors('japan-winter-2027', '2027-01-20');
+assert.strictEqual(visitors.length, 1);
+assert.strictEqual(visitors[0].kind, 'snowflake');
+assert.ok(fs.existsSync(path.join(ROOT, visitors[0].asset)), 'winter snowflake art must exist');
+const karasukiVisit = skins.seasonalKarasuki('japan-winter-2027');
+assert.strictEqual(karasukiVisit.kind, 'marshy');
+assert.strictEqual(karasukiVisit.asset, marshy.assets.karasuki);
+assert.ok(fs.existsSync(path.join(ROOT, karasukiVisit.asset)), 'Marshy Karasuki art must exist');
+assert.ok(karasukiVisit.lines.length >= 5, 'Marshy needs several Karasuki lines');
+karasukiVisit.lines.forEach((line, i) => {
+  assert.ok(line.en.startsWith('{name}, ') && line.jp.startsWith('{name}、'), `Marshy line ${i} needs the name slot`);
+  assert.ok(line.furigana && typeof line.furigana === 'object', `Marshy line ${i} needs a furigana map`);
+});
+
+// Every winter guide has hand-written unlock copy.
+const unlockContext = { window: {}, console };
+unlockContext.window.window = unlockContext.window;
+vm.createContext(unlockContext);
+vm.runInContext(read('js/maze-seasonal-unlock.js'), unlockContext, { filename: 'js/maze-seasonal-unlock.js' });
+const unlock = unlockContext.window.MazeSeasonalUnlock;
+characterIds.forEach(id => {
+  const copy = unlock.COPY[id];
+  assert.ok(copy, `${id} needs hand-written unlock copy`);
+  const name = skins.get(id).name;
+  assert.strictEqual(copy.titleEn, `You Unlocked ${name}!`);
+  assert.strictEqual(copy.buttonEn, `EQUIP ${name.toUpperCase()}`);
+  assert.ok(copy.titleJp.startsWith(skins.get(id).nameJp), `${id} Japanese title must use its name`);
+});
+
+// Repeat weeks welcome a collected character back instead of "unlocking" it.
+const back = unlock.returnCopyFor('doorknob', skins.get('doorknob'));
+assert.strictEqual(back.titleEn, 'Doorknob Booha Is Back!');
+assert.match(back.titleJp, /^ドアノブ・ブーハーが もどってきたよ！$/);
+function collectedAt(unlockedAt) {
+  const ctx = {
+    window: {
+      CALENDAR: calendarContext.window.CALENDAR,
+      BoohaAdventure: { save: { load() {
+        return { meta: { boohaSkinCollection: { 'japan-winter-2027:doorknob': { unlockedAt, seasonId: 'japan-winter-2027' } } } };
+      }, save() { return true; } } },
+    },
+    Intl, Date, console,
+  };
+  ctx.window.window = ctx.window;
+  ctx.BoohaAdventure = ctx.window.BoohaAdventure;
+  vm.createContext(ctx);
+  vm.runInContext(read('js/core/booha-skins.js'), ctx, { filename: 'js/core/booha-skins.js' });
+  return ctx.window.BoohaSkins.collectedBeforeThisWeek('doorknob');
+}
+assert.strictEqual(collectedAt(Date.now() - 14 * 86400000), true, 'collected two weeks ago counts as returning');
+assert.strictEqual(collectedAt(Date.now()), false, 'collected this week is a new unlock');
+assert.strictEqual(collectedAt(undefined), false, 'an entry without a time is treated as new');
+const maze = read('maze.html');
+assert.match(maze, /reveal\.returning/, 'the Maze arrival card must word repeat weeks as a return');
+
+console.log('Japan winter season passed: Marshy, nine-week guide rotation with the Setsubun repeat, complete assets, Tokyo boundaries, winter closet styling, greetings, Karasuki visit, unlock copy, and return reveals.');

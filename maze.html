@@ -137,8 +137,9 @@
   <div id="seasonalUnlockScrim" aria-hidden="true"></div>
   <section id="seasonalUnlockPopup" role="dialog" aria-modal="true" aria-labelledby="seasonalUnlockTitle" aria-describedby="seasonalUnlockCopy">
     <div class="seasonalUnlock-bar" aria-hidden="true"></div>
-    <button id="seasonalEquipButton" class="seasonalUnlock-equip-button" type="button" aria-label="Equip Batty Booha">
-      <img class="seasonalUnlock-art" src="assets/skins/batty_booha/static.webp" alt="Batty Booha" />
+    <button id="seasonalEquipButton" class="seasonalUnlock-equip-button" type="button" aria-label="Equip">
+      <!-- No default image: the popup sets this week's character before it shows. -->
+      <img class="seasonalUnlock-art" alt="" />
     </button>
     <p class="seasonalUnlock-kicker">A NEW FRIEND HAS ARRIVED<span class="seasonalUnlock-jp"><ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ</span></p>
     <h2 id="seasonalUnlockTitle">You Unlocked Batty Booha!<span class="seasonalUnlock-jp">バッティー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！</span></h2>
@@ -550,10 +551,14 @@ function personalizeMazeIntro() {
     setText('mazeNameTail', '.');
     setHTML('mazeEntryNameJp', 'よく がんばったね！');
     setText('mazeEntryMessageEn', reveal
-      ? `Today’s Daily Check and all 3 Blitz games are done. ${reveal.name} joins you in the Maze this week!`
+      ? (reveal.returning
+        ? `Today’s Daily Check and all 3 Blitz games are done. ${reveal.name} is back and joins you in the Maze this week!`
+        : `Today’s Daily Check and all 3 Blitz games are done. ${reveal.name} joins you in the Maze this week!`)
       : 'Today’s Daily Check and all 3 Blitz games are done. The Maze is waiting for you.');
     setHTML('mazeEntryMessageJp', reveal
-      ? 'きょうの デイリーチェックと ブリッツ 3つ、ぜんぶ クリア！ あたらしい ともだちが いっしょに めいろへ いくよ！'
+      ? (reveal.returning
+        ? 'きょうの デイリーチェックと ブリッツ 3つ、ぜんぶ クリア！ なかまが また いっしょに めいろへ いくよ！'
+        : 'きょうの デイリーチェックと ブリッツ 3つ、ぜんぶ クリア！ あたらしい ともだちが いっしょに めいろへ いくよ！')
       : 'きょうの デイリーチェックと ブリッツ 3つ、ぜんぶ クリア！ めいろへ いこう！');
     setText('continueBtnEn', 'Enter the Maze');
     setHTML('continueBtnJp', '<ruby>めいろ</ruby>へ <ruby>行<rt>い</rt></ruby>く');

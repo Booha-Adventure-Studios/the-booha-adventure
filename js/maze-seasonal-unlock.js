@@ -150,6 +150,87 @@
       buttonEn: 'EQUIP QUILLOCK BOOHA',
       buttonJp: 'クウィラック・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
     }),
+    // Japan winter 2027 guides.
+    meatball: Object.freeze({
+      kickerEn: 'A LUCKY FRIEND ROLLED IN!',
+      kickerJp: 'えんぎの いい ともだちが ころがってきたよ！',
+      titleEn: 'You Unlocked Meatball Booha!',
+      titleJp: 'ミートボール・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Meatball always gets back up. Fall down seven times, stand up eight! Tap to roll through the maze together!',
+      copyJp: 'ミートボールは なんど ころんでも おきあがるよ。ななころび やおき！ タップして いっしょに めいろを すすもう！',
+      buttonEn: 'EQUIP MEATBALL BOOHA',
+      buttonJp: 'ミートボール・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    noodle: Object.freeze({
+      kickerEn: 'A LUCKY CAT SAYS HELLO!',
+      kickerJp: 'まねきねこが あいさつに きたよ！',
+      titleEn: 'You Unlocked Noodle Booha!',
+      titleJp: 'ヌードル・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: "Noodle's little bell rings in good luck. Tap to bring some luck into the maze!",
+      copyJp: 'ヌードルの すずが しあわせを よんでくるよ。タップして めいろに しあわせを はこぼう！',
+      buttonEn: 'EQUIP NOODLE BOOHA',
+      buttonJp: 'ヌードル・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    gruffles: Object.freeze({
+      kickerEn: 'A NEW YEAR LION DANCED IN!',
+      kickerJp: 'ししまいの ともだちが おどってきたよ！',
+      titleEn: 'You Unlocked Gruffles Booha!',
+      titleJp: 'グラッフルズ・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Gruffles dances to chase away bad luck for the new year. Tap to dance through the maze!',
+      copyJp: 'グラッフルズは おどって わるいものを おいはらうよ。タップして おどりながら めいろを すすもう！',
+      buttonEn: 'EQUIP GRUFFLES BOOHA',
+      buttonJp: 'グラッフルズ・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    doorknob: Object.freeze({
+      kickerEn: 'AN ONI CAME TO THE MAZE!',
+      kickerJp: 'おにが めいろに きたよ！',
+      titleEn: 'You Unlocked Doorknob Booha!',
+      titleJp: 'ドアノブ・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Setsubun is coming, but Doorknob is a friendly oni. Tap to team up. No beans needed!',
+      copyJp: 'もうすぐ せつぶん。でも ドアノブは やさしい おにだよ。タップして なかまに しよう。まめは いらないよ！',
+      buttonEn: 'EQUIP DOORKNOB BOOHA',
+      buttonJp: 'ドアノブ・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    wumble: Object.freeze({
+      kickerEn: 'A KAPPA CLIMBED OUT OF THE POND!',
+      kickerJp: 'かっぱが いけから でてきたよ！',
+      titleEn: 'You Unlocked Wumble Booha!',
+      titleJp: 'ワンブル・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Wumble keeps a little water in the dish on its head. Tap gently and explore together!',
+      copyJp: 'ワンブルは あたまの おさらに みずを いれているよ。そっと タップして いっしょに たんけんしよう！',
+      buttonEn: 'EQUIP WUMBLE BOOHA',
+      buttonJp: 'ワンブル・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    socks: Object.freeze({
+      kickerEn: 'A FOX FRIEND APPEARED IN THE SNOW!',
+      kickerJp: 'ゆきの なかから きつねが でてきたよ！',
+      titleEn: 'You Unlocked Socks Booha!',
+      titleJp: 'ソックス・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Socks leaves tiny footprints in the snow. Tap to follow them through the maze!',
+      copyJp: 'ソックスは ゆきに ちいさな あしあとを のこすよ。タップして めいろで おいかけよう！',
+      buttonEn: 'EQUIP SOCKS BOOHA',
+      buttonJp: 'ソックス・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    boffo: Object.freeze({
+      kickerEn: 'A BRIGHT RED FRIEND STOMPED IN!',
+      kickerJp: 'まっかな ともだちが やってきたよ！',
+      titleEn: 'You Unlocked Boffo Booha!',
+      titleJp: 'ボッフォ・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Boffo brings good health and a big warm heart. Tap to stomp through the maze together!',
+      copyJp: 'ボッフォは げんきと あったかい きもちを はこんでくるよ。タップして いっしょに めいろを すすもう！',
+      buttonEn: 'EQUIP BOFFO BOOHA',
+      buttonJp: 'ボッフォ・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
+    bloopus: Object.freeze({
+      kickerEn: 'A SPRING FRIEND BLOOMED!',
+      kickerJp: 'はるの ともだちが さいたよ！',
+      titleEn: 'You Unlocked Bloopus Booha!',
+      titleJp: 'ブループス・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！',
+      copyEn: 'Bloopus brings the first cherry blossoms. Tap to welcome spring together!',
+      copyJp: 'ブループスが さくらを つれてきたよ。タップして いっしょに はるを むかえよう！',
+      buttonEn: 'EQUIP BLOOPUS BOOHA',
+      buttonJp: 'ブループス・ブーハーを <ruby>装備<rt>そうび</rt></ruby>',
+    }),
   });
 
   // Any character without hand-written copy still gets a reveal, built from
@@ -171,6 +252,24 @@
       titleJp: `${nameJp}を <ruby>解放<rt>かいほう</rt></ruby>したよ！`,
       copyEn: `Tap ${name} to equip your new traveling friend.`,
       copyJp: `${nameJp}を タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。`,
+      buttonEn: `EQUIP ${name.toUpperCase()}`,
+      buttonJp: `${nameJp}を <ruby>装備<rt>そうび</rt></ruby>`,
+    });
+  }
+
+  // A character the student already collected in an earlier week (a repeat
+  // week such as a fifth Sunday) is welcomed back instead of "unlocked" again.
+  function returnCopyFor(id, skin) {
+    const name = String((skin && skin.name) || '').trim();
+    if (!name) return null;
+    const nameJp = escapeHtml(String((skin && skin.nameJp) || name).trim());
+    return Object.freeze({
+      kickerEn: 'AN OLD FRIEND IS BACK!',
+      kickerJp: 'なかまが もどってきたよ！',
+      titleEn: `${name} Is Back!`,
+      titleJp: `${nameJp}が もどってきたよ！`,
+      copyEn: `${name} came back to the maze this week. Tap to travel together again!`,
+      copyJp: `${nameJp}が また めいろに きたよ。タップして、もう いちど いっしょに いこう！`,
       buttonEn: `EQUIP ${name.toUpperCase()}`,
       buttonJp: `${nameJp}を <ruby>装備<rt>そうび</rt></ruby>`,
     });
@@ -230,7 +329,8 @@
 
     function prepareSeasonalUnlockPopup(id) {
       const skin = skins?.get(id);
-      const copy = copyFor(id, skin);
+      const returning = !!skins?.collectedBeforeThisWeek?.(id);
+      const copy = returning ? returnCopyFor(id, skin) : copyFor(id, skin);
       if (!copy || !skin || !ui.popup) return false;
       const setLeadText = (selector, value) => {
         const el = ui.popup.querySelector(selector);
@@ -295,7 +395,7 @@
       if (skins.isUnlocked?.(id) && skins.isRevealSeen?.(id)) return null;
       const skin = skins.get?.(id);
       if (!skin) return null;
-      return { id, name: skin.name, art: skin.assets?.maze || '' };
+      return { id, name: skin.name, art: skin.assets?.maze || '', returning: !!skins.collectedBeforeThisWeek?.(id) };
     }
 
     function claimReveal(id) {
@@ -325,5 +425,5 @@
     };
   }
 
-  global.MazeSeasonalUnlock = Object.freeze({ COPY, copyFor, create });
+  global.MazeSeasonalUnlock = Object.freeze({ COPY, copyFor, returnCopyFor, create });
 })(window);
