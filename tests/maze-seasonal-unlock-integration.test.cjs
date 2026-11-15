@@ -190,5 +190,7 @@ assert.match(mazeSource, /mazeSeasonalUnlock\.reset\(\)/,
   'Maze weekly reset must reset the extracted controller');
 assert.match(mazeSource, /seasonalEquipButton\?\.addEventListener\('click', equipSeasonalFromUnlockPopup\)/,
   'the image equip button must use the extracted controller');
+assert.match(mazeSource, /seasonalEquipTextButton\?\.addEventListener\('click', equipSeasonalFromUnlockPopup\)/,
+  'the text equip button must use the extracted controller');
 
 console.log('Maze seasonal-unlock integration passed: direct controller execution, curriculum/stale negatives, popup-once, reload, equip, and reset hold.');
