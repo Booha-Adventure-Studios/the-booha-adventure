@@ -286,6 +286,11 @@
       "reason": "Scheduled seasonal characters must have complete art before entering the next 14 Tokyo calendar days."
     },
     {
+      "path": "tests/japan-winter-season.test.cjs",
+      "status": "verify",
+      "reason": "Japan winter 2027 season wiring: Marshy, the Jan 3–Mar 6 guide schedule, Boffo repeat, complete pose assets, Tokyo boundaries, and winter closet styling."
+    },
+    {
       "path": "tests/invaders-pass10.test.cjs",
       "status": "superseded",
       "reason": "Mute behavior assertion expects candy-SFX stopping that the current engine does not implement."

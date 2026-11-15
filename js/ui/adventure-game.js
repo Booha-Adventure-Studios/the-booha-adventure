@@ -22,6 +22,7 @@ const BoohaAdventureGame = (() => {
   const SEASON_STYLE = {
     halloween: { jp: 'ハロウィン', cls: 'halloween' },
     christmas: { jp: 'クリスマス', cls: 'christmas' },
+    winter: { jp: 'ふゆ', cls: 'winter' },
   };
   const TRAVELERS = [
     { id: 'nuppi', name: 'Nuppi', img: 'assets/img/wanderers/nuppi-1.webp', note: 'いつも たびしてる', always: true },

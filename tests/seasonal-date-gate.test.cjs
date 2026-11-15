@@ -95,8 +95,8 @@ assert.strictEqual(skins.mascotAsset('static', 'christmas'), 'assets/skins/grubb
 });
 assert.strictEqual(skins.seasonIdForDate('2027-01-02'), 'christmas-2026',
   'Jan 2: Christmas must remain active through the final unlock week');
-assert.strictEqual(skins.seasonIdForDate('2027-01-03'), null,
-  'Jan 3: Christmas must end after the eighth unlock week');
+assert.strictEqual(skins.seasonIdForDate('2027-01-03'), 'japan-winter-2027',
+  'Jan 3: Japan winter must begin when Christmas ends');
 
 // The requested fifth-Sunday case is Aug 30, outside the Sep 1–Nov 7 sweep.
 const fifthSunday = occurrence(new Date('2026-08-30T12:00:00+09:00'));

@@ -81,7 +81,7 @@ const nov = load('2026-11-10').dataset;
 assert.strictEqual(nov.seasonLights, undefined);
 assert.strictEqual(nov.seasonFrost, undefined);
 const after = load('2027-01-03').dataset;
-assert.strictEqual(after.season, undefined, 'no season after Jan 2');
+assert.strictEqual(after.season, 'winter', 'Japan winter starts after Jan 2');
 
 // ── Page wiring ──────────────────────────────────────────────────────────
 const index = readFamily('index.html');

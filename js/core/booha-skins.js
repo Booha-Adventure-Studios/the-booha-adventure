@@ -1,10 +1,3 @@
-/**
- * Booha Adventure — weekly Booha skin registry.
- *
- * World scripts ask this registry for an asset instead of knowing where a
- * skin's files live. Unknown, locked, or malformed selections fall back to
- * the original yellow Booha so an incomplete save can never break a world.
- */
 const BoohaSkins = (() => {
   'use strict';
 
@@ -41,22 +34,19 @@ const BoohaSkins = (() => {
     purple: '#55d486',
     lime: '#ffe9a3',
   });
+  const WINTER_PALETTE = Object.freeze({ red: '#bd4058', green: '#39758a', white: '#f4fbff', gold: '#d8b45c', orange: '#39758a', purple: '#6576c9', lime: '#9edfe5', black: '#07131d' });
+  const WINTER_GLOW = Object.freeze({ red: '#ff7187', green: '#62d8e4', white: '#fff', gold: '#ffe6a0', orange: '#62d8e4', purple: '#a9a7ff', lime: '#c1f8ff' });
   const CHRISTMAS_CHECKPOINT_SPARK_COLORS = Object.freeze([
     CHRISTMAS_GLOW.red,
     CHRISTMAS_GLOW.green,
     CHRISTMAS_GLOW.gold,
     CHRISTMAS_GLOW.white,
   ]);
-  // November is the quiet "First Snow" phase: frosty white, ice, and silver
-  // sparkles around the red/green checkpoint core. December's "Lights On"
-  // phase brings the gold back (see the Christmas season phases below).
   const CHRISTMAS_FIRST_SNOW_SPARK_COLORS = Object.freeze([
     '#ffffff',
     '#cfeaff',
     '#dfe5ee',
   ]);
-  // After Christmas (Dec 26 on) Japan turns to New Year, so the red/green
-  // fades to quieter gold-and-white winter lights.
   const WINTER_GOLD_SPARK_COLORS = Object.freeze([
     '#ffe9a3',
     '#ffffff',
@@ -196,17 +186,20 @@ const BoohaSkins = (() => {
     'maze', 'karasuki', 'grimmerglen', 'utsuroba', 'muenba', 'familyRoom',
     'marking', 'hiding', 'danceArmsUp', 'danceSway', 'danceWave',
   ]);
-  // Mascots are seasonal visitors, not weekly player skins. They need one
-  // everyday sprite plus an optional warmer Karasuki interaction pose, not
-  // the full gameplay/dance set required by an unlockable character.
   const MASCOT_POSE_KEYS = Object.freeze(['static', 'karasuki']);
   const BLITZ_GAME_TYPES = Object.freeze(['vocab', 'sentences', 'questions']);
   const BLITZ_CURRICULA = Object.freeze(['pb', 'br', 'bc']);
-  function makeSeasonalUnlockable(id, name, nameJp, enabled = false) {
+  const JAPAN_WINTER = 'japan-winter-2027';
+  const JAPAN_WINTER_GUIDES = Object.freeze({
+    meatball: 'ミートボール', noodle: 'ヌードル', gruffles: 'グラッフルズ', boffo: 'ボッフォ',
+    wumble: 'ワンブル', socks: 'ソックス', doorknob: 'ドアノブ', bloopus: 'ブループス',
+  });
+  const winterGuideSkins = Object.fromEntries(Object.entries(JAPAN_WINTER_GUIDES).map(([id, nameJp]) => [id, makeSeasonalUnlockable(id, id[0].toUpperCase() + id.slice(1), nameJp, true, JAPAN_WINTER)]));
+  function makeSeasonalUnlockable(id, name, nameJp, enabled = false, seasonId = 'christmas-2026') {
     const folder = `assets/skins/${id}_booha`;
     return Object.freeze({
       id,
-      seasonId: 'christmas-2026',
+      seasonId,
       enabled,
       name: `${name} Booha`,
       nameJp: `${nameJp}・ブーハー`,
@@ -365,9 +358,18 @@ const BoohaSkins = (() => {
         karasuki: 'assets/skins/grubb_booha/karasuki-knit.webp',
       }),
     }),
-    // Art-complete unlockables are enabled one at a time as their full pose
-    // sets land. The schedule is defined up front, but missing art can never
-    // become a playable selection by accident.
+    marshy: Object.freeze({
+      id: 'marshy',
+      kind: 'mascot',
+      seasonId: JAPAN_WINTER,
+      enabled: true,
+      name: 'Marshy',
+      nameJp: 'マーシー',
+      assets: Object.freeze({
+        static: 'assets/skins/marshy_booha/static.webp',
+        karasuki: 'assets/skins/marshy_booha/static.webp',
+      }),
+    }),
     thumpkin: makeSeasonalUnlockable('thumpkin', 'Thumpkin', 'ソンプキン', true),
     crumbly: makeSeasonalUnlockable('crumbly', 'Crumbly', 'クランブリー', true),
     gnasher: makeSeasonalUnlockable('gnasher', 'Gnasher', 'ナーシャー', true),
@@ -376,6 +378,7 @@ const BoohaSkins = (() => {
     tinkerplunk: makeSeasonalUnlockable('tinkerplunk', 'Tinkerplunk', 'ティンカープランク', true),
     oats: makeSeasonalUnlockable('oats', 'Oats', 'オーツ', true),
     quillock: makeSeasonalUnlockable('quillock', 'Quillock', 'クウィラック', true),
+    ...winterGuideSkins,
   });
 
   const seasonDefinitions = {
@@ -512,9 +515,24 @@ const BoohaSkins = (() => {
       seasonalVisitor: CHRISTMAS_SNOWFLAKE_VISITOR,
       seasonalKarasuki: CHRISTMAS_KARASUKI,
     }),
+    'japan-winter-2027': Object.freeze({
+      id: JAPAN_WINTER,
+      themeId: 'winter',
+      name: 'Japan Winter',
+      collectionJp: 'ふゆの なかま',
+      mascotId: 'marshy',
+      startDate: '2027-01-03',
+      endDate: '2027-03-06',
+      rotationStartOccurrenceKey: '2027-01-03|january-w1',
+      characterIds: Object.freeze(Object.keys(JAPAN_WINTER_GUIDES)),
+      weeklyCharacterIds: Object.freeze(Object.fromEntries('2027-01-03:meatball,2027-01-10:noodle,2027-01-17:gruffles,2027-01-24:boffo,2027-01-31:boffo,2027-02-07:wumble,2027-02-14:socks,2027-02-21:doorknob,2027-02-28:bloopus'.split(',').map(pair => pair.split(':')))),
+      menuSchedule: Object.freeze([
+        Object.freeze({ start: '2027-01-03', end: '2027-03-06', characterId: 'marshy' }),
+      ]),
+      palette: WINTER_PALETTE,
+      glow: WINTER_GLOW,
+    }),
   };
-  // Keep the old unversioned lookup working for existing world code while
-  // canonical season IDs remain year-scoped for collection storage.
   Object.defineProperty(seasonDefinitions, 'halloween', {
     value: seasonDefinitions['halloween-2026'],
     enumerable: false,
@@ -565,6 +583,7 @@ const BoohaSkins = (() => {
   function canonicalSeasonId(id) {
     if (id === 'halloween') return 'halloween-2026';
     if (id === 'christmas') return 'christmas-2026';
+    if (id === 'winter') return JAPAN_WINTER;
     return id;
   }
 

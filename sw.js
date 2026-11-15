@@ -190,7 +190,7 @@ const CURRENT_CACHES = {
   // into theme/hub.css, theme/hub-panels.css, theme/profile.css and
   // theme/maze.css. CSS is now network-first (like JavaScript), so style
   // edits reach iPads with the page; the new files are precached for offline.
-  pages:  'booha-pages-2026-551',
+  pages:  'booha-pages-2026-552',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -387,7 +387,7 @@ const CURRENT_CACHES = {
   // booha-sfx.js / game-motion.js) so a first offline game still has effects.
   // Hiragana answers in the listening games get full ink (theme/game-skin.css).
   // Compact combo pill below 1200 px; smaller on phones (theme/game.css .brun-hud).
-  assets: 'booha-assets-2026-622',
+  assets: 'booha-assets-2026-623',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
