@@ -552,7 +552,8 @@ const HAPPY_HOUSE_PORTAL = {
   let oddityPopShown = false;
 
   function anyDialogOpen() {
-    return Array.from(document.querySelectorAll('[aria-modal="true"]')).some(el => el.offsetParent !== null);
+    return Array.from(document.querySelectorAll('[aria-modal="true"]'))
+      .some(el => el.offsetParent !== null && getComputedStyle(el).visibility !== 'hidden');
   }
 
   function closeOddityPopup() {
