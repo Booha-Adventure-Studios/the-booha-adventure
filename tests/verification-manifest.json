@@ -51,6 +51,11 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/medal-toast-quiet-moments.test.cjs",
+      "status": "verify",
+      "reason": "Toast quiet moments: medal, level-up and oddity toasts wait for the Maze arrival card, the weekly companion popup, the week-sealed celebration and playing videos; results screens still show them."
+    },
+    {
       "path": "tests/app-text.test.cjs",
       "status": "verify",
       "reason": "App text pass: the install description and both READMEs match the current app (Daily Check, Blitz, Karasuki Cards, rewards notes); Listen game names kept."

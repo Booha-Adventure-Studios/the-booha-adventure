@@ -77,6 +77,10 @@
   }
 
   // Wait while a Blitz run or a Daily Check question is on screen.
+  function showing_(el) {
+    return !!el && !el.hidden && !!(el.getClientRects && el.getClientRects().length);
+  }
+
   function busy() {
     try {
       if (document.body.classList.contains('blitz-active')) return true;
@@ -85,6 +89,22 @@
       // Daily Check: wait until its result screen (score) is showing.
       var dc = document.querySelector('.dc-root');
       if (dc && !dc.querySelector('.dc-result-score')) return true;
+      // A student's biggest moments get the screen to themselves. These are
+      // named on purpose (not "any dialog"): game results and the Daily Check
+      // result are dialogs too, and medals are meant to appear there.
+      //  - Maze arrival card (congratulations or reminder), until it leaves.
+      var arrival = document.getElementById('overlay1');
+      if (arrival && !arrival.classList.contains('hidden') && !arrival.classList.contains('gone')) return true;
+      //  - The Maze's weekly companion popup.
+      var companion = document.getElementById('battyUnlockPopup');
+      if (companion && companion.classList.contains('show')) return true;
+      //  - The profile's "week sealed" celebration.
+      if (showing_(document.querySelector('.pg-sealed-card'))) return true;
+      //  - Any intro or flyover video that is playing.
+      var videos = document.querySelectorAll('video');
+      for (var i = 0; i < videos.length; i++) {
+        if (!videos[i].paused && !videos[i].ended) return true;
+      }
     } catch (_) {}
     return false;
   }
