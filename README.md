@@ -6,7 +6,7 @@ The Booha Adventure is a browser-based English-learning adventure for Japanese l
 
 It is designed for learners who benefit from short sessions, strong visual and audio feedback, and a reason to return tomorrow.
 
-*Last updated: 2026-10-25*
+*Last updated: 2026-11-15*
 
 ## What players can do
 
@@ -15,16 +15,18 @@ It is designed for learners who benefit from short sessions, strong visual and a
   - **Sentences:** Sentence Tap, Sentence Order, Sentence Speed
   - **Listen:** Say a Word, Say a Sentence, Ask a Sentence
 - **Choose a course.** Three curricula share the same game system: Pre-Boo (youngest learners, hiragana support), Boo-riculum, and Boo-Continuum.
-- **Follow the weekly trail.** Stars on each game light the path between neighbours (+1★ links). ★★ on all nine opens the arcade chest, three Blitz challenges unlock a weekly Booha skin, and everything resets each Sunday (Tokyo time).
+- **Start each day with the Daily Check.** About five minutes of the week's words, sentences, and questions, then a short quiz. The hub, maze, and game boards remind the player until it is done; it never blocks play.
+- **Clear the three Blitz rounds.** Timed Vocab, Sentence, and Question rounds, each with its own look and a best time to beat. Clearing all three unlocks that week's Booha skin and a Karasuki Card challenge.
+- **Follow the weekly trail.** Stars on each game light the path between neighbours (+1★ links), and ★★ on all nine opens the arcade chest. Players who have finished the Daily Check and all three Blitz rounds get an earned path into the maze: a congratulations once a week, then their weekly guide. Each world's intro video plays on the first visit of the week. Everything resets each Sunday (Tokyo time).
 - **Try Bonus Games.** Booha Bites (find the missing word), Echo (listen and type), and the Week Boss (a final-boss review that opens after all nine games are played). Bonus Games never change the nine-game unlock.
 - **Explore story worlds:**
-  - **Karasuki:** the hub world, home of the Wanderers, a collectable cast of characters with their own stories.
+  - **Karasuki:** the hub world, home of the Wanderers, a collectable cast of characters with their own stories. Karasuki Cards are won here through a word-memory challenge (one card a week), and odd things turn up in the forest for players who keep up their Daily Checks and Blitz rounds.
   - **Grimmerglen:** a house of lost memories, recovered through tiered typing (choices → clues → whole-memory recall).
   - **Utsuroba:** reading-centred episodes with sequence, detail, and inference tasks, plus drifter quests. Akiya (the Family Room) is a quiet study space inside it.
   - **Muenba:** a ghost cemetery with briefings, hunts, hiding, and reading gates.
   - **Mister Happy's House:** the Liar Machine (local two-player, pass-and-play) and the Snap Test.
 - **Unlock arcade games:** Booha Invaders, Booha Blocks, Booha Destruction, and Feed Booha.
-- **Grow a profile:** levels and rank coins, eight weekly medals (bronze, silver, gold), permanent Adventure Tokens, a Wanderer collection, and an adventure calendar.
+- **Grow a profile:** levels and rank coins, eight weekly medals (bronze, silver, gold), permanent trophies and Adventure Tokens, weekly postcards, a Wanderer collection, a binder of Karasuki Cards, a cabinet of odd finds, and an adventure calendar.
 - **Use English Juku** (for juku students): a classroom lesson mode with dictation, open-response translation, writing, and reading, plus a weekly report.
 - **Install it** as a web app (PWA) with offline caching.
 
@@ -38,6 +40,7 @@ These are the mechanisms the app actually uses:
 - **Short weekly cycles.** Content is organised by curriculum week; progress, medals, and bonus goals reset each Sunday so every week is a fresh start, while permanent records (tokens, ready weeks, collections) carry forward.
 - **Japanese support by level.** Instructions are bilingual; Pre-Boo uses hiragana, older courses use kanji with furigana.
 - **Visible, personal progress.** Stars, links, lane breakdowns ("Words 2/3 · Sentences 1/3 · Listen 1/3"), and a personal best week give learners a concrete next step.
+- **Rewards follow completion.** Rewards come from finishing real work (Daily Checks, Blitz clears, maze games), not from time spent or tapping around. Nobody is ever shown a week they missed: time-limited collections show only what the player earned.
 - **Low stakes.** Game activity is practice. In Juku, game results are never used as learning evidence and never change a score.
 
 ## Privacy and student data
@@ -79,7 +82,7 @@ verify.sh               Pre-deployment verification script
 
 Individual world and game pages, for example `karasuki.html`, `muenba.html`, and `liar_machine.html`, live at the repo root alongside `index.html` and `maze.html`, one file per experience.
 
-Design notes: [PERFORMANCE-BUDGETS.md](PERFORMANCE-BUDGETS.md), [JUKU-ASSESSMENT-DESIGN.md](JUKU-ASSESSMENT-DESIGN.md), [family-room-design-lock.md](family-room-design-lock.md). A plain-text map for AI tools is in [llms.txt](llms.txt).
+Design notes: [PERFORMANCE-BUDGETS.md](PERFORMANCE-BUDGETS.md), [JUKU-ASSESSMENT-DESIGN.md](JUKU-ASSESSMENT-DESIGN.md), [family-room-design-lock.md](family-room-design-lock.md), [REWARDS-DESIGN.md](REWARDS-DESIGN.md). A plain-text map for AI tools is in [llms.txt](llms.txt).
 
 ## Local development
 
@@ -110,7 +113,7 @@ Release checklist:
 - **Replaced any medal, trophy-token, rank-coin or chest art in `assets/img/profile/`?** Change `ART_REV` in `js/core/profile-art.js` (a date is fine), then run `node tests/profile-art-rev-guard.cjs --update`. Installed iPads only fetch replaced art under a new `ART_REV`; `verify.sh` fails until both steps are done.
 - Changed a precached page or asset? Bump the matching cache version in `sw.js` with a short comment line (`verify.sh` warns if you forget).
 
-The verification suite (about 300 checks) covers content data, navigation contracts, game behaviour, scoring and save rules, weekly rollover, service-worker paths, media assets, responsive behaviour, and performance budgets.
+The verification suite (about 360 checks) covers content data, navigation contracts, game behaviour, scoring and save rules, weekly rollover, service-worker paths, media assets, responsive behaviour, and performance budgets.
 
 Full verification requires Node.js, Python 3, and ffmpeg (ffprobe is included) for the media-inspection checks.
 

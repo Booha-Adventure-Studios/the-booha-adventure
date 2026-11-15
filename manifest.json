@@ -2,7 +2,7 @@
 {
   "name": "Booha Adventure",
   "short_name": "Booha",
-  "description": "An educational adventure game with mazes, study decks, and homework helpers.",
+  "description": "An English-learning adventure for Japanese learners: a Daily Check, weekly curriculum games, Blitz rounds, and strange story worlds to explore.",
   "start_url": "/the-booha-adventure/index.html",
   "scope": "/the-booha-adventure/",
   "display": "standalone",

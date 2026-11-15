@@ -51,6 +51,11 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/app-text.test.cjs",
+      "status": "verify",
+      "reason": "App text pass: the install description and both READMEs match the current app (Daily Check, Blitz, Karasuki Cards, rewards notes); Listen game names kept."
+    },
+    {
       "path": "tests/dead-code-removed.test.cjs",
       "status": "verify",
       "reason": "Dead code pass: empty placeholders and unused data/CSS stay removed and unreferenced; Uhibon is kept for later."

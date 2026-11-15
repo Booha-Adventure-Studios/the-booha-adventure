@@ -181,6 +181,9 @@ const CURRENT_CACHES = {
   // line on adventure-profile.html; bilingual pickup line in Karasuki.
   // Dead code pass: removed empty placeholders and unused data/CSS that no
   // page loads or precaches, so no cache version bump is needed.
+  // App text pass: manifest.json description updated. It only shows in
+  // install prompts, so the decks cache is not bumped (that would re-download
+  // every lesson deck for one line of text).
   pages:  'booha-pages-2026-549',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
