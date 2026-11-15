@@ -6,13 +6,14 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.join(__dirname, '..');
 const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 const profileProgress = read('js/ui/profile-progress.js');
 const adventureLog = read('js/ui/adventure-log.js');
-const profile = read('profile.html');
-const index = read('index.html');
+const profile = readFamily('profile.html');
+const index = readFamily('index.html');
 const muenba = read('js/muenba.js');
 const sw = read('sw.js');
 

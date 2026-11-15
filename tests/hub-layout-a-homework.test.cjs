@@ -13,9 +13,10 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
-const index = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const index = readFamily('index.html');
 
 // Top-level rule only (start of line, 4-space indent), not media overrides
 // or descendant selectors such as ".hubHeroActions .hubHomeworkBtn".

@@ -7,13 +7,14 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.join(__dirname, '..');
 const read = (f) => fs.readFileSync(path.join(root, f), 'utf8');
 
 // 1. Warm-up greeting: "Hey, Name." is one inline unit, so the flex gap of
 //    .entryPlayer cannot put a space before the period; one typeface.
-const maze = read('maze.html');
+const maze = readFamily('maze.html');
 assert.match(maze, /<span class="entryPlayerEn"><span id="mazeNameLead">Hey,<\/span>&nbsp;<strong id="mazeEntryName">[^<]*<\/strong><span id="mazeNameTail">\.<\/span><\/span>/,
   'lead, name and period sit together in .entryPlayerEn');
 assert.doesNotMatch(maze, /\.entryMessageEn\{[^}]*Georgia/, 'the warm-up body line uses the card typeface, not Georgia');

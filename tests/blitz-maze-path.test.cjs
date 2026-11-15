@@ -12,12 +12,13 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
 const engine = read('js/blitz-engine.js');
-const index = read('index.html');
-const maze = read('maze.html');
+const index = readFamily('index.html');
+const maze = readFamily('maze.html');
 
 // ── Blitz result card button ─────────────────────────────────────────────
 const rowFn = engine.slice(engine.indexOf('function renderFinalWeekRow('), engine.indexOf('function ensureFinalCard('));

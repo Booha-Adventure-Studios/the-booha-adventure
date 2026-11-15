@@ -7,6 +7,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -96,13 +97,13 @@ assert.ok(flakes.every(f => f.y >= -50 && f.y <= 310 && f.x >= -14 && f.x <= 414
 assert.ok(flakes.every(f => f.speed < 25), 'maze flakes fall slowly');
 
 // ── Wiring in the pages ──────────────────────────────────────────────────
-const maze = read('maze.html');
+const maze = readFamily('maze.html');
 assert.ok(maze.includes("w.visitorKind === 'snowflake'"), 'maze draws snowflakes as spinning flakes, not flapping bats');
 assert.ok(maze.includes('drawMazeSnow(now, activeSeasonPhase)'), 'maze draws the snowfall layer');
 assert.ok(maze.includes('checkpointSparkColors(activeSeason, cp.w, [col1, col2], activeSeasonPhase)'));
 assert.ok(!maze.includes("=== 'halloween-2026'"), 'maze must not hard-code a season id for visitors');
 
-const index = read('index.html');
+const index = readFamily('index.html');
 assert.ok(index.includes('id="seasonGreeting"'), 'first screen has Grubb greeting bubble');
 assert.ok(index.includes('function applySeasonGreeting('), 'greeting is filled from the season phase');
 assert.ok(/prefers-reduced-motion[\s\S]*\.seasonGreeting\.show \{ animation: none; \}/.test(index),

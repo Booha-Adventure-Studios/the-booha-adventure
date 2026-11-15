@@ -7,6 +7,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -68,7 +69,7 @@ assert.strictEqual(link.small.textContent, 'MUENBA');
 
 // Both portal rows list all five worlds and load the shared lock helper.
 for (const page of ['profile.html', 'adventure-profile.html']) {
-  const source = read(page);
+  const source = readFamily(page);
   ['profile.html', 'adventure-profile.html', 'utsuroba-profile.html', 'muenba-profile.html', 'grimmerglen-profile.html']
     .forEach(href => assert.ok(source.includes(`href="${href}"`), `${page} must show the ${href} portal`));
   assert.ok(source.includes('js/ui/world-portals.js'), `${page} must load world-portals.js`);

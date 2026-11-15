@@ -11,10 +11,11 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
-const index = read('index.html');
+const index = readFamily('index.html');
 
 function slice(startMarker, endMarker) {
   const s = index.indexOf(startMarker);

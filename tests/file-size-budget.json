@@ -24,9 +24,9 @@
     },
     "index.html": {
       "kind": "split-later",
-      "ceiling": 4950,
-      "listedAt": 4850,
-      "reason": "Hub page with inline CSS and script; CSS moves out in Pass 1, script later."
+      "ceiling": 2393,
+      "listedAt": 2293,
+      "reason": "Hub page; its CSS moved to theme/hub.css and theme/hub-panels.css in Pass 1. Inline script (about 77 KB) is what remains to move."
     },
     "js/utsuroba.js": {
       "kind": "split-later",
@@ -42,9 +42,9 @@
     },
     "maze.html": {
       "kind": "split-later",
-      "ceiling": 3342,
-      "listedAt": 3242,
-      "reason": "Maze page with inline CSS and script; CSS moves out in Pass 1, script later."
+      "ceiling": 2250,
+      "listedAt": 2150,
+      "reason": "Maze page; its CSS moved to theme/maze.css in Pass 1. Inline script (about 85 KB) is what remains to move."
     },
     "js/grimmerglen.js": {
       "kind": "split-later",

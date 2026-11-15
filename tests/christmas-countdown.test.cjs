@@ -8,6 +8,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -83,10 +84,10 @@ const after = load('2027-01-03').dataset;
 assert.strictEqual(after.season, undefined, 'no season after Jan 2');
 
 // ── Page wiring ──────────────────────────────────────────────────────────
-const index = read('index.html');
+const index = readFamily('index.html');
 assert.ok(index.includes('window.BoohaSkins?.seasonGreeting?.()'), 'Grubb bubble uses the dated greeting');
 assert.ok(index.includes("lights === 'gold' ? ['gold', 'white']"), 'after Christmas the bulbs are gold and white');
-const maze = read('maze.html');
+const maze = readFamily('maze.html');
 assert.ok(maze.includes('<div id="seasonFrost" aria-hidden="true"></div>'), 'maze has the frost layer');
 assert.ok(maze.includes('html[data-season="christmas"][data-season-frost] #seasonFrost'), 'frost only shows when the phase asks');
 assert.ok(/#seasonFrost\{[^}]*pointer-events:none/.test(maze), 'frost never blocks taps');

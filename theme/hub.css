@@ -1,0 +1,1493 @@
+/* theme/hub.css: hub page styles, part 1 (base, scenes, week hub). Moved out of index.html unchanged (Pass 1, Nov 2026).
+   url() paths are relative to this file. Loaded network-first by sw.js. */
+    :root{
+      --bg:#000;
+      --pink:#ff3bbd;
+      --pink2:#ff79d7;
+      --text:#ffffff;
+      --muted:rgba(255,255,255,.7);
+      --safe-top:    env(safe-area-inset-top,    0px);
+      --safe-right:  env(safe-area-inset-right,  0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left:   env(safe-area-inset-left,   0px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html.scene-start #alog-icon-btn,
+    html.scene-start #juku-icon-btn { display: none !important; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+        "Noto Sans","Hiragino Kaku Gothic ProN","Yu Gothic", sans-serif;
+      overscroll-behavior: none;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+      background: var(--bg) url('../assets/img/background-1.webp') center/cover no-repeat;
+      overflow: hidden;
+    }
+
+    #app::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center,
+        rgba(0,0,0,.10) 0%,
+        rgba(0,0,0,.48) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════════════
+       LANDSCAPE OVERLAY
+    ══════════════════════════════════════════ */
+    #landscapeOverlay {
+      position: fixed; inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 28px 24px;
+      text-align: center;
+      background: rgba(0,0,0,.97);
+      z-index: 9999;
+    }
+    #landscapeOverlay.show { display: flex; }
+
+    .ls-phone {
+      font-size: clamp(56px, 16vmin, 88px);
+      line-height: 1;
+      margin-bottom: 14px;
+      display: block;
+      animation: wobblePhone 1.6s ease-in-out infinite;
+      transform-origin: center center;
+    }
+    @keyframes wobblePhone {
+      0%   { transform: rotate(-15deg); }
+      50%  { transform: rotate(15deg); }
+      100% { transform: rotate(-15deg); }
+    }
+
+    .ls-main-jp {
+      font-size: clamp(26px, 7vmin, 44px);
+      font-weight: 900;
+      color: var(--pink2);
+      margin: 0 0 10px;
+      line-height: 1.3;
+      text-shadow: 0 0 24px rgba(255,100,220,.5);
+    }
+
+    .ls-sub-jp {
+      font-size: clamp(15px, 4vmin, 22px);
+      color: rgba(255,255,255,.65);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* ══ SCENES ══ */
+    .scene {
+      position: absolute; inset: 0;
+      display: none;
+      z-index: 1;
+    }
+    .scene.active { display: flex; }
+
+    /* ── START ── */
+    #startScene {
+      background: transparent;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(12px, 3vw, 22px);
+      padding:
+        calc(clamp(16px,3vw,24px) + var(--safe-top))
+        calc(clamp(16px,3vw,24px) + var(--safe-right))
+        calc(clamp(16px,3vw,24px) + var(--safe-bottom))
+        calc(clamp(16px,3vw,24px) + var(--safe-left));
+      text-align: center;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .ghostOuter {
+      position: relative;
+      width:  clamp(110px, 22vmin, 200px);
+      height: clamp(110px, 22vmin, 200px);
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .ghostWrap {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      animation: floaty 3.8s ease-in-out infinite;
+      filter: drop-shadow(0 12px 24px rgba(0,0,0,.75));
+      will-change: transform, opacity;
+    }
+
+    .ghostWrap.flyAway {
+      animation: none;
+      transition:
+        transform 1800ms cubic-bezier(.15,.8,.25,1),
+        opacity   1600ms ease 200ms;
+      transform: translate3d(0,-85vh,0) scale(.7) rotate(-4deg);
+      opacity: 0;
+    }
+
+    html[data-season="halloween"] .ghostWrap.flyAway::before,
+    html[data-season="halloween"] .ghostWrap.flyAway::after {
+      content: '';
+      position: absolute;
+      width: 26px;
+      height: 14px;
+      border-radius: 60% 20% 60% 20%;
+      background: linear-gradient(135deg, rgba(255,133,38,.95), rgba(112,53,174,.7));
+      clip-path: polygon(0 42%, 28% 22%, 50% 0, 58% 28%, 100% 16%, 78% 58%, 55% 100%, 43% 62%, 20% 90%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    html[data-season="halloween"] .ghostWrap.flyAway::before { animation: halloweenBatTrail 700ms ease-out 80ms forwards; }
+    html[data-season="halloween"] .ghostWrap.flyAway::after { animation: halloweenBatTrail 700ms ease-out 180ms forwards; transform: scale(.72); }
+    @keyframes halloweenBatTrail {
+      0% { opacity: 0; transform: translate3d(-18px, 16px, 0) scale(.4) rotate(-16deg); }
+      25% { opacity: .95; }
+      100% { opacity: 0; transform: translate3d(42px, 66px, 0) scale(1) rotate(12deg); }
+    }
+
+    @keyframes floaty {
+      0%   { transform: translateY(0px); }
+      50%  { transform: translateY(-12px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .sparkleField {
+      position: absolute;
+      inset: -20px;
+      pointer-events: none;
+    }
+
+    .sp {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      opacity: 0;
+      animation: sparkleLife var(--dur) ease-in-out var(--delay) infinite;
+      width: var(--size); height: var(--size);
+      top: var(--y); left: var(--x);
+      box-shadow:
+        0 0 4px 1px rgba(255,255,255,.9),
+        0 0 10px 3px rgba(255,100,220,.6);
+    }
+
+    @keyframes sparkleLife {
+      0%   { opacity: 0;    transform: scale(.4) translateY(0); }
+      20%  { opacity: 1;    transform: scale(1)  translateY(-6px); }
+      60%  { opacity: .85;  transform: scale(.9) translateY(-13px); }
+      100% { opacity: 0;    transform: scale(.3) translateY(-20px); }
+    }
+
+    html[data-season="halloween"] #startScene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, transparent 60%, rgba(25,8,38,.28) 76%, rgba(8,3,16,.92) 100%),
+        radial-gradient(ellipse at 50% 110%, rgba(131,59,161,.18), transparent 52%);
+      animation: halloweenFog 14s ease-in-out infinite alternate;
+    }
+    html[data-season="halloween"] #startScene {
+      background:
+        linear-gradient(180deg, rgba(5,9,30,.64) 0%, rgba(13,4,31,.82) 100%),
+        url('../assets/img/hw-background-1.webp') center/cover no-repeat;
+    }
+    html[data-season="halloween"] #startScene::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 35;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(4,1,16,.58) 70%, rgba(2,0,9,.84) 100%);
+    }
+    html.token-checking #halloweenOpening,
+    html.token-checking #halloweenOpening *,
+    html.halloween-hold #halloweenOpening,
+    html.halloween-hold #halloweenOpening * { animation-play-state: paused; }
+    html[data-season="halloween"] .sp {
+      background: var(--season-orange, #ff9b38);
+      box-shadow: 0 0 4px 1px var(--season-orange, #ffce78), 0 0 12px 3px var(--season-purple, #8442be);
+    }
+    @keyframes halloweenFog {
+      from { transform: translateX(-1.5%) scale(1.02); opacity: .74; }
+      to { transform: translateX(1.5%) scale(1.06); opacity: 1; }
+    }
+
+    #halloweenOpening {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      overflow: hidden;
+      display: none;
+      background: #030208;
+      cursor: pointer;
+      transition: opacity 520ms ease;
+    }
+    html[data-season="halloween"] #halloweenOpening { display: block; }
+    html:not(.halloween-opening) #halloweenOpening { opacity: 0; pointer-events: none; }
+    #halloweenOpening .openingMoon {
+      position: absolute;
+      left: 50%; top: 39%;
+      width: clamp(100px, 23vmin, 190px);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%, #fff7c9 0 7%, #ffd77f 34%, rgba(255,166,55,.38) 55%, transparent 72%);
+      filter: blur(.2px) drop-shadow(0 0 42px rgba(255,152,49,.76));
+      opacity: 0;
+      animation: halloweenMoonIn 1700ms ease-out 450ms forwards;
+    }
+    #halloweenOpening .openingMoon::after {
+      content: '';
+      position: absolute;
+      inset: 13%;
+      border-radius: 50%;
+      background: rgba(57,20,68,.18);
+      box-shadow: 17px 11px 0 -8px rgba(96,50,103,.24), -18px -10px 0 -11px rgba(96,50,103,.2);
+    }
+    #halloweenOpening .openingBats {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      overflow: visible;
+    }
+    #halloweenOpening .openingBat {
+      fill: #120c1c;
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    #halloweenOpening .openingBat:nth-child(1) { animation: halloweenBatCross 1850ms ease-in 1300ms forwards; }
+    #halloweenOpening .openingBat:nth-child(2) { animation: halloweenBatCross 2125ms ease-in 1700ms forwards; }
+    #halloweenOpening .openingBat:nth-child(3) { animation: halloweenBatCross 1950ms ease-in 1975ms forwards; }
+    @keyframes halloweenMoonIn { to { opacity: 1; } }
+    @keyframes halloweenBatCross {
+      0% { opacity: 0; transform: translate3d(-18vw, 12vh, 0) scale(.5) rotate(-8deg); }
+      15% { opacity: .95; }
+      100% { opacity: 0; transform: translate3d(118vw, -8vh, 0) scale(1.05) rotate(8deg); }
+    }
+    #halloweenOpening .openingHint {
+      position: absolute;
+      left: 50%; bottom: calc(10% + var(--safe-bottom));
+      transform: translateX(-50%);
+      color: rgba(255,224,185,.72);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: halloweenHintIn 1000ms ease 2375ms forwards;
+    }
+    @keyframes halloweenHintIn { to { opacity: .8; } }
+    html.halloween-opening #startScene > .ghostOuter,
+    html.halloween-opening #startScene > .dcStamp,
+    html.halloween-opening #startScene > .startBtns { opacity: 0; }
+    html.halloween-revealed #startScene > .ghostOuter { animation: halloweenGhostDrop 820ms cubic-bezier(.16,.92,.25,1.15) both; }
+    html.halloween-revealed #startScene > .dcStamp.show { animation: halloweenReveal 420ms ease 360ms both; }
+    html.halloween-revealed #startScene > .startBtns { animation: halloweenReveal 480ms ease 520ms both; }
+    @keyframes halloweenGhostDrop {
+      from { opacity: 0; transform: translate3d(0,-42vh,0) rotate(-10deg) scale(.72); }
+      68% { opacity: 1; transform: translate3d(0,14px,0) rotate(3deg) scale(1.02); }
+      to { opacity: 1; transform: translate3d(0,0,0) rotate(0) scale(1); }
+    }
+    @keyframes halloweenReveal {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    html[data-season="halloween"] .hubHeading {
+      background: linear-gradient(100deg, #fff 0%, #ffd28b 24%, var(--season-orange, #ff8b30) 42%, #f8d0ff 64%, var(--season-purple, #9b63e8) 82%, #fff 100%);
+      background-size: 260% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      filter: drop-shadow(0 0 26px rgba(255,126,45,.56)) drop-shadow(0 0 58px rgba(141,68,210,.3)) drop-shadow(0 2px 8px rgba(0,0,0,.9));
+    }
+    html[data-season="halloween"] .hubHeadingJp { color: rgba(255,217,174,.78); text-shadow: 0 0 12px rgba(255,126,45,.35), 0 1px 4px rgba(0,0,0,.8); }
+    html[data-season="halloween"] .btnGold {
+      border-radius: 18px 18px 12px 12px;
+      background: linear-gradient(180deg, #ffb34b, #db661d);
+      color: #241006;
+      box-shadow: 0 8px 24px rgba(225,99,28,.42), inset 0 1px 0 rgba(255,245,190,.62), 0 0 20px rgba(255,129,38,.28);
+      animation: halloweenPumpkinFlicker 3.8s ease-in-out infinite;
+    }
+    html[data-season="halloween"] .btnGhost {
+      border: 1.5px solid rgba(202,185,207,.62);
+      border-radius: 48% 48% 10px 10px;
+      color: rgba(239,228,243,.9);
+      background: linear-gradient(180deg, rgba(124,108,130,.42), rgba(42,35,51,.9));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 8px 22px rgba(0,0,0,.42);
+    }
+    html[data-season="halloween"] .btnGold.pressed { filter: brightness(1.28); transform: scale(.96) translateY(2px); }
+    html[data-season="halloween"] .btnGhost.pressed { filter: brightness(1.2); transform: scale(.97) translateY(2px); }
+    @keyframes halloweenPumpkinFlicker {
+      0%, 100% { filter: brightness(1); }
+      48% { filter: brightness(1.02); }
+      52% { filter: brightness(1.12); }
+      56% { filter: brightness(.98); }
+    }
+    html[data-season="halloween"] .dcStamp {
+      color: #ffc46d;
+      border: 1px solid rgba(255,170,75,.4);
+      border-radius: 999px;
+      padding: 4px 12px;
+      background: rgba(74,31,69,.5);
+      text-shadow: 0 0 12px rgba(255,145,45,.7);
+    }
+    .halloweenLabel { display: none !important; }
+    html[data-season="halloween"] .halloweenLabel { display: block !important; color: #ffbc65; text-shadow: 0 0 12px rgba(255,131,34,.56); }
+    html[data-season="halloween"] .defaultLabel { display: none !important; }
+    html[data-season="christmas"] #startScene {
+      background:
+        linear-gradient(180deg, rgba(4,16,20,.42) 0%, rgba(19,5,15,.68) 100%),
+        url('../assets/img/background-1.webp') center/cover no-repeat;
+    }
+    html[data-season="christmas"] #startScene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 24px 18px, rgba(255,250,240,.9) 0 1.5px, transparent 2.7px),
+        radial-gradient(circle at 86px 104px, rgba(255,250,240,.68) 0 2px, transparent 3.5px),
+        radial-gradient(circle at 152px 56px, rgba(242,201,92,.64) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 210px 170px, rgba(255,250,240,.72) 0 1px, transparent 2.5px),
+        radial-gradient(140% 20% at 50% 103%, rgba(236,246,255,.46) 0%, rgba(205,230,255,.18) 46%, transparent 72%),
+        linear-gradient(180deg, transparent 58%, rgba(7,19,15,.18) 100%);
+      background-size: 240px 210px, 320px 290px, 410px 330px, 280px 250px, 100% 100%, 100% 100%;
+      animation: christmasSnow 16s linear infinite;
+    }
+    html[data-season="christmas"] #startScene::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 35;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 34%, rgba(7,19,15,.26) 72%, rgba(5,8,8,.58) 100%);
+    }
+    @keyframes christmasSnow {
+      from { background-position: 0 -210px, 40px -290px, 90px -330px, 120px -250px, 0 0, 0 0; }
+      to { background-position: 56px 100vh, -28px 100vh, 34px 100vh, -46px 100vh, 0 0, 0 0; }
+    }
+    /* December string lights on the start screen (atmosphere only). The
+       container stays empty and hidden until a phase has lights;
+       buildStringLights() then adds the wire and bulbs. The hub title uses
+       the progress-aware ornament banner instead (see .ornamentBanner).
+       Dec 1–25 uses Christmas colors, Dec 26–Jan 2 quieter gold and white. */
+    .stringLights { display: none; }
+    html[data-season="christmas"][data-season-lights] .stringLights {
+      display: block;
+      position: absolute;
+      pointer-events: none;
+    }
+    #startScene > .stringLights {
+      top: var(--safe-top); left: 0; right: 0;
+      height: clamp(48px, 10vmin, 84px);
+      z-index: 2;
+    }
+    .stringLights svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .stringLights path { fill: none; stroke: rgba(30,52,38,.95); stroke-width: 2px; vector-effect: non-scaling-stroke; }
+    .stringLights .bulb {
+      position: absolute;
+      width: var(--bulb, 9px);
+      height: calc(var(--bulb, 9px) * 1.35);
+      margin-left: calc(var(--bulb, 9px) / -2);
+      border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+      background: radial-gradient(circle at 38% 34%, rgba(255,255,255,.9) 0 14%, var(--c) 46%, var(--c2) 100%);
+      box-shadow: 0 0 6px 1px var(--c), 0 0 16px 4px var(--glow);
+      animation: bulbTwinkle var(--t, 2.6s) ease-in-out var(--d, 0s) infinite alternate;
+    }
+    .stringLights .bulb::before {
+      content: '';
+      position: absolute;
+      left: 22%; right: 22%; top: -24%;
+      height: 30%;
+      border-radius: 2px 2px 1px 1px;
+      background: #2c3a2f;
+    }
+    #startScene > .stringLights .bulb { --bulb: clamp(8px, 1.5vmin, 12px); }
+    .stringLights .bulb.red   { --c: #ff5a69; --c2: #b3192e; --glow: rgba(255,80,96,.45); }
+    .stringLights .bulb.gold  { --c: #ffd978; --c2: #c98d1c; --glow: rgba(255,210,110,.5); }
+    .stringLights .bulb.green { --c: #5fe08f; --c2: #17723f; --glow: rgba(85,212,134,.42); }
+    .stringLights .bulb.white { --c: #fffaf0; --c2: #d8cdb4; --glow: rgba(255,246,220,.45); }
+    @keyframes bulbTwinkle {
+      from { opacity: .58; }
+      to { opacity: 1; }
+    }
+    html.hub-reduced-motion .stringLights .bulb,
+    html.hub-low-power .stringLights .bulb { animation: none; opacity: .92; }
+
+    /* Weekly ornament banner above the hub title (js/ui/hub-ornament-banner.js).
+       A quiet wire with plain beads is always there; each visit day this week
+       hangs one ornament; a completed Daily Check turns it gold. The forest
+       stays the star: small art, restrained glow, gold is the clear reward.
+       The art carries no glow — CSS lights it. Only transform/opacity
+       animate, and no filters (cheap on older iPads). */
+    .ornamentBanner {
+      --ob-h: clamp(38px, 5.2vw, 60px);
+      --ob-art: 1;          /* size factor (all current art is 1) */
+      --ob-loop: .075;      /* set per art by the module: loop height on the canvas */
+      --ob-glow-y: 50%;     /* set per art by the module: body centre on the canvas */
+      position: relative;
+      width: min(100%, 560px);
+      height: calc(var(--ob-h) * 1.15);
+      margin: -4px auto -2px;
+      pointer-events: none;
+    }
+    .ornamentBanner[hidden] { display: none; }
+    .ornamentBanner .obWire { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .ornamentBanner .obWire path { fill: none; stroke: rgba(25,34,27,.68); stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
+    .ornamentBanner .obBead {
+      position: absolute;
+      width: 3px; height: 3px;
+      margin: -1px 0 0 -1.5px;
+      border-radius: 50%;
+      background: rgba(214,222,200,.6);
+      opacity: .65;
+    }
+    .ornamentBanner .obOrnaments { position: absolute; inset: 0; }
+    .ornamentBanner .obOrn {
+      --glow: rgba(255,214,140,.72);
+      --ob-oh: calc(var(--ob-h) * var(--ob-art));
+      position: absolute;
+      width: calc(var(--ob-oh) * .6667);
+      height: var(--ob-oh);
+      /* lift each ornament by its own loop height so the loop meets the wire */
+      margin: calc(var(--ob-oh) * var(--ob-loop) * -1) 0 0 calc(var(--ob-oh) * -.3333);
+      transform-origin: 50% calc(var(--ob-loop) * 100%);
+    }
+    .ornamentBanner .obArt {
+      position: absolute; inset: 0;
+      transform: translateY(var(--ob-y, 0px)) rotate(var(--ob-tilt, 0deg));
+      transform-origin: 50% calc(var(--ob-loop) * 100%);   /* tilts pivot on the loop, like a real hang */
+    }
+    .ornamentBanner .obArt img { display: block; width: 100%; height: 100%; }
+    /* Tiny fixed variation per weekday so a full week never looks stamped. */
+    .ornamentBanner .obOrn[data-wd="0"] { --ob-tilt: -1.4deg; }
+    .ornamentBanner .obOrn[data-wd="1"] { --ob-tilt: 1.2deg; --ob-y: 1px; }
+    .ornamentBanner .obOrn[data-wd="2"] { --ob-tilt: -.6deg; }
+    .ornamentBanner .obOrn[data-wd="3"] { --ob-tilt: 1.4deg; }
+    .ornamentBanner .obOrn[data-wd="4"] { --ob-tilt: -1.1deg; --ob-y: 1px; }
+    .ornamentBanner .obOrn[data-wd="5"] { --ob-tilt: .7deg; }
+    .ornamentBanner .obOrn[data-wd="6"] { --ob-tilt: -1.3deg; }
+    .ornamentBanner .obOrn::before {
+      content: '';
+      position: absolute;
+      /* a circle 1.56× the ornament's width, centred on its body */
+      left: -28%; right: -28%;
+      top: calc(var(--ob-glow-y) - 52%); height: 104%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 50%, var(--glow) 0%, rgba(0,0,0,0) 62%);
+      opacity: .45;
+      animation: obGlow 3.4s ease-in-out infinite alternate;
+    }
+    .ornamentBanner .obOrn.gold { --glow: rgba(255,196,64,.95); }
+    .ornamentBanner .obOrn.gold::before {
+      left: -42%; right: -42%;
+      top: calc(var(--ob-glow-y) - 61%); height: 123%;
+      opacity: .72;
+      animation-name: obGlowGold;
+    }
+    .ornamentBanner .obOrn.is-new { animation: obHang 900ms cubic-bezier(.2,1.4,.4,1) both; }
+    @keyframes obGlow { from { opacity: .3; } to { opacity: .5; } }
+    @keyframes obGlowGold { from { opacity: .62; } to { opacity: .82; } }
+    @keyframes obHang {
+      0%   { opacity: 0; transform: translateY(-40%) scale(.6) rotate(-8deg); }
+      60%  { opacity: 1; transform: translateY(4%) scale(1.04) rotate(4deg); }
+      100% { opacity: 1; transform: none; }
+    }
+    html.hub-reduced-motion .ornamentBanner .obOrn,
+    html.hub-reduced-motion .ornamentBanner .obOrn::before,
+    html.hub-low-power .ornamentBanner .obOrn,
+    html.hub-low-power .ornamentBanner .obOrn::before,
+    html[data-motion="reduced"] .ornamentBanner .obOrn,
+    html[data-motion="reduced"] .ornamentBanner .obOrn::before,
+    html[data-power="reduced"] .ornamentBanner .obOrn::before,
+    html[data-power="minimal"] .ornamentBanner .obOrn,
+    html[data-power="minimal"] .ornamentBanner .obOrn::before { animation: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .ornamentBanner .obOrn,
+      .ornamentBanner .obOrn::before { animation: none; }
+    }
+    /* Blitz centerpiece (Pass 13): all three Blitz games done this week →
+       one bigger month ornament in the middle, the bow's knot on the wire,
+       soft gold rays behind. Sized to clear the title. The rays turn
+       slowly (transform only) and stand still for reduced motion / any
+       reduced power. */
+    .ornamentBanner .obOrn.obCenter { --ob-art: 1.32; z-index: 2; }
+    .ornamentBanner .obOrn.obCenter::before { display: none; }
+    .ornamentBanner .obRays {
+      position: absolute;
+      left: 50%; top: var(--ob-glow-y);
+      width: calc(var(--ob-oh) * 1.27); height: calc(var(--ob-oh) * 1.27);
+      margin: calc(var(--ob-oh) * -.635) 0 0 calc(var(--ob-oh) * -.635);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,214,110,.8) 0%, rgba(255,196,64,.32) 32%, rgba(0,0,0,0) 64%);
+      background:
+        radial-gradient(circle, rgba(255,214,110,.8) 0%, rgba(255,196,64,.32) 32%, rgba(0,0,0,0) 64%),
+        repeating-conic-gradient(rgba(255,226,150,.34) 0deg 7deg, rgba(0,0,0,0) 7deg 22.5deg);
+      -webkit-mask-image: radial-gradient(circle, #000 34%, rgba(0,0,0,0) 70%);
+      mask-image: radial-gradient(circle, #000 34%, rgba(0,0,0,0) 70%);
+      animation: obRaysTurn 30s linear infinite;
+    }
+    .ornamentBanner .obBow {
+      position: absolute; z-index: 1;
+      left: 50%;
+      width: calc(var(--ob-oh) * .4); height: calc(var(--ob-oh) * .6);
+      margin-left: calc(var(--ob-oh) * -.2);
+      /* knot centre on the wire: the wire sits at the art's loop height */
+      top: calc(var(--ob-oh) * var(--ob-loop) - var(--ob-oh) * .6 * var(--ob-bow-knot, .467));
+    }
+    @keyframes obRaysTurn { to { transform: rotate(360deg); } }
+    html.hub-reduced-motion .ornamentBanner .obRays,
+    html.hub-low-power .ornamentBanner .obRays,
+    html[data-motion="reduced"] .ornamentBanner .obRays,
+    html[data-power="reduced"] .ornamentBanner .obRays,
+    html[data-power="minimal"] .ornamentBanner .obRays { animation: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .ornamentBanner .obRays { animation: none; }
+    }
+
+    /* Grubb greets students on the first screen. The line comes from the
+       Christmas season phase (November: first snow, December: lights on). */
+    .seasonGreeting { display: none; }
+    html[data-season="christmas"] .seasonGreeting.show {
+      display: block;
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 12px);
+      z-index: 2;
+      white-space: nowrap;
+      padding: 8px 15px 7px;
+      border-radius: 16px;
+      background: rgba(255,250,240,.95);
+      color: #17402b;
+      font-weight: 800;
+      font-size: clamp(14px, 2.6vmin, 19px);
+      line-height: 1.2;
+      box-shadow: 0 0 0 2px rgba(199,53,75,.6), 0 8px 20px rgba(0,0,0,.38), 0 0 22px rgba(207,234,255,.28);
+      pointer-events: none;
+      transform: translateX(-50%);
+      animation: seasonGreetingPop 560ms cubic-bezier(.2,1.45,.4,1) 650ms both;
+    }
+    html[data-season="christmas"] .seasonGreeting.show::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      margin-left: -8px;
+      border: 8px solid transparent;
+      border-top-color: rgba(255,250,240,.95);
+      border-bottom: 0;
+    }
+    .seasonGreeting .sgJp {
+      display: block;
+      margin-top: 2px;
+      font-size: .72em;
+      font-weight: 700;
+      color: #2c5d43;
+    }
+    .ghostWrap.flyAway ~ .seasonGreeting.show { animation: none; opacity: 0; transition: opacity 220ms ease; }
+    @keyframes seasonGreetingPop {
+      from { opacity: 0; transform: translateX(-50%) translateY(8px) scale(.72); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+    html[data-season="christmas"] .sp {
+      background: var(--season-white, #fffaf0);
+      box-shadow: 0 0 4px 1px var(--season-white, #fffaf0), 0 0 12px 3px var(--season-green, #267448);
+    }
+    html[data-season="christmas"] .hubHeading {
+      background: linear-gradient(100deg, var(--season-white, #fffaf0) 0%, var(--season-gold, #f2c95c) 24%, var(--season-red, #c7354b) 42%, var(--season-white, #fffaf0) 64%, var(--season-green, #267448) 82%, var(--season-white, #fffaf0) 100%);
+      background-size: 260% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      filter: drop-shadow(0 0 26px rgba(242,201,92,.42)) drop-shadow(0 0 58px rgba(38,116,72,.3)) drop-shadow(0 2px 8px rgba(0,0,0,.9));
+    }
+    html[data-season="christmas"] .hubHeadingJp { color: var(--season-white, #fffaf0); text-shadow: 0 0 12px rgba(199,53,75,.34), 0 1px 4px rgba(0,0,0,.8); }
+    html[data-season="christmas"] .btnGold {
+      border-radius: 18px 18px 12px 12px;
+      background: linear-gradient(180deg, var(--season-gold, #f2c95c), var(--season-red, #c7354b));
+      color: #241006;
+      box-shadow: 0 8px 24px rgba(199,53,75,.34), inset 0 1px 0 rgba(255,255,255,.62), 0 0 20px rgba(242,201,92,.2);
+    }
+    html[data-season="christmas"] .btnGhost {
+      border: 1.5px solid rgba(38,116,72,.8);
+      border-radius: 48% 48% 10px 10px;
+      color: var(--season-white, #fffaf0);
+      background: linear-gradient(180deg, rgba(38,116,72,.52), rgba(11,45,28,.92));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 8px 22px rgba(0,0,0,.42);
+    }
+    html[data-season="christmas"] .btnGold.pressed { filter: brightness(1.18); transform: scale(.96) translateY(2px); }
+    html[data-season="christmas"] .btnGhost.pressed { filter: brightness(1.16); transform: scale(.97) translateY(2px); }
+    html[data-season="christmas"] .dcStamp {
+      color: var(--season-gold, #f2c95c);
+      border: 1px solid rgba(38,116,72,.62);
+      border-radius: 999px;
+      padding: 4px 12px;
+      background: rgba(38,116,72,.34);
+      text-shadow: 0 0 12px rgba(242,201,92,.56);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .sp { animation: none; }
+      html[data-season="halloween"] #halloweenOpening,
+      html[data-season="halloween"] #startScene::before,
+      html[data-season="halloween"] .btnGold { animation: none; }
+      html[data-season="halloween"] #halloweenOpening { display: none; }
+      html[data-season="halloween"] .hubHeading { animation: none; background-position: 0 50%; }
+      html[data-season="christmas"] #startScene::before { animation: none; }
+      html[data-season="christmas"] .seasonGreeting.show { animation: none; }
+      .stringLights .bulb { animation: none; opacity: .92; }
+      html[data-season="christmas"] .hubHeading { animation: none; background-position: 0 50%; }
+    }
+
+    #boohaGhost {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* ── VIDEO ── */
+    #videoScene {
+      background: #000;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #introVideo {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+
+
+    /* ══════════════════════════════════════════
+       HUB
+    ══════════════════════════════════════════ */
+    #hubScene {
+      background: transparent;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      display: none;
+    }
+    #hubScene.active { display: block; }
+
+    .hubScroll {
+      min-height: 100%;
+      display: flex;
+      /* "safe center": on a short viewport where the hub content is taller
+         than the screen, plain align-items:center can clip the TOP of the
+         content when scrolled to the start instead of scrolling cleanly to
+         it (a known flexbox-centering gotcha). "safe" falls back to
+         flex-start once content overflows, so nothing is ever unreachable.
+         Widely supported for a couple years now; degrades to plain center
+         (today's behavior) on anything that doesn't understand it. */
+      align-items: safe center;
+      justify-content: center;
+      padding:
+        calc(clamp(10px,2vw,18px) + var(--safe-top))
+        calc(clamp(10px,2vw,18px) + var(--safe-right))
+        calc(clamp(10px,2vw,18px) + var(--safe-bottom))
+        calc(clamp(10px,2vw,18px) + var(--safe-left));
+    }
+
+    .hub {
+      width: min(1100px, 100%);
+      display: grid;
+      grid-template-rows: auto auto auto;
+      align-items: start;
+      gap: clamp(8px, 1.8vw, 16px);
+    }
+
+    /* Pass 16 shell: the hub is now a stable three-part page rather than a
+       stack of unrelated floating controls. Later passes can replace the
+       contents of the hero and Blitz mount without moving the shell again. */
+    .hubHeader {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      grid-template-areas: "title title" "left curriculum";
+      align-items: center;
+      width: 100%;
+      gap: clamp(10px, 2vw, 24px);
+      row-gap: clamp(10px, 1.6vw, 18px);
+    }
+    .hubHeaderLeft {
+      grid-area: left;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: clamp(4px, .8vw, 8px);
+    }
+    .hubHeader > .hubTitle { grid-area: title; }
+    .hubUtilityNav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+    /* New weekly medals not yet seen on the Adventure Log. */
+    #alog-icon-btn { position: relative; }
+    .hub-medal-badge {
+      position: absolute; top: -6px; right: -6px; min-width: 22px; height: 22px; padding: 0 6px;
+      border-radius: 999px; background: #ffd77a; color: #3a2408; border: 2px solid #fff2c4;
+      font: 900 12px/18px 'Zen Maru Gothic', sans-serif; text-align: center;
+      box-shadow: 0 0 12px rgba(255,215,122,.9); animation: hubMedalPulse 1.8s ease-in-out infinite;
+    }
+    .hub-medal-badge[hidden] { display: none; }
+    #alog-icon-btn.has-new-medals { box-shadow: 0 0 0 2px #ffd77a, 0 0 18px rgba(255,215,122,.6); }
+    @keyframes hubMedalPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    @media (prefers-reduced-motion: reduce) { .hub-medal-badge { animation: none; } }
+    .hubUtilityBtn {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px 5px 7px;
+      border: 1px solid rgba(255,126,225,.62);
+      border-radius: 999px;
+      background: rgba(24,8,39,.62);
+      color: #fff;
+      text-decoration: none;
+      font-size: clamp(9px, 1.1vw, 12px);
+      font-weight: 900;
+      line-height: 1.05;
+      box-shadow: 0 0 14px rgba(255,80,215,.18), inset 0 0 0 1px rgba(255,255,255,.06);
+      transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hubUtilityBtn img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
+    .hubUtilityBtn span { display: block; }
+    .hubUtilityBtn small {
+      display: block;
+      margin-top: 2px;
+      color: rgba(255,255,255,.62);
+      font-size: .78em;
+      font-weight: 700;
+    }
+    .hubUtilityBtn:hover { filter: brightness(1.12); box-shadow: 0 0 20px rgba(255,80,215,.34), inset 0 0 0 1px rgba(255,255,255,.12); }
+    .hubUtilityBtn:active { transform: scale(.96); }
+    .hubUtilityBtn:focus-visible,
+    .hubCurriculumBtn:focus-visible { outline: 3px solid #fff3a8; outline-offset: 3px; }
+
+    .hubCurriculumBtn {
+      grid-area: curriculum;
+      justify-self: end;
+      min-width: min(190px, 100%);
+      min-height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      padding: 7px 12px 7px 8px;
+      border: 1px solid rgba(255,220,94,.88);
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(28,8,39,.74);
+      box-shadow: 0 0 18px rgba(255,211,85,.24), inset 0 0 0 1px rgba(255,255,255,.08);
+      cursor: pointer;
+      font-weight: 900;
+      text-align: left;
+      transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hubCurriculumBtn:hover { filter: brightness(1.12); box-shadow: 0 0 28px rgba(255,211,85,.42), inset 0 0 0 1px rgba(255,255,255,.14); }
+    .hubCurriculumBtn:active { transform: scale(.97); }
+    .hubCurriculumIcon { width: 34px; height: 34px; object-fit: contain; flex: 0 0 auto; }
+    .hubCurriculumCopy { min-width: 0; flex: 1; }
+    .hubCurriculumName { display: block; font-size: clamp(10px, 1.15vw, 13px); letter-spacing: .4px; white-space: nowrap; }
+    .hubCurriculumJp { display: block; margin-top: 2px; color: rgba(255,230,151,.72); font-size: clamp(8px, .9vw, 10px); font-weight: 700; }
+    .hubCurriculumChevron { color: #ffe88b; font-size: 18px; line-height: 1; }
+
+    .hubHero {
+      width: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      box-shadow: none;
+    }
+    .hubHeroActions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: clamp(8px, 1.4vw, 14px);
+      width: 100%;
+      margin-top: clamp(10px, 1.6vw, 16px);
+    }
+    .hubHeroActions .mazeCta { flex: 1 1 340px; }
+    .hubHeroActions .hubHomeworkBtn { flex: 0 1 190px; margin: 0; }
+    .hubHeroActions .pwaIconBtn { flex: 0 0 auto; }
+    /* Hub Pass 4 (layout A): the week card is full width, so the Blitz
+       strip simply matches it. */
+    .hubBlitzMount {
+      display: block;
+      width: 100%;
+      min-width: 0;
+    }
+
+    @media (max-width: 600px) {
+      .hubHeader { gap: 8px; }
+      .hubHeaderLeft { gap: 5px; }
+      .hubCurriculumBtn { min-width: 142px; min-height: 48px; padding-right: 9px; }
+      .hubCurriculumIcon { width: 28px; height: 28px; }
+      .hubUtilityBtn { padding-right: 9px; }
+      .hubHero { padding: 0; }
+      .hubHeroActions { align-items: stretch; }
+      .hubHeroActions .mazeCta,
+      .hubHeroActions .hubHomeworkBtn { flex-basis: 100%; max-width: none; width: 100%; }
+    }
+
+    .hubTitle {
+      position: relative;
+      display: flex; flex-direction: column; align-items: center;
+      grid-area: title;
+      text-align: center;
+      padding: 6px 20px 2px;
+      opacity: 0; transform: translateY(10px) scale(.94);
+      animation: hubTitleIn 900ms cubic-bezier(.18,.9,.2,1.15) 80ms forwards;
+    }
+    @keyframes hubTitleIn {
+      0%   { opacity: 0; transform: translateY(10px) scale(.94); }
+      65%  { opacity: 1; transform: translateY(-2px) scale(1.015); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .hubTitle .sparkleField { inset: -30px -10px; }
+
+    .hubHeading {
+      position: relative; z-index: 1;
+      text-align: center;
+      font-family: 'Bowlby One', system-ui, sans-serif;
+      font-size: clamp(34px, 5vw, 64px);
+      font-weight: 400;
+      letter-spacing: 3px;
+      line-height: 1.1;
+      color: #fff;
+      background: linear-gradient(100deg,
+        #ffffff 0%, #ffe6fb 18%, #ffb8f0 32%, #ffffff 48%,
+        #ffd9a8 62%, #ffffff 78%, #ffffff 100%);
+      background-size: 260% 100%;
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: hubHeadingShimmer 6.5s linear infinite;
+      filter:
+        drop-shadow(0 0 26px rgba(255,140,255,.6))
+        drop-shadow(0 0 60px rgba(255,80,200,.28))
+        drop-shadow(0 2px 8px rgba(0,0,0,.9));
+      white-space: nowrap;
+    }
+    @keyframes hubHeadingShimmer {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: -260% 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hubHeading { animation: none; background-position: 0% 50%; }
+    }
+
+    .hubHeadingJp {
+      position: relative; z-index: 1;
+      margin-top: 1px;
+      font-size: clamp(9px, 1.3vw, 13px);
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: rgba(255,225,250,.72);
+      text-shadow: 0 0 12px rgba(255,140,255,.35), 0 1px 4px rgba(0,0,0,.8);
+    }
+
+    .hubTitle .playerGreeting {
+      align-items: center;
+      padding: 0;
+      margin-top: clamp(6px, 1vh, 12px);
+    }
+    .hubTitle .playerGreeting .greetingEn {
+      font-size: clamp(14px, 1.6vw, 20px);
+      white-space: normal;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .hubHeading { font-size: clamp(24px, 8vw, 34px); letter-spacing: 2px; }
+    }
+
+    .playerGreeting {
+      margin-top: 2px;
+      min-height: 30px;
+      padding: 5px 18px 6px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+
+      opacity: 0;
+      transform: translateY(8px) scale(.96);
+      transition:
+        opacity 420ms ease,
+        transform 520ms cubic-bezier(.18,.9,.2,1.2);
+    }
+
+    .playerGreeting.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .playerGreeting .greetingEn {
+      font-family: 'Bowlby One', system-ui, sans-serif;
+      font-size: clamp(13px, 2vw, 22px);
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.96);
+      text-shadow:
+        0 0 10px rgba(255,255,255,.85),
+        0 0 24px rgba(255,90,220,.70),
+        0 0 54px rgba(255,40,190,.45),
+        0 3px 10px rgba(0,0,0,.95);
+      white-space: nowrap;
+    }
+
+    .playerGreeting .greetName {
+      color: inherit;
+      text-shadow: inherit;
+    }
+
+    .playerGreeting .greetingJp {
+      font-size: clamp(9px, 1.2vw, 12px);
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,.55);
+      text-shadow: 0 1px 4px rgba(0,0,0,.8);
+    }
+
+    .hubGreetingRow {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+      align-items: center;
+      width: 100%;
+      margin-top: 2px;
+    }
+    .hubGreetingRow .playerGreeting { grid-column: 2; }
+    /* Hub Pass 4: Homework is a sheet of notebook paper — cream page, ruled
+       blue lines, red margin, folded corner — a third category next to the
+       pink Maze and the gold Blitz. Drawn in CSS, so it stays sharp. */
+    .hubHomeworkBtn {
+      grid-column: 3;
+      justify-self: start;
+      margin-left: clamp(10px, 1.5vw, 22px);
+      appearance: none;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 18px 7px 28px;
+      border: 1px solid rgba(150,128,88,.55);
+      border-radius: 5px;
+      color: #1f3a6b;
+      background-color: #fbf6e8;
+      background-image:
+        linear-gradient(90deg, rgba(0,0,0,0) 17px, rgba(214,84,84,.85) 17px, rgba(214,84,84,.85) 18.5px, rgba(0,0,0,0) 18.5px),
+        repeating-linear-gradient(180deg, rgba(0,0,0,0) 0, rgba(0,0,0,0) 10px, rgba(110,150,210,.42) 10px, rgba(110,150,210,.42) 11px);
+      box-shadow:
+        0 5px 14px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.7);
+      cursor: pointer;
+      font-size: clamp(10px, 1.2vw, 13px);
+      font-weight: 1000;
+      letter-spacing: 1px;
+      line-height: 1.05;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+      transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+    }
+    .hubHomeworkBtn .hubHomeworkText { display: flex; flex-direction: column; align-items: center; }
+    .hubHomeworkBtn .hubHomeworkText span {
+      display: block;
+      margin-top: 3px;
+      font-size: .88em;
+      letter-spacing: .2px;
+    }
+    .hubHomeworkBtn .hubHomeworkPencil { flex: 0 0 auto; width: 18px; height: 18px; color: #2c4f86; }
+    /* folded top-right corner */
+    .hubHomeworkBtn::after {
+      content: '';
+      position: absolute;
+      top: -1px; right: -1px;
+      width: 14px; height: 14px;
+      border-bottom-left-radius: 3px;
+      background: linear-gradient(225deg, rgba(0,0,0,0) 50%, #e3d6b4 50%);
+      box-shadow: -1px 1px 2px rgba(0,0,0,.18);
+    }
+    /* Items left to copy this week (see updateHomeworkCountBadge): a quiet
+       ink-blue tab on the paper, no animation. */
+    .hubHomeworkCount {
+      position: absolute;
+      top: -9px; left: -8px;
+      min-width: 22px;
+      padding: 2px 6px 1px;
+      border-radius: 999px;
+      background: #2c4f86;
+      color: #fffaf0;
+      font-size: 11px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.3;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,.35);
+      pointer-events: none;
+    }
+    .hubHomeworkCount[hidden] { display: none; }
+    .hubHomeworkBtn:hover {
+      background-color: #fffaf0;
+      box-shadow:
+        0 7px 18px rgba(0,0,0,.4),
+        inset 0 1px 0 rgba(255,255,255,.8);
+    }
+    .hubHomeworkBtn:active { transform: scale(.97); }
+    .hubHomeworkBtn:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 4px;
+    }
+
+    @media (max-width: 760px) {
+      .hubGreetingRow {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .hubGreetingRow .playerGreeting { order: 1; }
+      .hubHomeworkBtn {
+        order: 2;
+        margin-left: 0;
+      }
+    }
+
+
+
+    .hubRow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: clamp(8px, 1.6vw, 14px);
+      width: 100%;
+    }
+
+    @media (orientation: portrait), (max-width: 600px) {
+      .hubRow {
+        grid-template-columns: 1fr;
+      }
+      .weekCard {
+        height: auto !important;
+        min-height: 60px;
+        padding: 9px 14px 7px !important;
+      }
+    }
+
+    /* ── Week card ──
+       Shrunk from the original clamp(100px,14vw,140px)/generous padding —
+       three cards each running their own animated border don't need to be
+       this large, and the extra visual weight was crowding out the Maze
+       CTA below them. */
+    .weekCard {
+      position: relative;
+      border-radius: clamp(12px,1.8vw,18px);
+      overflow: hidden;
+      padding: clamp(7px,1.1vw,11px) clamp(8px,1.3vw,13px) clamp(5px,.8vw,8px);
+      height: clamp(72px, 9.5vw, 100px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+
+      background: rgba(255,255,255,.09);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.22),
+        0 6px 24px rgba(0,0,0,.35),
+        0 0 0 2px hsl(var(--hue,0deg) 90% 65% / .7),
+        0 0 18px 4px hsl(var(--hue,0deg) 90% 65% / .30);
+
+      animation: rainbowHue var(--rainbow-speed,5s) linear infinite;
+      animation-delay: var(--rainbow-offset,0s);
+    }
+
+    /* The current week is the student's starting point, so it needs a clear
+       visual lead over the adjacent navigation cards. The homework action
+       lives beside the centered greeting, leaving this tile uncluttered. */
+    .weekCard.currentWeek {
+      z-index: 1;
+      background: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,91,202,.18) 48%, rgba(123,92,255,.20));
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.42),
+        0 10px 30px rgba(0,0,0,.44),
+        0 0 0 3px rgba(255,224,102,.92),
+        0 0 26px 7px rgba(255,111,181,.42),
+        0 0 44px 8px rgba(184,164,255,.24);
+      transform: translateY(-2px) translateZ(0);
+    }
+
+    .weekCard.currentWeek .weekTag {
+      color: #fff3a8;
+      text-shadow: 0 0 10px rgba(255,224,102,.58);
+    }
+
+    .weekCard.currentWeek .weekTag span { color: #ffffff; }
+
+    .weekCard.currentWeek .weekTitle {
+      font-size: clamp(12px, 1.85vw, 17px);
+      text-shadow: 0 2px 14px rgba(0,0,0,.72), 0 0 12px rgba(255,159,194,.28);
+    }
+
+    @property --hue {
+      syntax: '<angle>';
+      inherits: false;
+      initial-value: 0deg;
+    }
+    @keyframes rainbowHue {
+      from { --hue: 0deg; }
+      to   { --hue: 360deg; }
+    }
+
+    .weekCard:nth-child(1) { --rainbow-offset: 0s;     --rainbow-speed: 5s; }
+    .weekCard:nth-child(2) { --rainbow-offset: -1.67s; --rainbow-speed: 5s; }
+    .weekCard:nth-child(3) { --rainbow-offset: -3.33s; --rainbow-speed: 5s; }
+
+    .weekCard::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        120deg,
+        transparent 30%,
+        rgba(255,255,255,.18) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      animation: shimmerSweep 3.8s ease-in-out infinite;
+      animation-delay: var(--shimmer-offset,0s);
+      pointer-events: none;
+    }
+    .weekCard:nth-child(1)::before { --shimmer-offset: 0s; }
+    .weekCard:nth-child(2)::before { --shimmer-offset: 1.2s; }
+    .weekCard:nth-child(3)::before { --shimmer-offset: 2.4s; }
+
+    @keyframes shimmerSweep {
+      0%   { transform: translateX(-100%) skewX(-12deg); opacity: 0; }
+      20%  { opacity: 1; }
+      60%  { transform: translateX(200%)  skewX(-12deg); opacity: 0; }
+      100% { transform: translateX(200%)  skewX(-12deg); opacity: 0; }
+    }
+
+    .weekCard:hover {
+      transform: translateY(-3px) scale(1.015) translateZ(0);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.32),
+        0 12px 32px rgba(0,0,0,.45),
+        0 0 0 2px hsl(var(--hue,0deg) 90% 70% / .9),
+        0 0 28px 6px hsl(var(--hue,0deg) 90% 65% / .45);
+    }
+    .weekCard.currentWeek:hover {
+      transform: translateY(-5px) scale(1.02) translateZ(0);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,.52),
+        0 14px 34px rgba(0,0,0,.48),
+        0 0 0 3px rgba(255,238,133,1),
+        0 0 32px 8px rgba(255,111,181,.52),
+        0 0 50px 10px rgba(184,164,255,.30);
+    }
+    .weekCard:active { transform: scale(.99) translateZ(0); }
+    .weekCard.currentWeek:active { transform: translateY(-1px) scale(.995) translateZ(0); }
+
+    .weekCardOpen {
+      appearance: none;
+      align-self: stretch;
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+      text-align: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .weekCardOpen:focus-visible {
+      outline: 3px solid #fff3a8;
+      outline-offset: 4px;
+      border-radius: 10px;
+    }
+
+    .weekTag {
+      display: block;
+      font-weight: 900; letter-spacing: 1.2px;
+      font-size: clamp(8px,1.05vw,10px);
+      text-transform: uppercase;
+      color: rgba(255,255,255,.6);
+    }
+    .weekTag span { color: rgba(255,255,255,.9); margin-left: 4px; }
+
+    .weekTitle {
+      display: block;
+      font-size: clamp(11px, 1.7vw, 16px);
+      font-weight: 900; letter-spacing: .3px;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,.6);
+      margin-top: 3px;
+      line-height: 1.15;
+    }
+
+    .weekDates {
+      display: block;
+      font-size: clamp(8px, 1.05vw, 10px);
+      color: rgba(255,255,255,.65);
+      margin-top: 2px;
+      line-height: 1.25;
+    }
+
+    /* Hub Pass 4 (layout A, wide screens): the current week card takes the
+       full width and last/next week become compact doors in its top
+       corners (all three share one grid cell). At 999px and below the
+       stacked layout further down takes over. */
+    .hubWeekLayout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "current";
+      align-items: start;
+      gap: clamp(10px, 1.5vw, 18px);
+      width: 100%;
+    }
+    .hubCurrentWeekMount { grid-area: current; min-width: 0; }
+    .hubWeekTab {
+      appearance: none;
+      position: relative;
+      z-index: 2;
+      min-width: 0;
+      min-height: 44px;
+      align-self: start;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: clamp(12px, 1.6vw, 18px);
+      padding: 6px 14px 6px 10px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(14, 8, 27, .58);
+      cursor: pointer;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.28);
+      transition: transform 160ms ease, filter 160ms ease, box-shadow 160ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #hubPrevWeekBtn { grid-area: current; justify-self: start; border-color: rgba(191,133,255,.86); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 22px rgba(165,101,255,.22); }
+    #hubNextWeekBtn { grid-area: current; justify-self: end; padding: 6px 10px 6px 14px; border-color: rgba(64,229,207,.78); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 22px rgba(34,220,203,.2); }
+    .hubWeekTab:hover { filter: brightness(1.13); transform: translateY(-2px); }
+    .hubWeekTab:active { transform: translateY(0) scale(.98); }
+    .hubWeekTab:focus-visible { outline: 3px solid #fff3a8; outline-offset: 4px; }
+    .hubWeekTabArrow { font-size: clamp(20px, 2.8vw, 30px); line-height: .8; }
+    #hubPrevWeekBtn .hubWeekTabArrow { color: #d1a8ff; }
+    #hubNextWeekBtn .hubWeekTabArrow { color: #76ffe9; }
+    .hubWeekTabCopy { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+    #hubNextWeekBtn .hubWeekTabCopy { align-items: flex-end; }
+    .hubWeekTabLabel { font-size: clamp(8px, .8vw, 10px); font-weight: 900; letter-spacing: 1px; text-transform: uppercase; opacity: .8; }
+    .hubWeekTabTitle { margin-top: 1px; font-size: clamp(11px, 1.05vw, 13px); font-weight: 900; white-space: nowrap; }
+    .hubWeekTabDate { display: none; color: rgba(255,255,255,.66); font-size: clamp(8px, .85vw, 10px); line-height: 1.2; }
+
+    .hubCurrentWeekMount .weekCard {
+      min-height: 0;
+      height: auto;
+      padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.8vw, 34px) clamp(16px, 2vw, 24px);
+      cursor: default;
+    }
+    .hubCurrentWeekMount .weekCardOpen { gap: clamp(8px, 1.2vw, 14px); }
+    .hubCurrentWeekMount .weekCardOpen > span:first-child { width: 100%; }
+    .hubCurrentWeekMount .weekCard.currentWeek .weekTag { font-size: clamp(9px, 1vw, 12px); }
+    .hubCurrentWeekMount .weekCard.currentWeek .weekTitle { font-size: clamp(25px, 4vw, 42px); margin-top: 10px; }
+    .hubCurrentWeekMount .weekCard.currentWeek .weekDates { font-size: clamp(10px, 1.15vw, 13px); margin-top: 7px; }
+    .hubMazeLabel { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: clamp(12px, 2vw, 22px); color: #fff; font-size: clamp(10px, 1.15vw, 13px); font-weight: 900; text-align: left; }
+    .hubMazeLabel span { color: rgba(255,255,255,.66); font-size: .9em; font-weight: 700; }
+    .hubProgressCount { color: #ffe477; font-size: clamp(12px, 1.3vw, 15px); font-weight: 1000; }
+    .hubProgress { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; width: 100%; margin-top: 8px; }
+    .hubProgressSegment { height: clamp(8px, 1vw, 11px); border-radius: 999px; background: rgba(255,255,255,.18); box-shadow: inset 0 1px 2px rgba(0,0,0,.34); }
+    .hubProgressSegment.is-complete { background: linear-gradient(180deg, #fff2a0, #ffc943); box-shadow: 0 0 10px rgba(255,214,88,.55); }
+    .hubProgressHint { display: block; margin-top: 8px; color: rgba(255,255,255,.68); font-size: clamp(8px, .9vw, 10px); line-height: 1.35; text-align: left; }
+    .hubCurrentWeekMount .hubHeroActions { margin-top: clamp(14px, 2vw, 22px); }
+
+    /* 999px and below: the card stays full width with last/next week as two
+       doors underneath (unchanged from before Pass 4; phone layouts come later). */
+    @media (max-width: 999px) {
+      .hubWeekLayout { grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-areas: "current current" "previous next"; align-items: stretch; }
+      #hubPrevWeekBtn { grid-area: previous; justify-self: stretch; }
+      #hubNextWeekBtn { grid-area: next; justify-self: stretch; padding: clamp(10px, 1.4vw, 16px) clamp(7px, 1vw, 12px); }
+      .hubWeekTab { min-height: 82px; margin: 0; align-self: stretch; padding: clamp(10px, 1.4vw, 16px) clamp(7px, 1vw, 12px); border-radius: 20px; flex-direction: row; gap: 8px; }
+      .hubWeekTabArrow { font-size: 24px; }
+      .hubWeekTabCopy,
+      #hubNextWeekBtn .hubWeekTabCopy { align-items: flex-start; }
+      .hubWeekTabLabel { opacity: 1; }
+      .hubWeekTabDate { display: block; }
+    }
+    @media (max-width: 600px) {
+      .hubWeekLayout { gap: 8px; }
+      .hubWeekTab { min-height: 76px; border-radius: 16px; padding: 8px 6px; }
+      .hubWeekTabLabel { letter-spacing: .8px; }
+      .hubWeekTabTitle { font-size: 11px; }
+      .hubWeekTabDate { font-size: 8px; }
+      .hubProgress { gap: 4px; }
+      .hubProgressHint { font-size: 8px; }
+    }
+
+    /* Pass 19 glow language: each hub surface gets one restrained color
+       role. The low-power class is set before first paint when possible, and
+       the reduced-motion media query remains the final safety net. */
+    .hub-glow-gold { animation: hubGlowGold 3.8s ease-in-out infinite; }
+    .hub-glow-violet { animation: hubGlowViolet 4.2s ease-in-out infinite; }
+    .hub-glow-teal { animation: hubGlowTeal 4.2s ease-in-out infinite; }
+    .hub-glow-soft { animation: hubGlowSoft 5.4s ease-in-out infinite; }
+    .hub-glow-medal { animation: hubGlowMedal 4.8s ease-in-out infinite; }
+    .hub-glow-pink {
+      animation-name: mazeCtaGlow, mazeCtaSheen, hubGlowPink;
+      animation-duration: 3.2s, 7s, 3.6s;
+      animation-timing-function: ease-in-out, linear, ease-in-out;
+      animation-iteration-count: infinite;
+    }
+    @keyframes hubGlowGold {
+      0%, 100% { box-shadow: 0 0 18px rgba(255,211,85,.22), inset 0 0 0 1px rgba(255,255,255,.08); }
+      50% { box-shadow: 0 0 30px rgba(255,211,85,.42), inset 0 0 0 1px rgba(255,255,255,.14); }
+    }
+    @keyframes hubGlowViolet {
+      0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 18px rgba(165,101,255,.2); }
+      50% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.13), 0 0 30px rgba(191,133,255,.42); }
+    }
+    @keyframes hubGlowTeal {
+      0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 18px rgba(34,220,203,.18); }
+      50% { box-shadow: inset 0 0 0 1px rgba(255,255,255,.13), 0 0 30px rgba(64,229,207,.4); }
+    }
+    @keyframes hubGlowPink {
+      0%, 100% { filter: saturate(1); }
+      50% { filter: saturate(1.08) brightness(1.03); }
+    }
+    @keyframes hubGlowMedal {
+      0%, 100% { box-shadow: 0 0 0 rgba(255,210,72,0); }
+      50% { box-shadow: 0 0 16px rgba(255,210,72,.18); }
+    }
+    @keyframes hubGlowSoft {
+      0%, 100% { box-shadow: 0 12px 34px rgba(0,0,0,.36), 0 0 20px rgba(255,204,70,.08), inset 0 0 0 1px rgba(255,255,255,.08); }
+      50% { box-shadow: 0 12px 34px rgba(0,0,0,.36), 0 0 30px rgba(255,204,70,.16), inset 0 0 0 1px rgba(255,255,255,.1); }
+    }
+    html.hub-low-power .hub-glow-gold,
+    html.hub-low-power .hub-glow-violet,
+    html.hub-low-power .hub-glow-teal,
+    html.hub-low-power .hub-glow-soft,
+    html.hub-low-power .hub-glow-medal,
+    html.hub-low-power .hub-glow-pink,
+    html.hub-reduced-motion .hub-glow-gold,
+    html.hub-reduced-motion .hub-glow-violet,
+    html.hub-reduced-motion .hub-glow-teal,
+    html.hub-reduced-motion .hub-glow-soft,
+    html.hub-reduced-motion .hub-glow-medal,
+    html.hub-reduced-motion .hub-glow-pink {
+      animation: none !important;
+    }
+    html.hub-low-power .mazeCta.is-complete,
+    html.hub-reduced-motion .mazeCta.is-complete {
+      animation: none !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hub-glow-gold,
+      .hub-glow-violet,
+      .hub-glow-teal,
+      .hub-glow-soft,
+      .hub-glow-medal,
+      .hub-glow-pink,
+      .mazeCta.is-complete { animation: none !important; }
+    }
+
+    .homeworkTrackTab:focus-visible,
+    .homeworkActionBtn:focus-visible,
+    .ghostBtn:focus-visible {
+      outline: 3px solid #fff3a8;
+      outline-offset: 3px;
+    }
+
+    .hubBottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding-top: 6px;
+      width: 100%;
+    }
+
+    /* ── Shared button ── */
+    .btn {
+      appearance: none; border: 0;
+      border-radius: 999px;
+      padding: clamp(10px,1.6vw,13px) clamp(16px,2.5vw,22px);
+      font-size: clamp(13px,1.8vw,17px);
+      font-weight: 900; letter-spacing: .6px;
+      cursor: pointer; color: #000;
+      background: linear-gradient(180deg, var(--pink2), var(--pink));
+      box-shadow:
+        0 8px 18px rgba(255,59,189,.28),
+        0 0 0 2px rgba(255,59,189,.15),
+        0 0 22px rgba(255,59,189,.30);
+      transform: translateZ(0);
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(.98) translateZ(0); }
+    .btnSmall {
+      padding: clamp(8px,1.2vw,11px) clamp(12px,2vw,18px);
+      font-size: clamp(12px,1.5vw,14px);
+    }
+
+    /* ── Install button ── */
+    #pwa-install-btn {
+      display: none; /* shown by pwa-init.js when prompt is available */
+    }
+
+    /* ── Fade layer ── */
+    #fade {
+      position: absolute; inset: 0;
+      background: #000; opacity: 0;
+      pointer-events: none;
+      will-change: opacity;
+      transition: opacity 520ms ease;
+      z-index: 40;
+    }
+    #fade.on { opacity: 1; pointer-events: all; }

@@ -5,6 +5,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -165,7 +166,7 @@ assert.deepStrictEqual(
   ['aqua', 'mint'],
   'non-October checkpoints must retain their own spark colors');
 
-const index = read('index.html');
+const index = readFamily('index.html');
 assert.match(index, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.sp \{ animation: none; \}/,
   'index sparkles must stop under reduced motion');
 assert.match(index, /html\[data-season="christmas"\] #startScene/,
@@ -183,7 +184,7 @@ assert.match(dailyCheck, /season === 'christmas'/,
 assert.match(dailyCheck, /mascotAsset\?\.\('static'\)/,
   'Daily Check must be able to render the seasonal mascot');
 
-const maze = read('maze.html');
+const maze = readFamily('maze.html');
 assert.match(maze, /html\[data-season="halloween"\] #mazeImg\{ filter:brightness\(1\.10\) saturate\(1\.08\); \}/,
   'Halloween Maze artwork must receive a modest brightness lift');
 assert.match(maze, /html\[data-season="christmas"\] #mazeImg/,

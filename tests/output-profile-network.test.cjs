@@ -4,10 +4,11 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const pages = {
-  log: fs.readFileSync(path.join(ROOT, 'profile.html'), 'utf8'),
+  log: readFamily('profile.html'),
   adventure: fs.readFileSync(path.join(ROOT, 'adventure-profile.html'), 'utf8'),
   utsuroba: fs.readFileSync(path.join(ROOT, 'utsuroba-profile.html'), 'utf8'),
 };

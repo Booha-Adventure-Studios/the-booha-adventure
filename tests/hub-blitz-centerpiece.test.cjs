@@ -14,6 +14,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -150,7 +151,7 @@ assert.ok(center(), 'it can hang on its own');
 }
 
 // ── Hub wiring (index.html) ──────────────────────────────────────────────
-const index = read('index.html');
+const index = readFamily('index.html');
 function slice(a, b) { const s = index.indexOf(a); const e = index.indexOf(b, s); assert.ok(s >= 0 && e > s, `${a} extractable`); return index.slice(s, e); }
 const src = slice('let centerpieceShown = null;', "document.addEventListener('booha:visitRecorded'");
 assert.match(src, /window\.BoohaSkins\?\.hasCurrentBlitzTriple\?\.\(window\.BoohaAdventure\?\.save\?\.load\?\.\(\)\)/, 'same rule as the skin unlock, read from the student\'s save');

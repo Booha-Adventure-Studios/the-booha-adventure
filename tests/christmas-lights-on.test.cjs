@@ -7,6 +7,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
@@ -53,7 +54,7 @@ assert.strictEqual(skins.seasonPhase('christmas-2026', '2026-11-20').trailAccent
 assert.strictEqual(skins.seasonPhase('christmas-2026', '2026-12-10').trailAccent, christmas.glow.gold);
 
 // ── Maze wiring ──────────────────────────────────────────────────────────
-const maze = read('maze.html');
+const maze = readFamily('maze.html');
 assert.ok(maze.includes('function activeSeasonalVisitors()'), 'maze builds the full flock');
 assert.ok(maze.includes('visitorForSlot(seasonalFlock, i)'), 'each flock slot gets a kind');
 assert.ok(maze.includes('Math.floor(index / 2) % visitors.length'),
@@ -65,7 +66,7 @@ assert.ok(maze.includes('function christmasTrailAccent()') && maze.includes('con
   'player trail mixes in the December gold accent');
 
 // ── First screen + hub string lights ─────────────────────────────────────
-const index = read('index.html');
+const index = readFamily('index.html');
 // Hub Pass 3: the hub title's lights became the progress-aware ornament
 // banner (December bulbs light up per visit). Only the first screen keeps
 // the atmospheric string lights.

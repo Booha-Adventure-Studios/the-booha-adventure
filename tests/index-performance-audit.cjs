@@ -7,9 +7,10 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.join(__dirname, '..');
-const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const index = readFamily('index.html');
 const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const expected = [
   'background-1',

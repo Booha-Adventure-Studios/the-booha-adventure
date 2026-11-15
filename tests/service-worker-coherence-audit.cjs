@@ -14,7 +14,8 @@ const fetch = source.slice(
   source.indexOf('// ============================================================\n//  Strategy helpers')
 );
 
-const jsRoute = fetch.indexOf("if (/\\.m?js$/.test(path))");
+// Pass 1 (file size): CSS joined the network-first JavaScript route.
+const jsRoute = fetch.indexOf("if (/\\.(m?js|css)$/.test(path))");
 const assetRoute = fetch.indexOf('if (ASSET_PREFIXES.some');
 
 assert(jsRoute >= 0, 'service worker must define a JavaScript fetch route');

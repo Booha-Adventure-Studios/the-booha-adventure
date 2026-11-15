@@ -12,6 +12,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -194,7 +195,7 @@ assert.strictEqual(el.hidden, true);
 assert.strictEqual(el.children.length, 0);
 
 // ── index.html wiring and CSS ────────────────────────────────────────────
-const index = read('index.html');
+const index = readFamily('index.html');
 const v = index.indexOf('<script src="js/core/visit-days.js"></script>');
 const b = index.indexOf('<script src="js/ui/hub-ornament-banner.js"></script>');
 assert.ok(v > 0 && b > v, 'banner loads after the visit record');

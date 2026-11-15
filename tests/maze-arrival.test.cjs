@@ -15,10 +15,11 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
-const maze = read('maze.html');
+const maze = readFamily('maze.html');
 const arrivalSrc = read('js/core/maze-arrival.js');
 
 // ── 1. The rule (js/core/maze-arrival.js) ─────────────────────────────────

@@ -26,9 +26,16 @@ for (const [main, parts] of Object.entries(families)) {
   assert.ok(Array.isArray(parts) && parts.length, `${main} lists its parts`);
   for (const part of parts) {
     assert.ok(fs.existsSync(path.join(ROOT, part)), `${part} exists`);
-    assert.ok(tracked.includes(part), `${part} is tracked`);
+    // New parts are untracked until committed; they must not be git-ignored.
+    let ignored = false;
+    try { childProcess.execFileSync('git', ['check-ignore', '-q', part], { cwd: ROOT }); ignored = true; } catch (_) {}
+    assert.ok(!ignored, `${part} is not git-ignored`);
     assert.ok(!seen.has(part), `${part} belongs to only one family (also in ${seen.get(part)})`);
     seen.set(part, main);
+    if (main.endsWith('.html')) {
+      // A page's split-off stylesheet or script must be linked from the page.
+      assert.ok(read(main).includes(`"${part}"`), `${main} must link ${part}`);
+    }
     if (main.endsWith('.js')) {
       const name = path.basename(main);
       for (const page of pages) {

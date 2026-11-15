@@ -4,9 +4,10 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const root = path.join(__dirname, '..');
-const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const index = readFamily('index.html');
 const verify = fs.readFileSync(path.join(root, 'verify.sh'), 'utf8');
 
 for (const name of ['hubGlowGold', 'hubGlowViolet', 'hubGlowTeal', 'hubGlowPink', 'hubGlowMedal', 'hubGlowSoft']) {

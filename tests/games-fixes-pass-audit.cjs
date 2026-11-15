@@ -7,6 +7,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -83,18 +84,18 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
   assert(GOAL_Y - 38 > ys[2] + R, 'the skin sits below the last Blitz disc');
   // Blitz labels sit beside the discs, so the lane line only passes behind discs.
   assert.match(pg, /class="pg-node blitz side/, 'Blitz nodes use the side-label layout');
-  assert.match(read('profile.html'), /\.pg-node\.blitz\.side \{ flex-direction:row;/, 'side-label layout is styled');
+  assert.match(readFamily('profile.html'), /\.pg-node\.blitz\.side \{ flex-direction:row;/, 'side-label layout is styled');
   // The lanes never join: no segment runs from the maze lane into the Blitz lane.
   assert(!/seg\([^)]*MAZE_LANE_X[^)]*BLITZ_LANE_X|seg\([^)]*BLITZ_LANE_X[^)]*MAZE_LANE_X/.test(pg), 'no path joins the two lanes');
   assert(!/pg-divider/.test(pg), 'no stacked BLITZ · SKIN divider under the arcade');
-  const html = read('profile.html');
+  const html = readFamily('profile.html');
   const boardH = +html.match(/\.pg-trail-board \{\s*position:relative; height:(\d+)px;/)[1];
   assert(boardH >= GOAL_Y + 90, 'the board is tall enough for both goals and their labels');
 }
 
 // ── 4. Rank coin: irregular flicker, glint, badge on the rim, reduced motion ──
 {
-  const html = read('profile.html');
+  const html = readFamily('profile.html');
   const pg = read('js/ui/profile-game.js');
   assert.match(pg, /<span class="pg-coin-face"><img src="\$\{profileArt\(`rank-coin-/, 'the coin face wraps the image for the glint (URL via BoohaProfileArt)');
   const kf = name => (html.match(new RegExp(`@keyframes ${name} \\{([\\s\\S]*?\\})\\s*\\}`)) || [])[1] || '';

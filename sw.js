@@ -184,7 +184,11 @@ const CURRENT_CACHES = {
   // App text pass: manifest.json description updated. It only shows in
   // install prompts, so the decks cache is not bumped (that would re-download
   // every lesson deck for one line of text).
-  pages:  'booha-pages-2026-549',
+  // Pass 1 (file size): index, profile and maze move their big inline CSS
+  // into theme/hub.css, theme/hub-panels.css, theme/profile.css and
+  // theme/maze.css. CSS is now network-first (like JavaScript), so style
+  // edits reach iPads with the page; the new files are precached for offline.
+  pages:  'booha-pages-2026-550',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -434,6 +438,13 @@ const CORE_FILES = [
   `${BASE}/js/core/decoded-image-cache.js`,
   `${BASE}/js/core/seasonal-visuals.js`,
   `${BASE}/js/maze-seasonal-unlock.js`,
+  // Pass 1 (file size): page styles moved out of index, profile and maze.
+  // They were precached here before, inside those pages, so they stay in
+  // the page cache (and out of the CORE_ASSETS budget).
+  `${BASE}/theme/hub.css`,
+  `${BASE}/theme/hub-panels.css`,
+  `${BASE}/theme/profile.css`,
+  `${BASE}/theme/maze.css`,
 ];
 
 // Static images are fetched from ASSET_CACHE, so these must be pre-cached
@@ -603,10 +614,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ── JavaScript → Network-first, fall back to cached script ─
-  // Keep the HTML/JavaScript pair coherent whenever the device is online;
+  // ── JavaScript and CSS → Network-first, fall back to cached copy ─
+  // Keep the HTML/JavaScript/CSS set coherent whenever the device is online;
   // the cached copy remains available for offline and weak-network starts.
-  if (/\.m?js$/.test(path)) {
+  // (CSS joined this rule in Pass 1, when page styles moved out of the HTML:
+  // style edits must keep reaching iPads as soon as the page does.)
+  if (/\.(m?js|css)$/.test(path)) {
     event.respondWith(networkFirst(request, ASSET_CACHE));
     return;
   }
@@ -679,7 +692,8 @@ async function networkFirst(request, cacheName) {
     return response;
   } catch {
     const cached = await cache.match(request);
-    return cached || offlineFallback(request);
+    // Precached page styles live in the page cache; look there too.
+    return cached || (await caches.match(request)) || offlineFallback(request);
   }
 }
 

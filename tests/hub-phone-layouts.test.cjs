@@ -11,8 +11,9 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { readFamily } = require('./lib/source-family.cjs');
 
-const index = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const index = readFamily('index.html');
 
 function mediaBlock(query) {
   const start = index.indexOf(`@media ${query} {`);
@@ -34,7 +35,12 @@ const B = mediaBlock('(max-width: 600px) and (orientation: portrait)');
   const at = index.indexOf(rule);
   assert.ok(at > 0 && at < B.start && at < C.start, `phone rules come after ${rule}`);
 });
-assert.ok(C.start < index.indexOf('<div id="app">'), 'phone rules live in the main stylesheet');
+// Pass 1 (file size): the main stylesheet is now theme/hub-panels.css,
+// linked in the page head, before the app markup.
+const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const panelsCss = fs.readFileSync(path.join(__dirname, '..', 'theme', 'hub-panels.css'), 'utf8');
+assert.ok(panelsCss.includes('(orientation: landscape) and (max-height: 500px) and (max-width: 999px)'), 'phone rules live in the main stylesheet');
+assert.ok(html.indexOf('theme/hub-panels.css') > 0 && html.indexOf('theme/hub-panels.css') < html.indexOf('</head>'), 'the main stylesheet is linked in the page head');
 
 // ── C: two columns ───────────────────────────────────────────────────────
 assert.match(C.css, /\.hub \{[^}]*grid-template-columns: minmax\(0, 1fr\) minmax\(0, 1\.45fr\);[^}]*grid-template-areas: "head hero" "head blitz";/);

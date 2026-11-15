@@ -8,6 +8,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const { readFamily } = require('./lib/source-family.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
 const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -80,7 +81,7 @@ function state({ stars = Array(9).fill(null), blitz = 0, skin = { name: 'Batty B
   assert.strictEqual(rb.label, 'ゲームへ · Go to this week’s games');
   const pg = read('js/ui/profile-game.js');
   assert.match(pg, /class="pg-sum-go" data-i="\$\{idx\}" aria-label="\$\{esc\(opt\.label\)\}"/, 'buttons carry the label');
-  const html = read('profile.html');
+  const html = readFamily('profile.html');
   assert(!/\.pg-sum-choice \.pg-sum-go \{[^}]*min-height/.test(html), 'choice buttons keep the 44px minimum height');
   assert.match(html, /\.pg-sum-go \{[^}]*min-height:44px/, '44px touch target');
 }
@@ -106,7 +107,7 @@ function state({ stars = Array(9).fill(null), blitz = 0, skin = { name: 'Batty B
 
 // ── Placement and wiring ──
 {
-  const html = read('profile.html');
+  const html = readFamily('profile.html');
   const hero = html.indexOf('id="pg-hero"');
   const sum = html.indexOf('id="pg-summary"');
   const skin = html.indexOf('id="pg-skin"');

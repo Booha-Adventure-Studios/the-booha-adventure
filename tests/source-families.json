@@ -1,4 +1,15 @@
 {
   "about": "When a large file is split, its parts form a family. Tests that check a file's code read the whole family through tests/lib/source-family.cjs, so moving code between the main file and its parts does not break them. Add the parts here in the same pass that creates them.",
-  "families": {}
+  "families": {
+    "index.html": [
+      "theme/hub.css",
+      "theme/hub-panels.css"
+    ],
+    "profile.html": [
+      "theme/profile.css"
+    ],
+    "maze.html": [
+      "theme/maze.css"
+    ]
+  }
 }
