@@ -96,7 +96,7 @@
       var arrival = document.getElementById('overlay1');
       if (arrival && !arrival.classList.contains('hidden') && !arrival.classList.contains('gone')) return true;
       //  - The Maze's weekly companion popup.
-      var companion = document.getElementById('battyUnlockPopup');
+      var companion = document.getElementById('seasonalUnlockPopup');
       if (companion && companion.classList.contains('show')) return true;
       //  - The profile's "week sealed" celebration.
       if (showing_(document.querySelector('.pg-sealed-card'))) return true;

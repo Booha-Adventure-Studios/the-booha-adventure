@@ -137,6 +137,8 @@ const CURRENT_CACHES = {
   // Hub: twelve months of ornament art (r2, 192×288) with per-art loop/glow data; December glass tint removed.
   // Hub Pass 6: phone layouts (slim doors upright; two-column hub sideways).
   // Pass 8: Blitz → Maze path (hub new-friend cue) and the Christmas-coloured Maze reveal.
+  // Pass 1 seasonal unlock cleanup (2026-11-15): replace legacy Batty-only
+  // popup selectors with neutral seasonal unlock names in the cached Maze shell.
   // Pass 9: hub homework ticks move into the student save (weekly.homework).
   // Pass 10: quiet homework count badge replaces NEW on the notebook button.
   // Pass 11a: homework.html loads the save stack; shared js/core/homework-store.js (week-keyed known).
@@ -188,7 +190,7 @@ const CURRENT_CACHES = {
   // into theme/hub.css, theme/hub-panels.css, theme/profile.css and
   // theme/maze.css. CSS is now network-first (like JavaScript), so style
   // edits reach iPads with the page; the new files are precached for offline.
-  pages:  'booha-pages-2026-550',
+  pages:  'booha-pages-2026-551',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first

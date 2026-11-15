@@ -179,38 +179,38 @@
     }
 
     /* Weekly skin unlock — shown once after the qualifying Blitz run. */
-    #battyUnlockScrim{ position:fixed; inset:0; z-index:230; display:none; background:rgba(8,2,16,.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
-    #battyUnlockScrim.show{ display:block; }
-    #battyUnlockPopup{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.82) translateY(16px); z-index:235; display:none; width:min(90vw,430px); max-height:90vh; overflow:auto; padding:28px 24px 24px; border:1px solid rgba(255,150,64,.42); border-radius:28px; text-align:center; background:radial-gradient(ellipse at 50% 0%,rgba(255,112,36,.18),transparent 58%),linear-gradient(155deg,rgba(30,8,32,.99),rgba(8,7,28,.99)); box-shadow:0 0 0 1px rgba(255,255,255,.06),0 48px 120px rgba(0,0,0,.95),0 0 100px rgba(255,80,30,.18); opacity:0; transition:opacity 420ms ease,transform 480ms cubic-bezier(.34,1.35,.64,1); }
-    #battyUnlockPopup.show{ display:block; }
-    #battyUnlockPopup.visible{ opacity:1; transform:translate(-50%,-50%) scale(1) translateY(0); }
-    #battyUnlockPopup .batty-bar{ width:58%; height:3px; margin:0 auto 18px; border-radius:99px; background:linear-gradient(90deg,#692e8f,#ff8a3d,#f6d36b,#ff8a3d,#692e8f); box-shadow:0 0 18px rgba(255,130,54,.65); }
-    #battyUnlockPopup .batty-art{ display:block; width:min(48vw,190px); height:min(48vw,190px); object-fit:contain; margin:0 auto 8px; filter:drop-shadow(0 12px 24px rgba(0,0,0,.7)); }
-    #battyUnlockPopup .batty-equip-button{ appearance:none; border:0; padding:0; margin:0; background:transparent; cursor:pointer; border-radius:24px; }
-    #battyUnlockPopup .batty-equip-button:focus-visible{ outline:3px solid #ffd984; outline-offset:5px; }
-    #battyUnlockPopup .batty-kicker{ margin:0 0 7px; color:rgba(255,191,128,.82); font-size:11px; font-weight:900; letter-spacing:.25em; text-transform:uppercase; }
-    #battyUnlockPopup h2{ margin:0; color:#fff3db; font-family:'Bowlby One',sans-serif; font-size:clamp(22px,5vw,34px); line-height:1.15; text-shadow:0 0 25px rgba(255,120,50,.42); }
-    #battyUnlockPopup p{ margin:12px auto 18px; color:rgba(255,235,218,.72); font-size:14px; line-height:1.6; }
-    #battyUnlockPopup .batty-jp{ display:block; margin-top:7px; color:rgba(255,220,186,.86); font-size:.9em; font-weight:700; letter-spacing:.04em; }
-    #battyUnlockPopup ruby{ ruby-position:over; }
-    #battyUnlockPopup rt{ color:#ffd28f; font-size:.52em; font-weight:800; letter-spacing:0; }
-    #battyUnlockPopup .batty-equip{ appearance:none; border:0; border-radius:999px; padding:11px 22px; color:#170913; font-weight:1000; cursor:pointer; background:linear-gradient(180deg,#ffd984,#ff9149); box-shadow:0 7px 28px rgba(255,120,40,.36); }
-    #battyUnlockPopup .batty-equip .batty-jp{ display:inline; margin-left:8px; color:rgba(23,9,19,.78); font-size:.9em; }
-    #battyUnlockPopup .batty-equip:active{ transform:scale(.95); }
+    #seasonalUnlockScrim{ position:fixed; inset:0; z-index:230; display:none; background:rgba(8,2,16,.82); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+    #seasonalUnlockScrim.show{ display:block; }
+    #seasonalUnlockPopup{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%) scale(.82) translateY(16px); z-index:235; display:none; width:min(90vw,430px); max-height:90vh; overflow:auto; padding:28px 24px 24px; border:1px solid rgba(255,150,64,.42); border-radius:28px; text-align:center; background:radial-gradient(ellipse at 50% 0%,rgba(255,112,36,.18),transparent 58%),linear-gradient(155deg,rgba(30,8,32,.99),rgba(8,7,28,.99)); box-shadow:0 0 0 1px rgba(255,255,255,.06),0 48px 120px rgba(0,0,0,.95),0 0 100px rgba(255,80,30,.18); opacity:0; transition:opacity 420ms ease,transform 480ms cubic-bezier(.34,1.35,.64,1); }
+    #seasonalUnlockPopup.show{ display:block; }
+    #seasonalUnlockPopup.visible{ opacity:1; transform:translate(-50%,-50%) scale(1) translateY(0); }
+    #seasonalUnlockPopup .seasonalUnlock-bar{ width:58%; height:3px; margin:0 auto 18px; border-radius:99px; background:linear-gradient(90deg,#692e8f,#ff8a3d,#f6d36b,#ff8a3d,#692e8f); box-shadow:0 0 18px rgba(255,130,54,.65); }
+    #seasonalUnlockPopup .seasonalUnlock-art{ display:block; width:min(48vw,190px); height:min(48vw,190px); object-fit:contain; margin:0 auto 8px; filter:drop-shadow(0 12px 24px rgba(0,0,0,.7)); }
+    #seasonalUnlockPopup .seasonalUnlock-equip-button{ appearance:none; border:0; padding:0; margin:0; background:transparent; cursor:pointer; border-radius:24px; }
+    #seasonalUnlockPopup .seasonalUnlock-equip-button:focus-visible{ outline:3px solid #ffd984; outline-offset:5px; }
+    #seasonalUnlockPopup .seasonalUnlock-kicker{ margin:0 0 7px; color:rgba(255,191,128,.82); font-size:11px; font-weight:900; letter-spacing:.25em; text-transform:uppercase; }
+    #seasonalUnlockPopup h2{ margin:0; color:#fff3db; font-family:'Bowlby One',sans-serif; font-size:clamp(22px,5vw,34px); line-height:1.15; text-shadow:0 0 25px rgba(255,120,50,.42); }
+    #seasonalUnlockPopup p{ margin:12px auto 18px; color:rgba(255,235,218,.72); font-size:14px; line-height:1.6; }
+    #seasonalUnlockPopup .seasonalUnlock-jp{ display:block; margin-top:7px; color:rgba(255,220,186,.86); font-size:.9em; font-weight:700; letter-spacing:.04em; }
+    #seasonalUnlockPopup ruby{ ruby-position:over; }
+    #seasonalUnlockPopup rt{ color:#ffd28f; font-size:.52em; font-weight:800; letter-spacing:0; }
+    #seasonalUnlockPopup .seasonalUnlock-equip{ appearance:none; border:0; border-radius:999px; padding:11px 22px; color:#170913; font-weight:1000; cursor:pointer; background:linear-gradient(180deg,#ffd984,#ff9149); box-shadow:0 7px 28px rgba(255,120,40,.36); }
+    #seasonalUnlockPopup .seasonalUnlock-equip .seasonalUnlock-jp{ display:inline; margin-left:8px; color:rgba(23,9,19,.78); font-size:.9em; }
+    #seasonalUnlockPopup .seasonalUnlock-equip:active{ transform:scale(.95); }
     /* Pass 8: the same reveal in Christmas colours (deep green and berry red,
        gold trim) so the cozy Christmas copy isn't in a Halloween-orange card.
        Colours only; no new motion. */
-    html[data-season="christmas"] #battyUnlockScrim{ background:rgba(4,16,11,.82); }
-    html[data-season="christmas"] #battyUnlockPopup{ border-color:rgba(242,201,92,.5); background:radial-gradient(ellipse at 50% 0%,rgba(242,201,92,.2),transparent 58%),linear-gradient(155deg,rgba(14,42,27,.99),rgba(40,10,18,.99)); box-shadow:0 0 0 1px rgba(255,255,255,.06),0 48px 120px rgba(0,0,0,.95),0 0 100px rgba(199,53,75,.22); }
-    html[data-season="christmas"] #battyUnlockPopup .batty-bar{ background:linear-gradient(90deg,#267448,#c7354b,#f2c95c,#c7354b,#267448); box-shadow:0 0 18px rgba(242,201,92,.6); }
-    html[data-season="christmas"] #battyUnlockPopup .batty-kicker{ color:rgba(255,232,180,.9); }
-    html[data-season="christmas"] #battyUnlockPopup h2{ color:#fffaf0; text-shadow:0 0 25px rgba(242,201,92,.45); }
-    html[data-season="christmas"] #battyUnlockPopup p{ color:rgba(255,246,230,.78); }
-    html[data-season="christmas"] #battyUnlockPopup .batty-jp{ color:rgba(255,236,200,.9); }
-    html[data-season="christmas"] #battyUnlockPopup rt{ color:#f2c95c; }
-    html[data-season="christmas"] #battyUnlockPopup .batty-equip{ color:#2a1206; background:linear-gradient(180deg,#ffe9a6,#f2c95c); box-shadow:0 7px 28px rgba(242,201,92,.36); }
-    html[data-season="christmas"] #battyUnlockPopup .batty-equip .batty-jp{ color:rgba(42,18,6,.78); }
-    html[data-season="christmas"] #battyUnlockPopup .batty-equip-button:focus-visible{ outline-color:#f2c95c; }
+    html[data-season="christmas"] #seasonalUnlockScrim{ background:rgba(4,16,11,.82); }
+    html[data-season="christmas"] #seasonalUnlockPopup{ border-color:rgba(242,201,92,.5); background:radial-gradient(ellipse at 50% 0%,rgba(242,201,92,.2),transparent 58%),linear-gradient(155deg,rgba(14,42,27,.99),rgba(40,10,18,.99)); box-shadow:0 0 0 1px rgba(255,255,255,.06),0 48px 120px rgba(0,0,0,.95),0 0 100px rgba(199,53,75,.22); }
+    html[data-season="christmas"] #seasonalUnlockPopup .seasonalUnlock-bar{ background:linear-gradient(90deg,#267448,#c7354b,#f2c95c,#c7354b,#267448); box-shadow:0 0 18px rgba(242,201,92,.6); }
+    html[data-season="christmas"] #seasonalUnlockPopup .seasonalUnlock-kicker{ color:rgba(255,232,180,.9); }
+    html[data-season="christmas"] #seasonalUnlockPopup h2{ color:#fffaf0; text-shadow:0 0 25px rgba(242,201,92,.45); }
+    html[data-season="christmas"] #seasonalUnlockPopup p{ color:rgba(255,246,230,.78); }
+    html[data-season="christmas"] #seasonalUnlockPopup .seasonalUnlock-jp{ color:rgba(255,236,200,.9); }
+    html[data-season="christmas"] #seasonalUnlockPopup rt{ color:#f2c95c; }
+    html[data-season="christmas"] #seasonalUnlockPopup .seasonalUnlock-equip{ color:#2a1206; background:linear-gradient(180deg,#ffe9a6,#f2c95c); box-shadow:0 7px 28px rgba(242,201,92,.36); }
+    html[data-season="christmas"] #seasonalUnlockPopup .seasonalUnlock-equip .seasonalUnlock-jp{ color:rgba(42,18,6,.78); }
+    html[data-season="christmas"] #seasonalUnlockPopup .seasonalUnlock-equip-button:focus-visible{ outline-color:#f2c95c; }
     #hwPrompt.show{ display:block; }
     #hwPrompt.visible{
       opacity:1;

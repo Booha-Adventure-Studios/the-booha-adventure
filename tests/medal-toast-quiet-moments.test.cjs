@@ -46,8 +46,8 @@ assert.strictEqual(makeBusy({ byId: { overlay1: el({ classes: ['hidden'] }) } })
 assert.strictEqual(makeBusy({ byId: { overlay1: el({ classes: ['hidden', 'gone'] }) } })(), false, 'goes once the arrival card is gone');
 
 // Maze weekly companion popup
-assert.strictEqual(makeBusy({ byId: { battyUnlockPopup: el({ classes: ['show'] }) } })(), true, 'waits while the companion popup shows');
-assert.strictEqual(makeBusy({ byId: { battyUnlockPopup: el() } })(), false, 'a closed companion popup does not block');
+assert.strictEqual(makeBusy({ byId: { seasonalUnlockPopup: el({ classes: ['show'] }) } })(), true, 'waits while the companion popup shows');
+assert.strictEqual(makeBusy({ byId: { seasonalUnlockPopup: el() } })(), false, 'a closed companion popup does not block');
 
 // Week sealed
 assert.strictEqual(makeBusy({ query: { '.pg-sealed-card': el() } })(), true, 'waits while the week-sealed celebration is open');

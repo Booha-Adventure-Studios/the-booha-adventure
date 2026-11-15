@@ -134,16 +134,16 @@
     </div>
     <button id="cpCloseBtn" type="button">とじる ✕</button>
   </div>
-  <div id="battyUnlockScrim" aria-hidden="true"></div>
-  <section id="battyUnlockPopup" role="dialog" aria-modal="true" aria-labelledby="battyUnlockTitle" aria-describedby="battyUnlockCopy">
-    <div class="batty-bar" aria-hidden="true"></div>
-    <button id="battyEquipButton" class="batty-equip-button" type="button" aria-label="Equip Batty Booha">
-      <img class="batty-art" src="assets/skins/batty_booha/static.webp" alt="Batty Booha" />
+  <div id="seasonalUnlockScrim" aria-hidden="true"></div>
+  <section id="seasonalUnlockPopup" role="dialog" aria-modal="true" aria-labelledby="seasonalUnlockTitle" aria-describedby="seasonalUnlockCopy">
+    <div class="seasonalUnlock-bar" aria-hidden="true"></div>
+    <button id="seasonalEquipButton" class="seasonalUnlock-equip-button" type="button" aria-label="Equip Batty Booha">
+      <img class="seasonalUnlock-art" src="assets/skins/batty_booha/static.webp" alt="Batty Booha" />
     </button>
-    <p class="batty-kicker">A NEW FRIEND HAS ARRIVED<span class="batty-jp"><ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ</span></p>
-    <h2 id="battyUnlockTitle">You Unlocked Batty Booha!<span class="batty-jp">バッティー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！</span></h2>
-    <p id="battyUnlockCopy">Tap Batty Booha to equip your new traveling friend.<span class="batty-jp">バッティー・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。</span></p>
-    <button id="battyEquipTextButton" class="batty-equip" type="button">EQUIP BATTY BOOHA <span class="batty-jp">バッティー・ブーハーを <ruby>装備<rt>そうび</rt></ruby></span></button>
+    <p class="seasonalUnlock-kicker">A NEW FRIEND HAS ARRIVED<span class="seasonalUnlock-jp"><ruby>新<rt>あたら</rt></ruby>しい <ruby>友<rt>とも</rt></ruby>だちが <ruby>来<rt>き</rt></ruby>たよ</span></p>
+    <h2 id="seasonalUnlockTitle">You Unlocked Batty Booha!<span class="seasonalUnlock-jp">バッティー・ブーハーを <ruby>解放<rt>かいほう</rt></ruby>したよ！</span></h2>
+    <p id="seasonalUnlockCopy">Tap Batty Booha to equip your new traveling friend.<span class="seasonalUnlock-jp">バッティー・ブーハーを タップして、あたらしい おともだちを <ruby>身<rt>み</rt></ruby>につけよう。</span></p>
+    <button id="seasonalEquipTextButton" class="seasonalUnlock-equip" type="button">EQUIP BATTY BOOHA <span class="seasonalUnlock-jp">バッティー・ブーハーを <ruby>装備<rt>そうび</rt></ruby></span></button>
   </section>
   <div id="fade" aria-hidden="true"></div>
 
@@ -442,11 +442,11 @@ const app=document.getElementById('app'),rotateOverlay=document.getElementById('
   krYesBtn=document.getElementById('krYesBtn'),
   krVideoWrap=document.getElementById('krVideoWrap'),
   krVideo=document.getElementById('krVideo'),
-  battyUnlockScrim=document.getElementById('battyUnlockScrim'),
-  battyUnlockPopup=document.getElementById('battyUnlockPopup'),
-  battyEquipButton=document.getElementById('battyEquipButton'),
-  battyEquipTextButton=document.getElementById('battyEquipTextButton'),
-  battyUnlockArt=battyEquipButton?.querySelector('.batty-art');
+  seasonalUnlockScrim=document.getElementById('seasonalUnlockScrim'),
+  seasonalUnlockPopup=document.getElementById('seasonalUnlockPopup'),
+  seasonalEquipButton=document.getElementById('seasonalEquipButton'),
+  seasonalEquipTextButton=document.getElementById('seasonalEquipTextButton'),
+  seasonalUnlockArt=seasonalEquipButton?.querySelector('.seasonalUnlock-art');
 
 function loadMediaSource(media){
   if(!media||media.dataset.loaded==='1')return;
@@ -607,11 +607,11 @@ const mazeSeasonalUnlock = window.MazeSeasonalUnlock.create({
   getSave: () => window.BoohaAdventure?.save?.load?.() || {},
   applyEquippedMazeSkin,
   ui: {
-    popup: battyUnlockPopup,
-    scrim: battyUnlockScrim,
-    art: battyUnlockArt,
-    equipButton: battyEquipButton,
-    equipTextButton: battyEquipTextButton,
+    popup: seasonalUnlockPopup,
+    scrim: seasonalUnlockScrim,
+    art: seasonalUnlockArt,
+    equipButton: seasonalEquipButton,
+    equipTextButton: seasonalEquipTextButton,
   },
 });
 const {

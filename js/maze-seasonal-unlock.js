@@ -235,7 +235,7 @@
       const setLeadText = (selector, value) => {
         const el = ui.popup.querySelector(selector);
         if (!el) return;
-        const jp = el.querySelector('.batty-jp');
+        const jp = el.querySelector('.seasonalUnlock-jp');
         el.textContent = value;
         if (jp) el.appendChild(jp);
       };
@@ -243,14 +243,14 @@
         const el = ui.popup.querySelector(selector);
         if (el) el.innerHTML = value;
       };
-      setLeadText('.batty-kicker', copy.kickerEn);
-      setHTML('.batty-kicker .batty-jp', copy.kickerJp);
-      setLeadText('#battyUnlockTitle', copy.titleEn);
-      setHTML('#battyUnlockTitle .batty-jp', copy.titleJp);
-      setLeadText('#battyUnlockCopy', copy.copyEn);
-      setHTML('#battyUnlockCopy .batty-jp', copy.copyJp);
-      setLeadText('#battyEquipTextButton', copy.buttonEn);
-      setHTML('#battyEquipTextButton .batty-jp', copy.buttonJp);
+      setLeadText('.seasonalUnlock-kicker', copy.kickerEn);
+      setHTML('.seasonalUnlock-kicker .seasonalUnlock-jp', copy.kickerJp);
+      setLeadText('#seasonalUnlockTitle', copy.titleEn);
+      setHTML('#seasonalUnlockTitle .seasonalUnlock-jp', copy.titleJp);
+      setLeadText('#seasonalUnlockCopy', copy.copyEn);
+      setHTML('#seasonalUnlockCopy .seasonalUnlock-jp', copy.copyJp);
+      setLeadText('#seasonalEquipTextButton', copy.buttonEn);
+      setHTML('#seasonalEquipTextButton .seasonalUnlock-jp', copy.buttonJp);
       if (ui.art) {
         ui.art.src = skin.assets.maze;
         ui.art.alt = skin.name;

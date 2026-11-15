@@ -148,10 +148,10 @@ assert.strictEqual(h.popup.dataset.skinId, 'thumpkin');
 assert.strictEqual(h.art.src, 'assets/skins/thumpkin_booha/static.webp');
 assert.strictEqual(h.art.alt, 'Thumpkin Booha');
 assert.strictEqual(h.equipButton.attrs['aria-label'], 'Equip Thumpkin Booha');
-assert.strictEqual(h.popup.nodes['#battyUnlockTitle'].textContent, 'You Unlocked Thumpkin Booha!');
-assert.strictEqual(h.popup.nodes['.batty-kicker'].textContent, 'A FLUFFY FRIEND HOPPED IN!');
-assert.match(h.popup.nodes['#battyUnlockCopy'].textContent, /warm scarf/);
-assert.match(h.popup.nodes['#battyUnlockCopy .batty-jp'].html, /マフラー/);
+assert.strictEqual(h.popup.nodes['#seasonalUnlockTitle'].textContent, 'You Unlocked Thumpkin Booha!');
+assert.strictEqual(h.popup.nodes['.seasonalUnlock-kicker'].textContent, 'A FLUFFY FRIEND HOPPED IN!');
+assert.match(h.popup.nodes['#seasonalUnlockCopy'].textContent, /warm scarf/);
+assert.match(h.popup.nodes['#seasonalUnlockCopy .seasonalUnlock-jp'].html, /マフラー/);
 assert.ok(h.stored.weekly.unlockedBoohaSkins.thumpkin, 'Thumpkin is unlocked');
 
 // Shown but not acted on: NOT marked seen yet.
@@ -193,7 +193,7 @@ assert.strictEqual(none.popup.classList.contains('show'), false);
   assert.strictEqual(w.skins.rotationCharacterId(), id, `${today} → ${id}`);
   w.controller.maybeShowSeasonalUnlockPopup();
   assert.strictEqual(w.popup.dataset.skinId, id);
-  assert.strictEqual(w.popup.nodes['.batty-kicker'].textContent, kicker);
+  assert.strictEqual(w.popup.nodes['.seasonalUnlock-kicker'].textContent, kicker);
 });
 
 console.log('maze seasonal unlock (Christmas): ok');

@@ -128,10 +128,10 @@ assert.match(index, /html\.hub-reduced-motion \.mazeCtaFriend,\s*html\.hub-low-p
 assert.match(index, /@media \(prefers-reduced-motion: reduce\) \{ \.mazeCtaFriend \{ animation: none; \} \}/);
 
 // ── Maze reveal in Christmas colours ─────────────────────────────────────
-const xmas = maze.split('\n').filter(l => l.includes('html[data-season="christmas"] #battyUnlock'));
+const xmas = maze.split('\n').filter(l => l.includes('html[data-season="christmas"] #seasonalUnlock'));
 assert.ok(xmas.length >= 8, 'the reveal has a Christmas restyle');
-assert.ok(xmas.some(l => /#battyUnlockPopup\{[^}]*#267448|rgba\(14,42,27/.test(l)), 'green card');
-assert.ok(xmas.some(l => /\.batty-equip\{[^}]*#f2c95c/.test(l)), 'gold button');
+assert.ok(xmas.some(l => /#seasonalUnlockPopup\{[^}]*#267448|rgba\(14,42,27/.test(l)), 'green card');
+assert.ok(xmas.some(l => /\.seasonalUnlock-equip\{[^}]*#f2c95c/.test(l)), 'gold button');
 assert.ok(xmas.every(l => !/animation|transition/.test(l)), 'colours only, no new motion');
 
 console.log('blitz → maze path: ok');
