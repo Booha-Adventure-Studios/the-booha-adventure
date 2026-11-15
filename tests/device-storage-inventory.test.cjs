@@ -31,10 +31,9 @@ const LOCAL = {
   // Shared local multiplayer records: classmates' names are intentionally
   // visible, always escaped, and labelled "RECORDS ON THIS iPAD".
   sharedMultiplayer: ['booha_liar_machine', 'booha_snap_test_records'],
-  // Developer switch.
-  dev: ['booha_dev_worlds'],
   // Retired: removal only, never read, written or migrated.
-  retired: ['booha_blocks_name', 'booha_destruction_round_records_v1',
+  // booha_dev_worlds moved to sessionStorage (Nov 2026); the old copy is removed.
+  retired: ['booha_dev_worlds', 'booha_blocks_name', 'booha_destruction_round_records_v1',
     'booha_destruction_roster_unlocks_v1', 'booha_week_sealed_seen'],
 };
 
@@ -48,7 +47,8 @@ const SESSION = {
     'muenba_return_room', 'utsuroba_return_room', 'uhibon-lang'],
   // Sync session restore record, bound to a fingerprint of the current token.
   syncSession: ['booha_sync_session:v1'],
-  dev: ['booha_dev_session'],
+  // Developer switches (session-only, so they never outlive the tab).
+  dev: ['booha_dev_session', 'booha_dev_worlds'],
 };
 
 // Keys built at runtime: (file, argument up to the first ')') → category. Each one is scoped to

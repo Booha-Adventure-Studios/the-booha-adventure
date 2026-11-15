@@ -56,6 +56,11 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/dev-switch-boundary.test.cjs",
+      "status": "verify",
+      "reason": "Dev switch boundary: the teacher world switch is session-only (old localStorage copy cleared), writes nothing by itself, never records world visits, and forceUnlock is gone."
+    },
+    {
       "path": "tests/file-size-budget.test.cjs",
       "status": "verify",
       "reason": "File size budget: 2,000 lines per student-facing file; listed split-later files and documented exceptions have ceilings that only go down."

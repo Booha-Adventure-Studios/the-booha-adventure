@@ -214,8 +214,19 @@ window.BoohaTrophies = (function () {
   }
 
   /* World Traveler: adventure-core calls this once a world page has booted. */
+  // A teacher dev session (the world switch, or a console dev tool used in
+  // this tab) can open worlds a student has not earned. Visits made then are
+  // never recorded, so testing can never hand out World Traveler progress.
+  function devSessionActive() {
+    try {
+      return sessionStorage.getItem('booha_dev_worlds') === '1'
+        || sessionStorage.getItem('booha_dev_session') === '1';
+    } catch (_) { return false; }
+  }
+
   function recordWorldVisit(world) {
     if (WORLDS.indexOf(world) < 0) return false;
+    if (devSessionActive()) return false;
     try {
       var S = window.BoohaAdventure && BoohaAdventure.save;
       if (!S || !S.load || !S.patchDeep) return false;

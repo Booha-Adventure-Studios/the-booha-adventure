@@ -308,11 +308,11 @@
     }
   ];
 
-  // ?dev=1 only opens worlds on a teacher browser: the persistent switch
-  // (localStorage booha_dev_worlds) or a console dev tool used in this tab.
+  // ?dev=1 only opens worlds on a teacher browser: the session-only switch
+  // (sessionStorage booha_dev_worlds) or a console dev tool used in this tab.
   function devAccessAllowed() {
     try {
-      return localStorage.getItem('booha_dev_worlds') === '1'
+      return sessionStorage.getItem('booha_dev_worlds') === '1'
         || sessionStorage.getItem('booha_dev_session') === '1';
     } catch (_) { return false; }
   }

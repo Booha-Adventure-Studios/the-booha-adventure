@@ -16,7 +16,7 @@ const profilePages = ['profile.html', 'adventure-profile.html', 'utsuroba-profil
 
 assert(runtime.includes("const DEV_MODE = params.get('dev') === '1' && devAccessAllowed();"),
   'playable-world DEV mode must require the explicit dev=1 query flag on a teacher browser');
-assert(runtime.includes("localStorage.getItem('booha_dev_worlds') === '1'")
+assert(runtime.includes("sessionStorage.getItem('booha_dev_worlds') === '1'")
   && runtime.includes("sessionStorage.getItem('booha_dev_session') === '1'"),
   'dev=1 must be ignored unless the teacher switch or a console dev session is on');
 assert(runtime.includes('if (DEV_MODE) window.__devGrimmerglen = true;'),

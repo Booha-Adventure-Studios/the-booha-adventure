@@ -9,15 +9,23 @@
 const BoohaUnlockSystem = (() => {
   'use strict';
 
-  // ── Teacher test switch: every world open on THIS browser ────────────────
+  // ── Teacher test switch: every world open in THIS tab, for this session ───
   // Type in the Inspect console. The switch is watched live on this page:
-  //   localStorage.setItem('booha_dev_worlds', '1')   // all worlds open
-  //   localStorage.removeItem('booha_dev_worlds')     // back to normal gates
-  // It only sets the existing __dev* flags, so the gates read as open but no
-  // progress is ever written. A small "DEV · WORLDS OPEN" tag shows while on.
+  //   sessionStorage.setItem('booha_dev_worlds', '1')   // all worlds open
+  //   sessionStorage.removeItem('booha_dev_worlds')     // back to normal gates
+  // Session-only (Nov 2026): it ends when the tab or the installed app closes,
+  // so it can never stay on for the next student on a shared iPad.
+  // It only sets the existing __dev* flags, so the gates read as open; this
+  // file writes no progress for it, and world visits are not recorded while it
+  // is on (trophy-case.js). These client-side gates are convenience, never
+  // security: they are not proof that anything was earned.
+  // A small "DEV · WORLDS OPEN" tag shows while on.
   const DEV_WORLDS_KEY = 'booha_dev_worlds';
+  // Older builds kept the switch in localStorage, where it survived restarts.
+  // Clear any leftover copy so it cannot keep worlds open on a shared iPad.
+  try { localStorage.removeItem(DEV_WORLDS_KEY); } catch (_) {}
   function devWorldsOn() {
-    try { return localStorage.getItem(DEV_WORLDS_KEY) === '1'; } catch (_) { return false; }
+    try { return sessionStorage.getItem(DEV_WORLDS_KEY) === '1'; } catch (_) { return false; }
   }
   function showDevWorldsTag() {
     if (typeof document === 'undefined' || !document.body || typeof document.getElementById !== 'function') return;
@@ -64,7 +72,7 @@ const BoohaUnlockSystem = (() => {
     return enabled;
   }
   syncDevWorldsSwitch();
-  // Same-tab localStorage writes do not emit a storage event. Polling only
+  // Same-tab sessionStorage writes do not emit a storage event. Polling only
   // this small developer key keeps the console switch live without writing
   // progress or requiring a page reload.
   if (window && typeof window.setInterval === 'function') window.setInterval(syncDevWorldsSwitch, 500);
@@ -343,13 +351,6 @@ const BONUS_GAMES = [
     return !!(data.weekly && data.weekly.unlockedBonusGames && data.weekly.unlockedBonusGames[bonusId]);
   }
 
-  // ── Force unlock (testing) ────────────────────────────────────────────────
-  function forceUnlock(id) {
-    const current = _getUnlocks();
-    current[id] = { unlockedAt: Date.now(), forced: true };
-    BoohaAdventure.save.patch('unlocks', current);
-  }
-
   function getAll() {
     return UNLOCKS.map(u => ({
       ...u,
@@ -369,7 +370,6 @@ const BONUS_GAMES = [
     isBonusGameUnlocked,
     devWorldsOn,
     BONUS_GAMES,
-    forceUnlock,
     getAll,
     init() { checkAll(); },
   };

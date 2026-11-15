@@ -5164,7 +5164,7 @@ const HAPPY_HOUSE_PORTAL = {
       <button id="dev-clear-quest" style="margin-top:4px;font:700 11px monospace;color:#ffd700;background:transparent;border:1px solid rgba(255,200,0,.4);border-radius:4px;padding:3px 8px;cursor:pointer;width:100%;">Clear quest</button>
       <div id="dev-room-info" style="font-size:9px;color:rgba(255,200,0,.45);margin-top:8px;"></div>`;
     document.body.appendChild(panel);
-    // The persistent teacher switch (localStorage booha_dev_worlds, read in
+    // The session-only teacher switch (sessionStorage booha_dev_worlds, read in
     // unlock-system.js) keeps the three world flags on; otherwise start off.
     const keepWorlds = window.__devWorldsSwitch === true;
     window.__devAllGames = false; window.__devAllWanderers = false; window.__devUtsuroba = keepWorlds; window.__devMuenba = keepWorlds; window.__devGrimmerglen = keepWorlds; window.__devAllOrbs = false;
