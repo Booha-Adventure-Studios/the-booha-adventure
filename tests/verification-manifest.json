@@ -51,6 +51,16 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/file-size-budget.test.cjs",
+      "status": "verify",
+      "reason": "File size budget: 2,000 lines per student-facing file; listed split-later files and documented exceptions have ceilings that only go down."
+    },
+    {
+      "path": "tests/source-family.test.cjs",
+      "status": "verify",
+      "reason": "Source families: split parts exist, belong to one family, and are loaded wherever the main file is, so tests can read a file and its parts together."
+    },
+    {
       "path": "tests/medal-toast-quiet-moments.test.cjs",
       "status": "verify",
       "reason": "Toast quiet moments: medal, level-up and oddity toasts wait for the Maze arrival card, the weekly companion popup, the week-sealed celebration and playing videos; results screens still show them."

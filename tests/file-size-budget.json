@@ -1,0 +1,86 @@
+{
+  "about": "Line budget for student-facing code (.js, .html, .css outside tests/ and tools/). New files must stay at or under the limit. Files listed below are over it on purpose: 'split-later' files come down over time; 'exception' files are documented as fine to stay large. Each listed file has a ceiling (its size when listed plus headroom so small fixes still pass). Ceilings only go down: when a file shrinks to 200+ lines under its ceiling, lower the ceiling to its new size plus headroom. Remove a file from the list once it is under the limit.",
+  "limit": 2000,
+  "headroom": 100,
+  "lowerWhenUnder": 200,
+  "files": {
+    "js/muenba.js": {
+      "kind": "split-later",
+      "ceiling": 8066,
+      "listedAt": 7966,
+      "reason": "Muenba world in one block; split by stage after a read-only mapping pass, as Muenba work comes up."
+    },
+    "js/karasuki.js": {
+      "kind": "split-later",
+      "ceiling": 7072,
+      "listedAt": 6972,
+      "reason": "Karasuki world in one block; split section by section (oddities and the dev panel first) when Karasuki work comes up."
+    },
+    "js/blitz-engine.js": {
+      "kind": "split-later",
+      "ceiling": 6240,
+      "listedAt": 6140,
+      "reason": "Shared engine for the three Blitz games; heavily tested; split only when a change gives a reason."
+    },
+    "index.html": {
+      "kind": "split-later",
+      "ceiling": 4950,
+      "listedAt": 4850,
+      "reason": "Hub page with inline CSS and script; CSS moves out in Pass 1, script later."
+    },
+    "js/utsuroba.js": {
+      "kind": "split-later",
+      "ceiling": 4253,
+      "listedAt": 4153,
+      "reason": "Utsuroba world in one block; split when Utsuroba work comes up."
+    },
+    "js/destruction_1.js": {
+      "kind": "exception",
+      "ceiling": 4238,
+      "listedAt": 4138,
+      "reason": "Arcade game (Booha Destruction): self-contained, rarely changed; splitting buys little."
+    },
+    "maze.html": {
+      "kind": "split-later",
+      "ceiling": 3342,
+      "listedAt": 3242,
+      "reason": "Maze page with inline CSS and script; CSS moves out in Pass 1, script later."
+    },
+    "js/grimmerglen.js": {
+      "kind": "split-later",
+      "ceiling": 3304,
+      "listedAt": 3204,
+      "reason": "Grimmerglen world in one block; drawing section first when Grimmerglen work comes up."
+    },
+    "js/invaders-engine.js": {
+      "kind": "exception",
+      "ceiling": 2933,
+      "listedAt": 2833,
+      "reason": "Arcade game (Booha Invaders): self-contained, rarely changed."
+    },
+    "js/destruction_levels_1.js": {
+      "kind": "exception",
+      "ceiling": 2427,
+      "listedAt": 2327,
+      "reason": "Arcade game level data for Booha Destruction."
+    },
+    "liar_machine.html": {
+      "kind": "exception",
+      "ceiling": 2319,
+      "listedAt": 2219,
+      "reason": "Mister Happy's House game page (Liar Machine): self-contained, rarely changed."
+    },
+    "family-room.js": {
+      "kind": "split-later",
+      "ceiling": 2218,
+      "listedAt": 2118,
+      "reason": "Akiya (Family Room) in one file; split when Akiya work comes up."
+    },
+    "js/feed_booha_1.js": {
+      "kind": "exception",
+      "ceiling": 2160,
+      "listedAt": 2060,
+      "reason": "Arcade game (Feed Booha): self-contained, rarely changed."
+    }
+  }
+}

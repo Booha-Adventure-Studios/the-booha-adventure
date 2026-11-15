@@ -36,6 +36,28 @@ runtime monitors measure actual frame windows and memory estimates.
 Representative-device testing is still required for Safari/iOS thermal
 behavior, page hide/resume, audio activity, and visual edge quality.
 
+## File size budget
+
+Student-facing code (`.js`, `.html` and `.css` outside `tests/` and `tools/`)
+stays at or under **2,000 lines per file**. Smaller files are easier to read,
+review and change safely, by hand or with AI help. The budget is enforced by
+`tests/file-size-budget.test.cjs`, with the list in
+`tests/file-size-budget.json`:
+
+- **split-later:** large files that come down over time. Split a section into
+  its own file when that area is being worked on, rather than on a schedule.
+- **exception:** files documented as fine to stay large (self-contained
+  arcade games and their level data, the Liar Machine page).
+
+Each listed file has a ceiling (its size when listed plus 100 lines of
+headroom, so small fixes still pass). Ceilings only go down: once a file is
+200 or more lines under its ceiling, lower the ceiling; once it is under 2,000
+lines, take it off the list. New files over 2,000 lines fail.
+
+When a file is split, register its parts in `tests/source-families.json`.
+Tests that check the file's code read it through `tests/lib/source-family.cjs`,
+so moving code between the main file and its parts does not break them.
+
 ## Blitz pre-release check
 
 Before shipping a Blitz visual or performance change, run the three games
