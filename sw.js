@@ -179,6 +179,8 @@ const CURRENT_CACHES = {
   // only (special shelf hidden until earned, ×2 duplicates).
   // Oddities in Japanese: bilingual cabinet cards with a tap-to-open secret
   // line on adventure-profile.html; bilingual pickup line in Karasuki.
+  // Dead code pass: removed empty placeholders and unused data/CSS that no
+  // page loads or precaches, so no cache version bump is needed.
   pages:  'booha-pages-2026-549',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.

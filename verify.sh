@@ -18,9 +18,10 @@ echo "────────────────────────�
 # ── 1. JSON validity with explicit empty-file whitelist ──────
 echo "[1/36] Content JSON validity"
 json_bad=0; json_empty=0; json_ok=0
+# No empty JSON placeholders remain (removed Nov 2026). Add a path here only
+# with a reason, and name it in tests/verification-script-audit.cjs.
 allowed_empty_json() {
   case "$1" in
-    data/core-games.json|data/maze.json) return 0 ;;
     *) return 1 ;;
   esac
 }

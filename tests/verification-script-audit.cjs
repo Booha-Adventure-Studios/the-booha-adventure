@@ -14,7 +14,8 @@ if (process.platform !== 'win32') {
   assert((fs.statSync(path.join(__dirname, '..', 'verify.sh')).mode & 0o111) !== 0, 'verify.sh must be executable (chmod +x verify.sh)');
 }
 assert.match(source, /allowed_empty_json\(\)/, 'verify.sh must define an explicit empty-JSON whitelist');
-assert.match(source, /data\/core-games\.json\|data\/maze\.json/, 'the known empty JSON placeholders must be named explicitly');
+assert.match(source, /allowed_empty_json\(\) \{/, 'empty JSON files must go through the explicit whitelist');
+assert.ok(!/data\/core-games\.json|data\/maze\.json/.test(source), 'the removed empty placeholders are no longer whitelisted');
 assert.match(source, /unexpected empty JSON:/, 'unexpected empty JSON files must fail verification');
 assert.doesNotMatch(source, /wc -c < "\$f"\)" -le 2/, 'empty JSON handling must not rely on a size-only shortcut');
 assert.ok(

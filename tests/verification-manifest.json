@@ -51,6 +51,11 @@
       "reason": "Oddities earning channels: three Daily Checks plus Blitz for standard finds, seven Daily Checks for special finds, permanent logs, and duplicate conversion."
     },
     {
+      "path": "tests/dead-code-removed.test.cjs",
+      "status": "verify",
+      "reason": "Dead code pass: empty placeholders and unused data/CSS stay removed and unreferenced; Uhibon is kept for later."
+    },
+    {
       "path": "tests/oddities-art-and-placement.test.cjs",
       "status": "verify",
       "reason": "Oddity art budget (320 px, 48 KiB, lossy, zero metadata, no orphans), per-item drawn sizes, and placement that is never cut off on any landscape screen or hidden under the HUD."
