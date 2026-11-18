@@ -115,7 +115,7 @@ Release checklist:
 
 The verification suite (about 360 checks) covers content data, navigation contracts, game behaviour, scoring and save rules, weekly rollover, service-worker paths, media assets, responsive behaviour, and performance budgets.
 
-Full verification requires Node.js, Python 3, and ffmpeg (ffprobe is included) for the media-inspection checks.
+Full verification requires Node.js, Python 3, ffmpeg (ffprobe is included) for the media-inspection checks, and Chrome/Chromium for the headless browser smoke test. Set `CHROME_BIN` if the browser is not in a standard location.
 
 ## Project status
 
