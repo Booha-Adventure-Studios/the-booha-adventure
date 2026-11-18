@@ -469,6 +469,11 @@ const STYLE = `
 .vp-tool:disabled{opacity:.4;cursor:default}
 .vp-choose,.vp-vowels{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;align-items:center}
 .vp-choose[hidden],.vp-vowels[hidden]{display:none}
+/* Both sit on the pad, so the card never grows and nothing drops below the screen. */
+.vp-choose{position:absolute;inset:0;z-index:3;align-content:center;border-radius:22px;background:rgba(255,253,246,.94);box-shadow:inset 0 0 0 3px var(--game-amber)}
+.vp-vowels{position:absolute;left:6px;right:6px;top:6px;z-index:3;gap:6px 8px;pointer-events:none}
+.vp-vowels .vp-letter{pointer-events:auto;width:46px;height:46px;border-radius:15px;font-size:26px}
+.vp-vowels .vp-ask{font-size:12px;line-height:1.1;color:var(--game-muted)}
 .vp-ask{width:100%;font-weight:900;color:var(--game-ink)}
 .vp-letter{width:64px;height:64px;border:none;border-radius:20px;cursor:pointer;font:900 34px/1 var(--game-font-title,var(--game-font-body));color:#0b0614;
   background:radial-gradient(circle at 35% 30%,#fff,var(--c,#ffc94a) 70%);box-shadow:0 6px 0 rgba(0,0,0,.25);transition:transform .12s;animation:vpPopIn .35s cubic-bezier(.3,1.7,.5,1) both}
@@ -482,6 +487,7 @@ const STYLE = `
 .vp-side{display:flex;flex-direction:column;align-items:center;gap:.75rem;width:100%;min-width:0}
 /* Phones: a shorter pad and speaker so OK stays on screen. */
 @media (max-width:600px){
+  .vp-intro{display:none}
   .vp-pad{aspect-ratio:4/3}
   .vp-play{width:64px;height:64px;font-size:24px}
   .vp-card{gap:.6rem}
@@ -524,9 +530,9 @@ U.mount(`
       <div class="vp-padwrap" id="vp-padwrap">
         <canvas class="vp-pad" id="vp-pad" aria-label="Draw the missing letter here / ここに かこう"></canvas>
         <div class="vp-see" id="vp-see" aria-hidden="true"></div>
+        <div class="vp-choose" id="vp-choose" hidden></div>
+        <div class="vp-vowels" id="vp-vowels" hidden></div>
       </div>
-      <div class="vp-choose" id="vp-choose" hidden></div>
-      <div class="vp-vowels" id="vp-vowels" hidden></div>
       <div class="vp-tools">
         <button type="button" class="vp-tool" id="vp-clear">けす · Clear</button>
         <button type="button" class="vp-tool go" id="vp-ok">OK!</button>
@@ -794,6 +800,15 @@ function showCard() {
   playBtn.classList.add('is-waiting');
   run.ready(6000 + 3000 * round.slots.length, { waitAudio: true });
   if (heardAny) setTimeout(() => play(1), 350);   // after the first card, each word plays by itself
+  fitCard();
+}
+// Phones: scroll so the whole card (word, pad, Clear/OK) is on screen.
+function fitCard() {
+  if (window.innerWidth > 600) return;
+  const r = cardEl.getBoundingClientRect();
+  if (r.top >= 0 && r.bottom <= window.innerHeight) return;
+  const y = window.scrollY + Math.min(r.top - 8, r.bottom - window.innerHeight + 10);
+  try { window.scrollTo({ top: Math.max(0, y), behavior: stillMotion() ? 'auto' : 'smooth' }); } catch (_) { window.scrollTo(0, Math.max(0, y)); }
 }
 
 function popStreak(text) {
