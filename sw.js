@@ -407,7 +407,8 @@ const CURRENT_CACHES = {
   // Vowel Pop phone fit: choices on the pad, card scrolls into view; profile.css.
   // Don't Talk to Poopika: games/poopika.js, registry, game-core, pace zone.
   // Poopika rework: looking clock, shifting silhouette, voice effects (CORS), sized poses.
-  assets: 'booha-assets-2026-633',
+  // Poopika: choices wait for the question, then glitch and swap places; intro on two lines.
+  assets: 'booha-assets-2026-634',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

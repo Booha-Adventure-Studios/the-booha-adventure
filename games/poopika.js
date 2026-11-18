@@ -346,7 +346,8 @@ html[data-motion="reduced"].pk-world body::before,html[data-motion="reduced"].pk
   position:relative;max-width:720px;margin:0 auto;padding:.3rem 1rem 3rem;display:flex;flex-direction:column;align-items:center;gap:.7rem;box-sizing:border-box;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .pk-wrap>*{position:relative;z-index:1}
-.pk-intro{margin:0;text-align:center;font-weight:900;font-size:clamp(13px,2.2vw,16px);color:#fff7fd;text-shadow:0 2px 0 rgba(38,17,61,.5)}
+.pk-intro{margin:0;text-align:center;font-weight:900;font-size:clamp(13px,2.2vw,16px);line-height:1.45;color:#fff7fd;text-shadow:0 2px 0 rgba(38,17,61,.5)}
+.pk-intro span{display:block}
 .pk-hud{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .pk-pill{padding:5px 16px;border-radius:999px;background:var(--game-pill-bg);border:1.5px solid var(--game-pill-border);color:var(--game-pill-text);font-size:clamp(12px,2vw,15px);font-weight:900;font-variant-numeric:tabular-nums}
 .pk-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
@@ -426,6 +427,12 @@ html[data-motion="reduced"].pk-world body::before,html[data-motion="reduced"].pk
 .pk-choice.wrong{background:#d9d0dd;color:#5a4a60;box-shadow:0 3px 0 #a99bb0;text-decoration:line-through;text-decoration-thickness:3px;animation:pkNo .4s ease}
 @keyframes pkNo{25%{transform:translateX(-7px) rotate(-2deg)}55%{transform:translateX(6px) rotate(2deg)}}
 .pk-choice:disabled{cursor:default}
+/* Choices wait for the question, then will not stay put. */
+.pk-choices.pk-wait{visibility:hidden}
+.pk-choices.pk-wait .pk-choice{animation:none}
+.pk-choices.glitching{pointer-events:none}
+.pk-choices.glitching .pk-choice{filter:drop-shadow(4px 0 0 rgba(255,40,190,.75)) drop-shadow(-4px 0 0 rgba(40,255,230,.75));font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.04em}
+@media (prefers-reduced-motion:reduce){.pk-choices.glitching .pk-choice{filter:none}}
 .pk-fb{min-height:1.4em;margin:0;text-align:center;font-weight:900;font-size:clamp(14px,2.5vw,17px);color:#fff7fd;text-shadow:0 2px 0 rgba(38,17,61,.55)}
 .pk-next{border:none;border-radius:999px;padding:13px 26px;min-height:50px;font:900 17px/1 var(--game-font-body);cursor:pointer;color:var(--pk-ink);
   background:linear-gradient(135deg,var(--pk-yellow),var(--pk-pink));box-shadow:0 5px 0 rgba(38,17,61,.4)}
@@ -468,7 +475,7 @@ const layer = (cls, n) => `<span class="pk-layer ${cls}" data-pose="${n}"><img s
 U.mount(`<style>${STYLE}</style>
 <div class="pk-vignette" aria-hidden="true"></div>
 <div class="pk-wrap" id="pk-main">
-  <p class="pk-intro">What you see and hear changes around Poopika. Don't look too long. · プピカの まわりでは、みえるものも きこえるものも かわるよ。じっと みないでね。</p>
+  <p class="pk-intro"><span>What you see and hear changes around Poopika. Don't look too long.</span><span>プピカの まわりでは、みえるものも きこえるものも かわるよ。じっと みないでね。</span></p>
   <div class="pk-hud">
     <span class="pk-pill">Card <b id="pk-num">1</b> / ${TOTAL}</span>
     <span class="pk-pill">Score <b id="pk-score">0</b> / ${TOTAL}</span>
@@ -542,6 +549,11 @@ function tick() {
   s = stare(lookedNow(), CFG.curriculum);
   html.style.setProperty('--pk-s', s.toFixed(3));
   Bed.mood(s);
+  // The longer you look, the more often the choices jump.
+  if (revealed && !done && performance.now() > nextGlitch) {
+    glitch();
+    nextGlitch = performance.now() + (stillMotion() ? 5200 : 4300 - 2500 * s) + rand() * 900;
+  }
   if (done || stillMotion()) return;
   const t = performance.now();
   // Her outline keeps changing, faster the longer you look.
@@ -672,6 +684,7 @@ async function play(clean) {
   U.unlockAudio();
   stopVoice();
   speaking = true; lookStop(); Bed.duck(true);
+  later(reveal, 9000);   // a slow or stuck clip never hides the choices for long
   playBtn.classList.add('playing');
   POP.eq(playBtn);
   const spkId = POP.speaker(playBtn);
@@ -683,6 +696,7 @@ async function play(clean) {
     playBtn.classList.remove('playing', 'is-waiting');
     heardAny = true;
     run.audioDone();
+    reveal();
     if (!done) lookStart();
     if (clean && afterClean) { const f = afterClean; afterClean = null; f(); }
   };
@@ -781,10 +795,63 @@ function renderChoices() {
     b.dataset.choice = text;
     b.style.setProperty('--c', colours[i % colours.length]);
     b.setAttribute('aria-keyshortcuts', String(i + 1));
+    b.addEventListener('pointerdown', () => { b.dataset.down = String(performance.now()); });
     b.addEventListener('click', () => pick(b));
     choicesEl.appendChild(b);
   });
 }
+let revealed = false, stable = true, stableSince = 0, nextGlitch = 0;
+// The choices appear only once the question has been heard.
+function reveal() {
+  if (revealed || done) return;
+  revealed = true; stable = true; stableSince = performance.now();
+  choicesEl.classList.remove('pk-wait');
+  if (/^(Listen first|Tap ▶)/.test(fb.textContent)) fb.textContent = '';
+  choicesEl.querySelectorAll('.pk-choice').forEach(b => { b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; });
+  nextGlitch = performance.now() + 2600 + rand() * 900;
+}
+// A glitch: the buttons smear, flash static, and swap places.
+function glitch() {
+  if (!revealed || done) return;
+  const btns = Array.from(choicesEl.querySelectorAll('.pk-choice'));
+  if (btns.length < 2) return;
+  stable = false;
+  const first = new Map(btns.map(b => [b, b.getBoundingClientRect()]));
+  let order;
+  do { order = U.shuffle(btns.slice()); } while (order.every((b, i) => b === btns[i]));
+  choicesEl.classList.add('glitching');
+  buzz();
+  const labels = btns.map(b => b.textContent);
+  btns.forEach(b => { let t = ''; for (let i = 0; i < Math.max(3, b.dataset.choice.length); i++) t += STATIC[Math.floor(rand() * STATIC.length)]; b.textContent = t; });
+  order.forEach(b => choicesEl.appendChild(b));
+  const still = stillMotion();
+  order.forEach(b => {
+    const a = first.get(b), z = b.getBoundingClientRect();
+    if (still || !b.animate) return;
+    const dx = a.left - z.left, dy = a.top - z.top;
+    b.animate([
+      { transform: `translate(${dx}px,${dy}px)` },
+      { transform: `translate(${dx * 0.6 + 6}px,${dy * 0.6}px) skewX(-12deg)`, offset: 0.3 },
+      { transform: `translate(${dx * 0.2 - 5}px,${dy * 0.2}px) skewX(9deg)`, offset: 0.6 },
+      { transform: 'none' },
+    ], { duration: 320, easing: 'steps(6, end)' });
+  });
+  setTimeout(() => {
+    btns.forEach((b, i) => { b.textContent = labels[i]; });
+    choicesEl.classList.remove('glitching');
+    stable = true; stableSince = performance.now();
+  }, still ? 160 : 340);
+}
+function buzz() {
+  const c = ctx(); if (!c) return;
+  const t = c.currentTime + 0.005, n = Math.floor(c.sampleRate * 0.18), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (rand() * 2 - 1) * (i % 400 < 200 ? 1 : 0.2);
+  const src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = b; bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 1.2;
+  g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.18);
+  src.connect(bp); bp.connect(g); g.connect(c.destination); src.start(t);
+}
+
 function showCard() {
   stopVoice();
   afterClean = null;
@@ -798,8 +865,10 @@ function showCard() {
   jpEl.textContent = (CFG.curriculum === 'pb' ? (card.hira || card.jp) : card.jp) || '';
   renderQuestion();
   renderChoices();
+  revealed = false; stable = true;
+  choicesEl.classList.add('pk-wait');
   nextBtn.hidden = true;
-  fb.textContent = heardAny ? '' : 'Tap ▶ to listen · ▶ を タップ';
+  fb.textContent = heardAny ? 'Listen first… · まず きいて…' : 'Tap ▶ to listen · ▶ を タップ';
   listenLbl.textContent = 'Listen · きいて';
   playBtn.classList.add('is-waiting');
   run.ready(6000 + 2000 * rounds[idx].round.choices.length, { waitAudio: true });
@@ -830,7 +899,13 @@ function snap(cls, ms) {
 }
 
 function pick(btn) {
-  if (busy || done || btn.disabled) return;
+  if (busy || done || btn.disabled || !revealed) return;
+  // Fair to fingers: no answer while the buttons move, and a press that
+  // began before they settled does not count.
+  if (!stable) return;
+  const down = Number(btn.dataset.down || 0);
+  if (down && down < stableSince) return;
+  if (performance.now() - stableSince < 180) return;
   const { round } = rounds[idx];
   tries++;
   if (btn.dataset.choice === round.answer) { finishCard(tries === 1 ? 'ok' : 'half'); return; }
@@ -852,6 +927,7 @@ function pick(btn) {
 const YES = ['CUTE!', 'YES!', 'POP!', 'THERE!', 'PHEW!'];
 function finishCard(result) {
   done = true;
+  choicesEl.classList.remove('pk-wait', 'glitching');
   lookStop();
   clearInterval(staticTimer);
   const { round, card } = rounds[idx];
@@ -911,7 +987,7 @@ playBtn.addEventListener('click', () => { Bed.start(); play(done); });
 nextBtn.addEventListener('click', advance);
 document.addEventListener('keydown', e => {
   const n = Number(e.key);
-  if (!n || done) return;
+  if (!n || done || !revealed || !stable) return;
   const b = choicesEl.querySelectorAll('.pk-choice')[n - 1];
   if (b) { e.preventDefault(); pick(b); }
 });

@@ -147,7 +147,14 @@ setTimeout(() => {
   assert.match(SRC, /\.pk-sign\{[^}]*background:#fffaf6;color:var\(--pk-ink\)/, 'the question card stays plain and readable');
   assert.doesNotMatch(SRC, /class="pk-sky"|\.q::before\{content:'\?'\}/, 'no floating question marks');
   assert.doesNotMatch(SRC, /ate the question|ate the word|たべちゃった/i, 'she does not eat words any more');
-  assert.match(SRC, /What you see and hear changes around Poopika/);
+  assert.match(SRC, /<span>What you see and hear changes around Poopika\. Don't look too long\.<\/span><span>プピカの/, 'the Japanese sits under the English');
+  assert.match(SRC, /choicesEl\.classList\.add\('pk-wait'\)/, 'choices wait for the question');
+  assert.match(SRC, /run\.audioDone\(\);\n\s+reveal\(\);/, 'and appear once it has been heard');
+  assert.match(SRC, /later\(reveal, 9000\)/, 'a stuck clip never hides them for long');
+  assert.match(SRC, /\.pk-choices\.glitching\{pointer-events:none\}/, 'no taps while they move');
+  assert.match(SRC, /if \(down && down < stableSince\) return;/, 'a press that began before they settled does not count');
+  assert.match(SRC, /if \(!n \|\| done \|\| !revealed \|\| !stable\) return;/, 'keys follow the same rule');
+  assert.match(SRC, /4300 - 2500 \* s/, 'they jump more often the longer you look');
   assert.ok((SRC.match(/fetch\(/g) || []).length === 2 && /const url = CFG\.audioBase \+ card\.mp3;/.test(SRC), 'the only fetches are the question audio');
   for (const n of [1, 2, 3]) assert.ok(fs.existsSync(path.join(ROOT, `assets/img/wanderers/poopika-${n}.webp`)), `poopika-${n}.webp`);
 
