@@ -32,6 +32,7 @@
     'sentence-tap': 'Tap the pairs!', 'sentence-order': 'Line them up!', 'sentence-speed': 'Zoom!',
     'say-word': 'Listen closely!', 'say-sentence': 'Ears ready?', 'ask-question': 'Listen and choose!',
     'booha-bites': 'I ate a word! Find it!', 'echo': 'Listen, then type it!', 'week-boss': 'Beat the boss for the week crown!',
+    'vowel-pop': 'Draw the missing vowel!',
   };
   var MONTHS = { jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June',
     jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December' };
@@ -196,8 +197,10 @@
     xlab.appendChild(el('b', null, 'EXTRA'));
     xlab.appendChild(el('span', null, 'おまけ'));
     xl.appendChild(xlab);
-    extras.forEach(function (g) {
+    extras.forEach(function (g, i) {
       var a = el('a', 'tile tile-extra', g.name);
+      // A fourth extra starts a new row under the first one (not in the label column).
+      if (i > 0 && i % 3 === 0) a.classList.add('bm-row-start');
       a.setAttribute('data-extra', g.gameKey);
       if (g.hira) a.setAttribute('data-hira', g.hira);
       a._saveId = g.saveId;

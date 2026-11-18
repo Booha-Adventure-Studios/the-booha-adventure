@@ -835,7 +835,7 @@ const BoohaProfileGame = (() => {
     }
   }
 
-  // Bonus Games (ボーナス ゲーム): Booha Bites, Echo and the Week Boss as
+  // Bonus Games (ボーナス ゲーム): Booha Bites, Echo, Vowel Pop and the Week Boss as
   // record cards, not launchers (students play them from the game menu).
   // Each shows this week's bonus stars and done / not-yet, plus the
   // lifetime best and times played. None of it enters ★ / 27 or the 9-game
@@ -843,6 +843,7 @@ const BoohaProfileGame = (() => {
   const BONUS_ICON = {
     'booha-bites': '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="3"/><path d="M27 9a6 6 0 0 0 4 9 6 6 0 0 0 3 4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M13 21h9" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 3"/></svg>',
     echo: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 16h6l8-6v20l-8-6H8z" fill="currentColor"/><path d="M27 14a8 8 0 0 1 0 12M31 10a13 13 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+    'vowel-pop': '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="15" cy="22" r="7" fill="none" stroke="currentColor" stroke-width="3"/><path d="M22 15v14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M29 6l5 5-9 9-6 1 1-6z" fill="currentColor"/></svg>',
   };
   function renderBonusGames(s) {
     const host = document.getElementById('pg-extras');
@@ -887,16 +888,18 @@ const BoohaProfileGame = (() => {
           </span>
         </div>`;
     };
-    const small = games.filter(g => !g.boss);
-    const boss = games.filter(g => g.boss);
+    // Two cards a row, the boss last: Bites | Echo, then Vowel Pop | Week Boss.
+    // A card left alone on the last row spans it.
+    const ordered = games.filter(g => !g.boss).concat(games.filter(g => g.boss));
+    const rows = [];
+    for (let i = 0; i < ordered.length; i += 2) rows.push(ordered.slice(i, i + 2));
     host.innerHTML = `
       <div class="pg-section-head">
         <div><h2>ボーナス ゲーム</h2><span class="pg-kicker">BONUS GAMES · ${esc(CURR_NAME[s.curr] || s.curr.toUpperCase())} · THIS WEEK</span></div>
       </div>
       <p class="pg-x-note">Bonus practice — these games do not change the 9-game unlock. <span>ボーナス れんしゅう — ★ と 9ゲームの じょうけんには はいらないよ</span></p>
       <div class="pg-x-list" role="list" aria-label="Bonus games">
-        <div class="pg-x-row">${small.map(card).join('')}</div>
-        ${boss.map(card).join('')}
+        ${rows.map(row => `<div class="pg-x-row${row.length === 1 ? ' single' : ''}">${row.map(card).join('')}</div>`).join('')}
       </div>`;
   }
 

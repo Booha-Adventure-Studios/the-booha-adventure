@@ -291,6 +291,11 @@
       "reason": "Japan winter 2027 season wiring: Marshy, the Jan 3–Mar 6 guide schedule, Doorknob Setsubun repeat, complete pose assets, Tokyo boundaries, winter closet styling, greetings, Karasuki visit, unlock copy, and return reveals."
     },
     {
+      "path": "tests/vowel-pop.test.cjs",
+      "status": "verify",
+      "reason": "Vowel Pop extra game: blank ladder (pb/br/bc) on every vocab card, the on-device letter reader on varied drawn vowels and non-vowels, scoring, and wiring (registry after the Week Boss, game-core, menu row, profile pairs)."
+    },
+    {
       "path": "tests/closet-shared-records.test.cjs",
       "status": "verify",
       "reason": "One closet rule for My Adventure and Blitz Records: missed past-week skins hidden, empty seasons dropped, future seasons previewed, Records draws without writing the save."

@@ -193,6 +193,16 @@ const BoohaGameRegistry = (() => {
       scoreMax:       100,
       starThresholds: [40, 70, 90],
     },
+    {
+      id:             'vowel_pop',
+      gameKey:        'vowel-pop',
+      name:           'Vowel Pop',
+      file:           'games/vowel-pop.js',
+      category:       'spelling',
+      hira:           'ゆびで かこう！',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
   ];
   const EXTRA_GAMES = [];
   CURRICULUMS.forEach(curriculum => {

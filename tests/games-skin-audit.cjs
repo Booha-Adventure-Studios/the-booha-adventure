@@ -78,7 +78,7 @@ assert(/\[data-power="minimal"\] body::before \{ filter: none; \}/.test(css), 's
 
 // Lanes: every game has one, matching the menu rows; only finished lanes are v2.
 const lanes = Object.fromEntries([...core.matchAll(/'([a-z-]+)':\s+\['(words|sentences|listen|extra)'/g)].map(m => [m[1], m[2]]));
-const expected = { 'vocab-tap': 'words', 'spell-word': 'words', 'vocab-speed': 'words', 'sentence-tap': 'sentences', 'sentence-order': 'sentences', 'sentence-speed': 'sentences', 'say-word': 'listen', 'say-sentence': 'listen', 'ask-question': 'listen', 'booha-bites': 'extra', 'echo': 'extra', 'week-boss': 'extra' };
+const expected = { 'vocab-tap': 'words', 'spell-word': 'words', 'vocab-speed': 'words', 'sentence-tap': 'sentences', 'sentence-order': 'sentences', 'sentence-speed': 'sentences', 'say-word': 'listen', 'say-sentence': 'listen', 'ask-question': 'listen', 'booha-bites': 'extra', 'echo': 'extra', 'week-boss': 'extra', 'vowel-pop': 'extra' };
 assert.deepStrictEqual(lanes, expected, 'game-core lanes must match the menu lanes');
 assert.match(core, /const V2_LANES = new Set\(\['words', 'sentences', 'listen', 'extra'\]\);/, 'all four lanes are on v2');
 // Pass 13: extra games — meaning colours with icons, rose speakers, header chip.

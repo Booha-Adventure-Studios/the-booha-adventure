@@ -401,7 +401,7 @@ assert.match(skin, /\.correct :is\(\.stw-choice-hira, \.sas-choice-hira, \.aq-ch
 // ── 8. Wiring ──
 const at = shell.indexOf('js/game-pop.js');
 assert(at > shell.indexOf('js/game-scorecard.js') && at < shell.indexOf('js/game-core.js'), 'game.html loads game-pop.js after the score card, before game-core');
-for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw], ['ask-question', aq], ['say-sentence', sas], ['echo', ec], ['week-boss', wb], ['booha-bites', bb]]) {
+for (const [name, src] of [['vocab-tap', vt], ['spell-word', sw], ['vocab-speed', vs], ['sentence-tap', st], ['sentence-order', so], ['sentence-speed', ssp], ['say-word', stw], ['ask-question', aq], ['say-sentence', sas], ['echo', ec], ['week-boss', wb], ['booha-bites', bb], ['vowel-pop', read('games/vowel-pop.js')]]) {
   assert.match(src, /const POP = window\.BoohaPop \|\| new Proxy/, `${name}: plays on without game-pop.js`);
 }
 assert(!/assets: 'booha-assets-2026-61[78]'/.test(read('sw.js')), 'sw.js asset cache bumped for the new CSS / precache entry');

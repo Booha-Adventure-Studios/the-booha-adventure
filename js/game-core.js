@@ -99,6 +99,7 @@ const GAME_JSON = {
   'booha-bites':    'sentences',
   'echo':           'vocab',
   'week-boss':      'vocab',
+  'vowel-pop':      'vocab',
 };
 
 /* Extra decks a game needs besides its main one (same week's 15 cards). */
@@ -196,6 +197,7 @@ const GAME_LANES = {
   'booha-bites':    ['extra',     'Booha Bites'],
   'echo':           ['extra',     'Echo'],
   'week-boss':      ['extra',     'Week Boss'],
+  'vowel-pop':      ['extra',     'Vowel Pop'],
 };
 const V2_LANES = new Set(['words', 'sentences', 'listen', 'extra']);   // every lane is on v2 now
 const [lane, gameTitle] = GAME_LANES[gameName] || ['extra', gameName];

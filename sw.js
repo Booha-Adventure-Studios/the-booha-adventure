@@ -193,7 +193,8 @@ const CURRENT_CACHES = {
   // Japan winter follow-up: the Maze arrival card words a repeat week as a return.
   // Spelling: カラスキ → カラスキー (long ki) on world, profile and arcade pages.
   // Daily Check: a skip followed by the check leaves no mark; real skips get a red dot.
-  pages:  'booha-pages-2026-555',
+  // Vowel Pop (extra game): menu row, profile pairs.
+  pages:  'booha-pages-2026-556',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -399,7 +400,8 @@ const CURRENT_CACHES = {
   // Shared closet rule: BoohaSkins.closetStates now drives My Adventure and
   // the Blitz Records collection (missed skins hidden in both).
   // Blitz Records: upcoming-season silhouettes are grey, as in My Adventure.
-  assets: 'booha-assets-2026-629',
+  // Vowel Pop: games/vowel-pop.js, registry, game-core, menu/profile CSS.
+  assets: 'booha-assets-2026-630',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
