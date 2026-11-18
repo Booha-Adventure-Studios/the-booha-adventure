@@ -25,4 +25,15 @@ assert.ok(
 assert.match(source, /MANIFEST_EXTRA_TESTS/, 'verify.sh must retain the manifest extras runner marker');
 assert.match(source, /if \[ \$FAIL -gt 0 \]; then/, 'verification failures must produce a non-zero exit');
 
+// Every reporting call must use a helper verify.sh defines (ok / bad / warn).
+// An undefined name such as "fail" only prints "command not found": the
+// failure is never counted and verify.sh still reports success.
+const defined = new Set([...source.matchAll(/^([a-z_]+)\(\)\s*\{/gm)].map(m => m[1]));
+['ok', 'bad', 'warn'].forEach(name => assert.ok(defined.has(name), `verify.sh must define ${name}()`));
+const REPORTING = ['ok', 'bad', 'warn', 'fail', 'pass', 'error', 'err', 'die', 'success', 'info'];
+source.split('\n').forEach((line, i) => {
+  const call = line.match(/^\s*([a-z_]+)\s+["']/);
+  if (!call || !REPORTING.includes(call[1])) return;
+  assert.ok(defined.has(call[1]), `verify.sh line ${i + 1} calls undefined helper "${call[1]}" (use ok, bad or warn)`);
+});
 console.log('Verification-script hardening audit passed.');

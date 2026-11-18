@@ -2290,12 +2290,12 @@ echo "[inventory] Test manifest and current orphan tests"
 if node tests/status-message-audit.cjs >/dev/null 2>&1; then
   ok "status message copy and pink status treatment pass"
 else
-  fail "status message copy and pink status treatment failed"
+  bad "status message copy and pink status treatment failed"
 fi
 if node tests/verify-and-load-audit.cjs >/dev/null 2>&1; then
   ok "combined verify-and-load bootstrap contracts pass"
 else
-  fail "combined verify-and-load bootstrap contracts failed"
+  bad "combined verify-and-load bootstrap contracts failed"
 fi
 if node tests/verification-script-audit.cjs >/dev/null 2>&1; then
   ok "verify.sh shebang, empty-JSON whitelist, and failure exit contracts pass"
