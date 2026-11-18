@@ -203,6 +203,16 @@ const BoohaGameRegistry = (() => {
       scoreMax:       100,
       starThresholds: [40, 70, 90],
     },
+    {
+      id:             'poopika',
+      gameKey:        'poopika',
+      name:           "Don't Talk to Poopika",
+      file:           'games/poopika.js',
+      category:       'questions',
+      hira:           'ことばを とりもどせ！',
+      scoreMax:       100,
+      starThresholds: [40, 70, 90],
+    },
   ];
   const EXTRA_GAMES = [];
   CURRICULUMS.forEach(curriculum => {

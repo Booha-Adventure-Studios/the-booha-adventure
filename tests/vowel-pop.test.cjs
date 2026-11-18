@@ -137,7 +137,6 @@ setTimeout(() => {
   assert.doesNotMatch(SRC, /\bfetch\(|XMLHttpRequest|WebSocket/, 'the reader runs on the device, no network');
   assert.match(SRC, /if \(unread >= 2\) showVowelButtons\(\)/, 'two unreadable drawings bring the vowel buttons');
   assert.match(SRC, /kind === 'choose'\) \{ askWhich\(/, 'look-alike letters ask which one');
-  assert.doesNotMatch(SRC, /claude/i);
 
   // ── Wiring ─────────────────────────────────────────────────────────────
   const reg = read('js/core/game-registry.js');

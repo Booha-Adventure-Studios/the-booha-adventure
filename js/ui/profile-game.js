@@ -843,6 +843,7 @@ const BoohaProfileGame = (() => {
   const BONUS_ICON = {
     'booha-bites': '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14" fill="none" stroke="currentColor" stroke-width="3"/><path d="M27 9a6 6 0 0 0 4 9 6 6 0 0 0 3 4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M13 21h9" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 3"/></svg>',
     echo: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 16h6l8-6v20l-8-6H8z" fill="currentColor"/><path d="M27 14a8 8 0 0 1 0 12M31 10a13 13 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+    'poopika': '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M5 7h30v20H19l-8 7v-7H5z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="35" cy="7" r="6" fill="currentColor"/><path d="M16 13.5a4 4 0 1 1 5.5 3.7c-1 .4-1.5 1-1.5 2.1" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="20" cy="23" r="1.6" fill="currentColor"/></svg>',
     'vowel-pop': '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="15" cy="22" r="7" fill="none" stroke="currentColor" stroke-width="3"/><path d="M22 15v14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M29 6l5 5-9 9-6 1 1-6z" fill="currentColor"/></svg>',
   };
   function renderBonusGames(s) {

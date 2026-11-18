@@ -296,6 +296,11 @@
       "reason": "Vowel Pop extra game: blank ladder (pb/br/bc) on every vocab card, the on-device letter reader on varied drawn vowels and non-vowels, scoring, and wiring (registry after the Week Boss, game-core, menu row, profile pairs)."
     },
     {
+      "path": "tests/poopika.test.cjs",
+      "status": "verify",
+      "reason": "Don't Talk to Poopika extra game: what Poopika eats at each level, every wrong choice really wrong on every questions.json, week order, audio warp range, game rules, and wiring (registry after Vowel Pop, game-core, menu, profile icon, pace zone)."
+    },
+    {
       "path": "tests/closet-shared-records.test.cjs",
       "status": "verify",
       "reason": "One closet rule for My Adventure and Blitz Records: missed past-week skins hidden, empty seasons dropped, future seasons previewed, Records draws without writing the save."

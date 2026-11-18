@@ -472,7 +472,7 @@ const UTILS = {
     vocab_tap: 1.5, spell_word: 1.25, vocab_speed: null,
     sentence_tap: 1.5, sentence_order: 1.25, sentence_speed: null,
     say_word: 1.5, say_sentence: 1.5, ask_question: 1.5,
-    booha_bites: 1.25, echo: 1.5, week_boss: 1.5, vowel_pop: 1.5,
+    booha_bites: 1.25, echo: 1.5, week_boss: 1.5, vowel_pop: 1.5, poopika: 1.5,
   },
   readyPace(pace, saveId) {
     if (!pace || pace.v !== 1 || !Array.isArray(pace.t) || !pace.t.length) return false;

@@ -79,7 +79,7 @@ function load() {
 
 /* ── wiring: all twelve engines summarise then emit; nothing is displayed ── */
 ['vocab-tap', 'spell-word', 'vocab-speed', 'sentence-tap', 'sentence-order', 'sentence-speed',
-  'say-word', 'say-sentence', 'ask-question', 'booha-bites', 'echo', 'week-boss', 'vowel-pop'].forEach(g => {
+  'say-word', 'say-sentence', 'ask-question', 'booha-bites', 'echo', 'week-boss', 'vowel-pop', 'poopika'].forEach(g => {
   const src = read(`games/${g}.js`);
   assert(/run\.summary\(\)/.test(src) && /U\.emitGameEnd\(/.test(src), `${g} must summarise the run and emit through U.emitGameEnd`);
   assert(src.indexOf('run.summary()') < src.lastIndexOf('U.emitGameEnd('), `${g} must call summary() before emitGameEnd`);
@@ -155,7 +155,7 @@ assert(/recentRun/.test(read('js/core/adventure-core.js')) && /recentRuns/.test(
   at(0); run.ready(3000, { waitAudio: true }); at(1000); run.audioDone(); at(1500); run.pauseClock(); at(1700); run.hit();
   assert.deepStrictEqual(Array.from(run.summary().pace.t), [5], 'answering during a replay counts the banked time');
 }
-['say-word', 'say-sentence', 'ask-question', 'echo', 'week-boss', 'vowel-pop'].forEach(g => {
+['say-word', 'say-sentence', 'ask-question', 'echo', 'week-boss', 'vowel-pop', 'poopika'].forEach(g => {
   assert(/run\.pauseClock\(\)/.test(read(`games/${g}.js`)), `${g} must pause the pace clock on replay`);
 });
 /* ══ Pass B: emitGameEnd decides rainbow; incomplete runs never do ══ */

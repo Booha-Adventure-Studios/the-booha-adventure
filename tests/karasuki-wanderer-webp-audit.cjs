@@ -32,6 +32,18 @@ while ((match = framePattern.exec(karasuki))) {
 assert.strictEqual(definitionCount, 36, 'Karasuki should define all 36 wanderers');
 assert.strictEqual(expected.size, 74 + seasonalAssets.size, 'Karasuki frames, Nuppi, and seasonal visitor files should all be tracked');
 
+// Extra games may use extra poses of a wanderer (Don't Talk to Poopika uses
+// poopika-3). They must name each file in full so it is tracked here too.
+const gamesDir = path.join(root, 'games');
+const gamePoses = new Set();
+for (const name of fs.readdirSync(gamesDir).filter(n => n.endsWith('.js'))) {
+  const src = fs.readFileSync(path.join(gamesDir, name), 'utf8');
+  const posePattern = /assets\/img\/wanderers\/([a-z0-9-]+\.webp)/g;
+  while ((match = posePattern.exec(src))) gamePoses.add(match[1]);
+}
+assert(gamePoses.has('poopika-3.webp'), "Don't Talk to Poopika names its poses in full");
+gamePoses.forEach(asset => expected.add(asset));
+
 const webps = fs.readdirSync(wandererDir).filter((name) => /\.webp$/i.test(name)).sort();
 assert.deepStrictEqual(webps, [...expected].sort(), 'shared wanderer WebP set must match live definitions');
 assert.strictEqual(fs.readdirSync(wandererDir).filter((name) => /\.png$/i.test(name)).length, 0, 'retired wanderer PNG files must be absent');
