@@ -398,7 +398,8 @@ const CURRENT_CACHES = {
   // Daily Check skip-then-done: adventure-log.js, daily-check.js, theme/profile.css.
   // Shared closet rule: BoohaSkins.closetStates now drives My Adventure and
   // the Blitz Records collection (missed skins hidden in both).
-  assets: 'booha-assets-2026-628',
+  // Blitz Records: upcoming-season silhouettes are grey, as in My Adventure.
+  assets: 'booha-assets-2026-629',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

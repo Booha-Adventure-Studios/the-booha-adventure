@@ -5852,7 +5852,8 @@ window.BoohaBlitzEngine = (() => {
         .blitz-rec-character.is-collected .blitz-rec-character-name { color: #ffe27a; }
         .blitz-rec-character.is-thisweek .blitz-rec-character-name { color: #ffe27a; }
         .blitz-rec-character.is-thisweek img { filter: brightness(0) drop-shadow(0 0 8px rgba(255,226,122,.75)); }
-        .blitz-rec-season-block.is-preview { opacity: .78; }
+        /* Upcoming season: grey silhouettes like the My Adventure preview, so they read on the dark panel. */
+        .blitz-rec-season-block.is-preview .blitz-rec-character img { filter: brightness(0) invert(.32); opacity: .8; }
         .blitz-rec-collection-empty { margin: 0; color: rgba(255,255,255,.7); font-size: 11px; line-height: 1.6; }
         @media (max-width: 430px) {
           #blitz-rec-inner { border-radius: 20px; }
