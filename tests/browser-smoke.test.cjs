@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-// A real browser smoke test for the four most important student surfaces.
+// A real browser smoke test for the most important student surfaces, plus
+// one real game page (where "Booha is angry" is checked end to end).
 // This intentionally uses Chrome's built-in DevTools Protocol instead of a
 // third-party dependency: the repo is a static app and should not need a
 // browser framework just to catch a boot-time exception or blank page.
@@ -28,7 +29,61 @@ const ROUTES = [
   { name: 'Maze', path: '/maze.html', selector: '#mazeScene' },
   { name: 'Karasuki', path: '/karasuki.html?from=maze', selector: '#karasuki-app' },
   { name: 'Adventure Log', path: '/profile.html', selector: '#profile-content' },
+  { name: 'Game (Say the Word)', path: '/game.html?week=pb_nov_w3&game=say-word', selector: '#game-mount > *', check: gameAngryCheck },
 ];
+
+/* On a real game page: honest play leaves Booha calm; mashing makes him angry.
+   Then every Web Audio effect is silent, effect clips are muted, the badge
+   explains it, the English voice still plays new questions, and the record
+   is kept under the signed-in student's id. */
+async function gameAngryCheck(client) {
+  const PEAK = `(async () => {
+    const oc = new OfflineAudioContext(1, 4410, 44100);
+    const o = oc.createOscillator(); o.frequency.value = 440; o.connect(oc.destination); o.start();
+    const d = (await oc.startRendering()).getChannelData(0);
+    let m = 0; for (let i = 0; i < d.length; i++) m = Math.max(m, Math.abs(d[i]));
+    return m;
+  })()`;
+  const before = await evaluate(client, `(async () => ({
+    loaded: !!window.BoohaAngry,
+    angry: window.BoohaAngry ? BoohaAngry.isAngry() : null,
+    peak: await ${PEAK},
+  }))()`);
+  assert.strictEqual(before.loaded, true, 'Game: game-angry.js is loaded');
+  assert.strictEqual(before.angry, false, 'Game: Booha starts calm');
+  assert.ok(before.peak > 0.5, 'Game: effects are audible before any silliness');
+
+  const after = await evaluate(client, `(async () => {
+    const button = [...document.querySelectorAll('#game-mount button')].find(b => b.offsetParent);
+    if (!button) return { noButton: true };
+    for (let i = 0; i < 12; i++) button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    const fx = new Audio(GAME_CONFIG.sfxBase + 'ding.mp3');
+    fx.play().catch(() => {});
+    const badge = document.querySelector('.booha-angry');
+    const uid = localStorage.getItem('booha_userid') || '';
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('booha-angry-'));
+    return {
+      angry: BoohaAngry.isAngry(),
+      reason: BoohaAngry.reason(),
+      badge: badge ? badge.textContent : '',
+      peak: await ${PEAK},
+      effectMuted: fx.muted,
+      newQuestion: BoohaAngry.voiceOk(GAME_CONFIG.audioBase + 'smoke-question.mp3'),
+      uid,
+      keys,
+    };
+  })()`);
+  assert.ok(!after.noButton, 'Game: a game button was on screen');
+  assert.strictEqual(after.angry, true, 'Game: mashing makes Booha angry');
+  assert.strictEqual(after.reason, 'mashing');
+  assert.ok(after.badge.includes('Booha is angry! No sound.') && after.badge.includes('ブーハーが おこってるよ！おとは なし。'), 'Game: the badge explains it');
+  assert.strictEqual(after.peak, 0, 'Game: Web Audio effects are silent');
+  assert.strictEqual(after.effectMuted, true, 'Game: effect clips are muted');
+  assert.strictEqual(after.newQuestion, true, 'Game: the English voice still plays a new question');
+  assert.ok(after.uid, 'Game: a student is signed in');
+  assert.ok(after.keys.length > 0 && after.keys.every(k => k.endsWith(':' + after.uid)), 'Game: the record is kept per student');
+  console.log('Browser smoke passed: Game - calm for honest play, angry on mashing (effects silent, voice on, per-student record)');
+}
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -292,10 +347,11 @@ async function main() {
     for (const route of ROUTES) {
       browserErrors.length = 0;
       const state = await waitForRoute(client, route, baseUrl);
+      if (route.check) await route.check(client, state);
       assert.deepStrictEqual(browserErrors, [], `${route.name}: browser errors\n${browserErrors.join('\n')}`);
       console.log(`Browser smoke passed: ${route.name} (${state.children} body children)`);
     }
-    console.log('Browser smoke passed: hub, Maze, Karasuki, and Adventure Log rendered for preview-student with no console errors.');
+    console.log('Browser smoke passed: hub, Maze, Karasuki, Adventure Log and a game rendered for preview-student with no console errors; Booha is angry works on the game page.');
   } finally {
     client?.close();
     await Promise.all([stopProcess(chrome), stopProcess(server)]);

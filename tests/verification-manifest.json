@@ -368,7 +368,7 @@
     {
       "path": "tests/browser-smoke.test.cjs",
       "status": "verify",
-      "reason": "Real headless Chrome smoke test: preview student can open the Hub, Maze, Karasuki, and Adventure Log without uncaught browser errors or a blank surface."
+      "reason": "Real headless Chrome smoke test: preview student can open the Hub, Maze, Karasuki, and Adventure Log without uncaught browser errors or a blank surface; plus a real game page (Say the Word), where mashing must make Booha angry: effects silent, effect clips muted, badge shown, English voice still available, record kept per student."
     },
     {
       "path": "tests/palette-pop-audit.cjs",
