@@ -1,14 +1,24 @@
 /* ══════════════════════════════════════════════════════════════
    poopika.js — Don't Talk to Poopika (extra game)
 
-   "Poopika ate the question word. Put it back before the forest changes."
+   "What you see and hear changes around Poopika."
 
-   The week's questions play out loud, a little warped (Poopika's forest
-   bends sound), with the start of the question eaten. The student picks
-   the missing words from candy buttons. Put it back and the world snaps
-   into focus: the question plays once more, clean.
+   Poopika: when someone admires themselves in a mirror too long, the
+   mirror takes something, and that something is a Poopika. Cute at
+   first; the longer you look, the less cute. She keeps asking
+   "Am I cute?".
 
-   What Poopika eats (see chunkOf):
+   The game: the week's question plays with its opening missing (static
+   where the words should be). The student picks the missing words from
+   candy buttons. While the card is open, a looking clock runs (listening
+   does not count): her outline shifts between shapes, echoes drift off
+   her, the real her flickers through less and less cute, the forest
+   tints, breathes and closes in, a music box goes sour and a hum grows.
+   The voice drifts between ears with a whisper of itself a beat behind
+   and a reversed breath leading in (stranger the longer you look). A
+   right answer snaps it all back: the real, cute her, the clean voice.
+
+   What goes missing (see chunkOf):
      Pre-Boo        the first word            ___ you like hiking?   → Do
      Boo-riculum /  the question opening      ___ you relax?         → How do
      Boo-Continuum                            ___ rooms are there?   → How many
@@ -19,10 +29,14 @@
    A choice that also makes a right question is never offered.
 
    Players know the week's questions from class: this is practice, not a
-   first meeting, so the audio may be strange and the choices close.
+   first meeting, so the sound may be strange and the choices close.
 
    The scene is weird; the question card and buttons never are. Reduced
-   motion keeps the pops and drops the stretching and drifting.
+   motion keeps the pops and colour, and drops the shape-shifting,
+   flickers, stretching and static.
+
+   Voice effects need the audio host to allow cross-origin reads (CORS on
+   the R2 bucket). If a clip cannot be processed it plays plainly.
 
    Extra game: saves as "{curriculum}-extra:poopika" (outside the nine).
    ══════════════════════════════════════════════════════════════ */
@@ -30,7 +44,7 @@
 'use strict';
 
 /* ── Question logic (pure: also loaded by tests/poopika.test.cjs) ─────────
-   Poopika eats the start of the question. What she eats depends on level:
+   The start of the question goes missing. How much depends on level:
      Pre-Boo        the first word:            ___ is the rug?        → Where
                                                ___ you have a garden? → Do
      Boo-riculum /  the question opening:      ___ ___ you relax?     → How do
@@ -92,7 +106,7 @@ function otherWh(wh, rand, n, filter) {
   return pickFrom(WH_POOL.filter(w => !ban.has(w) && (!filter || filter(w))), n, rand);
 }
 
-/* What Poopika eats. Returns { eat: [words], kind } or null to skip the card. */
+/* What goes missing. Returns { eat: [words], kind } or null to skip the card. */
 function chunkOf(en, curriculum) {
   const ws = words(en);
   const w = ws.map(bare);
@@ -205,16 +219,44 @@ function spread(rounds, rand) {
   return out;
 }
 
-/* Warp: how the playback rate wobbles. Gentle enough to follow, odd enough
-   to feel like Poopika's forest. Returns the rate at time t (seconds). */
-function warpRate(t, w) {
-  return w.base + w.depth * Math.sin(2 * Math.PI * w.hz * t + w.phase) + w.dip * Math.max(0, Math.sin(2 * Math.PI * 0.45 * t + w.phase * 2)) ** 6;
-}
-function makeWarp(rand) {
-  return { base: 0.93 + rand() * 0.1, depth: 0.05 + rand() * 0.035, hz: 1.6 + rand() * 1.4, phase: rand() * 6.28, dip: -(0.06 + rand() * 0.06) };
+/* How long you have been looking, 0 (cute) to 1 (not so cute). Listening
+   time does not count: only looking. Pre-Boo gets longer before it turns. */
+function stare(ms, curriculum) {
+  const T = curriculum === 'pb' ? 22000 : curriculum === 'br' ? 18000 : 16000;
+  return Math.max(0, Math.min(1, ms / T));
 }
 
-const PoopikaLogic = { WH, FAMILY, TWIN, BREAKS, chunkOf, wrongs, buildRound, spread, rng, warpRate, makeWarp, baseVerb };
+/* She keeps asking. The longer you look, the stranger the asking. */
+const CUTE_LINES = [
+  ['Am I cute? · かわいい？', 'Am I cute?', 'Cute? · かわいい？'],
+  ['Am I cute?? · かわいい？？', 'Still cute? · まだ かわいい？', 'Look at me. · みて。'],
+  ['Am I cute? Am I cute?', 'Keep looking. · もっと みて。', 'Cute? Cute? Cute?'],
+];
+function cuteLine(s, rand) {
+  const tier = CUTE_LINES[s < 0.34 ? 0 : s < 0.67 ? 1 : 2];
+  return tier[Math.floor(rand() * tier.length)];
+}
+
+/* The three pictures are not drawn at one size: poopika-3 fills 95% of its
+   frame, -1 and -2 about 70%. alphaBox finds the drawn part; fitPose
+   scales and moves a pose so its height, feet and centre match the
+   reference pose. Measured on the device from the real files. */
+function alphaBox(alpha, w, h, threshold) {
+  const t = threshold == null ? 24 : threshold;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (alpha[y * w + x] > t) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  return x1 < 0 ? null : { x0: x0 / w, y0: y0 / h, x1: (x1 + 1) / w, y1: (y1 + 1) / h };
+}
+function fitPose(box, ref) {
+  if (!box || !ref) return { k: 1, ox: 50, oy: 100, dx: 0, dy: 0 };
+  const k = (ref.y1 - ref.y0) / (box.y1 - box.y0);
+  const cx = (box.x0 + box.x1) / 2, rcx = (ref.x0 + ref.x1) / 2;
+  return { k, ox: cx * 100, oy: box.y1 * 100, dx: (rcx - cx) * 100, dy: (ref.y1 - box.y1) * 100 };
+}
+
+const PoopikaLogic = { WH, FAMILY, TWIN, BREAKS, chunkOf, wrongs, buildRound, spread, rng, stare, cuteLine, CUTE_LINES, alphaBox, fitPose, baseVerb };
 if (typeof module !== 'undefined' && module.exports) module.exports = PoopikaLogic;
 if (typeof window !== 'undefined') window.PoopikaLogic = PoopikaLogic;
 
@@ -230,11 +272,11 @@ U.unlockAudio();
 const SAVE_ID = `${CFG.curriculum}-extra:poopika`;
 // Full paths, so tests/karasuki-wanderer-webp-audit.cjs tracks each pose.
 const POSE = {
-  idle:  '/the-booha-adventure/assets/img/wanderers/poopika-3.webp',   // paw at her mouth: she has the word
+  idle:  '/the-booha-adventure/assets/img/wanderers/poopika-3.webp',   // paw at her mouth
   right: '/the-booha-adventure/assets/img/wanderers/poopika-1.webp',   // happy
   wrong: '/the-booha-adventure/assets/img/wanderers/poopika-2.webp',   // hides her face
 };
-const IMG = src => src;
+const POSE_NAMES = Object.keys(POSE);
 let seedBase = (Date.now() >>> 0) || 7;
 function buildRounds() {
   seedBase += 101;
@@ -248,34 +290,62 @@ let rounds = buildRounds();
 const TOTAL = rounds.length;
 const run = U.createRun({ total: TOTAL, recoverPoints: 50 });
 const voiceGate = U.createAudioGate({ cooldownMs: 300, timeoutMs: 12000 });
-await Promise.all([
-  U.loadSFX('ding', CFG.sfxBase + 'ding.mp3'),
-  U.loadSFX('fart', CFG.sfxBase + 'fart.mp3'),
-]);
-// Poses load before the first card, so she never pops in late.
-await Promise.all(Object.values(POSE).map(n => new Promise(res => { const i = new Image(); i.onload = i.onerror = res; i.src = IMG(n); })));
+await U.loadSFX('ding', CFG.sfxBase + 'ding.mp3');
+
+/* Measure each pose once, so all three stand the same size on the same
+   feet (the files are drawn at different scales). */
+const FIT = {};
+await (async function measurePoses() {
+  const imgs = await Promise.all(POSE_NAMES.map(n => new Promise(res => {
+    const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = POSE[n];
+  })));
+  const boxes = imgs.map(img => {
+    if (!img) return null;
+    try {
+      const S = 128, c = document.createElement('canvas'); c.width = c.height = S;
+      const g = c.getContext('2d'); g.drawImage(img, 0, 0, S, S);
+      const d = g.getImageData(0, 0, S, S).data, a = new Uint8Array(S * S);
+      for (let i = 0; i < S * S; i++) a[i] = d[i * 4 + 3];
+      return alphaBox(a, S, S);
+    } catch (_) { return null; }
+  });
+  const ref = boxes.reduce((best, b) => (b && (!best || (b.y1 - b.y0) > (best.y1 - best.y0)) ? b : best), null);
+  POSE_NAMES.forEach((n, i) => { FIT[n] = fitPose(boxes[i], ref); });
+})();
+function fitStyle(n) {
+  const f = FIT[n] || { k: 1, ox: 50, oy: 100, dx: 0, dy: 0 };
+  return `transform-origin:${f.ox.toFixed(1)}% ${f.oy.toFixed(1)}%;transform:translate(${f.dx.toFixed(1)}%,${f.dy.toFixed(1)}%) scale(${f.k.toFixed(3)})`;
+}
 
 const STYLE = `
-/* Poopika's version of the curriculum forest: same art, candy tint. */
-html.pk-world{--world-ink:#fff7fd}
-html[data-skin="v2"].pk-world body::before{filter:blur(8px) saturate(1.7) hue-rotate(var(--pk-hue,290deg)) brightness(.95);transition:filter .5s ease,transform .5s ease}
+/* Poopika's version of the level forest. --pk-s is how long you have been
+   looking (0 cute … 1 not so cute); the scene follows it. */
+html.pk-world{--world-ink:#fff7fd;--pk-s:0}
+html[data-skin="v2"].pk-world body::before{
+  filter:blur(calc(8px + var(--pk-s) * 6px)) saturate(calc(1.6 + var(--pk-s) * 1.2)) hue-rotate(calc(var(--pk-hue,290deg) + var(--pk-s) * 80deg)) contrast(calc(1 + var(--pk-s) * .35));
+  transition:filter 1.2s linear;animation:pkBreathe 7s ease-in-out infinite}
+@keyframes pkBreathe{50%{transform:scale(calc(1.02 + var(--pk-s) * .07)) rotate(calc(var(--pk-s) * 1.5deg))}}
 html[data-skin="v2"].pk-world body::after{background:
-  radial-gradient(120% 70% at 85% 10%,rgba(255,212,94,.28),transparent 60%),
-  radial-gradient(90% 60% at 10% 90%,rgba(114,242,208,.30),transparent 60%),
-  linear-gradient(165deg,rgba(255,105,189,.62),rgba(150,96,255,.58) 52%,rgba(38,17,61,.78))}
+  radial-gradient(120% 70% at 85% 10%,rgba(255,212,94,.26),transparent 60%),
+  radial-gradient(90% 60% at 10% 90%,rgba(114,242,208,.28),transparent 60%),
+  linear-gradient(165deg,rgba(255,105,189,.62),rgba(150,96,255,.58) 52%,rgba(38,17,61,.8))}
 html[data-skin="v2"][data-power="minimal"].pk-world body::after{background:linear-gradient(165deg,rgba(255,105,189,.86),rgba(110,70,200,.9) 55%,rgba(38,17,61,.94))}
 html.pk-world .game-title,html.pk-world .game-week{color:#fff7fd;-webkit-text-fill-color:#fff7fd;text-shadow:0 2px 0 rgba(38,17,61,.55),0 0 18px rgba(255,105,189,.7)}
-/* A wrong answer: the forest melts for a moment (never the card). */
-html.pk-world.pk-melt body::before{filter:blur(12px) saturate(2.2) hue-rotate(calc(var(--pk-hue,290deg) + 70deg));transform:scale(1.08,1.22) skewX(6deg)}
-html.pk-world.pk-snap body::before{filter:blur(3px) saturate(1.3) hue-rotate(var(--pk-hue,290deg));transform:scale(1.02)}
-@media (prefers-reduced-motion:reduce){html.pk-world.pk-melt body::before,html.pk-world.pk-snap body::before{transform:none}}
-html[data-motion="reduced"].pk-world.pk-melt body::before,html[data-motion="reduced"].pk-world.pk-snap body::before{transform:none}
+/* The edges close in the longer you look. */
+.pk-vignette{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:calc(var(--pk-s) * .85);transition:opacity 1.2s linear;
+  background:radial-gradient(ellipse 75% 70% at 50% 45%,transparent 45%,rgba(38,17,61,.65) 78%,rgba(14,4,24,.95))}
+/* Wrong: the forest lurches. Right: everything snaps back. */
+html.pk-world.pk-lurch body::before{transform:scale(1.12,1.28) skewX(7deg);transition:transform .25s}
+html.pk-world.pk-snap body::before{filter:blur(3px) saturate(1.3) hue-rotate(var(--pk-hue,290deg));animation:none;transition:filter .3s}
+@media (prefers-reduced-motion:reduce){html.pk-world body::before,html.pk-world.pk-lurch body::before{animation:none !important;transform:none !important}}
+html[data-motion="reduced"].pk-world body::before,html[data-motion="reduced"].pk-world.pk-lurch body::before{animation:none !important;transform:none !important}
 
 .pk-wrap{
   --pk-pink:#ff69bd;--pk-mint:#72f2d0;--pk-lilac:#b98cff;--pk-yellow:#ffd45e;--pk-sky:#7fd3ff;--pk-ink:#24152f;--pk-night:#26113d;
   --game-pill-bg:rgba(38,17,61,.62);--game-pill-border:rgba(255,247,253,.35);--game-pill-text:#fff7fd;--game-meter-bg:rgba(255,247,253,.28);
   position:relative;max-width:720px;margin:0 auto;padding:.3rem 1rem 3rem;display:flex;flex-direction:column;align-items:center;gap:.7rem;box-sizing:border-box;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pk-wrap>*{position:relative;z-index:1}
 .pk-intro{margin:0;text-align:center;font-weight:900;font-size:clamp(13px,2.2vw,16px);color:#fff7fd;text-shadow:0 2px 0 rgba(38,17,61,.5)}
 .pk-hud{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .pk-pill{padding:5px 16px;border-radius:999px;background:var(--game-pill-bg);border:1.5px solid var(--game-pill-border);color:var(--game-pill-text);font-size:clamp(12px,2vw,15px);font-weight:900;font-variant-numeric:tabular-nums}
@@ -284,21 +354,43 @@ html[data-motion="reduced"].pk-world.pk-melt body::before,html[data-motion="redu
 .pk-dot.done{background:#22c55e}.pk-dot.half{background:var(--pk-yellow)}.pk-dot.miss{background:#ff7a45}
 .pk-dot.now{background:#fff7fd;transform:scale(1.3);box-shadow:0 0 10px var(--pk-pink)}
 
-/* The stage: Poopika leans in from the side, a little too big. */
 /* She never covers the English: beside the play button on phones and
    tablets, her own column left of the card on wide screens. */
-.pk-stage{position:relative;width:100%;display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:"sign sign sign" ". listen poo";align-items:center;row-gap:.6rem;padding-top:4px}
+.pk-stage{position:relative;width:100%;display:grid;grid-template-columns:1fr auto 1fr;grid-template-areas:"sign sign sign" ". listen who";align-items:center;row-gap:.6rem;padding-top:4px}
 .pk-sign{grid-area:sign}
 .pk-listen{grid-area:listen}
-.pk-poo{grid-area:poo;justify-self:start;align-self:start;z-index:2;width:clamp(96px,17vw,140px);height:auto;margin:-16px 0 0 4px;pointer-events:none;transform-origin:50% 90%;
-  transform:rotate(7deg);filter:drop-shadow(0 10px 18px rgba(38,17,61,.45));animation:pkSway 3.4s ease-in-out infinite}
-@keyframes pkSway{50%{transform:rotate(3deg) translateY(-4px) scale(1.02,.99)}}
-.pk-poo.bounce{animation:pkBounce .6s cubic-bezier(.3,1.8,.5,1)}
-@keyframes pkBounce{0%{transform:rotate(7deg) scale(.86,1.12)}45%{transform:rotate(-4deg) scale(1.16,.9)}100%{transform:rotate(7deg) scale(1)}}
-.pk-poo.cringe{animation:pkCringe .55s ease}
-@keyframes pkCringe{30%{transform:rotate(12deg) scale(.92,1.06) translateX(6px)}70%{transform:rotate(4deg) scale(1.04,.95)}}
 
-/* The candy wrapper: plain and readable, always. */
+/* Poopika: mostly a shape that will not hold still. Echoes drift off her;
+   now and then the real her shows through. */
+.pk-who{grid-area:who;justify-self:start;align-self:start;position:relative;z-index:2;width:clamp(100px,17vw,150px);aspect-ratio:1;margin:4px 0 0 2px;pointer-events:none}
+.pk-who .pk-layer{position:absolute;inset:0;transform-origin:50% 95%}
+.pk-who img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pk-who .pk-sil img,.pk-who .pk-echo img{filter:brightness(0)}
+.pk-who .pk-sil{filter:drop-shadow(0 0 5px var(--pk-pink)) drop-shadow(0 0 16px rgba(185,140,255,.9));
+  transform:scale(calc(1 + var(--pk-s) * .12),calc(1 + var(--pk-s) * .07)) skewX(calc(var(--pk-s) * -10deg));transition:transform 1.2s linear}
+.pk-who .pk-echo{opacity:calc(.1 + var(--pk-s) * .35);filter:blur(1px) drop-shadow(0 0 8px var(--pk-pink))}
+.pk-who .pk-echo.a{transform:translate(calc(var(--pk-s) * -26px),calc(var(--pk-s) * -8px)) scale(calc(1 + var(--pk-s) * .12));animation:pkEchoA 3.1s ease-in-out infinite}
+.pk-who .pk-echo.b{transform:translate(calc(var(--pk-s) * 22px),calc(var(--pk-s) * 6px)) scale(calc(.94 + var(--pk-s) * .2));animation:pkEchoB 4.3s ease-in-out infinite}
+@keyframes pkEchoA{50%{translate:calc(var(--pk-s) * -10px) 4px}}
+@keyframes pkEchoB{50%{translate:calc(var(--pk-s) * 9px) -5px}}
+.pk-who .pk-real{opacity:0;transition:opacity .08s}
+.pk-who.peek .pk-real{opacity:1}
+.pk-who.peek.odd .pk-real img{filter:contrast(1.5) saturate(.35) hue-rotate(-25deg)}
+.pk-who.peek.odd .pk-real{transform:scale(.93,1.16)}
+.pk-who.cute .pk-real{opacity:1;transition:opacity .25s}
+.pk-who.cute .pk-sil,.pk-who.cute .pk-echo{opacity:0;transition:opacity .25s}
+.pk-who.cute .pk-real{animation:pkBounce .65s cubic-bezier(.3,1.8,.5,1)}
+@keyframes pkBounce{0%{transform:scale(.85,1.14)}45%{transform:scale(1.14,.9)}100%{transform:none}}
+.pk-who.lurch .pk-sil{animation:pkLurch .5s ease}
+@keyframes pkLurch{20%{translate:-8px 0;scale:1.1 .9}50%{translate:7px -4px;scale:.9 1.2}80%{translate:-3px 0}}
+.pk-bubble{position:absolute;left:50%;bottom:calc(100% - 6px);z-index:3;transform:translate(-50%,6px) scale(.6);opacity:0;white-space:nowrap;
+  padding:5px 11px;border-radius:14px;background:#fff7fd;color:var(--pk-ink);font:900 13px/1.2 var(--game-font-body);box-shadow:0 3px 0 rgba(38,17,61,.35);transition:opacity .2s,transform .25s cubic-bezier(.3,1.7,.5,1)}
+.pk-bubble::after{content:'';position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top-color:#fff7fd}
+.pk-bubble.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.pk-bubble.odd{background:var(--pk-night);color:#ffd2ec;letter-spacing:.06em}
+.pk-bubble.odd::after{border-top-color:var(--pk-night)}
+
+/* The question card: plain and readable, always. */
 .pk-sign{position:relative;z-index:1;width:calc(100% - 28px);box-sizing:border-box;margin:0 14px;padding:1rem 1.1rem 1.05rem;border-radius:22px;
   background:#fffaf6;color:var(--pk-ink);box-shadow:0 0 0 4px var(--pk-pink),0 0 0 8px rgba(255,247,253,.6),0 14px 30px rgba(38,17,61,.4);text-align:left}
 .pk-sign::before,.pk-sign::after{content:'';position:absolute;top:50%;width:26px;height:46px;margin-top:-23px;background:var(--pk-pink);
@@ -306,14 +398,12 @@ html[data-motion="reduced"].pk-world.pk-melt body::before,html[data-motion="redu
 .pk-sign::before{left:-30px}.pk-sign::after{right:-30px;transform:scaleX(-1)}
 .pk-jp{margin:0 0 .35rem;font-weight:800;font-size:clamp(13px,2.4vw,16px);color:#6b4a73;line-height:1.35}
 .pk-q{margin:0;font:900 clamp(22px,4.6vw,34px)/1.3 var(--game-font-body);letter-spacing:.005em;color:var(--pk-ink);overflow-wrap:anywhere}
-.pk-gap{display:inline-flex;align-items:center;justify-content:center;min-width:3.4em;height:1.25em;margin-right:.18em;padding:0 .3em;box-sizing:border-box;vertical-align:-.12em;
-  border-radius:.4em .4em .55em .55em;background:var(--pk-night);color:var(--pk-yellow);font-size:.92em;
-  clip-path:polygon(0 0,100% 0,100% 72%,92% 100%,82% 78%,70% 100%,58% 80%,46% 100%,34% 78%,22% 100%,10% 80%,0 100%)}
-.pk-gap.wob{animation:pkGap 1.3s ease-in-out infinite}
-@keyframes pkGap{50%{transform:scale(1.06,.94) rotate(-1.5deg)}}
-.pk-gap.ok{clip-path:none;background:#1f7a46;color:#fff;animation:pkSpit .5s cubic-bezier(.3,1.7,.5,1)}
-.pk-gap.shown{clip-path:none;background:var(--pk-yellow);color:var(--pk-ink);animation:pkSpit .5s ease}
-@keyframes pkSpit{0%{transform:scale(.2) rotate(-20deg)}60%{transform:scale(1.25) rotate(4deg)}100%{transform:none}}
+/* The missing words will not hold still either: static until you choose. */
+.pk-gap{display:inline-flex;align-items:center;justify-content:center;min-width:3.6em;height:1.25em;margin-right:.18em;padding:0 .3em;box-sizing:border-box;vertical-align:-.12em;
+  border-radius:.35em;background:var(--pk-night);color:#ffb3df;font-size:.9em;letter-spacing:.08em;font-family:ui-monospace,Menlo,Consolas,monospace;overflow:hidden}
+.pk-gap.ok{background:#1f7a46;color:#fff;letter-spacing:0;font-family:inherit;animation:pkLand .5s cubic-bezier(.3,1.7,.5,1)}
+.pk-gap.shown{background:var(--pk-yellow);color:var(--pk-ink);letter-spacing:0;font-family:inherit;animation:pkLand .5s ease}
+@keyframes pkLand{0%{transform:scale(.3);filter:blur(4px)}60%{transform:scale(1.2);filter:none}100%{transform:none}}
 
 .pk-listen{display:flex;align-items:center;gap:12px;justify-content:center}
 .pk-play{position:relative;width:64px;height:64px;border:none;border-radius:50%;cursor:pointer;font-size:24px;color:var(--pk-ink);
@@ -331,7 +421,6 @@ html[data-motion="reduced"].pk-world.pk-melt body::before,html[data-motion="redu
 .pk-choice:nth-child(2){animation-delay:.05s}.pk-choice:nth-child(3){animation-delay:.1s}.pk-choice:nth-child(4){animation-delay:.15s}
 @keyframes pkIn{from{transform:scale(.4) rotate(-6deg);opacity:0}to{transform:none;opacity:1}}
 .pk-choice:active{transform:translateY(5px);box-shadow:0 2px 0 color-mix(in srgb,var(--c) 55%,#26113d)}
-.pk-choice .pk-key{display:none}
 .pk-choice.right{background:#1f7a46;color:#fff;box-shadow:0 7px 0 #0f4a29}
 .pk-choice.right::after{content:' ✓'}
 .pk-choice.wrong{background:#d9d0dd;color:#5a4a60;box-shadow:0 3px 0 #a99bb0;text-decoration:line-through;text-decoration-thickness:3px;animation:pkNo .4s ease}
@@ -346,40 +435,40 @@ html[data-motion="reduced"].pk-world.pk-melt body::before,html[data-motion="redu
 .pk-burst.show{animation:pkBurst 1.05s cubic-bezier(.3,1.6,.5,1) both}
 @keyframes pkBurst{0%{transform:translate(-50%,-50%) scale(0) rotate(-14deg)}25%{transform:translate(-50%,-50%) scale(1.2) rotate(5deg)}40%,75%{transform:translate(-50%,-50%) scale(1) rotate(0)}100%{transform:translate(-50%,-75%) scale(1);opacity:0}}
 
-/* Candy weather: translucent sweets and question-mark flowers drift by. */
-.pk-sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.pk-sky i{position:absolute;display:block;border-radius:50%;opacity:.5;animation:pkDrift linear infinite}
-.pk-sky i.q{border-radius:0;opacity:.55;font:900 normal 34px/1 var(--game-font-title,var(--game-font-body));color:#fff7fd;text-shadow:0 0 12px var(--pk-pink)}
-.pk-sky i.q::before{content:'?'}
-@keyframes pkDrift{from{transform:translateY(0) rotate(0)}to{transform:translateY(-118vh) rotate(260deg)}}
-.pk-wrap>*:not(.pk-sky){position:relative;z-index:1}
-@media (prefers-reduced-motion:reduce){.pk-sky i,.pk-poo,.pk-gap.wob,.pk-play.is-waiting{animation:none !important}.pk-burst.show{animation:none;transform:translate(-50%,-50%) scale(1)}}
-html[data-motion="reduced"] .pk-sky i,html[data-motion="reduced"] .pk-poo,html[data-motion="reduced"] .pk-gap.wob{animation:none !important}
+@media (prefers-reduced-motion:reduce){.pk-who .pk-echo,.pk-who.cute .pk-real,.pk-who.lurch .pk-sil,.pk-play.is-waiting{animation:none !important}.pk-burst.show{animation:none;transform:translate(-50%,-50%) scale(1)}}
+html[data-motion="reduced"] .pk-who .pk-echo,html[data-motion="reduced"] .pk-who.lurch .pk-sil{animation:none !important}
 
-/* Phones: the intro goes (the buttons say it), Poopika peeks smaller. */
+/* Phones: the intro goes, Poopika stands beside the play button. */
 @media (max-width:600px){
   .pk-intro{display:none}
   .pk-wrap{gap:.55rem;padding-top:0}
-  .pk-poo{width:96px;margin-top:-14px}
+  .pk-who{width:100px}
+  .pk-who .pk-sil{transform:scale(calc(1 + var(--pk-s) * .04),calc(1 + var(--pk-s) * .07)) skewX(calc(var(--pk-s) * -8deg))}
+  .pk-stage{overflow-x:clip}
+  .pk-bubble{left:auto;right:-6px;transform:translate(0,6px) scale(.6);transform-origin:85% 100%}
+  .pk-bubble.show{transform:none}
+  .pk-bubble::after{left:auto;right:30px}
   .pk-sign{padding:.8rem .85rem .9rem}
   .pk-choice{min-height:56px;border-radius:18px}
   .pk-play{width:56px;height:56px;font-size:21px}
 }
-/* Wide screens: Poopika leans in from the left, big and off-centre. */
+/* Wide screens: she gets her own column, big, leaning in from the left. */
 @media (min-width:1060px){
   .pk-wrap{max-width:900px}
-  .pk-stage{grid-template-columns:auto 1fr;grid-template-areas:"poo sign" "poo listen";column-gap:0}
-  .pk-poo{align-self:center;justify-self:end;width:210px;margin:0 -22px 0 0;transform:rotate(-8deg) scaleX(-1);animation-name:pkSwayL}
-  @keyframes pkSwayL{50%{transform:rotate(-4deg) scaleX(-1) translateY(-4px)}}
-  .pk-poo.bounce,.pk-poo.cringe{animation:pkSwayL 3.4s ease-in-out infinite}
-  .pk-choices{margin-left:188px;width:calc(100% - 188px)}
+  .pk-stage{grid-template-columns:auto 1fr;grid-template-areas:"who sign" "who listen";column-gap:0}
+  .pk-who{align-self:center;justify-self:end;width:230px;margin:0 -16px 0 0;transform:scaleX(-1)}
+  .pk-who .pk-sil{transform:scale(calc(1 - var(--pk-s) * .07),calc(1 + var(--pk-s) * .24)) skewX(calc(var(--pk-s) * -7deg))}
+  .pk-who .pk-bubble{transform:translate(-50%,6px) scale(.6) scaleX(-1)}
+  .pk-who .pk-bubble.show{transform:translate(-50%,0) scaleX(-1)}
+  .pk-choices{margin-left:200px;width:calc(100% - 200px)}
 }
 `;
 
+const layer = (cls, n) => `<span class="pk-layer ${cls}" data-pose="${n}"><img src="${POSE[n]}" alt="" style="${fitStyle(n)}"></span>`;
 U.mount(`<style>${STYLE}</style>
-<div class="pk-sky" id="pk-sky" aria-hidden="true"></div>
+<div class="pk-vignette" aria-hidden="true"></div>
 <div class="pk-wrap" id="pk-main">
-  <p class="pk-intro">Poopika ate the question word! Put it back. · プピカが ことばを たべちゃった！もどしてね</p>
+  <p class="pk-intro">What you see and hear changes around Poopika. Don't look too long. · プピカの まわりでは、みえるものも きこえるものも かわるよ。じっと みないでね。</p>
   <div class="pk-hud">
     <span class="pk-pill">Card <b id="pk-num">1</b> / ${TOTAL}</span>
     <span class="pk-pill">Score <b id="pk-score">0</b> / ${TOTAL}</span>
@@ -394,7 +483,10 @@ U.mount(`<style>${STYLE}</style>
       <button type="button" class="pk-play" id="pk-play" aria-label="Listen / きく">▶</button>
       <span class="pk-listen-label" id="pk-listen-label">Listen · きいて</span>
     </div>
-    <img class="pk-poo" id="pk-poo" src="${IMG(POSE.idle)}" alt="Poopika">
+    <div class="pk-who" id="pk-who" role="img" aria-label="Poopika">
+      ${layer('pk-echo a', 'idle')}${layer('pk-echo b', 'idle')}${layer('pk-sil', 'idle')}${layer('pk-real', 'idle')}
+      <div class="pk-bubble" id="pk-bubble" aria-live="polite"></div>
+    </div>
   </div>
   <div class="pk-choices" id="pk-choices" role="group" aria-label="Choices / えらんでね"></div>
   <p class="pk-fb" id="pk-fb" aria-live="polite"></p>
@@ -405,15 +497,17 @@ U.mount(`<style>${STYLE}</style>
 <div class="pk-burst" id="pk-burst" aria-hidden="true"></div>`);
 
 const $ = id => document.getElementById(id);
-const pooEl = $('pk-poo'), signEl = $('pk-sign'), jpEl = $('pk-jp'), qEl = $('pk-q'), playBtn = $('pk-play'), listenLbl = $('pk-listen-label');
+const whoEl = $('pk-who'), bubbleEl = $('pk-bubble'), signEl = $('pk-sign'), jpEl = $('pk-jp'), qEl = $('pk-q'), playBtn = $('pk-play'), listenLbl = $('pk-listen-label');
 const choicesEl = $('pk-choices'), fb = $('pk-fb'), nextBtn = $('pk-next'), numEl = $('pk-num'), scoreEl = $('pk-score'), dotsEl = $('pk-dots'), burstEl = $('pk-burst');
-document.documentElement.classList.add('pk-world');
-document.documentElement.style.setProperty('--pk-hue', { pb: '300deg', br: '250deg', bc: '40deg' }[CFG.curriculum] || '290deg');
+const html = document.documentElement;
+html.classList.add('pk-world');
+html.style.setProperty('--pk-hue', { pb: '300deg', br: '250deg', bc: '40deg' }[CFG.curriculum] || '290deg');
 
 const POP = window.BoohaPop || new Proxy({}, { get: (_, k) => (k === 'color' ? () => '' : k === 'canFlash' ? () => true : () => {}) });
 POP.init({ pill: '#pk-score' });
 const PLAY_HTML = playBtn.innerHTML;
-const CANDY = ['#ff69bd', '#b98cff', '#ffd45e', '#7fd3ff', '#ff9ad5', '#d7b5ff'];
+const CANDY = ['#ff69bd', '#b98cff', '#ffd45e', '#7fd3ff'];
+const rand = rng((Date.now() ^ 0x5eed) >>> 0);
 
 let idx = 0, score = 0, perfectRun = 0, heardAny = false;
 let tries = 0, busy = false, done = false, cardMissed = false;
@@ -427,92 +521,226 @@ function stillMotion() {
 }
 function later(fn, ms) { const my = idx; setTimeout(() => { if (my === idx) fn(); }, ms); }
 
-/* Candy weather (a handful of DOM sweets; none at all for reduced motion
-   beyond a few still shapes). */
-(function sky() {
-  const el = $('pk-sky');
-  const still = stillMotion();
-  const n = still ? 6 : (window.innerWidth < 600 ? 9 : 14);
-  for (let i = 0; i < n; i++) {
-    const s = document.createElement('i');
-    const isQ = i % 3 === 0;
-    if (isQ) s.className = 'q';
-    else {
-      const d = 18 + Math.random() * 46;
-      s.style.width = s.style.height = d + 'px';
-      s.style.background = `radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),${CANDY[i % CANDY.length]} 70%)`;
-    }
-    s.style.left = (Math.random() * 100) + 'vw';
-    s.style.top = still ? (Math.random() * 90) + 'vh' : (100 + Math.random() * 20) + 'vh';
-    s.style.animationDuration = (16 + Math.random() * 18) + 's';
-    s.style.animationDelay = (-Math.random() * 30) + 's';
-    el.appendChild(s);
+/* ── Looking: the clock that makes her less cute ─────────────────────── */
+// Only looking counts: the clock stops while a question is playing, while
+// the card is answered, and while the page is hidden.
+let lookedMs = 0, lookFrom = 0, looking = false, s = 0;
+function lookStart() { if (!looking && !done) { looking = true; lookFrom = performance.now(); } }
+function lookStop() { if (looking) { lookedMs += performance.now() - lookFrom; looking = false; } }
+function lookedNow() { return lookedMs + (looking ? performance.now() - lookFrom : 0); }
+document.addEventListener('visibilitychange', () => { if (document.hidden) { lookStop(); Bed.stop(); } else if (!done && !speaking) { lookStart(); Bed.start(); } });
+
+let nextShape = 0, nextPeek = 0, nextAsk = 0;
+function setPose(cls, n) { whoEl.querySelectorAll(cls).forEach(l => { if (l.dataset.pose === n) return; l.dataset.pose = n; const img = l.querySelector('img'); img.src = POSE[n]; img.setAttribute('style', fitStyle(n)); }); }
+function ask(text, odd) {
+  bubbleEl.textContent = text;
+  bubbleEl.classList.toggle('odd', !!odd);
+  bubbleEl.classList.remove('show'); void bubbleEl.offsetWidth; bubbleEl.classList.add('show');
+  clearTimeout(ask.t); ask.t = setTimeout(() => bubbleEl.classList.remove('show'), 1900);
+}
+function tick() {
+  s = stare(lookedNow(), CFG.curriculum);
+  html.style.setProperty('--pk-s', s.toFixed(3));
+  Bed.mood(s);
+  if (done || stillMotion()) return;
+  const t = performance.now();
+  // Her outline keeps changing, faster the longer you look.
+  if (t > nextShape) {
+    const n = POSE_NAMES[Math.floor(rand() * POSE_NAMES.length)];
+    setPose('.pk-sil', n);
+    setPose('.pk-echo.a', POSE_NAMES[(POSE_NAMES.indexOf(n) + 1) % 3]);
+    setPose('.pk-echo.b', POSE_NAMES[(POSE_NAMES.indexOf(n) + 2) % 3]);
+    nextShape = t + 2600 - 1700 * s + rand() * 600;
   }
+  // Now and then the real her shows through, cute at first, then not.
+  if (t > nextPeek) {
+    setPose('.pk-real', POSE_NAMES[Math.floor(rand() * 3)]);
+    whoEl.classList.toggle('odd', s > 0.55);
+    whoEl.classList.add('peek');
+    setTimeout(() => whoEl.classList.remove('peek'), s > 0.55 ? 220 : 160);
+    nextPeek = t + 3500 + rand() * 3500;
+  }
+  if (t > nextAsk && looking) {
+    ask(cuteLine(s, rand), s >= 0.67);
+    nextAsk = t + 6500 - 3500 * s + rand() * 1500;
+  }
+}
+setInterval(tick, 120);
+
+/* ── Sound: the question, and what is around it ──────────────────────── */
+function ctx() { try { const S = window.BoohaSFX; const c = S && S.context && S.context(); return c && c.state === 'running' ? c : null; } catch (_) { return null; } }
+// Inside a tap the shared context may still be waking up: give it a moment.
+async function liveCtx() {
+  let c = null;
+  try { const S = window.BoohaSFX; c = S && S.context && S.context(); } catch (_) {}
+  if (!c) return null;
+  if (c.state !== 'running') { try { await Promise.race([c.resume(), new Promise(r => setTimeout(r, 400))]); } catch (_) {} }
+  return c.state === 'running' ? c : null;
+}
+
+// A music box that goes sour, and a hum that grows, the longer you look.
+const Bed = (function () {
+  let c = null, out = null, hum = null, timer = 0, step = 0, sour = 0, duck = 1, nextAt = 0;
+  const TUNE = [0, 4, 7, 12, 7, 4, 9, 7, 0, 4, 7, 11, 12, 7, 4, 2];
+  function build() {
+    c = ctx(); if (!c) return false;
+    out = c.createGain(); out.gain.value = 0; out.connect(c.destination);
+    out.gain.setTargetAtTime(0.9, c.currentTime, 0.4);
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380; lp.connect(out);
+    const hg = c.createGain(); hg.gain.value = 0; hg.connect(lp);
+    const o1 = c.createOscillator(), o2 = c.createOscillator();
+    o1.type = 'sawtooth'; o2.type = 'sawtooth'; o1.frequency.value = 110; o2.frequency.value = 111.5;
+    o1.connect(hg); o2.connect(hg); o1.start(); o2.start();
+    hum = { hg, o2 };
+    return true;
+  }
+  function note() {
+    if (!c) return;
+    const t = Math.max(c.currentTime + 0.02, nextAt);
+    const semi = TUNE[step++ % TUNE.length];
+    const cents = (rand() - 0.5) * 2 * (6 + 85 * sour);
+    const f = 1046.5 * Math.pow(2, semi / 12) * Math.pow(2, cents / 1200);
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.045 * duck, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.9);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + 1);
+    nextAt = t + 0.36 + sour * (rand() * 0.25);   // and the rhythm stumbles
+  }
+  return {
+    start() {
+      if (timer || document.hidden) return;
+      if (!c && !build()) return;
+      nextAt = 0;
+      out.gain.setTargetAtTime(0.9, c.currentTime, 0.3);
+      timer = setInterval(() => { if (c.currentTime + 0.15 > nextAt) note(); }, 90);
+    },
+    stop() { clearInterval(timer); timer = 0; if (c && out) out.gain.setTargetAtTime(0, c.currentTime, 0.15); },
+    mood(v) {
+      sour = v;
+      if (!c || !hum) return;
+      hum.hg.gain.setTargetAtTime(0.11 * v * duck, c.currentTime, 0.5);
+      hum.o2.frequency.setTargetAtTime(111.5 + v * 5, c.currentTime, 0.8);
+    },
+    duck(on) { duck = on ? 0.25 : 1; this.mood(sour); },
+    hush() { if (c && hum) hum.hg.gain.setTargetAtTime(0, c.currentTime, 0.05); },
+  };
 })();
 
-/* ── Poopika ──────────────────────────────────────────────────────────── */
-let poseTimer = 0;
-function pose(name, ms) {
-  clearTimeout(poseTimer);
-  pooEl.src = IMG(POSE[name]);
-  pooEl.classList.remove('bounce', 'cringe'); void pooEl.offsetWidth;
-  if (name === 'right') pooEl.classList.add('bounce');
-  if (name === 'wrong') pooEl.classList.add('cringe');
-  if (ms) poseTimer = setTimeout(() => { pooEl.src = IMG(POSE.idle); }, ms);
+// The voice: decoded once per card. A whisper of it lags behind in the
+// other ear, it drifts between ears, and a reversed breath leads in. The
+// stranger the longer you look. A fixed question plays clean.
+const voices = new Map();
+function decode(c, buf) {
+  return new Promise((res, rej) => { const p = c.decodeAudioData(buf, res, rej); if (p && p.then) p.then(res, rej); });
 }
-function worldFlash(cls, ms) {
-  const h = document.documentElement;
-  h.classList.remove('pk-melt', 'pk-snap'); void h.offsetWidth;
-  h.classList.add(cls);
-  setTimeout(() => h.classList.remove(cls), ms);
+async function loadVoice(card) {
+  if (!card || !card.mp3) return null;
+  if (voices.has(card.mp3)) return voices.get(card.mp3);
+  const job = (async () => {
+    const c = await liveCtx(); if (!c) return null;
+    const url = CFG.audioBase + card.mp3;
+    let r = null;
+    try { r = await fetch(url, { mode: 'cors' }); } catch (_) {}
+    // A copy saved before the audio host allowed this cannot be used: reload it.
+    if (!r || !r.ok) { try { r = await fetch(url, { mode: 'cors', cache: 'reload' }); } catch (_) { r = null; } }
+    if (!r || !r.ok) return null;
+    const b = await decode(c, await r.arrayBuffer());
+    const rev = c.createBuffer(b.numberOfChannels, b.length, b.sampleRate);
+    for (let ch = 0; ch < b.numberOfChannels; ch++) { const a = b.getChannelData(ch), z = rev.getChannelData(ch), n = a.length; for (let i = 0; i < n; i++) z[i] = a[n - 1 - i]; }
+    return { b, rev };
+  })().catch(() => null);
+  voices.set(card.mp3, job);
+  const v = await job;
+  if (!v) voices.delete(card.mp3);   // try again next time
+  return v;
 }
 
-/* ── Voice: warped until the question is whole again ─────────────────── */
-let warpTimer = 0;
-function stopWarp() { clearInterval(warpTimer); warpTimer = 0; }
+let speaking = false, stopSpeech = null;
 function stopVoice() {
-  stopWarp();
+  if (stopSpeech) { try { stopSpeech(); } catch (_) {} stopSpeech = null; }
   voiceGate.stop();
+  speaking = false;
+  Bed.duck(false);
   playBtn.classList.remove('playing');
   playBtn.innerHTML = PLAY_HTML; POP.speakerWait(playBtn);
 }
-function play(clean) {
+async function play(clean) {
   const card = rounds[idx] && rounds[idx].card;
   if (!card || !card.mp3) return;
   const myIdx = idx;
   run.pauseClock();   // listening time is not answer time
   U.unlockAudio();
-  stopWarp();
-  const a = new Audio(CFG.audioBase + card.mp3);
-  a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
-  // A warped play bends pitch with speed, like a tape in a hot car.
-  const warp = clean ? null : makeWarp(rng((Date.now() ^ (idx * 9973)) >>> 0));
-  try {
-    a.preservesPitch = !!clean; a.webkitPreservesPitch = !!clean; a.mozPreservesPitch = !!clean;
-    a.playbackRate = warp ? warpRate(0, warp) : 1;
-  } catch (_) {}
-  if (warp) {
-    const t0 = performance.now();
-    warpTimer = setInterval(() => {
-      if (myIdx !== idx || a.paused && a.currentTime > 0) return;
-      try { a.playbackRate = Math.max(0.6, Math.min(1.15, warpRate((performance.now() - t0) / 1000, warp))); } catch (_) {}
-    }, 70);
-  }
+  stopVoice();
+  speaking = true; lookStop(); Bed.duck(true);
   playBtn.classList.add('playing');
   POP.eq(playBtn);
   const spkId = POP.speaker(playBtn);
   const end = () => {
-    stopWarp();
-    if (myIdx !== idx) return;
+    if (myIdx !== idx || !speaking) return;
+    speaking = false; stopSpeech = null;
+    Bed.duck(false);
     playBtn.innerHTML = PLAY_HTML; POP.speakerEnd(playBtn, spkId);
     playBtn.classList.remove('playing', 'is-waiting');
-    if (!heardAny) { heardAny = true; }
+    heardAny = true;
     run.audioDone();
+    if (!done) lookStart();
     if (clean && afterClean) { const f = afterClean; afterClean = null; f(); }
   };
-  if (!voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end })) end();
+  const v = await loadVoice(card);
+  const c = await liveCtx();
+  Bed.start();
+  if (myIdx !== idx || !speaking) return;
+  if (!v || !c) {   // no Web Audio: the plain recording still plays
+    const a = new Audio(CFG.audioBase + card.mp3);
+    a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
+    if (!voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end })) end();
+    return;
+  }
+  stopSpeech = speak(c, v, clean ? 0 : 0.25 + 0.75 * s, end);
+}
+function speak(c, v, weird, onEnd) {
+  const t0 = c.currentTime + (weird ? 0.55 : 0.03);
+  const out = c.createGain(); out.gain.value = 1; out.connect(c.destination);
+  const nodes = [];
+  const src = (buf) => { const n = c.createBufferSource(); n.buffer = buf; nodes.push(n); return n; };
+  const pan = () => (c.createStereoPanner ? c.createStereoPanner() : null);
+  // the voice itself, clear
+  const dry = src(v.b), dp = pan();
+  if (dp) { dry.connect(dp); dp.connect(out); } else dry.connect(out);
+  if (weird) {
+    // it drifts from ear to ear
+    if (dp) { const lfo = c.createOscillator(), d = c.createGain(); lfo.frequency.value = 0.3 + weird * 0.4; d.gain.value = 0.25 + weird * 0.5; lfo.connect(d); d.connect(dp.pan); lfo.start(t0); lfo.stop(t0 + v.b.duration + 0.2); nodes.push(lfo); }
+    // a thin whisper of it, a beat behind, in the other ear
+    const wh = src(v.b), hp = c.createBiquadFilter(), wg = c.createGain(), wp = pan();
+    hp.type = 'highpass'; hp.frequency.value = 1700; wg.gain.value = 0.1 + weird * 0.35;
+    wh.connect(hp); hp.connect(wg);
+    if (wp) { wp.pan.value = dp ? -0.7 : 0; wg.connect(wp); wp.connect(out); } else wg.connect(out);
+    wh.start(t0 + 0.08 + weird * 0.14);
+    // a reversed breath of the start, swelling into the first word
+    const lead = Math.min(0.55, v.rev.duration);
+    const rv = src(v.rev), rg = c.createGain();
+    rg.gain.setValueAtTime(0.0001, t0 - lead); rg.gain.exponentialRampToValueAtTime(0.18 + weird * 0.3, t0 - 0.02); rg.gain.linearRampToValueAtTime(0, t0);
+    rv.connect(rg); rg.connect(out);
+    rv.start(t0 - lead, v.rev.duration - lead, lead);
+  }
+  dry.start(t0);
+  let finished = false;
+  const finish = () => { if (finished) return; finished = true; clearTimeout(safety); onEnd(); };
+  dry.onended = finish;
+  const safety = setTimeout(finish, (v.b.duration + 1.5) * 1000);
+  return () => { finished = true; clearTimeout(safety); nodes.forEach(n => { try { n.stop(); } catch (_) {} }); try { out.disconnect(); } catch (_) {} };
 }
 let afterClean = null;
+
+// Small made sounds: a sour sting for a wrong answer, a bright chime when
+// the world snaps back.
+function sting() {
+  const c = ctx(); if (!c) return;
+  const t = c.currentTime + 0.01, g = c.createGain(), lp = c.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = 900; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0005, t + 0.5);
+  lp.connect(g); g.connect(c.destination);
+  [196, 207.6].forEach(f => { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f / 2.2, t + 0.45); o.connect(lp); o.start(t); o.stop(t + 0.52); });
+}
 
 /* ── Cards ────────────────────────────────────────────────────────────── */
 function renderDots() {
@@ -524,24 +752,28 @@ function renderDots() {
     dotsEl.appendChild(d);
   }
 }
+// The gap shows static, never the answer's length.
+const STATIC = '▒░▓▚▞▙▟▛▜';
+let staticTimer = 0;
 function gapEl() { return qEl.querySelector('.pk-gap'); }
 function renderQuestion() {
   const { round } = rounds[idx];
   qEl.innerHTML = '';
   const gap = document.createElement('span');
-  gap.className = 'pk-gap wob';
-  gap.textContent = '?';
+  gap.className = 'pk-gap';
   gap.setAttribute('aria-label', 'missing words / ぬけた ことば');
   qEl.appendChild(gap);
   qEl.appendChild(document.createTextNode(round.rest));
+  const fill = () => { let t = ''; for (let i = 0; i < 4; i++) t += STATIC[Math.floor(rand() * STATIC.length)]; gap.textContent = t; };
+  fill();
+  clearInterval(staticTimer);
+  if (!stillMotion()) staticTimer = setInterval(() => { if (!done) fill(); }, 110);
 }
 function renderChoices() {
   const { round } = rounds[idx];
   choicesEl.innerHTML = '';
-  const n = round.choices.length;
-  // Phones: two columns for four choices; three in a row for Pre-Boo's three.
-  choicesEl.style.setProperty('--pk-cols', n === 3 ? '3' : '2');
-  const colours = U.shuffle(CANDY.slice(0, 4));
+  choicesEl.style.setProperty('--pk-cols', round.choices.length === 3 ? '3' : '2');
+  const colours = U.shuffle(CANDY.slice());
   round.choices.forEach((text, i) => {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'pk-choice';
@@ -558,18 +790,24 @@ function showCard() {
   afterClean = null;
   const { card } = rounds[idx];
   tries = 0; busy = false; done = false; cardMissed = false;
+  lookedMs = 0; looking = false; nextAsk = performance.now() + 2500;
+  whoEl.classList.remove('cute', 'peek', 'odd', 'lurch');
+  setPose('.pk-sil', 'idle');
   numEl.textContent = idx + 1;
   renderDots();
   jpEl.textContent = (CFG.curriculum === 'pb' ? (card.hira || card.jp) : card.jp) || '';
   renderQuestion();
   renderChoices();
-  pose('idle');
   nextBtn.hidden = true;
   fb.textContent = heardAny ? '' : 'Tap ▶ to listen · ▶ を タップ';
   listenLbl.textContent = 'Listen · きいて';
   playBtn.classList.add('is-waiting');
   run.ready(6000 + 2000 * rounds[idx].round.choices.length, { waitAudio: true });
-  if (heardAny) setTimeout(() => play(false), 380);   // after the first card, each question plays by itself
+  loadVoice(card);   // start decoding now
+  const nextCard = rounds[idx + 1] && rounds[idx + 1].card;
+  if (nextCard) setTimeout(() => loadVoice(nextCard), 1500);
+  if (heardAny) { Bed.start(); setTimeout(() => play(false), 380); }   // after the first card, each question plays by itself
+  else lookStart();
   fitCard();
 }
 // Phones: keep the whole question and every choice on screen.
@@ -585,38 +823,50 @@ function popBurst(text) {
   burstEl.textContent = text;
   burstEl.classList.remove('show'); void burstEl.offsetWidth; burstEl.classList.add('show');
 }
+function snap(cls, ms) {
+  html.classList.remove('pk-lurch', 'pk-snap'); void html.offsetWidth;
+  html.classList.add(cls);
+  setTimeout(() => html.classList.remove(cls), ms);
+}
 
 function pick(btn) {
   if (busy || done || btn.disabled) return;
-  const { round, card } = rounds[idx];
-  const right = btn.dataset.choice === round.answer;
+  const { round } = rounds[idx];
   tries++;
-  if (right) { finishCard(btn, tries === 1 ? 'ok' : 'half'); return; }
-  // Wrong: the forest melts, Poopika hides her face. One more try.
+  if (btn.dataset.choice === round.answer) { finishCard(tries === 1 ? 'ok' : 'half'); return; }
+  // Wrong: the forest lurches, her shape jolts, and she gets less cute.
   btn.classList.add('wrong'); btn.disabled = true;
   POP.wrong(btn);
-  U.playSFX('fart', { volume: 0.7, rate: 0.8 + Math.random() * 0.4 });
-  pose('wrong', 1100);
-  worldFlash('pk-melt', 700);
+  sting();
+  lookedMs += 5000;
+  whoEl.classList.remove('lurch'); void whoEl.offsetWidth; whoEl.classList.add('lurch');
+  setPose('.pk-sil', 'wrong');
+  snap('pk-lurch', 450);
+  ask(cuteLine(Math.max(0.4, s), rand), true);
   if (!cardMissed) { cardMissed = true; run.miss(); perfectRun = 0; }
-  if (tries >= 2) { finishCard(null, 'miss'); return; }
-  fb.textContent = 'Blech! Try again · もう いちど！';
+  if (tries >= 2) { finishCard('miss'); return; }
+  fb.textContent = 'Not that one! Try again · もう いちど！';
   busy = true; setTimeout(() => { busy = false; }, 450);
 }
 
-const YUM = ['PTOO!', 'YUM!', 'POP!', 'SPIT!', 'BLEP!'];
-function finishCard(btn, result) {
+const YES = ['CUTE!', 'YES!', 'POP!', 'THERE!', 'PHEW!'];
+function finishCard(result) {
   done = true;
+  lookStop();
+  clearInterval(staticTimer);
   const { round, card } = rounds[idx];
   dotState[idx] = result;
   const gap = gapEl();
   choicesEl.querySelectorAll('.pk-choice').forEach(b => { b.disabled = true; if (b.dataset.choice === round.answer && result !== 'miss') b.classList.add('right'); });
-  gap.classList.remove('wob');
   gap.textContent = round.answer;
   if (result === 'ok' || result === 'half') {
+    // Everything snaps back: the real, cute her, a clean voice, quiet.
     gap.classList.add('ok');
-    pose('right', 1600);
-    worldFlash('pk-snap', 900);
+    lookedMs = 0; html.style.setProperty('--pk-s', '0'); Bed.mood(0); Bed.hush();
+    setPose('.pk-real', 'right');
+    whoEl.classList.remove('peek', 'odd', 'lurch'); whoEl.classList.add('cute');
+    snap('pk-snap', 900);
+    setTimeout(() => ask('Am I cute? · かわいい？', false), 500);
     U.playSFX('ding');
     if (result === 'ok') {
       const r = run.hit(); score += 1; perfectRun++;
@@ -624,18 +874,17 @@ function finishCard(btn, result) {
       if (!stillMotion()) U.confetti(gap, 18);
       if (perfectRun === TOTAL) { POP.fireworks(signEl, 7, 220); popBurst('PERFECT!!'); }
       else if (perfectRun >= 3 && perfectRun % 3 === 0) { POP.round(perfectRun >= 9 ? 5 : 3, signEl, 5); popBurst(`${perfectRun} IN A ROW!`); }
-      else popBurst(YUM[Math.floor(Math.random() * YUM.length)]);
-      fb.textContent = 'You got it back! · とりもどした！';
+      else popBurst(YES[Math.floor(rand() * YES.length)]);
+      fb.textContent = 'Back to normal! · もとに もどった！';
     } else {
       run.recover(); score += 0.5;
       POP.correct(gap, `pk${idx}`, 1);
       if (!missedItems.includes(card)) missedItems.push(card);
       fb.textContent = 'Got it on the second try · 2かいめで せいかい';
     }
-    // The world is whole again: hear the real question, then move on.
-    listenLbl.textContent = 'Fixed! · なおった！';
+    listenLbl.textContent = 'Clear! · はっきり！';
     let moved = false;
-    const go = () => { if (moved) return; moved = true; later(advance, 350); };
+    const go = () => { if (moved) return; moved = true; later(advance, 450); };
     afterClean = go;
     setTimeout(() => play(true), 450);
     later(go, 7000);   // never stall on a slow or silent clip
@@ -658,7 +907,7 @@ function advance() {
   else showCard();
 }
 
-playBtn.addEventListener('click', () => play(done));
+playBtn.addEventListener('click', () => { Bed.start(); play(done); });
 nextBtn.addEventListener('click', advance);
 document.addEventListener('keydown', e => {
   const n = Number(e.key);
@@ -669,9 +918,12 @@ document.addEventListener('keydown', e => {
 
 function showResults() {
   stopVoice();
+  Bed.stop();
+  done = true; lookStop();
+  html.style.setProperty('--pk-s', '0');
+  whoEl.classList.add('cute');
   const runSum = run.summary();
   const pct = TOTAL ? Math.round((score / TOTAL) * 100) : 0;
-  pose(pct >= 70 ? 'right' : 'idle');
   U.emitGameEnd({
     points: runSum.points, maxCombo: runSum.maxCombo, crown: runSum.fullCombo,
     saveId: SAVE_ID, score: pct, completed: pct >= 40,
@@ -706,10 +958,10 @@ $('pk-replay').addEventListener('click', () => {
   showCard();
 });
 $('pk-back').addEventListener('click', () => {
-  stopVoice();
+  stopVoice(); Bed.stop();
   window.location.assign(CFG.navTarget + '?week=' + encodeURIComponent(CFG.weekParam));
 });
-window.addEventListener('pagehide', () => { document.documentElement.classList.remove('pk-world', 'pk-melt', 'pk-snap'); });
+window.addEventListener('pagehide', () => { Bed.stop(); html.classList.remove('pk-world', 'pk-lurch', 'pk-snap'); });
 
 if (!TOTAL) {
   fb.textContent = 'No questions to play this week. · こんしゅうは あそべる しつもんが ないよ';

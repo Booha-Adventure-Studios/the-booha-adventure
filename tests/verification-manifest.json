@@ -298,7 +298,7 @@
     {
       "path": "tests/poopika.test.cjs",
       "status": "verify",
-      "reason": "Don't Talk to Poopika extra game: what Poopika eats at each level, every wrong choice really wrong on every questions.json, week order, audio warp range, game rules, and wiring (registry after Vowel Pop, game-core, menu, profile icon, pace zone)."
+      "reason": "Don't Talk to Poopika extra game: what goes missing at each level, every wrong choice really wrong on every questions.json, week order, looking clock, her lines, pose fitting, game rules, and wiring (registry after Vowel Pop, game-core, menu, profile icon, pace zone)."
     },
     {
       "path": "tests/closet-shared-records.test.cjs",

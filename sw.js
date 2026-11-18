@@ -196,7 +196,8 @@ const CURRENT_CACHES = {
   // Vowel Pop (extra game): menu row, profile pairs.
   // Vowel Pop phone fit: profile boss card no longer overflows a phone.
   // Don't Talk to Poopika (extra game): menu line, profile icon.
-  pages:  'booha-pages-2026-558',
+  // Poopika rework: menu line "Don't look too long!".
+  pages:  'booha-pages-2026-559',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -405,7 +406,8 @@ const CURRENT_CACHES = {
   // Vowel Pop: games/vowel-pop.js, registry, game-core, menu/profile CSS.
   // Vowel Pop phone fit: choices on the pad, card scrolls into view; profile.css.
   // Don't Talk to Poopika: games/poopika.js, registry, game-core, pace zone.
-  assets: 'booha-assets-2026-632',
+  // Poopika rework: looking clock, shifting silhouette, voice effects (CORS), sized poses.
+  assets: 'booha-assets-2026-633',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

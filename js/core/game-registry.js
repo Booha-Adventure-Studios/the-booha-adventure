@@ -209,7 +209,7 @@ const BoohaGameRegistry = (() => {
       name:           "Don't Talk to Poopika",
       file:           'games/poopika.js',
       category:       'questions',
-      hira:           'ことばを とりもどせ！',
+      hira:           'じっと みないでね！',
       scoreMax:       100,
       starThresholds: [40, 70, 90],
     },

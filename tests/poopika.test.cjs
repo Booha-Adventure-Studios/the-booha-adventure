@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 
-// Don't Talk to Poopika (extra game): what Poopika eats at each level, that
+// Don't Talk to Poopika (extra game): what goes missing at each level, that
 // every wrong choice is really wrong (never a second right question), the
-// order of the week, the audio warp range, the game rules in the source,
-// and wiring. Runs over every questions.json in content/.
+// order of the week, the looking clock, her lines, pose fitting, the game
+// rules in the source, and wiring. Runs over every questions.json in content/.
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -25,7 +25,7 @@ setTimeout(() => {
   const round = (en, curr) => L.buildRound({ en, n: 1 }, curr, 5);
   const wrongOf = r => JSON.parse(JSON.stringify(r.choices.filter(c => c !== r.answer)));   // plain arrays (the game runs in its own context)
 
-  // ── What Poopika eats ──────────────────────────────────────────────────
+  // ── What goes missing ──────────────────────────────────────────────────
   let r = round('Where is the rug?', 'pb');
   assert.strictEqual(r.answer, 'Where'); assert.strictEqual(r.rest, 'is the rug?');
   assert.strictEqual(round('Who cooks in the kitchen?', 'pb').answer, 'Who');
@@ -113,29 +113,42 @@ setTimeout(() => {
   assert.ok(stats.bc.ok / stats.bc.total >= 0.97, 'Boo-Continuum: 97%+ play');
   for (const c of ['pb', 'br', 'bc']) assert.ok(stats[c].worstWeek >= 10, `${c}: every week has 10+ questions`);
 
-  // ── Warp: odd but followable ───────────────────────────────────────────
-  let lo = 9, hi = 0;
-  for (let s = 1; s < 400; s++) {
-    const w = L.makeWarp(L.rng(s));
-    let a = 9, b = 0;
-    for (let t = 0; t < 5; t += 0.02) { const v = L.warpRate(t, w); a = Math.min(a, v); b = Math.max(b, v); }
-    assert.ok(b - a > 0.05, 'it really wobbles');
-    lo = Math.min(lo, a); hi = Math.max(hi, b);
-  }
-  assert.ok(lo >= 0.7 && hi <= 1.12, `warp stays between 0.7× and 1.12× (got ${lo.toFixed(2)}–${hi.toFixed(2)})`);
+  // ── Looking, asking, and the poses ─────────────────────────────────────
+  assert.strictEqual(L.stare(0, 'pb'), 0); assert.strictEqual(L.stare(60000, 'bc'), 1);
+  assert.ok(L.stare(10000, 'pb') < L.stare(10000, 'bc'), 'Pre-Boo gets longer before she turns');
+  const R = L.rng(9);
+  for (let i = 0; i < 60; i++) assert.ok(L.CUTE_LINES[0].includes(L.cuteLine(0.1, R)), 'cute at first');
+  for (let i = 0; i < 60; i++) assert.ok(L.CUTE_LINES[2].includes(L.cuteLine(0.9, R)), 'stranger later');
+  for (const line of [].concat(...L.CUTE_LINES)) assert.match(line, /^[A-Za-z?.,' ]+(\s·\s[ぁ-んァ-ヶー、。？！ ]+)?$/, `short, kind lines: ${line}`);
+  // A pose drawn small in its frame is scaled up, centred and stood on the same feet.
+  const S = 20, a = new Uint8Array(S * S); for (let y = 6; y < 16; y++) for (let x = 8; x < 14; x++) a[y * S + x] = 255;
+  const small = L.alphaBox(a, S, S); assert.deepStrictEqual(JSON.parse(JSON.stringify(small)), { x0: 0.4, y0: 0.3, x1: 0.7, y1: 0.8 });
+  const ref = { x0: 0.14, y0: 0.016, x1: 0.78, y1: 0.965 };
+  const f = L.fitPose(small, ref);
+  assert.ok(Math.abs(f.k - (ref.y1 - ref.y0) / 0.5) < 1e-9, 'same height as the reference');
+  assert.ok(Math.abs((f.oy + f.dy) - ref.y1 * 100) < 1e-9, 'feet on the same line');
+  assert.ok(Math.abs((f.ox + f.dx) - (ref.x0 + ref.x1) * 50) < 1e-9, 'same centre');
+  assert.strictEqual(L.alphaBox(new Uint8Array(4), 2, 2), null, 'an empty picture has no box');
 
   // ── Game rules in the source ───────────────────────────────────────────
   assert.match(SRC, /const SAVE_ID = `\$\{CFG\.curriculum\}-extra:poopika`;/, 'saves under the extra id');
   assert.ok(SRC.indexOf('run.summary()') < SRC.lastIndexOf('U.emitGameEnd('), 'summary before emitGameEnd');
   assert.match(SRC, /run\.pauseClock\(\)/, 'a replay pauses the pace clock');
   assert.match(SRC, /const POP = window\.BoohaPop \|\| new Proxy/, 'plays on without game-pop.js');
-  assert.match(SRC, /a\.preservesPitch = !!clean/, 'warped plays bend pitch; the clean play does not');
+  assert.match(SRC, /speak\(c, v, clean \? 0 : 0\.25 \+ 0\.75 \* s, end\)/, 'a fixed question plays clean; strangeness follows looking time');
   assert.match(SRC, /setTimeout\(\(\) => play\(true\), 450\)/, 'a fixed question plays once more, clean');
   assert.match(SRC, /later\(go, 7000\)/, 'never stalls on a slow clip');
-  assert.match(SRC, /if \(tries >= 2\) \{ finishCard\(null, 'miss'\)/, 'one more try, then the answer');
-  assert.match(SRC, /prefers-reduced-motion:reduce\)\{html\.pk-world\.pk-melt body::before/, 'reduced motion: no stretching');
+  assert.match(SRC, /if \(tries >= 2\) \{ finishCard\('miss'\)/, 'one more try, then the answer');
+  assert.match(SRC, /speaking = true; lookStop\(\)/, 'listening is not looking');
+  assert.match(SRC, /fetch\(url, \{ mode: 'cors', cache: 'reload' \}\)/, 'a copy saved before CORS is reloaded');
+  assert.match(SRC, /if \(!v \|\| !c\) \{   \/\/ no Web Audio: the plain recording still plays/, 'falls back to the plain recording');
+  assert.match(SRC, /prefers-reduced-motion:reduce\)\{html\.pk-world body::before,html\.pk-world\.pk-lurch body::before\{animation:none !important;transform:none !important\}\}/, 'reduced motion: no breathing or lurching');
+  assert.match(SRC, /if \(!stillMotion\(\)\) staticTimer = setInterval/, 'reduced motion: still static');
   assert.match(SRC, /\.pk-sign\{[^}]*background:#fffaf6;color:var\(--pk-ink\)/, 'the question card stays plain and readable');
-  assert.doesNotMatch(SRC, /\bfetch\(|XMLHttpRequest/, 'audio plays through the shared gate, no direct fetches');
+  assert.doesNotMatch(SRC, /class="pk-sky"|\.q::before\{content:'\?'\}/, 'no floating question marks');
+  assert.doesNotMatch(SRC, /ate the question|ate the word|たべちゃった/i, 'she does not eat words any more');
+  assert.match(SRC, /What you see and hear changes around Poopika/);
+  assert.ok((SRC.match(/fetch\(/g) || []).length === 2 && /const url = CFG\.audioBase \+ card\.mp3;/.test(SRC), 'the only fetches are the question audio');
   for (const n of [1, 2, 3]) assert.ok(fs.existsSync(path.join(ROOT, `assets/img/wanderers/poopika-${n}.webp`)), `poopika-${n}.webp`);
 
   // ── Wiring ─────────────────────────────────────────────────────────────
@@ -145,10 +158,10 @@ setTimeout(() => {
   const core = read('js/game-core.js');
   assert.match(core, /'poopika':\s+'questions'/);
   assert.match(core, /'poopika':\s+\['extra',\s+"Don't Talk to Poopika"\]/);
-  assert.match(read('js/menu-core.js'), /'poopika': 'Poopika ate the question!'/);
+  assert.match(read('js/menu-core.js'), /'poopika': "Don't look too long!"/);
   assert.match(read('js/ui/profile-game.js'), /'poopika': '<svg/, 'profile icon');
   assert.match(read('js/game-utils.js'), /poopika: 1\.5/, 'rainbow-star pace zone');
 
   const s = c => `${stats[c].ok}/${stats[c].total}`;
-  console.log(`Poopika passed: eats by level, every wrong choice really wrong, plays pb ${s('pb')} br ${s('br')} bc ${s('bc')}, no avoidable back-to-back answers, warp ${lo.toFixed(2)}–${hi.toFixed(2)}×, rules and wiring.`);
+  console.log(`Poopika passed: missing words by level, every wrong choice really wrong, plays pb ${s('pb')} br ${s('br')} bc ${s('bc')}, no avoidable back-to-back answers, looking clock, lines, pose fitting, rules and wiring.`);
 }, 0);

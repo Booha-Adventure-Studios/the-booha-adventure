@@ -32,7 +32,7 @@
     'sentence-tap': 'Tap the pairs!', 'sentence-order': 'Line them up!', 'sentence-speed': 'Zoom!',
     'say-word': 'Listen closely!', 'say-sentence': 'Ears ready?', 'ask-question': 'Listen and choose!',
     'booha-bites': 'I ate a word! Find it!', 'echo': 'Listen, then type it!', 'week-boss': 'Beat the boss for the week crown!',
-    'vowel-pop': 'Draw the missing vowel!', 'poopika': 'Poopika ate the question!',
+    'vowel-pop': 'Draw the missing vowel!', 'poopika': "Don't look too long!",
   };
   var MONTHS = { jan: 'January', feb: 'February', mar: 'March', apr: 'April', may: 'May', jun: 'June',
     jul: 'July', aug: 'August', sep: 'September', oct: 'October', nov: 'November', dec: 'December' };
