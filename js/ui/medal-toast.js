@@ -183,7 +183,7 @@
 
   function findAsset(item) {
     var src = item && item.asset;
-    if (!src) return profileArt('portal-adventure.webp');
+    if (!src) return ROOT + 'assets/img/oddities/ambrose-book-glasses.webp';   // Ambrose keeps the oddities
     return /^(https?:|\/)/.test(src) ? src : ROOT + src;
   }
 

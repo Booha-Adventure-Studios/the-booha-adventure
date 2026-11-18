@@ -438,8 +438,9 @@ const HAPPY_HOUSE_PORTAL = {
   /* oddity-placement:end */
   let oddityFinds = [];
   let oddityClueEl = null;
-  let oddityPickupEl = null;
-  let oddityPickupTimer = 0;
+  let oddityRevealOverlay = null;
+  // Ambrose looks after the oddities: he is their icon and their keeper.
+  const AMBROSE_ART = 'assets/img/oddities/ambrose-book-glasses.webp';
 
   function oddityHash(value) {
     let hash = 2166136261;
@@ -571,7 +572,7 @@ const HAPPY_HOUSE_PORTAL = {
       document.body.appendChild(oddityPopOverlay);
     }
     wpopThemeBox('oddity-pop', ODDITY_THEME);
-    wpopSetIconOrb('oddity-pop', 'radial-gradient(circle at 50% 45%,#fff6bd 0%,#ffe270 18%,rgba(60,30,90,.9) 55%,#050307 100%)', '0 0 26px rgba(255,226,112,.55)');
+    wpopSetIconImage('oddity-pop', AMBROSE_ART, 'Ambrose', 'image-ambrose');
     wpopSetLock('oddity-pop', false);
     const count = oddityFinds.filter(find => !find.collected).length;
     wpopSetText(document.getElementById('oddity-pop-eyebrow-en'), 'SOMETHING STRANGE');
@@ -602,25 +603,54 @@ const HAPPY_HOUSE_PORTAL = {
     openOddityPopup();
   }
 
-  function showOddityPickup(item, duplicate) {
-    if (!oddityPickupEl) return;
-    // The pickup is the reveal: the earn toast never named the item.
+  /* The pickup is the reveal (the earn toast never named the item): the
+     oddity itself, big and glowing, its name, and its discovery line, in a
+     popup that waits to be closed. Ambrose files it in the cabinet. */
+  function closeOddityReveal() {
+    if (oddityRevealOverlay) closeWpopOverlay(oddityRevealOverlay, 400);
+  }
+  function showOddityPickup(item, duplicate, copies) {
     const line = item.discovery || `You found ${item.name}.`;
     const lineJp = item.discoveryJp || '';
-    oddityPickupEl.textContent = '';
-    const en = document.createElement('span');
-    en.className = 'oddity-pickup-en';
-    en.textContent = duplicate ? `${line} Another one!` : line;
-    oddityPickupEl.appendChild(en);
-    if (lineJp || duplicate) {
-      const jp = document.createElement('span');
-      jp.className = 'oddity-pickup-jp';
-      jp.textContent = duplicate ? `${lineJp} もう ひとつ！`.trim() : lineJp;
-      oddityPickupEl.appendChild(jp);
+    const special = item.pool === 'special';
+    if (!oddityRevealOverlay) {
+      oddityRevealOverlay = document.createElement('div');
+      oddityRevealOverlay.id = 'oddity-reveal-overlay';
+      oddityRevealOverlay.className = 'wpop-overlay';
+      oddityRevealOverlay.innerHTML = wpopMarkup('oddity-reveal');
+      const actions = oddityRevealOverlay.querySelector('#oddity-reveal-actions');
+      actions.insertAdjacentHTML('beforebegin', `<div class="oddity-reveal-note"><img src="${AMBROSE_ART}" alt="Ambrose" width="40" height="60"><span id="oddity-reveal-note-en"></span><span id="oddity-reveal-note-jp" class="oddity-pickup-jp"></span></div>`);
+      document.body.appendChild(oddityRevealOverlay);
+      oddityRevealOverlay.addEventListener('click', event => { if (event.target === oddityRevealOverlay) closeOddityReveal(); });
     }
-    oddityPickupEl.classList.add('show');
-    window.clearTimeout(oddityPickupTimer);
-    oddityPickupTimer = window.setTimeout(() => oddityPickupEl.classList.remove('show'), 6500);
+    wpopThemeBox('oddity-reveal', special
+      ? Object.assign({}, ODDITY_THEME, { accent2: '#ff7ad9', border: 'rgba(255,226,112,.6)' })
+      : ODDITY_THEME);
+    wpopSetIconImage('oddity-reveal', item.asset, item.name, 'image-oddity');
+    const wrap = document.getElementById('oddity-reveal-icon-wrap');
+    if (wrap) { wrap.classList.remove('arrive'); void wrap.offsetWidth; wrap.classList.add('arrive'); wrap.classList.toggle('special', special); }
+    wpopSetLock('oddity-reveal', false);
+    wpopSetText(document.getElementById('oddity-reveal-eyebrow-en'), duplicate ? 'ANOTHER ONE!' : (special ? 'SPECIAL ODDITY FOUND' : 'ODDITY FOUND'));
+    wpopSetText(document.getElementById('oddity-reveal-eyebrow-jp'), duplicate ? 'もう ひとつ！' : (special ? 'とくべつな ふしぎな もの！' : 'ふしぎな もの みつけた！'));
+    wpopSetText(document.getElementById('oddity-reveal-title-en'), item.name);
+    wpopSetText(document.getElementById('oddity-reveal-title-jp'), item.nameJp || '');
+    const bodyEn = document.getElementById('oddity-reveal-body-en');
+    const bodyJp = document.getElementById('oddity-reveal-body-jp');
+    bodyEn.style.color = '#f3e9c6';
+    bodyJp.classList.add('oddity-pickup-jp');
+    wpopSetText(bodyEn, duplicate ? `${line} Another one!` : line);
+    wpopSetText(bodyJp, duplicate ? `${lineJp} もう ひとつ！`.trim() : lineJp);
+    const n = Math.max(2, Number(copies) || 2);
+    wpopSetText(document.getElementById('oddity-reveal-note-en'), duplicate ? `Ambrose adds it to your cabinet: ×${n}.` : 'Ambrose puts it in your Oddities Cabinet.');
+    wpopSetText(document.getElementById('oddity-reveal-note-jp'), duplicate ? `キャビネットに ついか。これで ×${n}。` : 'ふしぎな もの キャビネットに はいったよ。');
+    wpopSetActions('oddity-reveal', [
+      { en: 'See my cabinet', jp: 'キャビネットを みる', border: '1px solid rgba(255,226,112,.45)', color: '#ffe270',
+        onClick: () => { window.location.href = 'adventure-profile.html#adv-collectibles'; } },
+      { en: 'Keep exploring', jp: 'たんけんを つづける', border: '1px solid rgba(243,233,198,.25)', color: '#f3e9c6', onClick: closeOddityReveal },
+    ]);
+    const closeX = document.getElementById('oddity-reveal-close');
+    if (closeX) closeX.onclick = closeOddityReveal;
+    openWpopOverlay(oddityRevealOverlay, 'rgba(0,0,0,.84)');
   }
 
   function drawOddities(now) {
@@ -671,7 +701,7 @@ const HAPPY_HOUSE_PORTAL = {
       if (!result || result.saveFailed) return true;
       find.collected = true;
       playCollectChime();
-      showOddityPickup(find.item, !!result.duplicate);
+      showOddityPickup(find.item, !!result.duplicate, result.copies);
       renderOddityClue();
       return true;
     }
@@ -5054,11 +5084,26 @@ const HAPPY_HOUSE_PORTAL = {
       #oddity-clue[hidden]{display:none;}
       #oddity-clue .oddity-clue-en,#oddity-clue .oddity-clue-jp{display:block;}
       #oddity-clue .oddity-clue-jp{margin-top:2px;color:rgba(255,244,194,.68);font-size:.9em;font-weight:400;}
-      #oddity-pickup{position:fixed;left:50%;top:76px;transform:translate(-50%,-8px);z-index:7100;max-width:min(440px,calc(100vw - 28px));padding:10px 16px;border:1px solid rgba(255,226,112,.55);border-radius:14px;background:rgba(30,15,2,.94);box-shadow:0 0 24px rgba(255,196,50,.24);color:#fff8d3;font:700 13px/1.3 Georgia,serif;text-align:center;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;}
-      #oddity-pickup.show{opacity:1;transform:translate(-50%,0);}
-      #oddity-pickup .oddity-pickup-en,#oddity-pickup .oddity-pickup-jp{display:block;}
-      #oddity-pickup .oddity-pickup-jp{margin-top:4px;color:rgba(255,248,211,.74);font:500 .92em/1.45 sans-serif;}
-      @media(max-width:700px){#oddity-clue{left:9px;top:72px;max-width:calc(100vw - 18px);}#oddity-pickup{top:68px;font-size:12px;}}
+      .wpop-icon-wrap.image-mode.image-ambrose{width:clamp(76px,16vw,96px);height:clamp(114px,24vw,144px);}
+      .wpop-icon-wrap.image-mode.image-ambrose img{filter:drop-shadow(0 0 10px rgba(255,226,112,.35));}
+      .wpop-icon-wrap.image-mode.image-oddity{width:clamp(170px,46vw,230px);height:clamp(150px,40vw,200px);margin-bottom:18px;animation:none;}
+      .wpop-icon-wrap.image-mode.image-oddity::before{inset:-10%;opacity:.3;}
+      .wpop-icon-wrap.image-mode.image-oddity::after{content:"";position:absolute;left:50%;top:50%;width:150%;aspect-ratio:1;transform:translate(-50%,-50%);z-index:0;border-radius:50%;pointer-events:none;
+        background:repeating-conic-gradient(from 0deg,rgba(255,226,112,.22) 0deg 7deg,transparent 7deg 22deg);-webkit-mask:radial-gradient(circle,#000 28%,transparent 68%);mask:radial-gradient(circle,#000 28%,transparent 68%);animation:oddityRays 14s linear infinite;}
+      .wpop-icon-wrap.image-mode.image-oddity.special::after{background:repeating-conic-gradient(from 0deg,rgba(255,226,112,.26) 0deg 6deg,rgba(255,122,217,.18) 6deg 12deg,transparent 12deg 22deg);}
+      .wpop-icon-wrap.image-mode.image-oddity img{filter:drop-shadow(0 0 10px rgba(255,226,112,.55)) drop-shadow(0 10px 24px rgba(0,0,0,.7));}
+      .wpop-icon-wrap.image-oddity.arrive img{animation:oddityArrive .8s cubic-bezier(.2,1.5,.4,1) both;}
+      @keyframes oddityArrive{0%{transform:scale(.15) rotate(-24deg);opacity:0;filter:blur(6px) brightness(3);}55%{transform:scale(1.14) rotate(5deg);opacity:1;filter:blur(0) brightness(1.5);}100%{transform:none;}}
+      @keyframes oddityRays{to{transform:translate(-50%,-50%) rotate(360deg);}}
+      #oddity-reveal-box .wpop-title-en{font-size:clamp(1.15rem,4.4vw,1.45rem);line-height:1.3;margin-top:4px;}
+      #oddity-pop-box .wpop-eyebrow-jp,#oddity-reveal-box .wpop-eyebrow-jp{color:rgba(255,226,112,.72);opacity:1;}
+      #oddity-reveal-box .wpop-title-jp{color:rgba(243,233,198,.82);opacity:1;font-family:sans-serif;font-size:.95rem;}
+      #oddity-reveal-box .oddity-pickup-jp{color:rgba(243,233,198,.72);font-family:sans-serif;font-size:.9em;line-height:1.6;}
+      .oddity-reveal-note{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;text-align:left;margin:16px auto 4px;padding:8px 12px;max-width:340px;border-radius:12px;background:rgba(255,226,112,.07);border:1px solid rgba(255,226,112,.18);color:#ffe9a8;font-size:.86rem;line-height:1.35;}
+      .oddity-reveal-note img{grid-row:span 2;width:34px;height:auto;}
+      .oddity-reveal-note .oddity-pickup-jp{font-size:.8rem;}
+      @media(prefers-reduced-motion:reduce){.wpop-icon-wrap.image-oddity::after,.wpop-icon-wrap.image-oddity.arrive img{animation:none;}}
+      @media(max-width:700px){#oddity-clue{left:9px;top:72px;max-width:calc(100vw - 18px);}}
       /* ── Shared "world popup" component ───────────────
          One shell used by every destination confirm dialog
          (locked games, Happy House, Utsuroba, profile). Themed
@@ -5304,11 +5349,7 @@ const HAPPY_HOUSE_PORTAL = {
     oddityClueEl = document.createElement('div');
     oddityClueEl.id = 'oddity-clue';
     oddityClueEl.hidden = true;
-    oddityPickupEl = document.createElement('div');
-    oddityPickupEl.id = 'oddity-pickup';
-    oddityPickupEl.setAttribute('role', 'status');
     document.body.appendChild(oddityClueEl);
-    document.body.appendChild(oddityPickupEl);
     document.body.appendChild(portalOverlay);
     injectBonusPopOverlay(); injectWandererPopOverlay(); injectUtsuobaPopOverlay(); injectMuenbaPopOverlay(); injectOrbPanel(); injectObserverPop(); injectHappyHousePop();
     

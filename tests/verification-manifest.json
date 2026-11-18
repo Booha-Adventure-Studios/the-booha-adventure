@@ -296,6 +296,11 @@
       "reason": "Vowel Pop extra game: blank ladder (pb/br/bc) on every vocab card, the on-device letter reader on varied drawn vowels and non-vowels, scoring, and wiring (registry after the Week Boss, game-core, menu row, profile pairs)."
     },
     {
+      "path": "tests/oddities-moment.test.cjs",
+      "status": "verify",
+      "reason": "Oddities feel like a find: Ambrose on the Karasuki clue, the earn notice and the cabinet; picking one up opens a reveal popup (not a timed toast); every cabinet oddity opens big with all its text; arriving from Karasuki scrolls to the newest find."
+    },
+    {
       "path": "tests/poopika.test.cjs",
       "status": "verify",
       "reason": "Don't Talk to Poopika extra game: what goes missing at each level, every wrong choice really wrong on every questions.json, week order, looking clock, her lines, pose fitting, game rules, and wiring (registry after Vowel Pop, game-core, menu, profile icon, pace zone)."

@@ -265,11 +265,12 @@ const BoohaAdventureGame = (() => {
     if (!host) return;
     const system = window.BoohaCollectibleSystem;
     const owned = (system && system.getAll ? system.getAll() : []).filter(item => item.found);
+    const newest = owned.reduce((best, item) => (!best || (item.foundAt || 0) > (best.foundAt || 0) ? item : best), null);
     const card = item => {
       const special = item.pool === 'special';
       const copies = Number(item.copies) > 1 ? `<span class="collectible-copies">×${Number(item.copies)}</span>` : '';
-      return `<article class="collectible-card found${special ? ' special' : ''}">
-        <div class="collectible-art"><img src="${esc(item.asset)}" alt="${esc(item.name)}" width="160" height="112" loading="lazy" decoding="async">${copies}</div>
+      return `<article class="collectible-card found${special ? ' special' : ''}${newest && item.id === newest.id ? ' newest' : ''}" data-oddity-card="${esc(item.id)}">
+        <button type="button" class="collectible-art" data-oddity="${esc(item.id)}" aria-label="Look closer · よく みる: ${esc(item.name)}"><img src="${esc(item.asset)}" alt="${esc(item.name)}" width="160" height="112" loading="lazy" decoding="async">${copies}<span class="collectible-zoom" aria-hidden="true">⤢</span></button>
         ${special ? '<span class="collectible-badge special">SPECIAL</span>' : ''}
         <b class="collectible-name">${esc(item.name)}</b>
         ${item.nameJp ? `<span class="collectible-name-jp">${esc(item.nameJp)}</span>` : ''}
@@ -287,13 +288,74 @@ const BoohaAdventureGame = (() => {
     ].join('');
     host.innerHTML = `
       <div class="adv-head">
-        <div><h2 id="oddities-title">ふしぎな もの</h2><span class="adv-kicker cyan">ODDITIES CABINET · Forgotten Things</span></div>
+        <div class="collectible-head"><img class="collectible-keeper" src="assets/img/oddities/ambrose-book-glasses.webp" alt="Ambrose" width="40" height="60"><div><h2 id="oddities-title">ふしぎな もの</h2><span class="adv-kicker cyan">ODDITIES CABINET · Forgotten Things</span></div></div>
         <b class="adv-head-num cyan">${owned.length}</b>
       </div>
       ${owned.length
         ? `<p class="collectible-note">${owned.length} found · ${owned.length}こ みつけた</p>${shelves}`
         : '<p class="adv-note">The cabinet is waiting for its first strange thing. · まだ なにも ないよ。からすきで ふしぎな ものを さがそう。</p>'}`;
+    // Arriving from a Karasuki find: go to the cabinet and light up the newest.
+    const hash = typeof location !== 'undefined' ? location.hash : '';
+    if (hash === '#adv-collectibles' && !renderCollectibles.arrived && newest) {
+      renderCollectibles.arrived = true;
+      setTimeout(() => {
+        const el = Array.from(host.querySelectorAll('[data-oddity-card]')).find(c => c.dataset.oddityCard === newest.id) || host;
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        if (el.classList) el.classList.add('arrived');
+      }, 350);
+    }
   }
+
+  /* Look closer: an oddity opens big, with everything about it, so it can be
+     admired and read. Tap the picture in the cabinet; close with ✕, the
+     backdrop or Escape. */
+  let lookEl = null, lookReturn = null;
+  function closeOddityLook() {
+    if (!lookEl || lookEl.hidden) return;
+    lookEl.classList.remove('open');
+    setTimeout(() => { lookEl.hidden = true; }, 220);
+    document.documentElement.classList.remove('oddity-look-on');
+    if (lookReturn && lookReturn.focus) lookReturn.focus({ preventScroll: true });
+  }
+  function openOddityLook(id, from) {
+    const system = window.BoohaCollectibleSystem;
+    const item = (system && system.getAll ? system.getAll() : []).find(x => x.id === id && x.found);
+    if (!item) return;
+    if (!lookEl) {
+      lookEl = document.createElement('div');
+      lookEl.className = 'oddity-look';
+      lookEl.hidden = true;
+      lookEl.setAttribute('role', 'dialog');
+      lookEl.setAttribute('aria-modal', 'true');
+      lookEl.setAttribute('aria-labelledby', 'oddity-look-name');
+      document.body.appendChild(lookEl);
+      lookEl.addEventListener('click', event => { if (event.target === lookEl || event.target.closest('[data-look-close]')) closeOddityLook(); });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape') closeOddityLook(); });
+    }
+    const special = item.pool === 'special';
+    const copies = Number(item.copies) > 1 ? `<span class="oddity-look-copies">×${Number(item.copies)}</span>` : '';
+    lookEl.innerHTML = `
+      <article class="oddity-look-card${special ? ' special' : ''}">
+        <button type="button" class="oddity-look-close" data-look-close aria-label="Close / とじる">✕</button>
+        <div class="oddity-look-art"><img src="${esc(item.asset)}" alt="${esc(item.name)}">${copies}</div>
+        ${special ? '<span class="collectible-badge special">SPECIAL · とくべつ</span>' : ''}
+        <h3 id="oddity-look-name">${esc(item.name)}</h3>
+        ${item.nameJp ? `<p class="oddity-look-jp-name">${esc(item.nameJp)}</p>` : ''}
+        <p class="oddity-look-material">${esc(item.material)}${item.materialJp ? ` · ${esc(item.materialJp)}` : ''}</p>
+        <p class="oddity-look-copy">${esc(item.collection)}</p>
+        ${item.collectionJp ? `<p class="oddity-look-copy jp">${esc(item.collectionJp)}</p>` : ''}
+        ${item.storyHook ? `<details class="collectible-secret oddity-look-secret"><summary>✦ ひみつ · A secret</summary><p>${esc(item.storyHook)}</p>${item.storyHookJp ? `<p class="jp">${esc(item.storyHookJp)}</p>` : ''}</details>` : ''}
+        <button type="button" class="oddity-look-done" data-look-close>Close · とじる</button>
+      </article>`;
+    lookReturn = from || null;
+    lookEl.hidden = false;
+    document.documentElement.classList.add('oddity-look-on');
+    requestAnimationFrame(() => { lookEl.classList.add('open'); const c = lookEl.querySelector('.oddity-look-close'); if (c) c.focus({ preventScroll: true }); });
+  }
+  if (typeof document !== 'undefined' && document.addEventListener) document.addEventListener('click', event => {
+    const b = event.target.closest && event.target.closest('[data-oddity]');
+    if (b) openOddityLook(b.dataset.oddity, b);
+  });
 
   function render() {
     renderTitle();

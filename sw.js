@@ -197,7 +197,8 @@ const CURRENT_CACHES = {
   // Vowel Pop phone fit: profile boss card no longer overflows a phone.
   // Don't Talk to Poopika (extra game): menu line, profile icon.
   // Poopika rework: menu line "Don't look too long!".
-  pages:  'booha-pages-2026-559',
+  // Oddities: close-up view and Ambrose in the profile cabinet.
+  pages:  'booha-pages-2026-560',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -408,7 +409,8 @@ const CURRENT_CACHES = {
   // Don't Talk to Poopika: games/poopika.js, registry, game-core, pace zone.
   // Poopika rework: looking clock, shifting silhouette, voice effects (CORS), sized poses.
   // Poopika: choices wait for the question, then glitch and swap places; intro on two lines.
-  assets: 'booha-assets-2026-634',
+  // Oddities: Ambrose, a reveal popup on pickup in Karasuki, readable Japanese on the clue.
+  assets: 'booha-assets-2026-635',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
