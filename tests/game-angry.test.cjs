@@ -44,27 +44,33 @@ function load({ game = 'say-word', store = {}, clock = { t: 1000 } } = {}) {
   const pagehide = () => (listeners['win:pagehide'] || []).forEach(fn => fn());
   return { A: win.BoohaAngry, U: win.GAME_UTILS, clock, store, tap, pagehide };
 }
-const button = { closest: sel => (/button/.test(sel) ? {} : null) };
-const key = { closest: sel => (/\.bk-key/.test(sel) ? {} : /button/.test(sel) ? {} : null) };
+// Any tap on the game counts (cards, locked buttons, empty space)…
+const button = { closest: () => null };
+// …except Booha's keyboard, drawing pads, text boxes and the close button.
+const key = { closest: sel => (/\.bk-key/.test(sel) ? {} : null) };
+const pad = { closest: sel => (/canvas/.test(sel) ? {} : null) };
+const closeX = { closest: sel => (/#gameClose/.test(sel) ? {} : null) };
 
 // ── Mashing ───────────────────────────────────────────────────────────────
 {
   const t = load();
-  for (let i = 0; i < 9; i++) { t.clock.t += 400; t.tap(button); }
+  for (let i = 0; i < 12; i++) { t.clock.t += 600; t.tap(button); }
   assert.strictEqual(t.A.isAngry(), false, 'steady taps never trip it');
-  for (let i = 0; i < 10; i++) { t.clock.t += 120; t.tap(button); }
-  assert.strictEqual(t.A.isAngry(), true, '10 taps in 2.5 s trips it');
+  for (let i = 0; i < 12; i++) { t.clock.t += 200; t.tap(button); }
+  assert.strictEqual(t.A.isAngry(), true, '12 taps in 3 s trips it');
   assert.strictEqual(t.A.reason(), 'mashing');
 }
 {
   const t = load();
-  for (let i = 0; i < 40; i++) { t.clock.t += 60; t.tap(key); }
-  assert.strictEqual(t.A.isAngry(), false, "typing on Booha's keyboard never counts");
+  for (let i = 0; i < 40; i++) { t.clock.t += 60; t.tap(key); t.tap(pad); t.tap(closeX); }
+  assert.strictEqual(t.A.isAngry(), false, "typing on Booha's keyboard, drawing and the close button never count");
 }
 {
   const t = load({ game: 'spell-word' });
-  for (let i = 0; i < 14; i++) { t.clock.t += 150; t.tap(button); }
+  for (let i = 0; i < 14; i++) { t.clock.t += 220; t.tap(button); }
   assert.strictEqual(t.A.isAngry(), false, 'tile games allow fast tile taps');
+  for (let i = 0; i < 15; i++) { t.clock.t += 150; t.tap(button); }
+  assert.strictEqual(t.A.isAngry(), true, 'but 15 in 3 s is mashing');
 }
 
 // ── Instant wrong answers ─────────────────────────────────────────────────

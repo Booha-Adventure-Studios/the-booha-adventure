@@ -56,7 +56,7 @@ async function gameAngryCheck(client) {
   const after = await evaluate(client, `(async () => {
     const button = [...document.querySelectorAll('#game-mount button')].find(b => b.offsetParent);
     if (!button) return { noButton: true };
-    for (let i = 0; i < 12; i++) button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    for (let i = 0; i < 16; i++) button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     const fx = new Audio(GAME_CONFIG.sfxBase + 'ding.mp3');
     fx.play().catch(() => {});
     const badge = document.querySelector('.booha-angry');

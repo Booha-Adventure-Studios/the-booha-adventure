@@ -11,8 +11,10 @@
    What makes Booha angry (one of these is enough):
      • Instant wrong answers: 3 wrong answers each given within 0.7 s of
        the question appearing (speed games: 5 within 0.35 s).
-     • Mashing: 10 taps on buttons within 2.5 s (tile and pair games: 16).
-       Booha's keyboard and drawing pads never count.
+     • Mashing: 12 taps anywhere on the game within 3 s (tile and pair
+       games: 15). Not only buttons: many answers are cards, and buttons
+       are locked between rounds, and mashing hits those too. Booha's
+       keyboard, drawing pads, text boxes and the ✕ never count.
      • Bail-outs: twice in one day, a run ended or abandoned with almost
        nothing right at no-reading speed (≤ 20% first-try, typical answer
        under 1.5 s). The next game starts angry. Counted per student
@@ -35,8 +37,8 @@
   const COOLDOWN_MS = 3000;
   const FAST = { ms: 700, count: 3 };
   const FAST_SPEED = { ms: 350, count: 5 };
-  const MASH = { taps: 10, windowMs: 2500 };
-  const MASH_TILES = { taps: 16, windowMs: 2500 };
+  const MASH = { taps: 12, windowMs: 3000 };
+  const MASH_TILES = { taps: 15, windowMs: 3000 };
   const BAIL = { firstTry: 0.2, medianMs: 1500, perDay: 2, minAnswers: 2 };
   const SPEED_GAMES = ['vocab-speed', 'sentence-speed'];
   const TILE_GAMES = ['spell-word', 'sentence-order', 'vocab-tap', 'sentence-tap'];
@@ -272,8 +274,8 @@
     if (angry) return;
     const t = event.target;
     if (!t || !t.closest) return;
-    if (t.closest('.bk-key, canvas, .booha-angry')) return;      // typing and drawing never count
-    if (!t.closest('button, [role="button"]')) return;
+    // Typing, drawing and leaving never count; every other tap does.
+    if (t.closest('.bk-key, canvas, input, textarea, select, .booha-angry, #gameClose, .game-close, #ios-overlay')) return;
     const now = Date.now();
     taps.push(now);
     while (taps.length && now - taps[0] > mashRule.windowMs) taps.shift();

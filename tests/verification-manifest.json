@@ -298,7 +298,7 @@
     {
       "path": "tests/game-angry.test.cjs",
       "status": "verify",
-      "reason": "Booha is angry: mashing, instant wrong answers and bail-outs mute all effects and music for the game (badge text only); the English voice keeps playing with a 3 s same-clip cooldown; honest play, keyboard typing and tile taps never trip it."
+      "reason": "Booha is angry: mashing (any 12 taps on the game in 3 s; tile games 15), instant wrong answers and bail-outs mute all effects and music for the game (badge text only); the English voice keeps playing with a 3 s same-clip cooldown; honest play, keyboard typing and tile taps never trip it."
     },
     {
       "path": "tests/oddities-moment.test.cjs",
