@@ -193,6 +193,8 @@
     .dc-lantern { width:44px; height:44px; object-fit:contain; filter:grayscale(1) brightness(.45); opacity:.7; transition:filter .3s ease; }
     .dc-day.done .dc-lantern { filter:drop-shadow(0 0 10px rgba(255,170,60,.95)); opacity:1; }
     .dc-day.future .dc-lantern { opacity:.35; }
+    /* Skipped with no check that day: the same red dot as the calendar. */
+    .dc-day.skip .dc-dow::after { content:''; display:block; width:7px; height:7px; margin:3px auto 0; border-radius:50%; background:#ff3b4e; box-shadow:0 0 6px rgba(255,59,78,.8); }
     .dc-dow { font-size:12px; color:#8c8070; font-weight:700; }
     .dc-day.done .dc-dow { color:#ffd8a8; }
     .dc-day.today .dc-dow { color:#5cffd0; border-bottom:2px solid #5cffd0; }
@@ -623,14 +625,16 @@
     .rb-cal-cell.tappable:focus-visible { outline:3px solid #ffd966; outline-offset:2px; }
     .rb-cal-cell.selected { box-shadow:0 0 0 2px #fff6dc inset; }
     .rb-cal-flags { position:absolute; top:3px; right:3px; display:flex; gap:2px; }
-    .rb-cal-flag { display:inline-block; width:7px; height:7px; border-radius:2px; }
-    .rb-cal-flag.skip { background:#ffad55; }
-    .rb-cal-flag.tech { background:#9fd8ff; border-radius:50%; }
-    .rb-cal-flag.closed { background:transparent; border:1.5px solid #b7a88a; width:6px; height:6px; }
-    .rb-legend-key.flag { width:8px; height:8px; border-radius:2px; }
-    .rb-legend-key.flag.skip { background:#ffad55; }
-    .rb-legend-key.flag.tech { background:#9fd8ff; border-radius:50%; }
-    .rb-legend-key.flag.closed { border:1.5px solid #b7a88a; }
+    .rb-cal-flag { display:inline-block; width:7px; height:7px; border-radius:50%; }
+    /* A skipped Daily Check is the one red mark: easy to spot on purpose. */
+    .rb-cal-flag.skip { width:9px; height:9px; background:#ff3b4e; box-shadow:0 0 6px rgba(255,59,78,.8); }
+    /* Not the student's choice, or not a skip: quiet grey. */
+    .rb-cal-flag.tech { background:#8f98a6; }
+    .rb-cal-flag.closed { background:transparent; border:1.5px solid #8f98a6; width:6px; height:6px; }
+    .rb-legend-key.flag { width:8px; height:8px; border-radius:50%; }
+    .rb-legend-key.flag.skip { width:9px; height:9px; background:#ff3b4e; box-shadow:0 0 6px rgba(255,59,78,.8); }
+    .rb-legend-key.flag.tech { background:#8f98a6; }
+    .rb-legend-key.flag.closed { border:1.5px solid #8f98a6; }
     .rb-cal-detail { display:flex; flex-direction:column; gap:4px; margin-top:10px; padding:10px 12px; border-radius:12px; background:#1b1626; border:1px solid #3a2f4c; font-size:12px; color:#d9cbb0; }
     .rb-cal-detail[hidden] { display:none; }
     .rb-cal-detail b { color:#fff6dc; font-size:12px; }

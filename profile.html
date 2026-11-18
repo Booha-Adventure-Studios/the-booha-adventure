@@ -228,7 +228,7 @@
         var lamp = document.createElement('img');
         lamp.className = 'dc-lantern';
         lamp.src = LANTERN; lamp.width = 44; lamp.height = 44;
-        lamp.alt = DOW[i][0] + (d.st === 'done' ? ' — recorded' : d.isFuture ? ' — later this week' : ' — not recorded');
+        lamp.alt = DOW[i][0] + (d.st === 'done' ? ' — recorded' : d.st === 'skip' ? ' — skipped' : d.isFuture ? ' — later this week' : ' — not recorded');
         if (d.st === 'done') cell.classList.add('done');
         else if (d.st === 'skip') cell.classList.add('skip');
         else if (d.isFuture) cell.classList.add('future');

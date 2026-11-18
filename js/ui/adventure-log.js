@@ -301,10 +301,12 @@ const BoohaAdventureLog = (() => {
   }
 
   /* Daily Check events (meta.dailyCheckEvents, see daily-check.js): skips,
-     closes and technical failures. Completion stays the day's main state
-     (teal border); these add a small secondary mark, and tapping the day
-     shows each event's reason and time. Student skips and technical problems
-     are always counted separately — a loading failure is never a skip. */
+     closes and technical failures. A day with a completed check keeps no
+     event record at all: a skip followed by the check is just a checked day.
+     On days without a check, a skip is a red dot (players should do the
+     check every day), while a technical problem or closing partway is a
+     quiet grey mark. Tapping the day shows each event's reason and time.
+     A loading failure is never a skip. */
   const DC_KIND = { student_skip: 'skip', legacy_skip: 'skip', closed: 'closed', load_failure: 'tech', save_failure: 'tech' };
   const DC_TEXT = {
     student_skip: ['スキップ', 'Skipped today'],
@@ -330,6 +332,11 @@ const BoohaAdventureLog = (() => {
     Object.keys(checkIn || {}).forEach(day => {
       const rec = checkIn[day];
       if (rec && rec.st === 'skip') (byDay[day] = byDay[day] || []).push({ id: 'legacy', day, type: 'legacy_skip', ts: rec.ts });
+    });
+    // Read-time rule, the save is not changed: events sync between devices
+    // by merging, so a deleted skip could come back from another copy.
+    Object.keys(byDay).forEach(day => {
+      if (checkIn && checkIn[day] && checkIn[day].st === 'done') delete byDay[day];
     });
     Object.keys(byDay).forEach(day => byDay[day].sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0)));
     return byDay;

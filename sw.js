@@ -192,7 +192,8 @@ const CURRENT_CACHES = {
   // edits reach iPads with the page; the new files are precached for offline.
   // Japan winter follow-up: the Maze arrival card words a repeat week as a return.
   // Spelling: カラスキ → カラスキー (long ki) on world, profile and arcade pages.
-  pages:  'booha-pages-2026-554',
+  // Daily Check: a skip followed by the check leaves no mark; real skips get a red dot.
+  pages:  'booha-pages-2026-555',
   // JavaScript is served network-first with a cached fallback (see fetch
   // routing below), so connected pages pick up current scripts promptly.
   // Profile consolidation Pass 1: profile-progress.js is a new cache-first
@@ -394,7 +395,8 @@ const CURRENT_CACHES = {
   // Travelers: Karasuki records each seasonal visitor by its own id; Grubb
   // and Marshy join the Travelers lists; old Grubb-as-Barba saves read back fixed.
   // Spelling: カラスキ → カラスキー (long ki) in world scripts and Uhibon.
-  assets: 'booha-assets-2026-626',
+  // Daily Check skip-then-done: adventure-log.js, daily-check.js, theme/profile.css.
+  assets: 'booha-assets-2026-627',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

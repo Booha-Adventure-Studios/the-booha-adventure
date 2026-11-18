@@ -322,9 +322,12 @@ window.BoohaDailyCheck = (function () {
   /* ── Curriculum resolution ───────────────────────────────────────────── */
   // The saved curriculum is canonical; the local key remains a compatibility
   // mirror for older pages and is managed by BoohaCurriculum.
+  // The student's class. Pages without curriculum.js (the Adventure Log)
+  // read the same mirror it writes, so the picker opens preselected there too.
   function knownCurr() {
     try {
-      return window.BoohaCurriculum?.get?.() || null;
+      const curr = window.BoohaCurriculum?.get?.() || localStorage.getItem('booha_last_curr');
+      return ['pb', 'br', 'bc'].includes(curr) ? curr : null;
     } catch (_) {
       return null;
     }
@@ -1429,8 +1432,10 @@ window.BoohaDailyCheck = (function () {
       const rec = log[key] || null;
       const summary = summarizeRecord(rec);
       const dayEvents = events(key);
-      const skipped = dayEvents.some(ev => ev.type === 'student_skip') || !!(rec && rec.st === 'skip');
-      const tech = dayEvents.some(ev => ev.type === 'load_failure' || ev.type === 'save_failure');
+      // A completed check wins the day outright: no skip or problem remains.
+      const done = !!(rec && rec.st === 'done');
+      const skipped = !done && (dayEvents.some(ev => ev.type === 'student_skip') || !!(rec && rec.st === 'skip'));
+      const tech = !done && dayEvents.some(ev => ev.type === 'load_failure' || ev.type === 'save_failure');
       const st = rec && rec.st === 'done' ? 'done' : skipped ? 'skip' : tech ? 'tech' : null;
       if (st === 'done') {
         doneCount++;
