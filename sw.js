@@ -412,7 +412,8 @@ const CURRENT_CACHES = {
   // Poopika: choices wait for the question, then glitch and swap places; intro on two lines.
   // Oddities: Ambrose, a reveal popup on pickup in Karasuki, readable Japanese on the clue.
   // Booha is angry: js/game-angry.js (effects bus, voice cooldown, badge); Poopika voice marked.
-  assets: 'booha-assets-2026-636',
+  // Booha is angry: bail-out record and log scoped per student (booha_userid).
+  assets: 'booha-assets-2026-637',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

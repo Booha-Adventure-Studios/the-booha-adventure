@@ -103,7 +103,7 @@ const key = { closest: sel => (/\.bk-key/.test(sel) ? {} : /button/.test(sel) ? 
 
 // ── Bail-outs carry to the next game, once ────────────────────────────────
 {
-  const store = {}, clock = { t: Date.UTC(2026, 10, 18, 3) };
+  const store = { booha_userid: 'stu-a' }, clock = { t: Date.UTC(2026, 10, 18, 3) };
   const t = load({ store, clock });
   for (let n = 0; n < 2; n++) {
     const run = t.U.createRun();
@@ -116,7 +116,7 @@ const key = { closest: sel => (/\.bk-key/.test(sel) ? {} : /button/.test(sel) ? 
   assert.strictEqual(load({ store, clock }).A.isAngry(), false, 'and only that one');
 }
 {
-  const store = {}, clock = { t: Date.UTC(2026, 10, 18, 3) };
+  const store = { booha_userid: 'stu-a' }, clock = { t: Date.UTC(2026, 10, 18, 3) };
   const t = load({ store, clock });
   for (let n = 0; n < 3; n++) {
     const run = t.U.createRun();
@@ -126,12 +126,40 @@ const key = { closest: sel => (/\.bk-key/.test(sel) ? {} : /button/.test(sel) ? 
   assert.strictEqual(load({ store, clock }).A.isAngry(), false, 'a slow, honest struggle is never a bail-out');
 }
 {
-  const store = {}, clock = { t: Date.UTC(2026, 10, 18, 3) };
+  const store = { booha_userid: 'stu-a' }, clock = { t: Date.UTC(2026, 10, 18, 3) };
   const t = load({ store, clock });
   const r1 = t.U.createRun(); for (let i = 0; i < 3; i++) { r1.ready(); t.clock.t += 500; r1.miss(); } t.pagehide();
   const t2 = load({ store, clock });
   const r2 = t2.U.createRun(); for (let i = 0; i < 3; i++) { r2.ready(); t2.clock.t += 500; r2.miss(); } t2.pagehide();
   assert.strictEqual(load({ store, clock }).A.isAngry(), true, 'leaving early after silly answers counts too');
+}
+
+// ── Shared classroom iPads: per student, never shared ─────────────────────
+{
+  const store = { booha_userid: 'stu-a' }, clock = { t: Date.UTC(2026, 10, 18, 3) };
+  const a = load({ store, clock });
+  for (let n = 0; n < 2; n++) {
+    const run = a.U.createRun();
+    for (let i = 0; i < 6; i++) { run.ready(); a.clock.t += 900; run.miss(); }
+    run.summary();
+  }
+  assert.ok(Object.keys(store).every(k => k === 'booha_userid' || k.endsWith(':stu-a')), 'every key carries the student id');
+  store.booha_userid = 'stu-b';                       // the next student signs in on the same iPad
+  assert.strictEqual(load({ store, clock }).A.isAngry(), false, "student A's bail-outs never mute student B");
+  store.booha_userid = 'stu-a';
+  assert.strictEqual(load({ store, clock }).A.isAngry(), true, 'they still count for student A');
+}
+{
+  const store = {}, clock = { t: Date.UTC(2026, 10, 18, 3) };
+  const t = load({ store, clock });
+  for (let n = 0; n < 2; n++) {
+    const run = t.U.createRun();
+    for (let i = 0; i < 6; i++) { run.ready(); t.clock.t += 900; run.miss(); }
+    run.summary();
+  }
+  t.A.trip('mashing');
+  assert.deepStrictEqual(Object.keys(store), [], 'no signed-in student: nothing is stored (no shared fallback)');
+  assert.strictEqual(load({ store, clock }).A.isAngry(), false, 'and nothing carries over');
 }
 
 // ── Wiring and words ──────────────────────────────────────────────────────
@@ -145,4 +173,4 @@ const poo = read('games/poopika.js');
 assert.match(poo, /out\.__boohaVoice = true;/, "Poopika's Web Audio voice is marked as voice");
 assert.match(poo, /if \(!auto && A && !A\.voiceOk\(card\.mp3\)\) return;/, 'a tapped Poopika replay waits out the cooldown');
 
-console.log('Booha is angry passed: mashing, instant wrongs and bail-outs trip it; honest play, typing and tile taps do not; effects go silent; the English voice stays on with a 3 s cooldown.');
+console.log('Booha is angry passed: per-student storage on shared iPads; mashing, instant wrongs and bail-outs trip it; honest play, typing and tile taps do not; effects go silent; the English voice stays on with a 3 s cooldown.');

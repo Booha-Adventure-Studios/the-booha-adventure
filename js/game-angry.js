@@ -15,7 +15,8 @@
        Booha's keyboard and drawing pads never count.
      • Bail-outs: twice in one day, a run ended or abandoned with almost
        nothing right at no-reading speed (≤ 20% first-try, typical answer
-       under 1.5 s). The next game starts angry.
+       under 1.5 s). The next game starts angry. Counted per student
+       (booha_userid), never across a shared iPad.
 
    How the silence works: on the game page every Web Audio sound reaches
    the speakers through one effects bus, and this file turns that bus
@@ -50,8 +51,24 @@
     try { return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(new Date()); }
     catch (_) { return new Date().toISOString().slice(0, 10); }
   }
-  function readJSON(key, fallback) { try { const v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; } catch (_) { return fallback; } }
-  function writeJSON(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {} }
+  // Per student: classroom iPads are shared, so one student's bail-outs must
+  // never mute the next student. Keys are <base>:<booha_userid>; with no
+  // signed-in student nothing is read or written (no shared fallback).
+  function studentKey(base) {
+    let uid = '';
+    try { uid = localStorage.getItem('booha_userid') || ''; } catch (_) {}
+    return uid ? `${base}:${uid}` : null;
+  }
+  function readJSON(base, fallback) {
+    const key = studentKey(base);
+    if (!key) return fallback;
+    try { const v = JSON.parse(localStorage.getItem(key)); return v == null ? fallback : v; } catch (_) { return fallback; }
+  }
+  function writeJSON(base, value) {
+    const key = studentKey(base);
+    if (!key) return;
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
+  }
 
   /* ── The effects bus: every Web Audio sound goes through it ─────────── */
   const buses = new WeakMap();
@@ -82,13 +99,17 @@
   }
 
   /* ── <audio> clips: voice keeps playing (with a cooldown), effects go quiet ── */
-  function voiceRoot() {
-    const roots = [];
-    if (window.BOOHA_MEDIA && BOOHA_MEDIA.audioRoot) roots.push(BOOHA_MEDIA.audioRoot);
-    if (window.GAME_CONFIG && GAME_CONFIG.audioBase) roots.push(GAME_CONFIG.audioBase);
-    return roots;
+  // The English voice is anything served from the curriculum audio host
+  // (the host of GAME_CONFIG.audioBase); sound effects come from this site.
+  function voiceHost() {
+    const base = window.GAME_CONFIG && GAME_CONFIG.audioBase;
+    if (!base) return '';
+    try { return new URL(base, location.href).origin + '/'; } catch (_) { return ''; }
   }
-  function isVoiceSrc(src) { return !!src && voiceRoot().some(r => r && String(src).indexOf(r) === 0); }
+  function isVoiceSrc(src) {
+    const host = voiceHost();
+    return !!src && !!host && host !== (location.origin + '/') && String(src).indexOf(host) === 0;
+  }
   const voice = { key: '', playing: 0, endedAt: 0 };
   function voiceOk(key) {
     if (!angry) return true;

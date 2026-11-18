@@ -68,6 +68,7 @@ const DYNAMIC = new Map(Object.entries({
   'js/destruction_1.js|key': 'local:retired (removal of the listed retired keys)',
   'js/core/homework-store.js|key': 'local:retired (clearLegacy removes legacy homework prefixes)',
   'js/daily-check.js|mirrorKey(day': 'session:studentScoped (booha_dc_events:<userid>:<day>)',
+  'js/game-angry.js|key': 'local:studentScoped (booha-angry-bails:<userid>, booha-angry-log:<userid>; nothing stored without a userid)',
   'js/daily-check.js|mirrorKey(ev.day': 'session:studentScoped (booha_dc_events:<userid>:<day>)',
   'js/karasuki.js|key': 'session:navigation (return-room keys listed above)',
   'game.html|cfg.navKey': 'session:navigation (per-curriculum scroll keys)',
