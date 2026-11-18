@@ -59,6 +59,13 @@ const ctx = {
   BoohaAdventure: { save: { load: () => ({ meta: {} }) } },
   KARASUKI_WANDERER_DATA: {},
 };
+// The closet rule is shared (BoohaSkins.closetStates): run the real one
+// against this test's stand-in seasons.
+const skinsCtx = { window: { BoohaAdventure: { save: { load: () => ({}) } } }, Intl, Date, console };
+skinsCtx.window.window = skinsCtx.window;
+vm.createContext(skinsCtx);
+vm.runInContext(fs.readFileSync(path.join(ROOT, 'js/core/booha-skins.js'), 'utf8'), skinsCtx, { filename: 'js/core/booha-skins.js' });
+ctx.BoohaSkins.closetStates = skinsCtx.window.BoohaSkins.closetStates;
 ctx.window = ctx;
 vm.createContext(ctx);
 vm.runInContext(source, ctx, { filename: FILE });

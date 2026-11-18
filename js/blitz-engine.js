@@ -5850,6 +5850,10 @@ window.BoohaBlitzEngine = (() => {
         .blitz-rec-character.is-collected img { filter: drop-shadow(0 0 8px rgba(255,226,122,.52)); }
         .blitz-rec-character-name { display: block; overflow: hidden; margin-top: 3px; color: rgba(255,255,255,.7); font-size: 9px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
         .blitz-rec-character.is-collected .blitz-rec-character-name { color: #ffe27a; }
+        .blitz-rec-character.is-thisweek .blitz-rec-character-name { color: #ffe27a; }
+        .blitz-rec-character.is-thisweek img { filter: brightness(0) drop-shadow(0 0 8px rgba(255,226,122,.75)); }
+        .blitz-rec-season-block.is-preview { opacity: .78; }
+        .blitz-rec-collection-empty { margin: 0; color: rgba(255,255,255,.7); font-size: 11px; line-height: 1.6; }
         @media (max-width: 430px) {
           #blitz-rec-inner { border-radius: 20px; }
           #blitz-rec-top, #blitz-rec-toggle, #blitz-rec-list { padding-left: 12px; padding-right: 12px; }
@@ -5908,17 +5912,23 @@ window.BoohaBlitzEngine = (() => {
     return match ? match[0] : '';
   }
 
-  function recordCollectionSeasons() {
-    const seasons = window.BoohaSkins?.SEASONS || {};
-    return Object.values(seasons)
-      .filter(season => season && season.id && recordSeasonYear(season))
-      .sort((a, b) => `${recordSeasonYear(b)}:${b.id}`.localeCompare(`${recordSeasonYear(a)}:${a.id}`));
+  // Same closet rule as My Adventure (BoohaSkins.closetStates): missed
+  // past-week skins are not shown, a season with nothing left to show has
+  // no block, and a season that has not started is a dated preview.
+  function recordClosetShelves() {
+    const S = window.BoohaSkins;
+    if (!S?.closetStates) return [];
+    try {
+      return S.closetStates(S).filter(shelf => shelf.skins.length && recordSeasonYear(shelf.season));
+    } catch (error) {
+      console.warn('[Blitz Records] collection unavailable:', error);
+      return [];
+    }
   }
 
-  function recordCurrentSeasonId() {
-    return window.BoohaSkins?.currentSeasonId?.()
-      || window.BoohaSkins?.CURRENT_SEASON_ID
-      || null;
+  function recordShortDate(key) {
+    const m = String(key || '').match(/^\d{4}-(\d{2})-(\d{2})/);
+    return m ? `${Number(m[1])}/${Number(m[2])}` : '';
   }
 
   function renderRecordsPanel(panel) {
@@ -5955,8 +5965,6 @@ window.BoohaBlitzEngine = (() => {
       awake.hidden = false;
       const clearedCount = rows.filter(r => r.score).length;
       const skin = window.BoohaSkins?.get?.(window.BoohaSkins?.rotationCharacterId?.());
-      // Students who cleared all three before this fix get their unlock here.
-      if (skin && clearedCount === 3 && !window.BoohaSkins?.isUnlocked?.(skin.id)) window.BoohaSkins?.unlock?.(skin.id);
       const collected = !!skin && (window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id));
       const skinName = String(skin?.name || 'THIS WEEK\'S BOOHA').replace(/\s+Booha$/i, '');
       awakeSkin.hidden = !skin?.assets?.maze;
@@ -5976,10 +5984,11 @@ window.BoohaBlitzEngine = (() => {
 
     collection.hidden = scope !== 'alltime';
     if (scope === 'alltime') {
-      const seasons = recordCollectionSeasons();
-      const currentSeason = seasons.find(season => season.id === recordCurrentSeasonId());
-      const years = [...new Set(seasons.map(recordSeasonYear))].sort((a, b) => b.localeCompare(a));
-      const currentYear = recordSeasonYear(currentSeason) || String(new Date().getFullYear());
+      const shelves = recordClosetShelves();
+      const today = (() => { try { return window.CALENDAR?.getTodayKey?.() || ''; } catch (_) { return ''; } })();
+      const years = [...new Set(shelves.map(shelf => recordSeasonYear(shelf.season)))].sort((a, b) => b.localeCompare(a));
+      const currentShelf = shelves.find(shelf => shelf.started && (!shelf.season.endDate || today <= shelf.season.endDate));
+      const currentYear = recordSeasonYear(currentShelf?.season) || years[0] || String(new Date().getFullYear());
       const requestedYear = panel._recordsCollectionYear || currentYear;
       const selectedYear = years.includes(requestedYear) ? requestedYear : (years[0] || currentYear);
       panel._recordsCollectionYear = selectedYear;
@@ -5998,28 +6007,38 @@ window.BoohaBlitzEngine = (() => {
         });
         seasonTabs.appendChild(tab);
       });
-      const selectedSeasons = seasons.filter(season => recordSeasonYear(season) === selectedYear);
-      collectionSeason.textContent = selectedSeasons
-        .map(season => `${season.name || season.id} · ${selectedYear}`)
+      const selectedShelves = shelves.filter(shelf => recordSeasonYear(shelf.season) === selectedYear);
+      collectionSeason.textContent = selectedShelves
+        .map(({ season }) => `${season.name || season.id} · ${selectedYear}`)
         .join(' · ');
-      collectionJp.textContent = selectedSeasons
-        .map(season => season.collectionJp)
+      collectionJp.textContent = selectedShelves
+        .map(({ season }) => season.collectionJp)
         .filter(Boolean)
         .join(' · ');
       characters.innerHTML = '';
-      selectedSeasons.forEach(season => {
+      if (!selectedShelves.length) {
+        const empty = document.createElement('p');
+        empty.className = 'blitz-rec-collection-empty';
+        empty.textContent = 'Clear all 3 Blitz in a week to collect that week’s Booha. · 1しゅうかんに ブリッツを 3つ クリアすると、その週の ブーハーが もらえるよ。';
+        characters.appendChild(empty);
+      }
+      selectedShelves.forEach(({ season, started, skins }) => {
         const block = document.createElement('div');
-        block.className = 'blitz-rec-season-block';
+        block.className = `blitz-rec-season-block${started ? '' : ' is-preview'}`;
         const blockTitle = document.createElement('span');
         blockTitle.className = 'blitz-rec-season-block-title';
-        blockTitle.textContent = season.name || season.id;
+        blockTitle.textContent = started
+          ? (season.name || season.id)
+          : `${season.name || season.id} · ${recordShortDate(season.startDate)}から`;
         const grid = document.createElement('div');
         grid.className = 'blitz-rec-character-grid';
-        (season.characterIds || []).map(id => window.BoohaSkins?.get?.(id)).filter(Boolean).forEach(skin => {
-          const isCollected = window.BoohaSkins?.isCollected?.(skin.id) || window.BoohaSkins?.isUnlocked?.(skin.id);
+        skins.forEach(entry => {
+          const skin = window.BoohaSkins?.get?.(entry.id);
+          if (!skin) return;
+          const isCollected = entry.collected;
           const isAvailable = window.BoohaSkins?.isAvailable?.(skin.id) === true;
           const item = document.createElement('div');
-          item.className = `blitz-rec-character ${isCollected ? 'is-collected' : 'is-locked'}${isAvailable ? '' : ' is-unavailable'}`;
+          item.className = `blitz-rec-character ${isCollected ? 'is-collected' : 'is-locked'}${entry.state === 'thisweek' ? ' is-thisweek' : ''}${isAvailable ? '' : ' is-unavailable'}`;
           if (isAvailable && skin.assets?.maze) {
             const image = document.createElement('img');
             image.src = skin.assets.maze;
@@ -6036,8 +6055,10 @@ window.BoohaBlitzEngine = (() => {
           const name = document.createElement('span');
           name.className = 'blitz-rec-character-name';
           name.textContent = isCollected
-            ? String(skin.name || '').replace(/\s+Booha$/i, '')
-            : (isAvailable ? '???' : 'COMING SOON');
+            ? entry.name
+            : !isAvailable ? 'COMING SOON'
+              : entry.state === 'thisweek' ? 'THIS WEEK'
+                : (entry.date ? `${recordShortDate(entry.date)}〜` : '???');
           item.appendChild(name);
           grid.appendChild(item);
         });
@@ -6112,6 +6133,14 @@ window.BoohaBlitzEngine = (() => {
     panel._recordsReturnFocus = ctx.returnFocus || document.activeElement;
     panel._recordsPlayGame = typeof ctx.playGame === 'function' ? ctx.playGame : null;
     panel._recordsCollectionYear = null;
+    // Students who cleared all three Blitz before the in-game unlock existed
+    // get this week's skin here. Done once on open, not on every redraw;
+    // unlock() itself checks that the week's three Blitz are cleared.
+    try {
+      const S = window.BoohaSkins;
+      const id = S?.rotationCharacterId?.();
+      if (id && !S.isUnlocked?.(id)) S.unlock?.(id);
+    } catch (_) {}
     renderRecordsPanel(panel);
     panel.classList.add('show');
     panel.setAttribute('aria-hidden', 'false');

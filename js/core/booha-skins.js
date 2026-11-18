@@ -1071,7 +1071,60 @@ const BoohaSkins = (() => {
     return saveFile.patch('meta', { selectedBoohaSkin: id });
   }
 
-  return Object.freeze({
+  /* ── Closet: one rule for every screen that shows the skin collection ──
+     My Adventure's closet and the Blitz Records collection both read this.
+     Missed past-week skins are hidden, not locked: a player who joined late
+     or skipped a week never sees a slot they can no longer fill. Collected
+     skins, this week's skin and later weeks stay. A started season with
+     nothing left to show has no skins here (screens drop its shelf); a
+     season that has not started is a preview.
+     `api` is BoohaSkins itself; tests may pass a stand-in. */
+  function closetWeekStart() {
+    try {
+      const week = window.CALENDAR?.getCurrentCurriculumWeek?.();
+      return week?.weekStart || String(currentWeekKey() || '').split('|')[0];
+    } catch (_) { return ''; }
+  }
+
+  function closetStates(api, options = {}) {
+    const S = api || API;
+    const today = options.today || currentDateKey();
+    const weekStart = options.weekStart || closetWeekStart();
+    const selected = S.selectedId ? S.selectedId() : null;
+    const seasons = Object.keys(S.SEASONS || {}).map(id => S.SEASONS[id]).filter(Boolean)
+      .sort((a, b) => String(a.startDate).localeCompare(String(b.startDate)));
+    return seasons.map(season => {
+      const chars = S.seasonCharacters ? S.seasonCharacters(season.id) : [];
+      const weekly = season.weeklyCharacterIds || {};
+      const dateFor = id => Object.keys(weekly).sort().find(date => weekly[date] === id) || null;
+      const current = S.rotationCharacterId ? S.rotationCharacterId(season.id) : null;
+      const started = !season.startDate || today >= season.startDate;
+      const skins = chars.map(skin => {
+        const date = dateFor(skin.id);
+        const collected = S.isCollected ? S.isCollected(skin.id) : false;
+        let state;
+        if (selected === skin.id) state = 'wearing';
+        else if (S.isUnlocked && S.isUnlocked(skin.id)) state = 'wearable';
+        else if (collected) state = 'owned';
+        else if (current === skin.id && started) state = 'thisweek';
+        else if (date && weekStart && date < weekStart) state = 'missed';
+        else state = 'soon';
+        return {
+          id: skin.id,
+          name: String(skin.name || '').replace(/ Booha$/, ''),
+          src: (skin.assets && (skin.assets.maze || skin.assets.static)) || '',
+          date,
+          collected: collected || state === 'wearing' || state === 'wearable',
+          state,
+        };
+      });
+      const visible = skins.filter(s => s.state !== 'missed');
+      const mascot = season.mascotId && S.get ? S.get(season.mascotId) : null;
+      return { season, started, skins: visible, mascot };
+    });
+  }
+
+  const API = Object.freeze({
     BASE,
     get CURRENT_SEASON_ID() { return currentSeasonId(); },
     currentSeasonId,
@@ -1113,7 +1166,9 @@ const BoohaSkins = (() => {
     asset,
     unlockAndEquip,
     equip,
+    closetStates,
   });
+  return API;
 })();
 
 window.BoohaSkins = BoohaSkins;

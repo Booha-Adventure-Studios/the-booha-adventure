@@ -76,43 +76,11 @@ const BoohaAdventureGame = (() => {
     return best;
   }
 
-  function seasons() {
-    const S = window.BoohaSkins;
-    if (!S || !S.SEASONS) return [];
-    return Object.keys(S.SEASONS).map(id => S.SEASONS[id]).filter(Boolean)
-      .sort((a, b) => String(a.startDate).localeCompare(String(b.startDate)));
-  }
-
+  // The closet rule lives in BoohaSkins.closetStates, shared with the Blitz
+  // Records collection so both screens always show the same skins.
   function skinStates(data) {
     const S = window.BoohaSkins;
-    const today = todayKey();
-    const wk = weekKey();
-    const selected = S.selectedId ? S.selectedId() : null;
-    return seasons().map(season => {
-      const chars = S.seasonCharacters ? S.seasonCharacters(season.id) : [];
-      const weekly = season.weeklyCharacterIds || {};
-      const dateFor = id => Object.keys(weekly).sort().find(date => weekly[date] === id) || null;
-      const current = S.rotationCharacterId ? S.rotationCharacterId(season.id) : null;
-      const started = !season.startDate || today >= season.startDate;
-      const skins = chars.map(skin => {
-        const date = dateFor(skin.id);
-        const collected = S.isCollected ? S.isCollected(skin.id) : false;
-        let state;
-        if (selected === skin.id) state = 'wearing';
-        else if (S.isUnlocked && S.isUnlocked(skin.id)) state = 'wearable';
-        else if (collected) state = 'owned';
-        else if (current === skin.id && started) state = 'thisweek';
-        else if (date && wk.start && date < wk.start) state = 'missed';
-        else state = 'soon';
-        return { id: skin.id, name: skin.name.replace(/ Booha$/, ''), src: skin.assets.maze || skin.assets.static, date, collected: collected || state === 'wearing' || state === 'wearable', state };
-      });
-      // Missed past-week skins are hidden, not locked: a player who joined
-      // late (or skipped a week) never sees a slot they can no longer fill.
-      // Every count and percentage is built from this visible set.
-      const visible = skins.filter(s => s.state !== 'missed');
-      const mascot = season.mascotId && S.get ? S.get(season.mascotId) : null;
-      return { season, started, skins: visible, mascot };
-    });
+    return S.closetStates(S, { today: todayKey(), weekStart: weekKey().start });
   }
 
   /* ── renderers ──────────────────────────────────────────────── */

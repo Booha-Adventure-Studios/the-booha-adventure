@@ -396,7 +396,9 @@ const CURRENT_CACHES = {
   // and Marshy join the Travelers lists; old Grubb-as-Barba saves read back fixed.
   // Spelling: カラスキ → カラスキー (long ki) in world scripts and Uhibon.
   // Daily Check skip-then-done: adventure-log.js, daily-check.js, theme/profile.css.
-  assets: 'booha-assets-2026-627',
+  // Shared closet rule: BoohaSkins.closetStates now drives My Adventure and
+  // the Blitz Records collection (missed skins hidden in both).
+  assets: 'booha-assets-2026-628',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
