@@ -296,6 +296,11 @@
       "reason": "Vowel Pop extra game: blank ladder (pb/br/bc) on every vocab card, the on-device letter reader on varied drawn vowels and non-vowels, scoring, and wiring (registry after the Week Boss, game-core, menu row, profile pairs)."
     },
     {
+      "path": "tests/game-angry.test.cjs",
+      "status": "verify",
+      "reason": "Booha is angry: mashing, instant wrong answers and bail-outs mute all effects and music for the game (badge text only); the English voice keeps playing with a 3 s same-clip cooldown; honest play, keyboard typing and tile taps never trip it."
+    },
+    {
       "path": "tests/oddities-moment.test.cjs",
       "status": "verify",
       "reason": "Oddities feel like a find: Ambrose on the Karasuki clue, the earn notice and the cabinet; picking one up opens a reveal popup (not a timed toast); every cabinet oddity opens big with all its text; arriving from Karasuki scrolls to the newest find."

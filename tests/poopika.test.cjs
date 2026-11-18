@@ -135,8 +135,8 @@ setTimeout(() => {
   assert.ok(SRC.indexOf('run.summary()') < SRC.lastIndexOf('U.emitGameEnd('), 'summary before emitGameEnd');
   assert.match(SRC, /run\.pauseClock\(\)/, 'a replay pauses the pace clock');
   assert.match(SRC, /const POP = window\.BoohaPop \|\| new Proxy/, 'plays on without game-pop.js');
-  assert.match(SRC, /speak\(c, v, clean \? 0 : 0\.25 \+ 0\.75 \* s, end\)/, 'a fixed question plays clean; strangeness follows looking time');
-  assert.match(SRC, /setTimeout\(\(\) => play\(true\), 450\)/, 'a fixed question plays once more, clean');
+  assert.match(SRC, /speak\(c, v, clean \? 0 : 0\.25 \+ 0\.75 \* s, \(\) => \{ done1\(\); end\(\); \}\)/, 'a fixed question plays clean; strangeness follows looking time');
+  assert.match(SRC, /setTimeout\(\(\) => play\(true, true\), 450\)/, 'a fixed question plays once more, clean');
   assert.match(SRC, /later\(go, 7000\)/, 'never stalls on a slow clip');
   assert.match(SRC, /if \(tries >= 2\) \{ finishCard\('miss'\)/, 'one more try, then the answer');
   assert.match(SRC, /speaking = true; lookStop\(\)/, 'listening is not looking');

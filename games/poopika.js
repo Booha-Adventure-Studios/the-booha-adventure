@@ -676,9 +676,12 @@ function stopVoice() {
   playBtn.classList.remove('playing');
   playBtn.innerHTML = PLAY_HTML; POP.speakerWait(playBtn);
 }
-async function play(clean) {
+async function play(clean, auto) {
   const card = rounds[idx] && rounds[idx].card;
   if (!card || !card.mp3) return;
+  // Booha is angry (game-angry.js): a tapped replay waits out the cooldown.
+  const A = window.BoohaAngry;
+  if (!auto && A && !A.voiceOk(card.mp3)) return;
   const myIdx = idx;
   run.pauseClock();   // listening time is not answer time
   U.unlockAudio();
@@ -710,11 +713,17 @@ async function play(clean) {
     if (!voiceGate.play(a, { replace: true, ignoreCooldown: true, onEnd: end })) end();
     return;
   }
-  stopSpeech = speak(c, v, clean ? 0 : 0.25 + 0.75 * s, end);
+  if (A) A.voiceStart(card.mp3);
+  let ended = false;
+  const done1 = () => { if (!ended) { ended = true; if (A) A.voiceEnd(card.mp3); } };
+  const stopper = speak(c, v, clean ? 0 : 0.25 + 0.75 * s, () => { done1(); end(); });
+  stopSpeech = () => { stopper(); done1(); };
 }
 function speak(c, v, weird, onEnd) {
   const t0 = c.currentTime + (weird ? 0.55 : 0.03);
-  const out = c.createGain(); out.gain.value = 1; out.connect(c.destination);
+  const out = c.createGain(); out.gain.value = 1;
+  out.__boohaVoice = true;   // the English voice is not an effect: it stays on when Booha is angry
+  out.connect(c.destination);
   const nodes = [];
   const src = (buf) => { const n = c.createBufferSource(); n.buffer = buf; nodes.push(n); return n; };
   const pan = () => (c.createStereoPanner ? c.createStereoPanner() : null);
@@ -875,7 +884,7 @@ function showCard() {
   loadVoice(card);   // start decoding now
   const nextCard = rounds[idx + 1] && rounds[idx + 1].card;
   if (nextCard) setTimeout(() => loadVoice(nextCard), 1500);
-  if (heardAny) { Bed.start(); setTimeout(() => play(false), 380); }   // after the first card, each question plays by itself
+  if (heardAny) { Bed.start(); setTimeout(() => play(false, true), 380); }   // after the first card, each question plays by itself
   else lookStart();
   fitCard();
 }
@@ -962,7 +971,7 @@ function finishCard(result) {
     let moved = false;
     const go = () => { if (moved) return; moved = true; later(advance, 450); };
     afterClean = go;
-    setTimeout(() => play(true), 450);
+    setTimeout(() => play(true, true), 450);
     later(go, 7000);   // never stall on a slow or silent clip
   } else {
     gap.classList.add('shown');
@@ -970,7 +979,7 @@ function finishCard(result) {
     fb.textContent = `It was “${round.answer}” · こたえは「${round.answer}」`;
     nextBtn.hidden = false;
     try { nextBtn.focus({ preventScroll: true }); } catch (_) {}
-    setTimeout(() => play(true), 500);   // hear it clean with the answer in view
+    setTimeout(() => play(true, true), 500);   // hear it clean with the answer in view
   }
   scoreEl.textContent = String(score);
   renderDots();
