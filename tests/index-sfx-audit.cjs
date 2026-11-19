@@ -145,4 +145,27 @@ for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
   }
 }
 
+// Audio Pass 5: speed-game stings, GO cue, menu bonk, portal sounds.
+{
+  const engine = fs.readFileSync(path.join(root, 'js', 'booha-sfx.js'), 'utf8');
+  assert(/function stop\(name\)/.test(engine) && engine.includes('src._name = name;'), 'BoohaSFX can stop one named sound');
+  for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
+    const src = fs.readFileSync(path.join(root, 'games', g), 'utf8');
+    assert(src.includes("STREAK_SFX.load('streak:fire'") && src.includes("STREAK_SFX.load('streak:level4'"), `${g} preloads the streak stings as buffers`);
+    assert(src.includes("if (playStreakBuffer('streak:level4')) { activeLvl4 = 'buffer'; return; }"), `${g} level-4 sting prefers the buffer`);
+    assert(src.includes("STREAK_SFX.stop('streak:level4')"), `${g} can cut the level-4 sting`);
+    assert(src.includes('U.playGoCue();'), `${g} START plays the GO cue`);
+  }
+  const utils = fs.readFileSync(path.join(root, 'js', 'game-utils.js'), 'utf8');
+  assert(/playGoCue\(\) \{[\s\S]*?c\.state !== 'running'/.test(utils), 'GO cue only plays on a running context');
+  const menu = fs.readFileSync(path.join(root, 'js', 'menu-core.js'), 'utf8');
+  assert(menu.includes("kind === 'nope'") && /classList\.add\('nope'\);\n\s*cue\('nope'\);/.test(menu), 'locked menu tiles bonk');
+  const portals = fs.readFileSync(path.join(root, 'js', 'ui', 'world-portals.js'), 'utf8');
+  assert(portals.includes("closest('a[id^=\"pnet-\"]')") && /if \(!whoosh\(\)\) return;\s*e\.preventDefault\(\);/.test(portals), 'open portals whoosh and wait a beat; with no audio the link works as before');
+  for (const page of ['profile.html', 'adventure-profile.html', 'grimmerglen-profile.html', 'muenba-profile.html', 'utsuroba-profile.html']) {
+    const html = fs.readFileSync(path.join(root, page), 'utf8');
+    assert(/js\/booha-sfx\.js/.test(html) && html.search(/js\/booha-sfx\.js/) < html.search(/js\/ui\/world-portals\.js/), `${page} loads booha-sfx.js before world-portals.js`);
+  }
+}
+
 console.log('Index 22D SFX audit passed: shared WebAudio is audibly boosted, capped, and varied across hub controls.');

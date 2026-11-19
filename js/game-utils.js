@@ -123,6 +123,35 @@ const UTILS = {
     this._synthVoice[name] = { out, until: t + this.SYNTH_CUES[name] };
     return true;
   },
+  /* Audio Pass 5: a quick "ready, GO!" for a START button. Three rising
+     pops and a bright chord, on the shared context, inside the start tap. */
+  playGoCue() {
+    const c = this._synthCtx();
+    if (!c || c.state !== 'running') return false;
+    try {
+      const out = c.createGain();
+      out.gain.value = 0.7;
+      out.connect(c.destination);
+      const t0 = c.currentTime + 0.01;
+      const hz = n => 440 * Math.pow(2, (n - 69) / 12);
+      const note = (n, at, len, peak, type) => {
+        const o = c.createOscillator(), g = c.createGain(), t = t0 + at, f = hz(n);
+        o.type = type || 'sine';
+        o.frequency.setValueAtTime(f * 0.7, t);
+        o.frequency.exponentialRampToValueAtTime(f, t + 0.025);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(peak, t + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+        o.connect(g); g.connect(out); o.start(t); o.stop(t + len + 0.03);
+      };
+      note(72, 0, 0.12, 0.22); note(76, 0.08, 0.12, 0.22); note(79, 0.16, 0.12, 0.22);
+      [84, 88, 91].forEach(n => note(n, 0.26, 0.42, 0.12, 'triangle'));
+      note(96, 0.26, 0.3, 0.1);
+      setTimeout(() => { try { out.disconnect(); } catch (_) {} }, 1000);
+      return true;
+    } catch (_) { return false; }
+  },
+
   /* Called by createRun just before a milestone chime / combo crack:
      cuts the cue that is already sounding and swallows the next one. */
   _synthReplace(name, ms = 260) {

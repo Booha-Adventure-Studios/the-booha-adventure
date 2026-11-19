@@ -112,6 +112,8 @@
     else if (kind === 'select') { tone(c, f, t, 0.22, 'sine', 0.16); tone(c, f * 2, t + 0.07, 0.4, 'sine', 0.13); tone(c, f * 3, t + 0.14, 0.45, 'triangle', 0.04); }
     else if (kind === 'back') { tone(c, BASE_HZ * 1.5, t, 0.18, 'sine', 0.14); tone(c, BASE_HZ, t + 0.09, 0.3, 'sine', 0.14); }
     else if (kind === 'toggle') { tone(c, BASE_HZ * 2, t, 0.12, 'sine', 0.1); }
+    // Audio Pass 5: a soft two-note bonk on a locked tile (not yet / boss locked).
+    else if (kind === 'nope') { tone(c, BASE_HZ * 0.75, t, 0.14, 'triangle', 0.14); tone(c, BASE_HZ * 0.66, t + 0.11, 0.22, 'triangle', 0.12); }
   }
 
   /* ── Build ── */
@@ -394,6 +396,7 @@
           ? 'Play all 9 games first! あと ' + t._bossLeft + 'つ！'
           : 'The boss is only on this week’s page! / こんしゅうだけ！';
         t.classList.remove('nope'); void t.offsetWidth; t.classList.add('nope');
+        cue('nope');
         return;
       }
       if (locked) return;

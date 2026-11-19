@@ -201,8 +201,17 @@
     try {
       if (src.start) src.start(0); else src.noteOn(0);
     } catch (_) { cleanup(); return 0; }
+    src._name = name;
     voices.push(src);
     return dur;
+  }
+
+  /* Stop every voice of one sound now (Audio Pass 5: the speed games'
+     level-4 fire sting is cut when the streak breaks). */
+  function stop(name) {
+    voices.slice().forEach(function (src) {
+      if (src._name === name) { try { src.stop(0); } catch (_) {} }
+    });
   }
 
   /* Audio Pass 4: music volume that works on iPad. iOS ignores writes to
@@ -256,5 +265,6 @@
     isRunning: running,
     context: function () { return ensure(); },
     setVolume: setVolume,
+    stop: stop,
   };
 })();

@@ -52,5 +52,68 @@ window.BoohaPortals = (function () {
     document.addEventListener('booha:devWorldsChanged', update);
   }
 
+  /* ── Portal sounds (Audio Pass 5) ─────────────────────────────────
+     An open portal gets a rising shimmer-whoosh, and the page waits a beat
+     so the sound isn't cut off by the navigation. A locked portal gets a
+     soft bonk. Both use the shared js/booha-sfx.js context; with no running
+     context the link simply works as before. */
+  function audio() {
+    var S = window.BoohaSFX;
+    var c = S && typeof S.context === 'function' ? S.context() : null;
+    return c && c.state === 'running' ? c : null;
+  }
+  function note(c, out, f, t, len, peak, type, toF) {
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(f, t);
+    if (toF) o.frequency.exponentialRampToValueAtTime(toF, t + len);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + len + 0.03);
+  }
+  function whoosh() {
+    var c = audio();
+    if (!c) return false;
+    try {
+      var t = c.currentTime + 0.01, out = c.createGain();
+      out.gain.value = 0.7;
+      out.connect(c.destination);
+      // Airy sweep: filtered noise rising through a band-pass.
+      var n = Math.floor(c.sampleRate * 0.45), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+      var src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = buf; bp.type = 'bandpass'; bp.Q.value = 1.4;
+      bp.frequency.setValueAtTime(400, t); bp.frequency.exponentialRampToValueAtTime(3200, t + 0.4);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.12); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+      src.connect(bp); bp.connect(g); g.connect(out); src.start(t);
+      // Shimmer climbing on top.
+      [1046.5, 1318.5, 1568, 2093].forEach(function (f, k) { note(c, out, f, t + 0.08 + k * 0.05, 0.3, 0.07); });
+      setTimeout(function () { try { out.disconnect(); } catch (_) {} }, 900);
+      return true;
+    } catch (_) { return false; }
+  }
+  function bonk() {
+    var c = audio();
+    if (!c) return;
+    try {
+      var t = c.currentTime + 0.01;
+      note(c, c.destination, 330, t, 0.14, 0.12, 'triangle');
+      note(c, c.destination, 294, t + 0.11, 0.22, 0.1, 'triangle');
+    } catch (_) {}
+  }
+  if (document.addEventListener) {
+    document.addEventListener('click', function (e) {
+      var link = e.target && e.target.closest ? e.target.closest('a[id^="pnet-"]') : null;
+      if (!link) return;
+      if (link.classList.contains('is-locked')) { bonk(); return; }
+      var href = link.getAttribute('href');
+      if (!href || e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (!whoosh()) return;
+      e.preventDefault();
+      setTimeout(function () { window.location.href = href; }, 280);
+    });
+  }
+
   return { setLocked: setLocked, watch: watch };
 })();

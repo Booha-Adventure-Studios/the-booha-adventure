@@ -37,9 +37,25 @@ function getStreakAudio(file) {
   return a;
 }
 
+/* Audio Pass 5: the streak stings play from decoded buffers on the shared
+   js/booha-sfx.js context (no media-element lag, volume works on iPad).
+   The cached elements below stay as the fallback. */
+const STREAK_SFX = window.BoohaSFX ? window.BoohaSFX : null;
+if (STREAK_SFX) {
+  STREAK_SFX.load('streak:fire', CFG.sfxBase + 'fire.mp3');
+  STREAK_SFX.load('streak:level4', CFG.sfxBase + 'level4.mp3');
+}
+let fireBufferUntil = 0;
+function playStreakBuffer(name) {
+  const S = STREAK_SFX;
+  if (!S || !S.isRunning() || !S.has(name)) return false;
+  return S.play(name) > 0;
+}
+
 function playFireSound(level) {
   if (level >= 4) {
     stopLvl4();
+    if (playStreakBuffer('streak:level4')) { activeLvl4 = 'buffer'; return; }
     const a = getStreakAudio('level4.mp3');
     a.loop = false;
     try { a.currentTime = 0; } catch {}
@@ -47,6 +63,11 @@ function playFireSound(level) {
     activeLvl4 = a;
     a.onended = () => { if (activeLvl4 === a) activeLvl4 = null; };
     return;
+  }
+  if (performance.now() < fireBufferUntil) return;   // one fire at a time, as before
+  if (STREAK_SFX && STREAK_SFX.isRunning() && STREAK_SFX.has('streak:fire')) {
+    const dur = STREAK_SFX.play('streak:fire');
+    if (dur > 0) { fireBufferUntil = performance.now() + dur * 1000; return; }
   }
   const a = getStreakAudio('fire.mp3');
   a.loop = false;
@@ -57,6 +78,7 @@ function playFireSound(level) {
 
 function stopLvl4() {
   if (!activeLvl4) return;
+  if (activeLvl4 === 'buffer') { if (STREAK_SFX) STREAK_SFX.stop('streak:level4'); activeLvl4 = null; return; }
   try { activeLvl4.pause(); activeLvl4.currentTime = 0; } catch {}
   activeLvl4 = null;
 }
@@ -1001,6 +1023,7 @@ function doStart() {
   started = true;
   POP.reset();   /* Palette Pop: a restart starts clean */
   unlockAllAudio();
+  U.playGoCue();   /* Audio Pass 5: ready, GO! */
   feedbackState = 'playing';
   order = U.shuffle(CFG.cards.slice(0, 15));
   idx = 0; score = 0; streak = 0; lastLevel = 0; mistakes = 0; run.reset();

@@ -423,7 +423,9 @@ const CURRENT_CACHES = {
   // Blocks media unlocked muted, star-following end jingle (js/bonus-jingle.js).
   // Audio Pass 4: BoohaSFX.setVolume routes music through a GainNode where iOS
   // ignores <audio>.volume; worlds, Blocks, Invaders and Happy House use it.
-  assets: 'booha-assets-2026-643',
+  // Audio Pass 5: speed-game streak stings on buffers + GO cue, locked-tile bonk
+  // in menus, portal whoosh/bonk (world-portals.js) with booha-sfx on world profiles.
+  assets: 'booha-assets-2026-644',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
