@@ -41,6 +41,8 @@
   <script src="./js/core/game-registry.js"></script>
   <script src="./js/core/score-system.js"></script>
   <script src="./js/core/unlock-system.js"></script>
+  <script src="./js/booha-sfx.js"></script>
+  <script src="./js/bonus-jingle.js"></script>
   <script>
     (function () {
       'use strict';
@@ -817,11 +819,26 @@ const goAudio=new Audio(BASE+SFX.gameOver);
 bgmAudio.preload='none'; dangerAudio.preload='none'; goAudio.preload='none';
 bgmAudio.volume=0.28; dangerAudio.volume=0.55; dangerAudio.loop=true; goAudio.volume=0.95;
 bgmAudio.addEventListener('ended',()=>{ bgmIdx=(bgmIdx+1)%SFX.bgm.length; bgmAudio.src=BASE+SFX.bgm[bgmIdx]; if(audioUnlocked&&gameStarted&&!isGameOver) bgmAudio.play().catch(()=>{}); });
-async function unlockAudio(){ if(audioUnlocked) return; audioUnlocked=true; const v=bgmAudio.volume; bgmAudio.volume=0; try{await bgmAudio.play();bgmAudio.pause();bgmAudio.currentTime=0;}catch(_){} bgmAudio.volume=v; }
-function playSFX(f,v=1){ if(!audioUnlocked) return; try{const a=new Audio(BASE+f);a.volume=v;a.play().catch(()=>{});}catch(_){} }
+/* Audio Pass 3: unlock all three media elements inside the start tap, muted.
+   iPad ignores .volume, so the old volume-0 trick was audible there, and the
+   danger loop and game-over sound (started by a falling piece, not a tap)
+   were never unlocked at all. */
+async function unlockAudio(){ if(audioUnlocked) return; audioUnlocked=true;
+  if(window.BoohaSFX) BoohaSFX.unlock();
+  const els=[bgmAudio,dangerAudio,goAudio];
+  els.forEach(a=>{ a.muted=true; });
+  await Promise.all(els.map(a=>{ try{ return a.play().then(()=>{ a.pause(); a.currentTime=0; }).catch(()=>{}); }catch(_){ return null; } }));
+  els.forEach(a=>{ a.muted=false; }); }
+/* Short SFX play from decoded buffers on the shared js/booha-sfx.js context:
+   no new <audio> per sound, no load lag, and nothing for iPad to block when
+   a line clears from a falling piece. The old element path stays as a fallback. */
+const SFX_BUF={};
+if(window.BoohaSFX){ [SFX.line,SFX.levelUp,SFX.bomb,SFX.gameOver].forEach(f=>{ const n='blocks:'+f; SFX_BUF[f]=n; BoohaSFX.load(n,BASE+f); }); }
+function playBuffered(f,v){ const n=SFX_BUF[f]; if(!n||!window.BoohaSFX||!BoohaSFX.isRunning()||!BoohaSFX.has(n)) return false; return BoohaSFX.play(n,{volume:v})>0; }
+function playSFX(f,v=1){ if(!audioUnlocked) return; if(playBuffered(f,v)) return; try{const a=new Audio(BASE+f);a.volume=v;a.play().catch(()=>{});}catch(_){} }
 /* ── UI click tones (WebAudio, not the recorded SFX above) ── */
 let _uiAC=null;
-function getUiAC(){ if(_uiAC) return _uiAC; try{ _uiAC=new (window.AudioContext||window.webkitAudioContext)(); }catch(_){ _uiAC=null; } return _uiAC; }
+function getUiAC(){ if(_uiAC) return _uiAC; try{ _uiAC=(window.BoohaSFX&&BoohaSFX.context())||new (window.AudioContext||window.webkitAudioContext)(); }catch(_){ _uiAC=null; } return _uiAC; }
 function playUiTone(freq,end,dur,vol){
   if(!audioUnlocked) return;
   try{
@@ -1571,7 +1588,7 @@ nameInput?.addEventListener('keydown',e=>{if(e.key==='Enter')submitName();});
 function triggerGameOver(){
   if(isGameOver||isEnding)return;
   isEnding=true;endTimer=80;stopDanger();pauseBGM();
-  try{goAudio.currentTime=0;goAudio.play().catch(()=>{});}catch(_){}
+  if(!playBuffered(SFX.gameOver,.95)){ try{goAudio.currentTime=0;goAudio.play().catch(()=>{});}catch(_){} }
   isPaused=true;
 }
 function finalizeGameOver(){
@@ -1580,6 +1597,13 @@ function finalizeGameOver(){
   shakeMag=0;shakeFrames=0;openNameOverlay();
   if(!runSubmitted){
     runSubmitted=true;
+    // Audio Pass 3: an end jingle that follows the stars, after the game-over sting.
+    try{
+      const S=window.BoohaAdventure&&BoohaAdventure.scores;
+      const prevBest=S&&typeof S.getHighScore==='function'?Number(S.getHighScore(SAVE_ID))||0:0;
+      const stars=window.BoohaGameRegistry?BoohaGameRegistry.starsForScore(SAVE_ID,score):0;
+      if(window.BoohaBonusJingle) setTimeout(()=>BoohaBonusJingle.play({stars,newBest:prevBest>0&&score>prevBest}),1900);
+    }catch(_){}
     document.dispatchEvent(new CustomEvent('booha:gameEnd',{detail:{
       saveId:SAVE_ID, score, completed:linesTotal>0, time:elapsedMs,
       lines:linesTotal, level:currentLevel, maxCombo,

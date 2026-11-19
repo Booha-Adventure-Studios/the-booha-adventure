@@ -72,4 +72,31 @@ for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
   assert(!fs.readFileSync(path.join(root, 'games', g), 'utf8').includes('resultAudio'), `${g}: unused result audio stays removed`);
 }
 
+// Audio Pass 3: standalone bonus pages.
+{
+  const blocks = fs.readFileSync(path.join(root, 'booha_blocks.html'), 'utf8');
+  const feedPage = fs.readFileSync(path.join(root, 'feed_booha.html'), 'utf8');
+  const feed = fs.readFileSync(path.join(root, 'js', 'feed_booha_1.js'), 'utf8');
+  const jingle = fs.readFileSync(path.join(root, 'js', 'bonus-jingle.js'), 'utf8');
+  assert(blocks.includes('<script src="./js/booha-sfx.js"></script>') && blocks.includes('<script src="./js/bonus-jingle.js"></script>'), 'Blocks loads the shared engine and the end jingle');
+  assert(!blocks.includes('bgmAudio.volume=0;'), 'Blocks must not unlock with volume 0 (iPad ignores it; the music blips)');
+  assert(/const els=\[bgmAudio,dangerAudio,goAudio\];[\s\S]*?a\.muted=true/.test(blocks), 'Blocks unlocks music, danger and game-over muted inside the start tap');
+  assert(/function playSFX\(f,v=1\)\{ if\(!audioUnlocked\) return; if\(playBuffered\(f,v\)\) return;/.test(blocks), 'Blocks SFX prefer decoded buffers');
+  assert(blocks.includes('if(!playBuffered(SFX.gameOver,.95))'), 'Blocks game over prefers the decoded buffer');
+  assert(/BoohaBonusJingle\.play\(\{stars,newBest:prevBest>0&&score>prevBest\}\)/.test(blocks), 'Blocks plays the star-following end jingle');
+  assert(feedPage.indexOf('<script src="./js/booha-sfx.js"></script>') > -1 && feedPage.indexOf('<script src="./js/booha-sfx.js"></script>') < feedPage.indexOf('<script src="./js/feed_booha_1.js"></script>'), 'Feed Booha loads the shared engine first');
+  assert(/S\.isRunning\(\) && S\.has\('feed:' \+ file\)/.test(feed), 'Feed Booha eat sounds prefer decoded buffers');
+  assert(!/function playFile\(|function stopFile\(/.test(feed), 'unused Feed Booha file helpers stay removed');
+  assert(feed.includes("audioCtx.state !== 'running' && audioCtx.state !== 'closed'"), 'Feed Booha resumes from any non-running state');
+  assert(sw.includes('${BASE}/js/bonus-jingle.js'), 'service worker precaches the bonus jingle');
+  assert(jingle.includes("c.state !== 'running'"), 'the bonus jingle never starts late');
+  const vm = require('vm');
+  const sb = { window: {} }; sb.window.window = sb.window;
+  vm.runInNewContext(jingle, sb);
+  const T = sb.window.BoohaBonusJingle.tune;
+  const top = n => Math.max(...T(n, false).filter(e => e.kind === 'pop').map(e => e.note));
+  assert(top(3) > top(2) && top(2) > top(1) && top(1) > top(0), 'the end jingle climbs with the stars');
+  assert(T(2, true).length > T(2, false).length, 'a new best adds a sparkle run');
+}
+
 console.log('Index 22D SFX audit passed: shared WebAudio is audibly boosted, capped, and varied across hub controls.');

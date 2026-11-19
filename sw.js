@@ -419,7 +419,9 @@ const CURRENT_CACHES = {
   // Audio Pass 1: utsu-sfx.js shares js/booha-sfx.js (loaded on the world and
   // profile pages); medal toast sparkles where UtsuSfx is absent; dead audio removed.
   // Audio Pass 2: reward jingles in js/ui/medal-toast.js (medal tiers, level-up, finds).
-  assets: 'booha-assets-2026-641',
+  // Audio Pass 3: Booha Blocks and Feed Booha SFX on decoded buffers (booha-sfx.js),
+  // Blocks media unlocked muted, star-following end jingle (js/bonus-jingle.js).
+  assets: 'booha-assets-2026-642',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
@@ -525,6 +527,8 @@ const CORE_ASSETS = [
   `${BASE}/theme/menu.css`,
   `${BASE}/js/menu-core.js`,
   `${BASE}/js/booha-sfx.js`,
+  // Audio Pass 3: end jingle for the standalone bonus pages (Booha Blocks).
+  `${BASE}/js/bonus-jingle.js`,
   `${BASE}/js/game-motion.js`,
   `${BASE}/js/game-pop.js`,
   `${BASE}/assets/img/profile.webp`,

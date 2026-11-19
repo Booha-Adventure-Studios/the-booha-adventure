@@ -135,32 +135,30 @@
   // Global across the whole session — survives level resets
   let eatSoundIndex = 0;
 
+  // Audio Pass 3: share js/booha-sfx.js's context (tap re-unlock after an iPad
+  // interruption) and resume from any non-running state without a stray rejection.
   function getAudioCtx() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (!audioCtx) audioCtx = (window.BoohaSFX && window.BoohaSFX.context()) || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state !== 'running' && audioCtx.state !== 'closed') {
+      const resumed = audioCtx.resume();
+      if (resumed && resumed.catch) resumed.catch(() => {});
+    }
     return audioCtx;
-  }
-
-  function playFile(src, loop = false, vol = 1) {
-    const a = new Audio(src);
-    a.loop   = loop;
-    a.volume = vol;
-    a.play().catch(() => {});
-    return a;
-  }
-
-  function stopFile(a) {
-    if (!a) return;
-    try { a.pause(); a.currentTime = 0; } catch(e) {}
   }
 
   // v7: Play exactly one eat sound, then advance the global index
   // Index cycles through the four shipped catch sounds.
+  // Audio Pass 3: the catch lands after the candy falls, well after the cut
+  // tap, so a new <audio> element was often blocked on iPad. The sounds now
+  // play from decoded buffers on the shared context; the element is a fallback.
+  const EAT_FILES = ['get-1.mp3', 'get-2.mp3', 'get-3.mp3', 'get-0.mp3'];
+  if (window.BoohaSFX) EAT_FILES.forEach(f => window.BoohaSFX.load('feed:' + f, './assets/feed/' + f));
   function playEatSound() {
-    const files = ['get-1.mp3', 'get-2.mp3', 'get-3.mp3', 'get-0.mp3'];
-    const src   = './assets/feed/' + files[eatSoundIndex % files.length];
-    eatSoundIndex = (eatSoundIndex + 1) % files.length;
-    const a = new Audio(src);
+    const file = EAT_FILES[eatSoundIndex % EAT_FILES.length];
+    eatSoundIndex = (eatSoundIndex + 1) % EAT_FILES.length;
+    const S = window.BoohaSFX;
+    if (S && S.isRunning() && S.has('feed:' + file) && S.play('feed:' + file) > 0) return null;
+    const a = new Audio('./assets/feed/' + file);
     a.play().catch(() => {});
     return a;
   }
