@@ -12,7 +12,7 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const src = fs.readFileSync(path.join(ROOT, 'js/ui/medal-toast.js'), 'utf8');
-const fnSrc = src.slice(src.indexOf('  function showing_(el)'), src.indexOf('  function playSound()'));
+const fnSrc = src.slice(src.indexOf('  function showing_(el)'), src.indexOf('  function playSound('));
 assert.ok(fnSrc.includes('function busy()'), 'busy() is present');
 
 function el({ classes = [], hidden = false, rects = 1, paused = true, ended = false, children = {} } = {}) {

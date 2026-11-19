@@ -109,32 +109,126 @@
     return false;
   }
 
-  /* Audio Pass 1: the toast used to call only UtsuSfx, which game.html,
-     maze.html and profile.html don't load, so medals after a game were
-     silent. Pages without UtsuSfx get a short sparkle on the shared
-     js/booha-sfx.js context (already unlocked by the player's taps). */
-  function sparkle() {
-    var S = window.BoohaSFX;
-    var c = S && typeof S.context === 'function' ? S.context() : null;
-    if (!c || c.state !== 'running') return;
-    var t0 = c.currentTime + 0.02;
-    [1046.5, 1318.5, 1568, 2093].forEach(function (f, i) {
-      var o = c.createOscillator(), g = c.createGain(), t = t0 + i * 0.07;
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f, t);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.12, t + 0.006);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
-      o.connect(g); g.connect(c.destination);
-      o.start(t); o.stop(t + 0.3);
-    });
+  function playSound(sound) {
+    try {
+      if (!playTune(toastTune(sound)) && window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') {
+        window.UtsuSfx.popupOpen();
+      }
+    } catch (_) {}
   }
 
-  function playSound() {
-    try {
-      if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
-      else sparkle();
-    } catch (_) {}
+  /* ── Reward jingles (Audio Pass 2) ────────────────────────────────
+     Every reward reveal comes through this toast (REWARDS-DESIGN.md), so
+     each kind gets its own short jingle, synthesized on the shared
+     js/booha-sfx.js context (already unlocked by the player's taps):
+       medal   bronze ta-da · silver arpeggio + shimmer · gold fanfare
+       level   a coin "ka-ching" and a power-up run; the run gets longer
+               and climbs higher with every level (Lv 1–9)
+       find    a mysterious Karasuki wobble and twinkle; a special find
+               adds a low bell
+     If the context isn't running yet (no tap on this page so far), the
+     toast stays quiet rather than sounding late. toastTune() is pure data
+     so tests can check it without audio. */
+  var PENTA = [72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96, 98, 100];
+  function toastTune(sound) {
+    sound = sound || {};
+    var ev = [];
+    var add = function (at, kind, note, len, vol, extra) {
+      var e = { at: at, kind: kind, note: note, len: len, vol: vol };
+      if (extra) e.notes = extra;
+      ev.push(e);
+    };
+    if (sound.kind === 'level') {
+      var lv = Math.max(1, Math.min(9, Math.round(Number(sound.level) || 1)));
+      add(0, 'coin', 83, 0.08, 0.32);                       // B5 …
+      add(0.08, 'coin', 88, 0.3, 0.32);                     // … E6: ka-ching
+      var steps = 3 + Math.ceil(lv / 2);                    // 4–8 notes
+      var top = 3 + lv;                                     // ends higher each level
+      for (var i = 0; i < steps; i++) {
+        add(0.42 + i * 0.065, 'pop', PENTA[Math.max(0, top - steps + 1 + i)], 0.16, 0.36);
+      }
+      add(0.42 + steps * 0.065, 'chord', PENTA[top], 0.6, 0.12, [PENTA[top] - 12, PENTA[top] - 8, PENTA[top] - 5]);
+      add(0.42 + steps * 0.065, 'pop', PENTA[top], 0.5, 0.42);
+    } else if (sound.kind === 'find') {
+      // Whole-tone wobble: strange, curious, not scary.
+      [74, 70, 78, 82].forEach(function (n, i) { add(i * 0.14, 'wobble', n, 0.32, 0.22); });
+      [98, 102, 106].forEach(function (n, i) { add(0.62 + i * 0.09, 'spark', n, 0.24, 0.16); });
+      if (sound.special) add(0.62, 'bell', 50, 1.2, 0.28);
+    } else {
+      var tier = sound.tier || 'gold';
+      if (tier === 'bronze') {
+        add(0, 'pop', 79, 0.14, 0.4); add(0.13, 'pop', 84, 0.36, 0.46);
+        add(0.3, 'spark', 96, 0.22, 0.18);
+      } else if (tier === 'silver') {
+        [76, 79, 84].forEach(function (n, i) { add(i * 0.09, 'pop', n, 0.16, 0.4); });
+        add(0.27, 'pop', 88, 0.42, 0.46);
+        [96, 100, 103].forEach(function (n, i) { add(0.4 + i * 0.06, 'spark', n, 0.22, 0.18); });
+      } else {
+        add(0, 'pop', 67, 0.1, 0.4); add(0.09, 'pop', 67, 0.1, 0.4);
+        add(0.2, 'chord', 72, 0.55, 0.12, [72, 76, 79]);
+        add(0.2, 'pop', 84, 0.16, 0.44); add(0.34, 'pop', 88, 0.16, 0.44); add(0.48, 'pop', 91, 0.6, 0.5);
+        [108, 103, 100, 96].forEach(function (n, i) { add(0.6 + i * 0.07, 'spark', n, 0.2, 0.16); });
+      }
+    }
+    return ev;
+  }
+
+  function hz(n) { return 440 * Math.pow(2, (n - 69) / 12); }
+  function tone(c, out, type, f, t, len, peak, fromF, toF) {
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(fromF || f, t);
+    if (fromF) o.frequency.exponentialRampToValueAtTime(f, t + 0.03);
+    if (toF) o.frequency.exponentialRampToValueAtTime(toF, t + len);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + len + 0.03);
+    return o;
+  }
+  function voice(c, out, t, e) {
+    var f = hz(e.note);
+    if (e.kind === 'pop') {
+      tone(c, out, 'sine', f, t, e.len, e.vol, f * 0.62);
+      tone(c, out, 'sine', f * 2, t, 0.05, e.vol * 0.22);
+    } else if (e.kind === 'spark') {
+      tone(c, out, 'sine', f, t, e.len, e.vol);
+      tone(c, out, 'sine', f * 2.76, t, e.len * 0.45, e.vol * 0.3);
+    } else if (e.kind === 'coin') {
+      var lp = c.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = 3200; lp.connect(out);
+      tone(c, lp, 'square', f, t, e.len, e.vol * 0.35);
+      tone(c, out, 'sine', f, t, e.len, e.vol * 0.6);
+    } else if (e.kind === 'chord') {
+      e.notes.forEach(function (n) { tone(c, out, 'triangle', hz(n), t, e.len, e.vol); });
+    } else if (e.kind === 'wobble') {
+      var o = tone(c, out, 'triangle', f, t, e.len, e.vol);
+      var lfo = c.createOscillator(), depth = c.createGain();
+      lfo.frequency.value = 7; depth.gain.value = f * 0.03;
+      lfo.connect(depth); depth.connect(o.frequency);
+      lfo.start(t); lfo.stop(t + e.len + 0.03);
+    } else if (e.kind === 'bell') {
+      tone(c, out, 'sine', f, t, e.len, e.vol);
+      tone(c, out, 'sine', f * 2.4, t, e.len * 0.6, e.vol * 0.35);
+      tone(c, out, 'sine', f * 5.95, t, e.len * 0.3, e.vol * 0.15);
+    }
+  }
+
+  /* Returns true when the jingle was scheduled. */
+  function playTune(events) {
+    var S = window.BoohaSFX;
+    var c = S && typeof S.context === 'function' ? S.context() : null;
+    if (!c || c.state !== 'running' || !events.length) return false;
+    var comp = c.createDynamicsCompressor();
+    comp.connect(c.destination);
+    var bus = c.createGain();
+    bus.gain.value = 0.55;
+    bus.connect(comp);
+    var t0 = c.currentTime + 0.03, end = 0;
+    events.forEach(function (e) { voice(c, bus, t0 + e.at, e); end = Math.max(end, e.at + e.len); });
+    setTimeout(function () { try { bus.disconnect(); comp.disconnect(); } catch (_) {} }, Math.ceil((end + 0.5) * 1000));
+    return true;
   }
 
   function next() {
@@ -153,7 +247,7 @@
       (item.stars ? '<span class="bmt-stars">+' + item.stars + '★</span>' : '');
     el.setAttribute('aria-label', item.title + '. ' + item.sub + (item.stars ? '. +' + item.stars + ' stars' : ''));
     ensureHost().appendChild(el);
-    playSound();
+    playSound(item.sound);
     if (item.onShow) item.onShow();
     var done = false;
     function close() {
@@ -188,6 +282,7 @@
       title: m.jp,
       sub: tierJp + ' · ' + m.how,
       stars: W ? W.bonusFor(m.id) : 0,
+      sound: { kind: 'medal', tier: m.tier },
       onShow: function () { if (W) W.markShown([m.id]); }
     });
   }
@@ -199,7 +294,8 @@
       kicker: 'LEVEL UP! · レベルアップ！',
       title: 'Lv ' + level + ' に なった！',
       sub: 'あたらしい ランクコイン ゲット',
-      stars: 0
+      stars: 0,
+      sound: { kind: 'level', level: level }
     });
   }
 
@@ -259,6 +355,7 @@
       kicker: 'ODDITY FIND · ふしぎなもの ゲット！',
       title: title,
       sub: sub,
+      sound: { kind: 'find', special: fresh.some(function (award) { return award.pool === 'special'; }) },
       onShow: function () { markFindsRevealed(fresh); },
     });
     next();
@@ -346,5 +443,5 @@
   });
   document.addEventListener('booha:medalsSeen', updateBadge);
 
-  window.BoohaMedalToast = { check: check, updateBadge: updateBadge };
+  window.BoohaMedalToast = { check: check, updateBadge: updateBadge, toastTune: toastTune };
 })();

@@ -418,7 +418,8 @@ const CURRENT_CACHES = {
   // Muenba rhythm hits share js/booha-sfx.js (muenba.html loads it).
   // Audio Pass 1: utsu-sfx.js shares js/booha-sfx.js (loaded on the world and
   // profile pages); medal toast sparkles where UtsuSfx is absent; dead audio removed.
-  assets: 'booha-assets-2026-640',
+  // Audio Pass 2: reward jingles in js/ui/medal-toast.js (medal tiers, level-up, finds).
+  assets: 'booha-assets-2026-641',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

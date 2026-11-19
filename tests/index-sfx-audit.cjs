@@ -40,7 +40,24 @@ assert(sfx.includes('window.BoohaSFX.context()'), 'utsu-sfx must share the Booha
 assert(sfx.includes("ctx.state !== 'running' && ctx.state !== 'closed'"), "utsu-sfx must resume from iPad's 'interrupted' state too");
 assert(sfx.includes('resumed.catch(function () {})'), 'a refused resume must not raise an unhandled rejection');
 const toast = fs.readFileSync(path.join(root, 'js', 'ui', 'medal-toast.js'), 'utf8');
-assert(/function playSound\(\) \{[\s\S]*?else sparkle\(\);/.test(toast), 'medal toast must sound on pages without UtsuSfx');
+// Audio Pass 2: each reward kind has its own jingle on the shared context.
+assert(/function playSound\(sound\) \{[\s\S]*?playTune\(toastTune\(sound\)\)/.test(toast), 'medal toast plays a reward jingle');
+assert(toast.includes("c.state !== 'running'"), 'a jingle never starts late on a context that is not running');
+{
+  const vm = require('vm');
+  const sb = { window: {}, document: { addEventListener() {}, currentScript: null } }; sb.window.window = sb.window;
+  vm.runInNewContext(toast, sb);
+  const T = sb.window.BoohaMedalToast.toastTune;
+  const len = s => T(s).length;
+  const top = s => Math.max(...T(s).filter(e => e.kind === 'pop').map(e => e.note));
+  assert(len({ kind: 'medal', tier: 'gold' }) > len({ kind: 'medal', tier: 'silver' }) && len({ kind: 'medal', tier: 'silver' }) > len({ kind: 'medal', tier: 'bronze' }), 'medal jingles grow bronze → silver → gold');
+  assert(top({ kind: 'level', level: 9 }) > top({ kind: 'level', level: 5 }) && top({ kind: 'level', level: 5 }) > top({ kind: 'level', level: 1 }), 'level-up climbs with the level');
+  assert(T({ kind: 'level', level: 3 }).some(e => e.kind === 'coin'), 'level-up has the coin ka-ching');
+  assert(T({ kind: 'find', special: true }).some(e => e.kind === 'bell') && !T({ kind: 'find' }).some(e => e.kind === 'bell'), 'special finds add the low bell');
+}
+for (const [kind, re] of [['medal', /sound: \{ kind: 'medal', tier: m\.tier \}/], ['level', /sound: \{ kind: 'level', level: level \}/], ['find', /sound: \{ kind: 'find', special:/]]) {
+  assert(re.test(toast), `${kind} toasts carry their jingle`);
+}
 for (const page of ['maze.html', 'profile.html']) {
   const html = fs.readFileSync(path.join(root, page), 'utf8');
   const engine = html.indexOf('<script src="./js/booha-sfx.js"></script>');
