@@ -109,9 +109,31 @@
     return false;
   }
 
+  /* Audio Pass 1: the toast used to call only UtsuSfx, which game.html,
+     maze.html and profile.html don't load, so medals after a game were
+     silent. Pages without UtsuSfx get a short sparkle on the shared
+     js/booha-sfx.js context (already unlocked by the player's taps). */
+  function sparkle() {
+    var S = window.BoohaSFX;
+    var c = S && typeof S.context === 'function' ? S.context() : null;
+    if (!c || c.state !== 'running') return;
+    var t0 = c.currentTime + 0.02;
+    [1046.5, 1318.5, 1568, 2093].forEach(function (f, i) {
+      var o = c.createOscillator(), g = c.createGain(), t = t0 + i * 0.07;
+      o.type = 'sine';
+      o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.12, t + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+      o.connect(g); g.connect(c.destination);
+      o.start(t); o.stop(t + 0.3);
+    });
+  }
+
   function playSound() {
     try {
       if (window.UtsuSfx && typeof window.UtsuSfx.popupOpen === 'function') window.UtsuSfx.popupOpen();
+      else sparkle();
     } catch (_) {}
   }
 

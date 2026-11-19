@@ -29,8 +29,20 @@
   function ensureCtx() {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
+    // Audio Pass 1: share js/booha-sfx.js's context when the page loads it.
+    // That engine re-arms its tap unlock on every touch, including after an
+    // iPad interruption (screen lock, Control Center), so UI sounds recover.
+    if (!ctx && window.BoohaSFX && typeof window.BoohaSFX.context === 'function') {
+      try { ctx = window.BoohaSFX.context() || null; } catch (_) { ctx = null; }
+    }
     if (!ctx) ctx = new AC();
-    if (ctx.state === 'suspended') { try { ctx.resume(); } catch (_) {} }
+    // iPad also reports 'interrupted'; anything but running/closed retries.
+    if (ctx.state !== 'running' && ctx.state !== 'closed') {
+      try {
+        var resumed = ctx.resume();
+        if (resumed && resumed.catch) resumed.catch(function () {});
+      } catch (_) {}
+    }
     return ctx;
   }
 

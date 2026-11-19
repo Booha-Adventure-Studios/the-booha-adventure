@@ -3,8 +3,7 @@
    spell-word.js  —  Spell the Word  v4
    ══════════════════════════════════════════════════════════════
    FIXES v4:
-   - Audio unlock uses SILENT AudioContext oscillator — fixes the
-     "all audio plays at once on first tap" root cause.
+   - Audio unlock comes from the shared js/booha-sfx.js engine.
    - Tiles fire ZERO audio on click. Slots fire ZERO audio.
    - Tiles and slots always display LOWERCASE (CSS + JS).
    - Correct sequence (nothing overlaps):
@@ -47,28 +46,9 @@ for (const card of CFG.cards.slice(0, 15)) {
   wordCache[card.mp3] = a;
 }
 
-/* ── Silent AudioContext unlock ─────────────────────────────
-   Plays a zero-gain oscillator for 1 ms on first user gesture.
-   This warm-starts the audio context on iOS/Android WITHOUT
-   playing any game audio files simultaneously.               */
-let ctxUnlocked = false;
-function unlockCtx() {
-  if (ctxUnlocked) return;
-  ctxUnlocked = true;
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    gain.gain.value = 0;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(0);
-    osc.stop(ctx.currentTime + 0.001);
-    ctx.resume().catch(() => {});
-  } catch {}
-}
-document.addEventListener('touchstart', unlockCtx, { once: true, passive: true });
-document.addEventListener('mousedown',  unlockCtx, { once: true, passive: true });
+/* Audio unlock: js/booha-sfx.js unlocks the shared context on every tap
+   (Audio Pass 1 removed the old one-off silent-oscillator context here,
+   which created a second AudioContext that was never closed). */
 
 /* ── One active audio track at a time ── */
 let activeAudio = null;
@@ -764,7 +744,7 @@ function fireSpeaker() {
   setTimeout(() => { speakerBtn.disabled = false; }, 1400);
   playListen(allCards[idx]?.mp3);
 }
-speakerBtn.addEventListener('touchstart', e => { e.preventDefault(); unlockCtx(); fireSpeaker(); }, { passive: false });
+speakerBtn.addEventListener('touchstart', e => { e.preventDefault(); fireSpeaker(); }, { passive: false });
 speakerBtn.addEventListener('click', e => {
   if (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) return;
   fireSpeaker();

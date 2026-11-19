@@ -1175,15 +1175,10 @@ let mistakes = 0;
 let missedItems = [];
 let finalClimaxTimer = null;
 let resultFxTimers = [];
-let resultAudio = null;
 
 function clearResultEffects() {
   resultFxTimers.forEach(clearTimeout);
   resultFxTimers = [];
-  if (resultAudio) {
-    try { resultAudio.pause(); resultAudio.currentTime = 0; } catch {}
-    resultAudio = null;
-  }
   document.querySelectorAll('.vs-confetti-piece').forEach(el => el.remove());
 }
 

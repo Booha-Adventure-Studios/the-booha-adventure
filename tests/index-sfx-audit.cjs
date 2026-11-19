@@ -29,4 +29,30 @@ assert(sfx.includes('hubSelect: function ()'), 'shared palette needs a distinct 
 assert(!sfx.includes('new Audio('), 'button palette must not introduce audio-file playback');
 assert(verify.includes('tests/index-sfx-audit.cjs'), 'verify.sh must run the 22D index SFX audit');
 
+// Audio Pass 1: one shared engine. utsu-sfx.js uses js/booha-sfx.js's
+// context (tap re-unlock after iPad interruptions) on every page that loads it.
+for (const page of ['index.html', 'grimmerglen.html', 'adventure-profile.html', 'karasuki.html', 'utsuroba.html', 'muenba.html']) {
+  const html = fs.readFileSync(path.join(root, page), 'utf8');
+  const engine = html.indexOf('<script src="js/booha-sfx.js"></script>');
+  assert(engine > -1 && engine < html.indexOf('<script src="js/utsu-sfx.js"></script>'), `${page} must load booha-sfx.js before utsu-sfx.js`);
+}
+assert(sfx.includes('window.BoohaSFX.context()'), 'utsu-sfx must share the BoohaSFX context');
+assert(sfx.includes("ctx.state !== 'running' && ctx.state !== 'closed'"), "utsu-sfx must resume from iPad's 'interrupted' state too");
+assert(sfx.includes('resumed.catch(function () {})'), 'a refused resume must not raise an unhandled rejection');
+const toast = fs.readFileSync(path.join(root, 'js', 'ui', 'medal-toast.js'), 'utf8');
+assert(/function playSound\(\) \{[\s\S]*?else sparkle\(\);/.test(toast), 'medal toast must sound on pages without UtsuSfx');
+for (const page of ['maze.html', 'profile.html']) {
+  const html = fs.readFileSync(path.join(root, page), 'utf8');
+  const engine = html.indexOf('<script src="./js/booha-sfx.js"></script>');
+  assert(engine > -1 && engine < html.indexOf('<script src="./js/ui/medal-toast.js"></script>'), `${page} must load booha-sfx.js before the medal toast`);
+}
+const utils = fs.readFileSync(path.join(root, 'js', 'game-utils.js'), 'utf8');
+assert(!utils.includes('resultSoundFor'), 'the old result-mp3 helper stays removed');
+for (const g of ['spell-word.js', 'sentence-order.js']) {
+  assert(!fs.readFileSync(path.join(root, 'games', g), 'utf8').includes('unlockCtx'), `${g} must not create a second AudioContext`);
+}
+for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
+  assert(!fs.readFileSync(path.join(root, 'games', g), 'utf8').includes('resultAudio'), `${g}: unused result audio stays removed`);
+}
+
 console.log('Index 22D SFX audit passed: shared WebAudio is audibly boosted, capped, and varied across hub controls.');

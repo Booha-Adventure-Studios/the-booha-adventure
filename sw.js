@@ -416,7 +416,9 @@ const CURRENT_CACHES = {
   // Booha is angry sooner: every tap on the game counts (12 in 3 s; tile games 15).
   // Scorecard sound: tier jingles synthesized in js/game-scorecard.js (no mp3s).
   // Muenba rhythm hits share js/booha-sfx.js (muenba.html loads it).
-  assets: 'booha-assets-2026-639',
+  // Audio Pass 1: utsu-sfx.js shares js/booha-sfx.js (loaded on the world and
+  // profile pages); medal toast sparkles where UtsuSfx is absent; dead audio removed.
+  assets: 'booha-assets-2026-640',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

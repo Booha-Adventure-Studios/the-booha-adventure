@@ -1463,14 +1463,6 @@ const UTILS = {
     return api.reset();
   },
 
-  /* ── Result sound paths (from sfxBase) ── */
-  resultSoundFor(score, sfxBase) {
-    if (score <= 5)  return sfxBase + 'result_0-5.mp3';
-    if (score <= 10) return sfxBase + 'result_6-10.mp3';
-    if (score <= 14) return sfxBase + 'result_11-14.mp3';
-    return sfxBase + 'result_15.mp3';
-  },
-
 };
 
 /* ── Palette Pop pass (2026-11-12): the score pill pops when it changes ──
