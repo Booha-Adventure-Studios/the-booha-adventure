@@ -100,11 +100,23 @@ assert.strictEqual(tierFor(12, 12), 'perfect', 'a perfect run on a shorter deck 
   };
   assert(top(12, 2) > top(11, 2) && top(14, 2) > top(12, 2), 'GREAT climbs with every correct answer');
   assert(top(10, 1) > top(6, 1), 'KEEP GOING ends higher closer to 10');
-  const pops = (stars, calm) => B.scoreTune('great', 12, 15, stars, false, calm).filter(e => e.at < 0.9 && e.kind === 'pop' && [79, 84, 88].includes(e.note) && e.len === 0.22).length;
+  const pops = (stars, calm) => B.scoreTune('great', 12, 15, stars, false, calm).filter(e => e.at < 2 && e.kind === 'pop' && [79, 84, 88].includes(e.note) && e.len === 0.22).length;
   assert.strictEqual(pops(3, false), 3, 'one star pop per earned star');
   assert.strictEqual(B.scoreTune('try', 2, 15, 0, false, true)[0].at, 0, 'reduced motion: the jingle plays straight away, no star pops');
   const legend = B.scoreTune('legend', 15, 15, 3, true, false), perfect = B.scoreTune('perfect', 15, 15, 3, true, false);
   assert(legend.length > perfect.length, 'LEGEND adds a crown flourish on top of PERFECT');
+  // The staged reveal: a count-up tick per correct answer, a clunk per missed star, a boom when the tier lands,
+  // a stamp for a new best, and nothing of the build-up when motion is reduced.
+  const great2 = B.scoreTune('great', 12, 15, 2, false, false, true);
+  assert.strictEqual(great2.filter(e => e.kind === 'tick').length, 12, 'one count-up tick per correct answer');
+  assert.strictEqual(great2.filter(e => e.kind === 'clunk').length, 1, 'a missed star lands with a clunk');
+  assert(great2.some(e => e.kind === 'boom' && Math.abs(e.at - B.REVEAL.tier) < 0.01), 'the tier word lands on a boom');
+  assert(great2.some(e => e.kind === 'stamp'), 'NEW BEST gets a stamp');
+  assert(!B.scoreTune('great', 12, 15, 2, false, false, false).some(e => e.kind === 'stamp'), 'no stamp without a new best');
+  assert(!B.scoreTune('great', 12, 15, 2, false, true, true).some(e => ['tick', 'roll', 'boom', 'clunk', 'stamp'].includes(e.kind)), 'reduced motion keeps the plain jingle');
+  assert(Math.max(...great2.map(e => e.at)) < 6, 'the whole reveal stays short');
+  assert(/bsc-later/.test(cardSrc) && /addEventListener\('pointerdown', onSkip, true\)/.test(cardSrc), 'buttons arrive last and a tap skips the reveal');
+  assert(!/new Audio\(/.test(cardSrc) && /boo-dance\.mp3/.test(cardSrc) && /decodeAudioData/.test(cardSrc), 'the dance tune is decoded on the shared context');
 }
 
 console.log('Games score-card audit passed: nine engines open the shared card, old panels hidden, shims safe, five tiers mapped.');

@@ -1104,6 +1104,42 @@ html[data-power="reduced"] *, html[data-power="minimal"] * {
 @media (prefers-reduced-motion: reduce) { .bsc-rainbow::after { animation: none; display: none; } }
 @keyframes bscPop { from { opacity: 0; transform: scale(.2) rotate(-20deg); } to { opacity: 1; transform: none; } }
 
+/* ── Staged reveal: count-up, stars stamp one by one, the tier word slams in, Booha reacts ── */
+.bsc-tierrow { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.bsc-booha { width: 64px; height: 64px; object-fit: contain; flex: none; }
+.bsc-booha-try { filter: saturate(.7); transform: rotate(-8deg) translateY(4px); }
+.bsc-staged .bsc-star { animation: none; opacity: 0; transform: scale(2.4); }
+.bsc-staged .bsc-star.bsc-stamp.on { animation: bscStamp .32s cubic-bezier(.2,1.5,.5,1) both; }
+.bsc-staged .bsc-star.bsc-stamp.off { animation: bscDrop .4s cubic-bezier(.4,0,.6,1.4) both; }
+.bsc-card .bsc-star.bsc-instant, .bsc-revealed .bsc-crown { animation: none; opacity: 1; transform: none; }
+.bsc-staged .bsc-crown,
+.bsc-staged .bsc-tierrow, .bsc-staged .bsc-jp, .bsc-staged .bsc-en { opacity: 0; }
+.bsc-staged.bsc-slammed .bsc-tierrow { animation: bscSlam .42s cubic-bezier(.2,1.6,.4,1) both; }
+.bsc-staged.bsc-slammed .bsc-crown { animation: bscPop .5s cubic-bezier(.3,1.6,.5,1) .1s both; }
+.bsc-staged.bsc-slammed .bsc-jp, .bsc-staged.bsc-slammed .bsc-en { animation: bscRise .35s ease-out .18s both; }
+.bsc-slammed .bsc-booha-try { animation: bscDroop 1.6s ease-in-out .2s both; }
+.bsc-slammed .bsc-booha-keep { animation: bscSway 1.4s ease-in-out .1s 2; }
+.bsc-slammed .bsc-booha-great, .bsc-slammed .bsc-booha-perfect, .bsc-slammed .bsc-booha-legend { animation: bscHop .38s ease-out .1s 6 alternate; }
+.bsc-correct.bsc-landed { display: inline-block; animation: bscLand .3s cubic-bezier(.2,1.6,.4,1); }
+.bsc-staged .bsc-stampee { opacity: 0; }
+.bsc-staged.bsc-best-stamped .bsc-stampee { animation: bscStamp .32s cubic-bezier(.2,1.5,.5,1) both; }
+.bsc-staged .bsc-later { opacity: 0; pointer-events: none; }
+.bsc-revealed .bsc-later { animation: bscRise .35s ease-out both; }
+.bsc-flash { position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: radial-gradient(circle at 50% 40%, rgba(255,240,180,.9), rgba(255,200,80,.25) 45%, transparent 70%);
+  animation: bscFlash .8s ease-out both; }
+.bsc-flash-legend { background: radial-gradient(circle at 50% 40%, #fff, rgba(255,120,220,.55) 35%, rgba(92,200,255,.35) 60%, transparent 80%); }
+@keyframes bscStamp { 0% { opacity: 0; transform: scale(2.4) rotate(-12deg); } 60% { opacity: 1; transform: scale(.88); } 100% { opacity: 1; transform: none; } }
+@keyframes bscDrop { 0% { opacity: 0; transform: translateY(-40px) scale(1); } 70% { opacity: 1; transform: translateY(6px) rotate(6deg); } 100% { opacity: 1; transform: rotate(4deg); } }
+@keyframes bscSlam { 0% { opacity: 0; transform: scale(3); letter-spacing: .3em; } 55% { opacity: 1; transform: scale(.9); } 100% { opacity: 1; transform: none; } }
+@keyframes bscRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes bscLand { 50% { transform: scale(1.25); } }
+@keyframes bscFlash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes bscDroop { 0% { transform: rotate(-8deg) translateY(4px); } 60% { transform: rotate(-8deg) translateY(8px); } 100% { transform: rotate(6deg) translateY(-4px); filter: none; } }
+@keyframes bscSway { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-9deg); } 75% { transform: rotate(9deg); } }
+@keyframes bscHop { from { transform: translateY(0) scale(1); } to { transform: translateY(-12px) scale(1.06); } }
+@media (max-width: 520px) { .bsc-booha { width: 48px; height: 48px; } }
+
 .bsc-tier { font-family: var(--game-font-title); font-weight: 400; font-size: clamp(40px, 9vw, 60px);
   line-height: 1; letter-spacing: .03em; color: var(--bsc-c);
   text-shadow: 0 0 22px color-mix(in srgb, var(--bsc-c) 45%, transparent); margin-top: 2px; }
