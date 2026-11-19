@@ -185,6 +185,10 @@
     return (d.getMonth() + 1) + '/' + d.getDate();
   }
 
+  function tapSfx(name) {   // Audio Pass 6: light UI sounds (js/ui/tap-sfx.js)
+    try { var T = typeof window !== 'undefined' && window.BoohaTapSfx; if (T) T.play(name); } catch (_) {}
+  }
+
   function openCard(id) {
     var list = foundList();
     var index = list.findIndex(function (item) { return item.id === id; });
@@ -237,7 +241,7 @@
     document.documentElement.classList.add('wmodal-open');
     modal.querySelector('.wmodal-close').addEventListener('click', closeCard);
     modal.querySelectorAll('.wmodal-step').forEach(function (b) {
-      b.addEventListener('click', function () { step(Number(b.getAttribute('data-step'))); });
+      b.addEventListener('click', function () { var d = Number(b.getAttribute('data-step')); tapSfx(d > 0 ? 'next' : 'prev'); step(d); });
     });
     modal.querySelector('.wmodal-close').focus();
   }
@@ -252,6 +256,7 @@
 
   function closeCard() {
     if (!modal) return;
+    if (!modal.hidden) tapSfx('close');
     modal.hidden = true;
     document.documentElement.classList.remove('wmodal-open');
     if (returnFocus && document.body.contains(returnFocus)) returnFocus.focus();
@@ -262,6 +267,7 @@
       button.addEventListener('click', function () {
         var next = button.getAttribute('data-collection-filter');
         if (FILTERS.indexOf(next) >= 0) activeFilter = next;
+        tapSfx('select');
         render();
       });
     });
@@ -271,6 +277,7 @@
         var card = e.target.closest('[data-wanderer-id]');
         if (!card) return;
         returnFocus = card;
+        tapSfx('open');
         openCard(card.getAttribute('data-wanderer-id'));
       });
     }

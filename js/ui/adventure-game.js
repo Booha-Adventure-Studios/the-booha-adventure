@@ -234,7 +234,7 @@ const BoohaAdventureGame = (() => {
     host.querySelectorAll('[data-equip]').forEach(btn => {
       btn.addEventListener('click', () => {
         try {
-          if (window.BoohaSkins && BoohaSkins.equip(btn.getAttribute('data-equip'))) render();
+          if (window.BoohaSkins && BoohaSkins.equip(btn.getAttribute('data-equip'))) { tapSfx('equip'); render(); }
         } catch (e) { console.warn('[AdventureGame] equip failed:', e); }
       });
     });
@@ -310,8 +310,13 @@ const BoohaAdventureGame = (() => {
      admired and read. Tap the picture in the cabinet; close with ✕, the
      backdrop or Escape. */
   let lookEl = null, lookReturn = null;
+  function tapSfx(name) {   // Audio Pass 6: light UI sounds (js/ui/tap-sfx.js)
+    try { var T = typeof window !== 'undefined' && window.BoohaTapSfx; if (T) T.play(name); } catch (_) {}
+  }
+
   function closeOddityLook() {
     if (!lookEl || lookEl.hidden) return;
+    tapSfx('close');
     lookEl.classList.remove('open');
     setTimeout(() => { lookEl.hidden = true; }, 220);
     document.documentElement.classList.remove('oddity-look-on');
@@ -321,6 +326,7 @@ const BoohaAdventureGame = (() => {
     const system = window.BoohaCollectibleSystem;
     const item = (system && system.getAll ? system.getAll() : []).find(x => x.id === id && x.found);
     if (!item) return;
+    tapSfx('open');
     if (!lookEl) {
       lookEl = document.createElement('div');
       lookEl.className = 'oddity-look';

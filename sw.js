@@ -425,7 +425,9 @@ const CURRENT_CACHES = {
   // ignores <audio>.volume; worlds, Blocks, Invaders and Happy House use it.
   // Audio Pass 5: speed-game streak stings on buffers + GO cue, locked-tile bonk
   // in menus, portal whoosh/bonk (world-portals.js) with booha-sfx on world profiles.
-  assets: 'booha-assets-2026-644',
+  // Audio Pass 6: js/ui/tap-sfx.js on profile, adventure profile, homework and the
+  // study deck (card mode); quiet while any page video/audio plays.
+  assets: 'booha-assets-2026-645',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };
@@ -533,6 +535,8 @@ const CORE_ASSETS = [
   `${BASE}/js/booha-sfx.js`,
   // Audio Pass 3: end jingle for the standalone bonus pages (Booha Blocks).
   `${BASE}/js/bonus-jingle.js`,
+  // Audio Pass 6: small UI sounds for profile pages, the study deck and homework.
+  `${BASE}/js/ui/tap-sfx.js`,
   `${BASE}/js/game-motion.js`,
   `${BASE}/js/game-pop.js`,
   `${BASE}/assets/img/profile.webp`,

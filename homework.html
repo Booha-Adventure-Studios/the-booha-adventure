@@ -211,9 +211,14 @@
   <script src="./js/core/save-file.js"></script>
   <script src="./js/sync-client.js"></script>
   <script src="./js/core/homework-store.js"></script>
+  <script src="./js/booha-sfx.js"></script>
+  <script src="./js/ui/tap-sfx.js"></script>
   <script>
+  // Audio Pass 6: light UI sounds (js/ui/tap-sfx.js); a no-op without audio.
+  function tapSfx(name) { if (window.BoohaTapSfx) window.BoohaTapSfx.play(name); }
   document.getElementById('mazeBackBtn').addEventListener('click', () => {
-    window.location.href = 'maze.html';
+    tapSfx('back');
+    setTimeout(() => { window.location.href = 'maze.html'; }, 140);
   });
 
   const infoBtn   = document.getElementById('infoBtn');
@@ -348,8 +353,8 @@
     }
     const thisCard=root.querySelector('.week-card.this');
     if(thisCard) selectWeekCard(thisCard);
-    root.querySelectorAll('.week-card').forEach(btn=>btn.addEventListener('click',()=>selectWeekCard(btn)));
-    root.querySelectorAll('.curr-card').forEach(btn=>btn.addEventListener('click',()=>renderTypePicker(selectedMonth,selectedWeek,btn.dataset.curr)));
+    root.querySelectorAll('.week-card').forEach(btn=>btn.addEventListener('click',()=>{ tapSfx('select'); selectWeekCard(btn); }));
+    root.querySelectorAll('.curr-card').forEach(btn=>btn.addEventListener('click',()=>{ tapSfx('select'); renderTypePicker(selectedMonth,selectedWeek,btn.dataset.curr); }));
   }
 
   function renderTypePicker(month, week, curr) {
@@ -374,8 +379,8 @@
         <button class="glow-btn gold-glow" id="backToWeek">Back / もどる</button>
       </div>
     </div>`);
-    document.getElementById('backToWeek').addEventListener('click', renderWeekPicker);
-    root.querySelectorAll('.type-card').forEach(btn=>btn.addEventListener('click',()=>renderSheet(weekCode,curr,btn.dataset.type,false)));
+    document.getElementById('backToWeek').addEventListener('click', ()=>{ tapSfx('back'); renderWeekPicker(); });
+    root.querySelectorAll('.type-card').forEach(btn=>btn.addEventListener('click',()=>{ tapSfx('select'); renderSheet(weekCode,curr,btn.dataset.type,false); }));
   }
 
   async function renderSheet(weekCode, curr, type, hideKnown) {
@@ -409,10 +414,11 @@
     </div>`);
 
     document.getElementById('backToType').addEventListener('click', () => {
+      tapSfx('back');
       const p=parseWeekCode(weekCode);
       if(p) renderTypePicker(p.monthFolder,p.week,curr); else renderWeekPicker();
     });
-    document.getElementById('toggleHide').addEventListener('click', ()=>renderSheet(weekCode,curr,type,!hideKnown));
+    document.getElementById('toggleHide').addEventListener('click', ()=>{ tapSfx('select'); renderSheet(weekCode,curr,type,!hideKnown); });
 
     const list=document.getElementById('hwList');
     if(cards.length===0){ list.innerHTML='<div class="hw-item empty-item">No content found / コンテンツがみつかりません</div>'; return; }
@@ -435,6 +441,7 @@
         const set=getKnown(weekCode,curr,type);
         if(set.has(n)) set.delete(n); else set.add(n);
         if(!saveKnown(weekCode,curr,type,set)) return;   // only change what was saved
+        tapSfx(set.has(n) ? 'tick' : 'untick');
         renderSheet(weekCode,curr,type,hideKnown);
       });
       list.appendChild(item);

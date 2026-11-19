@@ -372,6 +372,10 @@ const BoohaProfileGame = (() => {
     return { next, progress, unlock: candidates[0] || null };
   }
 
+  function tapSfx(name) {   // Audio Pass 6: light UI sounds (js/ui/tap-sfx.js)
+    try { var T = typeof window !== 'undefined' && window.BoohaTapSfx; if (T) T.play(name); } catch (_) {}
+  }
+
   function goNext(kind, s) {
     if (kind === 'daily') {
       const sec = document.querySelector('.pg-daily');
@@ -453,7 +457,7 @@ const BoohaProfileGame = (() => {
     host.querySelectorAll('.pg-sum-go').forEach(btn => {
       const i = Number(btn.dataset.i);
       const kind = i >= 0 && nx.options ? nx.options[i].kind : nx.kind;
-      btn.addEventListener('click', () => goNext(kind, s));
+      btn.addEventListener('click', () => { tapSfx('select'); goNext(kind, s); });
     });
   }
 
@@ -732,6 +736,7 @@ const BoohaProfileGame = (() => {
     host.querySelectorAll('[data-pg-filter]').forEach(btn => {
       btn.addEventListener('click', () => {
         collectionFilter = btn.getAttribute('data-pg-filter');
+        tapSfx('select');
         try { renderCollection(s); } catch (e) { fallback(host, 'Wanderer collection', e); }
         const again = host.querySelector(`[data-pg-filter="${collectionFilter}"]`);
         if (again) again.focus();
@@ -1013,7 +1018,7 @@ const BoohaProfileGame = (() => {
       document.removeEventListener('keydown', onKey);
     };
     const onKey = e => { if (e.key === 'Escape') close(); };
-    host.querySelector('.pg-sealed-close').addEventListener('click', close);
+    host.querySelector('.pg-sealed-close').addEventListener('click', () => { tapSfx('close'); close(); });
     document.addEventListener('keydown', onKey);
     host.querySelector('.pg-sealed-close').focus();
   }

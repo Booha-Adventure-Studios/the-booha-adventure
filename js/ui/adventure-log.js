@@ -137,6 +137,10 @@ const BoohaAdventureLog = (() => {
     return e;
   }
 
+  function tapSfx(name) {   // Audio Pass 6: light UI sounds (js/ui/tap-sfx.js)
+    try { var T = typeof window !== 'undefined' && window.BoohaTapSfx; if (T) T.play(name); } catch (_) {}
+  }
+
   function showMountFallback(mount, label, error) {
     console.error(`[AdventureLog] ${label} section failed:`, error);
     if (!mount) return;
@@ -208,7 +212,7 @@ const BoohaAdventureLog = (() => {
       copy.appendChild(el('span', 'alog-curr-tab-en', label.en));
       copy.appendChild(el('span', 'alog-curr-tab-jp', label.jp));
       b.appendChild(copy);
-      b.addEventListener('click', () => { if (c !== curr && onPick) onPick(c); });
+      b.addEventListener('click', () => { if (c !== curr && onPick) { tapSfx('select'); onPick(c); } });
       tabs.appendChild(b);
     });
     switcher.appendChild(tabs);
@@ -383,12 +387,12 @@ const BoohaAdventureLog = (() => {
     prev.type = 'button';
     prev.setAttribute('aria-label', 'Previous month / まえの月');
     prev.disabled = !canBack;
-    prev.addEventListener('click', () => { calendarOffset++; renderCalendar(mount, dayLog, todayKey, checkIn, dcEvents); });
+    prev.addEventListener('click', () => { tapSfx('prev'); calendarOffset++; renderCalendar(mount, dayLog, todayKey, checkIn, dcEvents); });
     const next = el('button', 'rb-cal-nav', '›');
     next.type = 'button';
     next.setAttribute('aria-label', 'Next month / つぎの月');
     next.disabled = calendarOffset === 0;
-    next.addEventListener('click', () => { calendarOffset = Math.max(0, calendarOffset - 1); renderCalendar(mount, dayLog, todayKey, checkIn, dcEvents); });
+    next.addEventListener('click', () => { tapSfx('next'); calendarOffset = Math.max(0, calendarOffset - 1); renderCalendar(mount, dayLog, todayKey, checkIn, dcEvents); });
     head.appendChild(prev);
     head.appendChild(el('span', 'rb-cal-month', `${Y}年${M}月`));
     head.appendChild(next);
@@ -446,7 +450,8 @@ const BoohaAdventureLog = (() => {
         cell.tabIndex = 0;
         const show = () => {
           if (selectedCell) selectedCell.classList.remove('selected');
-          if (selectedCell === cell) { selectedCell = null; detail.hidden = true; return; }
+          if (selectedCell === cell) { selectedCell = null; detail.hidden = true; tapSfx('close'); return; }
+          tapSfx('open');
           selectedCell = cell;
           cell.classList.add('selected');
           detail.textContent = '';

@@ -168,4 +168,37 @@ for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
   }
 }
 
+// Audio Pass 6: small UI sounds on the quiet pages.
+{
+  const tap = fs.readFileSync(path.join(root, 'js', 'ui', 'tap-sfx.js'), 'utf8');
+  assert(/function mediaPlaying\(\)[\s\S]*?querySelectorAll\('video, audio'\)/.test(tap), 'tap sounds stay quiet while page video/audio plays (intros keep their baked-in audio)');
+  assert(tap.includes("c.state === 'running' ? c : null"), 'tap sounds only on a running context');
+  assert(sw.includes('${BASE}/js/ui/tap-sfx.js'), 'service worker precaches tap-sfx.js');
+  const vm = require('vm');
+  const sb = { window: {}, document: { querySelectorAll: () => [] } }; sb.window.window = sb.window;
+  vm.runInNewContext(tap, sb);
+  ['select', 'back', 'open', 'close', 'next', 'prev', 'flip', 'tick', 'untick', 'equip'].forEach(n =>
+    assert(sb.window.BoohaTapSfx.names.includes(n), `tap sound "${n}" exists`));
+  const pages = {
+    'profile.html': '<script src="./js/ui/tap-sfx.js"></script>',
+    'adventure-profile.html': '<script src="js/ui/tap-sfx.js"></script>',
+    'homework.html': '<script src="./js/ui/tap-sfx.js"></script>',
+    'study-deck.html': '<script src="/the-booha-adventure/js/ui/tap-sfx.js"></script>',
+  };
+  for (const [page, tag] of Object.entries(pages)) {
+    const html = fs.readFileSync(path.join(root, page), 'utf8');
+    assert(html.includes(tag) && /booha-sfx\.js/.test(html), `${page} loads booha-sfx.js and tap-sfx.js`);
+  }
+  const deck = fs.readFileSync(path.join(root, 'js', 'deck-core.js'), 'utf8');
+  assert(deck.includes("if (!playLocked) tapSfx('flip');"), 'a card flip stays quiet while its word plays');
+  const stream = fs.readFileSync(path.join(root, 'js', 'stream-core.js'), 'utf8');
+  assert(!stream.includes('tapSfx'), 'stream (listening) mode stays free of UI sounds');
+  const calls = { 'js/ui/adventure-collection.js': ["tapSfx('open')", "tapSfx('close')"], 'js/ui/adventure-game.js': ["tapSfx('equip')", "tapSfx('open')"],
+    'js/ui/adventure-log.js': ["tapSfx('prev')", "tapSfx('next')"], 'js/ui/profile-game.js': ["tapSfx('select')", "tapSfx('close')"] };
+  for (const [file, list] of Object.entries(calls)) {
+    const src = fs.readFileSync(path.join(root, file), 'utf8');
+    list.forEach(c => assert(src.includes(c), `${file} plays ${c}`));
+  }
+}
+
 console.log('Index 22D SFX audit passed: shared WebAudio is audibly boosted, capped, and varied across hub controls.');

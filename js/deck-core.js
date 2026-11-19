@@ -298,14 +298,19 @@ function playAudio() {
 /* ════════════════════════════
    NAVIGATION
 ════════════════════════════ */
+/* Audio Pass 6: light UI sounds (js/ui/tap-sfx.js). The word audio stops
+   before a next/prev tick, and a flip stays quiet while a word is playing. */
+function tapSfx(name) { if (window.BoohaTapSfx) window.BoohaTapSfx.play(name); }
 function goNext() {
   stopAudio();
+  tapSfx('next');
   idx = (idx + 1) % CARDS.length;
   flipped = false;
   showCard();
 }
-function goPrev() { stopAudio(); idx=(idx-1+CARDS.length)%CARDS.length; flipped=false; showCard(); }
+function goPrev() { stopAudio(); tapSfx('prev'); idx=(idx-1+CARDS.length)%CARDS.length; flipped=false; showCard(); }
 function doFlip() {
+  if (!playLocked) tapSfx('flip');
   flipped = !flipped;
   scene.classList.toggle('flipped', flipped);
   if (FX) FX.flip(flipped);
