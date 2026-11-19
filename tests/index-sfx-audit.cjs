@@ -222,7 +222,9 @@ for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
   assert(T.play('next'), 'a different sound is not blocked by another sound\'s cooldown');
   assert(T.COOLDOWN_MS >= 100 && T.COOLDOWN_MS <= 200, 'tap cooldown stays short enough to feel instant');
   const menu = fs.readFileSync(path.join(root, 'js', 'menu-core.js'), 'utf8');
-  assert(/if \(kind !== 'hover'\) \{[\s\S]*?now - \(cueAt\[kind\] \|\| 0\) < CUE_COOLDOWN_MS/.test(menu), 'menu cues (locked bonk, toggles) have a cooldown');
+  assert(/if \(now < \(cueFreeAt\[kind\] \|\| 0\)\) return;\s*cueFreeAt\[kind\] = now \+ \(CUE_LENGTH_MS\[kind\] \|\| 300\) \+ CUE_BREATH_MS;/.test(menu), 'a menu cue (locked bonk, toggles) cannot restart until it has finished playing, plus a breath');
+  assert(Number((menu.match(/var CUE_BREATH_MS = (\d+);/) || [])[1]) >= 200, 'the breath after a menu cue is noticeable');
+  assert(!/Booha is angry/.test(menu), 'angry Booha is only for the games; menus stay fun');
   const portals = fs.readFileSync(path.join(root, 'js', 'ui', 'world-portals.js'), 'utf8');
   assert(/now - bonkAt < BONK_COOLDOWN_MS/.test(portals), 'locked portal bonk has a cooldown');
   assert(/if \(leaving\) \{ e\.preventDefault\(\); return; \}/.test(portals), 'a leaving portal ignores further taps');

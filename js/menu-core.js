@@ -104,16 +104,19 @@
   }
   var PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19];
   var BASE_HZ = { pb: 523.25, br: 392, bc: 587.33 }[CURR] || 523.25;
-  // Cooldown: a smashed button (locked tile, Extras, sound toggle) repeats
-  // its cue at most every CUE_COOLDOWN_MS. Hover keeps its own 70 ms throttle.
-  var CUE_COOLDOWN_MS = 140;
-  var cueAt = {};
+  // Cooldown: a smashed button (locked tile, Extras, sound toggle) can't
+  // restart its cue until the cue has finished playing, plus a short breath.
+  // Mashing gets the sound at its natural pace, never a pile-up; normal taps
+  // never notice. Hover keeps its own 70 ms throttle (mouse only).
+  var CUE_LENGTH_MS = { select: 600, back: 400, toggle: 130, nope: 340 };
+  var CUE_BREATH_MS = 250;
+  var cueFreeAt = {};
   function cue(kind, i) {
     if (muted) return;
     if (kind !== 'hover') {
       var now = Date.now();
-      if (now - (cueAt[kind] || 0) < CUE_COOLDOWN_MS) return;
-      cueAt[kind] = now;
+      if (now < (cueFreeAt[kind] || 0)) return;
+      cueFreeAt[kind] = now + (CUE_LENGTH_MS[kind] || 300) + CUE_BREATH_MS;
     }
     var c = ctx(); if (!c) return;
     var t = c.currentTime + 0.01, f = BASE_HZ * Math.pow(2, PENTA[(i || 0) % 9] / 12);
