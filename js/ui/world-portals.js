@@ -72,6 +72,10 @@ window.BoohaPortals = (function () {
     g.gain.exponentialRampToValueAtTime(0.0001, t + len);
     o.connect(g); g.connect(out); o.start(t); o.stop(t + len + 0.03);
   }
+  // Cooldown: a smashed locked portal bonks at most every BONK_COOLDOWN_MS,
+  // and once an open portal is leaving, further taps make no sound.
+  var BONK_COOLDOWN_MS = 140;
+  var bonkAt = 0, leaving = false;
   function whoosh() {
     var c = audio();
     if (!c) return false;
@@ -94,6 +98,9 @@ window.BoohaPortals = (function () {
     } catch (_) { return false; }
   }
   function bonk() {
+    var now = Date.now();
+    if (now - bonkAt < BONK_COOLDOWN_MS) return;
+    bonkAt = now;
     var c = audio();
     if (!c) return;
     try {
@@ -109,8 +116,10 @@ window.BoohaPortals = (function () {
       if (link.classList.contains('is-locked')) { bonk(); return; }
       var href = link.getAttribute('href');
       if (!href || e.defaultPrevented || e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (leaving) { e.preventDefault(); return; }
       if (!whoosh()) return;
       e.preventDefault();
+      leaving = true;
       setTimeout(function () { window.location.href = href; }, 280);
     });
   }

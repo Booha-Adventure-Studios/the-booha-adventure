@@ -104,8 +104,17 @@
   }
   var PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19];
   var BASE_HZ = { pb: 523.25, br: 392, bc: 587.33 }[CURR] || 523.25;
+  // Cooldown: a smashed button (locked tile, Extras, sound toggle) repeats
+  // its cue at most every CUE_COOLDOWN_MS. Hover keeps its own 70 ms throttle.
+  var CUE_COOLDOWN_MS = 140;
+  var cueAt = {};
   function cue(kind, i) {
     if (muted) return;
+    if (kind !== 'hover') {
+      var now = Date.now();
+      if (now - (cueAt[kind] || 0) < CUE_COOLDOWN_MS) return;
+      cueAt[kind] = now;
+    }
     var c = ctx(); if (!c) return;
     var t = c.currentTime + 0.01, f = BASE_HZ * Math.pow(2, PENTA[(i || 0) % 9] / 12);
     if (kind === 'hover') { tone(c, f, t, 0.28, 'sine', 0.12); tone(c, f * 4, t, 0.05, 'sine', 0.02); }

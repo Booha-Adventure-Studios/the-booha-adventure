@@ -427,7 +427,8 @@ const CURRENT_CACHES = {
   // in menus, portal whoosh/bonk (world-portals.js) with booha-sfx on world profiles.
   // Audio Pass 6: js/ui/tap-sfx.js on profile, adventure profile, homework and the
   // study deck (card mode); quiet while any page video/audio plays.
-  assets: 'booha-assets-2026-645',
+  // UI sound cooldowns: tap-sfx.js, menu-core.js cues and portal sounds can't be smashed.
+  assets: 'booha-assets-2026-646',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

@@ -68,10 +68,18 @@
     equip:  function (c, o, t) { [1319, 1568, 2093].forEach(function (f, i) { note(c, o, f, t + i * 0.06, 0.22, 0.08); }); }
   };
 
+  /* Cooldown: the same sound can't repeat within COOLDOWN_MS, so a smashed
+     button gives at most a steady quiet tick, never a barrage. */
+  var COOLDOWN_MS = 140;
+  var lastAt = {};
+
   /* Returns true when the sound was scheduled. */
   function play(name) {
     var make = SOUNDS[name];
     if (!make || mediaPlaying()) return false;
+    var now = Date.now();
+    if (now - (lastAt[name] || 0) < COOLDOWN_MS) return false;
+    lastAt[name] = now;
     var c = context();
     if (!c) return false;
     try {
@@ -84,5 +92,5 @@
     } catch (_) { return false; }
   }
 
-  window.BoohaTapSfx = { play: play, names: Object.keys(SOUNDS) };
+  window.BoohaTapSfx = { play: play, names: Object.keys(SOUNDS), COOLDOWN_MS: COOLDOWN_MS };
 })();

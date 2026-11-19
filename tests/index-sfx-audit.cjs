@@ -201,4 +201,31 @@ for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
   }
 }
 
+// Cooldowns: no new UI sound can be smashed into a barrage.
+{
+  const vm = require('vm');
+  const tap = fs.readFileSync(path.join(root, 'js', 'ui', 'tap-sfx.js'), 'utf8');
+  let scheduled = 0;
+  const ctx = { state: 'running', currentTime: 0, sampleRate: 8000, destination: {},
+    createGain() { return { gain: { value: 1, setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {}, disconnect() {} }; },
+    createOscillator() { scheduled++; return { frequency: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {}, start() {}, stop() {} }; },
+    createBuffer() { return { getChannelData: () => new Float32Array(8) }; },
+    createBufferSource() { return { connect() {}, start() {} }; },
+    createBiquadFilter() { return { Q: {}, frequency: { setValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; } };
+  const sb = { window: { BoohaSFX: { context: () => ctx } }, document: { querySelectorAll: () => [] }, setTimeout: () => 0, Date };
+  sb.window.window = sb.window;
+  vm.runInNewContext(tap, sb);
+  const T = sb.window.BoohaTapSfx;
+  let played = 0;
+  for (let i = 0; i < 20; i++) if (T.play('flip')) played++;
+  assert.strictEqual(played, 1, 'twenty instant taps on one button make one sound');
+  assert(T.play('next'), 'a different sound is not blocked by another sound\'s cooldown');
+  assert(T.COOLDOWN_MS >= 100 && T.COOLDOWN_MS <= 200, 'tap cooldown stays short enough to feel instant');
+  const menu = fs.readFileSync(path.join(root, 'js', 'menu-core.js'), 'utf8');
+  assert(/if \(kind !== 'hover'\) \{[\s\S]*?now - \(cueAt\[kind\] \|\| 0\) < CUE_COOLDOWN_MS/.test(menu), 'menu cues (locked bonk, toggles) have a cooldown');
+  const portals = fs.readFileSync(path.join(root, 'js', 'ui', 'world-portals.js'), 'utf8');
+  assert(/now - bonkAt < BONK_COOLDOWN_MS/.test(portals), 'locked portal bonk has a cooldown');
+  assert(/if \(leaving\) \{ e\.preventDefault\(\); return; \}/.test(portals), 'a leaving portal ignores further taps');
+}
+
 console.log('Index 22D SFX audit passed: shared WebAudio is audibly boosted, capped, and varied across hub controls.');
