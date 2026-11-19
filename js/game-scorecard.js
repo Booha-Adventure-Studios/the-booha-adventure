@@ -25,11 +25,11 @@
   if (window.BoohaScorecard) return;
 
   var TIERS = {
-    try:     { label: 'TRY AGAIN',  sound: 'result_0-5.mp3',   en: "Rough start, but you've got this!", kana: 'だいじょうぶ！もういっかい やってみよう。', kanji: 'だいじょうぶ！もう一回やってみよう。' },
-    keep:    { label: 'KEEP GOING', sound: 'result_6-10.mp3',  en: 'Nice effort. You are getting stronger!', kana: 'いいかんじ！どんどん じょうずに なってる。', kanji: 'いい感じ！どんどん上手になってる。' },
-    great:   { label: 'GREAT',      sound: 'result_11-14.mp3', en: 'So close to perfect!', kana: 'すごい！あと すこしで パーフェクト。', kanji: 'すごい！あと少しでパーフェクト。' },
-    perfect: { label: 'PERFECT',    sound: 'result_15.mp3',    en: 'Every answer right!', kana: 'パーフェクト！ぜんぶ せいかい！', kanji: 'パーフェクト！全部正解！' },
-    legend:  { label: 'LEGEND',     sound: 'result_15.mp3',    en: 'Perfect, and not a single slip.', kana: 'レジェンド！いっかいも ミスなし！', kanji: 'レジェンド！一回もミスなし！' }
+    try:     { label: 'TRY AGAIN',  en: "Rough start, but you've got this!", kana: 'だいじょうぶ！もういっかい やってみよう。', kanji: 'だいじょうぶ！もう一回やってみよう。' },
+    keep:    { label: 'KEEP GOING', en: 'Nice effort. You are getting stronger!', kana: 'いいかんじ！どんどん じょうずに なってる。', kanji: 'いい感じ！どんどん上手になってる。' },
+    great:   { label: 'GREAT',      en: 'So close to perfect!', kana: 'すごい！あと すこしで パーフェクト。', kanji: 'すごい！あと少しでパーフェクト。' },
+    perfect: { label: 'PERFECT',    en: 'Every answer right!', kana: 'パーフェクト！ぜんぶ せいかい！', kanji: 'パーフェクト！全部正解！' },
+    legend:  { label: 'LEGEND',     en: 'Perfect, and not a single slip.', kana: 'レジェンド！いっかいも ミスなし！', kanji: 'レジェンド！一回もミスなし！' }
   };
   var STAR_PATH = 'M12 2.2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.4l-6.1 3.4 1.4-6.8-5.1-4.7 6.9-.8z';
   var CROWN_PATH = 'M2 17h22l-2-12-5.5 5L13 2 9.5 10 4 5z';
@@ -76,8 +76,149 @@
   }
 
   var overlay = null;
-  var tierAudio = null;
   var timers = [];
+
+  /* ── Score card sound (Scorecard Sound pass) ───────────────────────
+     Everything is synthesized on the shared Web Audio context
+     (js/booha-sfx.js) and scheduled on the audio clock. The player's taps
+     during the game have already unlocked that context, so iPad Safari has
+     nothing to block. (The old tier mp3s started a new <audio> element
+     more than a second after the last tap, which iPad Safari refuses, and
+     higher scores waited longest.)
+       star pops    one bubbly pop per earned star, rising, landing with the stars
+       rainbow      a quick sparkle run above the pops
+       tier jingle  grows with the score; inside each tier the top note
+                    climbs with every correct answer (12/15 ≠ 14/15)
+     scoreTune() is pure data so tests can check it without audio. */
+  var PENTA = [60, 62, 64, 67, 69, 72, 74, 76, 79, 81, 84, 86, 88, 91, 93, 96, 98, 100, 103];
+  function penta(i) { return PENTA[Math.max(0, Math.min(PENTA.length - 1, i))]; }
+
+  function tierTune(key, s) {
+    var ev = [];
+    var pop = function (at, note, len, vol) { ev.push({ at: at, kind: 'pop', note: note, len: len || 0.22, vol: vol == null ? 0.5 : vol }); };
+    var spark = function (at, note, vol) { ev.push({ at: at, kind: 'spark', note: note, len: 0.2, vol: vol == null ? 0.3 : vol }); };
+    var chord = function (at, notes, len, vol) { ev.push({ at: at, kind: 'chord', notes: notes, len: len, vol: vol == null ? 0.22 : vol }); };
+    var k;
+    if (key === 'try') {
+      // A friendly bounce that still ends going up: "you've got this".
+      k = 5 + Math.round(Math.max(0, Math.min(5.5, s)) / 5.5 * 2);          // C5 · D5 · E5
+      pop(0, 60, 0.18, 0.42); pop(0.15, 67, 0.18, 0.42); pop(0.32, penta(k), 0.42, 0.48);
+    } else if (key === 'keep') {
+      k = 8 + Math.max(0, Math.min(3, Math.round((s - 6) * 0.75)));         // G5 · A5 · C6 · D6
+      pop(0, 67); pop(0.11, 72); pop(0.22, 76); pop(0.36, penta(k), 0.45, 0.55);
+      spark(0.5, penta(k) + 12, 0.18);
+    } else if (key === 'great') {
+      k = 11 + Math.max(0, Math.min(3, Math.round(s - 11)));                // D6 · E6 · G6 · A6
+      pop(0, 72, 0.18); pop(0.09, 76, 0.18); pop(0.18, 79, 0.18); pop(0.27, 84, 0.2);
+      chord(0.4, [72, 76, 79], 0.5, 0.13);
+      pop(0.4, penta(k), 0.5, 0.58);
+      [0, 1, 2].forEach(function (n) { spark(0.55 + n * 0.06, penta(k + 2 + n), 0.2); });
+    } else {
+      // PERFECT fanfare (LEGEND adds the crown flourish below).
+      pop(0, 67, 0.12, 0.45); pop(0.1, 67, 0.12, 0.45);
+      chord(0.22, [72, 76, 79, 84], 0.6, 0.14);
+      pop(0.22, 84, 0.18, 0.55); pop(0.38, 88, 0.18, 0.55); pop(0.54, 91, 0.7, 0.62);
+      [108, 103, 100, 96].forEach(function (n, i) { spark(0.66 + i * 0.07, n, 0.18); });
+      if (key === 'legend') {
+        [96, 98, 100, 103, 105, 108].forEach(function (n, i) { spark(1.1 + i * 0.05, n, 0.26); });
+        chord(1.45, [84, 88, 91, 96], 0.95, 0.13);
+        pop(1.45, 96, 0.9, 0.5);
+      }
+    }
+    return ev;
+  }
+
+  function scoreTune(key, correct, total, stars, rainbow, calm) {
+    var s = total > 0 ? (correct / total) * 15 : 0;
+    var ev = [];
+    var at = 0;
+    if (!calm) {
+      for (var k = 0; k < stars; k++) {
+        ev.push({ at: 0.25 + k * 0.26, kind: 'pop', note: [79, 84, 88][k] || 88, len: 0.22, vol: 0.5 });
+      }
+      at = 0.25 + stars * 0.26 + 0.12;
+      if (rainbow) {
+        [96, 98, 100, 103].forEach(function (n, i) {
+          ev.push({ at: 0.25 + stars * 0.26 + i * 0.07, kind: 'spark', note: n, len: 0.2, vol: 0.26 });
+        });
+        at += 0.26;
+      }
+    }
+    tierTune(key, s).forEach(function (e) { e.at += at; ev.push(e); });
+    return ev;
+  }
+
+  var sfxBus = null;
+  function audioCtx() {
+    try {
+      var S = window.BoohaSFX;
+      var c = S && typeof S.context === 'function' ? S.context() : null;
+      if (!c && window.GAME_UTILS && typeof window.GAME_UTILS._synthCtx === 'function') c = window.GAME_UTILS._synthCtx();
+      return c && c.state !== 'closed' ? c : null;
+    } catch (_) { return null; }
+  }
+  function hz(n) { return 440 * Math.pow(2, (n - 69) / 12); }
+
+  function tone(c, out, type, f, t, len, peak, fromF) {
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type;
+    if (fromF) {
+      o.frequency.setValueAtTime(fromF, t);
+      o.frequency.exponentialRampToValueAtTime(f, t + 0.03);
+    } else o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + len + 0.03);
+  }
+
+  function voice(c, out, t, e) {
+    if (e.kind === 'pop') {
+      // Bubbly pop: a quick upward bloop, a soft chiptune body, a bright click.
+      var f = hz(e.note);
+      tone(c, out, 'sine', f, t, e.len, e.vol, f * 0.62);
+      var lp = c.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.value = 2600; lp.connect(out);
+      tone(c, lp, 'square', f, t, Math.min(0.16, e.len), e.vol * 0.12);
+      tone(c, out, 'sine', f * 2, t, 0.06, e.vol * 0.25);
+    } else if (e.kind === 'spark') {
+      var fs = hz(e.note);
+      tone(c, out, 'sine', fs, t, e.len, e.vol);
+      tone(c, out, 'sine', fs * 2.76, t, e.len * 0.45, e.vol * 0.3);
+    } else if (e.kind === 'chord') {
+      e.notes.forEach(function (n) {
+        tone(c, out, 'triangle', hz(n), t, e.len, e.vol);
+        tone(c, out, 'sine', hz(n) * 1.004, t, e.len * 0.8, e.vol * 0.5);
+      });
+    }
+  }
+
+  function playTune(events) {
+    var c = audioCtx();
+    if (!c || !events.length) return;
+    var opened = Date.now();
+    var start = function () {
+      if (!overlay || sfxBus) return;
+      if (c.state !== 'running' || Date.now() - opened > 1500) return;   // never burst out late
+      try {
+        var comp = c.createDynamicsCompressor();
+        comp.connect(c.destination);
+        sfxBus = c.createGain();
+        sfxBus.gain.value = 0.6;
+        sfxBus.connect(comp);
+        sfxBus._comp = comp;
+        var t0 = c.currentTime + 0.03;
+        events.forEach(function (e) { voice(c, sfxBus, t0 + e.at, e); });
+      } catch (_) {}
+    };
+    if (c.state === 'running') { start(); return; }
+    try {
+      if (window.BoohaSFX && typeof window.BoohaSFX.unlock === 'function') window.BoohaSFX.unlock();
+      var p = c.resume();
+      if (p && p.then) p.then(start, function () {});
+    } catch (_) {}
+  }
 
   /* Chips under the points. Sharp = a correct answer inside the item's
      target time (+25 points each, js/game-utils.js). It is shown only when
@@ -160,9 +301,13 @@
   function stopSound() {
     timers.forEach(clearTimeout);
     timers = [];
-    if (tierAudio) {
-      try { tierAudio.pause(); tierAudio.currentTime = 0; } catch (_) {}
-      tierAudio = null;
+    if (sfxBus) {
+      var bus = sfxBus, c = bus.context;
+      sfxBus = null;
+      try { bus.gain.setTargetAtTime(0.0001, c.currentTime, 0.03); } catch (_) {}
+      setTimeout(function () {
+        try { bus.disconnect(); if (bus._comp) bus._comp.disconnect(); } catch (_) {}
+      }, 250);
     }
   }
 
@@ -346,44 +491,12 @@
     card.setAttribute('tabindex', '-1');
     try { card.focus({ preventScroll: true }); } catch (_) { card.focus(); }
 
-    // One rising ding per earned star, then the tier sound.
-    var playSFX = U && typeof U.playSFX === 'function' ? U.playSFX.bind(U) : null;
-    if (playSFX && !calm) {
-      for (var k = 0; k < stars; k++) {
-        (function (k) {
-          timers.push(setTimeout(function () { playSFX('ding', { rate: 1 + k * 0.12 }); }, 250 + k * 260));
-        })(k);
-      }
-    }
-    var soundAt = calm ? 0 : 250 + stars * 260 + 120;
-    if (rainbow && playSFX && !calm) {
-      // Rainbow: a quick sparkling run above the star dings.
-      [2, 2.25, 2.52, 3].forEach(function (r, n) {
-        timers.push(setTimeout(function () { playSFX('ding', { rate: r, volume: 0.55 }); }, 250 + stars * 260 + n * 70));
-      });
-      soundAt += 260;
-    }
-    if (key === 'legend' && playSFX) {
-      // LEGEND: a bright rising run of dings on top of the PERFECT stinger.
-      [1.5, 1.68, 1.89, 2].forEach(function (r, n) {
-        timers.push(setTimeout(function () { playSFX('ding', { rate: r, volume: 0.8 }); }, soundAt + 500 + n * 160));
-      });
-    }
-    if (cfg.sfxBase && tier.sound) {
-      timers.push(setTimeout(function () {
-        try {
-          tierAudio = new Audio(cfg.sfxBase + tier.sound);
-          tierAudio.setAttribute('playsinline', '');
-          tierAudio.setAttribute('webkit-playsinline', '');
-          var p = tierAudio.play();
-          if (p && p.catch) p.catch(function () {});
-        } catch (_) {}
-      }, soundAt));
-    }
+    // Star pops, rainbow sparkle and the tier jingle, all on the audio clock.
+    playTune(scoreTune(key, correct, total, stars, rainbow, calm));
     return { tier: key, stars: stars, rainbow: rainbow, close: close };
   }
 
-  var api = { show: show, close: close, tierFor: tierFor, runChips: runChips, TIERS: TIERS };
+  var api = { show: show, close: close, tierFor: tierFor, runChips: runChips, scoreTune: scoreTune, TIERS: TIERS };
   window.BoohaScorecard = api;
   if (window.GAME_UTILS) {
     window.GAME_UTILS.showScorecard = function (opts) { return show(opts); };

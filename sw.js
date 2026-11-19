@@ -414,7 +414,9 @@ const CURRENT_CACHES = {
   // Booha is angry: js/game-angry.js (effects bus, voice cooldown, badge); Poopika voice marked.
   // Booha is angry: bail-out record and log scoped per student (booha_userid).
   // Booha is angry sooner: every tap on the game counts (12 in 3 s; tile games 15).
-  assets: 'booha-assets-2026-638',
+  // Scorecard sound: tier jingles synthesized in js/game-scorecard.js (no mp3s).
+  // Muenba rhythm hits share js/booha-sfx.js (muenba.html loads it).
+  assets: 'booha-assets-2026-639',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

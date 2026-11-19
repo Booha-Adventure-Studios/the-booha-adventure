@@ -82,4 +82,29 @@ assert.strictEqual(tierFor(15, 15, true), 'legend', '15/15 with a full combo mus
 assert.strictEqual(tierFor(15, 15, false), 'perfect', '15/15 without a full combo stays PERFECT');
 assert.strictEqual(tierFor(12, 12), 'perfect', 'a perfect run on a shorter deck must be PERFECT');
 
+// Scorecard sound: synthesized on the shared Web Audio context, scheduled on
+// the audio clock. No <audio> element is started late outside a tap (iPad
+// Safari blocks that), and the jingle follows the score inside each tier.
+{
+  assert(!/new Audio\(/.test(cardSrc), 'score card must not start an <audio> element for its sounds');
+  assert(!/result_\d/.test(cardSrc), 'score card must not use the old result mp3s');
+  assert(/window\.BoohaSFX/.test(cardSrc) && /function playTune\(/.test(cardSrc), 'score card plays on the shared BoohaSFX context');
+  assert(/Date\.now\(\) - opened > 1500/.test(cardSrc), 'a sound that could not start in time never bursts out late');
+  const vm = require('vm');
+  const sb = { window: {}, document: {} }; sb.window.window = sb.window;
+  vm.runInNewContext(cardSrc, sb);
+  const B = sb.window.BoohaScorecard;
+  const top = (c, stars) => {
+    const ev = B.scoreTune(B.tierFor(c, 15, false), c, 15, stars, false, false);
+    return Math.max(...ev.filter(e => e.kind === 'pop').map(e => e.note));
+  };
+  assert(top(12, 2) > top(11, 2) && top(14, 2) > top(12, 2), 'GREAT climbs with every correct answer');
+  assert(top(10, 1) > top(6, 1), 'KEEP GOING ends higher closer to 10');
+  const pops = (stars, calm) => B.scoreTune('great', 12, 15, stars, false, calm).filter(e => e.at < 0.9 && e.kind === 'pop' && [79, 84, 88].includes(e.note) && e.len === 0.22).length;
+  assert.strictEqual(pops(3, false), 3, 'one star pop per earned star');
+  assert.strictEqual(B.scoreTune('try', 2, 15, 0, false, true)[0].at, 0, 'reduced motion: the jingle plays straight away, no star pops');
+  const legend = B.scoreTune('legend', 15, 15, 3, true, false), perfect = B.scoreTune('perfect', 15, 15, 3, true, false);
+  assert(legend.length > perfect.length, 'LEGEND adds a crown flourish on top of PERFECT');
+}
+
 console.log('Games score-card audit passed: nine engines open the shared card, old panels hidden, shims safe, five tiers mapped.');

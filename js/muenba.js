@@ -619,20 +619,28 @@
     return !REDUCED_MOTION;
   }
 
-  function getCaseAudioContext() {
-    if (!caseAudioEnabled()) return null;
+  // Rhythm sound is never tied to Reduce Motion; only the reading cues are.
+  // Muenba shares js/booha-sfx.js's context when it is loaded: that engine
+  // re-arms its tap unlock on every touch, including after an iPad
+  // interruption (screen lock, Control Center), so hits can't stay silent.
+  function getMuenbaAudioContext() {
     const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextCtor) return null;
     try {
       if (!caseAudioContext) {
-        caseAudioContext = new AudioContextCtor();
+        const shared = window.BoohaSFX && typeof window.BoohaSFX.context === 'function'
+          ? window.BoohaSFX.context() : null;
+        caseAudioContext = shared || new AudioContextCtor();
         caseAudioMaster = caseAudioContext.createGain();
         caseAudioMaster.gain.value = 0.7;
         caseAudioMaster.connect(caseAudioContext.destination);
       }
       ensureRhythmAudioBuses(caseAudioContext);
-      if (caseAudioContext.state === 'suspended' && typeof caseAudioContext.resume === 'function') {
-        caseAudioContext.resume().catch(() => {});
+      // iPad also reports 'interrupted'; anything but running/closed retries.
+      const st = caseAudioContext.state;
+      if (st !== 'running' && st !== 'closed' && typeof caseAudioContext.resume === 'function') {
+        const resumed = caseAudioContext.resume();
+        if (resumed && typeof resumed.catch === 'function') resumed.catch(() => {});
       }
       return caseAudioContext;
     } catch (_) {
@@ -646,8 +654,13 @@
     }
   }
 
+  function getCaseAudioContext() {
+    if (!caseAudioEnabled()) return null;
+    return getMuenbaAudioContext();
+  }
+
   function primeRhythmSfx() {
-    const context = getCaseAudioContext();
+    const context = getMuenbaAudioContext();
     if (!context || typeof fetch !== 'function' || typeof context.decodeAudioData !== 'function') {
       return Promise.resolve(false);
     }
@@ -662,7 +675,11 @@
         if (!response.ok) throw new Error(`Rhythm SFX request failed: ${response.status}`);
         return response.arrayBuffer();
       })
-      .then(arrayBuffer => context.decodeAudioData(arrayBuffer));
+      .then(arrayBuffer => new Promise((resolve, reject) => {
+        // Callback form: older iPads (Safari < 14.1) have no promise form.
+        const decoded = context.decodeAudioData(arrayBuffer, resolve, reject);
+        if (decoded && typeof decoded.then === 'function') decoded.then(resolve, reject);
+      }));
 
     rhythmAudioLoadPromise = Promise.all([
       loadBuffer(RHYTHM_HIT_SFX_URL),
@@ -2526,12 +2543,18 @@
   // the browser sees it as an explicit user activation before the click
   // handler changes the capture phase.
   function unlockRhythmAudioFromGesture() {
-    const context = getCaseAudioContext();
+    const context = getMuenbaAudioContext();
     if (!context) return;
     try {
-      if (context.state === 'suspended' && typeof context.resume === 'function') {
-        const result = context.resume();
-        if (result && typeof result.catch === 'function') result.catch(() => {});
+      if (window.BoohaSFX && typeof window.BoohaSFX.unlock === 'function') {
+        window.BoohaSFX.unlock();
+      } else {
+        // getMuenbaAudioContext() already asked to resume; iPad also needs a
+        // source started inside the gesture itself.
+        const silent = context.createBufferSource();
+        silent.buffer = context.createBuffer(1, 1, 22050);
+        silent.connect(context.destination);
+        silent.start(0);
       }
     } catch (_) {}
     primeRhythmSfx();
@@ -4131,10 +4154,15 @@
   }
 
   function playRhythmAudioBuffer(result) {
-    const context = getCaseAudioContext();
+    const context = getMuenbaAudioContext();
     const buffer = result === 'miss' ? rhythmMissAudioBuffer : rhythmHitAudioBuffer;
     const bus = result === 'miss' ? rhythmMissAudioBus : rhythmHitAudioBus;
-    if (!context || !buffer || !bus || context.state === 'closed') return false;
+    // A suspended or interrupted context would queue the hit silently and
+    // report success; only a running one counts, otherwise use the fallback.
+    if (!context || !buffer || !bus || context.state !== 'running') {
+      if (context && !buffer) primeRhythmSfx();
+      return false;
+    }
     try {
       const source = context.createBufferSource();
       source.buffer = buffer;
@@ -4165,8 +4193,8 @@
   }
 
   function playRhythmDecoyCue() {
-    const context = getCaseAudioContext();
-    if (!context || !rhythmAudioMaster || context.state === 'closed') return;
+    const context = getMuenbaAudioContext();
+    if (!context || !rhythmAudioMaster || context.state !== 'running') return;
     try {
       const now = context.currentTime;
       const oscillator = context.createOscillator();

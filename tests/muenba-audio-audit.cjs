@@ -7,6 +7,7 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'js', 'muenba.js'), 'utf8');
+const page = fs.readFileSync(path.join(root, 'muenba.html'), 'utf8');
 const audioDir = path.join(root, 'assets', 'img', 'muenba');
 const audioFiles = new Set(fs.readdirSync(audioDir));
 
@@ -47,5 +48,12 @@ assert(source.includes('window.UtsuSfx && window.UtsuSfx.stopDangerScreamSamples
 assert(source.includes('const playResult = dangerRhythmMusic.play();'), 'danger rhythm music must start with the danger chart');
 assert(source.includes('let dangerRhythmPlayToken = 0;'), 'danger rhythm music must guard against stale asynchronous playback');
 assert(source.includes('stopDangerScream();\n    stopDangerRhythmMusic();'), 'leaving Muenba must stop danger audio before navigation');
+
+assert(page.includes('<script src="js/booha-sfx.js"></script>'), 'Muenba must load the shared tap-unlock audio engine');
+assert(source.includes('function getMuenbaAudioContext()'), 'rhythm audio must have a context that is not tied to reduced motion');
+assert(/function playRhythmAudioBuffer\(result\) \{\n    const context = getMuenbaAudioContext\(\);/.test(source), 'rhythm hits must not go silent under Reduce Motion');
+assert(source.includes("context.state !== 'running') {\n      if (context && !buffer) primeRhythmSfx();\n      return false;"), 'a suspended/interrupted context must fall back instead of queuing silence');
+assert(source.includes("if (st !== 'running' && st !== 'closed'"), "iPad 'interrupted' state must also be resumed");
+assert(source.includes('context.decodeAudioData(arrayBuffer, resolve, reject)'), 'rhythm SFX decode must use the callback form for older iPads');
 
 console.log('Muenba audio audit passed: looping BGM, staggered authored danger audio, pooled rhythm SFX, and 18F reading cues.');
