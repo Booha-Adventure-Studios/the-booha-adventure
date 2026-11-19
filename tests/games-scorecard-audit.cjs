@@ -116,7 +116,10 @@ assert.strictEqual(tierFor(12, 12), 'perfect', 'a perfect run on a shorter deck 
   assert(!B.scoreTune('great', 12, 15, 2, false, true, true).some(e => ['tick', 'roll', 'boom', 'clunk', 'stamp'].includes(e.kind)), 'reduced motion keeps the plain jingle');
   assert(Math.max(...great2.map(e => e.at)) < 6, 'the whole reveal stays short');
   assert(/bsc-later/.test(cardSrc) && /addEventListener\('pointerdown', onSkip, true\)/.test(cardSrc), 'buttons arrive last and a tap skips the reveal');
-  assert(!/new Audio\(/.test(cardSrc) && /boo-dance\.mp3/.test(cardSrc) && /decodeAudioData/.test(cardSrc), 'the dance tune is decoded on the shared context');
+  assert(!/\.mp3/.test(cardSrc) && !/booha_ghost/.test(cardSrc), 'the card is all Web Audio and colour: no music track, no Booha art');
+  const perf = B.scoreTune('perfect', 15, 15, 3, false, false, false);
+  assert(perf.some(e => e.kind === 'sweep' && e.at < B.REVEAL.tier) && perf.some(e => e.kind === 'shimmer' && e.at > B.REVEAL.tier), 'PERFECT rises into the slam and shimmers after it');
+  assert(!B.scoreTune('keep', 8, 15, 1, false, false, false).some(e => e.kind === 'sweep'), 'KEEP GOING stays modest');
 }
 
 console.log('Games score-card audit passed: nine engines open the shared card, old panels hidden, shims safe, five tiers mapped.');

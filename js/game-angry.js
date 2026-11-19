@@ -125,6 +125,7 @@
     if (key === voice.key && !voice.playing) { voice.endedAt = Date.now(); if (angry) Badge.cool(); }
   }
   const quietEls = [];
+  const speaking = new Set();   // voice clips playing right now (games quiet their small taps under them)
   const HME = window.HTMLMediaElement;
   const origPlay = HME && HME.prototype.play;
   if (origPlay) {
@@ -137,8 +138,8 @@
         if (!this.__boohaTracked) {
           this.__boohaTracked = true;
           let on = false;
-          const stop = () => { if (on) { on = false; voiceEnd(this.__boohaKey); } };
-          this.addEventListener('playing', () => { if (!on) { on = true; voiceStart(this.__boohaKey); } });
+          const stop = () => { speaking.delete(this); if (on) { on = false; voiceEnd(this.__boohaKey); } };
+          this.addEventListener('playing', () => { speaking.add(this); if (!on) { on = true; voiceStart(this.__boohaKey); } });
           this.addEventListener('ended', stop);
           this.addEventListener('pause', stop);
           this.addEventListener('error', stop);
@@ -287,6 +288,7 @@
     reason: () => reason,
     trip,
     voiceOk, voiceStart, voiceEnd,
+    voicePlaying: () => speaking.size > 0,
     COOLDOWN_MS,
     rules: { FAST, FAST_SPEED, MASH, MASH_TILES, BAIL },
   };

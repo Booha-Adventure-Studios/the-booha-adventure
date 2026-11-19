@@ -430,7 +430,8 @@ const CURRENT_CACHES = {
   // UI sound cooldowns: tap-sfx.js, menu-core.js cues and portal sounds can't be smashed.
   // Game menu: a sound can't restart until it has finished playing, plus 0.25 s.
   // Score card reveal: count-up, stars stamp one by one, tier slam, Booha reacts.
-  assets: 'booha-assets-2026-648',
+  // Score card: colour rays and rings, sweep and shimmer (no music, no Booha); game taps sit above the voice, louder lock thud.
+  assets: 'booha-assets-2026-649',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

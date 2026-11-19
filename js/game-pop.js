@@ -95,18 +95,26 @@ window.BoohaPop = (() => {
     track(s);
     s.connect(f); f.connect(g); g.connect(c.destination); s.start(t);
   }
+  // While the English voice plays, small taps sit lower so the word stays clear.
+  // (Thuds, sparkles and crunches are never lowered.)
+  function underVoice() { try { const A = window.BoohaAngry; return !!(A && A.voicePlaying && A.voicePlaying()); } catch (_) { return false; } }
   const PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51];
   const SFX = {
-    pop() { const c = ctx(); if (!c) return; const t = c.currentTime + .005, f = pick(PENTA);
-      tone(c, 'sine', f * .5, f, t, .06, .14); tone(c, 'triangle', f * 2, 0, t + .03, .06, .035); noise(c, t, .02, .08, 5000, 2); },
+    // A tile tap usually starts a word, so the pop lives above the voice:
+    // short, bright, two octaves up, with an airy click.
+    pop() { const c = ctx(); if (!c) return; const t = c.currentTime + .005, f = pick(PENTA), k = underVoice() ? .5 : 1;
+      tone(c, 'sine', f * 2, f * 4, t, .045, .09 * k); tone(c, 'triangle', f * 4, 0, t + .02, .04, .025 * k); noise(c, t, .015, .06 * k, 7500, 1.5, 'highpass'); },
+    // The English word lands on the Japanese: a thud an iPad speaker can carry
+    // (body at 330→160 Hz over the deep kick) and a sharp two-part clack.
     lock() { const c = ctx(); if (!c) return; const t = c.currentTime + .005;
-      tone(c, 'sine', 150, 52, t, .11, .32); noise(c, t, .018, .16, 2300, 5); noise(c, t + .038, .022, .14, 1600, 5); tone(c, 'square', 78, 0, t + .036, .035, .03); },
+      tone(c, 'sine', 150, 52, t, .14, .34); tone(c, 'triangle', 330, 160, t, .09, .2); tone(c, 'sine', 240, 120, t + .004, .07, .12);
+      noise(c, t, .022, .24, 2600, 4); noise(c, t + .036, .026, .2, 1700, 4); tone(c, 'square', 78, 0, t + .036, .035, .03); },
     unlock() { const c = ctx(); if (!c) return; const t = c.currentTime + .005; noise(c, t, .02, .1, 1500, 4); tone(c, 'sine', 220, 120, t, .07, .09); },
     sparkle(k) { const c = ctx(); if (!c) return; const t = c.currentTime + .05, b = 3 + Math.min(4, k);
       [0, 1, 2].forEach(i => tone(c, 'sine', PENTA[(b + i) % PENTA.length] * 2, 0, t + i * .035, .045, .035)); },
     note(step) { const c = ctx(); if (!c) return; const t = c.currentTime + .004, f = PENTA[Math.min(PENTA.length - 1, step % PENTA.length)] * (step >= PENTA.length ? 2 : 1);
       tone(c, 'triangle', f, 0, t, .09, .06); },
-    tink() { const n = performance.now(); if (n - lastTink < 50) return; lastTink = n; const c = ctx(); if (!c) return; tone(c, 'sine', 2400 + Math.random() * 600, 0, c.currentTime + .003, .03, .03); },
+    tink() { const n = performance.now(); if (n - lastTink < 50) return; lastTink = n; const c = ctx(); if (!c) return; tone(c, 'sine', 2400 + Math.random() * 600, 0, c.currentTime + .003, .03, underVoice() ? .015 : .03); },
     crunch() { const c = ctx(); if (!c) return; const t = c.currentTime + .005; noise(c, t, .12, .22, 700, .9); noise(c, t + .004, .03, .1, 5200, .7, 'highpass'); tone(c, 'square', 95, 48, t, .12, .04); },
     zap() { const c = ctx(); if (!c) return; const t = c.currentTime + .005;
       tone(c, 'sine', 320, 1500, t, .13, .08); tone(c, 'triangle', 640, 2600, t + .02, .1, .03); },

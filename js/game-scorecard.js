@@ -161,6 +161,14 @@
           ev.push({ at: REVEAL.star0 + 3 * REVEAL.starGap - 0.1 + i * 0.05, kind: 'spark', note: nn, len: 0.2, vol: 0.26 });
         });
       }
+      if (key === 'great' || key === 'perfect' || key === 'legend') {
+        // A riser into the slam, then a sparkle run and a shimmer after it.
+        var big2 = key !== 'great';
+        ev.push({ at: REVEAL.tier - 0.42, kind: 'sweep', len: 0.42, vol: big2 ? 0.2 : 0.12 });
+        var run = big2 ? [84, 88, 91, 96, 100, 103, 108] : [84, 88, 91, 96];
+        run.forEach(function (nn, i) { ev.push({ at: REVEAL.tier + 0.62 + i * 0.055, kind: 'spark', note: nn, len: 0.22, vol: 0.2 }); });
+        if (big2) ev.push({ at: REVEAL.tier + 0.62 + run.length * 0.055, kind: 'shimmer', len: key === 'legend' ? 1.3 : 0.9, vol: key === 'legend' ? 0.14 : 0.1 });
+      }
       ev.push({ at: REVEAL.tier, kind: 'boom', len: key === 'try' ? 0.35 : 0.7, vol: { try: 0.22, keep: 0.4, great: 0.55, perfect: 0.65, legend: 0.75 }[key] || 0.4 });
       tierTune(key, s).forEach(function (e) { e.at += REVEAL.tier; ev.push(e); });
       if (newBest) ev.push({ at: REVEAL.best, kind: 'stamp', len: 0.25, vol: 0.5 });
@@ -234,10 +242,29 @@
       // Weight underneath: a falling sine kick plus a short low noise hit.
       var big = e.kind === 'boom';
       tone(c, out, 'sine', big ? 42 : 58, t, e.len, e.vol, big ? 110 : 150);
+      tone(c, out, 'triangle', big ? 120 : 170, t, e.len * 0.5, e.vol * 0.35, big ? 260 : 330);   // body an iPad speaker can play
       var nh = noiseSrc(c, big ? 0.32 : 0.09), lpn = c.createBiquadFilter(), gn = c.createGain();
       lpn.type = 'lowpass'; lpn.frequency.value = big ? 900 : 1800;
       gn.gain.setValueAtTime(e.vol * (big ? 0.5 : 0.4), t); gn.gain.exponentialRampToValueAtTime(0.0001, t + (big ? 0.32 : 0.09));
       nh.connect(lpn); lpn.connect(gn); gn.connect(out); nh.start(t); nh.stop(t + 0.35);
+    } else if (e.kind === 'sweep') {
+      // A riser: filtered noise and a sawtooth gliding up into the tier word.
+      var ns = noiseSrc(c, e.len), bps = c.createBiquadFilter(), gs = c.createGain();
+      bps.type = 'bandpass'; bps.Q.value = 2.5;
+      bps.frequency.setValueAtTime(500, t); bps.frequency.exponentialRampToValueAtTime(6000, t + e.len);
+      gs.gain.setValueAtTime(0.0001, t); gs.gain.exponentialRampToValueAtTime(e.vol, t + e.len * 0.95); gs.gain.exponentialRampToValueAtTime(0.0001, t + e.len + 0.03);
+      ns.connect(bps); bps.connect(gs); gs.connect(out); ns.start(t); ns.stop(t + e.len + 0.05);
+      var os = c.createOscillator(), lps = c.createBiquadFilter(), go = c.createGain();
+      os.type = 'sawtooth'; os.frequency.setValueAtTime(220, t); os.frequency.exponentialRampToValueAtTime(1760, t + e.len);
+      lps.type = 'lowpass'; lps.frequency.value = 2400;
+      go.gain.setValueAtTime(0.0001, t); go.gain.exponentialRampToValueAtTime(e.vol * 0.35, t + e.len * 0.95); go.gain.exponentialRampToValueAtTime(0.0001, t + e.len + 0.03);
+      os.connect(lps); lps.connect(go); go.connect(out); os.start(t); os.stop(t + e.len + 0.05);
+    } else if (e.kind === 'shimmer') {
+      // A glittery tail: quick random high bells thinning out.
+      for (var si = 0; si < 14; si++) {
+        var ft = t + (si / 14) * e.len, fq = hz(96 + [0, 3, 5, 7, 10, 12][Math.floor(Math.random() * 6)]);
+        tone(c, out, 'sine', fq, ft, 0.14, e.vol * (1 - si / 16));
+      }
     } else if (e.kind === 'clunk') {
       tone(c, out, 'triangle', 110, t, e.len, e.vol, 190);
     } else if (e.kind === 'stamp') {
@@ -395,35 +422,18 @@
    * }
    */
   /* ── The reveal ──────────────────────────────────────────────────── */
-  var BOOHA_ART = '/the-booha-adventure/assets/img/';
-  var BOOHA_POSE = { try: 'booha_ghost.webp', keep: 'booha_ghost_dance_sway.webp', great: 'booha_ghost_dance_arms_up.webp', perfect: 'booha_ghost_dance_arms_up.webp', legend: 'booha_ghost_dance_arms_up.webp' };
-  var DANCE_POSES = ['booha_ghost_dance_sway.webp', 'booha_ghost_dance_arms_up.webp', 'booha_ghost_dance_wave.webp'];
-  var danceBuf = null;
-  // PERFECT and LEGEND: Booha dances to a few seconds of boo-dance.mp3,
-  // decoded on the shared Web Audio context (no <audio> element).
-  function loadDance() {
-    var c = audioCtx();
-    if (!c || typeof fetch !== 'function') return null;
-    if (danceBuf) return Promise.resolve(danceBuf);
-    return fetch(BOOHA_ART.replace('img/', 'audio/') + 'boo-dance.mp3')
-      .then(function (r) { return r.ok ? r.arrayBuffer() : null; })
-      .then(function (b) { return b && new Promise(function (res, rej) { var p = c.decodeAudioData(b, res, rej); if (p && p.then) p.then(res, rej); }); })
-      .then(function (buf) { danceBuf = buf || null; return danceBuf; })
-      .catch(function () { return null; });
-  }
-  function playDance(buf, delaySec) {
-    if (!buf || !sfxBus) return;
-    try {
-      var c = sfxBus.context, g = c.createGain(), src = c.createBufferSource();
-      var t = Math.max(c.currentTime + 0.02, (sfxBus._t0 || c.currentTime) + delaySec);
-      src.buffer = buf;
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.42, t + 0.15);
-      g.gain.setValueAtTime(0.42, t + 2.6);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 3.4);
-      src.connect(g); g.connect(sfxBus);
-      src.start(t, 0, 3.5);
-    } catch (_) {}
+  // A colour ring that pulses out from a node (a stamped star, the tier word).
+  function ringOut(node, cls) {
+    if (!overlay || !node || !node.getBoundingClientRect) return;
+    // Size from the layout box, not the on-screen box: the node may be mid-stamp (scaled up).
+    var r = node.getBoundingClientRect(), cs = getComputedStyle(node);
+    var d = Math.min(220, Math.max(parseFloat(cs.width) || r.width, parseFloat(cs.height) || r.height));
+    var ring = el('span', 'bsc-ring ' + (cls || ''));
+    ring.style.left = (r.left + r.width / 2 - d / 2) + 'px';
+    ring.style.top = (r.top + r.height / 2 - d / 2) + 'px';
+    ring.style.width = ring.style.height = d + 'px';
+    overlay.appendChild(ring);
+    setTimeout(function () { ring.remove(); }, 800);
   }
   function shake(node, px) {
     if (!node.animate) return;
@@ -460,14 +470,18 @@
     starsEls.forEach(function (st, i) {
       at(REVEAL.star0 + i * REVEAL.starGap, function () {
         st.classList.add('bsc-stamp');
-        if (i < r.stars) shake(r.card, 3 + i * 2);
+        if (i < r.stars) {
+          shake(r.card, 3 + i * 2);
+          ringOut(st, 'bsc-ring-star');
+          burst(st, 10 + i * 6);
+        }
       });
     });
     // The tier word slams in; Booha reacts; the size of the moment matches the tier.
     at(REVEAL.tier, function () {
       r.card.classList.add('bsc-slammed');
       shake(r.card, { try: 0, keep: 3, great: 6, perfect: 9, legend: 12 }[r.key] || 0);
-      if (r.key === 'great') burst(r.card.querySelector('.bsc-tier'), 40);
+      if (r.key === 'great') { burst(r.card.querySelector('.bsc-tier'), 40); ringOut(r.card.querySelector('.bsc-tier'), 'bsc-ring-gold'); }
       if (r.key === 'perfect' || r.key === 'legend') {
         flash(r.key === 'legend' ? 'bsc-flash-legend' : '');
         burst(r.card.querySelector('.bsc-tier'), 70);
@@ -475,14 +489,8 @@
           if (!d) return;
           at(REVEAL.tier + d, function () { burst(starsEls[j % 3] || r.card, r.key === 'legend' ? 60 : 40); });
         });
-        // Booha dances.
-        var pose = 0;
-        var dance = setInterval(function () {
-          if (!overlay) { clearInterval(dance); return; }
-          r.booha.src = BOOHA_ART + DANCE_POSES[pose++ % DANCE_POSES.length];
-        }, 380);
-        timers.push(setTimeout(function () { clearInterval(dance); r.booha.src = BOOHA_ART + 'booha_ghost_dance_arms_up.webp'; }, 3600));
-        if (r.danceJob) r.danceJob.then(function (buf) { if (!done && overlay) playDance(buf, REVEAL.tier + 0.85); });
+        ringOut(r.card.querySelector('.bsc-tier'), r.key === 'legend' ? 'bsc-ring-rainbow' : 'bsc-ring-gold');
+        at(REVEAL.tier + 0.22, function () { ringOut(r.card.querySelector('.bsc-tier'), r.key === 'legend' ? 'bsc-ring-rainbow' : 'bsc-ring-gold'); });
       }
     });
     if (r.newBest) at(REVEAL.best, function () { r.card.classList.add('bsc-best-stamped'); shake(r.card, 4); });
@@ -538,7 +546,6 @@
     var kana = cfg.curriculum === 'pb';
     var calm = reduced();
     var staged = !calm;          // the beat-by-beat reveal (REVEAL); reduced motion shows it all at once
-    var danceJob = (staged && (key === 'perfect' || key === 'legend')) ? loadDance() : null;
 
     overlay = el('div', 'bsc-overlay');
     overlay.setAttribute('role', 'dialog');
@@ -589,15 +596,13 @@
       card.appendChild(rb);
     }
 
-    // Booha reacts to the result, beside the tier word.
+    // The tier word, with a burst of colour behind it (rays from GREAT up).
     var tierRow = el('div', 'bsc-tierrow');
-    var booha = el('img', 'bsc-booha bsc-booha-' + key);
-    booha.alt = '';
-    booha.decoding = 'async';
-    booha.src = BOOHA_ART + (BOOHA_POSE[key] || BOOHA_POSE.keep);
+    var burstEl = el('div', 'bsc-burst');
+    burstEl.setAttribute('aria-hidden', 'true');
     var h = el('h2', 'bsc-tier', tier.label);
     h.id = 'bsc-tier';
-    tierRow.appendChild(booha);
+    tierRow.appendChild(burstEl);
     tierRow.appendChild(h);
     card.appendChild(tierRow);
     var tierJp = el('p', 'bsc-jp', kana ? tier.kana : tier.kanji);
@@ -693,7 +698,7 @@
 
     overlay.appendChild(card);
     document.body.appendChild(overlay);
-    if (staged) runReveal({ card: card, overlay: overlay, key: key, stars: stars, newBest: newBest, correctEl: correctEl, shown: shown, total: total, booha: booha, danceJob: danceJob, tierTuneEvents: tierTune(key, total > 0 ? (correct / total) * 15 : 0) });
+    if (staged) runReveal({ card: card, overlay: overlay, key: key, stars: stars, newBest: newBest, correctEl: correctEl, shown: shown, total: total, tierTuneEvents: tierTune(key, total > 0 ? (correct / total) * 15 : 0) });
     document.documentElement.classList.add('bsc-open');
     // Focus the card itself so screen readers land in the dialog without a
     // focus ring flashing on the button for touch players.
