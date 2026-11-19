@@ -362,6 +362,11 @@ function ensureAudio() {
   }
 }
 
+// Audio Pass 4: music volume that also works on iPad (js/booha-sfx.js).
+function setTrackVolume(audio, volume) {
+  if (window.BoohaSFX && typeof window.BoohaSFX.setVolume === 'function') window.BoohaSFX.setVolume(audio, volume);
+  else audio.volume = volume;
+}
 function playTone(kind, mult = 1) {
   if (!audioReady || !audioCtx || !audioMaster) return;
   const now = audioNow();
@@ -502,7 +507,7 @@ function setBossMusic(on) {
       if (!bossBgm || bossBgm._src !== src) {
         if (bossBgm) { try { bossBgm.pause(); } catch (_) {} }
         bossBgm = new Audio(src);
-        bossBgm.loop = true; bossBgm.preload = "auto"; bossBgm.volume = 0.9; bossBgm._src = src;
+        bossBgm.loop = true; bossBgm.preload = "auto"; setTrackVolume(bossBgm, 0.9); bossBgm._src = src;
         bossBgm.addEventListener("error", () => {
           if (started && !paused) {
             retryAudioElement(bossBgm);
@@ -2773,7 +2778,7 @@ function startInvadersRun(continueRun) {
     bgm = new Audio(ASSET_PATHS.bgm);
     bgm.loop = true;
     bgm.preload = "auto";
-    bgm.volume = 0.6;
+    setTrackVolume(bgm, 0.6);
     bgm.addEventListener("error", () => {
       if (started && !paused) {
         retryAudioElement(bgm);

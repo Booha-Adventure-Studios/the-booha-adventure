@@ -421,7 +421,9 @@ const CURRENT_CACHES = {
   // Audio Pass 2: reward jingles in js/ui/medal-toast.js (medal tiers, level-up, finds).
   // Audio Pass 3: Booha Blocks and Feed Booha SFX on decoded buffers (booha-sfx.js),
   // Blocks media unlocked muted, star-following end jingle (js/bonus-jingle.js).
-  assets: 'booha-assets-2026-642',
+  // Audio Pass 4: BoohaSFX.setVolume routes music through a GainNode where iOS
+  // ignores <audio>.volume; worlds, Blocks, Invaders and Happy House use it.
+  assets: 'booha-assets-2026-643',
   // Utsuroba episodes gained vocabulary (8 words per memory per level).
   decks:  'booha-decks-2026-315',
 };

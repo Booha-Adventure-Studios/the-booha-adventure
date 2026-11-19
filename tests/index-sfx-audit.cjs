@@ -99,4 +99,50 @@ for (const g of ['vocab-speed.js', 'sentence-speed.js']) {
   assert(T(2, true).length > T(2, false).length, 'a new best adds a sparkle run');
 }
 
+// Audio Pass 4: music volume that works on iPad.
+{
+  const vm = require('vm');
+  const engine = fs.readFileSync(path.join(root, 'js', 'booha-sfx.js'), 'utf8');
+  const run = (ios) => {
+    const routed = [];
+    const ctx = {
+      state: 'running', destination: {},
+      createGain() { return { gain: { value: 1 }, connect() {} }; },
+      createMediaElementSource(el) { routed.push(el); return { connect() {} }; },
+    };
+    const doc = {
+      addEventListener() {}, removeEventListener() {}, visibilityState: 'visible',
+      createElement() { let v = 1; return { get volume() { return v; }, set volume(x) { if (!ios) v = x; } }; },
+    };
+    const win = { addEventListener() {}, document: doc, AudioContext: function () { return ctx; } };
+    win.window = win;
+    vm.runInNewContext(engine, { window: win, document: doc, navigator: {}, console, setTimeout, Map, WeakMap, Promise });
+    const el = { volume: 1 };
+    win.BoohaSFX.setVolume(el, 0.3);
+    win.BoohaSFX.setVolume(el, 0.6);
+    return { routed, el };
+  };
+  const ipad = run(true), desk = run(false);
+  assert.strictEqual(ipad.routed.length, 1, 'iPad: the element is routed through a gain once');
+  assert.strictEqual(desk.routed.length, 0, 'desktop: the element keeps its own volume (no routing)');
+  assert.strictEqual(desk.el.volume, 0.6, 'desktop: volume lands on the element');
+  const tracks = {
+    'js/muenba.js': ['setTrackVolume(music, MUENBA_MUSIC_VOLUME)', 'setTrackVolume(music, MUENBA_SCREAM_DUCK_VOLUME)', 'setTrackVolume(dangerRhythmMusic', 'setTrackVolume(muenbaDance'],
+    'js/grimmerglen.js': ['setTrackVolume(grimmerglenMusic', 'setTrackVolume(grimmerglenDance', 'setTrackVolume(boohaChangeAudio, 0)'],
+    'js/utsuroba.js': ['setTrackVolume(music, 0.65)', 'setTrackVolume(booDance'],
+    'js/karasuki.js': ['setTrackVolume(music, 0.65)'],
+    'js/invaders-engine.js': ['setTrackVolume(bossBgm, 0.9)', 'setTrackVolume(bgm, 0.6)'],
+    'booha_blocks.html': ['setTrackVolume(bgmAudio,0.28)', 'setTrackVolume(dangerAudio,0.55)', 'setTrackVolume(goAudio,0.95)'],
+    'happy_house.html': ['setTrackVolume(bgm, 0.65)'],
+  };
+  for (const [file, calls] of Object.entries(tracks)) {
+    const src = fs.readFileSync(path.join(root, file), 'utf8');
+    calls.forEach(c => assert(src.includes(c), `${file} must set music volume through setTrackVolume: ${c}`));
+    assert(src.includes('BoohaSFX.setVolume'), `${file} must route through BoohaSFX.setVolume`);
+  }
+  for (const page of ['booha_invaders.html', 'happy_house.html']) {
+    assert(fs.readFileSync(path.join(root, page), 'utf8').includes('<script src="./js/booha-sfx.js"></script>'), `${page} must load the shared engine`);
+  }
+}
+
 console.log('Index 22D SFX audit passed: shared WebAudio is audibly boosted, capped, and varied across hub controls.');

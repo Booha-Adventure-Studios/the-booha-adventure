@@ -501,6 +501,7 @@
 </div>
 <!-- ════════════════════════════════════════════════════════ -->
 
+<script src="./js/booha-sfx.js"></script>
 <script>
 (() => {
 
@@ -592,11 +593,16 @@
   let bgm = null;
 
   // Pass 4: defer this long-form track until Happy House is actually entered.
+  // Audio Pass 4: music volume that also works on iPad (js/booha-sfx.js).
+  function setTrackVolume(audio, volume) {
+    if (window.BoohaSFX && typeof window.BoohaSFX.setVolume === 'function') window.BoohaSFX.setVolume(audio, volume);
+    else audio.volume = volume;
+  }
   function ensureHappyHouseBgm() {
     if (!bgm) {
       bgm = new Audio('assets/happy_house/happy-house.mp3');
       bgm.loop = true;
-      bgm.volume = 0.65;
+      setTrackVolume(bgm, 0.65);
     }
     return bgm;
   }

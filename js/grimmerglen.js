@@ -196,14 +196,19 @@
   // memory during the transition. 'metadata' still gives duration/seekability
   // immediately; the audio body itself is only actually fetched once
   // startGrimmerglenMusic() calls .play(), same as before.
+  // Audio Pass 4: music volume that also works on iPad (js/booha-sfx.js).
+  function setTrackVolume(audio, volume) {
+    if (window.BoohaSFX && typeof window.BoohaSFX.setVolume === 'function') window.BoohaSFX.setVolume(audio, volume);
+    else audio.volume = volume;
+  }
   const grimmerglenMusic = new Audio('assets/img/grimmerglen/grimmerglen_bgm.mp3');
   grimmerglenMusic.preload = 'metadata';
   grimmerglenMusic.loop = true;
-  grimmerglenMusic.volume = GRIMMERGLEN_MUSIC_VOLUME;
+  setTrackVolume(grimmerglenMusic, GRIMMERGLEN_MUSIC_VOLUME);
   const grimmerglenDance = new Audio('assets/img/grimmerglen/grimmerglen_dance.mp3');
   grimmerglenDance.preload = 'metadata';
   grimmerglenDance.loop = false;
-  grimmerglenDance.volume = GRIMMERGLEN_DANCE_VOLUME;
+  setTrackVolume(grimmerglenDance, GRIMMERGLEN_DANCE_VOLUME);
   // Perf pass: this is small (44K) but was still set to 'auto' and
   // constructed at module load, well before the change prompt is ever
   // shown -- 'none' defers the actual fetch to beginBoohaChange()'s own
@@ -211,7 +216,7 @@
   const boohaChangeAudio = new Audio('assets/img/grimmerglen/booha_change.mp3');
   boohaChangeAudio.preload = 'none';
   boohaChangeAudio.loop = false;
-  boohaChangeAudio.volume = 0.88;
+  setTrackVolume(boohaChangeAudio, 0.88);
   let boohaChangePromptOpen = false;
   let boohaChangeStartTimer = 0;
   let grimmerglenDanceAudioActive = false;
@@ -2787,14 +2792,14 @@
     // Start the media element from the user gesture so browser autoplay
     // rules are satisfied. It stays silent during the tiny anticipation beat,
     // then resets and becomes audible exactly when the visual change begins.
-    boohaChangeAudio.volume = 0;
+    setTrackVolume(boohaChangeAudio, 0);
     const primingPlayback = boohaChangeAudio.play();
     if (primingPlayback && typeof primingPlayback.catch === 'function') primingPlayback.catch(() => {});
     window.clearTimeout(boohaChangeStartTimer);
     boohaChangeStartTimer = window.setTimeout(() => {
       closeBoohaChangePrompt();
       try { boohaChangeAudio.currentTime = 0; } catch (_) {}
-      boohaChangeAudio.volume = 0.88;
+      setTrackVolume(boohaChangeAudio, 0.88);
       playBoohaChangeAudio();
       playBoohaTransform();
     }, BOOHA_CHANGE_START_DELAY_MS);

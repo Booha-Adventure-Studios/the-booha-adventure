@@ -817,7 +817,9 @@ const bgmAudio=new Audio(BASE+SFX.bgm[0]);
 const dangerAudio=new Audio(BASE+SFX.danger);
 const goAudio=new Audio(BASE+SFX.gameOver);
 bgmAudio.preload='none'; dangerAudio.preload='none'; goAudio.preload='none';
-bgmAudio.volume=0.28; dangerAudio.volume=0.55; dangerAudio.loop=true; goAudio.volume=0.95;
+/* Audio Pass 4: music volume that also works on iPad (js/booha-sfx.js). */
+function setTrackVolume(a,v){ if(window.BoohaSFX&&typeof BoohaSFX.setVolume==='function') BoohaSFX.setVolume(a,v); else a.volume=v; }
+setTrackVolume(bgmAudio,0.28); setTrackVolume(dangerAudio,0.55); dangerAudio.loop=true; setTrackVolume(goAudio,0.95);
 bgmAudio.addEventListener('ended',()=>{ bgmIdx=(bgmIdx+1)%SFX.bgm.length; bgmAudio.src=BASE+SFX.bgm[bgmIdx]; if(audioUnlocked&&gameStarted&&!isGameOver) bgmAudio.play().catch(()=>{}); });
 /* Audio Pass 3: unlock all three media elements inside the start tap, muted.
    iPad ignores .volume, so the old volume-0 trick was audible there, and the

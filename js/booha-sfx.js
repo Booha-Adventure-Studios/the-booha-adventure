@@ -205,6 +205,45 @@
     return dur;
   }
 
+  /* Audio Pass 4: music volume that works on iPad. iOS ignores writes to
+     <audio>.volume (it always reads back 1), so every quieter music level
+     and every "duck the music" moment did nothing there. On those browsers
+     the element is routed once through a GainNode on this context and the
+     volume goes on the gain. Everywhere else the element's own volume is
+     used, so desktop playback is unchanged. A routed element is heard only
+     while the context runs; the tap unlock above keeps it running. */
+  var volumeIgnored = null;
+  function elementVolumeIgnored() {
+    if (volumeIgnored === null) {
+      try {
+        var probe = document.createElement('audio');
+        probe.volume = 0.5;
+        volumeIgnored = Math.abs(probe.volume - 0.5) > 0.01;
+      } catch (_) { volumeIgnored = false; }
+    }
+    return volumeIgnored;
+  }
+  var routes = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function setVolume(el, volume) {
+    if (!el) return;
+    var v = Math.max(0, Math.min(1, Number(volume) || 0));
+    if (!routes || !elementVolumeIgnored()) { try { el.volume = v; } catch (_) {} return; }
+    var route = routes.get(el);
+    if (!route) {
+      var c = ensure();
+      if (!c || typeof c.createMediaElementSource !== 'function') { try { el.volume = v; } catch (_) {} return; }
+      try {
+        var src = c.createMediaElementSource(el);
+        var g = c.createGain();
+        src.connect(g);
+        g.connect(c.destination);
+        route = { gain: g };
+        routes.set(el, route);
+      } catch (_) { try { el.volume = v; } catch (_) {} return; }
+    }
+    try { route.gain.gain.value = v; } catch (_) {}
+  }
+
   // Arm from the start so the very first tap anywhere unlocks audio.
   arm();
 
@@ -216,5 +255,6 @@
     duration: function (name) { var b = buffers.get(name); return b ? b.duration : 0; },
     isRunning: running,
     context: function () { return ensure(); },
+    setVolume: setVolume,
   };
 })();

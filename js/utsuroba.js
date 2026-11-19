@@ -1047,11 +1047,16 @@
   // Constructing the media element only when playback is requested preserves
   // the existing looping behavior without making the browser fetch both
   // tracks while the world is still booting.
+  // Audio Pass 4: music volume that also works on iPad (js/booha-sfx.js).
+  function setTrackVolume(audio, volume) {
+    if (window.BoohaSFX && typeof window.BoohaSFX.setVolume === 'function') window.BoohaSFX.setVolume(audio, volume);
+    else audio.volume = volume;
+  }
   function ensureUtsurobaMusic() {
     if (!music) {
       music = new Audio('./assets/audio/utsuroba-music.mp3');
       music.loop = true;
-      music.volume = 0.65;
+      setTrackVolume(music, 0.65);
     }
     return music;
   }
@@ -1059,7 +1064,7 @@
     if (!booDance) {
       booDance = new Audio('./assets/audio/boo-dance.mp3');
       booDance.loop = true;
-      booDance.volume = 0.72;
+      setTrackVolume(booDance, 0.72);
     }
     return booDance;
   }

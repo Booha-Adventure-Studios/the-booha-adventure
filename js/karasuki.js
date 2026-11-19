@@ -5009,11 +5009,16 @@ const HAPPY_HOUSE_PORTAL = {
 
   // Pass 4: defer the long-form world track until the player first enters
   // an interaction that is allowed to start music.
+  // Audio Pass 4: music volume that also works on iPad (js/booha-sfx.js).
+  function setTrackVolume(audio, volume) {
+    if (window.BoohaSFX && typeof window.BoohaSFX.setVolume === 'function') window.BoohaSFX.setVolume(audio, volume);
+    else audio.volume = volume;
+  }
   function ensureKarasukiMusic() {
     if (!music) {
       music = new Audio('assets/audio/karasuki-music.mp3');
       music.loop = true;
-      music.volume = 0.65;
+      setTrackVolume(music, 0.65);
     }
     return music;
   }

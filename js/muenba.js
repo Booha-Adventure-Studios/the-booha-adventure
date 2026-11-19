@@ -548,6 +548,11 @@
   // Setting preload=none alone is only a browser hint; withholding src makes
   // the entry path genuinely request-free while preserving first-gesture
   // playback below.
+  // Audio Pass 4: music volume that also works on iPad (js/booha-sfx.js).
+  function setTrackVolume(audio, volume) {
+    if (window.BoohaSFX && typeof window.BoohaSFX.setVolume === 'function') window.BoohaSFX.setVolume(audio, volume);
+    else audio.volume = volume;
+  }
   function makeDeferredMuenbaAudio(src) {
     const audio = new Audio();
     audio.preload = 'none';
@@ -562,13 +567,13 @@
 
   const music = makeDeferredMuenbaAudio('assets/img/muenba/Muenba_BGM.mp3');
   music.loop = true;
-  music.volume = MUENBA_MUSIC_VOLUME;
+  setTrackVolume(music, MUENBA_MUSIC_VOLUME);
   const dangerRhythmMusic = makeDeferredMuenbaAudio('assets/img/muenba/rhythm.mp3');
   dangerRhythmMusic.loop = true;
-  dangerRhythmMusic.volume = MUENBA_DANGER_RHYTHM_VOLUME;
+  setTrackVolume(dangerRhythmMusic, MUENBA_DANGER_RHYTHM_VOLUME);
   const muenbaDance = makeDeferredMuenbaAudio('assets/img/muenba/muenba_dance.mp3');
   muenbaDance.loop = false;
-  muenbaDance.volume = 0.72;
+  setTrackVolume(muenbaDance, 0.72);
   let dangerScreamPreloadStarted = false;
   // HTML Audio remains as a compatibility fallback. The primary rhythm path
   // below uses decoded Web Audio buffers so a fast chart does not wait on
@@ -835,7 +840,7 @@
   function startDangerScream(options) {
     options = options || {};
     stopDangerRhythmMusic();
-    music.volume = MUENBA_SCREAM_DUCK_VOLUME;
+    setTrackVolume(music, MUENBA_SCREAM_DUCK_VOLUME);
     try {
       const sound = window.UtsuSfx && window.UtsuSfx.startDangerScreamSamples;
       if (typeof sound === 'function') {
@@ -852,7 +857,7 @@
       const sound = window.UtsuSfx && window.UtsuSfx.stopDangerScreamSamples;
       if (typeof sound === 'function') sound();
     } catch (_) {}
-    music.volume = MUENBA_MUSIC_VOLUME;
+    setTrackVolume(music, MUENBA_MUSIC_VOLUME);
   }
 
   function dangerScreamStateIsActive() {
@@ -943,7 +948,7 @@
       dangerRhythmMusic.pause();
       if (reset) dangerRhythmMusic.currentTime = 0;
     } catch (_) {}
-    music.volume = MUENBA_MUSIC_VOLUME;
+    setTrackVolume(music, MUENBA_MUSIC_VOLUME);
   }
 
   // Reads the same 'muenba_return_room' key enterMuenba() in karasuki.js
